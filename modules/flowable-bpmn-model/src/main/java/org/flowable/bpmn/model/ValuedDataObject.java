@@ -41,20 +41,35 @@ public abstract class ValuedDataObject extends DataObject {
     }
 
     @Override
+    public int hashCode() {
+        int result = 0;
+        result = 31 * result + (itemSubjectRef.getStructureRef() != null ? itemSubjectRef.getStructureRef().hashCode() : 0);
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
+    
+    @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         ValuedDataObject otherObject = (ValuedDataObject) o;
 
-        if (!otherObject.getItemSubjectRef().getStructureRef().equals(this.itemSubjectRef.getStructureRef()))
+        if (!otherObject.getItemSubjectRef().getStructureRef().equals(this.itemSubjectRef.getStructureRef())) {
             return false;
-        if (!otherObject.getId().equals(this.id))
+        }
+        if (!otherObject.getId().equals(this.id)) {
             return false;
-        if (!otherObject.getName().equals(this.name))
+        }
+        if (!otherObject.getName().equals(this.name)) {
             return false;
+        }
         return otherObject.getValue().equals(this.value.toString());
     }
 }

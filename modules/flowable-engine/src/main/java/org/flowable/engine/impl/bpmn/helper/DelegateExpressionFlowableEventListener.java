@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**

@@ -12,22 +12,29 @@
  */
 package org.flowable.examples.bpmn.executionlistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
 public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithRollback() {
 
@@ -43,24 +50,23 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionDependentExecutionListenerProcess", variables);
 
         // execute the only job that should be there 1 time
-        try {
-            managementService.executeJob(managementService.createJobQuery().singleResult().getId());
-
-        } catch (Exception ex) {
-            // expected; serviceTask3 throws exception
-        }
+        assertThatThrownBy(() -> managementService.executeJob(managementService.createJobQuery().singleResult().getId()))
+                .as("serviceTask3 throws exception")
+                .isInstanceOf(Exception.class);
 
         List<CurrentActivityTransactionDependentExecutionListener.CurrentActivity> currentActivities = CurrentActivityTransactionDependentExecutionListener.getCurrentActivities();
-        assertEquals(1, currentActivities.size());
+        assertThat(currentActivities)
+                .extracting(CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityId,
+                        CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityName)
+                .containsExactly(
+                        tuple("serviceTask1", "Service Task 1")
+                );
+        assertThat(currentActivities.get(0).getProcessInstanceId()).isEqualTo(processInstance.getId());
 
-        assertEquals("serviceTask1", currentActivities.get(0).getActivityId());
-        assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
-        assertEquals(processInstance.getId(), currentActivities.get(0).getProcessInstanceId());
-        assertNotNull(currentActivities.get(0).getProcessInstanceId());
-
-        assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithRollback() {
 
@@ -76,24 +82,23 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         runtimeService.startProcessInstanceByKey("transactionDependentExecutionListenerProcess", variables);
 
         // execute the only job that should be there 1 time
-        try {
-            managementService.executeJob(managementService.createJobQuery().singleResult().getId());
-        } catch (Exception ex) {
-            // expected; serviceTask3 throws exception
-        }
+        assertThatThrownBy(() -> managementService.executeJob(managementService.createJobQuery().singleResult().getId()))
+                .as("serviceTask3 throws exception")
+                .isInstanceOf(Exception.class);
 
         List<CurrentActivityTransactionDependentExecutionListener.CurrentActivity> currentActivities = CurrentActivityTransactionDependentExecutionListener.getCurrentActivities();
-        assertEquals(2, currentActivities.size());
-
-        // the before commit listener
-        assertEquals("serviceTask1", currentActivities.get(0).getActivityId());
-        assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
-
-        // the before rolled-back listener
-        assertEquals("serviceTask3", currentActivities.get(1).getActivityId());
-        assertEquals("Service Task 3", currentActivities.get(1).getActivityName());
+        assertThat(currentActivities)
+                .extracting(CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityId,
+                        CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityName)
+                .containsExactly(
+                        // the before commit listener
+                        tuple("serviceTask1", "Service Task 1"),
+                        // the before rolled-back listener
+                        tuple("serviceTask3", "Service Task 3")
+                );
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithExecutionVariables() {
 
@@ -102,23 +107,23 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         runtimeService.startProcessInstanceByKey("transactionDependentExecutionListenerProcess");
 
         List<CurrentActivityTransactionDependentExecutionListener.CurrentActivity> currentActivities = CurrentActivityTransactionDependentExecutionListener.getCurrentActivities();
-        assertEquals(3, currentActivities.size());
+        assertThat(currentActivities)
+                .extracting(CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityId,
+                        CurrentActivityTransactionDependentExecutionListener.CurrentActivity::getActivityName)
+                .containsExactly(
+                        tuple("serviceTask1", "Service Task 1"),
+                        tuple("serviceTask2", "Service Task 2"),
+                        tuple("serviceTask3", "Service Task 3")
+                );
 
-        assertEquals("serviceTask1", currentActivities.get(0).getActivityId());
-        assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
-        assertEquals(0, currentActivities.get(0).getExecutionVariables().size());
-
-        assertEquals("serviceTask2", currentActivities.get(1).getActivityId());
-        assertEquals("Service Task 2", currentActivities.get(1).getActivityName());
-        assertEquals(1, currentActivities.get(1).getExecutionVariables().size());
-        assertEquals("test1", currentActivities.get(1).getExecutionVariables().get("injectedExecutionVariable"));
-
-        assertEquals("serviceTask3", currentActivities.get(2).getActivityId());
-        assertEquals("Service Task 3", currentActivities.get(2).getActivityName());
-        assertEquals(1, currentActivities.get(2).getExecutionVariables().size());
-        assertEquals("test2", currentActivities.get(2).getExecutionVariables().get("injectedExecutionVariable"));
+        assertThat(currentActivities.get(0).getExecutionVariables()).isEmpty();
+        assertThat(currentActivities.get(1).getExecutionVariables())
+                .containsExactly(entry("injectedExecutionVariable", "test1"));
+        assertThat(currentActivities.get(2).getExecutionVariables())
+                .containsExactly(entry("injectedExecutionVariable", "test2"));
     }
 
+    @Test
     @Deployment
     public void testOnCloseFailureExecutionListenersWithTransactionalOperation() {
 
@@ -129,8 +134,9 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-            assertEquals(1, historicProcessInstances.size());
-            assertEquals("transactionDependentExecutionListenerProcess", historicProcessInstances.get(0).getProcessDefinitionKey());
+            assertThat(historicProcessInstances)
+                    .extracting(HistoricProcessInstance::getProcessDefinitionKey)
+                    .containsExactly("transactionDependentExecutionListenerProcess");
         }
 
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("secondTransactionDependentExecutionListenerProcess");
@@ -139,17 +145,21 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // first historic process instance was deleted by execution listener
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-            assertEquals(1, historicProcessInstances.size());
-            assertEquals("secondTransactionDependentExecutionListenerProcess", historicProcessInstances.get(0).getProcessDefinitionKey());
+            assertThat(historicProcessInstances)
+                    .extracting(HistoricProcessInstance::getProcessDefinitionKey)
+                    .containsExactly("secondTransactionDependentExecutionListenerProcess");
         }
 
         List<MyTransactionalOperationTransactionDependentExecutionListener.CurrentActivity> currentActivities = MyTransactionalOperationTransactionDependentExecutionListener.getCurrentActivities();
-        assertEquals(1, currentActivities.size());
-
-        assertEquals("serviceTask1", currentActivities.get(0).getActivityId());
-        assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
+        assertThat(currentActivities)
+                .extracting(MyTransactionalOperationTransactionDependentExecutionListener.CurrentActivity::getActivityId,
+                        MyTransactionalOperationTransactionDependentExecutionListener.CurrentActivity::getActivityName)
+                .containsExactly(
+                        tuple("serviceTask1", "Service Task 1")
+                );
     }
 
+    @Test
     @Deployment
     public void testOnClosedExecutionListenersWithCustomPropertiesResolver() {
 
@@ -158,12 +168,12 @@ public class ExecutionListenerOnTransactionTest extends PluggableFlowableTestCas
         runtimeService.startProcessInstanceByKey("transactionDependentExecutionListenerProcess");
 
         List<CurrentActivityTransactionDependentExecutionListener.CurrentActivity> currentActivities = CurrentActivityTransactionDependentExecutionListener.getCurrentActivities();
-        assertEquals(1, currentActivities.size());
-
-        assertEquals("serviceTask1", currentActivities.get(0).getActivityId());
-        assertEquals("Service Task 1", currentActivities.get(0).getActivityName());
-        assertEquals(1, currentActivities.get(0).getCustomPropertiesMap().size());
-        assertEquals("serviceTask1", currentActivities.get(0).getCustomPropertiesMap().get("customProp1"));
+        assertThat(currentActivities)
+                .extracting(MyTransactionalOperationTransactionDependentExecutionListener.CurrentActivity::getActivityId,
+                        MyTransactionalOperationTransactionDependentExecutionListener.CurrentActivity::getActivityName)
+                .containsExactly(tuple("serviceTask1", "Service Task 1"));
+        assertThat(currentActivities.get(0).getCustomPropertiesMap())
+                .containsExactly(entry("customProp1", "serviceTask1"));
     }
 
 }

@@ -13,8 +13,6 @@
 
 package org.activiti.engine.impl.context;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -29,6 +27,8 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens

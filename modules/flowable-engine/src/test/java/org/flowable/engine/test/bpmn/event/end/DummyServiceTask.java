@@ -12,14 +12,11 @@
  */
 package org.flowable.engine.test.bpmn.event.end;
 
-import java.util.logging.Logger;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.TaskActivityBehavior;
 
 public class DummyServiceTask extends TaskActivityBehavior {
-
-    private static final Logger LOGGER = Logger.getLogger("DummyServiceTask");
 
     public DummyServiceTask() {
         super();

@@ -15,12 +15,12 @@ package org.flowable.osgi;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
+import org.flowable.common.engine.impl.scripting.ScriptEvaluation;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -37,33 +37,22 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope) {
-        Bindings bindings = createBindings(variableScope);
-        return evaluate(script, language, bindings);
+    public ScriptEvaluation evaluate(ScriptEngineRequest request) {
+        return super.evaluate(request);
     }
 
     @Override
-    public Object evaluate(String script, String language, VariableScope variableScope, boolean storeScriptVariables) {
-        return evaluate(script, language, createBindings(variableScope, storeScriptVariables));
-    }
-
-    @Override
-    protected Object evaluate(String script, String language, Bindings bindings) {
+    protected Object evaluate(ScriptEngineRequest request, Bindings bindings) {
         ScriptEngine scriptEngine = null;
         try {
-            scriptEngine = Extender.resolveScriptEngine(language);
+            scriptEngine = Extender.resolveScriptEngine(request.getLanguage());
         } catch (InvalidSyntaxException e) {
             throw new FlowableException("problem resolving scripting engine: " + e.getMessage(), e);
         }
 
         if (scriptEngine == null) {
-            return super.evaluate(script, language, bindings);
+            return super.evaluate(request, bindings);
         }
-
-        try {
-            return scriptEngine.eval(script, bindings);
-        } catch (ScriptException e) {
-            throw new FlowableException("problem evaluating script: " + e.getMessage(), e);
-        }
+        return evaluate(scriptEngine, request, bindings);
     }
 }

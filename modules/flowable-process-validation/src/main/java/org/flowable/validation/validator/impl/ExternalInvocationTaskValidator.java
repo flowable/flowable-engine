@@ -14,7 +14,12 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.CaseServiceTask;
+import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
@@ -23,28 +28,34 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public abstract class ExternalInvocationTaskValidator extends ProcessLevelValidator {
 
     protected void validateFieldDeclarationsForEmail(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
-        boolean toDefined = false;
+        boolean recipientDefined = false;
         boolean textOrHtmlDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
-            if (fieldExtension.getFieldName().equals("to")) {
-                toDefined = true;
+            if ("to".equals(fieldExtension.getFieldName())) {
+                recipientDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("html")) {
+            if ("cc".equals(fieldExtension.getFieldName())) {
+                recipientDefined = true;
+            }
+            if ("bcc".equals(fieldExtension.getFieldName())) {
+                recipientDefined = true;
+            }
+            if ("html".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("htmlVar")) {
+            if ("htmlVar".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("text")) {
+            if ("text".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
-            if (fieldExtension.getFieldName().equals("textVar")) {
+            if ("textVar".equals(fieldExtension.getFieldName())) {
                 textOrHtmlDefined = true;
             }
         }
 
-        if (!toDefined) {
+        if (!recipientDefined) {
             addError(errors, Problems.MAIL_TASK_NO_RECIPIENT, process, task, "No recipient is defined on the mail activity");
         }
         if (!textOrHtmlDefined) {
@@ -59,12 +70,12 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldName = fieldExtension.getFieldName();
             String fieldValue = fieldExtension.getStringValue();
 
-            if (fieldName.equals("command")) {
+            if ("command".equals(fieldName)) {
                 shellCommandDefined = true;
             }
 
-            if ((fieldName.equals("wait") || fieldName.equals("redirectError") || fieldName.equals("cleanEnv")) && !fieldValue.toLowerCase().equals("true") && !fieldValue.toLowerCase().equals("false")) {
-                addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, "Undefined parameter value for shell field");
+            if (("wait".equals(fieldName) || "redirectError".equals(fieldName) || "cleanEnv".equals(fieldName)) && !"true".equals(fieldValue.toLowerCase()) && !"false".equals(fieldValue.toLowerCase())) {
+                addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, fieldExtension, "Undefined parameter value for shell field");
             }
 
         }
@@ -81,13 +92,18 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldName = fieldExtension.getFieldName();
             String fieldValue = fieldExtension.getStringValue();
 
-            if (fieldName.equals("decisionTableReferenceKey") && fieldValue != null && fieldValue.length() > 0) {
+            if ("decisionTableReferenceKey".equals(fieldName) && fieldValue != null && fieldValue.length() > 0) {
                 keyDefined = true;
+                break;
+            }
+            if ("decisionServiceReferenceKey".equals(fieldName) && fieldValue != null && fieldValue.length() > 0) {
+                keyDefined = true;
+                break;
             }
         }
 
         if (!keyDefined) {
-            addError(errors, Problems.DMN_TASK_NO_KEY, process, task, "No decision table reference key is defined on the dmn activity");
+            addError(errors, Problems.DMN_TASK_NO_KEY, process, task, "No decision table or decision service reference key is defined on the dmn activity");
         }
     }
 
@@ -101,11 +117,11 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             String fieldValue = fieldExtension.getStringValue();
             String fieldExpression = fieldExtension.getExpression();
 
-            if (fieldName.equals("requestMethod") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+            if ("requestMethod".equals(fieldName) && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
                 requestMethodDefined = true;
             }
 
-            if (fieldName.equals("requestUrl") && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
+            if ("requestUrl".equals(fieldName) && ((fieldValue != null && fieldValue.length() > 0) || (fieldExpression != null && fieldExpression.length() > 0))) {
                 requestUrlDefined = true;
             }
         }
@@ -119,5 +135,29 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
 
     }
+    
+    protected void validateFieldDeclarationsForCase(org.flowable.bpmn.model.Process process, CaseServiceTask caseServiceTask, List<ValidationError> errors) {
+        if (StringUtils.isEmpty(caseServiceTask.getCaseDefinitionKey())) {
+            addError(errors, Problems.CASE_TASK_NO_CASE_DEFINITION_KEY, process, caseServiceTask, "No case definition key is defined on the case task");
+        }
+    }
+    
+    protected void validateFieldDeclarationsForSendEventTask(org.flowable.bpmn.model.Process process, SendEventServiceTask sendEventServiceTask, List<ValidationError> errors) {
+        if (StringUtils.isEmpty(sendEventServiceTask.getEventType())) {
+            addError(errors, Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
+        }
+        List<ExtensionElement> channelKeyExtensionElements = sendEventServiceTask.getExtensionElements().get("channelKey");
+        if (channelKeyExtensionElements == null || channelKeyExtensionElements.isEmpty() || StringUtils.isEmpty(channelKeyExtensionElements.get(0).getElementText())) {
+            List<ExtensionElement> systemChannelElements = sendEventServiceTask.getExtensionElements().get("systemChannel");
+            if (systemChannelElements == null || systemChannelElements.isEmpty()) {
+                addError(errors, Problems.SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL, process, sendEventServiceTask, "No outbound channel set on the send event task");
+            }
+        }
+    }
 
+    protected void validateExternalWorkerTask(org.flowable.bpmn.model.Process process, ExternalWorkerServiceTask externalWorkerServiceTask, List<ValidationError> errors) {
+        if (StringUtils.isEmpty(externalWorkerServiceTask.getTopic())) {
+            addError(errors, Problems.EXTERNAL_WORKER_TASK_NO_TOPIC, process, externalWorkerServiceTask, "No topic is defined on the external worker task");
+        }
+    }
 }

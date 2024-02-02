@@ -15,33 +15,62 @@ package org.flowable.cmmn.engine.impl.callback;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.callback.CallbackData;
-import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.callback.CallbackData;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
+ * Callback implementation for a child case instance returning it's state change to its parent.
+ *
  * @author Joram Barrez
  */
 public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStateChangeCallback {
 
     @Override
     public void stateChanged(CallbackData callbackData) {
-        
+
         /*
          * The child case instance has the plan item instance id as callback id stored.
-         * When the child case instance is finished, the plan item of the parent case 
+         * When the child case instance is finished, the plan item of the parent case
          * needs to be triggered.
          */
-        
-        if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())
-                || CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
+
+        if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState())
+            || CaseInstanceState.TERMINATED.equals(callbackData.getNewState())) {
+
             CommandContext commandContext = CommandContextUtil.getCommandContext();
-            PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil
-                    .getPlanItemInstanceEntityManager(commandContext).findById(callbackData.getCallbackId());
+            PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                .findById(callbackData.getCallbackId());
+
             if (planItemInstanceEntity != null) {
-                CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+                if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
+                    CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+
+                } else if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())) {
+
+                    if (callbackData.getAdditionalData() != null && callbackData.getAdditionalData().containsKey(CallbackConstants.MANUAL_TERMINATION)) {
+
+                        boolean manualTermination = (Boolean) callbackData.getAdditionalData().get(CallbackConstants.MANUAL_TERMINATION);
+                        if (manualTermination) {
+                            // For a manual termination, the state is simply changed and no additional logic (e.g. out parameter mapping) needs to be done.
+                            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity,
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_TYPE),
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_EVENT_TYPE));
+                        } else {
+                            // a termination through an exit sentry needs to go beyond than just change the state
+                            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity,
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_CRITERION_ID),
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_TYPE),
+                                (String) callbackData.getAdditionalData().get(CallbackConstants.EXIT_EVENT_TYPE));
+                        }
+
+                    }
+
+                }
             }
+
         }
+
     }
 
 }

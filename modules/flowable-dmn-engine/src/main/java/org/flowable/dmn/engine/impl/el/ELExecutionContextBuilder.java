@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,16 +12,21 @@
  */
 package org.flowable.dmn.engine.impl.el;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.flowable.engine.common.api.FlowableException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +38,26 @@ public class ELExecutionContextBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ELExecutionContextBuilder.class);
 
-    public static ELExecutionContext build(Decision decision, Map<String, Object> inputVariables) {
-
+    public static ELExecutionContext build(DecisionService decisionService, ExecuteDecisionContext executeDecisionInfo) {
         ELExecutionContext executionContext = new ELExecutionContext();
+        executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
+        executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
+
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionServiceExecutionAudit(decisionService, executeDecisionInfo));
+
+        return executionContext;
+    }
+
+    public static ELExecutionContext build(Decision decision, ExecuteDecisionContext executeDecisionInfo) {
+        ELExecutionContext executionContext = new ELExecutionContext();
+        executionContext.setInstanceId(executeDecisionInfo.getInstanceId());
+        executionContext.setScopeType(executeDecisionInfo.getScopeType());
+        executionContext.setTenantId(executeDecisionInfo.getTenantId());
+        executionContext.setForceDMN11(decision.isForceDMN11());
 
         // initialize audit trail
-        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeRuleExecutionAudit(decision, inputVariables));
+        executionContext.setAuditContainer(DecisionExecutionAuditUtil.initializeDecisionExecutionAudit(decision, executeDecisionInfo));
 
         DecisionTable decisionTable = (DecisionTable) decision.getExpression();
 
@@ -57,8 +76,8 @@ public class ELExecutionContextBuilder {
             executionContext.setAggregator(decisionTable.getAggregation());
         }
 
+        Map<String, Object> inputVariables = executeDecisionInfo.getVariables();
         preProcessInputVariables(decisionTable, inputVariables);
-
         executionContext.setStackVariables(inputVariables);
 
         LOGGER.debug("Execution Context created");
@@ -96,13 +115,30 @@ public class ELExecutionContextBuilder {
 
         // check if transformation is needed
         for (Map.Entry<String, Object> inputVariable : inputVariables.entrySet()) {
+            String inputVariableName = inputVariable.getKey();
             try {
-                if (inputVariable.getValue() instanceof LocalDate) {
-                    Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
-                    inputVariables.put(inputVariable.getKey(), transformedDate);
+                Object inputVariableValue = inputVariable.getValue();
+                if (inputVariableValue instanceof LocalDate) {
+                    Date transformedDate = ((LocalDate) inputVariableValue).toDate();
+                    inputVariables.put(inputVariableName, transformedDate);
+                } else if (inputVariableValue instanceof java.time.LocalDate) {
+                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariableValue).atStartOfDay()
+                            .atZone(ZoneId.systemDefault())
+                            .toInstant());
+                    inputVariables.put(inputVariableName, transformedDate);
+                } else if (inputVariableValue instanceof Long || inputVariableValue instanceof Integer) {
+                    BigInteger transformedNumber = new BigInteger(inputVariableValue.toString());
+                    inputVariables.put(inputVariableName, transformedNumber);
+                } else if (inputVariableValue instanceof Double ) {
+                    BigDecimal transformedNumber = new BigDecimal((Double) inputVariableValue);
+                    inputVariables.put(inputVariableName, transformedNumber);
+                } else if (inputVariableValue instanceof Float) {
+                    double doubleValue = Double.parseDouble(inputVariableValue.toString());
+                    BigDecimal transformedNumber = new BigDecimal(doubleValue);
+                    inputVariables.put(inputVariableName, transformedNumber);
                 }
             } catch (Exception ex) {
-                throw new FlowableException("error while transforming variable", ex);
+                throw new FlowableException("error while transforming input variable " + inputVariableName + " for decision table " + decisionTable.getId(), ex);
             }
         }
     }

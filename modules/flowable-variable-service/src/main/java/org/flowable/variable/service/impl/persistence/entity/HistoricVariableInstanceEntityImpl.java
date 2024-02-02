@@ -18,14 +18,15 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
  * @author Joram Barrez
  */
-public class HistoricVariableInstanceEntityImpl extends AbstractEntity implements HistoricVariableInstanceEntity, Serializable {
+public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceEntity implements HistoricVariableInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +47,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     protected Double doubleValue;
     protected String textValue;
     protected String textValue2;
-    protected VariableByteArrayRef byteArrayRef;
+    protected ByteArrayRef byteArrayRef;
+
+    protected String metaInfo;
 
     protected Object cachedValue;
 
@@ -75,6 +78,8 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
             persistentState.put("byteArrayRef", byteArrayRef.getId());
         }
 
+        persistentState.put("metaInfo", metaInfo);
+
         persistentState.put("createTime", createTime);
         persistentState.put("lastUpdatedTime", lastUpdatedTime);
 
@@ -94,7 +99,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     @Override
     public byte[] getBytes() {
         if (byteArrayRef != null) {
-            return byteArrayRef.getBytes();
+            return byteArrayRef.getBytes(getEngineType());
         }
         return null;
     }
@@ -102,9 +107,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     @Override
     public void setBytes(byte[] bytes) {
         if (byteArrayRef == null) {
-            byteArrayRef = new VariableByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
-        byteArrayRef.setValue("hist.var-" + name, bytes);
+        byteArrayRef.setValue("hist.var-" + name, bytes, getEngineType());
     }
 
     // getters and setters //////////////////////////////////////////////////////
@@ -275,12 +280,29 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     }
 
     @Override
-    public VariableByteArrayRef getByteArrayRef() {
+    public String getMetaInfo() {
+        return metaInfo;
+    }
+
+    public void setMetaInfo(String metaInfo) {
+        this.metaInfo = metaInfo;
+    }
+
+    @Override
+    public ByteArrayRef getByteArrayRef() {
         return byteArrayRef;
     }
 
     // common methods //////////////////////////////////////////////////////////
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

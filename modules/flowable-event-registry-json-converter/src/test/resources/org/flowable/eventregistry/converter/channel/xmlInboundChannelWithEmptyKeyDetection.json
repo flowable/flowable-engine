@@ -1,0 +1,8 @@
+{
+  "key": "xmlInboundWithEmptyKeyDetection",
+  "channelType": "inbound",
+  "type": "jms",
+  "deserializerType": "xml",
+  "channelEventKeyDetection": {
+  }
+}

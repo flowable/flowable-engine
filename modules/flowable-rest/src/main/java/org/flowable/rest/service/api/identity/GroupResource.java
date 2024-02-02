@@ -13,10 +13,7 @@
 
 package org.flowable.rest.service.api.identity;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -46,7 +44,7 @@ public class GroupResource extends BaseGroupResource {
             @ApiResponse(code = 404, message = "Indicates the requested group does not exist.")
     })
     @GetMapping(value = "/identity/groups/{groupId}", produces = "application/json")
-    public GroupResponse getGroup(@ApiParam(name = "groupId") @PathVariable String groupId, HttpServletRequest request) {
+    public GroupResponse getGroup(@ApiParam(name = "groupId") @PathVariable String groupId) {
         return restResponseFactory.createGroupResponse(getGroupFromRequest(groupId));
     }
 
@@ -58,7 +56,7 @@ public class GroupResource extends BaseGroupResource {
             @ApiResponse(code = 409, message = "Indicates the requested group was updated simultaneously.")
     })
     @PutMapping(value = "/identity/groups/{groupId}", produces = "application/json")
-    public GroupResponse updateGroup(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody GroupRequest groupRequest, HttpServletRequest request) {
+    public GroupResponse updateGroup(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody GroupRequest groupRequest) {
         Group group = getGroupFromRequest(groupId);
 
         if (groupRequest.getId() == null || groupRequest.getId().equals(group.getId())) {
@@ -70,21 +68,26 @@ public class GroupResource extends BaseGroupResource {
             }
             identityService.saveGroup(group);
         } else {
-            throw new FlowableIllegalArgumentException("Key provided in request body doesn't match the key in the resource URL.");
+            throw new FlowableIllegalArgumentException("Key provided in request body does not match the key in the resource URL.");
         }
 
         return restResponseFactory.createGroupResponse(group);
     }
 
-    @ApiOperation(value = "Delete a group", tags = { "Groups" })
+    @ApiOperation(value = "Delete a group", tags = { "Groups" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the group was found and  has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested group does not exist.")
     })
     @DeleteMapping("/identity/groups/{groupId}")
-    public void deleteGroup(@ApiParam(name = "groupId") @PathVariable String groupId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteGroup(@ApiParam(name = "groupId") @PathVariable String groupId) {
         Group group = getGroupFromRequest(groupId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteGroup(group);
+        }
+        
         identityService.deleteGroup(group.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

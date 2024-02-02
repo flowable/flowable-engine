@@ -12,15 +12,21 @@
  */
 package org.flowable.examples.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveUser(identityService.newUser("kermit"));
@@ -32,7 +38,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.createMembership("kermit", "management");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         identityService.deleteUser("fozzie");
         identityService.deleteUser("kermit");
@@ -40,27 +46,30 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.deleteGroup("management");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/usertask/FinancialReportProcess.bpmn20.xml" })
     public void testProcess() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
-        assertEquals(1, tasks.size());
-        org.flowable.task.api.Task task = tasks.get(0);
-        assertEquals("Write monthly financial report", task.getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Write monthly financial report");
+        String taskId = tasks.get(0).getId();
 
-        taskService.claim(task.getId(), "fozzie");
+        taskService.claim(taskId, "fozzie");
         tasks = taskService.createTaskQuery().taskAssignee("fozzie").list();
 
-        assertEquals(1, tasks.size());
-        taskService.complete(task.getId());
+        assertThat(tasks).hasSize(1);
+        taskService.complete(taskId);
 
         tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
         tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
-        assertEquals(1, tasks.size());
-        assertEquals("Verify monthly financial report", tasks.get(0).getName());
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("Verify monthly financial report");
         taskService.complete(tasks.get(0).getId());
 
         assertProcessEnded(processInstance.getId());

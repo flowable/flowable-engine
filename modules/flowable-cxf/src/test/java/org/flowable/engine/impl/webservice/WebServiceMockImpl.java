@@ -14,7 +14,8 @@ package org.flowable.engine.impl.webservice;
 
 import java.util.Date;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
 
 /**
  * An implementation of a Counter WS
@@ -34,12 +35,12 @@ public class WebServiceMockImpl implements WebServiceMock {
     }
 
     @Override
-    public int getCount() {
+    public synchronized int getCount() {
         return this.count;
     }
 
     @Override
-    public void inc() throws MaxValueReachedFault {
+    public synchronized void inc() throws MaxValueReachedFault {
         if (this.count == 123456) {
             throw new RuntimeException("A runtime exception not expected in the processing of the web-service");
         } else if (this.count != Integer.MAX_VALUE) {
@@ -50,12 +51,36 @@ public class WebServiceMockImpl implements WebServiceMock {
     }
 
     @Override
+    public synchronized void add(int value) {
+        this.count += value;
+    }
+
+    @Override
+    public synchronized void addMulti(final int[] values) {
+        for (final int value : values) {
+            this.count += value;
+        }
+    }
+
+    @Override
+    public synchronized void addition(final int value1, final int value2) {
+        this.count += value1;
+        this.count += value2;
+    }
+
+    @Override
+    public synchronized void addOperands(final Operands args) {
+        this.count += args.getArg1();
+        this.count += args.getArg2();
+    }
+
+    @Override
     public void reset() {
         this.setTo(0);
     }
 
     @Override
-    public void setTo(int value) {
+    public synchronized void setTo(int value) {
         this.count = value;
     }
 
@@ -83,5 +108,13 @@ public class WebServiceMockImpl implements WebServiceMock {
     @Override
     public String reservedWordAsName(String prefix, String suffix) {
         return prefix + this.getCount() + suffix;
+    }
+
+    @Override
+    public void returnsSeveralParams(String inParam, Holder<String> outParam1, Holder<Integer> outParam2,
+            Holder<String> outParam3) {
+        outParam1.value = inParam;
+        outParam2.value = Integer.valueOf(inParam);
+        outParam3.value = inParam + "-" + inParam;
     }
 }

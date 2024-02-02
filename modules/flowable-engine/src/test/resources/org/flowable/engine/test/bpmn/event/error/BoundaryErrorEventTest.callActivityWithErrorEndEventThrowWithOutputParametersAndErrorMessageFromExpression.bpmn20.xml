@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.lbswest.de/LWSPlusMaster">
+    <process id="throwError" isExecutable="true">
+        <startEvent id="theStart"/>
+        <endEvent id="errorEndEvent1" name="ErrorEnd">
+            <extensionElements>
+              <flowable:out target="errorMessage" sourceExpression="Custom error message" />
+            </extensionElements>
+            <errorEventDefinition errorRef="myError"/>
+        </endEvent>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask1"/>
+        <serviceTask id="serviceTask1" flowable:expression="${true}"/>
+        <boundaryEvent id="catchScriptError" name="Error" attachedToRef="serviceTask1">
+            <errorEventDefinition/>
+        </boundaryEvent>
+        <sequenceFlow id="flow2" sourceRef="serviceTask1" targetRef="errorEndEvent1"/>
+        <endEvent id="endEvent1" name="End"/>
+        <sequenceFlow id="flow3" sourceRef="catchScriptError" targetRef="endEvent1"/>
+    </process>
+</definitions>

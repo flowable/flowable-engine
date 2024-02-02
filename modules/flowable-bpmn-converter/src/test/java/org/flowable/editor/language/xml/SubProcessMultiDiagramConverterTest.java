@@ -12,9 +12,7 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +30,7 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
 
@@ -59,127 +57,127 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
     }
 
     private void validateModel(BpmnModel model) {
-    	Process process = model.getMainProcess();
-    	Collection<Artifact> artifacts = process.getArtifacts();
+        Process process = model.getMainProcess();
+        Collection<Artifact> artifacts = process.getArtifacts();
         List<ValuedDataObject> dataObjects = process.getDataObjects();
 
-    	// verify main process
-        assertEquals(13, process.getFlowElements().size());
-        assertEquals(2, artifacts.size());
-        assertEquals(6, dataObjects.size());
+        // verify main process
+        assertThat(process.getFlowElements()).hasSize(13);
+        assertThat(artifacts).hasSize(2);
+        assertThat(dataObjects).hasSize(6);
 
         Artifact artifact = artifacts.iterator().next();
-        assertNotNull(artifact);
-        assertEquals("textannotation1", artifact.getId());
-        assertTrue(artifact instanceof TextAnnotation);
-        assertEquals("Test Annotation", ((TextAnnotation) artifact).getText());
+        assertThat(artifact)
+                .isInstanceOfSatisfying(TextAnnotation.class, art -> {
+                    assertThat(art.getId()).isEqualTo("textannotation1");
+                    assertThat(art.getText()).isEqualTo("Test Annotation");
+                });
 
         FlowElement flowElement = process.getFlowElement("start1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                    assertThat(startEvent.getId()).isEqualTo("start1");
+                });
 
         flowElement = process.getFlowElement("userTask1");
-        assertNotNull(flowElement);
-        assertEquals("User task 1", flowElement.getName());
-        assertTrue(flowElement instanceof UserTask);
-        UserTask userTask = (UserTask) flowElement;
-        assertEquals(1, userTask.getCandidateUsers().size());
-        assertEquals(1, userTask.getCandidateGroups().size());
-        
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                    assertThat(userTask.getName()).isEqualTo("User task 1");
+                    assertThat(userTask.getCandidateUsers()).hasSize(1);
+                    assertThat(userTask.getCandidateGroups()).hasSize(1);
+                });
+
         flowElement = process.getFlowElement("subprocess1");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof SubProcess);
+        assertThat(flowElement)
+                .isInstanceOfSatisfying(SubProcess.class, subProcess -> {
+                    assertThat(subProcess.getId()).isEqualTo("subprocess1");
+                    assertThat(subProcess.getFlowElements()).hasSize(11);
 
-        // verify subprocess
-        SubProcess subProcess = (SubProcess) flowElement;
-        artifacts = subProcess.getArtifacts();
-        dataObjects = subProcess.getDataObjects();
+                    // verify subprocess
+                    assertThat(subProcess.getArtifacts()).hasSize(2);
+                    assertThat(subProcess.getDataObjects()).hasSize(6);
 
-        assertEquals(11, subProcess.getFlowElements().size());
-        assertEquals(2, artifacts.size());
-        assertEquals(6, dataObjects.size());
-        
-        artifact = artifacts.iterator().next();
-        assertNotNull(artifact);
-        assertEquals("textannotation2", artifact.getId());
-        assertTrue(artifact instanceof TextAnnotation);
-        assertEquals("Sub Test Annotation", ((TextAnnotation) artifact).getText());
+                    assertThat(subProcess.getArtifacts().iterator().next())
+                            .isInstanceOfSatisfying(TextAnnotation.class, art -> {
+                                assertThat(art.getId()).isEqualTo("textannotation2");
+                                assertThat(art.getText()).isEqualTo("Sub Test Annotation");
+                            });
 
-        flowElement = subProcess.getFlowElement("subStartEvent");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof StartEvent);
+                    assertThat(subProcess.getFlowElement("subStartEvent"))
+                            .isInstanceOfSatisfying(StartEvent.class, startEvent -> {
+                                assertThat(startEvent.getId()).isEqualTo("subStartEvent");
+                            });
 
-        flowElement = subProcess.getFlowElement("subUserTask1");
-        assertNotNull(flowElement);
-        assertEquals("User task 2", flowElement.getName());
-        assertTrue(flowElement instanceof UserTask);
-        userTask = (UserTask) flowElement;
-        assertEquals(0, userTask.getCandidateUsers().size());
-        assertEquals(0, userTask.getCandidateGroups().size());
-}
+                    assertThat(subProcess.getFlowElement("subUserTask1"))
+                            .isInstanceOfSatisfying(UserTask.class, userTask -> {
+                                assertThat(userTask.getName()).isEqualTo("User task 2");
+                                assertThat(userTask.getCandidateUsers()).isEmpty();
+                                assertThat(userTask.getCandidateGroups()).isEmpty();
+                            });
+                });
+    }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	private void validateGraphicInfo(BpmnModel model) throws Exception {
-    	Process process = model.getMainProcess();
-    	List<SubProcess> subList = process.findFlowElementsOfType(SubProcess.class);
-    	Map<String, List<GraphicInfo>> flowLocationMap = model.getFlowLocationMap();
-    	Map<String, GraphicInfo> locationMap = model.getLocationMap();
+        Process process = model.getMainProcess();
+        List<SubProcess> subList = process.findFlowElementsOfType(SubProcess.class);
+        Map<String, List<GraphicInfo>> flowLocationMap = model.getFlowLocationMap();
+        Map<String, GraphicInfo> locationMap = model.getLocationMap();
 
-    	// BPMNDI data
-    	Map<String, Map> baseBpmnDI = parseBPMNDI(new BpmnXMLConverter().convertToXML(model));
-    	
+        // BPMNDI data
+        Map<String, Map> baseBpmnDI = parseBPMNDI(new BpmnXMLConverter().convertToXML(model));
+
         // verify sequence flows/edges
-        assertEquals(7, flowLocationMap.size());
+        assertThat(flowLocationMap).hasSize(7);
 
-    	// verify other elements/shapes
-        assertEquals(9, locationMap.size());
+        // verify other elements/shapes
+        assertThat(locationMap).hasSize(9);
 
-        // verify BPMNDI data
-    	// should have 2 diagrams
-    	assertEquals(2, baseBpmnDI.size());
+        // verify BPMNDI data should have 2 diagrams
+        assertThat(baseBpmnDI).hasSize(2);
 
-		// subprocess diagram
-        assertEquals(1, subList.size());
-    	Map<String, List<GraphicInfo>> multiMainEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_EDGE);
-    	Map<String, GraphicInfo> multiMainShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_SHAPE);
-    	Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);
+        // subprocess diagram
+        assertThat(subList).hasSize(1);
+        Map<String, List<GraphicInfo>> multiMainEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_EDGE);
+        Map<String, GraphicInfo> multiMainShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(process.getId()).get(ELEMENT_DI_SHAPE);
+        Map<String, List<GraphicInfo>> multiSubEdgeMap = (Map<String, List<GraphicInfo>>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_EDGE);
         Map<String, GraphicInfo> multiSubShapeMap = (Map<String, GraphicInfo>) baseBpmnDI.get(subList.get(0).getId()).get(ELEMENT_DI_SHAPE);
 
-    	assertEquals(4, multiMainEdgeMap.size());
-    	assertEquals(5, multiMainShapeMap.size());
-    	assertEquals(3, multiSubEdgeMap.size());
-    	assertEquals(4, multiSubShapeMap.size());
+        assertThat(multiMainEdgeMap).hasSize(4);
+        assertThat(multiMainShapeMap).hasSize(5);
+        assertThat(multiSubEdgeMap).hasSize(3);
+        assertThat(multiSubShapeMap).hasSize(4);
 
-    	// verify annotations are in correct diagram
-    	assertTrue(multiMainShapeMap.containsKey("textannotation1"));
-    	assertTrue(multiSubShapeMap.containsKey("textannotation2"));
-    	assertTrue(multiMainEdgeMap.containsKey("association1"));
-    	assertTrue(multiSubEdgeMap.containsKey("association2"));
+        // verify annotations are in correct diagram
+        assertThat(multiMainShapeMap).containsKey("textannotation1");
+        assertThat(multiSubShapeMap).containsKey("textannotation2");
+        assertThat(multiMainEdgeMap).containsKey("association1");
+        assertThat(multiSubEdgeMap).containsKey("association2");
 
-    	// verify sequence flows/edges
+        // verify sequence flows/edges
         List<GraphicInfo> info;
         List<GraphicInfo> diInfo;
         for (String id : flowLocationMap.keySet()) {
-    		info = new ArrayList<>(flowLocationMap.get(id));
-    		diInfo = multiMainEdgeMap.get(id);
-    		// if not found in main process, must be in subprocess
-    		if (diInfo == null) {
-        		diInfo = multiSubEdgeMap.get(id);
-    		}
-    		assertEquals(info.size(), diInfo.size());
-    		compareCollections(info, diInfo);
-    	}
+            info = new ArrayList<>(flowLocationMap.get(id));
+            diInfo = multiMainEdgeMap.get(id);
+            // if not found in main process, must be in subprocess
+            if (diInfo == null) {
+                diInfo = multiSubEdgeMap.get(id);
+            }
+            assertThat(diInfo).hasSameSizeAs(info);
+            compareCollections(info, diInfo);
+        }
 
     	// verify other elements/shapes
         GraphicInfo shapeInfo;
 		for (String id : locationMap.keySet()) {
-			// compare graphic info for each element
-			shapeInfo = multiMainShapeMap.get(id);
-    		// if not found in main process, must be in subprocess
-			if (shapeInfo == null) {
-				shapeInfo = multiSubShapeMap.get(id);
-			}
-        	assertTrue(locationMap.get(id).equals(shapeInfo));
+            // compare graphic info for each element
+            shapeInfo = multiMainShapeMap.get(id);
+            // if not found in main process, must be in subprocess
+            if (shapeInfo == null) {
+                shapeInfo = multiSubShapeMap.get(id);
+            }
+            assertThat(locationMap.get(id).equals(shapeInfo)).isTrue();
         }
     }
 }

@@ -13,6 +13,7 @@
 package org.flowable.bpmn.model;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -22,6 +23,8 @@ public interface FlowElementsContainer {
     FlowElement getFlowElement(String id);
 
     Collection<FlowElement> getFlowElements();
+    
+    Map<String, FlowElement> getFlowElementMap();
 
     void addFlowElement(FlowElement element);
 
@@ -34,8 +37,15 @@ public interface FlowElementsContainer {
     Artifact getArtifact(String id);
 
     Collection<Artifact> getArtifacts();
+    
+    Map<String, Artifact> getArtifactMap();
 
     void addArtifact(Artifact artifact);
+    
+    void addArtifactToMap(Artifact artifact);
 
     void removeArtifact(String artifactId);
+
+    String getId();
+
 }

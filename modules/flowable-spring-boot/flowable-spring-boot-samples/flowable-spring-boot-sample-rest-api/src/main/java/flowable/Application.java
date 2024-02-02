@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package flowable;
 
 import org.flowable.engine.IdentityService;
@@ -11,7 +23,7 @@ import org.springframework.context.annotation.Bean;
 /**
  * Demonstrates the <A href="http://localhost:8080/">REST API</A>
  */
-@SpringBootApplication
+@SpringBootApplication(proxyBeanMethods = false)
 public class Application {
 
     @Bean
@@ -27,25 +39,18 @@ public class Application {
                 group.setType("security-role");
                 identityService.saveGroup(group);
 
-                User joram = identityService.newUser("jbarrez");
-                joram.setFirstName("Joram");
-                joram.setLastName("Barrez");
-                joram.setPassword("password");
-                identityService.saveUser(joram);
-
                 User josh = identityService.newUser("jlong");
                 josh.setFirstName("Josh");
                 josh.setLastName("Long");
                 josh.setPassword("password");
                 identityService.saveUser(josh);
 
-                identityService.createMembership("jbarrez", "user");
                 identityService.createMembership("jlong", "user");
             }
         };
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }

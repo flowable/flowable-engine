@@ -1,0 +1,16 @@
+{
+    "key": "channel1",
+    "category": "channel",
+    "name": "My channel",
+    "description": "My channel description",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "testQueue",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "fixedValue": "myEvent"
+    },
+    "channelEventTenantIdDetection": {
+        "fixedValue": "testTenant"
+    }
+}

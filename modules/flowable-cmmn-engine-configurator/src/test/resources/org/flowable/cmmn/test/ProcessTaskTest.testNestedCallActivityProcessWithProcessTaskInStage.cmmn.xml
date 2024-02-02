@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="myCase" name="My Case" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <planItem id="planItem4" name="Process Stage" definitionRef="processStage"/>
+            <stage id="processStage" name="Process Stage" flowable:includeInStageOverview="true">
+                <planItem id="planItem1" name="Task One" definitionRef="task1"/>
+                <planItem id="planItem2" name="The Process" definitionRef="processTask1">
+                    <entryCriterion id="entryCriterion1" sentryRef="sentry1"/>
+                </planItem>
+                <planItem id="planItem3" name="Task Two" definitionRef="task2">
+                    <entryCriterion id="entryCriterion2" sentryRef="sentry2"/>
+                </planItem>
+                <sentry id="sentry1">
+                    <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <sentry id="sentry2">
+                    <planItemOnPart id="sentryOnPart2" sourceRef="planItem2">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <task id="task1" name="Task One"/>
+                <processTask id="processTask1" name="The Process" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
+                    <processRefExpression><![CDATA[nestedCallActivity]]></processRefExpression>
+                </processTask>
+                <task id="task2" name="Task Two"/>
+            </stage>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_myCase">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="754.0" width="758.0" x="45.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+                <dc:Bounds height="329.0" width="509.0" x="135.0" y="360.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="149.0" y="405.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="315.0" y="405.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion1" cmmnElementRef="entryCriterion1">
+                <dc:Bounds height="28.0" width="18.0" x="306.0" y="431.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="480.0" y="405.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion2" cmmnElementRef="entryCriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="471.0" y="431.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector1" cmmnElementRef="planItem1" targetCMMNElementRef="entryCriterion1">
+                <di:waypoint x="248.94999999997887" y="445.0"/>
+                <di:waypoint x="282.0" y="445.0"/>
+                <di:waypoint x="282.0" y="445.0"/>
+                <di:waypoint x="306.0" y="445.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector2" cmmnElementRef="planItem2" targetCMMNElementRef="entryCriterion2">
+                <di:waypoint x="414.95000000000005" y="445.0"/>
+                <di:waypoint x="447.5" y="445.0"/>
+                <di:waypoint x="447.5" y="445.0"/>
+                <di:waypoint x="471.0" y="445.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

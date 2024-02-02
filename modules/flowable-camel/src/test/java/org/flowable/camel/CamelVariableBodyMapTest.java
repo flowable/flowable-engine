@@ -12,6 +12,8 @@
  */
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +27,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
 
@@ -36,7 +43,7 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -50,15 +57,16 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
         service1.reset();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
-            camelContext.stopRoute(r.getId());
+            camelContext.getRouteController().stopRoute(r.getId());
             camelContext.removeRoute(r.getId());
         }
     }
 
+    @Test
     @Deployment(resources = {"process/HelloCamelBodyMap.bpmn20.xml"})
     public void testCamelBody() throws Exception {
         Map<String, Object> varMap = new HashMap<>();
@@ -66,13 +74,13 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
         service1.expectedBodiesReceived(varMap);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HelloCamel", varMap);
         // Ensure that the variable is equal to the expected value.
-        assertEquals("hello world", runtimeService.getVariable(processInstance.getId(), "camelBody"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "camelBody")).isEqualTo("hello world");
         service1.assertIsSatisfied();
 
         Task task = taskService.createTaskQuery().singleResult();
 
         // Ensure that the name of the task is correct.
-        assertEquals("Hello Task", task.getName());
+        assertThat(task.getName()).isEqualTo("Hello Task");
 
         // Complete the task.
         taskService.complete(task.getId());

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.FormValue;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.AbstractFormType;
 
 /**

@@ -15,9 +15,11 @@ package org.flowable.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.FormService;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetFormKeyCmd;
 import org.flowable.engine.impl.cmd.GetRenderedStartFormCmd;
 import org.flowable.engine.impl.cmd.GetRenderedTaskFormCmd;
@@ -31,7 +33,7 @@ import org.flowable.engine.runtime.ProcessInstance;
  * @author Tom Baeyens
  * @author Falko Menge (camunda)
  */
-public class FormServiceImpl extends ServiceImpl implements FormService {
+public class FormServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements FormService {
 
     @Override
     public Object getRenderedStartForm(String processDefinitionId) {

@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.engine;
 
 import java.util.Date;
 
-import org.flowable.rest.util.DateToStringSerializer;
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -79,7 +79,7 @@ public class AttachmentResponse {
         this.description = description;
     }
 
-    @ApiModelProperty(value = "Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the the given value.")
+    @ApiModelProperty(value = "Can be any arbitrary value. When a valid formatted media-type (e.g. application/xml, text/plain) is included, the binary content HTTP response content-type will be set the given value.")
     public String getType() {
         return type;
     }

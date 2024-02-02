@@ -19,12 +19,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,11 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     @Autowired
     protected ObjectMapper objectMapper;
 
-    protected List<RestVariable> processVariables(Execution execution, String scope, int variableType) {
-        List<RestVariable> result = new ArrayList<>();
+    public BaseVariableCollectionResource(int variableType) {
+        super(variableType);
+    }
+
+    protected List<RestVariable> processVariables(Execution execution, String scope) {
         Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid execution to get the variables for
@@ -50,33 +53,38 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
 
         if (variableScope == null) {
             // Use both local and global variables
-            addLocalVariables(execution, variableType, variableMap);
-            addGlobalVariables(execution, variableType, variableMap);
+            addLocalVariables(execution, variableMap);
+            addGlobalVariables(execution, variableMap);
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            addGlobalVariables(execution, variableType, variableMap);
+            addGlobalVariables(execution, variableMap);
 
         } else if (variableScope == RestVariableScope.LOCAL) {
-            addLocalVariables(execution, variableType, variableMap);
+            addLocalVariables(execution, variableMap);
+        }
+
+        if (restApiInterceptor != null) {
+            variableMap = restApiInterceptor.accessExecutionVariables(execution, variableMap);
         }
 
         // Get unique variables from map
-        result.addAll(variableMap.values());
+        List<RestVariable> result = new ArrayList<>(variableMap.values());
         return result;
     }
 
-    public void deleteAllLocalVariables(Execution execution, HttpServletResponse response) {
+    public void deleteAllLocalVariables(Execution execution) {
         Collection<String> currentVariables = runtimeService.getVariablesLocal(execution.getId()).keySet();
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteExecutionVariables(execution, currentVariables, RestVariableScope.LOCAL);
+        }
         runtimeService.removeVariablesLocal(execution.getId(), currentVariables);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
-    protected Object createExecutionVariable(Execution execution, boolean override, int variableType, HttpServletRequest request, HttpServletResponse response) {
+    protected Object createExecutionVariable(Execution execution, boolean override, HttpServletRequest request, HttpServletResponse response) {
 
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, variableType, true);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, true);
         } else {
 
             List<RestVariable> inputVariables = new ArrayList<>();
@@ -95,7 +103,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
             }
 
             if (inputVariables == null || inputVariables.size() == 0) {
-                throw new FlowableIllegalArgumentException("Request didn't contain a list of variables to create.");
+                throw new FlowableIllegalArgumentException("Request did not contain a list of variables to create.");
             }
 
             RestVariableScope sharedScope = null;
@@ -125,30 +133,43 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, varScope, execution.getId(), variableType, false));
             }
 
             if (!variablesToSet.isEmpty()) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.createExecutionVariables(execution, variablesToSet, sharedScope);
+                }
+
+                Map<String, Object> setVariables;
                 if (sharedScope == RestVariableScope.LOCAL) {
                     runtimeService.setVariablesLocal(execution.getId(), variablesToSet);
+                    setVariables = runtimeService.getVariablesLocal(execution.getId(), variablesToSet.keySet());
                 } else {
                     if (execution.getParentId() != null) {
                         // Explicitly set on parent, setting non-local variables
                         // on execution itself will override local-variables if
                         // exists
                         runtimeService.setVariables(execution.getParentId(), variablesToSet);
+                        setVariables = runtimeService.getVariables(execution.getParentId(), variablesToSet.keySet());
                     } else {
                         // Standalone task, no global variables possible
                         throw new FlowableIllegalArgumentException("Cannot set global variables on execution '" + execution.getId() + "', task is not part of process.");
                     }
                 }
+
+                for (RestVariable inputVariable : inputVariables) {
+                    String variableName = inputVariable.getName();
+                    Object variableValue = setVariables.get(variableName);
+                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, varScope, execution.getId(), variableType, false));
+                }
+
             }
         }
         response.setStatus(HttpStatus.CREATED.value());
         return result;
     }
 
-    protected void addGlobalVariables(Execution execution, int variableType, Map<String, RestVariable> variableMap) {
+    protected void addGlobalVariables(Execution execution, Map<String, RestVariable> variableMap) {
         Map<String, Object> rawVariables = runtimeService.getVariables(execution.getId());
         List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, execution.getId(), variableType, RestVariableScope.GLOBAL);
 
@@ -162,7 +183,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         }
     }
 
-    protected void addLocalVariables(Execution execution, int variableType, Map<String, RestVariable> variableMap) {
+    protected void addLocalVariables(Execution execution, Map<String, RestVariable> variableMap) {
         Map<String, Object> rawLocalvariables = runtimeService.getVariablesLocal(execution.getId());
         List<RestVariable> localVariables = restResponseFactory.createRestVariables(rawLocalvariables, execution.getId(), variableType, RestVariableScope.LOCAL);
 

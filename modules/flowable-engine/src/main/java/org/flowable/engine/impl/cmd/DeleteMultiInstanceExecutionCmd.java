@@ -17,9 +17,9 @@ import java.io.Serializable;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -27,6 +27,8 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.impl.variable.ParallelMultiInstanceLoopVariableType;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Tijs Rademakers
@@ -35,8 +37,8 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
 
     private static final long serialVersionUID = 1L;
     
-    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
-    protected final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
+    protected static final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    protected static final String NUMBER_OF_COMPLETED_INSTANCES = "nrOfCompletedInstances";
     
     protected String executionId;
     protected boolean executionIsCompleted;
@@ -56,20 +58,20 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = miActivityElement.getLoopCharacteristics();
         
         if (miActivityElement.getLoopCharacteristics() == null) {
-            throw new FlowableException("No multi instance execution found for execution id " + executionId);
+            throw new FlowableException("No multi instance execution found for " + execution);
         }
         
         if (!(miActivityElement.getBehavior() instanceof MultiInstanceActivityBehavior)) {
-            throw new FlowableException("No multi instance behavior found for execution id " + executionId);
+            throw new FlowableException("No multi instance behavior found for " + execution);
         }
         
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-            throw new FlowableException("Flowable 5 process definitions are not supported");
+            throw new FlowableException("Flowable 5 process definitions are not supported for " + execution);
         }
         
         ExecutionEntity miExecution = getMultiInstanceRootExecution(execution);
         executionEntityManager.deleteChildExecutions(execution, "Delete MI execution", false);
-        executionEntityManager.deleteExecutionAndRelatedData(execution, "Delete MI execution");
+        executionEntityManager.deleteExecutionAndRelatedData(execution, "Delete MI execution", false);
         
         int loopCounter = 0;
         if (multiInstanceLoopCharacteristics.isSequential()) {
@@ -78,8 +80,11 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         }
         
         if (executionIsCompleted) {
-            Integer numberOfCompletedInstances = (Integer) miExecution.getVariable(NUMBER_OF_COMPLETED_INSTANCES);
-            miExecution.setVariableLocal(NUMBER_OF_COMPLETED_INSTANCES, numberOfCompletedInstances + 1);
+            VariableInstance nrOfCompletedInstancesVariable = miExecution.getVariableInstance(NUMBER_OF_COMPLETED_INSTANCES);
+            if (!ParallelMultiInstanceLoopVariableType.TYPE_NAME.equals(nrOfCompletedInstancesVariable.getTypeName())) {
+                Integer numberOfCompletedInstances = (Integer) nrOfCompletedInstancesVariable.getValue();
+                miExecution.setVariableLocal(NUMBER_OF_COMPLETED_INSTANCES, numberOfCompletedInstances + 1);
+            }
             loopCounter++;
             
         } else {
@@ -87,10 +92,10 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
             miExecution.setVariableLocal(NUMBER_OF_INSTANCES, currentNumberOfInstances - 1);
         }
         
-        ExecutionEntity childExecution = executionEntityManager.createChildExecution(miExecution);
-        childExecution.setCurrentFlowElement(miExecution.getCurrentFlowElement());
         
         if (multiInstanceLoopCharacteristics.isSequential()) {
+            ExecutionEntity childExecution = executionEntityManager.createChildExecution(miExecution);
+            childExecution.setCurrentFlowElement(miExecution.getCurrentFlowElement());
             SequentialMultiInstanceBehavior miBehavior = (SequentialMultiInstanceBehavior) miActivityElement.getBehavior();
             miBehavior.continueSequentialMultiInstance(childExecution, loopCounter, childExecution);
         }

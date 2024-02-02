@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
+
+    <resultMap id="batchResultMap" type="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <result property="revision" column="REV_" jdbcType="INTEGER"/>
+        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
+        <result property="batchSearchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
+        <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="status" column="STATUS_" jdbcType="VARCHAR"/>
+        <result property="batchDocRefId" column="BATCH_DOC_ID_" typeHandler="BatchByteArrayRefTypeHandler"/>
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- Batch INSERTS -->
+    <insert id="insertBatch" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
+        INSERT INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_)
+        VALUES (#{id, jdbcType=VARCHAR},
+                #{revision, jdbcType=INTEGER},
+                #{batchType, jdbcType=VARCHAR},
+                #{batchSearchKey, jdbcType=VARCHAR},
+                #{batchSearchKey2, jdbcType=VARCHAR},
+                #{createTime, jdbcType=TIMESTAMP},
+                #{completeTime, jdbcType=TIMESTAMP},
+                #{status, jdbcType=VARCHAR},
+                #{batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+                #{tenantId, jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="bulkInsertBatch" parameterType="java.util.List">
+        INSERT INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_)
+        VALUES
+        <foreach collection="list" item="batch" index="index" separator=",">
+            (#{batch.id, jdbcType=VARCHAR},
+            #{batch.revision, jdbcType=INTEGER},
+            #{batch.batchType, jdbcType=VARCHAR},
+            #{batch.batchSearchKey, jdbcType=VARCHAR},
+            #{batch.batchSearchKey2, jdbcType=VARCHAR},
+            #{batch.createTime, jdbcType=TIMESTAMP},
+            #{batch.completeTime, jdbcType=TIMESTAMP},
+            #{batch.status, jdbcType=VARCHAR},
+            #{batch.batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            #{batch.tenantId, jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertBatch" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="batch" index="index">
+            INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_) VALUES
+            (#{batch.id, jdbcType=VARCHAR},
+            #{batch.revision, jdbcType=INTEGER},
+            #{batch.batchType, jdbcType=VARCHAR},
+            #{batch.batchSearchKey, jdbcType=VARCHAR},
+            #{batch.batchSearchKey2, jdbcType=VARCHAR},
+            #{batch.createTime, jdbcType=TIMESTAMP},
+            #{batch.completeTime, jdbcType=TIMESTAMP},
+            #{batch.status, jdbcType=VARCHAR},
+            #{batch.batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
+            #{batch.tenantId, jdbcType=VARCHAR})
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+    
+    <!-- Batch UPDATE -->
+    <update id="updateBatch" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
+        update ${prefix}FLW_RU_BATCH
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.status != null">
+                STATUS_ = #{status, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.completeTime != completeTime">
+                COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID_ = #{id, jdbcType=VARCHAR}
+        and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+
+    <!-- Batch DELETE -->
+    <delete id="deleteBatch" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
+        delete
+        from ${prefix}FLW_RU_BATCH
+        where ID_ = #{id, jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="bulkDeleteBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> RES </if>
+        <include refid="selectBatchByQueryCriteriaSql" />
+    </delete>
+
+    <delete id="bulkDeleteBytesForBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if>
+        from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select RES.BATCH_DOC_ID_
+            <include refid="selectBatchByQueryCriteriaSql" />
+                and RES.BATCH_DOC_ID_ is not null
+                <if test="_databaseId != 'oracle'">and RES.BATCH_DOC_ID_ != ''</if>
+
+            union all
+
+            select PARTS_.RESULT_DOC_ID_
+            from ${prefix}FLW_RU_BATCH_PART PARTS_
+            where PARTS_.RESULT_DOC_ID_ is not null
+                <if test="_databaseId != 'oracle'">and PARTS_.RESULT_DOC_ID_ != ''</if>
+                and PARTS_.BATCH_ID_ in (
+                    select RES.ID_
+                    <include refid="selectBatchByQueryCriteriaSql" />
+                )
+        )
+    </delete>
+
+    <delete id="bulkDeleteBatchPartsForBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> PARTS_ </if>
+        from ${prefix}FLW_RU_BATCH_PART PARTS_
+        where PARTS_.BATCH_ID_ in (
+            select RES.ID_
+            <include refid="selectBatchByQueryCriteriaSql" />
+        )
+    </delete>
+
+    <!-- Batch SELECT -->
+    <select id="selectBatch" parameterType="string" resultMap="batchResultMap">
+        select *
+        from ${prefix}FLW_RU_BATCH
+        where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="selectBatchesBySearchKey" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchResultMap">
+        select *
+        from ${prefix}FLW_RU_BATCH
+        where SEARCH_KEY_ = #{parameter.searchKey, jdbcType=VARCHAR} or SEARCH_KEY2_ = #{parameter.searchKey2, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectAllBatches" parameterType="string" resultMap="batchResultMap">
+        select * from ${prefix}FLW_RU_BATCH
+    </select>
+    
+    <select id="selectBatchByQueryCriteria" parameterType="org.flowable.batch.service.impl.BatchQueryImpl" resultMap="batchResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectBatchByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <select id="selectBatchCountByQueryCriteria" parameterType="org.flowable.batch.service.impl.BatchQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectBatchByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectBatchByQueryCriteriaSql">
+        from ${prefix}FLW_RU_BATCH RES
+        <where>
+            <if test="id != null">
+                RES.ID_ = #{id}
+            </if>
+            <if test="batchType != null">
+                and RES.TYPE_ = #{batchType}
+            </if>
+            <if test="batchTypes != null and !batchTypes.empty">
+                and RES.TYPE_ IN
+                <foreach item="batchTypeItem" index="index" collection="batchTypes"
+                         open="(" separator="," close=")">
+                    #{batchTypeItem}
+                </foreach>
+            </if>
+            <if test="searchKey != null">
+                and RES.SEARCH_KEY_ = #{searchKey}
+            </if>
+            <if test="searchKey2 != null">
+                and RES.SEARCH_KEY2_ = #{searchKey2}
+            </if>
+            <if test="createTimeHigherThan != null">
+                and RES.CREATE_TIME_ &gt; #{createTimeHigherThan}
+            </if>
+            <if test="createTimeLowerThan != null">
+                and RES.CREATE_TIME_ &lt; #{createTimeLowerThan}
+            </if>
+            <if test="completeTimeHigherThan != null">
+                and RES.COMPLETE_TIME_ &gt; #{completeTimeHigherThan}
+            </if>
+            <if test="completeTimeLowerThan != null">
+                and RES.COMPLETE_TIME_ &lt; #{completeTimeLowerThan}
+            </if>
+            <if test="status != null">
+                and RES.STATUS_ = #{status}
+            </if>
+            <if test="tenantId != null">
+                and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="tenantIdLike != null">
+                and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+            </if>
+            <if test="withoutTenantId">
+                and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+            </if>
+        </where>
+    </sql>
+</mapper>

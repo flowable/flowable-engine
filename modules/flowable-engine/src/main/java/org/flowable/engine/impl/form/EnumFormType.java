@@ -15,7 +15,7 @@ package org.flowable.engine.impl.form;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.AbstractFormType;
 
 /**
@@ -38,7 +38,7 @@ public class EnumFormType extends AbstractFormType {
 
     @Override
     public Object getInformation(String key) {
-        if (key.equals("values")) {
+        if ("values".equals(key)) {
             return values;
         }
         return null;

@@ -15,7 +15,7 @@ package org.flowable.cdi.annotation.event;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 /**
  * Can be used to qualify events fired when an activity is started
@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface StartActivity {
     /** the id of the activity that is being entered / was entered */
-    public String value();
+    String value();
 }

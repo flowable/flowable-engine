@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="methodExpressionCase" name="Method Expression Case">
+        <casePlanModel id="casePlanModel" name="Case plan model">
+            <planItem id="planItem1" name="Service task" definitionRef="serviceTask1"/>
+            <planItem id="planItem2" name="Service task" definitionRef="serviceTask2">
+                <entryCriterion id="entryCriterion2" sentryRef="sentry1"/>
+            </planItem>
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="serviceTask1" name="Service task" flowable:type="java" flowable:expression="${aString.substring(3,7)}"/>
+            <task id="serviceTask2" name="Service task" flowable:type="java" flowable:expression="${aString.toString()}"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_testAuthenticatedUserIdAvailableCase">
+            <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="121.0" y="211.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="316.0" y="211.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion2" cmmnElementRef="entryCriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="307.0" y="237.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector3" cmmnElementRef="planItem1" targetCMMNElementRef="entryCriterion2">
+                <di:waypoint x="220.9499999999887" y="251.0"/>
+                <di:waypoint x="268.5" y="251.0"/>
+                <di:waypoint x="268.5" y="251.0"/>
+                <di:waypoint x="307.0" y="251.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector4" cmmnElementRef="planItem2" targetCMMNElementRef="exitCriterion2">
+                <di:waypoint x="366.0" y="211.0"/>
+                <di:waypoint x="366.0" y="21.0"/>
+                <di:waypoint x="812.0" y="21.0"/>
+                <di:waypoint x="812.0" y="251.0"/>
+                <di:waypoint x="796.9298148536527" y="251.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

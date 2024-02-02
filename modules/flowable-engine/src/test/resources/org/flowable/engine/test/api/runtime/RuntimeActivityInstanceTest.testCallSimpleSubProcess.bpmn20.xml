@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples">
+  
+  <process id="callSimpleSubProcess">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
+    
+    <callActivity id="callSubProcess" calledElement="calledProcess" />
+    
+    <sequenceFlow id="flow3" sourceRef="callSubProcess" targetRef="waitForEnd" />
+
+    <receiveTask id="waitForEnd"/>
+
+    <sequenceFlow sourceRef="waitForEnd" targetRef="theEnd"/>
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

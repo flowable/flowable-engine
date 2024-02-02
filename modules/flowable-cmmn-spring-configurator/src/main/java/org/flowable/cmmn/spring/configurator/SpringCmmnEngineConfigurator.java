@@ -15,9 +15,12 @@ package org.flowable.cmmn.spring.configurator;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
-import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.spring.SpringEngineConfiguration;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -38,19 +41,42 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
 
-        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
-        initProcessInstanceService(springProcessEngineConfiguration);
-        initProcessInstanceStateChangedCallbacks(springProcessEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        
+        SpringProcessEngineConfiguration springProcessEngineConfiguration = null;
+        if (springEngineConfiguration instanceof SpringProcessEngineConfiguration) {
+            springProcessEngineConfiguration = (SpringProcessEngineConfiguration) springEngineConfiguration;
+        } else {
+            AbstractEngineConfiguration processEngineConfiguration = engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            if (processEngineConfiguration instanceof SpringProcessEngineConfiguration) {
+                springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
+            }
+        }
+        
+        if (springProcessEngineConfiguration != null) {
+           copyProcessEngineProperties(springProcessEngineConfiguration);
+        }
 
-        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(springProcessEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
-        cmmnEngineConfiguration.setTaskQueryLimit(springProcessEngineConfiguration.getTaskQueryLimit());
-        cmmnEngineConfiguration.setHistoricTaskQueryLimit(springProcessEngineConfiguration.getHistoricTaskQueryLimit());
-
-        ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
-        cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
-                        springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
+        ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
+        if (cmmnEngineConfiguration.getBeans() == null) {
+            cmmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
+        }
 
         initCmmnEngine();
+
+        if (springProcessEngineConfiguration != null) {
+            cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.BPMN, springProcessEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+
+            springProcessEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
+
+        JobServiceConfiguration engineJobServiceConfiguration = getJobServiceConfiguration(engineConfiguration);
+        if (engineJobServiceConfiguration != null) {
+            engineJobServiceConfiguration.getInternalJobManager()
+                    .registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager());
+        }
 
         initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }

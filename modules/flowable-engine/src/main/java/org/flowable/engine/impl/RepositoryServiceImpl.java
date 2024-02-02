@@ -18,11 +18,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceExtraForModelCmd;
 import org.flowable.engine.impl.cmd.AddEditorSourceForModelCmd;
@@ -36,7 +38,7 @@ import org.flowable.engine.impl.cmd.DeployCmd;
 import org.flowable.engine.impl.cmd.GetAppResourceModelCmd;
 import org.flowable.engine.impl.cmd.GetAppResourceObjectCmd;
 import org.flowable.engine.impl.cmd.GetBpmnModelCmd;
-import org.flowable.engine.impl.cmd.GetDecisionTablesForProcessDefinitionCmd;
+import org.flowable.engine.impl.cmd.GetDecisionsForProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDiagramCmd;
 import org.flowable.engine.impl.cmd.GetDeploymentProcessDiagramLayoutCmd;
@@ -53,6 +55,7 @@ import org.flowable.engine.impl.cmd.IsProcessDefinitionSuspendedCmd;
 import org.flowable.engine.impl.cmd.SaveModelCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentCategoryCmd;
 import org.flowable.engine.impl.cmd.SetDeploymentKeyCmd;
+import org.flowable.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.engine.impl.cmd.SetProcessDefinitionCategoryCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.flowable.engine.impl.cmd.ValidateBpmnModelCmd;
@@ -60,8 +63,10 @@ import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentMergeStrategy;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.DiagramLayout;
+import org.flowable.engine.repository.MergeMode;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.engine.repository.NativeDeploymentQuery;
@@ -78,11 +83,11 @@ import org.flowable.validation.ValidationError;
  * @author Falko Menge
  * @author Joram Barrez
  */
-public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
+public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements RepositoryService {
 
     @Override
     public DeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<DeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
             @Override
             public DeploymentBuilder execute(CommandContext commandContext) {
                 return new DeploymentBuilderImpl(RepositoryServiceImpl.this);
@@ -117,6 +122,11 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     public void setDeploymentKey(String deploymentId, String key) {
         commandExecutor.execute(new SetDeploymentKeyCmd(deploymentId, key));
     }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
+    }
 
     @Override
     public ProcessDefinitionQuery createProcessDefinitionQuery() {
@@ -142,6 +152,16 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     @Override
     public void changeDeploymentTenantId(String deploymentId, String newTenantId) {
         commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId));
+    }
+
+    @Override
+    public void changeDeploymentTenantId(String deploymentId, String newTenantId, MergeMode mergeMode) {
+        commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId, mergeMode));
+    }
+
+    @Override
+    public void changeDeploymentTenantId(String deploymentId, String newTenantId, DeploymentMergeStrategy deploymentMergeStrategy) {
+        commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId, deploymentMergeStrategy));
     }
 
     @Override
@@ -349,8 +369,8 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
     }
 
     @Override
-    public List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
-        return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
+    public List<DmnDecision> getDecisionsForProcessDefinition(String processDefinitionId) {
+        return commandExecutor.execute(new GetDecisionsForProcessDefinitionCmd(processDefinitionId));
     }
 
     @Override

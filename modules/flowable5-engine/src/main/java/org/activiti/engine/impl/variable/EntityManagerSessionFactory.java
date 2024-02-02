@@ -13,11 +13,12 @@
 
 package org.activiti.engine.impl.variable;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.interceptor.Session;
 import org.activiti.engine.impl.interceptor.SessionFactory;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
 
 /**
  * @author Frederik Heremans
@@ -33,7 +34,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
             throw new ActivitiIllegalArgumentException("entityManagerFactory is null");
         }
         if (!(entityManagerFactory instanceof EntityManagerFactory)) {
-            throw new ActivitiIllegalArgumentException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+            throw new ActivitiIllegalArgumentException("EntityManagerFactory must implement 'jakarta.persistence.EntityManagerFactory'");
         }
 
         this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;

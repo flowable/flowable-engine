@@ -12,23 +12,25 @@
  */
 package org.flowable.engine.test.cfg;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daniel Meyer
@@ -40,7 +42,7 @@ public class RetryInterceptorTest {
 
     protected RetryInterceptor retryInterceptor;
 
-    @Before
+    @BeforeEach
     public void setupProcessEngine() {
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) new StandaloneInMemProcessEngineConfiguration();
         processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:retryInterceptorTest");
@@ -51,7 +53,7 @@ public class RetryInterceptorTest {
         processEngine = processEngineConfiguration.buildProcessEngine();
     }
 
-    @After
+    @AfterEach
     public void shutdownProcessEngine() {
         processEngine.close();
     }
@@ -59,14 +61,11 @@ public class RetryInterceptorTest {
     @Test
     public void testRetryInterceptor() {
 
-        try {
-            processEngine.getManagementService().executeCommand(new CommandThrowingOptimisticLockingException());
-            Assert.fail("ActivitiException expected.");
-        } catch (FlowableException e) {
-            Assert.assertTrue(e.getMessage().contains(retryInterceptor.getNumOfRetries() + " retries failed"));
-        }
+        assertThatThrownBy(() -> processEngine.getManagementService().executeCommand(new CommandThrowingOptimisticLockingException()))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining(retryInterceptor.getNumOfRetries() + " retries failed");
 
-        Assert.assertEquals(retryInterceptor.getNumOfRetries() + 1, counter.get()); // +1, we retry 3 times, so one extra for the regular execution
+        assertThat(counter.get()).isEqualTo(retryInterceptor.getNumOfRetries() + 1); // +1, we retry 3 times, so one extra for the regular execution
     }
 
     public static AtomicInteger counter = new AtomicInteger();

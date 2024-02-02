@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <process id="scriptTaskProcess">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+
+        <scriptTask id="task1" scriptFormat="JavaScript" flowable:skipExpression="${skipExpression}" flowable:resultVariable="persistentResult">
+            <script>
+                <![CDATA[
+                    var ret = "success";
+                    ret;
+                ]]>
+            </script>
+        </scriptTask>
+
+        <sequenceFlow id="flow2" sourceRef="task1" targetRef="theEnd" />
+
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

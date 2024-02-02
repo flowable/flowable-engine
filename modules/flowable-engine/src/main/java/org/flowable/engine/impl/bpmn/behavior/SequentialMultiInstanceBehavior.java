@@ -12,10 +12,12 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Set;
+
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -59,9 +61,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         setLoopVariable(multiInstanceRootExecution, NUMBER_OF_ACTIVE_INSTANCES, 1);
         logLoopDetails(multiInstanceRootExecution, "initialized", 0, 0, 1, nrOfInstances);
 
-        if (nrOfInstances > 0) {
-            executeOriginalBehavior(execution, 0);
-        }
+        executeOriginalBehavior(execution, (ExecutionEntity) multiInstanceRootExecution, 0);
 
         return nrOfInstances;
     }
@@ -83,17 +83,20 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         callActivityEndListeners(execution);
 
-        // executeCompensationBoundaryEvents(execution.getCurrentFlowElement(), execution);
+        // When leaving one of the child executions we need to aggregate the information for it
+        // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
+        aggregateVariablesForChildExecution(execution, multiInstanceRootExecution);
 
         boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
-            if(completeConditionSatisfied) {
+            if (completeConditionSatisfied) {
                 sendCompletedWithConditionEvent(multiInstanceRootExecution);
             }
             else {
                 sendCompletedEvent(multiInstanceRootExecution);
             }
 
+            // Call logic to leave activity instead of continuing multi-instance
             super.leave(execution);
         } else {
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
@@ -108,10 +111,16 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 ExecutionEntity executionToContinue = executionEntityManager.createChildExecution(multiInstanceRootExecution);
                 executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
                 executionToContinue.setScope(true);
-                executeOriginalBehavior(executionToContinue, loopCounter);
+                executeOriginalBehavior(executionToContinue, multiInstanceRootExecution, loopCounter);
             } else {
-                CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
-                executeOriginalBehavior(execution, loopCounter);
+                CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
+                // Delete all local variables
+                Set<String> localVariableInstances = execution.getVariableInstancesLocal().keySet();
+                localVariableInstances.remove(NUMBER_OF_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_COMPLETED_INSTANCES);
+                localVariableInstances.remove(NUMBER_OF_ACTIVE_INSTANCES);
+                execution.removeVariablesLocal(localVariableInstances);
+                executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 
         } catch (BpmnError error) {
@@ -119,7 +128,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             // Intermediate Event or Error Event Sub-Process in the process
             throw error;
         } catch (Exception e) {
-            throw new FlowableException("Could not execute inner activity behavior of multi instance behavior", e);
+            throw new FlowableException("Could not execute inner activity behavior of multi instance behavior for " + execution, e);
         }
     }
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,15 +13,17 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
@@ -42,8 +44,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected String categoryNotEquals;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected Set<String> deploymentIds;
+    protected String parentDeploymentId;
     protected String key;
     protected String keyLike;
     protected String resourceName;
@@ -56,11 +60,16 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     protected boolean latest;
     protected SuspensionState suspensionState;
     protected String authorizationUserId;
+    protected Collection<String> authorizationGroups;
+    private List<List<String>> safeAuthorizationGroups;
+    protected boolean authorizationGroupsSet;
     protected String procDefId;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String engineVersion;
+    protected String locale;
+    protected boolean withLocalizationFallback;
 
     protected String eventSubscriptionName;
     protected String eventSubscriptionType;
@@ -134,6 +143,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
     }
 
     @Override
+    public ProcessDefinitionQueryImpl processDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        if (nameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("nameLikeIgnoreCase is null");
+        }
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
+        return this;
+    }
+
+    @Override
     public ProcessDefinitionQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("id is null");
@@ -148,6 +166,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
             throw new FlowableIllegalArgumentException("ids are null");
         }
         this.deploymentIds = deploymentIds;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQueryImpl parentDeploymentId(String parentDeploymentId) {
+        if (parentDeploymentId == null) {
+            throw new FlowableIllegalArgumentException("parentDeploymentId is null");
+        }
+        this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
@@ -287,6 +314,18 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return eventSubscription("message", messageName);
     }
 
+    @Override
+    public ProcessDefinitionQuery locale(String locale) {
+        this.locale = locale;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQuery withLocalizationFallback() {
+        this.withLocalizationFallback = true;
+        return this;
+    }
+
     public ProcessDefinitionQuery processDefinitionStarter(String procDefId) {
         this.procDefId = procDefId;
         return this;
@@ -304,11 +343,35 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return this;
     }
 
-    public List<String> getAuthorizationGroups() {
-        if (authorizationUserId == null) {
+    public Collection<String> getAuthorizationGroups() {
+        if (authorizationGroupsSet) {
+            // if authorizationGroupsSet is true then startableByUserOrGroups was called
+            // and the groups passed in that methods have precedence
+            return authorizationGroups;
+        } else if (authorizationUserId == null) {
             return null;
         }
         return CommandContextUtil.getProcessEngineConfiguration().getCandidateManager().getGroupsForCandidateUser(authorizationUserId);
+    }
+
+    @Override
+    public ProcessDefinitionQueryImpl startableByUser(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("userId is null");
+        }
+        this.authorizationUserId = userId;
+        return this;
+    }
+
+    @Override
+    public ProcessDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups) {
+        if (userId == null && (groups == null || groups.isEmpty())) {
+            throw new FlowableIllegalArgumentException("userId is null and groups are null or empty");
+        }
+        this.authorizationUserId = userId;
+        this.authorizationGroups = groups;
+        this.authorizationGroupsSet = true;
+        return this;
     }
 
     // sorting ////////////////////////////////////////////
@@ -352,19 +415,22 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionCountByQueryCriteria(this);
     }
 
     @Override
     public List<ProcessDefinition> executeList(CommandContext commandContext) {
-        checkQueryOk();
-        return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByQueryCriteria(this);
-    }
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
-    @Override
-    public void checkQueryOk() {
-        super.checkQueryOk();
+        List<ProcessDefinition> processDefinitions = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByQueryCriteria(this);
+
+        if (processDefinitions != null && processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessDefinitionLocalizationManager() != null) {
+            for (ProcessDefinition processDefinition : processDefinitions) {
+                processEngineConfiguration.getInternalProcessDefinitionLocalizationManager().localize(processDefinition, locale, withLocalizationFallback);
+            }
+        }
+
+        return processDefinitions;
     }
 
     // getters ////////////////////////////////////////////
@@ -375,6 +441,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public Set<String> getDeploymentIds() {
         return deploymentIds;
+    }
+
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
     }
 
     public String getId() {
@@ -391,6 +461,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
 
     public String getNameLike() {
         return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
     }
 
     public String getKey() {
@@ -485,12 +559,15 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return eventSubscriptionType;
     }
 
-    @Override
-    public ProcessDefinitionQueryImpl startableByUser(String userId) {
-        if (userId == null) {
-            throw new FlowableIllegalArgumentException("userId is null");
-        }
-        this.authorizationUserId = userId;
-        return this;
+    public boolean isIncludeAuthorization() {
+        return authorizationUserId != null || (authorizationGroups != null && !authorizationGroups.isEmpty());
+    }
+
+    public List<List<String>> getSafeAuthorizationGroups() {
+        return safeAuthorizationGroups;
+    }
+
+    public void setSafeAuthorizationGroups(List<List<String>> safeAuthorizationGroups) {
+        this.safeAuthorizationGroups = safeAuthorizationGroups;
     }
 }

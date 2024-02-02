@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.history;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -23,13 +24,26 @@ public interface HistoricCaseInstance {
     String getName();
     String getParentId();
     String getBusinessKey();
+    String getBusinessStatus();
     String getCaseDefinitionId();
+    String getCaseDefinitionKey();
+    String getCaseDefinitionName();
+    Integer getCaseDefinitionVersion();
+    String getCaseDefinitionDeploymentId();
     String getState();
     Date getStartTime();
     Date getEndTime();
     String getStartUserId();
+    Date getLastReactivationTime();
+    String getLastReactivationUserId();
     String getCallbackId();
     String getCallbackType();
+    String getReferenceId();
+    String getReferenceType();
     String getTenantId();
-    
+
+    Map<String, Object> getCaseVariables();
+
+    /** Sets an optional localized name for the case. */
+    void setLocalizedName(String localizedName);
 }

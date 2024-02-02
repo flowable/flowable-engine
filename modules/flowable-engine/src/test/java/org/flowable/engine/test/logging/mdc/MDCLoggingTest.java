@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.logging.mdc;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -23,6 +26,7 @@ import org.apache.log4j.PatternLayout;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.logging.LogMDC;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class MDCLoggingTest extends PluggableFlowableTestCase {
 
@@ -67,31 +71,27 @@ public class MDCLoggingTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testLogger() {
         setCustomLogger();
 
-        try {
-            runtimeService.startProcessInstanceByKey("testLoggerProcess");
-            fail("Expected exception");
-        } catch (Exception e) {
-            // expected exception
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testLoggerProcess"))
+                .isInstanceOf(Exception.class);
         String messages = console.toString();
 
-        assertTrue(messages.contains("ProcessDefinitionId=" + TestService.processDefinitionId));
-        assertTrue(messages.contains("executionId=" + TestService.executionId));
-        assertTrue(messages.contains("mdcProcessInstanceID=" + TestService.processInstanceId));
-        assertTrue(messages.contains("mdcBusinessKey=" + (TestService.businessKey == null ? "" : TestService.businessKey)));
+        assertThat(messages)
+                .contains(
+                        "ProcessDefinitionId=" + TestService.processDefinitionId,
+                        "executionId=" + TestService.executionId,
+                        "mdcProcessInstanceID=" + TestService.processInstanceId,
+                        "mdcBusinessKey=" + (TestService.businessKey == null ? "" : TestService.businessKey)
+                );
         console.clear();
         restoreLoggers();
 
-        try {
-            runtimeService.startProcessInstanceByKey("testLoggerProcess");
-            fail("Expected exception");
-        } catch (Exception e) {
-            // expected exception
-        }
-        assertFalse(console.toString().contains("ProcessDefinitionId=" + TestService.processDefinitionId));
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testLoggerProcess"))
+                .isInstanceOf(Exception.class);
+        assertThat(console.toString()).doesNotContain("ProcessDefinitionId=" + TestService.processDefinitionId);
     }
 }

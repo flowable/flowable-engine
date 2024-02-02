@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    
+    <case id="scriptCase">
+        <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+            <planItem id="blockerPlanItem" definitionRef="blockerEvent"/>
+            <planItem id="returnValueScript" definitionRef="returnValueScriptTask" />
+                <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:scriptFormat="groovy" flowable:autoStoreVariables="true">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string>
+                            sum = 0
+                            for ( i in inputArray ) {
+                                sum += i
+                            }
+                        </string>
+                    </flowable:field>
+                </extensionElements>                
+            </task>
+            <userEventListener id="blockerEvent"/>
+        </casePlanModel>
+    </case>
+</definitions>

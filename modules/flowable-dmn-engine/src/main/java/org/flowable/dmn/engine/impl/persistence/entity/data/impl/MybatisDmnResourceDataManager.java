@@ -43,7 +43,7 @@ public class MybatisDmnResourceDataManager extends AbstractDmnDataManager<DmnRes
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteDmnResourcesByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteDmnResourcesByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

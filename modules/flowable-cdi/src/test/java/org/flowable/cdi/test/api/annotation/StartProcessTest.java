@@ -12,9 +12,7 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.StartProcessInterceptor;
@@ -34,14 +32,14 @@ public class StartProcessTest extends CdiFlowableTestCase {
     @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
     public void testStartProcessByKey() {
 
-        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult()).isNull();
 
         getBeanInstance(DeclarativeProcessController.class).startProcessByKey();
         BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult()).isNotNull();
 
-        assertEquals("Flowable", businessProcess.getVariable("name"));
+        assertThat((String)businessProcess.getVariable("name")).isEqualTo("Flowable");
 
         businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
         businessProcess.completeTask();
@@ -51,15 +49,15 @@ public class StartProcessTest extends CdiFlowableTestCase {
     @Deployment(resources = "org/flowable/cdi/test/api/annotation/StartProcessTest.bpmn20.xml")
     public void testStartProcessByName() {
 
-        assertNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult()).isNull();
 
         getBeanInstance(DeclarativeProcessController.class).startProcessByName();
 
         BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().singleResult());
+        assertThat(runtimeService.createProcessInstanceQuery().singleResult()).isNotNull();
 
-        assertEquals("Flowable", businessProcess.getVariable("name"));
+        assertThat((String)businessProcess.getVariable("name")).isEqualTo("Flowable");
 
         businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
         businessProcess.completeTask();

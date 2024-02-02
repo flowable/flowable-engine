@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +26,9 @@ import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.repository.ProcessDefinition;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

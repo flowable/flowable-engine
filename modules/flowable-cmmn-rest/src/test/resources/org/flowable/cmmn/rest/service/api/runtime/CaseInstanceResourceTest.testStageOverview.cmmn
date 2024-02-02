@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testStageOverview" name="testStageOverview" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem2" name="Stage one" definitionRef="stage1"></planItem>
+      <planItem id="planItem4" name="Stage two" definitionRef="stage2">
+        <entryCriterion id="sid-F552A9CE-C096-46D7-8EC2-835031D48540" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <planItem id="planItem6" name="Stage three" definitionRef="stage3">
+        <entryCriterion id="sid-FE37C30F-BC23-40CA-8CFF-5D8205F95C39" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <planItem id="planItem8" name="Stage four" definitionRef="stage4">
+        <entryCriterion id="sid-7401FD46-B2C3-4A43-BE05-9EE603476CCA" sentryRef="sentry3"></entryCriterion>
+      </planItem>
+      <planItem id="planItem10" name="Stage five" definitionRef="stage5">
+        <entryCriterion sentryRef="sentry4"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem4">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry3">
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem6">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry4">
+        <planItemOnPart id="sentryOnPart4" sourceRef="planItem8">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="stage1" name="Stage one" flowable:displayOrder="10">
+        <planItem id="planItem1" name="A" definitionRef="task1"></planItem>
+        <humanTask id="task1" name="A"></humanTask>
+      </stage>
+      <stage id="stage2" name="Stage two" flowable:includeInStageOverview="true" flowable:displayOrder="20">
+        <planItem id="planItem3" name="B" definitionRef="task2"></planItem>
+        <humanTask id="task2" name="B"></humanTask>
+      </stage>
+      <stage id="stage3" name="Stage three" flowable:includeInStageOverview="false" flowable:displayOrder="34">
+        <planItem id="planItem5" name="C" definitionRef="task3"></planItem>
+        <humanTask id="task3" name="C"></humanTask>
+      </stage>
+      <stage id="stage4" name="Stage four" flowable:includeInStageOverview="${includeInOverview}" flowable:displayOrder="40">
+        <planItem id="planItem7" name="D" definitionRef="task4"></planItem>
+        <humanTask id="task4" name="D"></humanTask>
+      </stage>
+      <stage id="stage5" name="Stage five" flowable:includeInStageOverview="${includeInOverviewNegative}" flowable:displayOrder="50">
+        <planItem id="planItem9" name="E" definitionRef="task5"></planItem>
+        <humanTask id="task5" name="D"></humanTask>
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

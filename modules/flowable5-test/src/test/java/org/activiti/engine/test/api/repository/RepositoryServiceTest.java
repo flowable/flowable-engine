@@ -27,9 +27,9 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -176,7 +176,7 @@ public class RepositoryServiceTest extends PluggableFlowableTestCase {
         // Move time four days forward, the timer will fire and the process definitions will be active
         Date inFourDays = new Date(startTime.getTime() + (4 * 24 * 60 * 60 * 1000));
         processEngineConfiguration.getClock().setCurrentTime(inFourDays);
-        waitForJobExecutorToProcessAllJobs(5000L, 50L);
+        waitForJobExecutorToProcessAllJobs(7000L, 50L);
 
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(2, repositoryService.createProcessDefinitionQuery().count());

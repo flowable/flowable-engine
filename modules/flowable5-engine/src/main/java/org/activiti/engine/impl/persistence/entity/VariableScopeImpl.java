@@ -25,7 +25,7 @@ import java.util.Set;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
@@ -76,12 +76,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     @Override
     public Map<String, Object> getVariables() {
-        return collectVariables(new HashMap<String, Object>());
+        return collectVariables(new HashMap<>());
     }
 
     @Override
     public Map<String, VariableInstance> getVariableInstances() {
-        return collectVariableInstances(new HashMap<String, VariableInstance>());
+        return collectVariableInstances(new HashMap<>());
     }
 
     @Override
@@ -454,7 +454,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     @Override
     public Set<String> getVariableNames() {
-        return collectVariableNames(new HashSet<String>());
+        return collectVariableNames(new HashSet<>());
     }
 
     @Override
@@ -1009,7 +1009,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     @Override
     public Map<String, Object> getTransientVariables() {
-        return collectTransientVariables(new HashMap<String, Object>());
+        return collectTransientVariables(new HashMap<>());
     }
 
     protected Map<String, Object> collectTransientVariables(HashMap<String, Object> variables) {

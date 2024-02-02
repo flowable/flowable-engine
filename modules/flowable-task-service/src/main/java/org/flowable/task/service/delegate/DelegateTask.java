@@ -16,9 +16,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -68,9 +68,38 @@ public interface DelegateTask extends VariableScope {
      * Reference to the process definition or null if it is not related to a process.
      */
     String getProcessDefinitionId();
+    
+    /**
+     * The current state of the task.
+     */
+    String getState();
 
     /** The date/time when this task was created */
     Date getCreateTime();
+    
+    /** The date/time when this task was put in progress */
+    Date getInProgressStartTime();
+    
+    /**
+     * The user reference that started the task.
+     */
+    String getInProgressStartedBy();
+    
+    /** The date/time when this task was claimed */
+    Date getClaimTime();
+    
+    /**
+     * The user reference that claimed the task.
+     */
+    String getClaimedBy();
+    
+    /** The date/time when this task was suspended */
+    Date getSuspendedTime();
+    
+    /**
+     * The user reference that suspended the task.
+     */
+    String getSuspendedBy();
 
     /**
      * The id of the activity in the process defining this task or null if this is not related to a process
@@ -81,6 +110,7 @@ public interface DelegateTask extends VariableScope {
     boolean isSuspended();
 
     /** The tenant identifier of this task */
+    @Override
     String getTenantId();
 
     /** The form key for the user task */
@@ -100,7 +130,7 @@ public interface DelegateTask extends VariableScope {
     String getEventHandlerId();
     
     /**
-     * The current {@link org.flowable.engine.task.DelegationState} for this task.
+     * The current {@link org.flowable.task.api.DelegationState} for this task.
      */
     DelegationState getDelegationState();
 
@@ -116,22 +146,28 @@ public interface DelegateTask extends VariableScope {
     /** Adds multiple groups as candidate group to this task. */
     void addCandidateGroups(Collection<String> candidateGroups);
 
-    /** The {@link User.getId() userId} of the person responsible for this task. */
+    /** The user id of the person responsible for this task. */
     String getOwner();
 
-    /** The {@link User.getId() userId} of the person responsible for this task. */
+    /** The user id of the person responsible for this task. */
     void setOwner(String owner);
 
     /**
-     * The {@link User.getId() userId} of the person to which this task is delegated.
+     * The user id of the person to which this task is delegated.
      */
     String getAssignee();
 
     /**
-     * The {@link User.getId() userId} of the person to which this task is delegated.
+     * The user id of the person to which this task is delegated.
      */
     void setAssignee(String assignee);
 
+    /** Due date of the in progress start of the task. */
+    Date getInProgressStartDueDate();
+
+    /** Change the in progress start due date of the task. */
+    void setInProgressStartDueDate(Date inProgressStartDueDate);
+    
     /** Due date of the task. */
     Date getDueDate();
 
@@ -183,7 +219,7 @@ public interface DelegateTask extends VariableScope {
     void deleteCandidateUser(String userId);
 
     /**
-     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String)}; with type {@link IdentityLinkType#CANDIDATE}
      *
      * @param groupId
      *            id of the group to use as candidate, cannot be null.

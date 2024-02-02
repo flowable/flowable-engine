@@ -24,7 +24,7 @@ import org.flowable.idm.api.User;
 import org.flowable.ldap.LDAPGroupCache.LDAPGroupCacheListener;
 
 /**
- * A {@link ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
+ * A {@link org.flowable.engine.configurator.ProcessEngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
  * fetching groups of a user.
  * <p>
  * This class is extensible and many methods can be overridden when the default behavior is not fitting your use case.
@@ -58,6 +58,7 @@ public class LDAPConfiguration {
     protected String queryUserByFullNameLike;
     protected String queryAllUsers;
     protected String queryAllGroups;
+    protected String queryGroupByGroupId;
 
     // Attribute names
     protected String userIdAttribute;
@@ -78,6 +79,8 @@ public class LDAPConfiguration {
 
     // Cache listener (experimental)
     protected LDAPGroupCacheListener groupCacheListener;
+
+    protected boolean connectionPooling = true;
 
     // Getters and Setters //////////////////////////////////////////////////
 
@@ -259,6 +262,9 @@ public class LDAPConfiguration {
         return queryAllUsers;
     }
 
+    /**
+     * The query that is executed when searching for all users.
+     */
     public void setQueryAllUsers(String queryAllUsers) {
         this.queryAllUsers = queryAllUsers;
     }
@@ -267,8 +273,25 @@ public class LDAPConfiguration {
         return queryAllGroups;
     }
 
+    /**
+     * The query that is executed when searching for all groups.
+     */
     public void setQueryAllGroups(String queryAllGroups) {
         this.queryAllGroups = queryAllGroups;
+    }
+
+    /**
+     * Query that is executed when searching for one group by a specific group id
+     */
+    public String getQueryGroupByGroupId() {
+        return queryGroupByGroupId;
+    }
+
+    /**
+     * Query that is executed when searching for one group by a specific group id
+     */
+    public void setQueryGroupByGroupId(String queryGroupByGroupId) {
+        this.queryGroupByGroupId = queryGroupByGroupId;
     }
 
     /**
@@ -433,4 +456,16 @@ public class LDAPConfiguration {
         this.groupCacheListener = groupCacheListener;
     }
 
+    /**
+     * Sets if connections to the LDAP system should be pooled and reused.
+     * <p>
+     * Enabled by default.
+     */
+    public void setConnectionPooling(boolean connectionPooling) {
+        this.connectionPooling = connectionPooling;
+    }
+
+    public boolean isConnectionPooling() {
+        return connectionPooling;
+    }
 }

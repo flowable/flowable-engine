@@ -12,8 +12,7 @@
  */
 package org.flowable.dmn.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SimpleConverterTest extends AbstractConverterTest {
 
@@ -46,15 +45,31 @@ public class SimpleConverterTest extends AbstractConverterTest {
 
     private void validateModel(DmnDefinition model) {
         List<Decision> decisions = model.getDecisions();
-        assertEquals(1, decisions.size());
+        assertThat(decisions)
+                .extracting(Decision::isForceDMN11)
+                .containsExactly(false);
 
         DecisionTable decisionTable = (DecisionTable) decisions.get(0).getExpression();
-        assertNotNull(decisionTable);
+        assertThat(decisionTable).isNotNull();
 
         List<InputClause> inputClauses = decisionTable.getInputs();
-        assertEquals(3, inputClauses.size());
+        assertThat(inputClauses).hasSize(3);
+
+        assertThat(inputClauses.get(0).getInputValues().getTextValues())
+                .containsOnly("val1", "val2");
+        assertThat(inputClauses.get(0).getInputValues().getText()).isEqualTo("\"val1\",\"val2\"");
+
+        assertThat(inputClauses.get(1).getInputValues().getTextValues())
+                .containsOnly("10", "20");
+        assertThat(inputClauses.get(1).getInputValues().getText()).isEqualTo("10,20");
+
+        assertThat(inputClauses.get(2).getInputValues()).isNull();
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
-        assertEquals(1, outputClauses.size());
+        assertThat(outputClauses).hasSize(1);
+
+        assertThat(outputClauses.get(0).getOutputValues().getTextValues())
+                .containsOnly("val1", "val2");
+        assertThat(outputClauses.get(0).getOutputValues().getText()).isEqualTo("\"val1\",\"val2\"");
     }
 }

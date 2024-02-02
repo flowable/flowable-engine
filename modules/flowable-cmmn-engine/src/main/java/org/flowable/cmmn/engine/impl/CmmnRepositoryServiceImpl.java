@@ -21,28 +21,44 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.cmd.AddIdentityLinkForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
+import org.flowable.cmmn.engine.impl.cmd.DeleteIdentityLinkForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDecisionsForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetFormDefinitionsForCaseDefinitionCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetIdentityLinksForCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseDefinitionCategoryCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetDeploymentParentDeploymentIdCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnRepositoryService {
+public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngineConfiguration> implements CmmnRepositoryService {
+
+    public CmmnRepositoryServiceImpl(CmmnEngineConfiguration engineConfiguration) {
+        super(engineConfiguration);
+    }
 
     @Override
     public CmmnDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<CmmnDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
+
             @Override
             public CmmnDeploymentBuilder execute(CommandContext commandContext) {
                 return new CmmnDeploymentBuilderImpl();
@@ -86,16 +102,56 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     
     @Override
     public CmmnDeploymentQuery createDeploymentQuery() {
-        return cmmnEngineConfiguration.getCmmnDeploymentEntityManager().createDeploymentQuery();
+        return configuration.getCmmnDeploymentEntityManager().createDeploymentQuery();
     }
     
     @Override
     public CaseDefinitionQuery createCaseDefinitionQuery() {
-        return cmmnEngineConfiguration.getCaseDefinitionEntityManager().createCaseDefinitionQuery();
+        return configuration.getCaseDefinitionEntityManager().createCaseDefinitionQuery();
+    }
+    
+    @Override
+    public void addCandidateStarterUser(String caseDefinitionId, String userId) {
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null, configuration));
+    }
+
+    @Override
+    public void addCandidateStarterGroup(String caseDefinitionId, String groupId) {
+        commandExecutor.execute(new AddIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId, configuration));
+    }
+
+    @Override
+    public void deleteCandidateStarterGroup(String caseDefinitionId, String groupId) {
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, null, groupId));
+    }
+
+    @Override
+    public void deleteCandidateStarterUser(String caseDefinitionId, String userId) {
+        commandExecutor.execute(new DeleteIdentityLinkForCaseDefinitionCmd(caseDefinitionId, userId, null));
+    }
+
+    @Override
+    public List<IdentityLink> getIdentityLinksForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetIdentityLinksForCaseDefinitionCmd(caseDefinitionId));
     }
 
     @Override
     public void setCaseDefinitionCategory(String caseDefinitionId, String category) {
         commandExecutor.execute(new SetCaseDefinitionCategoryCmd(caseDefinitionId, category));
+    }
+    
+    @Override
+    public void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId) {
+        commandExecutor.execute(new SetDeploymentParentDeploymentIdCmd(deploymentId, newParentDeploymentId));
+    }
+
+    @Override
+    public List<DmnDecision> getDecisionsForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDecisionsForCaseDefinitionCmd(caseDefinitionId));
+    }
+
+    @Override
+    public List<FormDefinition> getFormDefinitionsForCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetFormDefinitionsForCaseDefinitionCmd(caseDefinitionId));
     }
 }

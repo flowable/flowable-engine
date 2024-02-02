@@ -12,10 +12,12 @@
 
 <h1>Documentation</h1>
 <ul>
-    <li><a href="docs/userguide/index.html">The Flowable User Guide</a></li>
-    <li><a href="docs/userguide-dmn/index.html">The Flowable DMN User Guide</a></li>
-    <li><a href="docs/userguide-form/index.html">The Flowable Form User Guide</a></li>
-    <li><a href="docs/javadocs/index.html">Flowable Javadocs</a></li>
+    <li><a href="https://flowable.com/open-source/docs/bpmn/ch02-GettingStarted">The Flowable User Guide</a></li>
+    <li><a href="https://flowable.com/open-source/docs/cmmn/ch02-Configuration">The Flowable CMMN User Guide</a></li>
+    <li><a href="https://flowable.com/open-source/docs/dmn/ch02-Configuration">The Flowable DMN User Guide</a></li>
+    <li><a href="https://flowable.com/open-source/docs/eventregistry/ch02-Configuration">The Flowable Event Registry User Guide</a></li>
+    <li><a href="https://flowable.com/open-source/docs/form/ch02-Configuration">The Flowable Form User Guide</a></li>
+    <li><a href="https://flowable.com/open-source/docs/all-javadocs/">Flowable Javadocs</a></li>
 </ul>
 
 <h1>Links</h1>
@@ -25,6 +27,536 @@
 </ul>
 
 <h1>Flowable Release Notes</h1>
+
+<h3>Release Notes - Flowable - 7.0.0.M1</h3>
+
+<ul>
+	<li>This is the first milestone for version 7 of the Flowable Engines focusing on the Spring Boot 3, Spring 6 and Java 17 upgrade.</li>
+	<li>The plan forward is to keep maintaining the 6.x and 7.x versions for at least the next year, so we will do both 6.x and 7.x releases.</li>
+	<li>The REST application requires a servlet container / application server that supports Jakarta 9.</li>
+	<li>This release focuses on the main Flowable Engines and REST APIs for the BPMN, CMMN, DMN and event registry engines. This means that there
+	are no UI applications, no content and form engines and the modules for Mule and some others are removed.</li>
+</ul>
+
+
+<h3>Release Notes - Flowable - 6.8.0</h3>
+
+<ul>
+	<li>Added support for using scripts in task and execution listeners and HTTP request and response handlers.</li>
+	<li>Added support for new task and instance history levels to provide more options to reduce the amount of historic data stored.</li>
+	<li>Added support to throw BPMN errors in scripts.</li>
+	<li>Added support for headers in an event model that can be used with event registry events in case and process definitions.</li>
+	<li>Improved support for starting case and process instances with the unique feature enabled on event registry start events.
+	The event subscription for the event registry event is locked while starting the case and process instance to prevent any duplicate instances.</li>
+	<li>Added support for async leave in addition to the already long existing async (before) attribute for async tasks in BPMN and CMMN. 
+	An async job will be created to execute the leave of a task when the async leave attribute is set to true.</li>
+	<li>Improved support for parallel repeatable event listeners in case definitions.</li>
+	<li>Added interface to provide an implementation for non-matching events that are received in the event registry.</li>
+	<li>Added support to query directly on runtime variable instances both in the Java API and REST API.</li>
+	<li>Improved housekeeping logic to reduce the throughput time.</li>
+	<li>Added support for retries in Kafka channels in the event registry.</li>
+	<li>Expose topic, partitions and offset consumer record for inbound Kafka channel and provide custom partition support for outbound Kafka channel.</li>
+	<li>Added bulk support for deleting case and process instances, terminating case instances and moving deadletter jobs to executable.</li>
+	<li>Added activity instance REST API query support.</li>
+	<li>Fixed issue with event listeners in a repeatable stage in a case definition.</li>
+	<li>Fixed issue with having multiple event registry start events in a process definition.</li>
+	<li>Add dedicated task executor for the task invoker. This is fixing an issue with a potential deadlock when using the "true parallel" HTTP task feature.</li>
+	<li>Improved channel definition caching logic to prevent channels from getting unregistered when they should not.</li>
+	<li>Added support for providing an owner and assignee when starting a case or process instance.</li>
+	<li>Upgrade to Spring Boot 2.7.6.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.7.2</h3>
+
+<ul>
+	<li>Fixed issue with vulnerable Log4j dependency. The Flowable apps now use the default Spring Boot logging framework, which is Logback.</li>
+	<li>Added support to execute a decision service in the DMN REST API.</li>
+	<li>Added support to query tasks with case instance variables.</li>
+	<li>Fixed issue with migrating a process instance to a new process definition with a call activity and a new boundary event.</li>
+	<li>Upgraded to Spring boot 2.6.2.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.7.1</h3>
+
+<ul>
+	<li>A case and process instance has support for a business status value, similar to a business key.</li>
+	<li>Added support for deleting historic case and process instances and their related data using batches and batch parts.</li>
+	<li>Fixed issue with the global lock mechanism when running a cluster of Flowable instances.</li>
+	<li>Fixed issue with transient variables made persistent when passing all variables to a sub process instance with a call activity task.</li>
+	<li>Added support for querying tasks, jobs and event subscriptions without the BPMN or CMMN entities. By using withoutProcessInstanceId on the task query for example you
+	can make sure that only CMMN tasks and standalone tasks are returned without the BPMN tasks.</li>
+	<li>Added MariaDB to the Flowable QA databases in Github Actions.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.7.0</h3>
+
+<ul>
+	<li>Implemented a global locking mechanism to have better support for using the async executor in a setup with multiple Flowable Engines. Together with this the async executor default configuration was changed
+	to be able to handle more jobs per second by default. A 4-part article series describe all the fine details and a performance benchmark of this, <a href="https://blog.flowable.org/2021/04/14/handling-asynchronous-operations-with-flowable-part-1-introducing-the-new-async-executor/">Part 1</a>,
+	<a href="https://blog.flowable.org/2021/04/21/handling-asynchronous-operations-with-flowable-part-2-components-configuration/">Part 2</a>, <a href="https://blog.flowable.org/2021/04/28/handling-asynchronous-operations-with-flowable-part-3-performance-benchmarks/">Part 3</a>,
+	<a href="https://blog.flowable.org/2021/05/05/handling-asynchronous-operations-with-flowable-part-4-evolution-of-the-async-executor/">Part 4</a>.</li>
+	<li>Added support for multi instance variable aggregation, <a href="https://blog.flowable.org/2021/02/16/multi-instance-variable-aggregation/">https://blog.flowable.org/2021/02/16/multi-instance-variable-aggregation/</a>.</li>
+	Aggregating values from a multi instance execution has always been tricky, but now with the support for variable aggregation this can be handled in an elegant way.</li>
+	<li>Added support for case reactivation to support reactivating historic and completed case instances to a running case instance. Case definitions can have a case reactivation listener.
+	that can be triggered to reactivate a historic case instance and the variable context etc will be re-created.</li>
+	<li>A variable listener has been added to allow for BPMN and CMMN models to listen to changes for a specific variable and handle this trigger in the model.</li>
+	<li>Add support for repetition signal and generic event listener in the CMMN engine to be triggered in parallel.</li>
+	<li>Added an optimization flag for asynchronous multi-instance usage when the multi-instance is an automatic step or a sequence of automatic steps. If set, the engine will drastically lower resource consumption, and remove the optimistic locking exceptions and typically be more performant.</li>
+	<li>Added support of synchronous handling of event registry events.</li>
+	<li>Added support for DMN 1.3 version models.</li>
+	<li>Added support for method overloading in JUEL / backend expressions.</li>
+	<li>Added localization support for case definitions and runtime and history case instances and plan item instances.</li>
+	<li>Added basic CMMN model validation to the CMMN engine.</li>
+	<li>Added basic CDI support to the CMMN engine.</li>
+	<li>Exceptions thrown from Task listeners are no longer wrapped in FlowableException.</li>
+	<li>Exceptions thrown from Task, case lifecycle and plan item lifecycle listeners are no longer wrapped in FlowableException.</li>
+	<li>Improved paging of runtime and historic process and case instance queries including variables. In earlier versions queries with include variables did paging in memory with a lot of limitations.</li>
+	This is now done on a query level and the limitations are not present anymore.</li>
+	<li>In this release an upgrade to Spring Boot 2.5.4 and Spring 5.3.9 was done.</li>
+	<li> There has been a change in the way a process / case instance is started from an event from the event registry.
+    Instead of starting the process / case asynchronously, it is started synchronously. Using this default value allows correct processing of in-order event coming on the same topic.
+    In case in order processing is not important you can configure that as part of your model by marking the Event Registry Start event as async or marking the Case Model as async.
+    If you want to go back to the previous default you can set the following properties: <code>flowable.process.event-registry-start-process-instance-async</code> and <code>flowable.cmmn.event-registry-start-case-instance-async</code> to <code>true</code>.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.6.0</h3>
+
+<h4>GENERAL</h4>
+
+<ul>
+	<li>External worker tasks have been added to the BPMN and CMMN engine. This is a new paradigm that is available to execute service logic outside of the BPMN and CMMN engine.
+	Until this release this could be done by pushing work to another service, like with using a HTTP task or send an event with the event registry task. The external worker task
+	can be used to pull work from the BPMN and CMMN engine. This means that a service written in any language can pull for open external worker tasks over a dedicated external worker REST API,
+	then execute the work, and finally complete the worker task to move the state of the process or case to the next state.</li>
+	<li>Added support for future Java delegates to enable running service tasks and HTTP tasks actually in parallel. Until this release a parallel gateway with multiple outgoing sequence flows to a service task
+	didn't run the synchronous service tasks really in parallel, they were still executed sequential. When these service tasks are made asynchronous and not exclusive, then they were executed in parallel by the
+	async executor, but also in different transactions. With the new future service task support, it's now possible to run synchronous service tasks within the same transaction in parallel.
+	The service tasks are executed in parallel on a thread pool and the future will wait until all service tasks are completed.
+	More info is available in this <a href="https://blog.flowable.org/2020/08/06/true-parallel-service-task-execution-with-flowable/">blog post</a></li>
+	<li>Added a category property to jobs to be able to distinguish between different groups of jobs. This can also be used to enable the execution of only
+	specific job categories in the BPMN or CMMN engine. In this way different micro services with an embedded Flowable engine using the same database can be configured
+	to only execute jobs from a defined list of categories, as an example.</li>
+	<li>History jobs are now moved to the deadletter job table when the retries are exhausted. This ensures that the history job is always kept in the database.</li>
+	<li>Removed the get current engine configuration from the CommandContextUtil classes of the Flowable engines because in an application 
+	where multiple engines are used it could not be guaranteed that the correct engine configuration was returned.</li>
+	<li>JSON variable changes are now tracked when updated in expressions, scripts, delegate classes or Spring beans. This means that when updating a property like
+	customer.name in a delegate class, the customer JSON variable will now automatically be updated.</li>
+	<li>Extended the entity link support to also record grand parent entity links, which means the parent process of a task in a sub process for example.</li>
+    <li>When deploying via the BPMN, CMMN or DMN repository service the created deployment will have the parent deployment id set from its own deployment id.</li>
+    <li>The FlowableExpressionEnhancer has been removed. We have adapted the Expression parsing, so now functions are enhanced during the
+    expression tree building. This is a lower level api and uses the new FlowableAstFunctionCreator.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+	<li>In and out parameters can be defined for signal events, similar to the existing in and out parameter support for call activities.
+	By defining in parameters for a signal boundary event for example, variables can be set on the process instance scope from the signal payload data.</li>
+	<li>Added support for triggerable service tasks with expressions.</li>
+	<li>Added support for event registry backed receive task and intermediate catch event.<li>
+	<li>Added support for JSON variables in web service tasks.</li>
+	<li>For ordering activity instances that are part of the same Flowable transaction, a transaction order value has been added, which is a basic numeric value starting with 1
+	and incremented with 1 for every new activity instance.</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+	<li>Added support for case instance migration with defining for which plan item definitions the state needs to be changed. 
+	This also includes moving new plan item definitions to available state if needed.</li>
+	<li>The Case task now supports in and out parameter mapping.</li>
+</ul>
+
+<h4>DMN</h4>
+
+<ul>
+	<li>Support for Decision services and DRD (Decision Requirement Diagram) has been added to the DMN engine. This enables the usage of a hierarchy of 
+	decision tables to calculate the output of a decision service in multiple decision tables.</li>
+</ul>
+
+<h4>APPS</h4>
+
+<ul>
+	<li>The UI Apps have been consolidated in one single Flowable UI App instead of 4 different applications. This makes the authentication and authorization logic
+	less complex, makes the demo experience and installation experience easier and doesn't require you to switch between multiple browser tabs all the time.
+	This means that now only 2 WAR files are provided in the Flowable Download, the Flowable UI app, that includes the Modeler, IDM, Admin and Task application together with the Flowable REST API and
+	the second WAR file is the REST application that only includes the Flowable REST API. For more information you can read this 
+	<a href="https://blog.flowable.org/2020/10/12/whats-new-with-the-flowable-ui-apps/">blog post</a></li>
+	<li>Support for OAuth2 authentication is added to the Flowable UI App, with Keycloak as an example implementation.</li>
+	<li>Updated Docker images and Kubernetes Helm charts for the new Flowable UI app and with more configuration options. On the docker images the Spring boot applications
+	are now started with a flowable user and not with the root user as before.</li>
+</ul>
+
+<h4>ADDITIONAL</h4>
+
+<ul>
+    <li>In this release an upgrade to Spring Boot 2.3.4 and Spring 5.2.9 was done.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.5.0</h3>
+    
+<h4>GENERAL</h4>
+
+<ul>
+    <li>Added a new Event Registry engine which provides functionality to use Flowable in event driven architectures and has out-of-the-box support for JMS, Apache Kafka and RabbitMQ.
+    Events can be received by BPMN start events, boundary events and triggerable send event tasks. In CMMN receiving events is supported by event listeners and for starting new case instances.
+    Both engines also provide a send event task to send out an event to the event adapter implementation.</li>
+    <li>To improve the support for running Flowable on multiple servers / nodes a new option was added to use a lock for creating the database schema and
+    for executing the auto deployments at bootup. This ensures that when starting multiple servers / nodes at the same time, creating the database schema
+    and doing the auto deployment of CMMN XML and BPMN XML files etc only happens on one server / node at the same time.</li>
+    <li>A new Batch service was added to support executing multiple jobs in one batch, where each job is a batch part. The first usage of the Batch service is the support for batch
+    process instance migration, but the Batch service is designed to support many use cases.</li>
+    <li>A first version of the Logging Session support has been added, which provides a full insight in the execution of case and process instances with all its child entities like tasks,
+    variables, event subscriptions etc. This can be useful for debugging purpose, problem detection in production environments or for audit purposes.</li>
+    <li>The variable service has been enriched to support java.time.Instant, java.time.LocalDate and java.time.LocalDateTime as additional variable types. When using these Object types as
+    a variable they will not be stored as serializable anymore, but with a timestamp value and when used transformed into the correct Object type.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>BPMN</h4>
+    
+<ul>
+    <li>Added support for Event Registry start events to trigger starting a process instance with an incoming event.</li>
+    <li>An Event Registry boundary event has been added to support triggering a running process instance with an incoming event, with correlation and tenant detection support.</li>
+    <li>Added an Event Registry send event task to support sending events from a process instance and optionally listening for a response event using the triggerable task support.</li>
+    <li>The process instance migration support has been enhanced with supporting batch migration. Migrating a process definition with all its running instances to a new process definition
+    is now possible with one batch, where each instance migration will be a batch part of a parent batch.</li>
+    <li>Support has been added for Kubernetes and HELM charts in specific. For more details see the Github documentation about this <a href="https://github.com/flowable/flowable-engine/tree/master/k8s">https://github.com/flowable/flowable-engine/tree/master/k8s</a></li>
+    <li>With historic information growing bigger over time, a way to cleaning this historic information was necessary. For this purpose a history cleaning job was added
+    that can be configured to clean historic information older than a configured time period.</li>
+    <li>To support the history clean job, delete methods have been added to the history query interfaces to also allow to delete historic data with other criteria
+    than just time period based parameters.</li>
+    <li>The mail task has been enhanced with support for sending content items as attachments.</li>
+</ul>
+    
+<h4>CMMN</h4>
+    
+<ul>
+    <li>Added support on a Case definition root level to listen for incoming events to start a new case instance.</li>
+    <li>An Event Registry event listener has been added to support triggering a running case instance with an incoming event, with correlation and tenant detection support.</li>
+    <li>Added an Event Registry send event task to support sending events from a case instance.</li>
+    <li>Added support to inject a Stage or a specific Task in a Stage instance of a running case instance. In this way a CMMN model can be enriched with
+    new Stage or Task logic for a specific case instance.</li>
+    <li>Java Collection support has been added to repetition rules for plan items. This is similar to the Java Collection support for BPMN multi-instance constructs.
+    A Java Collection variable or an expression can be used to define a repetition rule.</li>
+    <li>Enriched the support for evaluating if a Stage can be completed. On a plan item a parent completion rule can be defined with a type that matches the desired evaluation logic.</li>
+    <li>The support for expressions in a case instance has been extended. It's now possible to get a count value for all active plan item instances of a specific definition for example with the following
+    expression: ${planItemInstances.definitionId('a').active().count()}. The CMMN documentation has been updated with all options possible.</li>
+    <li>A mail task has been added to the CMMN engine (similar as the one in the BPMN engine) with support for sending content items as attachments.</li>
+</ul>
+
+<h4>EVENT REGISTRY</h4>
+    
+<ul>
+    <li>A new engine was added with the regular deployment and deployment resources support to follow the pattern of the other engines.</li>
+    <li>Support for Event definitions which define the event payload, the channel definition to use, and the optional correlation parameters of an incoming or outgoing event. The BPMN start event,
+    boundary event or send task or the CMMN Case element or event listener are linked to an Event definition based on a logical key, like it's also the case for, for example,
+    BPMN call activities and CMMN case tasks.</li>
+    <li>Support for Channel definitions which define the source or target destination, with a specific adapter type (JMS, Kafka or RabbitMQ by default). Also an event key detection
+    and an optional tenant id detection configuration can be provided. An Event definition links to a Channel definition based on the Channel logical key.</li>
+    <li>When using the Event Registry Spring module, there are 3 out-of-the-box adapters supported, JMS, Kafka and RabbitMQ.</li>
+</ul>
+
+<h4>DMN</h4>
+    
+<ul>
+    <li>Added support for DMN 1.2, which is the revision of the DMN 1.1 specification. The Collect hit policy logic was changed to not only consider unique outcome values
+    but every outcome value for which the rule was hit. This was changed in the DMN 1.2 specification version.</li>
+</ul>
+
+<h4>ADDITIONAL</h4>
+
+<ul>
+    <li>In this release an upgrade to Spring Boot 2.2.2 and Spring 5.2.2 was done. This is the last release where we have official support for Spring Boot 1.5.x and Spring 4.x.
+    Starting from the next release this will not be officially supported anymore.</li>
+</ul>
+	
+<h3>Release Notes - Flowable - 6.4.2</h3>
+	
+<h4>GENERAL</h4>
+
+<ul>
+    <li>Support has been added for CockroachDB (<a href="https://github.com/cockroachdb/cockroach">https://github.com/cockroachdb/cockroach</a>) as an alternative DB option.
+    A blog post with more details and getting started can be found <a href="http://blog.flowable.org/2019/07/10/getting-started-with-flowable-and-cockroachdb/">here</a>.
+    The full list of changes can be found here <a href="https://github.com/flowable/flowable-engine/pull/1716">https://github.com/flowable/flowable-engine/pull/1716</a>.</li>
+    <li>Extracted the event subscription logic from the BPMN engine into a service (similar to the variable and job service for example), so that event subscriptions
+    can also be used from the CMMN engine and possibly other engines in the future.</li>
+    <li>The manual sql scripts that can be found in the distro download are updated to include convenient scripts that will update and create the engines in one sql script.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+	
+<h4>BPMN</h4>
+	
+<ul>
+    <li>Added support for BPMN escalation events.</li>
+</ul>
+	
+<h4>CMMN</h4>
+	
+<ul>
+    <li>Added support to listen to signal events in a CMMN case model. This enables more options to interact from a BPMN process instance with a CMMN case instance.</li>
+    <li>Added 'available condition' to CMMN event listeners (e.g. user or timer event listener) to guard precisely when an event listener becomes available. See the documentation for examples.</li>
+</ul>
+	
+<h3>Release Notes - Flowable - 6.4.1</h3>
+
+<h4>Highlights</h4>
+
+<h4>GENERAL</h4>
+
+<ul>
+    <li>A new table has been added to keep track of all changes that happen with a user / human task. A HistoricTaskLogEntry is created when the assignee of a task changes, or the owner, or for example the due date.
+    By default the user / human task logging is disabled, with the enableHistoricTaskLogging property in the process or cmmn engine configuration, the user / human task logging can be enabled.</li>
+    <li>A new runtime and historic entity link table has been added to store the relationship between parent entities and all children. This means for example that when a parent process instance has a sub process, and the sub process has a user task, that for the user task
+    two entity links are created, one between the parent process instance and the user task, and another with the sub process instance and the user task. The same is true when a case instance starts a process instance via the CMMN Process Task for example. This makes it possible
+    to get all child tasks for a parent process instance for example. By default, storing entity links is not enabled in the Flowable engines, but using the enableEntityLinks property in the process engine configuration and/or CMMN engine configuration this can be enabled.</li>
+    <li>Support for DMN 1.2 (<a href="https://www.omg.org/spec/DMN">https://www.omg.org/spec/DMN</a>, still in beta). This is foremost a XSD and parse support.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+    <li>A runtime activity instance table has been added to allow you to query for the activity instances that have been executed for a running process instance without needing
+    to go to the history tables. This includes active and completed activity instances. When a process instance is completed or terminated, the runtime activity instance will be deleted and only available in the historic activity instance table.</li>
+    <li>The sequence flows that are taken are now also stored as part of the runtime and historic activity instance data. This provides a more complete audit history of the process instance execution.</li>
+    <li>The process instance migration feature has been extended with logic to allow migrating process instances with call activities and support moving the current active state from a parent process instance to a sub process instance and vice versa.</li>
+    <li>The admin app now contains a migrate process instance button in the process instance view, that allows for simple migration cases to define the activity mappings and execute the migration.</li>
+    <li>Multi tenancy improvements to support lookups for process, case, form, and decision table definitions within the tenant, but also allow for a fallback lookup in a default tenant of choice. This makes it possible to share common definitions in a default tenant, and only
+    use tenant specific definitions when necessary.</li>
+    <li>REST services have been added to make it easier to fetch a form definition associated with a user task or a start event. Also, completing a form for a user task or starting a process instance with a form is now a lot easier via REST.
+    Getting a BPMN user task form can be done via GET process-api/runtime/tasks/{taskId}/form for example, and completing a user task can be done via POST process-api/runtime/tasks/{taskId} as it was possible already before. But now the payload can contain a form definition id 
+    and outcome value to complete the user task with a form.</li>
+    <li>Using transient variables in the BPMN web service task instead of using process variables for values that should not be persisted in the variables table.</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+    <li>Plan item instances are now stored in the runtime tables until the case instance is finished. This allows to query the state of a case instance without having to use the historical api's or data.</li>
+    <li>The engine will automatically detect when event listeners (user, generic or timer) are not useful anymore and remove the event listener instances.</li>
+    <li>Addition of a new 'trigger mode' called "on event" for event resolving in sentries that allows to scope the event evaluation to that evaluation cycle only (versus with memory as is the default). This enables advanced models where events (and consequentially the related sentries) only should be evaluated at the moment they happen.</li>
+    <li>Addition of the task and plan item lifecycle listener, similar to task and execution listeners in BPMN.</li>
+    <li>To support modeling arbitrary user or automated actions in CMMN, it is now possible to use a 'generic event listeners'. This event listener behaves like a user event listener, but can be triggered programmatically through an API (see the CmmnRuntimeService).</li>
+    <li>It is now possible to make a user or generic event listeners repeatable, which allows a more natural way of modeling cases where a certain event happens multiple times.</li>
+    <li>Greatly improved cross border resolving of sentry dependencies (across multiple and potentially nested stages).</li>
+    <li>A first version of case instance change state has been added to the Flowable CMMN Engine. In the CmmnRuntimeService you can now use the createChangePlanItemStateBuilder to define and execute the case instance change state logic.
+    This first version supports changing state focused on human tasks. In the next version more support will be added for more complex cases.</li>
+    <li>REST services have been added to make it easier to fetch a form definition associated with a human task or a plan model. Also, completing a form for a human task or starting a case instance with a form is now a lot easier via REST.
+    Getting a CMMN human task form can be done via GET cmmn-api/cmmn-runtime/tasks/{taskId}/form for example, and completing a human task can be done via POST cmmn-api/runtime/tasks/{taskId} as it was possible already before. But now the payload can contain a form definition id 
+    and outcome value to complete the user task with a form.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.4.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>A first version of process instance migration has been added to the Flowable BPMN Engine. In the RuntimeService you can now use the createProcessInstanceMigrationBuilder to define and execute the process instance migration.
+    This first version supports migrating process instances with wait states, embedded (event) sub processes and boundary events. 
+    In the next version more support will be added for more complex cases like parallel and inclusive gateways, multi-instance activities and call activities.</li>
+    <li>Expression support have been added for the BPMN and CMMN engines to make it easier to work with variables and in specific variables that may not have been initialized yet.
+    When you reference a variable in an expression like ${customerNumber > 40} and there is no customerNumber variable yet, an exception would be thrown.
+    With the variable expression support this can be handled without an exception with ${variables:getOrDefault(customerNumber, 0) > 0}. 
+    A similar expression is possible for strings with ${variables:get(customerName) == "test"}. The user guide describes the full set of available variable expressions.</li>
+    <li>A first version with support for MongoDB persistence has been added. The MongoDB module is available from a separate Git repository at <a href="https://github.com/flowable/flowable-mongodb">https://github.com/flowable/flowable-mongodb</a>.
+    The MongoDB module is made available in a separate repository, so that it can be released in a different pace than the full Flowable Engine releases.
+    The support of MongoDB already includes most BPMN constructs, but in the coming releases it will be extended to be on par with the relational database support.</li>
+    <li>Upgrade to Spring 5.x for all the integration modules using Spring.</li>
+    <li>Added plan item lifecycle listener to the CMMN engine, to allow for listening to plan item instance state changes</li>
+    <li>In the Task app support for activating manual plan items and triggering user event listeners has been added</li>
+    <li>Added support for JUnit 5.</li>
+    <li>Support for using java.time.Duration variables and expressions for Timer durations.</li>
+    <li>Chinese translation has been added for the UI apps.</li>
+    <li>Various small bugfixes and improvements all around.</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<h5>Idm Engine SpringEncoder</h5>
+<p>
+    The deprecated constructor from SpringEncoder that accepted <i>org.springframework.security.authentication.encoding.PasswordEncoder</i> has been removed
+</p>
+
+<h5>Custom IdGenerator using a Bean in Spring Boot</h5>
+<p>
+    It is now possible to define the custom IdGenerator for the Flowable Process engine, by creating a bean of type IdGenerator.
+    If no bean is provided the StrongUuidGenerator will be used.
+    If there is a bean qualified with @Process then this one would be used, otherwise a unique global one would be used.
+    If there are more global beans then the default StrongUuidGenerator will be used.
+</p>
+
+<h5>FlowableFunctionDelegate changes</h5>
+<p>
+    The method <i>functionClass</i> has been removed from the <i>org.flowable.common.engine.api.delegate.FlowableFunctionDelegate</i> interface.
+    This doesn't change anything with regards to adding custom functions to expressions: returning the right Method in <i>functionMethod()</i> is enough.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of an app engine, so apps are now a first class citizen and the process engine is not misused any more to handle app deployments. 
+    When starting the Flowable Task application all app deployments are automatically migrated to the new app engine.</li>
+    <li>Added async history support to the CMMN engine.</li>
+    <li>Added more history information to the CMMN engine with historic plan items.</li>
+    <li>Improved the Spring Boot support and upgraded to Spring Boot 2.0.2.</li>
+    <li>Enhanced debugger in the Flowable Task application to evaluate expressions and scripts.</li>
+    <li>Made the job service more generic with the scope type property to improve the possibility to run different job handlers for different job types.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Amina Zoheir (AminaZoheir)</li>
+    <li>Toni (ttonl)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+	
+<h5>Package renaming</h5>
+	
+<p>To make the Flowable modules compatible with OSGi and Java 9 modules some package renaming was needed to prevent clashes.
+The renaming has been done according to this pattern org.flowable.engine.common -> org.flowable.common.engine</p>
+
+<h5>StrongUuidGenerator usage with Spring Boot</h5>
+
+<p>The Spring Boot process auto configuration now uses the StrongUuidGenerator. In case you were overwriting the default one you can remove that.
+In case you want to keep using the DbIdGenerator, then just add the following bean to your configuration:
+<pre><code>
+    @Bean
+    public EngineConfigurationConfigurer&lt;SpringProcessEngineConfiguration&gt; processEngineDbIdGeneratorConfigurer() {
+        return engineConfiguration -> engineConfiguration.setIdGenerator(new DbIdGenerator());
+    }
+</code></pre>
+The default values of the DbIdGenerator would be filled in during the creation of the Process Engine.
+
+<h5>IdmEngineConfigurator</h5>
+
+<p>
+    The default <code>IdmEngineConfigurator</code> and <code>SpringIdmEngineConfigurator</code> have been moved from <code>org.flowable.app.engine.impl.cfg</code>
+    and <code>org.flowable.spring.configurator</code> to <code>org.flowable.idm.engine.configurator</code> and <code>org.flowable.idm.spring.configurator</code>
+    respectively. In case you have used them please replace your imports.
+</p>
+
+<h5>Async history classes package change</h5>
+<p>
+    The async history classes have been moved from the process engine module to the job service, to make them available for other components. Generally, the packages now have <code>job.service</code> added to make this clear.
+    <ul>
+      <li>
+          Classes with regards to async history collection and execution (<code>AbstractAsyncHistoryJobHandler, AsyncHistoryJobHandler, AsyncHistoryListener, AsyncHistorySessionFactory, 
+          AsyncHistorySession, DefaultAsyncHistoryJobProducer, HistoryJsonTransformer</code>) in the <code>org.flowable.engine.impl.history.async</code> have been moved to the <code>org.flowable.job.service.impl.history.async</code> package.</li>
+      <li>
+          Classes related to executing async jobs using a message queue (most notably <code>AsyncHistoryJobMessageHandler and AsyncHistoryJobMessageReceiver</code>) have been moved from the 
+          <code>org.flowable.engine.impl.asyncexecutor.message</code> to the <code>org.flowable.job.service.impl.asyncexecutor.message</code> package.     
+      </li>
+      <li>
+          Similarly, for executing async history jobs using a message queue: the classes in the package <code>org.flowable.engine.impl.history.async.message</code> are now found in the <code>org.flowable.job.service.impl.history.async.message</code> package.
+      </li>
+    </ul>  
+    Updating the imports is sufficient when upgrading.
+</p>
+
+<h3>Release Notes - Flowable - 6.3.0</h3>
+
+<p>Flowable 6.3.0 has turned out to be a big release with many new features (and even more fixes). Many thanks to all the community contributers that participated in the release
+and a special shout-out to Pascal Schumacher, Zach Visagie, Robert Hafner, Christophe Deneux and Seif El Deen Khaled</p>
+
+<h4>Highlights</h4>
+
+<h4>Note: Flowable now requires JDK 8 as a minimum version!</h4>
+
+<h4>GENERAL</h4>
+
+<p>The Spring Boot starters have all been updated to version 2.0. There are now starters available for each engine (BPMN, CMMN and DMN). 
+Check the completely revised documentation for more details!</p>
+
+<ul>
+    <li>Support and fixes for running various modules on JDK 9 (the engines themselves already ran on JDK 9)</li>
+    <li>Updated all 3rd-party libraries to latest versions</li>
+    <li>The REST app can now be configured to use privileges, instead of all users being able to make REST calls.</li>
+</ul>
+
+<h4>BPMN</h4>
+
+<ul>
+    <li>Performance enhancements with great results. Read all about it here: <a href="https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/">https://blog.flowable.org/2018/03/05/flowable-6-3-0-performance-benchmark/</a></li>
+    <li>Dynamic task and subprocess injection into running process instances is now fully supported and out of experimental state</li>
+    <li>Allow the configuration of history on individual process definitions, overriding the engine default setting</li>
+    <li>Introduce the 'triggerable' service task: a service task that provides configurable service calls that are executed externally and call the engine when done. 
+    The implementation is guaranteed to be correct with regards to the transactional behavior of the engine.</li>
+    <li>Support for a transaction-lifecycle based event listener</li>
+    <li>Support for 'sameDeployment' when looking up the called process definition for a call activity</li>
+    <li>HTTP task: support for storing response variables transiently</li>
+    <li>Multi instance: support for Iterable when resolving a collection (e.g. ArrayNode)</li>
+</ul>
+
+<h4>CMMN</h4>
+
+<ul>
+    <li>REST API support for all CMMN services and operations</li>
+    <li>Support for asynchronous service tasks</li>
+    <li>Support for manual activation rules and enabling/manually starting plan items through the runtime service</li>
+    <li>Support for required rule</li>
+    <li>Support for autocomplete</li>
+    <li>Support for completion neutral</li>
+    <li>A Script task type has been added</li>
+    <li>Support for User event listeners</li>
+    <li>Support for viewing and managing CMMN date in the Admin app</li>
+</ul>
+
+<h4>DMN</h4>
+
+<ul>
+    <li>Support for collection expressions, such as IN and NOT IN</li>
+    <li>Improved decision table editor user experience to make it easier to add JUEL expressions in specific rules</li>
+    <li>Support for viewing and managing decision executions in the Admin app</li>
+</ul>
+
+<h4>APPS</h4>
+
+<ul>
+    <li>All apps have been rewritten to use Spring Boot 2.0. All apps now use one property file for configuration. 
+    Please check the documentation, as many new configuration options are available (with backwards compatibility for old properties).</li>
+    <li>Support for expressions in the options fields, including dropdown, radio and hyperlink fields</li>
+    <li>Support for a password fields in the form editor and runtime</li>
+    <li>Multi-tenancy support in the Modeler by defining the active tenant in the Modeler property file</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>
+To remove duplicate code, some more logic has been added to the common modules, such as flowable-engine-common and flowable-common-rest. 
+For example, the scripting engine has been moved to the flowable-engine-common module so it can be used by both the BPMN and the CMMN engine.
+If you are using Flowable internal classes then it is possible that some package changes to the common modules are required.
+Most of this should be automatically handled by your IDE.
+</p>
+
+<p>
+All Flowable apps (IDM, Modeler, Task, Admin and REST) now read their configuration from the <i>flowable-app.properties</i> file, which is included in each WAR file in the <i>META-INF/flowable-app</i> folder.
+Consequently, a single, shared <i>flowable-app.properties</i> can be placed on the classpath for all apps.
+All property files (e.g. <i>db.properties</i> for the REST app) are still read and work in a backwards-compatible way.  
+</p>
+
+<p>
+The default way user credentials are authenticated and verified when calling the Flowable REST API has changed. A user now needs to have the <i>access-rest-api</i> privilege (before, any valid credentials could be used).
+An admin user can be given this privilege by setting the <i>flowable.rest.app.admin.user-id</i> and <i>flowable.rest.app.admin.password</i> properties in the <i>flowable-app.properties</i> file. On start-up, the admin user will be created if it doesn't exist, or it will be given the <i>access-rest-api</i> privilege. This admin user can then give other users this privilige using the Flowable IDM app or through a REST call (doing an HTTP post to <i>privileges/{privilegeId}/users</i> with the userId in the body).
+</p>
+
+<p>
+By default, all Flowable apps (IDM, Modeler, Task, Admin and REST) are configured to use an in-memory H2 database that is persisted in the user home folder, which is shared between all apps by default. Previously, each app had its own in-memory H2 database.
+</p>
+
+<p>
+Due to upgrading to the latest Spring Security dependencies for handling the authentication for all the Flowable apps, users can get a "cookie theft exception" when accessing the apps with a cookie from a previous version that is still present in the browser.
+The reason for this is that Spring Security has changed the way cookie tokens are hashed. A hard refresh or relogin fixes this by generating a new cookie.
+If you don't want to force your users to do this, you can delete all rows from the <i>ACT_ID_TOKEN</i> database table. This will invalidate all old cookies and all users will have to login again.
+</p>
 
 <h3>Release Notes - Flowable - 6.2.1</h3>
 

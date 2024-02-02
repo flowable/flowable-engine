@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
+
+  <!-- PROPERTY INSERT -->
+  
+  <insert id="insertIdmProperty" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
+      insert into ${prefix}ACT_ID_PROPERTY (
+        NAME_,
+        VALUE_,
+        REV_
+      ) values (
+        #{name ,jdbcType=VARCHAR},
+        #{value, jdbcType=VARCHAR},
+        1
+      )
+  </insert>
+
+  <insert id="bulkInsertIdmProperty" parameterType="java.util.List">
+      INSERT INTO ${prefix}ACT_ID_PROPERTY (NAME_, VALUE_, REV_) VALUES 
+      <foreach collection="list" item="property" index="index" separator=","> 
+        (#{property.name ,jdbcType=VARCHAR},
+         #{property.value, jdbcType=VARCHAR},
+         1)
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertIdmProperty" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+    <foreach collection="list" item="property" index="index">
+      INTO ${prefix}ACT_ID_PROPERTY (NAME_, VALUE_, REV_) VALUES
+      (#{property.name ,jdbcType=VARCHAR},
+       #{property.value, jdbcType=VARCHAR},
+       1)
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <!-- PROPERTY UPDATE -->
+  
+  <update id="updateIdmProperty" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
+    update ${prefix}ACT_ID_PROPERTY
+    <set>
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      VALUE_ = #{value, jdbcType=VARCHAR},
+    </set>
+    where NAME_ = #{name, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- PROPERTY DELETE -->
+  
+  <delete id="deleteIdmProperty" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
+    delete from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name} and REV_ = #{revision}
+  </delete>
+
+
+  <!-- PROPERTY SELECT -->
+  
+  <resultMap id="idmPropertyResultMap" type="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
+    <id property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="value" column="VALUE_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <select id="selectIdmDbSchemaVersion" resultType="string">
+    select VALUE_ from ${prefix}ACT_ID_PROPERTY where NAME_ = 'schema.version'
+  </select>
+
+  <select id="selectIdmProperty" parameterType="string" resultMap="idmPropertyResultMap">
+    select * from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectIdmProperties" resultMap="idmPropertyResultMap">
+    select * from ${prefix}ACT_ID_PROPERTY 
+  </select>
+  
+</mapper>

@@ -12,7 +12,7 @@
  */
 package org.flowable.job.api;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
 /**
  * This exception is thrown when you try to execute a job that is not found (may be due to cancelActiviti="true" for instance)..

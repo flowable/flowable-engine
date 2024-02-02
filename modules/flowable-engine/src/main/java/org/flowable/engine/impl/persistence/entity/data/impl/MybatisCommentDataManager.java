@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +85,16 @@ public class MybatisCommentDataManager extends AbstractProcessDataManager<Commen
     @Override
     public void deleteCommentsByProcessInstanceId(String processInstanceId) {
         getDbSqlSession().delete("deleteCommentsByProcessInstanceId", processInstanceId, CommentEntityImpl.class);
+    }
+    
+    @Override
+    public void bulkDeleteCommentsForTaskIds(Collection<String> taskIds) {
+        getDbSqlSession().delete("bulkDeleteCommentsForTaskIds", createSafeInValuesList(taskIds), CommentEntityImpl.class);
+    }
+    
+    @Override
+    public void bulkDeleteCommentsForProcessInstanceIds(Collection<String> processInstanceIds) {
+        getDbSqlSession().delete("bulkDeleteCommentsForProcessInstanceIds", createSafeInValuesList(processInstanceIds), CommentEntityImpl.class);
     }
 
     @Override

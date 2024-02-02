@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             targetNamespace="http://www.flowable.org/casedef">
+    <case id="simpleCase" name="Simple Case" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="casePlanModel" flowable:formFieldValidation="true">
+            <planItem id="planItem1" name="Customer Service (Case)" definitionRef="sid-151F657A-484D-46DC-93F7-A6C8BA6AF19A"/>
+            <planItem id="planItem2" name="Customer Process" definitionRef="sid-8F1D25A8-C9D5-4C98-95A1-E153F917FD10"/>
+            <task id="sid-151F657A-484D-46DC-93F7-A6C8BA6AF19A" name="Customer Service (Case)" flowable:type="external-worker" flowable:exclusive="false"
+                  flowable:topic="customer"/>
+            <processTask id="sid-8F1D25A8-C9D5-4C98-95A1-E153F917FD10" name="Customer Process" flowable:fallbackToDefaultTenant="false">
+                <processRefExpression><![CDATA[simpleProcess]]></processRefExpression>
+            </processTask>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_simpleCase">
+            <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+                <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="195.0" y="210.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="410.5" y="210.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

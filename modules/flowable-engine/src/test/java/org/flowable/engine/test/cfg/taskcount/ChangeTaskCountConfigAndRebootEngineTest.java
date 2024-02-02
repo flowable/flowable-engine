@@ -12,20 +12,25 @@
  */
 package org.flowable.engine.test.cfg.taskcount;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
-import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeTaskCountConfigAndRebootEngineTest.class);
@@ -51,11 +56,10 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
     protected void rebootEngine(boolean newTaskRelationshipCountValue) {
         LOGGER.info("Rebooting engine");
         this.newTaskRelationshipCountValue = newTaskRelationshipCountValue;
-        closeDownProcessEngine();
-        initializeProcessEngine();
-        initializeServices();
+        rebootEngine();
     }
 
+    @Test
     @Deployment
     public void testChangeTaskCountSettingAndRebootengine() {
 
@@ -149,18 +153,18 @@ public class ChangeTaskCountConfigAndRebootEngineTest extends ResourceFlowableTe
      * Check the DB property against Process Engine flag.
      */
     protected void assertConfigProperty(boolean expectedValue) {
-        PropertyEntity propertyEntity = managementService.executeCommand(new Command<PropertyEntity>() {
+        PropertyEntity propertyEntity = managementService.executeCommand(new Command<>() {
             @Override
             public PropertyEntity execute(CommandContext commandContext) {
                 return CommandContextUtil.getPropertyEntityManager(commandContext).findById(
                         ValidateTaskRelatedEntityCountCfgCmd.PROPERTY_TASK_RELATED_ENTITY_COUNT);
             }
         });
-        assertEquals(expectedValue, Boolean.parseBoolean(propertyEntity.getValue()));
+        assertThat(Boolean.parseBoolean(propertyEntity.getValue())).isEqualTo(expectedValue);
     }
 
     protected void assertTaskCountFlag(org.flowable.task.api.Task task, boolean enableTaskCountFlag) {
-        assertEquals(((CountingTaskEntity) task).isCountEnabled(), enableTaskCountFlag);
+        assertThat(enableTaskCountFlag).isEqualTo(((CountingTaskEntity) task).isCountEnabled());
     }
 
     protected void finishProcessInstance(ProcessInstance processInstance) {

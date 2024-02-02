@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
   xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:flowable="http://flowable.org/bpmn"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   targetNamespace="Examples">
 
   <process id="testLongServiceTaskLoop">
+
+    <extensionElements>
+      <flowable:historyLevel>none</flowable:historyLevel>
+    </extensionElements>
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />
     
-    <serviceTask id="serviceTask" activiti:class="org.flowable.engine.test.api.v6.CountingServiceTaskTestDelegate"/>
+    <serviceTask id="serviceTask" flowable:class="org.flowable.engine.test.api.v6.CountingServiceTaskTestDelegate"/>
     <sequenceFlow id="flow2" sourceRef="serviceTask" targetRef="exclusiveGw" />
     
     <exclusiveGateway id="exclusiveGw" />
@@ -19,11 +23,14 @@
       	<![CDATA[${counter < maxCount}]]>
       </conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="exclusiveGw" targetRef="theEnd">
+    <sequenceFlow id="flow4" sourceRef="exclusiveGw" targetRef="taskBeforeEnd">
       <conditionExpression xsi:type="tFormalExpression">
       	<![CDATA[${counter == maxCount}]]>
       </conditionExpression>
     </sequenceFlow>
+
+    <userTask id="taskBeforeEnd" />
+    <sequenceFlow id="flow5" sourceRef="taskBeforeEnd" targetRef="theEnd" />
     
     <endEvent id="theEnd" />
     

@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -23,6 +26,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,44 +39,36 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the collection of info for a user.
      */
+    @Test
     public void testGetUserInfoCollection() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
             identityService.setUserInfo(newUser.getId(), "key1", "Value 1");
             identityService.setUserInfo(newUser.getId(), "key2", "Value 2");
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO_COLLECTION, newUser.getId())), HttpStatus.SC_OK);
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO_COLLECTION, newUser.getId())), HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertTrue(responseNode.isArray());
-            assertEquals(2, responseNode.size());
-
-            boolean foundFirst = false;
-            boolean foundSecond = false;
-
-            for (int i = 0; i < responseNode.size(); i++) {
-                ObjectNode info = (ObjectNode) responseNode.get(i);
-                assertNotNull(info.get("key").textValue());
-                assertNotNull(info.get("url").textValue());
-
-                if (info.get("key").textValue().equals("key1")) {
-                    foundFirst = true;
-                    assertTrue(info.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")));
-                } else if (info.get("key").textValue().equals("key2")) {
-                    assertTrue(info.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key2")));
-                    foundSecond = true;
-                }
-            }
-            assertTrue(foundFirst);
-            assertTrue(foundSecond);
+            assertThat(responseNode).isNotNull();
+            assertThat(responseNode.isArray()).isTrue();
+            assertThatJson(responseNode)
+                    .isEqualTo("[ {"
+                            + "  key: 'key1',"
+                            + "  url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1") + "'"
+                            + "},"
+                            + "{"
+                            + "  key: 'key2',"
+                            + "  url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key2") + "'"
+                            + "}"
+                            + "]");
 
         } finally {
 
@@ -86,25 +82,29 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting info for a user.
      */
+    @Test
     public void testGetUserInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
             identityService.setUserInfo(newUser.getId(), "key1", "Value 1");
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")), HttpStatus.SC_OK);
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")), HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals("key1", responseNode.get("key").textValue());
-            assertEquals("Value 1", responseNode.get("value").textValue());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")));
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "key: 'key1',"
+                            + "value: 'Value 1',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1") + "'"
+                            + "}");
 
         } finally {
 
@@ -118,20 +118,22 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the info for an unexisting user.
      */
+    @Test
     public void testGetInfoForUnexistingUser() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, "unexisting", "key1")), HttpStatus.SC_NOT_FOUND));
     }
 
     /**
-     * Test getting the info for a user who doesn't have that info set
+     * Test getting the info for a user who does not have that info set
      */
+    @Test
     public void testGetInfoForUserWithoutInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -149,13 +151,14 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting info for a user.
      */
+    @Test
     public void testDeleteUserInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -164,7 +167,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
             closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")), HttpStatus.SC_NO_CONTENT));
 
             // Check if info is actually deleted
-            assertNull(identityService.getUserInfo(newUser.getId(), "key1"));
+            assertThat(identityService.getUserInfo(newUser.getId(), "key1")).isNull();
         } finally {
 
             // Delete user after test passes or fails
@@ -177,13 +180,14 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test update info for a user.
      */
+    @Test
     public void testUpdateUserInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -197,13 +201,15 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals("key1", responseNode.get("key").textValue());
-            assertEquals("Updated value", responseNode.get("value").textValue());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")));
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "key: 'key1',"
+                            + "value: 'Updated value',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1") + "'"
+                            + "}");
 
             // Check if info is actually updated
-            assertEquals("Updated value", identityService.getUserInfo(newUser.getId(), "key1"));
+            assertThat(identityService.getUserInfo(newUser.getId(), "key1")).isEqualTo("Updated value");
 
         } finally {
 
@@ -217,6 +223,7 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test update the info for an unexisting user.
      */
+    @Test
     public void testUpdateInfoForUnexistingUser() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("value", "Updated value");
@@ -227,15 +234,16 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
+    @Test
     public void testUpdateUnexistingInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -258,20 +266,22 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting the info for an unexisting user.
      */
+    @Test
     public void testDeleteInfoForUnexistingUser() throws Exception {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, "unexisting", "key1")), HttpStatus.SC_NOT_FOUND));
     }
 
     /**
-     * Test deleting the info for a user who doesn't have that info set
+     * Test deleting the info for a user who does not have that info set
      */
+    @Test
     public void testDeleteInfoForUserWithoutInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -286,13 +296,14 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateUserInfo() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 
@@ -305,10 +316,12 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertEquals("key1", responseNode.get("key").textValue());
-            assertEquals("Value 1", responseNode.get("value").textValue());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1")));
+            assertThatJson(responseNode)
+                    .isEqualTo("{"
+                            + "key: 'key1',"
+                            + "value: 'Value 1',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_INFO, newUser.getId(), "key1") + "'"
+                            + "}");
 
         } finally {
 
@@ -319,13 +332,14 @@ public class UserInfoResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateUserInfoExceptions() throws Exception {
         User savedUser = null;
         try {
             User newUser = identityService.newUser("testuser");
             newUser.setFirstName("Fred");
             newUser.setLastName("McDonald");
-            newUser.setEmail("no-reply@activiti.org");
+            newUser.setEmail("no-reply@flowable.org");
             identityService.saveUser(newUser);
             savedUser = newUser;
 

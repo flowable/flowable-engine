@@ -12,9 +12,10 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
@@ -37,6 +38,10 @@ public interface CommentDataManager extends DataManager<CommentEntity> {
     void deleteCommentsByTaskId(String taskId);
 
     void deleteCommentsByProcessInstanceId(String processInstanceId);
+    
+    void bulkDeleteCommentsForTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteCommentsForProcessInstanceIds(Collection<String> processInstanceIds);
 
     List<Comment> findCommentsByProcessInstanceId(String processInstanceId);
 

@@ -15,7 +15,7 @@ package org.flowable.variable.api.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 
 /**
  * A single process variable containing the last value when its process instance has finished.
@@ -39,6 +39,11 @@ public interface HistoricVariableInstance extends HistoricData {
     String getProcessInstanceId();
 
     /**
+     * The process instance reference.
+     */
+    String getExecutionId();
+
+    /**
      * @return the task id of the task, in case this variable instance has been set locally on a task. Returns null, if this variable is not related to a task.
      */
     String getTaskId();
@@ -58,4 +63,6 @@ public interface HistoricVariableInstance extends HistoricData {
     String getSubScopeId();
     
     String getScopeType();
+
+    String getMetaInfo();
 }

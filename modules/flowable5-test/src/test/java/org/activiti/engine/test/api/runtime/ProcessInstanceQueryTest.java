@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -349,7 +349,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals(PROCESS_DEPLOY_COUNT, instances.size());
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
         assertEquals(PROCESS_DEPLOY_COUNT, runtimeService.createProcessInstanceQuery().deploymentId(deployment.getId()).count());
@@ -363,7 +363,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 
@@ -375,7 +375,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals(PROCESS_DEPLOY_COUNT, instances.size());
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 
@@ -436,7 +436,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = instances.get(0);
         assertEquals(deployment.getId(), processInstance.getDeploymentId());
-        assertEquals(new Integer(1), processInstance.getProcessDefinitionVersion());
+        assertEquals(Integer.valueOf(1), processInstance.getProcessDefinitionVersion());
         assertEquals(PROCESS_DEFINITION_KEY, processInstance.getProcessDefinitionKey());
         assertEquals("oneTaskProcessName", processInstance.getProcessDefinitionName());
 

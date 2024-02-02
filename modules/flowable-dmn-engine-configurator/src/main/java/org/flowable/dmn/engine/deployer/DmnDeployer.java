@@ -14,13 +14,13 @@ package org.flowable.dmn.engine.deployer;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.EngineDeployer;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +33,9 @@ public class DmnDeployer implements EngineDeployer {
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
-        if (!deployment.isNew())
+        if (!deployment.isNew()) {
             return;
+        }
 
         LOGGER.debug("DmnDeployer: processing deployment {}", deployment.getName());
 
@@ -46,7 +47,7 @@ public class DmnDeployer implements EngineDeployer {
                 LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
                     DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
-                    dmnDeploymentBuilder = dmnRepositoryService.createDeployment();
+                    dmnDeploymentBuilder = dmnRepositoryService.createDeployment().name(deployment.getName());
                 }
 
                 dmnDeploymentBuilder.addDmnBytes(resourceName, resources.get(resourceName).getBytes());

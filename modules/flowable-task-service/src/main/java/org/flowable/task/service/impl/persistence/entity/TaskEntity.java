@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -35,8 +35,26 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     @Override
     List<IdentityLinkEntity> getIdentityLinks();
 
-    void setCreateTime(Date createTime);
+    boolean isIdentityLinksInitialized();
+    
+    void setState(String state);
 
+    void setCreateTime(Date createTime);
+    
+    void setInProgressStartTime(Date inProgressStartTime);
+    
+    void setInProgressStartedBy(String inProgressStartedBy);
+    
+    void setClaimTime(Date claimTime);
+    
+    void setClaimedBy(String claimBy);
+    
+    void setSuspendedTime(Date suspendedTime);
+    
+    void setSuspendedBy(String suspendedBy);
+
+    void setTaskDefinitionId(String taskDefinitionId);
+    
     void setProcessDefinitionId(String processDefinitionId);
 
     void setEventName(String eventName);
@@ -53,6 +71,8 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     
     void setScopeDefinitionId(String scopeDefinitionId);
 
+    void setPropagatedStageInstanceId(String propagatedStageInstanceId);
+
     int getSuspensionState();
 
     void setSuspensionState(int suspensionState);
@@ -66,6 +86,14 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     boolean isCanceled();
 
     void setCanceled(boolean isCanceled);
+    
+    void setAssigneeValue(String assignee);
+    
+    void setOwnerValue(String owner);
+    
+    String getTempCompletedBy();
+    
+    void setTempCompletedBy(String completedBy);
 
-    void setClaimTime(Date claimTime);
+    List<VariableInstanceEntity> getQueryVariables();
 }

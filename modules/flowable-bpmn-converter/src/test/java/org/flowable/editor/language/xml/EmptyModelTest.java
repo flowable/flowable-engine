@@ -12,35 +12,20 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.exceptions.XMLException;
-import org.junit.Test;
+import org.flowable.common.engine.impl.util.io.StringStreamSource;
+import org.junit.jupiter.api.Test;
 
-public class EmptyModelTest extends AbstractConverterTest {
-
-    @Test
-    public void convertXMLToModel() throws Exception {
-        try {
-            readXMLFile();
-            fail("Expected xml exception");
-        } catch (XMLException e) {
-            // exception expected
-        }
-    }
+class EmptyModelTest {
 
     @Test
-    public void convertModelToXML() throws Exception {
-        try {
-            readXMLFile();
-            fail("Expected xml exception");
-        } catch (XMLException e) {
-            // exception expected
-        }
-    }
+    void convertEmptyModel() {
+        assertThatThrownBy(() -> new BpmnXMLConverter()
+                .convertToBpmnModel(new StringStreamSource(""), true, false, "UTF-8"))
+            .isInstanceOf(XMLException.class);
 
-    @Override
-    protected String getResource() {
-        return "empty.bpmn";
     }
 }

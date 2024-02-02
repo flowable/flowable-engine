@@ -14,6 +14,12 @@ package org.flowable.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -21,13 +27,10 @@ import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
+import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
@@ -50,6 +53,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     protected FormService formService;
     protected ManagementService managementService;
     protected DynamicBpmnService dynamicBpmnService;
+    protected ProcessMigrationService processInstanceMigrationService;
     protected AsyncExecutor asyncExecutor;
     protected AsyncExecutor asyncHistoryExecutor;
     protected CommandExecutor commandExecutor;
@@ -68,14 +72,15 @@ public class ProcessEngineImpl implements ProcessEngine {
         this.formService = processEngineConfiguration.getFormService();
         this.managementService = processEngineConfiguration.getManagementService();
         this.dynamicBpmnService = processEngineConfiguration.getDynamicBpmnService();
+        this.processInstanceMigrationService = processEngineConfiguration.getProcessMigrationService();
         this.asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         this.asyncHistoryExecutor = processEngineConfiguration.getAsyncHistoryExecutor();
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
         this.sessionFactories = processEngineConfiguration.getSessionFactories();
         this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
 
-        if (processEngineConfiguration.isUsingRelationalDatabase() && processEngineConfiguration.getDatabaseSchemaUpdate() != null) {
-            commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), new SchemaOperationsProcessEngineBuild());
+        if (processEngineConfiguration.getSchemaManagementCmd() != null) {
+            commandExecutor.execute(processEngineConfiguration.getSchemaCommandConfig(), processEngineConfiguration.getSchemaManagementCmd());
         }
 
         if (name == null) {
@@ -86,17 +91,32 @@ public class ProcessEngineImpl implements ProcessEngine {
 
         ProcessEngines.registerProcessEngine(this);
 
-        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineBuilt(this);
+        if (processEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : processEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
         }
 
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED), 
+                processEngineConfiguration.getEngineCfgKey());
+    }
 
+    @Override
+    public void startExecutors() {
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
         }
+        
         if (asyncHistoryExecutor != null && asyncHistoryExecutor.isAutoActivate()) {
             asyncHistoryExecutor.start();
+        }
+        
+        if (processEngineConfiguration.isEnableHistoryCleaning()) {
+            try {
+                managementService.handleHistoryCleanupTimerJob();
+            } catch (FlowableOptimisticLockingException ex) {
+                LOGGER.warn("Optimistic locking exception when creating timer history clean jobs. Cleanup timer job was created / updated by another instance.");
+            }
         }
     }
 
@@ -115,11 +135,16 @@ public class ProcessEngineImpl implements ProcessEngine {
             closeRunnable.run();
         }
 
-        if (processEngineConfiguration.getProcessEngineLifecycleListener() != null) {
-            processEngineConfiguration.getProcessEngineLifecycleListener().onProcessEngineClosed(this);
+        processEngineConfiguration.close();
+
+        if (processEngineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : processEngineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
         }
 
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
+        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED),
+                processEngineConfiguration.getEngineCfgKey());
     }
 
     // getters and setters
@@ -168,6 +193,11 @@ public class ProcessEngineImpl implements ProcessEngine {
     @Override
     public DynamicBpmnService getDynamicBpmnService() {
         return dynamicBpmnService;
+    }
+
+    @Override
+    public ProcessMigrationService getProcessMigrationService() {
+        return processInstanceMigrationService;
     }
 
     @Override

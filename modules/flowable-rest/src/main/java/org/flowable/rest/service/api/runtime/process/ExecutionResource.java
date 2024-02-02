@@ -13,10 +13,9 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +45,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @GetMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
-    public ExecutionResponse getExecution(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request) {
+    public ExecutionResponse getExecution(@ApiParam(name = "executionId") @PathVariable String executionId) {
         return restResponseFactory.createExecutionResponse(getExecutionFromRequest(executionId));
     }
 
@@ -58,9 +57,13 @@ public class ExecutionResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @PutMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
-    public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.doExecutionActionRequest(actionRequest);
+        }
 
         if (ExecutionActionRequest.ACTION_SIGNAL.equals(actionRequest.getAction())
                 || ExecutionActionRequest.ACTION_TRIGGER.equals(actionRequest.getAction())) {
@@ -93,8 +96,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
         }
 
-        // Re-fetch the execution, could have changed due to action or even
-        // completed
+        // Re-fetch the execution, could have changed due to action or even completed
         execution = runtimeService.createExecutionQuery().executionId(execution.getId()).singleResult();
         if (execution == null) {
             // Execution is finished, return empty body to inform user
@@ -106,19 +108,21 @@ public class ExecutionResource extends ExecutionBaseResource {
     }
     
     @ApiOperation(value = "Change the state of an execution", tags = { "Executions" },
-            notes = "")
+            notes = "", nickname = "changeExecutionActivityState")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @PostMapping(value = "/runtime/executions/{executionId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "executionId") @PathVariable String executionId,
-            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest) {
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.changeActivityState(activityStateRequest);
+        }
 
         runtimeService.createChangeActivityStateBuilder()
-                .executionId(executionId)
-                .cancelActivityId(activityStateRequest.getCancelActivityId())
-                .startActivityId(activityStateRequest.getStartActivityId())
+                .moveSingleExecutionToActivityIds(executionId, activityStateRequest.getStartActivityIds())
                 .changeState();
     }
 }

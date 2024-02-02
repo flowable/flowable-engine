@@ -14,7 +14,7 @@ package org.flowable.cmmn.api.history;
 
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
@@ -45,6 +45,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
     /** Only select historic variables which were not set task-local. */
     HistoricVariableInstanceQuery excludeTaskVariables();
+
+    /** Only select historic process variables which were not set local. */
+    HistoricVariableInstanceQuery excludeLocalVariables();
 
     /** Don't initialize variable values. This is foremost a way to deal with variable delete queries */
     HistoricVariableInstanceQuery excludeVariableInitialization();

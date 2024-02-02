@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 
 /**

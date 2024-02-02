@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:flowable="http://flowable.org/bpmn"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+	expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://activiti.org/bpmn20">
+	<process id="userTaskIdVariableName">
+		<documentation>This is a process for testing purposes</documentation>
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="parallelGateway1" />
+		<parallelGateway id="parallelGateway1" />
+		<sequenceFlow id="flow2" sourceRef="parallelGateway1" targetRef="task1" />
+		<sequenceFlow id="flow3" sourceRef="parallelGateway1" targetRef="task2" />
+		<userTask id="task1" name="Task" flowable:taskIdVariableName="myTaskId" />
+		<userTask id="task2" name="Task" flowable:taskIdVariableName="${'myExpressionTaskId'}" />
+		<sequenceFlow id="flow4" sourceRef="task1" targetRef="parallelGateway2" />
+		<sequenceFlow id="flow5" sourceRef="task2" targetRef="parallelGateway2" />
+		<parallelGateway id="parallelGateway2" />
+		<sequenceFlow id="flow6" sourceRef="parallelGateway2" targetRef="theEnd" />
+		<endEvent id="theEnd" />
+
+	</process>
+</definitions>

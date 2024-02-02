@@ -12,11 +12,21 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import static org.flowable.cmmn.engine.impl.variable.CmmnAggregation.groupAggregationsByTarget;
+
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
+import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
+import org.flowable.cmmn.engine.impl.variable.CmmnAggregation;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.VariableAggregationDefinition;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -26,29 +36,59 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     public CreatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-    
+
     @Override
-    public void run() {
-        super.run();
-        
-        PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        if (planItem != null
-                && planItem.getItemControl() != null
-                && planItem.getItemControl().getRepetitionRule() != null
-                && !planItem.getEntryCriteria().isEmpty()) {
-            int counter = getRepetitionCounter(planItemInstanceEntity);
-            setRepetitionCounter(planItemInstanceEntity, ++counter);
+    protected void internalExecute() {
+        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
+        if (repetitionRule != null) {
+            //Increase repetition counter, value is kept from the previous instance of the repetition
+            //@see CmmOperation.copyAndInsertPlanItemInstance used by @see EvaluateCriteriaOperation and @see AbstractDeletePlanItemInstanceOperation
+            //Or if its the first instance of the repetition, this call sets the counter to 1
+            int repetitionCounter = PlanItemInstanceUtil.getRepetitionCounter(planItemInstanceEntity);
+            if (repetitionCounter == 0 && repetitionRule.getAggregations() != null) {
+                // This is the first repetition counter so we need to create the aggregated overview values
+                // If there are aggregations we need to create an overview variable for every aggregation
+                Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(planItemInstanceEntity,
+                        repetitionRule.getAggregations().getOverviewAggregations(), CommandContextUtil.getCmmnEngineConfiguration(commandContext));
+
+                for (String variableName : aggregationsByTarget.keySet()) {
+                    CmmnAggregation bpmnAggregation = new CmmnAggregation(planItemInstanceEntity.getId());
+                    planItemInstanceEntity.getParentVariableScope().setVariable(variableName, bpmnAggregation);
+                }
+            }
+            
+            if (repetitionRule.getAggregations() != null || !PlanItemInstanceUtil.hasIgnoreCounterVariable(planItemInstanceEntity)) {
+                setRepetitionCounter(planItemInstanceEntity, repetitionCounter + 1);
+            }
+        }
+
+        CmmnHistoryManager cmmnHistoryManager = CommandContextUtil.getCmmnHistoryManager(commandContext);
+        cmmnHistoryManager.recordPlanItemInstanceCreated(planItemInstanceEntity);
+
+        //Extending classes might override getNewState, so need to check the available state again
+        if (getNewState().equals(PlanItemInstanceState.AVAILABLE)) {
+            planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
+            cmmnHistoryManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
         }
     }
-    
+
     @Override
-    protected String getNewState() {
-        return PlanItemInstanceState.AVAILABLE;
+    public String getNewState() {
+        if (isEventListenerWithAvailableCondition(planItemInstanceEntity.getPlanItem())) {
+            return PlanItemInstanceState.UNAVAILABLE;
+        } else {
+            return PlanItemInstanceState.AVAILABLE;
+        }
     }
-    
+
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.CREATE;
     }
-    
+
+    @Override
+    public String getOperationName() {
+        return "[Create plan item]";
+    }
+
 }

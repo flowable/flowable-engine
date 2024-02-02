@@ -11,12 +11,14 @@
  */
 package org.flowable.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.history.HistoricData;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.history.HistoricData;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -24,6 +26,8 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daisuke Yoshimoto
@@ -42,10 +46,8 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
         LARGE_STRING_VALUE = sb.toString();
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         // Deploy test process
         deployTwoTasksTestProcess();
 
@@ -61,42 +63,39 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testIncludeVariables() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariables()
                     .singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(1, events.size());
+            assertThat(events).hasSize(1);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableInstance);
-                assertEquals(LARGE_STRING_VALUE, ((HistoricVariableInstanceEntity) event).getValue());
+                assertThat(event).isInstanceOf(HistoricVariableInstance.class);
+                assertThat(((HistoricVariableInstanceEntity) event).getValue()).isEqualTo(LARGE_STRING_VALUE);
             }
         }
     }
 
+    @Test
     public void testIncludeVariableUpdates() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
 
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstanceId).variableName("var").singleResult();
-            assertEquals(LARGE_STRING_VALUE, historicVariableInstance.getValue());
+            assertThat(historicVariableInstance.getValue()).isEqualTo(LARGE_STRING_VALUE);
 
             ProcessInstanceHistoryLog log = historyService.createProcessInstanceHistoryLogQuery(processInstanceId)
                     .includeVariableUpdates()
                     .singleResult();
             List<HistoricData> events = log.getHistoricData();
-            assertEquals(1, events.size());
+            assertThat(events).hasSize(1);
 
             for (HistoricData event : events) {
-                assertTrue(event instanceof HistoricVariableUpdate);
-                assertEquals(LARGE_STRING_VALUE, ((HistoricDetailVariableInstanceUpdateEntity) event).getValue());
+                assertThat(event).isInstanceOf(HistoricVariableUpdate.class);
+                assertThat(((HistoricDetailVariableInstanceUpdateEntity) event).getValue()).isEqualTo(LARGE_STRING_VALUE);
             }
         }
     }

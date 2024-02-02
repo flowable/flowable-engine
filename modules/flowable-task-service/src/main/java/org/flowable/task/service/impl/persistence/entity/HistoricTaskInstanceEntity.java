@@ -16,8 +16,8 @@ package org.flowable.task.service.impl.persistence.entity;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -46,6 +46,8 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setFormKey(String formKey);
 
     void setPriority(int priority);
+    
+    void setInProgressStartDueDate(Date inProgressStartDueDate);
 
     void setDueDate(Date dueDate);
 
@@ -54,8 +56,6 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setOwner(String owner);
 
     void setParentTaskId(String parentTaskId);
-
-    void setClaimTime(Date claimTime);
 
     void setTenantId(String tenantId);
     
@@ -67,11 +67,13 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
 
     void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables);
     
-    void markEnded(String deleteReason);
+    void markEnded(String deleteReason, Date endTime);
 
     void setProcessInstanceId(String processInstanceId);
 
     void setProcessDefinitionId(String processDefinitionId);
+
+    void setTaskDefinitionId(String taskDefinitionId);
 
     void setScopeId(String scopeId);
 
@@ -80,10 +82,34 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setScopeType(String scopeType);
 
     void setScopeDefinitionId(String scopeDefinitionId);
+    
+    void setState(String state);
 
-    void setStartTime(Date startTime);
+    void setCreateTime(Date createTime);
+
+    /**
+     * @deprecated use {@link #setCreateTime(Date)} instead
+     */
+    @Deprecated
+    default void setStartTime(Date startTime) {
+        setCreateTime(startTime);
+    }
+    
+    void setInProgressStartTime(Date inProgressStartTime);
+    
+    void setInProgressStartedBy(String inProgressStartedBy);
+    
+    void setClaimTime(Date claimTime);
+    
+    void setClaimedBy(String claimedBy);
+    
+    void setSuspendedTime(Date suspendedTime);
+    
+    void setSuspendedBy(String suspendedBy);
 
     void setEndTime(Date endTime);
+    
+    void setCompletedBy(String completedBy);
 
     void setDurationInMillis(Long durationInMillis);
 

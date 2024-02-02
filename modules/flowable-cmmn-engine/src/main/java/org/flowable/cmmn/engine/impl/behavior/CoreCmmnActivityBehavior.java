@@ -15,13 +15,13 @@ package org.flowable.cmmn.engine.impl.behavior;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * Superclass for {@link CmmnActivityBehavior} implementations that are part of the 
  * core CMMN behaviors of the CMMN Engine.
  *
- * More specifically, subclasses needed to implement {@link #execute(CommandContext, DelegatePlanItemInstance)}
+ * More specifically, subclasses needed to implement {@link #execute(CommandContext, PlanItemInstanceEntity)}
  * instead of {@link #execute(DelegatePlanItemInstance)} and thus avoid an extra lookup 
  * of the thread-local {@link CommandContext}.
  * Instead of passing a {@link DelegatePlanItemInstance}, a 'raw' {@link PlanItemInstanceEntity} is also passed.

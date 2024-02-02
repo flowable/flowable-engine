@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -20,22 +22,26 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 /**
  * @author Bassam Al-Sarori
  */
 public class ProcessDefinitionImageResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml", "org/flowable/rest/service/api/repository/oneTaskProcess.png" })
     public void testGetProcessDefinitionImage() throws Exception {
         ProcessDefinition oneTaskProcess = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IMAGE, oneTaskProcess.getId())),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IMAGE, oneTaskProcess.getId())),
                 HttpStatus.SC_OK);
-        assertNotNull(response.getEntity().getContent());
-        assertEquals("image/png", response.getEntity().getContentType().getValue());
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
         closeResponse(response);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessDefinitionImageWithoutImage() throws Exception {
         ProcessDefinition oneTaskProcess = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
@@ -44,13 +50,14 @@ public class ProcessDefinitionImageResourceTest extends BaseSpringRestTestCase {
                 HttpStatus.SC_BAD_REQUEST);
 
         // response content type application/json;charset=UTF-8
-        assertEquals("application/json", response.getEntity().getContentType().getValue().split(";")[0]);
+        assertThat(response.getEntity().getContentType().getValue().split(";")[0]).isEqualTo("application/json");
         closeResponse(response);
     }
 
     /**
      * Test getting an unexisting process definition.
      */
+    @Test
     public void testGetUnexistingProcessDefinition() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IMAGE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }

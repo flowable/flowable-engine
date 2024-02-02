@@ -12,25 +12,35 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
  */
 public interface HistoricCaseInstanceEntityManager extends EntityManager<HistoricCaseInstanceEntity> {
+
+    HistoricCaseInstanceEntity create(CaseInstance caseInstance);
     
     HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
     
     List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId);
     
-    List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
+    List<String> findHistoricCaseInstanceIdsByParentIds(Collection<String> caseInstanceIds);
     
+    List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
+
+    List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query);
+
     long countByCriteria(HistoricCaseInstanceQuery query);
     
-    void deleteByCaseDefinitionId(String caseDefinitionId);
+    void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery);
     
+    void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds);
 }

@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.1.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -129,38 +129,26 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>provided</scope>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-engine-common</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>provided</scope>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   
-  <profiles>
-    <profile>
-      <id>distro</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.1.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

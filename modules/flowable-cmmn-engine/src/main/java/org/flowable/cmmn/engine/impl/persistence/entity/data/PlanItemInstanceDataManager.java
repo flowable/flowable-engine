@@ -17,21 +17,29 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
  */
 public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanceEntity> {
     
-    List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstanceId);
+    List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId);
+
+    List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceEntity);
+
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId);
     
-    List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId);
+    List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+
+    List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
     
     long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
     
-    List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
-    
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteByStageInstanceId(String stageInstanceId);
+    
+    void deleteByCaseInstanceId(String caseInstanceId);
     
 }

@@ -12,9 +12,10 @@
  */
 package org.flowable.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +24,10 @@ import java.util.zip.ZipInputStream;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.IoUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -42,7 +43,6 @@ import org.flowable.engine.repository.DeploymentBuilder;
 public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient RepositoryServiceImpl repositoryService;
     protected transient ResourceEntityManager resourceEntityManager;
@@ -75,11 +75,16 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     @Override
     public DeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = ReflectUtil.getResourceAsStream(resource)) {
+	        if (inputStream == null) {
+	            throw new FlowableIllegalArgumentException("resource '" + resource + "' not found");
+	        }
+	        return addInputStream(resource, inputStream);
+	        
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
+
     }
 
     @Override
@@ -89,11 +94,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         }
         ResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get process bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }
@@ -135,12 +136,8 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     @Override
     public DeploymentBuilder addBpmnModel(String resourceName, BpmnModel bpmnModel) {
         BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
-        try {
-            String bpmn20Xml = new String(bpmnXMLConverter.convertToXML(bpmnModel), "UTF-8");
-            addString(resourceName, bpmn20Xml);
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Error while transforming BPMN model to xml: not UTF-8 encoded", e);
-        }
+        String bpmn20Xml = new String(bpmnXMLConverter.convertToXML(bpmnModel), StandardCharsets.UTF_8);
+        addString(resourceName, bpmn20Xml);
         return this;
     }
 
@@ -159,6 +156,12 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
     @Override
     public DeploymentBuilder key(String key) {
         deployment.setKey(key);
+        return this;
+    }
+    
+    @Override
+    public DeploymentBuilder parentDeploymentId(String parentDeploymentId) {
+        deployment.setParentDeploymentId(parentDeploymentId);
         return this;
     }
 

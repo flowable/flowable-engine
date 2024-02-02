@@ -14,20 +14,22 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 
 public class IntermediateCatchMessageEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
@@ -44,21 +46,27 @@ public class IntermediateCatchMessageEventActivityBehavior extends IntermediateC
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String messageName = null;
-        if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
-            messageName = messageEventDefinition.getMessageRef();
-        } else {
-            Expression messageExpression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager()
-                    .createExpression(messageEventDefinition.getMessageExpression());
-            messageName = messageExpression.getValue(execution).toString();
-        }
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, execution);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                        .eventName(messageName)
+                        .executionId(executionEntity.getId())
+                        .processInstanceId(executionEntity.getProcessInstanceId())
+                        .activityId(executionEntity.getCurrentActivityId())
+                        .processDefinitionId(executionEntity.getProcessDefinitionId())
+                        .tenantId(executionEntity.getTenantId())
+                        .create();
+        
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        executionEntity.getEventSubscriptions().add(eventSubscription);
 
-        CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageName, executionEntity);
-
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
-                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
+                    null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
 
@@ -72,17 +80,22 @@ public class IntermediateCatchMessageEventActivityBehavior extends IntermediateC
     public void eventCancelledByEventGateway(DelegateExecution execution) {
         deleteMessageEventSubScription(execution);
         CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
     }
 
     protected ExecutionEntity deleteMessageEventSubScription(DelegateExecution execution) {
+        CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
-        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-            if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageEventDefinition.getMessageRef())) {
 
-                eventSubscriptionEntityManager.delete(eventSubscription);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, execution);
+        for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
+            if (eventSubscription instanceof MessageEventSubscriptionEntity && eventSubscription.getEventName().equals(messageName)) {
+
+                eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
             }
         }
         return executionEntity;

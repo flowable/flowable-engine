@@ -15,8 +15,8 @@ package org.flowable.engine.task;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.history.HistoricData;
 
 /**
  * User comments that form discussions around tasks.

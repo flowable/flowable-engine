@@ -13,14 +13,14 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
 import org.flowable.engine.impl.util.TaskHelper;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -32,8 +32,8 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
 
     private static final long serialVersionUID = 1L;
 
-    public static int IDENTITY_USER = 1;
-    public static int IDENTITY_GROUP = 2;
+    public static final  int IDENTITY_USER = 1;
+    public static final  int IDENTITY_GROUP = 2;
 
     protected String userId;
 
@@ -87,7 +87,7 @@ public class DeleteIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
             IdentityLinkUtil.deleteTaskIdentityLinks(task, userId, groupId, type);
         }
 
-        CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(taskId, userId, groupId, type, false);
+        CommandContextUtil.getHistoryManager(commandContext).createIdentityLinkComment(task, userId, groupId, type, false);
 
         return null;
     }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="testExpressionFunction" name="testExpressionFunction" isExecutable="true">
+    <startEvent id="startEvent1"></startEvent>
+    <exclusiveGateway id="sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19" default="sid-826377D5-8D95-4735-8181-543CDCCECB89"></exclusiveGateway>
+    <sequenceFlow id="sid-BA634968-FB98-41FE-A40B-113E3A040917" sourceRef="startEvent1" targetRef="sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19"></sequenceFlow>
+    <userTask id="sid-F5799224-7B30-46E7-B703-4E1028A136BE" name="A"></userTask>
+    <userTask id="sid-CC202B6A-5FCD-4E7F-9805-98054E856277" name="B"></userTask>
+    <endEvent id="sid-1A08718D-53D5-40C9-AA3E-646959109884"></endEvent>
+    <sequenceFlow id="sid-C62C8C0D-44D4-4A3D-ABCB-4E1F553945CB" sourceRef="sid-F5799224-7B30-46E7-B703-4E1028A136BE" targetRef="sid-1A08718D-53D5-40C9-AA3E-646959109884"></sequenceFlow>
+    <endEvent id="sid-E3D726DE-D19C-49BF-BAA2-A7DB85EF8EB9"></endEvent>
+    <sequenceFlow id="sid-A307500B-C2C6-4AEE-B671-616338A20ACE" sourceRef="sid-CC202B6A-5FCD-4E7F-9805-98054E856277" targetRef="sid-E3D726DE-D19C-49BF-BAA2-A7DB85EF8EB9"></sequenceFlow>
+    <sequenceFlow id="sid-826377D5-8D95-4735-8181-543CDCCECB89" sourceRef="sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19" targetRef="sid-CC202B6A-5FCD-4E7F-9805-98054E856277"></sequenceFlow>
+    <sequenceFlow id="sid-7D60A91B-B875-44A4-ACC6-976FAF73FB97" sourceRef="sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19" targetRef="sid-F5799224-7B30-46E7-B703-4E1028A136BE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:exists('myVar')}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testExpressionFunction">
+    <bpmndi:BPMNPlane bpmnElement="testExpressionFunction" id="BPMNPlane_testExpressionFunction">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19" id="BPMNShape_sid-6E34791D-78DF-4C8F-B731-8CE6CCEBFB19">
+        <omgdc:Bounds height="40.0" width="40.0" x="165.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-F5799224-7B30-46E7-B703-4E1028A136BE" id="BPMNShape_sid-F5799224-7B30-46E7-B703-4E1028A136BE">
+        <omgdc:Bounds height="80.0" width="100.0" x="270.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-CC202B6A-5FCD-4E7F-9805-98054E856277" id="BPMNShape_sid-CC202B6A-5FCD-4E7F-9805-98054E856277">
+        <omgdc:Bounds height="80.0" width="100.0" x="270.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-1A08718D-53D5-40C9-AA3E-646959109884" id="BPMNShape_sid-1A08718D-53D5-40C9-AA3E-646959109884">
+        <omgdc:Bounds height="28.0" width="28.0" x="415.0" y="131.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-E3D726DE-D19C-49BF-BAA2-A7DB85EF8EB9" id="BPMNShape_sid-E3D726DE-D19C-49BF-BAA2-A7DB85EF8EB9">
+        <omgdc:Bounds height="28.0" width="28.0" x="415.0" y="326.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-A307500B-C2C6-4AEE-B671-616338A20ACE" id="BPMNEdge_sid-A307500B-C2C6-4AEE-B671-616338A20ACE">
+        <omgdi:waypoint x="369.949999999934" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="415.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-826377D5-8D95-4735-8181-543CDCCECB89" id="BPMNEdge_sid-826377D5-8D95-4735-8181-543CDCCECB89">
+        <omgdi:waypoint x="185.5" y="259.44048694779116"></omgdi:waypoint>
+        <omgdi:waypoint x="185.5" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-C62C8C0D-44D4-4A3D-ABCB-4E1F553945CB" id="BPMNEdge_sid-C62C8C0D-44D4-4A3D-ABCB-4E1F553945CB">
+        <omgdi:waypoint x="369.949999999996" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="415.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-7D60A91B-B875-44A4-ACC6-976FAF73FB97" id="BPMNEdge_sid-7D60A91B-B875-44A4-ACC6-976FAF73FB97">
+        <omgdi:waypoint x="185.5" y="220.5"></omgdi:waypoint>
+        <omgdi:waypoint x="185.5" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-BA634968-FB98-41FE-A40B-113E3A040917" id="BPMNEdge_sid-BA634968-FB98-41FE-A40B-113E3A040917">
+        <omgdi:waypoint x="119.9496588110467" y="240.09285545292158"></omgdi:waypoint>
+        <omgdi:waypoint x="165.375" y="240.375"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

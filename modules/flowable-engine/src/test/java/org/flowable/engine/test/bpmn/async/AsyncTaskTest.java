@@ -12,109 +12,146 @@
  */
 package org.flowable.engine.test.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceActivityCompletionJobHandler;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
-/**
- * 
- * @author Daniel Meyer
- */
 public class AsyncTaskTest extends PluggableFlowableTestCase {
 
     public static boolean INVOCATION;
 
+    @Test
     @Deployment
     public void testAsyncServiceNoListeners() {
         INVOCATION = false;
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         // the service was not invoked:
-        assertFalse(INVOCATION);
+        assertThat(INVOCATION).isFalse();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // the service was invoked
-        assertTrue(INVOCATION);
+        assertThat(INVOCATION).isTrue();
         // and the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceListeners() {
         String pid = runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         // the listener was not yet invoked:
-        assertNull(runtimeService.getVariable(pid, "listener"));
+        assertThat(runtimeService.getVariable(pid, "listener")).isNull();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
+    @Deployment
+    public void testAsyncServiceCurrentTenant() {
+        String noTenantInstanceId = runtimeService.startProcessInstanceByKey("asyncService").getProcessInstanceId();
+        String flowableInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("asyncService")
+                .overrideProcessDefinitionTenantId("flowable")
+                .start()
+                .getId();
+        String muppetsInstanceId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("asyncService")
+                .overrideProcessDefinitionTenantId("muppets")
+                .start()
+                .getId();
+
+        assertThat(runtimeService.hasVariable(noTenantInstanceId, "currentTenantVar")).isFalse();
+        assertThat(runtimeService.hasVariable(flowableInstanceId, "currentTenantVar")).isFalse();
+        assertThat(runtimeService.hasVariable(muppetsInstanceId, "currentTenantVar")).isFalse();
+
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(noTenantInstanceId, "currentTenantVar");
+        assertThat(variableInstance).isNotNull();
+        assertThat((String) variableInstance.getValue()).isNullOrEmpty();
+        assertThat(runtimeService.getVariable(flowableInstanceId, "currentTenantVar")).isEqualTo("flowable");
+        assertThat(runtimeService.getVariable(muppetsInstanceId, "currentTenantVar")).isEqualTo("muppets");
+    }
+
+    @Test
     @Deployment
     public void testAsyncServiceConcurrent() {
         INVOCATION = false;
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         // the service was not invoked:
-        assertFalse(INVOCATION);
+        assertThat(INVOCATION).isFalse();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // the service was invoked
-        assertTrue(INVOCATION);
+        assertThat(INVOCATION).isTrue();
         // and the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceMultiInstance() {
         INVOCATION = false;
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         // the service was not invoked:
-        assertFalse(INVOCATION);
+        assertThat(INVOCATION).isFalse();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // the service was invoked
-        assertTrue(INVOCATION);
+        assertThat(INVOCATION).isTrue();
         // and the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testFailingAsyncServiceTimer() {
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there should be one job in the database, and it is a message
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         Job job = managementService.createJobQuery().singleResult();
 
-        try {
-            managementService.executeJob(job.getId());
-            fail();
-        } catch (Exception e) {
-            // exception expected
-        }
+        assertThatThrownBy(() -> managementService.executeJob(job.getId()))
+                .isInstanceOf(FlowableException.class);
 
         // the service failed: the execution is still sitting in the service task:
         Execution execution = null;
@@ -123,11 +160,11 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 execution = e;
             }
         }
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // there is still a single job because the timer was created in the same
         // transaction as the service was executed (which rolled back)
-        assertEquals(1, managementService.createTimerJobQuery().count());
+        assertThat(managementService.createTimerJobQuery().count()).isEqualTo(1);
 
         runtimeService.deleteProcessInstance(execution.getId(), "dead");
     }
@@ -138,116 +175,273 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there are two jobs the message and a timer:
-        assertEquals(2, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(2);
 
         // let 'max-retires' on the message be reached
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
-        // the service failed: the execution is still sitting in the service
-        // task:
+        // the service failed: the execution is still sitting in the service task:
         Execution execution = runtimeService.createExecutionQuery().singleResult();
-        assertNotNull(execution);
-        assertEquals("service", runtimeService.getActiveActivityIds(execution.getId()).get(0));
+        assertThat(execution).isNotNull();
+        assertThat(runtimeService.getActiveActivityIds(execution.getId()).get(0)).isEqualTo("service");
 
         // there are tow jobs, the message and the timer (the message will not
         // be retried anymore, max retires is reached.)
-        assertEquals(2, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(2);
 
         // now the timer triggers:
         Context.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(System.currentTimeMillis() + 10000));
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // and we are done:
-        assertNull(runtimeService.createExecutionQuery().singleResult());
+        assertThat(runtimeService.createExecutionQuery().singleResult()).isNull();
         // and there are no more jobs left:
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
 
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceSubProcessTimer() {
         INVOCATION = false;
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
         // now there should be two jobs in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
 
         // the service was not invoked:
-        assertFalse(INVOCATION);
+        assertThat(INVOCATION).isFalse();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 200L);
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
 
         // the service was invoked
-        assertTrue(INVOCATION);
+        assertThat(INVOCATION).isTrue();
 
         // both the timer and the message are cancelled
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testAsyncServiceSubProcess() {
         // start process
         runtimeService.startProcessInstanceByKey("asyncService");
 
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // both the timer and the message are cancelled
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
 
     }
 
+    @Test
     @Deployment
     public void testAsyncTask() {
         // start process
         runtimeService.startProcessInstanceByKey("asyncTask");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job.getElementId()).isEqualTo("task");
+        assertThat(job.getElementName()).isEqualTo("Test task");
+
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
+
+        // the job is done
+        assertThat(managementService.createJobQuery().count()).isZero();
+    }
+    
+    @Test
+    @Deployment
+    public void testAsyncTaskWithJobCategory() {
+        // start process
+        runtimeService.startProcessInstanceByKey("asyncTask");
+        // now there should be one job in the database:
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job.getElementId()).isEqualTo("task");
+        assertThat(job.getCategory()).isEqualTo("testCategory");
+
+        waitForJobExecutorToProcessAllJobs(7000L, 200L);
+
+        // the job is done
+        assertThat(managementService.createJobQuery().count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategory.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask");
+
+            assertThatThrownBy(() -> waitForJobExecutorToProcessAllJobs(4000L, 200L))
+                    .isInstanceOf(FlowableException.class);
+            
+            // job is not executed because of different job category value
+            assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+            
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertThat(managementService.createJobQuery().count()).isZero();
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategory.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithCategoryConfigurationSetAndRunningAsyncExecutor() throws Exception {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            
+            processEngineConfiguration.getAsyncExecutor().start();
+            processEngineConfiguration.setAsyncExecutorActivate(true);
+            
+            // start process
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
+            
+            JobEntity job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job.getLockOwner()).isNull();
+            assertThat(job.getLockExpirationTime()).isNull();
+            
+            Thread.sleep(4000);
+            
+            // job is not executed because of different job category value
+            assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+            
+            job = (JobEntity) managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job.getLockOwner()).isNull();
+            assertThat(job.getLockExpirationTime()).isNull();
+            
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+            
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(Collections.singletonList("testCategory"));
+    
+            processEngineConfiguration.getAsyncExecutor().start();
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 4000, 300, false);
+            
+            // the job is done
+            assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+            processEngineConfiguration.setAsyncExecutorActivate(false);
+            processEngineConfiguration.getAsyncExecutor().shutdown();
+        }
+    }
+    
+    @Test
+    @Deployment
+    public void testAsyncTaskWithJobCategoryExpression() {
+        // start process
+        runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "myCategory"));
+        // now there should be one job in the database:
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job.getCategory()).isEqualTo("myCategory");
 
         waitForJobExecutorToProcessAllJobs(5000L, 200L);
 
         // the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategoryExpression.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryExpressionWithCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "myCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertThat(managementService.createJobQuery().count()).isZero();
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncTaskWithJobCategoryExpression.bpmn20.xml")
+    public void testAsyncTaskWithJobCategoryWithMultipleCategoryConfigurationSet() {
+        try {
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("myCategory");
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("anotherCategory");
+            processEngineConfiguration.getJobServiceConfiguration().addEnabledJobCategory("testCategory");
+            
+            // start process
+            runtimeService.startProcessInstanceByKey("asyncTask", Collections.singletonMap("categoryValue", "testCategory"));
+    
+            waitForJobExecutorToProcessAllJobs(4000L, 200L);
+            
+            // the job is done
+            assertThat(managementService.createJobQuery().count()).isZero();
+            
+        } finally {
+            processEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(null);
+        }
     }
 
+    @Test
     @Deployment
     public void testAsyncEndEvent() {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncEndEvent");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job.getElementId()).isEqualTo("theEnd");
+        assertThat(job.getElementName()).isEqualTo("End event");
 
         Object value = runtimeService.getVariable(processInstance.getId(), "variableSetInExecutionListener");
-        assertNull(value);
+        assertThat(value).isNull();
 
         waitForJobExecutorToProcessAllJobs(2000L, 200L);
 
         // the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
 
         assertProcessEnded(processInstance.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list();
-            assertEquals(3, variables.size());
+            assertThat(variables).hasSize(3);
 
-            Object historyValue = null;
-            for (HistoricVariableInstance variable : variables) {
-                if ("variableSetInExecutionListener".equals(variable.getVariableName())) {
-                    historyValue = variable.getValue();
-                }
-            }
-            assertEquals("firstValue", historyValue);
+            assertThat(variables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .contains(tuple("variableSetInExecutionListener", "firstValue"));
         }
     }
 
+    @Test
     @Deployment
     public void testAsyncScript() {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncScript");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
+        
+        Job job = managementService.createJobQuery().singleResult();
+        assertThat(job.getElementId()).isEqualTo("script");
+        assertThat(job.getElementName()).isEqualTo("Script");
+        
         // the script was not invoked:
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
         String eid = null;
@@ -256,91 +450,101 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 eid = e.getId();
             }
         }
-        assertNull(runtimeService.getVariable(eid, "invoked"));
+        assertThat(runtimeService.getVariable(eid, "invoked")).isNull();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 100L);
+        waitForJobExecutorToProcessAllJobs(7000L, 100L);
 
         // and the job is done
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
 
         // the script was invoked
-        assertEquals("true", runtimeService.getVariable(eid, "invoked"));
+        assertThat(runtimeService.getVariable(eid, "invoked")).isEqualTo("true");
 
         runtimeService.trigger(eid);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncCallActivity.bpmn20.xml",
             "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testAsyncServiceNoListeners.bpmn20.xml" })
     public void testAsyncCallActivity() throws Exception {
         // start process
         runtimeService.startProcessInstanceByKey("asyncCallactivity");
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
 
         waitForJobExecutorToProcessAllJobs(20000L, 250L);
 
-        assertEquals(0, managementService.createJobQuery().count());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/async/AsyncTaskTest.testBasicAsyncCallActivity.bpmn20.xml", "org/flowable/engine/test/bpmn/StartToEndTest.testStartToEnd.bpmn20.xml" })
     public void testBasicAsyncCallActivity() {
         runtimeService.startProcessInstanceByKey("myProcess");
-        Assert.assertEquals("There should be one job available.", 1, managementService.createJobQuery().count());
-        waitForJobExecutorToProcessAllJobs(5000L, 250L);
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).as("There should be one job available.").isEqualTo(1);
+        waitForJobExecutorToProcessAllJobs(7000L, 250L);
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testAsyncUserTask() {
         // start process
         String pid = runtimeService.startProcessInstanceByKey("asyncUserTask").getId();
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isEqualTo(1);
         // the listener was not yet invoked:
-        assertNull(runtimeService.getVariable(pid, "listener"));
+        assertThat(runtimeService.getVariable(pid, "listener")).isNull();
         // the task listener was not yet invoked:
-        assertNull(runtimeService.getVariable(pid, "taskListener"));
+        assertThat(runtimeService.getVariable(pid, "taskListener")).isNull();
         // there is no usertask
-        assertNull(taskService.createTaskQuery().singleResult());
+        assertThat(taskService.createTaskQuery().singleResult()).isNull();
 
-        waitForJobExecutorToProcessAllJobs(5000L, 250L);
+        waitForJobExecutorToProcessAllJobs(7000L, 250L);
         // the listener was now invoked:
-        assertNotNull(runtimeService.getVariable(pid, "listener"));
+        assertThat(runtimeService.getVariable(pid, "listener")).isNotNull();
         // the task listener was now invoked:
-        assertNotNull(runtimeService.getVariable(pid, "taskListener"));
+        assertThat(runtimeService.getVariable(pid, "taskListener")).isNotNull();
 
         // there is a usertask
-        assertNotNull(taskService.createTaskQuery().singleResult());
+        assertThat(taskService.createTaskQuery().singleResult()).isNotNull();
         // and no more job
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
         taskService.complete(taskId);
 
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceAsyncTask() {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
         // now there should be one job in the database:
-        assertEquals(3, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE);
 
         // execute first of 3 parallel multi instance tasks
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).list().get(0).getId());
-        assertEquals(2, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, AsyncContinuationJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE);
 
         // execute second of 3 parallel multi instance tasks
-        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).list().get(0).getId());
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).handlerType(AsyncContinuationJobHandler.TYPE).list().get(0).getId());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).list())
+                .extracting(Job::getJobHandlerType )
+                .containsExactlyInAnyOrder(AsyncContinuationJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE, ParallelMultiInstanceActivityCompletionJobHandler.TYPE);
 
         // execute third of 3 parallel multi instance tasks
-        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
+        managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).handlerType(AsyncContinuationJobHandler.TYPE).singleResult().getId());
 
         // the job is done
-        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
@@ -350,6 +554,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -360,17 +565,22 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
-            assertEquals(1, startCount);
-            assertEquals(3, taskCount);
-            assertEquals(1, endCount);
+            assertThat(startCount).isEqualTo(1);
+            assertThat(taskCount).isEqualTo(3);
+            assertThat(sequenceFlowCount).isEqualTo(2);
+            assertThat(endCount).isEqualTo(1);
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceTask() {
         // start process
@@ -384,6 +594,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -394,38 +605,43 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
-            assertEquals(1, startCount);
-            assertEquals(3, taskCount);
-            assertEquals(1, endCount);
+            assertThat(startCount).isEqualTo(1);
+            assertThat(taskCount).isEqualTo(3);
+            assertThat(sequenceFlowCount).isEqualTo(2);
+            assertThat(endCount).isEqualTo(1);
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceAsyncSequentialTask() {
         // start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncTask");
 
         // now there should be one job in the database:
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         // execute first of 3 sequential multi instance tasks
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         // execute second of 3 sequential multi instance tasks
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
-        assertEquals(1, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
 
         // execute third of 3 sequential multi instance tasks
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         // the job is done
-        assertEquals(0, managementService.createJobQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(managementService.createJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricActivityInstance> historicActivities = historyService.createHistoricActivityInstanceQuery()
@@ -435,6 +651,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -445,17 +662,22 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
-            assertEquals(1, startCount);
-            assertEquals(3, taskCount);
-            assertEquals(1, endCount);
+            assertThat(startCount).isEqualTo(1);
+            assertThat(taskCount).isEqualTo(3);
+            assertThat(sequenceFlowCount).isEqualTo(2);
+            assertThat(endCount).isEqualTo(1);
         }
     }
 
+    @Test
     @Deployment
     public void testMultiInstanceSequentialTask() {
         // start process
@@ -469,6 +691,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
             int startCount = 0;
             int taskCount = 0;
             int endCount = 0;
+            int sequenceFlowCount = 0;
             for (HistoricActivityInstance historicActivityInstance : historicActivities) {
                 if ("task".equals(historicActivityInstance.getActivityId())) {
                     taskCount++;
@@ -479,14 +702,18 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                 } else if ("theEnd".equals(historicActivityInstance.getActivityId())) {
                     endCount++;
 
+                } else if (historicActivityInstance.getActivityId().contains("_flow_")) {
+                    sequenceFlowCount++;
+
                 } else {
                     Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
-            assertEquals(1, startCount);
-            assertEquals(3, taskCount);
-            assertEquals(1, endCount);
+            assertThat(startCount).isEqualTo(1);
+            assertThat(taskCount).isEqualTo(3);
+            assertThat(sequenceFlowCount).isEqualTo(2);
+            assertThat(endCount).isEqualTo(1);
         }
     }
 

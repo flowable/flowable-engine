@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.history;
 
-import org.flowable.engine.common.api.query.NativeQuery;
+import org.flowable.common.engine.api.query.NativeQuery;
 
 /**
  * Allows querying of {@link org.flowable.engine.history.HistoricDetail}s via native (SQL) queries

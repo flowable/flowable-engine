@@ -21,7 +21,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
@@ -57,12 +57,18 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
     protected List<User> executeQuery() {
         if (getId() != null) {
             List<User> result = new ArrayList<>();
-            result.add(findById(getId()));
+            UserEntity user = findById(getId());
+            if (user != null) {
+                result.add(user);
+            }
             return result;
 
         } else if (getIdIgnoreCase() != null) {
             List<User> result = new ArrayList<>();
-            result.add(findById(getIdIgnoreCase()));
+            UserEntity user = findById(getIdIgnoreCase());
+            if (user != null) {
+                result.add(user);
+            }
             return result;
 
         } else if (getFullNameLike() != null) {
@@ -99,8 +105,9 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
 
                     String baseDn = ldapConfigurator.getUserBaseDn() != null ? ldapConfigurator.getUserBaseDn() : ldapConfigurator.getBaseDn();
                     NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());
-                    UserEntity user = new UserEntityImpl();
+                    UserEntity user = null;
                     while (namingEnum.hasMore()) { // Should be only one
+                        user = new UserEntityImpl();
                         SearchResult result = (SearchResult) namingEnum.next();
                         mapSearchResultToUser(result, user);
                     }
@@ -109,7 +116,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
                     return user;
 
                 } catch (NamingException ne) {
-                    LOGGER.debug("Could not find user {} : {}", userId, ne.getMessage(), ne);
+                    LOGGER.error("Could not find user {} : {}", userId, ne.getMessage(), ne);
                     return null;
                 }
             }

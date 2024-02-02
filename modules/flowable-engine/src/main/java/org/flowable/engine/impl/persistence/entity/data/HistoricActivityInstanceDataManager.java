@@ -12,18 +12,22 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.runtime.ActivityInstance;
 
 /**
  * @author Joram Barrez
  */
 public interface HistoricActivityInstanceDataManager extends DataManager<HistoricActivityInstanceEntity> {
+
+    HistoricActivityInstanceEntity create(ActivityInstance activityInstance);
 
     List<HistoricActivityInstanceEntity> findUnfinishedHistoricActivityInstancesByExecutionAndActivityId(String executionId, String activityId);
     
@@ -40,5 +44,10 @@ public interface HistoricActivityInstanceDataManager extends DataManager<Histori
     List<HistoricActivityInstance> findHistoricActivityInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricActivityInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery);
+    
+    void bulkDeleteHistoricActivityInstancesByProcessInstanceIds(Collection<String> historicProcessInstanceIds);
 
+    void deleteHistoricActivityInstancesForNonExistingProcessInstances();
 }

@@ -7,8 +7,7 @@
   <insert id="insertCaseDefinition" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl">
     insert into ${prefix}ACT_CMMN_CASEDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -26,8 +25,7 @@
     VALUES 
       <foreach collection="list" item="caseDefinition" index="index" separator=","> 
         (#{caseDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{caseDefinition.category, jdbcType=VARCHAR},
+         1, #{caseDefinition.category, jdbcType=VARCHAR},
          #{caseDefinition.name, jdbcType=VARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
@@ -47,8 +45,7 @@
       INTO ${prefix}ACT_CMMN_CASEDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_) VALUES 
         (#{caseDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{caseDefinition.category, jdbcType=VARCHAR},
+         1, #{caseDefinition.category, jdbcType=VARCHAR},
          #{caseDefinition.name, jdbcType=VARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
@@ -64,9 +61,11 @@
   </insert>
   
   <update id="updateCaseDefinition" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl">
-    update ${prefix}ACT_CMMN_CASEDEF set
+    update ${prefix}ACT_CMMN_CASEDEF
+    <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},    
-      CATEGORY_ = #{category, jdbcType=VARCHAR}
+      CATEGORY_ = #{category, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -120,14 +119,30 @@
       and KEY_ = #{caseDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{caseDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+  <select id="selectCaseDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="caseDefinitionResultMap">
+    select *
+    from ${prefix}ACT_CMMN_CASEDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{caseDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
   
-  <select id="selectCaseDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_CMMN_CASEDEF 
     where KEY_ = #{parameter.caseDefinitionKey} and VERSION_ = #{parameter.caseDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
-  <select id="selectCaseDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
+  <select id="selectCaseDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="caseDefinitionResultMap">
     select *
     from ${prefix}ACT_CMMN_CASEDEF 
     where KEY_ = #{parameter.caseDefinitionKey} and VERSION_ = #{parameter.caseDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}
@@ -150,11 +165,11 @@
   </select>
   
   <select id="selectCaseDefinitionsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultMap="caseDefinitionResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="nullHandlingColumn != null">, ${nullHandlingColumn}</if> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectCaseDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectCaseDefinitionCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl" resultType="long">
@@ -189,6 +204,9 @@
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
       </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
       </if>
@@ -219,11 +237,14 @@
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null and !deploymentIds.isEmpty()">
+      <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
         <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
           #{item}
         </foreach>
+      </if>
+      <if test="parentDeploymentId != null">
+          and EXISTS (select 1 from ${prefix}ACT_CMMN_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = RES.DEPLOYMENT_ID_)
       </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_CMMN_CASEDEF where KEY_ = RES.KEY_ 
@@ -249,6 +270,31 @@
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="includeAuthorization">
+          AND
+          <trim prefix="(" prefixOverrides="OR" suffix=")">
+             <if test="authorizationUserId != null">
+                 exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.USER_ID_ = #{authorizationUserId})
+             </if>
+              <if test="authorizationGroups != null &amp;&amp; !authorizationGroups.empty">
+                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and 
+                    (
+                    <foreach item="authorizationGroupListItem" index="groupIndex" collection="safeAuthorizationGroups">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        IDN.GROUP_ID_ IN
+                        <foreach item="group" index="index" collection="authorizationGroupListItem"
+                              open="(" separator="," close=")">
+                          #{group}
+                        </foreach>
+                    </foreach>
+                    )
+                  )
+              </if>
+
+          </trim>
       </if>
     </where>
   </sql>

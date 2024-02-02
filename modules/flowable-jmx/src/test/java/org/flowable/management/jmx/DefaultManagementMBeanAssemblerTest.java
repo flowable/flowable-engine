@@ -13,9 +13,7 @@
 
 package org.flowable.management.jmx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -43,17 +41,17 @@ public class DefaultManagementMBeanAssemblerTest {
     public void testHappyPath() throws MalformedObjectNameException, JMException {
         TestMbean testMbean = new TestMbean();
         ModelMBean mbean = defaultManagementMBeanAssembler.assemble(testMbean, new ObjectName("org.flowable.jmx.Mbeans:type=something"));
-        assertNotNull(mbean);
-        assertNotNull(mbean.getMBeanInfo());
-        assertNotNull(mbean.getMBeanInfo().getAttributes());
+        assertThat(mbean).isNotNull();
+        assertThat(mbean.getMBeanInfo()).isNotNull();
+        assertThat(mbean.getMBeanInfo().getAttributes()).isNotNull();
         MBeanAttributeInfo[] attributes = mbean.getMBeanInfo().getAttributes();
-        assertEquals(2, attributes.length);
-        assertTrue((attributes[0].getName().equals("TestAttributeString") && attributes[1].getName().equals("TestAttributeBoolean") || (attributes[1].getName().equals("TestAttributeString") && attributes[0]
-                .getName().equals("TestAttributeBoolean"))));
-        assertNotNull(mbean.getMBeanInfo().getOperations());
+        assertThat(attributes).hasSize(2);
+        assertThat(("TestAttributeString".equals(attributes[0].getName()) && "TestAttributeBoolean".equals(attributes[1].getName()) || (
+		        "TestAttributeString".equals(attributes[1].getName()) && "TestAttributeBoolean".equals(attributes[0]
+		                .getName())))).isTrue();
+        assertThat(mbean.getMBeanInfo().getOperations()).isNotNull();
         MBeanOperationInfo[] operations = mbean.getMBeanInfo().getOperations();
-        assertNotNull(operations);
-        assertEquals(3, operations.length);
+        assertThat(operations).hasSize(3);
 
     }
 
@@ -61,11 +59,11 @@ public class DefaultManagementMBeanAssemblerTest {
     public void testNotificationAware() throws MalformedObjectNameException, JMException {
         NotificationSenderAware mockedNotificationAwareMbean = mock(NotificationSenderAware.class);
         ModelMBean modelBean = defaultManagementMBeanAssembler.assemble(mockedNotificationAwareMbean, new ObjectName("org.flowable.jmx.Mbeans:type=something"));
-        assertNotNull(modelBean);
+        assertThat(modelBean).isNotNull();
         ArgumentCaptor<NotificationSender> argument = ArgumentCaptor.forClass(NotificationSender.class);
         verify(mockedNotificationAwareMbean).setNotificationSender(argument.capture());
-        assertNotNull(argument);
-        assertNotNull(argument.getValue());
+        assertThat(argument).isNotNull();
+        assertThat(argument.getValue()).isNotNull();
 
     }
 

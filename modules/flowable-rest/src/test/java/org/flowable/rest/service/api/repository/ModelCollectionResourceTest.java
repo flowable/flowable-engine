@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Calendar;
 
 import org.apache.http.HttpStatus;
@@ -23,15 +26,20 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
  */
 public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetModels() throws Exception {
         // Create 2 models
@@ -154,7 +162,8 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
-
+    
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testCreateModel() throws Exception {
         Model model = null;
@@ -179,30 +188,32 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("Model name", responseNode.get("name").textValue());
-            assertEquals("Model key", responseNode.get("key").textValue());
-            assertEquals("Model category", responseNode.get("category").textValue());
-            assertEquals(2, responseNode.get("version").intValue());
-            assertEquals("Model metainfo", responseNode.get("metaInfo").textValue());
-            assertEquals(deploymentId, responseNode.get("deploymentId").textValue());
-            assertEquals("myTenant", responseNode.get("tenantId").textValue());
-
-            assertEquals(createTime.getTime().getTime(), getDateFromISOString(responseNode.get("createTime").textValue()).getTime());
-            assertEquals(createTime.getTime().getTime(), getDateFromISOString(responseNode.get("lastUpdateTime").textValue()).getTime());
-
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").textValue())));
-            assertTrue(responseNode.get("deploymentUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId)));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "name: 'Model name',"
+                            + "key: 'Model key',"
+                            + "category: 'Model category',"
+                            + "version: 2,"
+                            + "metaInfo: 'Model metainfo',"
+                            + "deploymentId: '" + deploymentId + "',"
+                            + "tenantId: 'myTenant',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").textValue()) + "',"
+                            + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
+                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
+                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime()))
+                            + "}");
 
             model = repositoryService.createModelQuery().modelId(responseNode.get("id").textValue()).singleResult();
-            assertNotNull(model);
-            assertEquals("Model category", model.getCategory());
-            assertEquals("Model name", model.getName());
-            assertEquals("Model key", model.getKey());
-            assertEquals(deploymentId, model.getDeploymentId());
-            assertEquals("Model metainfo", model.getMetaInfo());
-            assertEquals("myTenant", model.getTenantId());
-            assertEquals(2, model.getVersion().intValue());
+            assertThat(model).isNotNull();
+            assertThat(model.getCategory()).isEqualTo("Model category");
+            assertThat(model.getName()).isEqualTo("Model name");
+            assertThat(model.getKey()).isEqualTo("Model key");
+            assertThat(model.getDeploymentId()).isEqualTo(deploymentId);
+            assertThat(model.getMetaInfo()).isEqualTo("Model metainfo");
+            assertThat(model.getTenantId()).isEqualTo("myTenant");
+            assertThat(model.getVersion().intValue()).isEqualTo(2);
 
         } finally {
             if (model != null) {

@@ -15,18 +15,15 @@ package org.flowable.dmn.engine.impl.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.test.DmnTestHelper;
-import org.junit.Assert;
-
-import junit.framework.AssertionFailedError;
 
 /**
  * @author Tom Baeyens
@@ -39,6 +36,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOGLOCK");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
     }
 
     protected DmnEngine dmnEngine;
@@ -50,7 +48,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnManagementService managementService;
     protected DmnRepositoryService repositoryService;
-    protected DmnRuleService ruleService;
+    protected DmnDecisionService ruleService;
     protected DmnHistoryService historyService;
 
     protected abstract void initializeDmnEngine();
@@ -80,7 +78,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
 
             super.runBare();
 
-        } catch (AssertionFailedError e) {
+        } catch (AssertionError e) {
             LOGGER.error(EMPTY_LINE);
             LOGGER.error("ASSERTION FAILED: {}", e, e);
             exception = e;
@@ -117,41 +115,21 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
      * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
      */
     protected void assertAndEnsureCleanDb() throws Throwable {
-        LOGGER.debug("verifying that db is clean after test");
-        Map<String, Long> tableCounts = managementService.getTableCount();
-        StringBuilder outputMessage = new StringBuilder();
-        for (String tableName : tableCounts.keySet()) {
-            String tableNameWithoutPrefix = tableName.replace(dmnEngineConfiguration.getDatabaseTablePrefix(), "");
-            if (!TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.contains(tableNameWithoutPrefix)) {
-                Long count = tableCounts.get(tableName);
-                if (count != 0L) {
-                    outputMessage.append("  ").append(tableName).append(": ").append(count).append(" record(s) ");
-                }
-            }
-        }
-
-        if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error(outputMessage.toString());
-
-            LOGGER.info("dropping and recreating db");
-
-            if (exception != null) {
-                throw exception;
-            } else {
-                Assert.fail(outputMessage.toString());
-            }
-        } else {
-            LOGGER.info("database was clean");
-        }
+        EnsureCleanDbUtils.assertAndEnsureCleanDb(
+                getName(),
+                LOGGER,
+                dmnEngineConfiguration,
+                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
+                exception == null,
+                null
+        );
     }
 
     protected void initializeServices() {
         dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
         managementService = dmnEngine.getDmnManagementService();
         repositoryService = dmnEngine.getDmnRepositoryService();
-        ruleService = dmnEngine.getDmnRuleService();
+        ruleService = dmnEngine.getDmnDecisionService();
         historyService = dmnEngine.getDmnHistoryService();
     }
 

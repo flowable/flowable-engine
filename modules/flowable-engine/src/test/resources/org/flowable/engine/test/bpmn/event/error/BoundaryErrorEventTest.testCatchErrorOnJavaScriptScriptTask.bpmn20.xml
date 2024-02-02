@@ -14,19 +14,8 @@
         <scriptTask id="theScript" scriptFormat="JavaScript">
             <script><![CDATA[
 
-            var JvmUtil = Packages.org.flowable.engine.common.impl.util.JvmUtil;
             var BpmnError = Packages.org.flowable.engine.delegate.BpmnError;
-
-            if (JvmUtil.isJDK8()) {
-            
-              throw new BpmnError("errorOne");
-
-            } else {
-
-              var Context = Packages.sun.org.mozilla.javascript.internal.Context;
-              Context.throwAsScriptRuntimeEx(new org.flowable.engine.delegate.BpmnError("errorOne"));
-
-            }
+            throw new BpmnError("errorOne");
 
       ]]></script>
         </scriptTask>

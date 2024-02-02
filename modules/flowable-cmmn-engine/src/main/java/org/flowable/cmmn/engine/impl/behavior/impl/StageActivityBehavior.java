@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
@@ -22,8 +23,8 @@ import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -38,10 +39,22 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity.getPlanItem().getName() != null) {
+        if (planItemInstanceEntity.getName() == null && planItemInstanceEntity.getPlanItem().getName() != null) {
             Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+            Object nameExpressionValue = nameExpression.getValue(planItemInstanceEntity);
+            if (nameExpressionValue != null) {
+                planItemInstanceEntity.setName(nameExpressionValue.toString());
+            }
         }
+
+        if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {
+            Expression businessStatusExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(stage.getBusinessStatus());
+            String actualBusinessStatus = (String) businessStatusExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatus)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(planItemInstanceEntity.getCaseInstanceId(), actualBusinessStatus);
+            }
+        }
+
         CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planItemInstanceEntity);
     }
     
@@ -55,7 +68,7 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
                 }
             }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
     
     @Override
@@ -71,11 +84,13 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
         List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                if (StateTransition.isPossible(planItemInstance, transition)) {
+                if (StateTransition.isPossible(childPlanItemInstance, transition)) {
+                    // we don't propagate the exit and exit event type to the child plan items as regardless of the parent termination type, children always
+                    // get treated the same way
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance, null, null);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null, null, null);
                     }
                 }
             }

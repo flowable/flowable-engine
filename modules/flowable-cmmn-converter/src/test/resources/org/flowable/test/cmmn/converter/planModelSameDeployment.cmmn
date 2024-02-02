@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" targetNamespace="http://www.flowable.org/casedef">
+    <case id="sameDeploymentCase" name="Same Deployment">
+        <casePlanModel id="casePlanModel" flowable:formKey="testForm" flowable:sameDeployment="true">
+            <planItem id="planItem1" name="Start Task" definitionRef="startTask"/>
+            <humanTask id="startTask" name="Start Task"/>
+        </casePlanModel>
+    </case>
+</definitions>

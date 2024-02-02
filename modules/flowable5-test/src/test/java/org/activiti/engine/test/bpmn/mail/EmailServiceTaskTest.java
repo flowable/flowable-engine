@@ -22,14 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;

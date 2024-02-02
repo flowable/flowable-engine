@@ -13,20 +13,22 @@
 
 package org.flowable.rest.service.api.history;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.util.DateToStringSerializer;
-
 import java.util.Date;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers
  */
 public class HistoricDetailResponse {
 
-    public static String FORM_PROPERTY = "formProperty";
-    public static String VARIABLE_UPDATE = "variableUpdate";
+    public static final String FORM_PROPERTY = "formProperty";
+    public static final String VARIABLE_UPDATE = "variableUpdate";
 
     protected String id;
     protected String processInstanceId;

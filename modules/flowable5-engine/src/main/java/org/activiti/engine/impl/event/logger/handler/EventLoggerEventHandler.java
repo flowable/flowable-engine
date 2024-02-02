@@ -16,7 +16,7 @@ import java.util.Date;
 
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventLogEntryEntity;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

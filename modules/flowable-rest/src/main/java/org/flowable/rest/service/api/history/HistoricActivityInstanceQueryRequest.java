@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
-import org.flowable.rest.api.PaginateRequest;
+import org.flowable.common.rest.api.PaginateRequest;
 
 /**
  * @author Tijs Rademakers

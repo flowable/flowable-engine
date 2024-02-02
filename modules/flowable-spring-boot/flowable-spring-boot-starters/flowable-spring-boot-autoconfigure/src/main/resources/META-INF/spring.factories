@@ -1,0 +1,8 @@
+
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  org.flowable.spring.boot.environment.FlowableDefaultPropertiesEnvironmentPostProcessor,\
+  org.flowable.spring.boot.environment.FlowableLiquibaseEnvironmentPostProcessor
+
+# Failure analyzers
+org.springframework.boot.diagnostics.FailureAnalyzer=\
+  org.flowable.spring.boot.liquibase.LiquibaseXmlElementClassNotFoundFailureAnalyzer

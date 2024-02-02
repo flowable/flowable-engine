@@ -15,6 +15,7 @@ package org.flowable.engine.impl.webservice;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,8 +37,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.flowable.bpmn.model.Import;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
@@ -46,8 +47,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.sun.codemodel.JClass;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
+import com.sun.codemodel.JType;
 import com.sun.tools.xjc.ConsoleErrorReporter;
 import com.sun.tools.xjc.api.ErrorListener;
 import com.sun.tools.xjc.api.Mapping;
@@ -182,8 +185,46 @@ public class WSDLImporter implements XMLImporter {
         Map<String, JFieldVar> fields = theClass.fields();
         int index = 0;
         for (Entry<String, JFieldVar> entry : fields.entrySet()) {
-            Class<?> fieldClass = ReflectUtil.loadClass(entry.getValue().type().boxify().fullName());
-            structure.setFieldName(index, entry.getKey(), fieldClass);
+
+            final JType fieldType = entry.getValue().type();
+            final Class<?> fieldClass = ReflectUtil.loadClass(fieldType.boxify().fullName());
+            final Class<?> fieldParameterClass;
+            if (fieldType instanceof JClass) {
+                final JClass fieldClassType = (JClass) fieldType;
+                final List<JClass> fieldTypeParameters = fieldClassType.getTypeParameters();
+                if (fieldTypeParameters.size() > 1) {
+                    throw new FlowableException(
+                            String.format("Field type '%s' with more than one parameter is not supported: %S",
+                                    fieldClassType, fieldTypeParameters));
+                } else if (fieldTypeParameters.isEmpty()) {
+                    fieldParameterClass = null;
+                } else {
+                    final JClass fieldParameterType = fieldTypeParameters.get(0);
+
+                    // Hack because JClass.fullname() doesn't return the right class fullname for a nested class to be
+                    // loaded from classloader. It should be contain "$" instead of "." as separator
+                    boolean isFieldParameterTypeNeestedClass = false;
+                    final Iterator<JDefinedClass> theClassNeestedClassIt = theClass.classes();
+                    while (theClassNeestedClassIt.hasNext() && !isFieldParameterTypeNeestedClass) {
+                        final JDefinedClass neestedType = theClassNeestedClassIt.next();
+                        if (neestedType.name().equals(fieldParameterType.name())) {
+                            isFieldParameterTypeNeestedClass = true;
+                        }
+                    }
+                    if (isFieldParameterTypeNeestedClass) {
+                        // The parameter type is a nested class
+                        fieldParameterClass = ReflectUtil
+                                .loadClass(theClass.erasure().fullName() + "$" + fieldParameterType.name());
+                    } else {
+                        // The parameter type is not a nested class
+                        fieldParameterClass = ReflectUtil.loadClass(fieldParameterType.erasure().fullName());
+                    }
+                }
+            } else {
+                fieldParameterClass = null;
+            }
+
+            structure.setFieldName(index, entry.getKey(), fieldClass, fieldParameterClass);
             index++;
         }
     }
@@ -212,11 +253,7 @@ public class WSDLImporter implements XMLImporter {
             Element root = (Element) doc.getFirstChild();
             Element typesElement = (Element) root.getElementsByTagName("wsdl:types").item(0);
             return (Element) typesElement.getElementsByTagNameNS("http://www.w3.org/2001/XMLSchema", "schema").item(0);
-        } catch (SAXException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (IOException e) {
-            throw new FlowableException(e.getMessage(), e);
-        } catch (ParserConfigurationException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new FlowableException(e.getMessage(), e);
         }
     }

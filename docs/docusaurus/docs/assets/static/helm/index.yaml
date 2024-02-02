@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  flowable:
+  - apiVersion: v1
+    appVersion: 6.5.0
+    created: "2020-01-23T14:41:46.335086+01:00"
+    description: A Flowable Helm chart for Kubernetes
+    digest: d231d0b5ba78c6f0952ba2ab5ed0b17566f54a46af3ad840107690715a782f61
+    home: https://flowable.org
+    icon: https://flowable.org/docs/img/logo.png
+    name: flowable
+    urls:
+    - https://flowable.org/helm/flowable-6.5.0.tgz
+    version: 6.5.0
+generated: "2020-01-23T14:41:46.332982+01:00"

@@ -12,6 +12,8 @@
  */
 package org.flowable.variable.service;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -35,10 +37,10 @@ public interface HistoricVariableService {
     
     void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable);
     
-    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable);
-    
-    void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity);
-    
+    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable, Date createTime);
+
+    void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime);
+
     void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity);
     
     void deleteHistoricVariableInstance(HistoricVariableInstanceEntity historicVariable);
@@ -47,4 +49,11 @@ public interface HistoricVariableService {
     
     void deleteHistoricVariableInstancesByTaskId(String taskId);
     
+    void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
+    
+    void deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricVariableInstancesForNonExistingCaseInstances();
 }

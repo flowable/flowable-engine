@@ -12,11 +12,11 @@
  */
 package org.flowable.dmn.api;
 
-import org.flowable.engine.common.api.FlowableException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Yvo Swillens

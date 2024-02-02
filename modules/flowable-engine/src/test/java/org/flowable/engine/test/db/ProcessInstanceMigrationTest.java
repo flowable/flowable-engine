@@ -13,13 +13,16 @@
 
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cmd.SetProcessDefinitionVersionCmd;
@@ -31,6 +34,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Falko Menge
@@ -46,47 +50,34 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
     private static final String TEST_PROCESS_USER_TASK_V2 = "org/flowable/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionWithTaskV2.bpmn20.xml";
     private static final String TEST_PROCESS_NESTED_SUB_EXECUTIONS = "org/flowable/engine/test/db/ProcessInstanceMigrationTest.testSetProcessDefinitionVersionSubExecutionsNested.bpmn20.xml";
 
+    @Test
     public void testSetProcessDefinitionVersionEmptyArguments() {
-        try {
-            new SetProcessDefinitionVersionCmd(null, 23);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process instance id is mandatory, but 'null' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> new SetProcessDefinitionVersionCmd(null, 23))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process instance id is mandatory, but 'null' has been provided.");
 
-        try {
-            new SetProcessDefinitionVersionCmd("", 23);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process instance id is mandatory, but '' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> new SetProcessDefinitionVersionCmd("", 23))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process instance id is mandatory, but '' has been provided.");
 
-        try {
-            new SetProcessDefinitionVersionCmd("42", null);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition version is mandatory, but 'null' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> new SetProcessDefinitionVersionCmd("42", null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process definition version is mandatory, but 'null' has been provided.");
 
-        try {
-            new SetProcessDefinitionVersionCmd("42", -1);
-            fail("ActivitiException expected");
-        } catch (FlowableIllegalArgumentException ae) {
-            assertTextPresent("The process definition version must be positive, but '-1' has been provided.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> new SetProcessDefinitionVersionCmd("42", -1))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process definition version must be positive, but '-1' has been provided.");
     }
 
+    @Test
     public void testSetProcessDefinitionVersionNonExistingPI() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        try {
-            commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23));
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("No process instance found for id = '42'.", ae.getMessage());
-            assertEquals(ProcessInstance.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> commandExecutor.execute(new SetProcessDefinitionVersionCmd("42", 23)))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process instance found for id = '42'.");
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
     public void testSetProcessDefinitionVersionPIIsSubExecution() {
         // start process instance
@@ -95,30 +86,25 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         Execution execution = runtimeService.createExecutionQuery().activityId("receivePayment").singleResult();
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         SetProcessDefinitionVersionCmd command = new SetProcessDefinitionVersionCmd(execution.getId(), 1);
-        try {
-            commandExecutor.execute(command);
-            fail("ActivitiException expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("A process instance id is required, but the provided id '" + execution.getId() + "' points to a child execution of process instance '" + pi.getId() + "'. Please invoke the "
-                    + command.getClass().getSimpleName() + " with a root execution id.", ae.getMessage());
-        }
+        assertThatThrownBy(() -> commandExecutor.execute(command))
+                .isInstanceOf(FlowableException.class)
+                .hasMessage("A process instance id is required, but the provided id '" + execution.getId() + "' points to a child execution of process instance '" + pi.getId() + "'. Please invoke the "
+                        + command.getClass().getSimpleName() + " with a root execution id.");
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS })
     public void testSetProcessDefinitionVersionNonExistingPD() {
         // start process instance
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("receiveTask");
 
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
-        try {
-            commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23));
-            fail("ActivitiException expected");
-        } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no processes deployed with key = 'receiveTask' and version = '23'", ae.getMessage());
-            assertEquals(ProcessDefinition.class, ae.getObjectClass());
-        }
+        assertThatThrownBy(() -> commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 23)))
+                .isExactlyInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("no processes deployed with key = 'receiveTask' and version = '23'");
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS })
     public void testSetProcessDefinitionVersionActivityMissing() {
         // start process instance
@@ -126,26 +112,24 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         // check that receive task has been reached
         Execution execution = runtimeService.createExecutionQuery().activityId("waitState1").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // deploy new version of the process definition
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_ACTIVITY_MISSING).deploy();
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
 
         // migrate process instance to new process definition version
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         SetProcessDefinitionVersionCmd setProcessDefinitionVersionCmd = new SetProcessDefinitionVersionCmd(pi.getId(), 2);
-        try {
-            commandExecutor.execute(setProcessDefinitionVersionCmd);
-            fail("ActivitiException expected");
-        } catch (FlowableException ae) {
-            assertTextPresent("The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '", ae.getMessage());
-        }
+        assertThatThrownBy(() -> commandExecutor.execute(setProcessDefinitionVersionCmd))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("The new process definition (key = 'receiveTask') does not contain the current activity (id = 'waitState1') of the process instance (id = '");
 
         // undeploy "manually" deployed process definition
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment
     public void testSetProcessDefinitionVersion() {
         // start process instance
@@ -153,11 +137,11 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         // check that receive task has been reached
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState1").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // deploy new version of the process definition
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+        repositoryService.createDeployment().addClasspathResource(TEST_PROCESS).deploy();
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
 
         // migrate process instance to new process definition version
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -169,36 +153,38 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         // check that the instance now uses the new process definition version
         ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
         pi = runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals(newProcessDefinition.getId(), pi.getProcessDefinitionId());
+        assertThat(pi.getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
         
         // check history
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstance historicPI = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
-            assertEquals(newProcessDefinition.getId(), historicPI.getProcessDefinitionId());
+            assertThat(historicPI.getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
 
             List<HistoricActivityInstance> historicActivities = historyService
                     .createHistoricActivityInstanceQuery()
                     .processInstanceId(pi.getId())
                     .unfinished()
                     .list();
-            assertEquals(1, historicActivities.size());
-            assertEquals(newProcessDefinition.getId(), historicActivities.get(0).getProcessDefinitionId());
+            assertThat(historicActivities)
+                    .extracting(HistoricActivityInstance::getProcessDefinitionId)
+                    .containsExactly(newProcessDefinition.getId());
         }
 
         deleteDeployments();
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_WITH_PARALLEL_GATEWAY })
     public void testSetProcessDefinitionVersionSubExecutions() {
         // start process instance
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoin");
 
         // check that the user tasks have been reached
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // deploy new version of the process definition
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_WITH_PARALLEL_GATEWAY).deploy();
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
 
         // migrate process instance to new process definition version
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -209,13 +195,14 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).list();
         for (Execution execution : executions) {
-            assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
         }
 
         // undeploy "manually" deployed process definition
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_CALL_ACTIVITY })
     public void testSetProcessDefinitionVersionWithCallActivity() {
         // start process instance
@@ -223,11 +210,11 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
         // check that receive task has been reached
         Execution execution = runtimeService.createExecutionQuery().activityId("waitState1").processDefinitionKey("childProcess").singleResult();
-        assertNotNull(execution);
+        assertThat(execution).isNotNull();
 
         // deploy new version of the process definition
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_CALL_ACTIVITY).deploy();
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("parentProcess").count());
+        assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionKey("parentProcess").count()).isEqualTo(2);
 
         // migrate process instance to new process definition version
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -237,12 +224,13 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         runtimeService.trigger(execution.getId());
 
         // should be finished now
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).count()).isZero();
 
         // undeploy "manually" deployed process definition
         repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_USER_TASK_V1 })
     public void testSetProcessDefinitionVersionWithWithTask() {
         try {
@@ -250,11 +238,11 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("userTask");
 
             // check that user task has been reached
-            assertEquals(1, taskService.createTaskQuery().processInstanceId(pi.getId()).count());
+            assertThat(taskService.createTaskQuery().processInstanceId(pi.getId()).count()).isEqualTo(1);
 
             // deploy new version of the process definition
-            org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
-            assertEquals(2, repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count());
+            repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_USER_TASK_V2).deploy();
+            assertThat(repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").count()).isEqualTo(2);
 
             ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("userTask").processDefinitionVersion(2).singleResult();
 
@@ -263,13 +251,13 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
 
             // check UserTask
             org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-            assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
-            assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
+            assertThat(task.getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
+            assertThat(formService.getTaskFormData(task.getId()).getFormKey()).isEqualTo("testFormKey");
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).singleResult();
-                assertEquals(newProcessDefinition.getId(), historicTask.getProcessDefinitionId());
-                assertEquals("testFormKey", formService.getTaskFormData(historicTask.getId()).getFormKey());
+                assertThat(historicTask.getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
+                assertThat(formService.getTaskFormData(historicTask.getId()).getFormKey()).isEqualTo("testFormKey");
             }
 
             // continue
@@ -284,17 +272,18 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { TEST_PROCESS_NESTED_SUB_EXECUTIONS })
     public void testSetProcessDefinitionVersionSubExecutionsNested() {
         // start process instance
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("forkJoinNested");
 
         // check that the user tasks have been reached
-        assertEquals(2, taskService.createTaskQuery().count());
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(2);
 
         // deploy new version of the process definition
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource(TEST_PROCESS_NESTED_SUB_EXECUTIONS).deploy();
-        assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+        assertThat(repositoryService.createProcessDefinitionQuery().count()).isEqualTo(2);
 
         // migrate process instance to new process definition version
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
@@ -305,7 +294,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
         ProcessDefinition newProcessDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(2).singleResult();
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).list();
         for (Execution execution : executions) {
-            assertEquals(newProcessDefinition.getId(), ((ExecutionEntity) execution).getProcessDefinitionId());
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(newProcessDefinition.getId());
         }
 
         // undeploy "manually" deployed process definition

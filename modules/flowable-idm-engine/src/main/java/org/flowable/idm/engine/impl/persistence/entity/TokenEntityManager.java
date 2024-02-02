@@ -15,7 +15,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.TokenQuery;
 import org.flowable.idm.engine.impl.TokenQueryImpl;

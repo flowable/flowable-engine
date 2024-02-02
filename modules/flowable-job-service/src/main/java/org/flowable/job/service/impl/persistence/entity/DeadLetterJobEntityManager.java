@@ -14,7 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -25,9 +25,19 @@ import org.flowable.job.service.impl.JobQueryImpl;
 public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobEntity> {
 
     /**
-     * Returns all {@link DeadLetterJobEntity} instances related to on {@link ExecutionEntity}.
+     * Find the deadletter job with the given correlation id.
+     */
+    DeadLetterJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
+     * Returns all {@link DeadLetterJobEntity} instances related to an execution id.
      */
     List<DeadLetterJobEntity> findJobsByExecutionId(String id);
+    
+    /**
+     * Returns all {@link DeadLetterJobEntity} instances related to a process instance
+     */
+    List<DeadLetterJobEntity> findJobsByProcessInstanceId(String id);
 
     /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link DeadLetterJobEntity} instances.
@@ -40,7 +50,8 @@ public interface DeadLetterJobEntityManager extends EntityManager<DeadLetterJobE
     long findJobCountByQueryCriteria(DeadLetterJobQueryImpl jobQuery);
 
     /**
-     * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
+     * Changes the tenantId for all jobs related to a given deployment id.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    
 }

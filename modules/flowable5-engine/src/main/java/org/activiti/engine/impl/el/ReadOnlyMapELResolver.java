@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 
 /**
  * An {@link ELResolver} that exposed object values in the map, under the name of the entry's key. The values in the map are only returned when requested property has no 'base', meaning it's a

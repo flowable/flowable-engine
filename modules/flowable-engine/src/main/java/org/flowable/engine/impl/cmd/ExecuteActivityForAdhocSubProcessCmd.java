@@ -18,10 +18,10 @@ import java.io.Serializable;
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
@@ -48,7 +48,7 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
         }
 
         if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
-            throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
+            throw new FlowableException("The current flow element of the requested " + execution + " is not an ad-hoc sub process");
         }
 
         FlowNode foundNode = null;
@@ -57,7 +57,7 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
         // if sequential ordering, only one child execution can be active
         if (adhocSubProcess.hasSequentialOrdering()) {
             if (execution.getExecutions().size() > 0) {
-                throw new FlowableException("Sequential ad-hoc sub process already has an active execution");
+                throw new FlowableException("Sequential ad-hoc sub process in " + execution + " already has an active execution");
             }
         }
 
@@ -71,7 +71,7 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
         }
 
         if (foundNode == null) {
-            throw new FlowableException("The requested activity with id " + activityId + " can not be enabled");
+            throw new FlowableException("The requested activity with id " + activityId + " can not be enabled in " + execution);
         }
 
         ExecutionEntity activityExecution = CommandContextUtil.getExecutionEntityManager().createChildExecution(execution);

@@ -37,7 +37,7 @@ public class LDAPTemplate {
         try {
             initialDirContext = LDAPConnectionUtil.creatDirectoryContext(ldapConfigurator);
         } catch (Exception e) {
-            LOGGER.info("Could not create LDAP connection : {}", e.getMessage(), e);
+            LOGGER.info("Could not create LDAP connection: {}", e.getMessage(), e);
         }
         T result = ldapCallBack.executeInContext(initialDirContext);
         LDAPConnectionUtil.closeDirectoryContext(initialDirContext);

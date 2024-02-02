@@ -18,8 +18,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
 import org.flowable.engine.impl.cmd.DeploymentSettings;

@@ -13,7 +13,7 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
 

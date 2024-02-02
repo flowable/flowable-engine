@@ -33,6 +33,7 @@ public class SecureScriptContextFactory extends ContextFactory {
     protected int maxStackDepth = -1;
     protected int optimizationLevel = -1;
     protected SecureScriptThreadMxBeanWrapper threadMxBeanWrapper;
+    protected boolean enableAccessToBeans = false;
 
     @Override
     protected Context makeContext() {
@@ -160,5 +161,13 @@ public class SecureScriptContextFactory extends ContextFactory {
 
     public void setMaxStackDepth(int maxStackDepth) {
         this.maxStackDepth = maxStackDepth;
+    }
+
+    public boolean isEnableAccessToBeans() {
+        return enableAccessToBeans;
+    }
+
+    public void setEnableAccessToBeans(boolean enableAccessToBeans) {
+        this.enableAccessToBeans = enableAccessToBeans;
     }
 }

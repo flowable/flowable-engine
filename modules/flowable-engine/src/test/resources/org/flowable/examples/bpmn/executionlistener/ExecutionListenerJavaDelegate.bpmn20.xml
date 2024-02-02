@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef" exporter="Flowable Open Source Modeler" exporterVersion="6.7.2">
+    <process id="MyFlow" name="MyFlow" isExecutable="true">
+        <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+        <userTask id="sid-5C3D68E7-1D85-43C6-8395-EC625DB7DE07" name="Production Manager" flowable:candidateUsers="ProductionManager,StationManager" flowable:formFieldValidation="true">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.examples.bpmn.executionlistener.JavaDelegateTestExecutionListener">
+                    <flowable:field name="action">
+                        <flowable:string><![CDATA[ProductionManager taskListener]]></flowable:string>
+                    </flowable:field>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+        <userTask id="sid-5228C746-FE0B-407A-AE17-7DA540271C46" name="Station Manager" flowable:assignee="StationManager" flowable:formFieldValidation="true">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.examples.bpmn.executionlistener.JavaDelegateTestExecutionListener">
+                    <flowable:field name="action">
+                        <flowable:string><![CDATA[StationManager taskListener]]></flowable:string>
+                    </flowable:field>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+        <endEvent id="sid-A46C569A-2C8D-448B-9F98-BBB6C13061E0"></endEvent>
+        <sequenceFlow id="sid-BBE08CC4-2B4E-415B-ADCE-8B15A2FE55E8" sourceRef="startEvent1" targetRef="sid-5C3D68E7-1D85-43C6-8395-EC625DB7DE07">
+            <extensionElements>
+                <flowable:executionListener event="take" class="org.flowable.examples.bpmn.executionlistener.JavaDelegateTestExecutionListener">
+                    <flowable:field name="action">
+                        <flowable:string><![CDATA[Start executionListener]]></flowable:string>
+                    </flowable:field>
+                </flowable:executionListener>
+            </extensionElements>
+        </sequenceFlow>
+
+        <sequenceFlow id="sid-5D648E6B-705D-40C9-B911-1880865A22D3" sourceRef="sid-5C3D68E7-1D85-43C6-8395-EC625DB7DE07" targetRef="sid-5228C746-FE0B-407A-AE17-7DA540271C46"></sequenceFlow>
+        <sequenceFlow id="sid-BED0F7CD-0089-42DA-88F1-9FBE29745F85" sourceRef="sid-5228C746-FE0B-407A-AE17-7DA540271C46" targetRef="sid-A46C569A-2C8D-448B-9F98-BBB6C13061E0"></sequenceFlow>
+
+    </process>
+</definitions>

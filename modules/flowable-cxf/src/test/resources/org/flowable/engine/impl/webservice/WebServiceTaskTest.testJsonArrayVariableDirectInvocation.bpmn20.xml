@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.flowable.engine.impl.webservice"
+  xmlns:tns="org.flowable.engine.impl.webservice"
+  xmlns:webservice="http://webservice.flowable.org/">
+
+  <import importType="http://schemas.xmlsoap.org/wsdl/"
+          location="http://localhost:63081/webservicemock?wsdl"
+          namespace="http://webservice.flowable.org/" />
+
+   <process id="jsonArrayVariableDirectInvocation">
+
+      <startEvent id="theStart">
+         <extensionElements>
+            <activiti:formProperty id="values" name="Values to add" type="json" required="true" />
+         </extensionElements>
+      </startEvent>
+
+      <sequenceFlow id="flow1" sourceRef="theStart" targetRef="webService" />
+
+      <serviceTask id="webService" name="Web service invocation" implementation="##WebService"
+         operationRef="tns:addMultiOperation">
+         <ioSpecification>
+            <dataInput itemSubjectRef="tns:addMultiRequestItem" id="dataInputOfAddMultiRequest" />
+            <inputSet>
+               <dataInputRefs>dataInputOfAddMultiRequest</dataInputRefs>
+            </inputSet>
+            <outputSet />
+         </ioSpecification>
+         <dataInputAssociation>
+            <targetRef>dataInputOfAddMultiRequest</targetRef>
+            <assignment>
+               <from>${values}</from>
+               <to>${dataInputOfAddMultiRequest.values}</to>
+            </assignment>
+         </dataInputAssociation>
+      </serviceTask>
+
+      <sequenceFlow id="flow2" sourceRef="webService" targetRef="theEnd" />
+
+      <endEvent id="theEnd" />
+
+   </process>
+
+   <itemDefinition id="addMultiRequestItem" structureRef="webservice:addMulti" />
+   <itemDefinition id="addMultiResponseItem" structureRef="webservice:addMultiResponse" />
+
+   <message id="addMultiRequestMessage" itemRef="tns:addMultiRequestItem" name="addMultiRequestMessage" />
+   <message id="addMultiResponseMessage" itemRef="tns:addMultiResponseItem" name="addMultiResponseMessage" />
+
+   <interface name="Webservice Interface">
+      <operation id="addMultiOperation" name="Addition Operation with multiple values" implementationRef="webservice:addMulti">
+         <inMessageRef>tns:addMultiRequestMessage</inMessageRef>
+         <outMessageRef>tns:addMultiResponseMessage</outMessageRef>
+      </operation>
+   </interface>
+
+</definitions>

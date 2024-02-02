@@ -13,16 +13,20 @@
 
 package org.flowable.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testHistoricTaskInstanceUpdate() {
         runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
@@ -38,15 +42,15 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
-        assertEquals(1, historyService.createHistoricTaskInstanceQuery().count());
+        assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(1);
 
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
-        assertEquals("Updated name", historicTaskInstance.getName());
-        assertEquals("Updated description", historicTaskInstance.getDescription());
-        assertEquals("gonzo", historicTaskInstance.getAssignee());
-        assertEquals("task", historicTaskInstance.getTaskDefinitionKey());
+        assertThat(historicTaskInstance.getName()).isEqualTo("Updated name");
+        assertThat(historicTaskInstance.getDescription()).isEqualTo("Updated description");
+        assertThat(historicTaskInstance.getAssignee()).isEqualTo("gonzo");
+        assertThat(historicTaskInstance.getTaskDefinitionKey()).isEqualTo("task");
 
         // Validate fix of ACT-1923: updating assignee to null should be reflected in history
         ProcessInstance secondInstance = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest");
@@ -60,13 +64,13 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
 
         taskService.complete(task.getId());
         
-        waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
         
-        assertEquals(1, historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).count());
+        assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).count()).isEqualTo(1);
 
         historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(secondInstance.getId()).singleResult();
-        assertNull(historicTaskInstance.getName());
-        assertNull(historicTaskInstance.getDescription());
-        assertNull(historicTaskInstance.getAssignee());
+        assertThat(historicTaskInstance.getName()).isNull();
+        assertThat(historicTaskInstance.getDescription()).isNull();
+        assertThat(historicTaskInstance.getAssignee()).isNull();
     }
 }

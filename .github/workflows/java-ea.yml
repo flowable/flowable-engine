@@ -1,0 +1,36 @@
+name: Flowable Java EA Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
+
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  test_jdkea:
+    name: Linux (OpenJDK EA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Maven Repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: 'Set up JDK'
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: jdk.java.net
+          release: EA
+      - name: Install
+        # Need to do install first in order for the OSGi tests to work
+        run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+      - name: Test
+        run: ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+        continue-on-error: true

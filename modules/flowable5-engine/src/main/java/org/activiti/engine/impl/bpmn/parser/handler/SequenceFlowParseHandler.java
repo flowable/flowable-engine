@@ -22,7 +22,7 @@ import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

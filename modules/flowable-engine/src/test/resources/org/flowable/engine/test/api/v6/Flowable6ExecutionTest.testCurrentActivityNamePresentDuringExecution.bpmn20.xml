@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="currentActivityNameProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+
+    <serviceTask id="theTask" name="The famous task" flowable:resultVariable="serviceTaskActivityName" flowable:expression="${execution.currentActivityName}" />
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theScriptTask" />
+    <scriptTask id="theScriptTask" name="Script Task name" scriptFormat="javascript" >
+      <script><![CDATA[execution.setVariable("scriptTaskActivityName", execution.currentActivityName);]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow3" sourceRef="theScriptTask" targetRef="userTask" />
+
+    <userTask id="userTask" name="User task" />
+    <sequenceFlow id="flow4" sourceRef="userTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

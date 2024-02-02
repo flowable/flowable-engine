@@ -35,6 +35,7 @@ public class DecisionExecutionAuditContainer {
 
     protected String decisionKey;
     protected String decisionName;
+    protected int decisionVersion;
     protected String hitPolicy;
     protected String dmnDeploymentId;
     protected Date startTime;
@@ -42,21 +43,37 @@ public class DecisionExecutionAuditContainer {
     protected Map<String, Object> inputVariables;
     protected Map<String, String> inputVariableTypes;
     protected List<Map<String, Object>> decisionResult = new ArrayList<>();
+    protected boolean multipleResults = false;
     protected Map<String, String> decisionResultTypes = new HashMap<>();
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
+    protected String validationMessage;
     protected Boolean strictMode;
 
     public DecisionExecutionAuditContainer() {
     }
 
-    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, HitPolicy hitPolicy, 
-                    Boolean strictMode, Map<String, Object> inputVariables) {
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, 
+            Boolean strictMode, Map<String, Object> inputVariables, Date startTime) {
         
-        startTime = new Date();
+        this.startTime = startTime;
         this.decisionKey = decisionKey;
         this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
+        this.strictMode = strictMode;
+        this.inputVariableTypes = getVariablesTypeMap(inputVariables);
+        // create defensive copy of input variables
+        this.inputVariables = createDefensiveCopyInputVariables(inputVariables);
+    }
+
+    public DecisionExecutionAuditContainer(String decisionKey, String decisionName, int decisionVersion, HitPolicy hitPolicy, 
+            Boolean strictMode, Map<String, Object> inputVariables, Date startTime) {
+        
+        this.startTime = startTime;
+        this.decisionKey = decisionKey;
+        this.decisionName = decisionName;
+        this.decisionVersion = decisionVersion;
         this.hitPolicy = hitPolicy.getValue();
         this.strictMode = strictMode;
 
@@ -94,8 +111,8 @@ public class DecisionExecutionAuditContainer {
         return variablesTypesMap;
     }
 
-    public void stopAudit() {
-        endTime = new Date();
+    public void stopAudit(Date endTime) {
+        this.endTime = endTime; 
     }
 
     public void addRuleEntry(DecisionRule rule) {
@@ -129,7 +146,15 @@ public class DecisionExecutionAuditContainer {
     public void setDecisionResult(List<Map<String, Object>> decisionResult) {
         this.decisionResult = decisionResult;
     }
-    
+
+    public boolean isMultipleResults() {
+        return multipleResults;
+    }
+
+    public void setMultipleResults(boolean multipleResults) {
+        this.multipleResults = multipleResults;
+    }
+
     public void addDecisionResultObject(Map<String, Object> decisionResultObject) {
         this.decisionResult.add(decisionResultObject);
     }
@@ -140,6 +165,10 @@ public class DecisionExecutionAuditContainer {
 
     public String getDecisionName() {
         return decisionName;
+    }
+    
+    public int getDecisionVersion() {
+        return decisionVersion;
     }
 
     public String getHitPolicy() {
@@ -190,6 +219,22 @@ public class DecisionExecutionAuditContainer {
         this.exceptionMessage = exceptionMessage;
     }
 
+    public String getValidationMessage() {
+        return validationMessage;
+    }
+
+    public void setValidationMessage(String validationMessage) {
+        this.validationMessage = validationMessage;
+    }
+
+    public Boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public void setStrictMode(Boolean strictMode) {
+        this.strictMode = strictMode;
+    }
+
     public Map<String, String> getInputVariableTypes() {
         return inputVariableTypes;
     }
@@ -230,15 +275,15 @@ public class DecisionExecutionAuditContainer {
                 if (entry.getValue() == null) {
                     // do nothing
                 } else if (entry.getValue() instanceof Long) {
-                    newValue = new Long(((Long) entry.getValue()).longValue());
+                    newValue = Long.valueOf(((Long) entry.getValue()).longValue());
                 } else if (entry.getValue() instanceof Double) {
-                    newValue = new Double(((Double) entry.getValue()).doubleValue());
+                    newValue = Double.valueOf(((Double) entry.getValue()).doubleValue());
                 } else if (entry.getValue() instanceof Integer) {
-                    newValue = new Integer(((Integer) entry.getValue()).intValue());
+                    newValue = Integer.valueOf(((Integer) entry.getValue()).intValue());
                 } else if (entry.getValue() instanceof Date) {
                     newValue = new Date(((Date) entry.getValue()).getTime());
                 } else if (entry.getValue() instanceof Boolean) {
-                    newValue = new Boolean(((Boolean) entry.getValue()).booleanValue());
+                    newValue = Boolean.valueOf(((Boolean) entry.getValue()).booleanValue());
                 } else {
                     newValue = new String(entry.getValue().toString());
                 }

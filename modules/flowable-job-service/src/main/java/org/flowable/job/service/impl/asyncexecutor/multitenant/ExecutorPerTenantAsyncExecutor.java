@@ -13,17 +13,17 @@
 
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AbstractAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,8 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     protected TenantInfoHolder tenantInfoHolder;
     protected TenantAwareAsyncExecutorFactory tenantAwareAyncExecutorFactory;
 
-    protected Map<String, AsyncExecutor> tenantExecutors = new HashMap<>();
+    protected AsyncExecutor nullTenantIdAsyncExecutor; // a concurrent hashmap doesn't allow for null keys, hence why it needs to be stored separately.
+    protected Map<String, AsyncExecutor> tenantExecutors = new ConcurrentHashMap<>();
 
     protected JobServiceConfiguration jobServiceConfiguration;
     protected boolean active;
@@ -64,7 +65,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         AsyncExecutor tenantExecutor = null;
 
         if (tenantAwareAyncExecutorFactory == null) {
-            tenantExecutor = new DefaultAsyncJobExecutor();
+            DefaultAsyncJobExecutor defaultAsyncJobExecutor = new DefaultAsyncJobExecutor();
+            defaultAsyncJobExecutor.setTenantId(tenantId);
+            tenantExecutor = defaultAsyncJobExecutor;
         } else {
             tenantExecutor = tenantAwareAyncExecutorFactory.createAsyncExecutor(tenantId);
         }
@@ -74,12 +77,16 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         if (tenantExecutor instanceof AbstractAsyncExecutor) {
             AbstractAsyncExecutor defaultAsyncJobExecutor = (AbstractAsyncExecutor) tenantExecutor;
             defaultAsyncJobExecutor.setAsyncJobsDueRunnable(new TenantAwareAcquireAsyncJobsDueRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
-            defaultAsyncJobExecutor.setTimerJobRunnable(new TenantAwareAcquireTimerJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
+            defaultAsyncJobExecutor.setTimerJobRunnable(new TenantAwareAcquireTimerJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId, defaultAsyncJobExecutor.getMoveTimerExecutorPoolSize()));
             defaultAsyncJobExecutor.setExecuteAsyncRunnableFactory(new TenantAwareExecuteAsyncRunnableFactory(tenantInfoHolder, tenantId));
             defaultAsyncJobExecutor.setResetExpiredJobsRunnable(new TenantAwareResetExpiredJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
         }
 
-        tenantExecutors.put(tenantId, tenantExecutor);
+        if (tenantId != null) {
+            tenantExecutors.put(tenantId, tenantExecutor);
+        } else {
+            nullTenantIdAsyncExecutor = tenantExecutor;
+        }
 
         if (startExecutor) {
             startTenantExecutor(tenantId);
@@ -88,17 +95,29 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     
     @Override
     public AsyncExecutor getTenantAsyncExecutor(String tenantId) {
-        return tenantExecutors.get(tenantId);
+        if (tenantId != null) {
+            return tenantExecutors.get(tenantId);
+        }
+        return nullTenantIdAsyncExecutor;
     }
 
     @Override
     public void removeTenantAsyncExecutor(String tenantId) {
         shutdownTenantExecutor(tenantId);
-        tenantExecutors.remove(tenantId);
+
+        if (tenantId != null) {
+            tenantExecutors.remove(tenantId);
+        } else {
+            nullTenantIdAsyncExecutor = null;
+        }
     }
 
     protected AsyncExecutor determineAsyncExecutor() {
-        return tenantExecutors.get(tenantInfoHolder.getCurrentTenantId());
+        String currentTenantId = tenantInfoHolder.getCurrentTenantId();
+        if (currentTenantId != null) {
+            return tenantExecutors.get(currentTenantId);
+        }
+        return nullTenantIdAsyncExecutor;
     }
 
     @Override
@@ -107,20 +126,13 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     }
 
     @Override
-    public int getRemainingCapacity() {
-        return determineAsyncExecutor().getRemainingCapacity();
-    }
-
-    public JobManager getJobManager() {
-        // Should never be accessed on this class, should be accessed on the actual AsyncExecutor
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
+        }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         }
     }
 
@@ -149,12 +161,19 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (String tenantId : tenantExecutors.keySet()) {
             startTenantExecutor(tenantId);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            startTenantExecutor(null);
+        }
         active = true;
     }
 
     protected void startTenantExecutor(String tenantId) {
         tenantInfoHolder.setCurrentTenantId(tenantId);
-        tenantExecutors.get(tenantId).start();
+        if (tenantId != null) {
+            tenantExecutors.get(tenantId).start();
+        } else if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.start();
+        }
         tenantInfoHolder.clearCurrentTenantId();
     }
 
@@ -163,12 +182,21 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (String tenantId : tenantExecutors.keySet()) {
             shutdownTenantExecutor(tenantId);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            shutdownTenantExecutor(null);
+        }
         active = false;
     }
 
     protected void shutdownTenantExecutor(String tenantId) {
         LOGGER.info("Shutting down async executor for tenant {}", tenantId);
-        tenantExecutors.get(tenantId).shutdown();
+        tenantInfoHolder.setCurrentTenantId(tenantId);
+        if (tenantId != null) {
+            tenantExecutors.get(tenantId).shutdown();
+        } else if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.shutdown();
+        }
+        tenantInfoHolder.clearCurrentTenantId();
     }
 
     @Override
@@ -186,6 +214,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setTimerLockTimeInMillis(lockTimeInMillis);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setTimerLockTimeInMillis(lockTimeInMillis);
+        }
     }
 
     @Override
@@ -197,6 +228,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     public void setAsyncJobLockTimeInMillis(int lockTimeInMillis) {
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setAsyncJobLockTimeInMillis(lockTimeInMillis);
+        }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setAsyncJobLockTimeInMillis(lockTimeInMillis);
         }
     }
 
@@ -210,6 +244,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(waitTimeInMillis);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setDefaultTimerJobAcquireWaitTimeInMillis(waitTimeInMillis);
+        }
     }
 
     @Override
@@ -221,6 +258,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     public void setDefaultAsyncJobAcquireWaitTimeInMillis(int waitTimeInMillis) {
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(waitTimeInMillis);
+        }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setDefaultAsyncJobAcquireWaitTimeInMillis(waitTimeInMillis);
         }
     }
 
@@ -234,6 +274,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setDefaultQueueSizeFullWaitTimeInMillis(defaultQueueSizeFullWaitTimeInMillis);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setDefaultQueueSizeFullWaitTimeInMillis(defaultQueueSizeFullWaitTimeInMillis);
+        }
     }
 
     @Override
@@ -245,6 +288,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
     public void setMaxAsyncJobsDuePerAcquisition(int maxJobs) {
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setMaxAsyncJobsDuePerAcquisition(maxJobs);
+        }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setMaxAsyncJobsDuePerAcquisition(maxJobs);
         }
     }
 
@@ -258,17 +304,8 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setMaxTimerJobsPerAcquisition(maxJobs);
         }
-    }
-
-    @Override
-    public int getRetryWaitTimeInMillis() {
-        return determineAsyncExecutor().getRetryWaitTimeInMillis();
-    }
-
-    @Override
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
-            asyncExecutor.setRetryWaitTimeInMillis(retryWaitTimeInMillis);
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setMaxTimerJobsPerAcquisition(maxJobs);
         }
     }
 
@@ -282,6 +319,9 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setResetExpiredJobsInterval(resetExpiredJobsInterval);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setResetExpiredJobsInterval(resetExpiredJobsInterval);
+        }
     }
 
     @Override
@@ -294,6 +334,29 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
             asyncExecutor.setResetExpiredJobsPageSize(resetExpiredJobsPageSize);
         }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setResetExpiredJobsPageSize(resetExpiredJobsPageSize);
+        }
     }
 
+    @Override
+    public AsyncTaskExecutor getTaskExecutor() {
+        AsyncExecutor asyncExecutor = determineAsyncExecutor();
+        if (asyncExecutor == null) {
+            return null;
+        }
+        return asyncExecutor.getTaskExecutor();
+    }
+
+    @Override
+    public void setTaskExecutor(AsyncTaskExecutor taskExecutor) {
+        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
+            if (asyncExecutor.getTaskExecutor() == null) {
+                asyncExecutor.setTaskExecutor(taskExecutor);
+            }
+        }
+        if (nullTenantIdAsyncExecutor != null) {
+            nullTenantIdAsyncExecutor.setTaskExecutor(taskExecutor);
+        }
+    }
 }

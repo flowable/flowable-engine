@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -22,7 +22,7 @@ public class ExecutionsByRootProcessInstanceMatcher extends CachedEntityMatcherA
 
     @Override
     public boolean isRetained(ExecutionEntity entity, Object parameter) {
-        return entity.getRootProcessInstanceId() != null && entity.getRootProcessInstanceId().equals((String) parameter);
+        return entity.getRootProcessInstanceId() != null && entity.getRootProcessInstanceId().equals(parameter);
     }
 
 }

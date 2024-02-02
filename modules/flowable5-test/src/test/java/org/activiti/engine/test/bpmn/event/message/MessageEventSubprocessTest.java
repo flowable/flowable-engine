@@ -14,10 +14,10 @@
 package org.activiti.engine.test.bpmn.event.message;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 
 /**
  * @author Daniel Meyer
@@ -128,7 +128,7 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

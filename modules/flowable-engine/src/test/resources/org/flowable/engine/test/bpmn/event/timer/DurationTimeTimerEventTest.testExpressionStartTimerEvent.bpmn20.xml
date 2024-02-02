@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="startTimerEventExample" name="Timer start event example">
+
+        <startEvent id="theStart">
+            <timerEventDefinition>
+                <timeDuration>${durationTimeProvider.getDuration()}</timeDuration>
+            </timerEventDefinition>
+        </startEvent>    
+
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="receive"/>
+
+        <receiveTask id="receive"/>
+
+        <sequenceFlow id="flow2" sourceRef="receive" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

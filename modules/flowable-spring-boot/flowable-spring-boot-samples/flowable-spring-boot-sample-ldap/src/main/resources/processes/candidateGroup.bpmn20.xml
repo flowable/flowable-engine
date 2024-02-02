@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskCandidateGroupExample"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+
+    <process id="testCandidateGroup">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
+
+        <userTask id="theTask">
+            <potentialOwner>
+                <resourceAssignmentExpression>
+                    <formalExpression>user(kermit), group(sales)</formalExpression>
+                </resourceAssignmentExpression>
+            </potentialOwner>
+        </userTask>
+
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

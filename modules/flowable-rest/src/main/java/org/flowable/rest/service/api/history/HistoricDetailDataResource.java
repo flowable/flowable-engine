@@ -13,15 +13,15 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -33,18 +33,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
 @Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricDetailDataResource {
+public class HistoricDetailDataResource extends HistoricDetailBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -56,13 +57,13 @@ public class HistoricDetailDataResource {
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic detail instance was found and the requested variable data is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested historic detail instance was not found or the historic detail instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
+            @ApiResponse(code = 404, message = "Indicates the requested historic detail instance was not found or the historic detail instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @GetMapping(value = "/history/historic-detail/{detailId}/data")
     @ResponseBody
-    public byte[] getVariableData(@ApiParam(name = "detailId") @PathVariable("detailId") String detailId, HttpServletRequest request, HttpServletResponse response) {
+    public byte[] getVariableData(@ApiParam(name = "detailId") @PathVariable("detailId") String detailId, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, detailId, request);
+            RestVariable variable = getVariableFromRequest(true, detailId);
             if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -86,7 +87,7 @@ public class HistoricDetailDataResource {
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String detailId, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String detailId) {
         Object value = null;
         HistoricVariableUpdate variableUpdate = null;
         HistoricDetail detailObject = historyService.createHistoricDetailQuery().id(detailId).singleResult();
@@ -94,9 +95,13 @@ public class HistoricDetailDataResource {
             variableUpdate = (HistoricVariableUpdate) detailObject;
             value = variableUpdate.getValue();
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryDetailById(detailObject);
+        }
 
         if (value == null) {
-            throw new FlowableObjectNotFoundException("Historic detail '" + detailId + "' doesn't have a variable value.", VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Historic detail '" + detailId + "' does not have a variable value.", VariableInstanceEntity.class);
         } else {
             return restResponseFactory.createRestVariable(variableUpdate.getVariableName(), value, null, detailId, RestResponseFactory.VARIABLE_HISTORY_DETAIL, includeBinary);
         }

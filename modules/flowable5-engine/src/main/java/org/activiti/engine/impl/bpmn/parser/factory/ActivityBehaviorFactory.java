@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.impl.bpmn.parser.factory;
 
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
@@ -21,12 +20,12 @@ import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.activiti.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
@@ -61,6 +60,7 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.ManualTask;
@@ -114,20 +114,16 @@ public interface ActivityBehaviorFactory {
     public abstract ServiceTaskDelegateExpressionActivityBehavior createServiceTaskDelegateExpressionActivityBehavior(ServiceTask serviceTask);
 
     public abstract ServiceTaskExpressionActivityBehavior createServiceTaskExpressionActivityBehavior(ServiceTask serviceTask);
+    
+    public abstract ExternalWorkerTaskActivityBehavior createExternalWorkerTaskActivityBehavior(ExternalWorkerServiceTask externalWorkerServiceTask);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask);
+    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
 
-    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask);
+    public abstract WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
 
-    public abstract MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
+    public abstract ActivityBehavior createMailActivityBehavior(ServiceTask serviceTask);
 
-    public abstract MailActivityBehavior createMailActivityBehavior(SendTask sendTask);
-
-    // We do not want a hard dependency on the Mule module, hence we return ActivityBehavior and instantiate
-    // the delegate instance using a string instead of the Class itself.
-    public abstract ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
-
-    public abstract ActivityBehavior createMuleActivityBehavior(SendTask sendTask, BpmnModel bpmnModel);
+    public abstract ActivityBehavior createMailActivityBehavior(SendTask sendTask);
 
     public abstract ActivityBehavior createCamelActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel);
 
@@ -147,9 +143,9 @@ public interface ActivityBehaviorFactory {
 
     public abstract EventBasedGatewayActivityBehavior createEventBasedGatewayActivityBehavior(EventGateway eventGateway);
 
-    public abstract SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+    public abstract SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior);
 
-    public abstract ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior);
+    public abstract ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(ActivityImpl activity, ActivityBehavior innerActivityBehavior);
 
     public abstract SubProcessActivityBehavior createSubprocActivityBehavior(SubProcess subProcess);
 

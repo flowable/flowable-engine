@@ -12,9 +12,10 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
@@ -36,4 +37,9 @@ public abstract class AbstractProcessDataManager<EntityImpl extends Entity> exte
         return processEngineConfiguration.getClock();
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return processEngineConfiguration.getIdGenerator();
+    }
+    
 }

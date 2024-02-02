@@ -16,18 +16,17 @@ package org.flowable.variable.service.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -36,6 +35,9 @@ import org.flowable.variable.service.impl.util.CommandContextUtil;
 public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVariableInstanceQuery, HistoricVariableInstance> implements HistoricVariableInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    
     protected String id;
     protected String taskId;
     protected Set<String> taskIds;
@@ -51,16 +53,19 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     protected String subScopeId;
     protected String scopeType;
     protected QueryVariableValue queryVariableValue;
+    protected boolean excludeLocalVariables;
 
     public HistoricVariableInstanceQueryImpl() {
     }
 
-    public HistoricVariableInstanceQueryImpl(CommandContext commandContext) {
+    public HistoricVariableInstanceQueryImpl(CommandContext commandContext, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandContext);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
-    public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
+    public HistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor, VariableServiceConfiguration variableServiceConfiguration) {
         super(commandExecutor);
+        this.variableServiceConfiguration = variableServiceConfiguration;
     }
 
     @Override
@@ -83,6 +88,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Execution id is null");
         }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use executionId together with excludeLocalVariables");
+        }
         this.executionId = executionId;
         return this;
     }
@@ -94,6 +102,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         }
         if (executionIds.isEmpty()) {
             throw new FlowableIllegalArgumentException("Set of executionIds is empty");
+        }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use executionIds together with excludeLocalVariables");
         }
         this.executionIds = executionIds;
         return this;
@@ -112,6 +123,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         if (excludeTaskRelated) {
             throw new FlowableIllegalArgumentException("Cannot use taskId together with excludeTaskVariables");
         }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use taskId together with excludeLocalVariables");
+        }
         this.taskId = taskId;
         return this;
     }
@@ -126,6 +140,9 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         }
         if (excludeTaskRelated) {
             throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeTaskVariables");
+        }
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeLocalVariables");
         }
         this.taskIds = taskIds;
         return this;
@@ -227,6 +244,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     
     @Override
     public HistoricVariableInstanceQuery subScopeId(String subScopeId) {
+        if (excludeLocalVariables) {
+            throw new FlowableIllegalArgumentException("Cannot use subScopeId together with excludeLocalVariables");
+        }
+
         this.subScopeId = subScopeId;
         return this;
     }
@@ -237,26 +258,41 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
+    public HistoricVariableInstanceQuery excludeLocalVariables() {
+        if (taskId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use taskId together with excludeLocalVariables");
+        }
+        if (taskIds != null) {
+            throw new FlowableIllegalArgumentException("Cannot use taskIds together with excludeLocalVariables");
+        }
+        if (executionId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use executionId together with excludeLocalVariables");
+        }
+        if (subScopeId != null) {
+            throw new FlowableIllegalArgumentException("Cannot use subScopeId together with excludeLocalVariables");
+        }
+        excludeLocalVariables = true;
+        return this;
+    }
+
     protected void ensureVariablesInitialized() {
         if (this.queryVariableValue != null) {
-            VariableTypes variableTypes = CommandContextUtil.getVariableServiceConfiguration().getVariableTypes();
-            queryVariableValue.initialize(variableTypes);
+            queryVariableValue.initialize(variableServiceConfiguration);
         }
     }
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
-        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstanceCountByQueryCriteria(this);
+        return variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricVariableInstance> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
 
-        List<HistoricVariableInstance> historicVariableInstances = CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstancesByQueryCriteria(this);
+        List<HistoricVariableInstance> historicVariableInstances = variableServiceConfiguration.getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(this);
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
@@ -330,8 +366,36 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return scopeType;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public Set<String> getTaskIds() {
+        return taskIds;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public Set<String> getExecutionIds() {
+        return executionIds;
+    }
+
+    public boolean isExcludeTaskRelated() {
+        return excludeTaskRelated;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
+    }
+
     public QueryVariableValue getQueryVariableValue() {
         return queryVariableValue;
+    }
+
+    public boolean isExcludeLocalVariables() {
+        return excludeLocalVariables;
     }
 
 }

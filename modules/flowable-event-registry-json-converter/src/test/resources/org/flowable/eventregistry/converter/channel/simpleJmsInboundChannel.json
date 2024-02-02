@@ -1,0 +1,17 @@
+{
+  "key": "jmsChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test JMS channel",
+  "channelType": "inbound",
+  "type": "jms",
+  "destination": "customer",
+  "selector": "name = 'kermit'",
+  "subscription": "testSubscription",
+  "concurrency": "3",
+  "deserializerType": "json",
+  "eventFilterDelegateExpression": "testEventFilterExpression",
+  "channelEventKeyDetection": {
+    "jsonField": "eventKey"
+  }
+}

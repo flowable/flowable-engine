@@ -34,6 +34,9 @@ public interface HistoricProcessInstance {
 
     /** The user provided unique reference to this process instance. */
     String getBusinessKey();
+    
+    /** The user provided business status for this process instance. */
+    String getBusinessStatus();
 
     /** The process definition reference. */
     String getProcessDefinitionId();
@@ -46,6 +49,11 @@ public interface HistoricProcessInstance {
 
     /** The version of the process definition of the process instance. */
     Integer getProcessDefinitionVersion();
+
+    /**
+     * The category of the process definition of the process instance.
+     */
+    String getProcessDefinitionCategory();
 
     /**
      * The deployment id of the process definition of the process instance.
@@ -111,6 +119,24 @@ public interface HistoricProcessInstance {
      * The callback type for the process instance.
      */
     String getCallbackType();
+
+    /**
+     * The reference id for the process instance.
+     */
+    String getReferenceId();
+
+    /**
+     * The reference type for the process instance.
+     */
+    String getReferenceType();
+
+    /**
+     * If this process instance runs in the context of a case and stage, this method returns it's closest parent stage instance id
+     * (the stage plan item instance id to be precise).
+     *
+     * @return the stage instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage
+     */
+    String getPropagatedStageInstanceId();
 
     /** Returns the process variables if requested in the process instance query */
     Map<String, Object> getProcessVariables();

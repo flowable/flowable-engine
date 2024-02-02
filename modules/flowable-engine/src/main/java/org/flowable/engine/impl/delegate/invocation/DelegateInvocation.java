@@ -27,9 +27,6 @@ public abstract class DelegateInvocation {
 
     /**
      * Make the invocation proceed, performing the actual invocation of the user code.
-     * 
-     * @throws Exception
-     *             the exception thrown by the user code
      */
     public void proceed() {
         invoke();

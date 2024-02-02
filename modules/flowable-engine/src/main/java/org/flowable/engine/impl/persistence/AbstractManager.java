@@ -13,18 +13,18 @@
 
 package org.flowable.engine.impl.persistence;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityManager;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
+import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
-import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
@@ -111,8 +111,8 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getExecutionEntityManager();
     }
 
-    protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
-        return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
+    protected ActivityInstanceEntityManager getActivityInstanceEntityManager() {
+        return getProcessEngineConfiguration().getActivityInstanceEntityManager();
     }
 
     protected HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {

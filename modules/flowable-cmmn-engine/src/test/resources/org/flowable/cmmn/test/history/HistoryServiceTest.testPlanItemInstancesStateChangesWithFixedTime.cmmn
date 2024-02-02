@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="allStates" name="All States" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:includeInStageOverview="false">
+            <planItem id="planItem2" name="Available -&gt; Active -&gt; Terminated" definitionRef="stageAvailableActiveTerminated">
+                <exitCriterion id="oneexitcriterion2" sentryRef="sentry1"/>
+            </planItem>
+            <planItem id="planItem3" name="Available -&gt; Async Active" definitionRef="serviceTaskAvailableAsyncActive"/>
+            <planItem id="planItem4" name="Available -&gt; Enabled" definitionRef="serviceTaskAvailableEnabled">
+                <itemControl>
+                    <manualActivationRule/>
+                </itemControl>
+            </planItem>
+            <planItem id="planItem5" name="Available -&gt; Active -&gt; Completed" definitionRef="serviceTaskAvailableActiveCompleted"/>
+            <planItem id="planItem6" name="Unavailable" definitionRef="eventListenerUnavailable"/>
+            <planItem id="planItem7" name="Available" definitionRef="eventListenerAvailable"/>
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem5">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="stageAvailableActiveTerminated" name="Available -&gt; Active -&gt; Terminated" flowable:includeInStageOverview="true">
+                <planItem id="planItem1" name="Available -&gt; Active -&gt; Terminated + Waiting for repetition"
+                          definitionRef="humanTaskAvailableActiveTerminatedAndWaitingForRepetition">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter"/>
+                    </itemControl>
+                </planItem>
+                <humanTask id="humanTaskAvailableActiveTerminatedAndWaitingForRepetition"
+                           name="Available -&gt; Active -&gt; Terminated + Waiting for repetition"
+                           flowable:assignee="${initiator}"/>
+            </stage>
+            <task id="serviceTaskAvailableAsyncActive" name="Available -&gt; Async Active" isBlocking="false" flowable:async="true" flowable:exclusive="true"
+                  flowable:type="java" flowable:expression="${true}"/>
+            <task id="serviceTaskAvailableEnabled" name="Available -&gt; Enabled" isBlocking="false" flowable:type="java" flowable:expression="${true}"/>
+            <task id="serviceTaskAvailableActiveCompleted" name="Available -&gt; Active -&gt; Completed" isBlocking="false" flowable:type="java"
+                  flowable:expression="${true}"/>
+            <eventListener id="eventListenerUnavailable" name="Unavailable" flowable:availableCondition="${false}"/>
+            <eventListener id="eventListenerAvailable" name="Available"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_allStates">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="170.0" width="370.0" x="106.0" y="286.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_oneexitcriterion2" cmmnElementRef="oneexitcriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="375.0" y="272.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="89.0" width="165.0" x="195.0" y="331.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="466.0" y="106.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+                <dc:Bounds height="80.0" width="100.0" x="556.0" y="226.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+                <dc:Bounds height="80.0" width="100.0" x="75.0" y="106.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+                <dc:Bounds height="30.0" width="30.0" x="140.0" y="515.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem7" cmmnElementRef="planItem7">
+                <dc:Bounds height="30.0" width="30.0" x="245.0" y="515.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_oneconnector3" cmmnElementRef="planItem5" targetCMMNElementRef="oneexitcriterion2">
+                <di:waypoint x="125.0" y="185.95"/>
+                <di:waypoint x="125.0" y="236.0"/>
+                <di:waypoint x="384.0" y="236.0"/>
+                <di:waypoint x="384.0" y="272.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

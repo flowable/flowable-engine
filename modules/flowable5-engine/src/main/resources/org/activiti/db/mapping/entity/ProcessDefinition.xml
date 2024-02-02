@@ -293,7 +293,7 @@
 
   <!-- mysql specific sql -->
   <select id="selectProcessDefinitionCountByQueryCriteria_mysql" parameterType="org.activiti.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
+    select count(distinct RES.ID_)
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
   </select>
 

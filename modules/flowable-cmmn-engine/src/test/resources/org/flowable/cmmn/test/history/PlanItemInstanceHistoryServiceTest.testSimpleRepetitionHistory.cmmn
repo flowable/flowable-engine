@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" targetNamespace="http://flowable.org/cmmn">
+    <case id="testSimpleRepetitionHistory">
+        <casePlanModel id="casePlanModel">
+            <planItem id="repeatingTaskPlanItem" name="My Task" definitionRef="taskDefinition">
+                <itemControl>
+                    <repetitionRule>
+                        <condition><![CDATA[${repetitionCounter < totalRepetitions}]]></condition>
+                    </repetitionRule>
+                </itemControl>
+            </planItem>
+            <humanTask id="taskDefinition" name="My Task"/>
+        </casePlanModel>
+    </case>
+</definitions>

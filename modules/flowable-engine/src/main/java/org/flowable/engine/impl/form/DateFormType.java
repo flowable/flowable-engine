@@ -18,7 +18,7 @@ import java.text.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.AbstractFormType;
 
 /**
@@ -57,7 +57,7 @@ public class DateFormType extends AbstractFormType {
         try {
             return dateFormat.parseObject(propertyValue);
         } catch (ParseException e) {
-            throw new FlowableIllegalArgumentException("invalid date value " + propertyValue);
+            throw new FlowableIllegalArgumentException("invalid date value " + propertyValue, e);
         }
     }
 

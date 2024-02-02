@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -45,9 +45,16 @@ public interface DeploymentEntity extends Deployment, Entity {
 
     void setDeploymentTime(Date deploymentTime);
 
+    @Override
     boolean isNew();
 
     void setNew(boolean isNew);
+    
+    void setDerivedFrom(String derivedFrom);
+
+    void setDerivedFromRoot(String derivedFromRoot);
+    
+    void setParentDeploymentId(String parentDeploymentId);
 
     void setEngineVersion(String engineVersion);
 

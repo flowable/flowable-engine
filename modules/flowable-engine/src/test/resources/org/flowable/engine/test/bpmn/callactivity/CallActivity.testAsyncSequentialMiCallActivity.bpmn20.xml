@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="testAsyncMiCallActivity" name="testAsyncMiCallActivity" isExecutable="true">
+    <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+    <sequenceFlow id="sid-144AAFE6-DDA9-441F-9A0D-5D51A9829A1B" sourceRef="startEvent1" targetRef="sid-2853C65C-5C34-4EE1-AC0E-E8B790BAED56"></sequenceFlow>
+    <endEvent id="sid-B929A45C-9919-4BAD-AC60-686B66D44590"></endEvent>
+    <sequenceFlow id="sid-8A90814D-DD92-4DC8-A464-19854498B5AB" sourceRef="sid-2853C65C-5C34-4EE1-AC0E-E8B790BAED56" targetRef="sid-B929A45C-9919-4BAD-AC60-686B66D44590"></sequenceFlow>
+    <callActivity id="sid-2853C65C-5C34-4EE1-AC0E-E8B790BAED56" name="myCallActivity" flowable:async="true" flowable:exclusive="false" calledElement="simpleSubProcess" flowable:calledElementType="key" flowable:fallbackToDefaultTenant="false">
+      <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="myList" flowable:elementVariable="counter"></multiInstanceLoopCharacteristics>
+    </callActivity>
+  </process>
+</definitions>

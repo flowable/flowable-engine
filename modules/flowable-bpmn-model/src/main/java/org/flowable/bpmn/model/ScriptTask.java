@@ -21,6 +21,7 @@ public class ScriptTask extends Task {
     protected String scriptFormat;
     protected String script;
     protected String resultVariable;
+    protected String skipExpression;
     protected boolean autoStoreVariables; // see https://activiti.atlassian.net/browse/ACT-1626
 
     public String getScriptFormat() {
@@ -47,6 +48,14 @@ public class ScriptTask extends Task {
         this.resultVariable = resultVariable;
     }
 
+    public String getSkipExpression() {
+        return skipExpression;
+    }
+
+    public void setSkipExpression(String skipExpression) {
+        this.skipExpression = skipExpression;
+    }
+
     public boolean isAutoStoreVariables() {
         return autoStoreVariables;
     }
@@ -67,6 +76,7 @@ public class ScriptTask extends Task {
         setScriptFormat(otherElement.getScriptFormat());
         setScript(otherElement.getScript());
         setResultVariable(otherElement.getResultVariable());
+        setSkipExpression(otherElement.getSkipExpression());
         setAutoStoreVariables(otherElement.isAutoStoreVariables());
     }
 }

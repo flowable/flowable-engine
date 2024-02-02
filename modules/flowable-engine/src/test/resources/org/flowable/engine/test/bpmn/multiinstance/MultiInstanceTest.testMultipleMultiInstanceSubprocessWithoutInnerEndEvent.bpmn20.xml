@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="testMi" name="testMi" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:language><![CDATA[English]]></design:language>
+            <design:creationdate><![CDATA[2022-03-17T08:25:54.844Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2022-03-17T09:30:51.891Z]]></design:modificationdate>
+        </extensionElements>
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <subProcess id="expandedSubProcess1" name="Subprocess">
+            <extensionElements>
+                <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <extensionElements></extensionElements>
+                <loopCardinality>${iterations}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+            <subProcess id="expandedSubProcess2" name="Subprocess">
+                <extensionElements>
+                    <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+                </extensionElements>
+                <multiInstanceLoopCharacteristics isSequential="true">
+                    <extensionElements></extensionElements>
+                    <loopCardinality>${iterations - 1}</loopCardinality>
+                </multiInstanceLoopCharacteristics>
+                <startEvent id="startNoneEvent3" flowable:initiator="initiator" flowable:formFieldValidation="false">
+                    <extensionElements>
+                        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+                    </extensionElements>
+                </startEvent>
+                <serviceTask id="serviceTask1" name="Service task" flowable:expression="${execution.setVariable('counter', execution.getVariable('counter')+1)}">
+                    <extensionElements>
+                        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    </extensionElements>
+                </serviceTask>
+                <sequenceFlow id="sequenceFlow7" sourceRef="startNoneEvent3" targetRef="serviceTask1">
+                    <extensionElements>
+                        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+                    </extensionElements>
+                </sequenceFlow>
+            </subProcess>
+            <startEvent id="startNoneEvent2" flowable:initiator="initiator" flowable:formFieldValidation="false">
+                <extensionElements>
+                    <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                    <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+                </extensionElements>
+            </startEvent>
+            <sequenceFlow id="sequenceFlow2" sourceRef="startNoneEvent2" targetRef="expandedSubProcess2">
+                <extensionElements>
+                    <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+                </extensionElements>
+            </sequenceFlow>
+        </subProcess>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="expandedSubProcess1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <userTask id="formTask1" name="User task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="sequenceFlow5" sourceRef="expandedSubProcess1" targetRef="formTask1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <endEvent id="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <sequenceFlow id="sequenceFlow6" sourceRef="formTask1" targetRef="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_testMi">
+        <bpmndi:BPMNPlane bpmnElement="testMi" id="BPMNPlane_testMi">
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="261.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="expandedSubProcess1" id="BPMNShape_expandedSubProcess1">
+                <omgdc:Bounds height="675.0" width="915.0" x="225.0" y="45.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="expandedSubProcess2" id="BPMNShape_expandedSubProcess2">
+                <omgdc:Bounds height="480.0" width="705.0" x="375.0" y="135.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startNoneEvent3" id="BPMNShape_startNoneEvent3">
+                <omgdc:Bounds height="30.0" width="30.0" x="510.0" y="330.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="serviceTask1" id="BPMNShape_serviceTask1">
+                <omgdc:Bounds height="80.0" width="100.0" x="721.0" y="305.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startNoneEvent2" id="BPMNShape_startNoneEvent2">
+                <omgdc:Bounds height="30.0" width="30.0" x="260.0" y="290.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="formTask1" id="BPMNShape_formTask1">
+                <omgdc:Bounds height="80.0" width="100.0" x="1185.0" y="342.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+                <omgdc:Bounds height="28.0" width="28.0" x="1330.0" y="368.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5" flowable:sourceDockerX="457.5" flowable:sourceDockerY="337.5" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="1139.95" y="382.5"></omgdi:waypoint>
+                <omgdi:waypoint x="1184.999999998911" y="382.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow6" id="BPMNEdge_sequenceFlow6" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+                <omgdi:waypoint x="1284.95" y="382.5"></omgdi:waypoint>
+                <omgdi:waypoint x="1330.0" y="382.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="457.5" flowable:targetDockerY="337.5">
+                <omgdi:waypoint x="132.0" y="290.94999838919756"></omgdi:waypoint>
+                <omgdi:waypoint x="132.0" y="382.5"></omgdi:waypoint>
+                <omgdi:waypoint x="224.99999999989802" y="382.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="352.5" flowable:targetDockerY="240.0">
+                <omgdi:waypoint x="275.0" y="319.94999627316565"></omgdi:waypoint>
+                <omgdi:waypoint x="275.0" y="375.0"></omgdi:waypoint>
+                <omgdi:waypoint x="374.9999999999414" y="375.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow7" id="BPMNEdge_sequenceFlow7" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="539.9499996979166" y="345.0"></omgdi:waypoint>
+                <omgdi:waypoint x="720.9999999999005" y="345.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

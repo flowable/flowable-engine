@@ -23,6 +23,12 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
@@ -32,17 +38,10 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -62,6 +61,8 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_GE_PROPERTY");
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_ID_PROPERTY");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("FLW_EV_DATABASECHANGELOG");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("FLW_EV_DATABASECHANGELOGLOCK");
     }
 
     protected ProcessEngine processEngine;
@@ -166,9 +167,9 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
-                    dbSchemaManager.dbSchemaDrop();
-                    dbSchemaManager.dbSchemaCreate();
+                    SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+                    schemaManager.schemaDrop();
+                    schemaManager.schemaCreate();
                     return null;
                 }
             });

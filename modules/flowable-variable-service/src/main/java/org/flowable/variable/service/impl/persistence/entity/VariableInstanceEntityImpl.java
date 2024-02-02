@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -26,7 +27,7 @@ import org.flowable.variable.api.types.VariableType;
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public class VariableInstanceEntityImpl extends AbstractEntity implements VariableInstanceEntity, ValueFields, Serializable {
+public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity implements VariableInstanceEntity, ValueFields, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,20 +42,20 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
+    protected String scopeDefinitionId;
 
     protected Long longValue;
     protected Double doubleValue;
     protected String textValue;
     protected String textValue2;
-    protected VariableByteArrayRef byteArrayRef;
+    protected ByteArrayRef byteArrayRef;
+
+    protected String metaInfo;
 
     protected Object cachedValue;
     protected boolean forcedUpdate;
     protected boolean deleted;
 
-    public VariableInstanceEntityImpl() {
-
-    }
 
     @Override
     public Object getPersistentState() {
@@ -74,6 +75,7 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
         if (byteArrayRef != null && byteArrayRef.getId() != null) {
             persistentState.put("byteArrayValueId", byteArrayRef.getId());
         }
+        persistentState.put("metaInfo", metaInfo);
         if (forcedUpdate) {
             persistentState.put("forcedUpdate", Boolean.TRUE);
         }
@@ -105,23 +107,23 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     @Override
     public byte[] getBytes() {
         ensureByteArrayRefInitialized();
-        return byteArrayRef.getBytes();
+        return byteArrayRef.getBytes(getEngineType());
     }
 
     @Override
     public void setBytes(byte[] bytes) {
         ensureByteArrayRefInitialized();
-        byteArrayRef.setValue("var-" + name, bytes);
+        byteArrayRef.setValue("var-" + name, bytes, getEngineType());
     }
 
     @Override
-    public VariableByteArrayRef getByteArrayRef() {
+    public ByteArrayRef getByteArrayRef() {
         return byteArrayRef;
     }
 
     protected void ensureByteArrayRefInitialized() {
         if (byteArrayRef == null) {
-            byteArrayRef = new VariableByteArrayRef();
+            byteArrayRef = new ByteArrayRef();
         }
     }
 
@@ -236,6 +238,16 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     }
 
     @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
     public Long getLongValue() {
         return longValue;
     }
@@ -276,6 +288,16 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     }
 
     @Override
+    public String getMetaInfo() {
+        return metaInfo;
+    }
+
+    @Override
+    public void setMetaInfo(String metaInfo) {
+        this.metaInfo = metaInfo;
+    }
+
+    @Override
     public Object getCachedValue() {
         return cachedValue;
     }
@@ -287,6 +309,14 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
 
     // misc methods ///////////////////////////////////////////////////////////////
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -294,6 +324,27 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
         sb.append("id=").append(id);
         sb.append(", name=").append(name);
         sb.append(", type=").append(type != null ? type.getTypeName() : "null");
+        if (executionId != null) {
+            sb.append(", executionId=").append(executionId);
+        }
+        if (processInstanceId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId);
+        }
+        if (processDefinitionId != null) {
+            sb.append(", processDefinitionId=").append(processDefinitionId);
+        }
+        if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId);
+        }
+        if (subScopeId != null) {
+            sb.append(", subScopeId=").append(subScopeId);
+        }
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
         if (longValue != null) {
             sb.append(", longValue=").append(longValue);
         }

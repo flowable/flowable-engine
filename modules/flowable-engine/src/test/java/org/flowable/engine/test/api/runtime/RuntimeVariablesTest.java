@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,13 +25,16 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daisuke Yoshimoto
  */
 public class RuntimeVariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testGetVariablesByExecutionIds() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -50,7 +56,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         Set<String> executionIds = new HashSet<>();
         executionIds.add(processInstance1.getId());
         List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-        assertEquals(1, variables.size());
+        assertThat(variables).hasSize(1);
         checkVariable(processInstance1.getId(), "executionVar1", "helloWorld1", variables);
 
         // 2 process
@@ -58,11 +64,12 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         executionIds.add(processInstance1.getId());
         executionIds.add(processInstance2.getId());
         variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-        assertEquals(2, variables.size());
+        assertThat(variables).hasSize(2);
         checkVariable(processInstance1.getId(), "executionVar1", "helloWorld1", variables);
         checkVariable(processInstance2.getId(), "executionVar2", "helloWorld2", variables);
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/RuntimeVariablesTest.testGetVariablesByExecutionIds.bpmn20.xml"
     })
@@ -83,20 +90,21 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         Set<String> executionIds = new HashSet<>();
         executionIds.add(processInstance1.getId());
         List<VariableInstance> variables = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-        assertEquals(serializableTypeVar, variables.get(0).getValue());
+        assertThat(variables.get(0).getValue()).isEqualTo(serializableTypeVar);
     }
 
     private void checkVariable(String executionId, String name, String value, List<VariableInstance> variables) {
         for (VariableInstance variable : variables) {
             if (executionId.equals(variable.getExecutionId())) {
-                assertEquals(name, variable.getName());
-                assertEquals(value, variable.getValue());
+                assertThat(variable.getName()).isEqualTo(name);
+                assertThat(variable.getValue()).isEqualTo(value);
                 return;
             }
         }
-        fail();
+        fail("checkVariable() failed");
     }
 
+    @Test
     @Deployment(resources = {
             "org/flowable/engine/test/api/runtime/variableScope.bpmn20.xml"
     })
@@ -120,17 +128,55 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
         }
 
         List<VariableInstance> executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-        assertEquals(2, executionVariableInstances.size());
-        assertEquals("executionVar", executionVariableInstances.get(0).getName());
-        assertEquals("executionVar", executionVariableInstances.get(0).getValue());
-        assertEquals("executionVar", executionVariableInstances.get(1).getName());
-        assertEquals("executionVar", executionVariableInstances.get(1).getValue());
+        assertThat(executionVariableInstances).hasSize(2);
+        assertThat(executionVariableInstances.get(0).getName()).isEqualTo("executionVar");
+        assertThat(executionVariableInstances.get(0).getValue()).isEqualTo("executionVar");
+        assertThat(executionVariableInstances.get(1).getName()).isEqualTo("executionVar");
+        assertThat(executionVariableInstances.get(1).getValue()).isEqualTo("executionVar");
 
         executionIds = new HashSet<>();
         executionIds.add(processInstance.getId());
         executionVariableInstances = runtimeService.getVariableInstancesByExecutionIds(executionIds);
-        assertEquals(1, executionVariableInstances.size());
-        assertEquals("processVar", executionVariableInstances.get(0).getName());
-        assertEquals("processVar", executionVariableInstances.get(0).getValue());
+        assertThat(executionVariableInstances).hasSize(1);
+        assertThat(executionVariableInstances.get(0).getName()).isEqualTo("processVar");
+        assertThat(executionVariableInstances.get(0).getValue()).isEqualTo("processVar");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/RuntimeVariablesTest.callActivityAndTask.bpmn20.xml" })
+    public void testVariableInstanceQueryExcludeLocalVariables() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivityAndTask");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("mySubProcess")
+                .singleResult();
+
+        runtimeService.setVariable(subProcessExecution.getId(), "var2", "test3");
+        runtimeService.setVariableLocal(subProcessExecution.getId(), "varLocal2", "test4");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test5");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test6");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(3);
+        assertThat(vars).extracting(VariableInstance::getValue).containsExactlyInAnyOrder("test1", "test3", "test5");
     }
 }

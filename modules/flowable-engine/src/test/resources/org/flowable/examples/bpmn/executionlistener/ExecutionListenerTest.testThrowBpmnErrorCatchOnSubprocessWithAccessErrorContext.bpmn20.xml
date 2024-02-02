@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-process-palette">
+    <process id="errorHandlingSubProcess" name="errorHandlingSubProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <startEvent id="startEvent" flowable:initiator="initiator" flowable:formFieldValidation="false" />
+        <scriptTask id="bpmnErrorThrowingTask" name="Error Throwing Task" scriptFormat="groovy">
+            <extensionElements>
+                <flowable:executionListener type="script" event="start">
+                    <flowable:script language="groovy">
+                        <![CDATA[if (execution.getVariable('throwErrorStartListener') != null){
+                        throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorStartListener'));
+                    }]]>
+                    </flowable:script>
+                </flowable:executionListener>
+                <flowable:executionListener type="script" event="end">
+                    <flowable:script language="groovy">
+                        <![CDATA[if (execution.getVariable('throwErrorEndListener') != null){
+                        throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorEndListener'));
+                    }]]>
+                    </flowable:script>
+                </flowable:executionListener>
+            </extensionElements>
+            <script>
+                execution.setVariable('_script_task', 'executed');
+            </script>
+        </scriptTask>
+        <sequenceFlow id="startEvent_to_bpmnErrorThrowingTask" sourceRef="startEvent" targetRef="bpmnErrorThrowingTask"/>
+        <endEvent id="endEvent1"/>
+        <sequenceFlow id="bpmnErrorThrowingTaskToEndEvent1" sourceRef="bpmnErrorThrowingTask" targetRef="endEvent1"/>
+
+        <subProcess id="errorCatchingSubProcess" name="Error Handler" triggeredByEvent="true">
+            <startEvent id="errorCatchingEvent" isInterrupting="true">
+                <errorEventDefinition flowable:errorVariableName="error_code" flowable:errorVariableTransient="true"></errorEventDefinition>
+            </startEvent>
+            <sequenceFlow id="sequenceFlow1" sourceRef="errorCatchingEvent" targetRef="exclusive_gateway_split" />
+            
+            <exclusiveGateway id="exclusive_gateway_split" default="toErrorOther" />
+
+            <sequenceFlow id="toErrorA" sourceRef="exclusive_gateway_split" targetRef="handleErrorA">
+                <conditionExpression xsi:type="tFormalExpression"><![CDATA[${error_code eq 'ERROR_A'}]]></conditionExpression>
+            </sequenceFlow>
+            <sequenceFlow id="toErrorOther" sourceRef="exclusive_gateway_split" targetRef="handleErrorOther" />
+            
+            <scriptTask id="handleErrorA" name="Handle Error A" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('handled_error', execution.getVariable('error_code')+"_special");]]></script>
+            </scriptTask>
+            <scriptTask id="handleErrorOther" name="Handle Other" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[execution.setVariable('handled_error', execution.getVariable('error_code'));]]></script>
+            </scriptTask>
+
+            <exclusiveGateway id="exclusive_gateway_join" />
+            <sequenceFlow id="handleErrorA_to_exclusive_gateway_join" sourceRef="handleErrorA" targetRef="exclusive_gateway_join" />
+            <sequenceFlow id="handleErrorOther_to_exclusive_gateway_join" sourceRef="handleErrorOther" targetRef="exclusive_gateway_join" />
+            
+            <sequenceFlow id="exclusive_gateway_join_to_subProcessEndEvent" sourceRef="exclusive_gateway_join" targetRef="subProcessEndEvent" />
+            <endEvent id="subProcessEndEvent" />
+        </subProcess>
+
+    </process>
+
+</definitions>

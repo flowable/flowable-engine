@@ -21,10 +21,17 @@ import java.util.Date;
  * @author Tijs Rademakers
  */
 public interface HistoryJob extends JobInfo {
+
+    String HISTORY_JOB_TYPE = "historyJob";
     
     /**
      * Get the job create time.
      */
     Date getCreateTime();
+    
+    /**
+     * Get the scope type. 
+     */
+    String getScopeType();
 
 }

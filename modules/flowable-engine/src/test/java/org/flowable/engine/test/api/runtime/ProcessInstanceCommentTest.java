@@ -12,21 +12,26 @@
  */
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testAddCommentToProcessInstance() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -35,21 +40,19 @@ public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
             taskService.addComment(null, processInstance.getId(), "Hello World");
 
             List<Comment> comments = taskService.getProcessInstanceComments(processInstance.getId());
-            assertEquals(1, comments.size());
+            assertThat(comments).hasSize(1);
 
             List<Comment> commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "comment");
-            assertEquals(1, commentsByType.size());
+            assertThat(commentsByType).hasSize(1);
 
             commentsByType = taskService.getProcessInstanceComments(processInstance.getId(), "noThisType");
-            assertEquals(0, commentsByType.size());
+            assertThat(commentsByType).isEmpty();
 
             // Suspend process instance
             runtimeService.suspendProcessInstanceById(processInstance.getId());
-            try {
-                taskService.addComment(null, processInstance.getId(), "Hello World 2");
-            } catch (FlowableException e) {
-                assertTextPresent("Cannot add a comment to a suspended execution", e.getMessage());
-            }
+            assertThatThrownBy(() -> taskService.addComment(null, processInstance.getId(), "Hello World 2"))
+                    .isInstanceOf(FlowableException.class)
+                    .hasMessage("Cannot add a comment to a suspended ProcessInstance[" + processInstance.getId() + "] - definition '" + processInstance.getProcessDefinitionId() + "'");
 
             // Delete comments again
             taskService.deleteComments(null, processInstance.getId());

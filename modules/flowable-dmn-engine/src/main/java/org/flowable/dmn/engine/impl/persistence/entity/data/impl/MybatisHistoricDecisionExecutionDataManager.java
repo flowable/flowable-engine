@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,13 +46,13 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     
     @Override
     public void deleteHistoricDecisionExecutionsByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteHistoricDecisionExecutionsByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteHistoricDecisionExecutionsByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
-        return getDbSqlSession().selectList("selectHistoricDecisionExecutionsByQueryCriteria", decisionExecutionQuery);
+        return getDbSqlSession().selectList("selectHistoricDecisionExecutionsByQueryCriteria", decisionExecutionQuery, getManagedEntityClass());
     }
 
     @Override
@@ -67,5 +69,19 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     @Override
     public long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricDecisionExecutionCountByNativeQuery", parameterMap);
+    }
+
+    @Override
+    public void delete(HistoricDecisionExecutionQueryImpl query) {
+        getDbSqlSession().delete("bulkDeleteHistoricDecisionExecutions", query, getManagedEntityClass());
+    }
+
+    @Override
+    public void bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType(Collection<String> instanceIds, String scopeType) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("instanceIds", createSafeInValuesList(instanceIds));
+        params.put("scopeType", scopeType);
+        
+        getDbSqlSession().delete("bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType", params, getManagedEntityClass());
     }
 }

@@ -15,8 +15,8 @@ package org.flowable.standalone.jpa;
 
 import java.util.Calendar;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 /**
  * 

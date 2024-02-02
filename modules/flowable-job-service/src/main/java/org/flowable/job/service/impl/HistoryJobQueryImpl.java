@@ -14,16 +14,17 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -33,26 +34,34 @@ import org.flowable.job.service.impl.util.CommandContextUtil;
 public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJob> implements HistoryJobQuery, Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    protected JobServiceConfiguration jobServiceConfiguration;
+
     protected String id;
     protected String handlerType;
+    protected Collection<String> handlerTypes;
     protected boolean withException;
     protected String exceptionMessage;
+    protected String scopeType;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String lockOwner;
     protected boolean onlyLocked;
     protected boolean onlyUnlocked;
+    protected boolean withoutScopeType;
 
     public HistoryJobQueryImpl() {
     }
 
-    public HistoryJobQueryImpl(CommandContext commandContext) {
+    public HistoryJobQueryImpl(CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration) {
         super(commandContext);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
-    public HistoryJobQueryImpl(CommandExecutor commandExecutor) {
+    public HistoryJobQueryImpl(CommandExecutor commandExecutor, JobServiceConfiguration jobServiceConfiguration) {
         super(commandExecutor);
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -74,6 +83,15 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     }
 
     @Override
+    public HistoryJobQuery handlerTypes(Collection<String> handlerTypes) {
+        if (handlerTypes == null) {
+            throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
+        }
+        this.handlerTypes = handlerTypes;
+        return this;
+    }
+
+    @Override
     public HistoryJobQuery withException() {
         this.withException = true;
         return this;
@@ -85,6 +103,15 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
             throw new FlowableIllegalArgumentException("Provided exception message is null");
         }
         this.exceptionMessage = exceptionMessage;
+        return this;
+    }
+
+    @Override
+    public HistoryJobQuery scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("Provided scope type is null");
+        }
+        this.scopeType = scopeType;
         return this;
     }
 
@@ -130,26 +157,17 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
+    public HistoryJobQuery withoutScopeType() {
+        this.withoutScopeType = true;
+        return this;
+    }
+
     // sorting //////////////////////////////////////////
-
-    @Override
-    public HistoryJobQuery orderByJobDuedate() {
-        return orderBy(JobQueryProperty.DUEDATE);
-    }
-
-    @Override
-    public HistoryJobQuery orderByExecutionId() {
-        return orderBy(JobQueryProperty.EXECUTION_ID);
-    }
 
     @Override
     public HistoryJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
-    }
-
-    @Override
-    public HistoryJobQuery orderByProcessInstanceId() {
-        return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
     @Override
@@ -166,14 +184,12 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
-        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobCountByQueryCriteria(this);
+        return jobServiceConfiguration.getHistoryJobEntityManager().findHistoryJobCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoryJob> executeList(CommandContext commandContext) {
-        checkQueryOk();
-        return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(this);
+        return jobServiceConfiguration.getHistoryJobEntityManager().findHistoryJobsByQueryCriteria(this);
     }
 
     // getters //////////////////////////////////////////
@@ -182,8 +198,12 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this.handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
+
     public Date getNow() {
-        return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        return jobServiceConfiguration.getClock().getCurrentTime();
     }
 
     public boolean isWithException() {
@@ -192,6 +212,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public String getExceptionMessage() {
         return exceptionMessage;
+    }
+
+    public String getScopeType() {
+        return scopeType;
     }
 
     public String getTenantId() {
@@ -224,6 +248,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public boolean isOnlyUnlocked() {
         return onlyUnlocked;
+    }
+
+    public boolean isWithoutScopeType() {
+        return withoutScopeType;
     }
 
 }

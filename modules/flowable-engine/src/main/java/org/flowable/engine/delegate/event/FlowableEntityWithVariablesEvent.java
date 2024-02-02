@@ -14,7 +14,7 @@ package org.flowable.engine.delegate.event;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 
 /**
  * An {@link FlowableEntityEvent} related to a single entity.

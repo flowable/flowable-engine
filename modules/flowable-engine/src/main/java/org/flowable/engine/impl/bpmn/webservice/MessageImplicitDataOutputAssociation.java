@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.webservice;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.FieldBaseStructureInstance;
@@ -37,7 +37,7 @@ public class MessageImplicitDataOutputAssociation extends AbstractDataAssociatio
 
     @Override
     public void evaluate(DelegateExecution execution) {
-        MessageInstance message = (MessageInstance) execution.getVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
+        MessageInstance message = (MessageInstance) execution.getTransientVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
         if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
             FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
             execution.setVariable(this.getTarget(), structure.getFieldValue(this.getSource()));

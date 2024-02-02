@@ -13,9 +13,10 @@
 
 package org.flowable.rest.service.api.identity;
 
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.User;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,6 +30,9 @@ public class BaseUserResource {
 
     @Autowired
     protected IdentityService identityService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected User getUserFromRequest(String userId) {
         User user = identityService.createUserQuery().userId(userId).singleResult();
@@ -36,6 +40,11 @@ public class BaseUserResource {
         if (user == null) {
             throw new FlowableObjectNotFoundException("Could not find a user with id '" + userId + "'.", User.class);
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessUserInfoById(user);
+        }
+        
         return user;
     }
 }

@@ -14,18 +14,22 @@ package org.flowable.cmmn.api.runtime;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
  */
 public interface MilestoneInstanceQuery extends Query<MilestoneInstanceQuery, MilestoneInstance> {
     
+    MilestoneInstanceQuery milestoneInstanceId(String milestoneInstanceId);
     MilestoneInstanceQuery milestoneInstanceName(String name);
     MilestoneInstanceQuery milestoneInstanceCaseInstanceId(String caseInstanceId);
     MilestoneInstanceQuery milestoneInstanceCaseDefinitionId(String caseDefinitionId);
     MilestoneInstanceQuery milestoneInstanceReachedBefore(Date reachedBefore);
     MilestoneInstanceQuery milestoneInstanceReachedAfter(Date reachedAfter);
+    MilestoneInstanceQuery milestoneInstanceTenantId(String tenantId);
+    MilestoneInstanceQuery milestoneInstanceTenantIdLike(String tenantIdLike);
+    MilestoneInstanceQuery milestoneInstanceWithoutTenantId();
     
     MilestoneInstanceQuery orderByMilestoneName();
     MilestoneInstanceQuery orderByTimeStamp();

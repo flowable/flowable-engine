@@ -15,9 +15,9 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -109,13 +109,11 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricDetail> executeList(CommandContext commandContext) {
-        checkQueryOk();
         List<HistoricDetail> historicDetails = CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailsByQueryCriteria(this);
 
         HistoricDetailVariableInstanceUpdateEntity varUpdate = null;
@@ -223,4 +221,7 @@ public class HistoricDetailQueryImpl extends AbstractQuery<HistoricDetailQuery, 
         return activityInstanceId;
     }
 
+    public boolean isExcludeTaskRelated() {
+        return excludeTaskRelated;
+    }
 }

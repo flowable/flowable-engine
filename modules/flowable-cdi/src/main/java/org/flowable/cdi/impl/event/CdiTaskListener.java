@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.Date;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.BusinessProcessEvent;
 import org.flowable.cdi.BusinessProcessEventType;
@@ -27,8 +27,8 @@ import org.flowable.cdi.annotation.event.CreateTaskLiteral;
 import org.flowable.cdi.annotation.event.DeleteTaskLiteral;
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -71,7 +71,7 @@ public class CdiTaskListener implements TaskListener, Serializable {
 
         BusinessProcessEvent event = createEvent(task);
         Annotation[] qualifiers = getQualifiers(event);
-        getBeanManager().fireEvent(event, qualifiers);
+        getBeanManager().getEvent().select(qualifiers).fire(event);
     }
 
     protected BusinessProcessEvent createEvent(DelegateTask task) {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             targetNamespace="Examples">
+
+    <process id="calledChildProcess">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask1" />
+
+        <userTask id="userTask1" name="Original Child Process User Task" />
+        <sequenceFlow id="flow2" sourceRef="userTask1" targetRef="theEnd" />
+
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

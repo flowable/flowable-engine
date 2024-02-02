@@ -32,8 +32,9 @@ public class CancelEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         CancelEventDefinition eventDefinition = new CancelEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);

@@ -13,10 +13,12 @@
 package org.flowable.engine.impl.scripting;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -42,9 +44,9 @@ public class VariableScopeResolver implements Resolver {
     protected static final String formServiceKey = "formService";
     protected static final String identityServiceKey = "identityServiceKey";
 
-    protected static final List<String> KEYS = Arrays.asList(
-            processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
-            repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey);
+    protected static final Set<String> KEYS = new HashSet<>(Arrays.asList(
+        processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
+        repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey));
 
     public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
 
@@ -86,6 +88,8 @@ public class VariableScopeResolver implements Resolver {
             return processEngineConfiguration.getFormService();
         } else if (identityServiceKey.equals(key)) {
             return processEngineConfiguration.getIdentityService();
+        } else if (historyServiceKey.equals(key)) {
+            return processEngineConfiguration.getHistoryService();
         }
 
         return variableScope.getVariable((String) key);

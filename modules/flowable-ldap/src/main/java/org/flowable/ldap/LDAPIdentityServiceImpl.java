@@ -21,7 +21,7 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
@@ -29,6 +29,7 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.PrivilegeMapping;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl;
@@ -44,7 +45,8 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
     protected LDAPConfiguration ldapConfigurator;
     protected LDAPGroupCache ldapGroupCache;
 
-    public LDAPIdentityServiceImpl(LDAPConfiguration ldapConfigurator, LDAPGroupCache ldapGroupCache) {
+    public LDAPIdentityServiceImpl(LDAPConfiguration ldapConfigurator, LDAPGroupCache ldapGroupCache, IdmEngineConfiguration idmEngineConfiguration) {
+        super(idmEngineConfiguration);
         this.ldapConfigurator = ldapConfigurator;
         this.ldapGroupCache = ldapGroupCache;
     }

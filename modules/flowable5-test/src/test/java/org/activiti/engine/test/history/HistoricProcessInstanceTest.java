@@ -25,9 +25,9 @@ import java.util.Map;
 
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -89,7 +89,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getProcessDefinitionId(), historicProcessInstance.getProcessDefinitionId());
         assertEquals(noon, historicProcessInstance.getStartTime());
         assertEquals(twentyFiveSecsAfterNoon, historicProcessInstance.getEndTime());
-        assertEquals(new Long(25 * 1000), historicProcessInstance.getDurationInMillis());
+        assertEquals(Long.valueOf(25 * 1000), historicProcessInstance.getDurationInMillis());
 
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().unfinished().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());

@@ -17,8 +17,8 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**

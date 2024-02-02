@@ -14,8 +14,8 @@ package org.flowable.dmn.engine.test;
 
 import java.lang.reflect.Method;
 
+import org.flowable.common.engine.impl.el.AbstractFlowableFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.util.DateUtil;
-import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
 
 /**
  * @author Tijs Rademakers

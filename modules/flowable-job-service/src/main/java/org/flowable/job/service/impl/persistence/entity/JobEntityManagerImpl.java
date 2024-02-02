@@ -15,9 +15,8 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
@@ -29,18 +28,12 @@ import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> implements JobEntityManager {
-
-    protected JobDataManager jobDataManager;
+public class JobEntityManagerImpl
+    extends JobInfoEntityManagerImpl<JobEntity, JobDataManager>
+    implements JobEntityManager {
 
     public JobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, JobDataManager jobDataManager) {
         super(jobServiceConfiguration, jobDataManager);
-        this.jobDataManager = jobDataManager;
-    }
-
-    @Override
-    protected DataManager<JobEntity> getDataManager() {
-        return jobDataManager;
     }
 
     @Override
@@ -54,29 +47,39 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
     }
 
     protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
-        boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
-        if (!handledJob) {
-            return false;
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            boolean handledJob = serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
+            if (!handledJob) {
+                return false;
+            }
         }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
         return true;
     }
 
     @Override
+    public JobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
+    }
+
+    @Override
     public List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(JobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void delete(JobEntity jobEntity) {
-        super.delete(jobEntity);
+        delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
@@ -84,23 +87,22 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
         // Send event
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
     }
 
     @Override
     public void delete(JobEntity entity, boolean fireDeleteEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(entity);
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(entity);
+        }
+        
         super.delete(entity, fireDeleteEvent);
     }
 
     @Override
-    public JobDataManager getJobDataManager() {
-        return jobDataManager;
+    public void deleteJobsByExecutionId(String executionId) {
+        dataManager.deleteJobsByExecutionId(executionId);
     }
-
-    public void setJobDataManager(JobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-    }
-
 }

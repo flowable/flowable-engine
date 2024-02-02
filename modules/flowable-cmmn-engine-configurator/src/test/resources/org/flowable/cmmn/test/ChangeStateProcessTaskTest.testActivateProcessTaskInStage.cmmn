@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+        
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1">
+                <entryCriterion sentryRef="stageSentry" />
+            </planItem>
+            <planItem id="planItemAnotherStage" name="Stage Two" definitionRef="stage2">
+                <entryCriterion sentryRef="anotherStageSentry" />
+            </planItem>
+            
+            <sentry id="stageSentry">
+                <ifPart>
+                    <condition><![CDATA[${activateStage}]]></condition>
+                </ifPart>
+            </sentry>
+            
+            <sentry id="anotherStageSentry">
+                <ifPart>
+                    <condition><![CDATA[${false}]]></condition>
+                </ifPart>
+            </sentry>
+
+            <stage id="stage1" name="Stage One">
+                <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
+                
+                <processTask id="theProcess" processRef="oneTaskProcess" isBlocking="true" />
+            </stage>
+            
+            <stage id="stage2" name="Stage One">
+                <planItem id="planItem2" name="The Process2" definitionRef="theProcess2" />
+                
+                <processTask id="theProcess2" processRef="oneTaskProcess" isBlocking="true" />
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+    <process id="oneTaskProcess" name="The One Task process" externalRef="oneTask" />
+
+</definitions>

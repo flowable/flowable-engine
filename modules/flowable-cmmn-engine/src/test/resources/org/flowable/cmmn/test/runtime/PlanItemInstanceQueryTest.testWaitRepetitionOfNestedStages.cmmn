@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="testWaitRepetitionOfNestedStages" name="Test Query Stages Only" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:includeInStageOverview="false">
+      <extensionElements>
+        <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[onecaseplanmodel]]></design:stencilid>
+        <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[CasePlanModel]]></design:stencilsuperid>
+        <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+        <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+        <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-136187e7-e511-4c43-b631-52f089d64d39]]></design:guid>
+        <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+        <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+        <design:name xmlns:design="http://flowable.org/design"><![CDATA[Case plan model]]></design:name>
+        <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Case plan model]]></design:name_en_us>
+        <design:id xmlns:design="http://flowable.org/design"><![CDATA[onecaseplanmodel1]]></design:id>
+        <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[onecaseplanmodel]]></design:customstencilid>
+        <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+        <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[CasePlanModel]]></design:xmlTag>
+      </extensionElements>
+      <planItem id="planItem5" name="Stage 1" definitionRef="oneexpandedstage1">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+        </itemControl>
+        <entryCriterion id="oneentrycriterion9" sentryRef="sentry5"></entryCriterion>
+      </planItem>
+      <planItem id="planItem7" name="Stage 2" definitionRef="oneexpandedstage2">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+        </itemControl>
+        <entryCriterion id="oneentrycriterion3" sentryRef="sentry4"></entryCriterion>
+      </planItem>
+      <sentry id="sentry5">
+        <extensionElements>
+          <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:stencilid>
+          <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilsuperid>
+          <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EntryCriterion"]]]></design:stencilsuperids>
+          <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+          <design:triggermode xmlns:design="http://flowable.org/design"><![CDATA[deferred]]></design:triggermode>
+          <design:condition xmlns:design="http://flowable.org/design"><![CDATA[${stage1}]]></design:condition>
+          <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-dca84ff9-2fc1-4b78-a8c9-032dd3be9c5d]]></design:guid>
+          <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion9]]></design:id>
+          <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:customstencilid>
+          <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+          <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:xmlTag>
+        </extensionElements>
+        <ifPart>
+          <condition><![CDATA[${stage1}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry4">
+        <extensionElements>
+          <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:stencilid>
+          <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilsuperid>
+          <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EntryCriterion"]]]></design:stencilsuperids>
+          <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+          <design:triggermode xmlns:design="http://flowable.org/design"><![CDATA[deferred]]></design:triggermode>
+          <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-ebb636ab-41f5-45dc-83b8-e6e1ea0da77d]]></design:guid>
+          <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion3]]></design:id>
+          <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:customstencilid>
+          <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+          <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:xmlTag>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem5">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="oneexpandedstage1" name="Stage 1" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:stencilid>
+          <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:stencilsuperid>
+          <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["ExpandedStage"]]]></design:stencilsuperids>
+          <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+          <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+          <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:repetition>
+          <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+          <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+          <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+          <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+          <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+          <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-475b1ed9-bd87-4c21-a4b1-a23f803b78d8]]></design:guid>
+          <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+          <design:statevisible xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:statevisible>
+          <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+          <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage1]]></design:id>
+          <design:name xmlns:design="http://flowable.org/design"><![CDATA[Stage 1]]></design:name>
+          <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Stage 1]]></design:name_en_us>
+          <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:customstencilid>
+          <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+          <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:xmlTag>
+        </extensionElements>
+        <planItem id="planItem3" name="Stage 1.2" definitionRef="oneexpandedstage4">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+          </itemControl>
+          <entryCriterion id="oneentrycriterion10" sentryRef="sentry3"></entryCriterion>
+        </planItem>
+        <planItem id="planItem4" name="Stage 1.1" definitionRef="oneexpandedstage6">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+          </itemControl>
+          <entryCriterion id="oneentrycriterion6" sentryRef="sentry2"></entryCriterion>
+        </planItem>
+        <sentry id="sentry3">
+          <extensionElements>
+            <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:stencilid>
+            <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilsuperid>
+            <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EntryCriterion"]]]></design:stencilsuperids>
+            <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+            <design:triggermode xmlns:design="http://flowable.org/design"><![CDATA[deferred]]></design:triggermode>
+            <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-9fd0df34-79ea-47c9-8991-a95349d3829b]]></design:guid>
+            <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion10]]></design:id>
+            <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:customstencilid>
+            <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+            <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:xmlTag>
+          </extensionElements>
+          <planItemOnPart id="sentryOnPart2" sourceRef="planItem4">
+            <standardEvent>complete</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <sentry id="sentry2">
+          <extensionElements>
+            <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:stencilid>
+            <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilsuperid>
+            <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EntryCriterion"]]]></design:stencilsuperids>
+            <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+            <design:triggermode xmlns:design="http://flowable.org/design"><![CDATA[deferred]]></design:triggermode>
+            <design:condition xmlns:design="http://flowable.org/design"><![CDATA[${stage11}]]></design:condition>
+            <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-c1f2cdcb-1cb8-401c-bc27-a575e2344d45]]></design:guid>
+            <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion6]]></design:id>
+            <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:customstencilid>
+            <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+            <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:xmlTag>
+          </extensionElements>
+          <ifPart>
+            <condition><![CDATA[${stage11}]]></condition>
+          </ifPart>
+        </sentry>
+        <stage id="oneexpandedstage4" name="Stage 1.2" flowable:includeInStageOverview="true">
+          <extensionElements>
+            <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:stencilid>
+            <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:stencilsuperid>
+            <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["ExpandedStage"]]]></design:stencilsuperids>
+            <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+            <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+            <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:repetition>
+            <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+            <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+            <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+            <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+            <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+            <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-0871677e-5d3f-4e58-988e-417a2886c5f8]]></design:guid>
+            <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+            <design:statevisible xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:statevisible>
+            <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+            <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage4]]></design:id>
+            <design:name xmlns:design="http://flowable.org/design"><![CDATA[Stage 1.2]]></design:name>
+            <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Stage 1.2]]></design:name_en_us>
+            <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:customstencilid>
+            <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+            <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:xmlTag>
+          </extensionElements>
+          <planItem id="planItem1" name="Human task" definitionRef="onehumantask1">
+            <entryCriterion id="oneentrycriterion8" sentryRef="sentry1"></entryCriterion>
+          </planItem>
+          <planItem id="planItem2" name="Event" definitionRef="oneeventlistener1"></planItem>
+          <sentry id="sentry1">
+            <extensionElements>
+              <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:stencilid>
+              <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilsuperid>
+              <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EntryCriterion"]]]></design:stencilsuperids>
+              <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+              <design:triggermode xmlns:design="http://flowable.org/design"><![CDATA[deferred]]></design:triggermode>
+              <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-ba842718-4018-4f8e-8e31-a63d012f0932]]></design:guid>
+              <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion8]]></design:id>
+              <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneentrycriterion]]></design:customstencilid>
+              <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+              <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:xmlTag>
+            </extensionElements>
+            <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+              <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+          </sentry>
+          <humanTask id="onehumantask1" name="Human task" flowable:assignee="${initiator}">
+            <extensionElements>
+              <design:initiator-can-complete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:initiator-can-complete>
+              <design:activiti-idm-initiator xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:activiti-idm-initiator>
+              <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[onehumantask]]></design:stencilid>
+              <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[HumanTask]]></design:stencilsuperid>
+              <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["Task","HumanTask"]]]></design:stencilsuperids>
+              <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+              <design:async xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:async>
+              <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-569ef81a-b5a5-4b97-b72c-f8a78813ed3e]]></design:guid>
+              <design:exclusive xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:exclusive>
+              <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+              <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+              <design:assignee-run xmlns:design="http://flowable.org/design"><![CDATA[${initiator}]]></design:assignee-run>
+              <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+              <design:isblocking xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:isblocking>
+              <design:tasktype xmlns:design="http://flowable.org/design"><![CDATA[human]]></design:tasktype>
+              <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+              <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:repetition>
+              <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+              <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+              <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+              <design:id xmlns:design="http://flowable.org/design"><![CDATA[onehumantask1]]></design:id>
+              <design:name xmlns:design="http://flowable.org/design"><![CDATA[Human task]]></design:name>
+              <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Human task]]></design:name_en_us>
+              <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[onehumantask]]></design:customstencilid>
+              <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+              <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[HumanTask]]></design:xmlTag>
+            </extensionElements>
+          </humanTask>
+          <eventListener id="oneeventlistener1" name="Event">
+            <extensionElements>
+              <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneeventlistener]]></design:stencilid>
+              <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[EventListener]]></design:stencilsuperid>
+              <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["EventListener"]]]></design:stencilsuperids>
+              <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+              <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:repetition>
+              <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+              <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-c3eb0a79-9577-4b60-92e0-7a04e5670f46]]></design:guid>
+              <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+              <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+              <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+              <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+              <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneeventlistener1]]></design:id>
+              <design:name xmlns:design="http://flowable.org/design"><![CDATA[Event]]></design:name>
+              <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Event]]></design:name_en_us>
+              <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneeventlistener]]></design:customstencilid>
+              <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+              <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[EventListener]]></design:xmlTag>
+            </extensionElements>
+          </eventListener>
+        </stage>
+        <stage id="oneexpandedstage6" name="Stage 1.1" flowable:includeInStageOverview="true">
+          <extensionElements>
+            <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:stencilid>
+            <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:stencilsuperid>
+            <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["ExpandedStage"]]]></design:stencilsuperids>
+            <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+            <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+            <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:repetition>
+            <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+            <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+            <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+            <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+            <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+            <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-0e59fb9e-4e45-4e44-b31c-67f7b3e524e4]]></design:guid>
+            <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+            <design:statevisible xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:statevisible>
+            <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+            <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage6]]></design:id>
+            <design:name xmlns:design="http://flowable.org/design"><![CDATA[Stage 1.1]]></design:name>
+            <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Stage 1.1]]></design:name_en_us>
+            <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:customstencilid>
+            <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+            <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:xmlTag>
+          </extensionElements>
+        </stage>
+      </stage>
+      <stage id="oneexpandedstage2" name="Stage 2" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:stencilid>
+          <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:stencilsuperid>
+          <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["ExpandedStage"]]]></design:stencilsuperids>
+          <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+          <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+          <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:repetition>
+          <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+          <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+          <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+          <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+          <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+          <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-b9ee1a18-1456-40f3-aa8e-211adb738a47]]></design:guid>
+          <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+          <design:statevisible xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:statevisible>
+          <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+          <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage2]]></design:id>
+          <design:name xmlns:design="http://flowable.org/design"><![CDATA[Stage 2]]></design:name>
+          <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Stage 2]]></design:name_en_us>
+          <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:customstencilid>
+          <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+          <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:xmlTag>
+        </extensionElements>
+        <planItem id="planItem6" name="Stage 2.1" definitionRef="oneexpandedstage5">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+          </itemControl>
+        </planItem>
+        <stage id="oneexpandedstage5" name="Stage 2.1" flowable:includeInStageOverview="true">
+          <extensionElements>
+            <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:stencilid>
+            <design:stencilsuperid xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:stencilsuperid>
+            <design:stencilsuperids xmlns:design="http://flowable.org/design"><![CDATA[["ExpandedStage"]]]></design:stencilsuperids>
+            <design:customstencil xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:customstencil>
+            <design:bgcolor xmlns:design="http://flowable.org/design"><![CDATA[#ffffff]]></design:bgcolor>
+            <design:repetition xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:repetition>
+            <design:isdiscretionary xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:isdiscretionary>
+            <design:autocomplete xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:autocomplete>
+            <design:manualactivation xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:manualactivation>
+            <design:repetitioncountervariablename xmlns:design="http://flowable.org/design"><![CDATA[repetitionCounter]]></design:repetitioncountervariablename>
+            <design:required xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:required>
+            <design:guid xmlns:design="http://flowable.org/design"><![CDATA[GEAR-d05278c0-0301-42bf-8d41-2265ad0e7ea5]]></design:guid>
+            <design:bordercolor xmlns:design="http://flowable.org/design"><![CDATA[#000000]]></design:bordercolor>
+            <design:statevisible xmlns:design="http://flowable.org/design"><![CDATA[true]]></design:statevisible>
+            <design:completionneutral xmlns:design="http://flowable.org/design"><![CDATA[false]]></design:completionneutral>
+            <design:id xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage5]]></design:id>
+            <design:name xmlns:design="http://flowable.org/design"><![CDATA[Stage 2.1]]></design:name>
+            <design:name_en_us xmlns:design="http://flowable.org/design"><![CDATA[Stage 2.1]]></design:name_en_us>
+            <design:customstencilid xmlns:design="http://flowable.org/design"><![CDATA[oneexpandedstage]]></design:customstencilid>
+            <design:customnamespace xmlns:design="http://flowable.org/design"><![CDATA[http://b3mn.org/stencilset/default.case.palette.xml#]]></design:customnamespace>
+            <design:xmlTag xmlns:design="http://flowable.org/design"><![CDATA[ExpandedStage]]></design:xmlTag>
+          </extensionElements>
+        </stage>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testStagesOnly">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="705.0" width="1005.0" x="30.0" y="45.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="195.0" width="855.0" x="105.0" y="105.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion9" cmmnElementRef="oneentrycriterion9">
+        <dc:Bounds height="28.0" width="18.0" x="96.0" y="188.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="135.0" width="320.0" x="490.0" y="135.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion10" cmmnElementRef="oneentrycriterion10">
+        <dc:Bounds height="28.0" width="18.0" x="481.0" y="188.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="700.0" y="165.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion8" cmmnElementRef="oneentrycriterion8">
+        <dc:Bounds height="28.0" width="18.0" x="691.0" y="191.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="30.0" width="30.0" x="550.0" y="195.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="136.0" width="160.0" x="174.5" y="137.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion6" cmmnElementRef="oneentrycriterion6">
+        <dc:Bounds height="28.0" width="18.0" x="165.5" y="190.50364963503648"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem7" cmmnElementRef="planItem7">
+        <dc:Bounds height="180.0" width="855.0" x="105.0" y="405.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion3" cmmnElementRef="oneentrycriterion3">
+        <dc:Bounds height="28.0" width="18.0" x="461.1081081081082" y="391.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+        <dc:Bounds height="135.0" width="179.0" x="165.0" y="435.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_oneconnector2" cmmnElementRef="planItem5" targetCMMNElementRef="oneentrycriterion3">
+        <di:waypoint x="501.488646377008" y="299.95"></di:waypoint>
+        <di:waypoint x="485.22186628087223" y="351.1429161930348"></di:waypoint>
+        <di:waypoint x="472.83159685265025" y="395.254300599708"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_oneconnector5" cmmnElementRef="planItem4" targetCMMNElementRef="oneentrycriterion10">
+        <di:waypoint x="334.45000000000005" y="205.0"></di:waypoint>
+        <di:waypoint x="412.25" y="205.0"></di:waypoint>
+        <di:waypoint x="412.25" y="202.0"></di:waypoint>
+        <di:waypoint x="481.0" y="202.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_oneconnector4" cmmnElementRef="planItem2" targetCMMNElementRef="oneentrycriterion8">
+        <di:waypoint x="579.949996325733" y="210.0"></di:waypoint>
+        <di:waypoint x="635.5" y="210.0"></di:waypoint>
+        <di:waypoint x="635.5" y="205.0"></di:waypoint>
+        <di:waypoint x="691.0" y="205.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

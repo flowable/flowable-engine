@@ -48,8 +48,9 @@ public class DefinitionsRootExport implements BpmnXMLConstants {
         xtw.writeNamespace(OMGDC_PREFIX, OMGDC_NAMESPACE);
         xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
         for (String prefix : model.getNamespaces().keySet()) {
-            if (!defaultNamespaces.contains(prefix) && StringUtils.isNotEmpty(prefix))
+            if (!defaultNamespaces.contains(prefix) && StringUtils.isNotEmpty(prefix)) {
                 xtw.writeNamespace(prefix, model.getNamespaces().get(prefix));
+            }
         }
         xtw.writeAttribute(TYPE_LANGUAGE_ATTRIBUTE, SCHEMA_NAMESPACE);
         xtw.writeAttribute(EXPRESSION_LANGUAGE_ATTRIBUTE, XPATH_NAMESPACE);
@@ -57,6 +58,13 @@ public class DefinitionsRootExport implements BpmnXMLConstants {
             xtw.writeAttribute(TARGET_NAMESPACE_ATTRIBUTE, model.getTargetNamespace());
         } else {
             xtw.writeAttribute(TARGET_NAMESPACE_ATTRIBUTE, PROCESS_NAMESPACE);
+        }
+
+        if (StringUtils.isNotEmpty(model.getExporter())) {
+            xtw.writeAttribute(BpmnXMLConstants.ATTRIBUTE_EXPORTER, model.getExporter());
+        }
+        if (StringUtils.isNotEmpty(model.getExporterVersion())) {
+            xtw.writeAttribute(BpmnXMLConstants.ATTRIBUTE_EXPORTER_VERSION, model.getExporterVersion());
         }
 
         BpmnXMLUtil.writeCustomAttributes(model.getDefinitionsAttributes().values(), xtw, model.getNamespaces(), defaultAttributes);

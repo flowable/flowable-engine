@@ -7,48 +7,96 @@
   <!-- INSERT IDENTITY LINK -->
   
   <insert id="insertIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
     values (#{id, jdbcType=VARCHAR},
-            1,
-            #{type, jdbcType=VARCHAR},
+            1, #{type, jdbcType=VARCHAR},
             #{userId, jdbcType=VARCHAR},
             #{groupId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
-            #{processDefId, jdbcType=VARCHAR})
+            #{processDefId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR})
             
   </insert>
   
   <insert id="bulkInsertIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
-    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_)
+    insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_)
     values 
     <foreach collection="list" item="identityLink" index="index" separator=","> 
       (#{identityLink.id, jdbcType=VARCHAR},
-        1,
-        #{identityLink.type, jdbcType=VARCHAR},
+        1, #{identityLink.type, jdbcType=VARCHAR},
         #{identityLink.userId, jdbcType=VARCHAR},
         #{identityLink.groupId, jdbcType=VARCHAR},
         #{identityLink.taskId, jdbcType=VARCHAR},
         #{identityLink.processInstanceId, jdbcType=VARCHAR},
-        #{identityLink.processDefId, jdbcType=VARCHAR})
+        #{identityLink.processDefId, jdbcType=VARCHAR},
+        #{identityLink.scopeId, jdbcType=VARCHAR},
+        #{identityLink.subScopeId, jdbcType=VARCHAR},
+        #{identityLink.scopeType, jdbcType=VARCHAR},
+        #{identityLink.scopeDefinitionId, jdbcType=VARCHAR})
     </foreach>
   </insert>
   
   <insert id="bulkInsertIdentityLink" databaseId="oracle" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
     INSERT ALL
       <foreach collection="list" item="identityLink" index="index">
-        into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_) VALUES
+        into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_) VALUES
            (#{identityLink.id, jdbcType=VARCHAR},
-            1,
-            #{identityLink.type, jdbcType=VARCHAR},
+            1, #{identityLink.type, jdbcType=VARCHAR},
             #{identityLink.userId, jdbcType=VARCHAR},
             #{identityLink.groupId, jdbcType=VARCHAR},
             #{identityLink.taskId, jdbcType=VARCHAR},
             #{identityLink.processInstanceId, jdbcType=VARCHAR},
-            #{identityLink.processDefId, jdbcType=VARCHAR})
+            #{identityLink.processDefId, jdbcType=VARCHAR},
+            #{identityLink.scopeId, jdbcType=VARCHAR},
+            #{identityLink.subScopeId, jdbcType=VARCHAR},
+            #{identityLink.scopeType, jdbcType=VARCHAR},
+            #{identityLink.scopeDefinitionId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <!-- IDENTITY LINK UPDATE -->
+
+  <update id="updateIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
+    update ${prefix}ACT_RU_IDENTITYLINK
+    <set>
+        <if test="originalPersistentState.type != type">
+            TYPE_ = #{type, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.userId != userId">
+            USER_ID_ = #{userId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.groupId != groupId">
+            GROUP_ID_ = #{groupId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.taskId != taskId">
+            TASK_ID_ = #{taskId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.processInstanceId != processInstanceId">
+            PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeId != scopeId">
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.subScopeId != subScopeId">
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeType != scopeType">
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+        </if>
+    </set>
+    where ID_= #{id, jdbcType=VARCHAR}
+  </update>
   
   <!-- IDENTITY LINK DELETE -->
   
@@ -63,10 +111,39 @@
     </foreach>
   </delete>
   
-  <delete id="deleteIdentityLinkByProcDef" parameterType="string">
+  <delete id="deleteIdentityLinksByTaskId" parameterType="string">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteIdentityLinksByProcDef" parameterType="string">
     delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{id}
   </delete>
   
+  <delete id="deleteIdentityLinksByProcessInstanceId" parameterType="string">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{id}
+  </delete>
+
+  <delete id="deleteIdentityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+  
+  <delete id="deleteIdentityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
+  </delete>
+
+  <delete id="bulkDeleteIdentityLinksForScopeIdsAndScopeType" parameterType="map">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where 
+    (<foreach item="listItem" index="listIndex" collection="scopeIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    and SCOPE_TYPE_ = #{scopeType}
+  </delete>  
 
   <!-- IDENTITY LINK RESULTMAP -->
 
@@ -77,7 +154,11 @@
     <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
     <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />    
-    <result property="processDefId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />    
+    <result property="processDefId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- IDENTITY LINK SELECT -->
@@ -86,23 +167,35 @@
     select * from ${prefix}ACT_RU_IDENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectIdentityLinksByTask" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinksByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{parameter}
   </select>
   
-  <select id="selectIdentityLinksByProcessInstance" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinksByProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{parameter}
   </select>
   
-  <select id="selectIdentityLinksByProcessDefinition" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+  </select>
+  
+  <select id="selectIdentityLinksBySubScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * from ${prefix}ACT_RU_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+  </select>
+  
+  <select id="selectIdentityLinksByProcessDefinition" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{parameter}
+  </select>
+  
+  <select id="selectIdentityLinksByScopeDefinitionAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * from ${prefix}ACT_RU_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId} and SCOPE_TYPE_ = #{parameter.scopeType}
   </select>
   
  <select id="selectIdentityLinks" resultMap="identityLinkResultMap">
     select * from ${prefix}ACT_RU_IDENTITYLINK
   </select>
   
-  <select id="selectIdentityLinkByTaskUserGroupAndType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinkByTaskUserGroupAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * 
     from ${prefix}ACT_RU_IDENTITYLINK 
     where TASK_ID_ = #{parameter.taskId}
@@ -117,7 +210,7 @@
       </if>
   </select>
   
-   <select id="selectIdentityLinkByProcessInstanceUserGroupAndType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinkByProcessInstanceUserGroupAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * 
     from ${prefix}ACT_RU_IDENTITYLINK 
     where PROC_INST_ID_ = #{parameter.processInstanceId}
@@ -132,10 +225,37 @@
       </if>
   </select>
   
-  <select id="selectIdentityLinkByProcessDefinitionUserAndGroup" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+  <select id="selectIdentityLinkByScopeIdScopeTypeUserGroupAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * 
+    from ${prefix}ACT_RU_IDENTITYLINK 
+    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+      <if test="parameter.userId != null">
+        and USER_ID_ = #{parameter.userId}
+      </if>
+      <if test="parameter.groupId != null">
+        and GROUP_ID_ = #{parameter.groupId}
+      </if>
+      <if test="parameter.type != null">
+        and TYPE_ = #{parameter.type}
+      </if>
+  </select>
+  
+  <select id="selectIdentityLinkByProcessDefinitionUserAndGroup" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
     select * 
     from ${prefix}ACT_RU_IDENTITYLINK 
     where PROC_DEF_ID_ = #{parameter.processDefinitionId}
+      <if test="parameter.userId != null">
+        and USER_ID_ = #{parameter.userId}
+      </if>
+      <if test="parameter.groupId != null">
+        and GROUP_ID_ = #{parameter.groupId}
+      </if>
+  </select>
+  
+  <select id="selectIdentityLinkByScopeDefinitionScopeTypeUserAndGroup" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
+    select * 
+    from ${prefix}ACT_RU_IDENTITYLINK 
+    where SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId} and SCOPE_TYPE_ = #{parameter.scopeType}
       <if test="parameter.userId != null">
         and USER_ID_ = #{parameter.userId}
       </if>

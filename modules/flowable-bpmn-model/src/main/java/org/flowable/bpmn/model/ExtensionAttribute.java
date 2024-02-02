@@ -26,6 +26,11 @@ public class ExtensionAttribute {
         this.name = name;
     }
 
+    public ExtensionAttribute(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
+
     public String getName() {
         return name;
     }
@@ -63,12 +68,15 @@ public class ExtensionAttribute {
         StringBuilder sb = new StringBuilder();
         if (namespacePrefix != null) {
             sb.append(namespacePrefix);
-            if (name != null)
+            if (name != null) {
                 sb.append(":").append(name);
-        } else
+            }
+        } else {
             sb.append(name);
-        if (value != null)
+        }
+        if (value != null) {
             sb.append("=").append(value);
+        }
         return sb.toString();
     }
 

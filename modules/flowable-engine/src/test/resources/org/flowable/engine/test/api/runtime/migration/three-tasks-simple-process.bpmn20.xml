@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+    <process id="MP" name="MyProcess" isExecutable="true">
+        <documentation>My process documentation</documentation>
+        <startEvent id="startEvent1"></startEvent>
+        <userTask id="userTask1Id" name="My User Task"/>
+        <sequenceFlow id="seqFlow1Id" sourceRef="startEvent1" targetRef="userTask1Id"></sequenceFlow>
+        <userTask id="intermediateTask" name="Intermediate Task"/>
+        <sequenceFlow id="seqFlow3Id" sourceRef="userTask1Id" targetRef="intermediateTask"></sequenceFlow>
+        <userTask id="userTask2Id" name="Last User Task"/>
+        <sequenceFlow id="seqFlow2Id" sourceRef="intermediateTask" targetRef="userTask2Id"></sequenceFlow>
+        <endEvent id="endEvent1"></endEvent>
+        <sequenceFlow id="seqFlow4Id" sourceRef="userTask2Id" targetRef="endEvent1"></sequenceFlow>
+    </process>
+</definitions>

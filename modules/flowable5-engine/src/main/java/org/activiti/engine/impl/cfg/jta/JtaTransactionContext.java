@@ -13,12 +13,12 @@
 
 package org.activiti.engine.impl.cfg.jta;
 
-import javax.transaction.RollbackException;
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.RollbackException;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.Transaction;
+import jakarta.transaction.TransactionManager;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.TransactionContext;
@@ -53,9 +53,9 @@ public class JtaTransactionContext implements TransactionContext {
                 transaction.setRollbackOnly();
             }
         } catch (IllegalStateException e) {
-            throw new ActivitiException("Unexpected IllegalStateException while marking transaction rollback only");
+            throw new ActivitiException("Unexpected IllegalStateException while marking transaction rollback only", e);
         } catch (SystemException e) {
-            throw new ActivitiException("SystemException while marking transaction rollback only");
+            throw new ActivitiException("SystemException while marking transaction rollback only", e);
         }
     }
 

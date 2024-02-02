@@ -13,9 +13,9 @@
 
 package org.activiti.engine.impl.test;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

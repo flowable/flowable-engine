@@ -14,11 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Execution;
@@ -49,7 +49,7 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
         }
 
         if (execution.isSuspended()) {
-            throw new FlowableException(getSuspendedExceptionMessage());
+            throw new FlowableException(getSuspendedExceptionMessagePrefix() + " a suspended " + execution);
         }
 
         return execute(commandContext, execution);
@@ -63,8 +63,8 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
     /**
      * Subclasses can override this to provide a more detailed exception message that will be thrown when the execution is suspended.
      */
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot execution operation because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot execute operation for";
     }
 
 }

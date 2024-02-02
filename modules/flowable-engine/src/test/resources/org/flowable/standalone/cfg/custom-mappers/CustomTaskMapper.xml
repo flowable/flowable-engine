@@ -33,11 +33,11 @@
   </select>
   
   <select id="selectCustomTaskByQueryCriteria" parameterType="org.flowable.standalone.cfg.CustomTaskQuery" resultMap="customTaskResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct <include refid="selectCustomTaskColumns"/> <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectCustomTaskByQueryCriteriaSql"/> 
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT <include refid="selectCustomTaskColumns"/> <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectCustomTaskByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <sql id="selectCustomTaskByQueryCriteriaSql">

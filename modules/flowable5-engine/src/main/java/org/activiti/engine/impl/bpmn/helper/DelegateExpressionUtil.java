@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.activiti.engine.impl.bpmn.parser.FieldDeclaration;
 import org.activiti.engine.impl.context.Context;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

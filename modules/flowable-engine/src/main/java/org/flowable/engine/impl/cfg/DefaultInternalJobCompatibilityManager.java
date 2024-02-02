@@ -13,8 +13,8 @@
 
 package org.flowable.engine.impl.cfg;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -50,13 +50,19 @@ public class DefaultInternalJobCompatibilityManager implements InternalJobCompat
 
     @Override
     public void executeV5JobWithLockAndRetry(final Job job) {
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+
+        // Retrieving the compatibility handler needs to be done outside of the executeJobWithLockAndRetry call,
+        // as it shouldn't be wrapped in a transaction.
+        Flowable5CompatibilityHandler compatibilityHandler = processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
+
             @Override
-            public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().executeJobWithLockAndRetry(job);
-                return null;
+            public Flowable5CompatibilityHandler execute(CommandContext commandContext) {
+                return CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler();
             }
         });
+
+        // Note: no transaction (on purpose)
+        compatibilityHandler.executeJobWithLockAndRetry(job);
     }
     
     @Override

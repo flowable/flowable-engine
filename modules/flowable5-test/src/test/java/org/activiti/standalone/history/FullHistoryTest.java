@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.impl.variable.EntityManagerSession;
@@ -31,9 +31,9 @@ import org.activiti.engine.impl.variable.EntityManagerSessionFactory;
 import org.activiti.engine.test.api.runtime.DummySerializable;
 import org.activiti.engine.test.history.SerializableVariable;
 import org.activiti.standalone.jpa.FieldAccessJPAEntity;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricFormProperty;
@@ -305,13 +305,13 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals("one", historicProcessVariable.getValue());
 
         Map<String, Object> variables3 = new HashMap<String, Object>();
-        variables3.put("long", 1000l);
+        variables3.put("long", 1000L);
         variables3.put("double", 25.43d);
         ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("receiveTask", variables3);
         runtimeService.trigger(processInstance3.getProcessInstanceId());
 
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("long").count());
-        assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000l).count());
+        assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("long", 1000L).count());
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableName("double").count());
         assertEquals(1, historyService.createHistoricVariableInstanceQuery().variableValueEquals("double", 25.43d).count());
 
@@ -351,7 +351,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertEquals("initial value", startVarUpdate.getValue());
         assertEquals(0, startVarUpdate.getRevision());
         assertEquals(processInstance.getId(), startVarUpdate.getProcessInstanceId());
-        // Date should the the one set when starting
+        // Date should the one set when starting
         assertEquals(startedDate, startVarUpdate.getTime());
 
         HistoricVariableUpdate updatedStringVariable = (HistoricVariableUpdate) details.get(1);

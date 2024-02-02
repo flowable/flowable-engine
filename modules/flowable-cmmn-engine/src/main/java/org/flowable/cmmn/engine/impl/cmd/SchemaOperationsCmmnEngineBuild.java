@@ -14,8 +14,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -24,7 +24,7 @@ public class SchemaOperationsCmmnEngineBuild implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((CmmnDbSchemaManager) CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDbSchemaManager()).initSchema();
+        ((CmmnDbSchemaManager) CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager()).initSchema();
         return null;
     }
 

@@ -13,9 +13,9 @@
 
 package org.flowable.engine.impl.el;
 
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.engine.impl.delegate.invocation.ExpressionGetInvocation;
 import org.flowable.engine.impl.delegate.invocation.ExpressionSetInvocation;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
@@ -27,7 +27,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class JuelExpression extends org.flowable.engine.common.impl.el.JuelExpression {
+public class JuelExpression extends org.flowable.common.engine.impl.el.JuelExpression {
 
     private static final long serialVersionUID = 1L;
     

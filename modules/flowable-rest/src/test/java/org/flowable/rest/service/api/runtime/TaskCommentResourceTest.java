@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -28,9 +31,12 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -40,6 +46,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all comments for a task. GET runtime/tasks/{taskId}/comments
      */
+    @Test
     public void testGetComments() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -54,18 +61,19 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertTrue(responseNode.isArray());
-            assertEquals(1, responseNode.size());
-
-            ObjectNode commentNode = (ObjectNode) responseNode.get(0);
-            assertEquals("kermit", commentNode.get("author").textValue());
-            assertEquals("This is a comment...", commentNode.get("message").textValue());
-            assertEquals(comment.getId(), commentNode.get("id").textValue());
-            assertTrue(commentNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId())));
-            assertEquals(task.getId(), commentNode.get("taskId").asText());
-            assertTrue(commentNode.get("processInstanceUrl").isNull());
-            assertTrue(commentNode.get("processInstanceId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("[ {"
+                            + "id: '" + comment.getId() + "',"
+                            + "author: 'kermit',"
+                            + "message: 'This is a comment...',"
+                            + "taskId: '" + task.getId() + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId())
+                            + "',"
+                            + "processInstanceId: null,"
+                            + "processInstanceUrl: null"
+                            + "} ]");
 
             // Test with unexisting task
             httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT_COLLECTION, "unexistingtask"));
@@ -83,6 +91,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a comment for a task. POST runtime/tasks/{taskId}/comments
      */
+    @Test
     public void testCreateComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -95,19 +104,23 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
             httpPost.setEntity(new StringEntity(requestNode.toString()));
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             List<Comment> commentsOnTask = taskService.getTaskComments(task.getId());
-            assertNotNull(commentsOnTask);
-            assertEquals(1, commentsOnTask.size());
+            assertThat(commentsOnTask).hasSize(1);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("kermit", responseNode.get("author").textValue());
-            assertEquals("This is a comment...", responseNode.get("message").textValue());
-            assertEquals(commentsOnTask.get(0).getId(), responseNode.get("id").textValue());
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), commentsOnTask.get(0).getId())));
-            assertEquals(task.getId(), responseNode.get("taskId").asText());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertTrue(responseNode.get("processInstanceId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id: '" + commentsOnTask.get(0).getId() + "',"
+                            + "author: 'kermit',"
+                            + "message: 'This is a comment...',"
+                            + "taskId: '" + task.getId() + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), commentsOnTask.get(0).getId()) + "',"
+                            + "processInstanceId: null,"
+                            + "processInstanceUrl: null"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -118,6 +131,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
     public void testCreateCommentWithProcessInstanceId() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -133,25 +147,30 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
 
         List<Comment> commentsOnTask = taskService.getTaskComments(task.getId());
-        assertNotNull(commentsOnTask);
-        assertEquals(1, commentsOnTask.size());
+        assertThat(commentsOnTask).hasSize(1);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals(processInstance.getId(), responseNode.get("processInstanceId").asText());
-        assertEquals(task.getId(), responseNode.get("taskId").asText());
-        assertEquals(message, responseNode.get("message").asText());
-        assertNotNull(responseNode.get("time").asText());
-
-        assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), commentsOnTask.get(0).getId())));
-        assertTrue(responseNode.get("processInstanceUrl").textValue()
-                .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, processInstance.getId(), commentsOnTask.get(0).getId())));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "message: '" + message + "',"
+                        + "time: '${json-unit.any-string}',"
+                        + "taskId: '" + task.getId() + "',"
+                        + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), commentsOnTask.get(0).getId()) + "',"
+                        + "processInstanceId: '" + processInstance.getId() + "',"
+                        + "processInstanceUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, processInstance.getId(),
+                                commentsOnTask.get(0).getId()) + "'"
+                        + "}");
     }
 
     /**
      * Test getting a comment for a task. GET runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testGetComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -166,15 +185,19 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-
-            assertEquals("kermit", responseNode.get("author").textValue());
-            assertEquals("This is a comment...", responseNode.get("message").textValue());
-            assertEquals(comment.getId(), responseNode.get("id").textValue());
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId())));
-            assertEquals(task.getId(), responseNode.get("taskId").asText());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertTrue(responseNode.get("processInstanceId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "id: '" + comment.getId() + "',"
+                            + "author: 'kermit',"
+                            + "message: 'This is a comment...',"
+                            + "taskId: '" + task.getId() + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId())
+                            + "',"
+                            + "processInstanceId: null,"
+                            + "processInstanceUrl: null"
+                            + "}");
 
             // Test with unexisting task
             httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, "unexistingtask", "123"));
@@ -196,6 +219,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a comment for a task. DELETE runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testDeleteComment() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -229,6 +253,7 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a comment for a completed task. GET runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     public void testGetCommentWithCompletedTask() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -245,15 +270,19 @@ public class TaskCommentResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-
-            assertEquals("kermit", responseNode.get("author").textValue());
-            assertEquals("This is a comment...", responseNode.get("message").textValue());
-            assertEquals(comment.getId(), responseNode.get("id").textValue());
-            assertTrue(responseNode.get("taskUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId())));
-            assertEquals(task.getId(), responseNode.get("taskId").asText());
-            assertTrue(responseNode.get("processInstanceUrl").isNull());
-            assertTrue(responseNode.get("processInstanceId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "author: 'kermit',"
+                            + "message: 'This is a comment...',"
+                            + "id: '" + comment.getId() + "',"
+                            + "taskId: '" + task.getId() + "',"
+                            + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT, task.getId(), comment.getId()) + "',"
+                            + "processInstanceId: null,"
+                            + "processInstanceUrl: null"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails

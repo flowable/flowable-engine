@@ -1,0 +1,3 @@
+alter table ACT_HI_ENTITYLINK add column ROOT_SCOPE_ID_ varchar(255);
+alter table ACT_HI_ENTITYLINK add column ROOT_SCOPE_TYPE_ varchar(255);
+create index ACT_IDX_HI_ENT_LNK_ROOT_SCOPE on ACT_HI_ENTITYLINK(ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, LINK_TYPE_);

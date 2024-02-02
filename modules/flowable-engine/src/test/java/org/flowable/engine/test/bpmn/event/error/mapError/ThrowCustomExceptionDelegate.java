@@ -13,7 +13,7 @@
 package org.flowable.engine.test.bpmn.event.error.mapError;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
@@ -33,8 +33,13 @@ public class ThrowCustomExceptionDelegate implements JavaDelegate {
         if (StringUtils.isNotEmpty(exceptionClassName)) {
             RuntimeException exception = null;
             try {
+                Object exceptionMessage = execution.getVariable("exceptionMessage");
                 Class<?> clazz = Class.forName(exceptionClassName);
-                exception = (RuntimeException) clazz.newInstance();
+                if (exceptionMessage != null) {
+                    exception = (RuntimeException) clazz.getConstructor(String.class).newInstance(exceptionMessage.toString());
+                } else {
+                    exception = (RuntimeException) clazz.getConstructor().newInstance();
+                }
 
             } catch (Exception e) {
                 throw new FlowableException("Class not found", e);

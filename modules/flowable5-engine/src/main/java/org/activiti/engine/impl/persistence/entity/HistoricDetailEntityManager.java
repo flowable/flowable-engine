@@ -20,7 +20,7 @@ import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.HistoricDetailQueryImpl;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 
 /**
  * @author Tom Baeyens

@@ -72,6 +72,11 @@ public interface DeploymentBuilder {
      * Gives the deployment the given key.
      */
     DeploymentBuilder key(String key);
+    
+    /**
+     * Gives the deployment the given parent deployment id.
+     */
+    DeploymentBuilder parentDeploymentId(String parentDeploymentId);
 
     /**
      * Gives the deployment the given tenant id.

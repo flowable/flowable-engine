@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.impl.event;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,11 +29,11 @@ public class EventNotificationTest extends CdiFlowableTestCase {
         listenerBean.reset();
 
         // assert that the bean has received 0 events
-        assertEquals(0, listenerBean.getEventsReceived().size());
+        assertThat(listenerBean.getEventsReceived()).isEmpty();
         runtimeService.startProcessInstanceByKey("process1");
 
         // assert that now the bean has received 11 events
-        assertEquals(11, listenerBean.getEventsReceived().size());
+        assertThat(listenerBean.getEventsReceived()).hasSize(11);
     }
 
     @Test
@@ -42,13 +42,13 @@ public class EventNotificationTest extends CdiFlowableTestCase {
         TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
         listenerBean.reset();
 
-        assertEquals(0, listenerBean.getEventsReceivedByKey().size());
+        assertThat(listenerBean.getEventsReceivedByKey()).isEmpty();
         // start the 2 processes
         runtimeService.startProcessInstanceByKey("process1");
         runtimeService.startProcessInstanceByKey("process2");
 
         // assert that now the bean has received 11 events
-        assertEquals(11, listenerBean.getEventsReceivedByKey().size());
+        assertThat(listenerBean.getEventsReceivedByKey()).hasSize(11);
     }
 
     @Test
@@ -57,18 +57,18 @@ public class EventNotificationTest extends CdiFlowableTestCase {
         TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
         listenerBean.reset();
 
-        assertEquals(0, listenerBean.getEndActivityService1WithLoopCounter());
-        assertEquals(0, listenerBean.getEndActivityService1WithoutLoopCounter());
-        assertEquals(0, listenerBean.getStartActivityService1WithoutLoopCounter());
-        assertEquals(0, listenerBean.getTakeTransitiont1());
+        assertThat(listenerBean.getEndActivityService1WithLoopCounter()).isZero();
+        assertThat(listenerBean.getEndActivityService1WithoutLoopCounter()).isZero();
+        assertThat(listenerBean.getStartActivityService1WithoutLoopCounter()).isZero();
+        assertThat(listenerBean.getTakeTransitiont1()).isZero();
 
         // start the process
         runtimeService.startProcessInstanceByKey("process1");
 
         // assert
-        assertEquals(1, listenerBean.getEndActivityService1WithoutLoopCounter());
-        assertEquals(1, listenerBean.getStartActivityService1WithoutLoopCounter());
-        assertEquals(1, listenerBean.getTakeTransitiont1());
+        assertThat(listenerBean.getEndActivityService1WithoutLoopCounter()).isEqualTo(1);
+        assertThat(listenerBean.getStartActivityService1WithoutLoopCounter()).isEqualTo(1);
+        assertThat(listenerBean.getTakeTransitiont1()).isEqualTo(1);
     }
 
     @Test
@@ -77,10 +77,10 @@ public class EventNotificationTest extends CdiFlowableTestCase {
         TestEventListener listenerBean = getBeanInstance(TestEventListener.class);
         listenerBean.reset();
 
-        assertEquals(0, listenerBean.getCreateTask1());
-        assertEquals(0, listenerBean.getAssignTask1());
-        assertEquals(0, listenerBean.getCompleteTask1());
-        assertEquals(0, listenerBean.getDeleteTask3());
+        assertThat(listenerBean.getCreateTask1()).isZero();
+        assertThat(listenerBean.getAssignTask1()).isZero();
+        assertThat(listenerBean.getCompleteTask1()).isZero();
+        assertThat(listenerBean.getDeleteTask3()).isZero();
 
         // start the process
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("process3");
@@ -100,12 +100,12 @@ public class EventNotificationTest extends CdiFlowableTestCase {
         runtimeService.deleteProcessInstance(pi.getId(), "DELETED");
 
         // assert
-        assertEquals(1, listenerBean.getCreateTask1());
-        assertEquals(1, listenerBean.getCreateTask2());
-        assertEquals(1, listenerBean.getAssignTask1());
-        assertEquals(1, listenerBean.getCompleteTask1());
-        assertEquals(1, listenerBean.getCompleteTask2());
-        assertEquals(1, listenerBean.getDeleteTask3());
+        assertThat(listenerBean.getCreateTask1()).isEqualTo(1);
+        assertThat(listenerBean.getCreateTask2()).isEqualTo(1);
+        assertThat(listenerBean.getAssignTask1()).isEqualTo(1);
+        assertThat(listenerBean.getCompleteTask1()).isEqualTo(1);
+        assertThat(listenerBean.getCompleteTask2()).isEqualTo(1);
+        assertThat(listenerBean.getDeleteTask3()).isEqualTo(1);
     }
 
 }

@@ -15,7 +15,7 @@ package org.flowable.task.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.task.api.TaskQuery;
 
 /**
@@ -42,6 +42,7 @@ public class TaskQueryProperty implements QueryProperty {
     public static final TaskQueryProperty DUE_DATE = new TaskQueryProperty("RES.DUE_DATE_");
     public static final TaskQueryProperty TENANT_ID = new TaskQueryProperty("RES.TENANT_ID_");
     public static final TaskQueryProperty TASK_DEFINITION_KEY = new TaskQueryProperty("RES.TASK_DEF_KEY_");
+    public static final TaskQueryProperty CATEGORY = new TaskQueryProperty("RES.CATEGORY_");
 
     private String name;
 

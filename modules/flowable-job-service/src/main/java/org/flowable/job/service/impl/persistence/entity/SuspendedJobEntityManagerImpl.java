@@ -15,59 +15,64 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<SuspendedJobEntity> implements SuspendedJobEntityManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SuspendedJobEntityManagerImpl.class);
-
-    protected SuspendedJobDataManager jobDataManager;
+public class SuspendedJobEntityManagerImpl
+    extends AbstractJobServiceEngineEntityManager<SuspendedJobEntity, SuspendedJobDataManager>
+    implements SuspendedJobEntityManager {
 
     public SuspendedJobEntityManagerImpl(JobServiceConfiguration jobServiceConfiguration, SuspendedJobDataManager jobDataManager) {
-        super(jobServiceConfiguration);
-        this.jobDataManager = jobDataManager;
+        super(jobServiceConfiguration, jobServiceConfiguration.getEngineName(), jobDataManager);
+    }
+
+    @Override
+    public SuspendedJobEntity findJobByCorrelationId(String correlationId) {
+        return dataManager.findJobByCorrelationId(correlationId);
     }
 
     @Override
     public List<SuspendedJobEntity> findJobsByExecutionId(String id) {
-        return jobDataManager.findJobsByExecutionId(id);
+        return dataManager.findJobsByExecutionId(id);
     }
 
     @Override
     public List<SuspendedJobEntity> findJobsByProcessInstanceId(String id) {
-        return jobDataManager.findJobsByProcessInstanceId(id);
+        return dataManager.findJobsByProcessInstanceId(id);
     }
 
     @Override
     public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-        return jobDataManager.findJobsByQueryCriteria(jobQuery);
+        return dataManager.findJobsByQueryCriteria(jobQuery);
     }
 
     @Override
     public long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery) {
-        return jobDataManager.findJobCountByQueryCriteria(jobQuery);
+        return dataManager.findJobCountByQueryCriteria(jobQuery);
     }
 
     @Override
     public void updateJobTenantIdForDeployment(String deploymentId, String newTenantId) {
-        jobDataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
+        dataManager.updateJobTenantIdForDeployment(deploymentId, newTenantId);
     }
 
     @Override
     public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
-        getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobInsert(jobEntity);
+        }
 
-        jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
+        jobEntity.setCreateTime(getClock().getCurrentTime());
+        if (jobEntity.getCorrelationId() == null) {
+            jobEntity.setCorrelationId(serviceConfiguration.getIdGenerator().getNextId());
+        }
         super.insert(jobEntity, fireCreateEvent);
     }
 
@@ -78,17 +83,25 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
 
     @Override
     public void delete(SuspendedJobEntity jobEntity) {
-        super.delete(jobEntity);
+        delete(jobEntity, false);
 
         deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
         deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
-        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
-
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, jobEntity),
+                    serviceConfiguration.getEngineName());
         }
+    }
+
+    @Override
+    public void delete(SuspendedJobEntity jobEntity, boolean fireDeleteEvent) {
+        if (serviceConfiguration.getInternalJobManager() != null) {
+            serviceConfiguration.getInternalJobManager().handleJobDelete(jobEntity);
+        }
+
+        super.delete(jobEntity, fireDeleteEvent);
     }
 
     protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
@@ -114,12 +127,4 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         return newSuspendedJobEntity;
     }
 
-    @Override
-    protected SuspendedJobDataManager getDataManager() {
-        return jobDataManager;
-    }
-
-    public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-    }
 }

@@ -16,17 +16,19 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.Date;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface MilestoneInstanceEntity extends Entity, MilestoneInstance {
+public interface MilestoneInstanceEntity extends Entity, HasRevision, MilestoneInstance {
 
     void setName(String name);
     void setTimeStamp(Date timeStamp);
     void setCaseInstanceId(String caseInstanceId);
     void setCaseDefinitionId(String caseDefinitionId);
     void setElementId(String elementId);
+    void setTenantId(String tenantId);
     
 }

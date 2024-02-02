@@ -23,10 +23,10 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.activiti.engine.impl.variable.CacheableVariable;
 import org.activiti.engine.impl.variable.JPAEntityListVariableType;
 import org.activiti.engine.impl.variable.JPAEntityVariableType;
 import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.impl.types.CacheableVariable;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -296,6 +296,30 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
     public String getVariableNameLike() {
         return variableNameLike;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Set<String> getTaskIds() {
+        return taskIds;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public Set<String> getExecutionIds() {
+        return executionIds;
+    }
+
+    public boolean isExcludeTaskRelated() {
+        return excludeTaskRelated;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public QueryVariableValue getQueryVariableValue() {

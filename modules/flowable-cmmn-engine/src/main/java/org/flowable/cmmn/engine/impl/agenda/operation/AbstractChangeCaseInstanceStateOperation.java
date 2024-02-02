@@ -12,9 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Objects;
+
+import org.flowable.cmmn.engine.impl.listener.CaseInstanceLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -31,12 +34,46 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
 
     @Override
     public void run() {
+        preRunCheck();
+
         super.run();
-        caseInstanceEntity.setState(getNewState());
+
+        String oldState = caseInstanceEntity.getState();
+        String newState = getNewState();
+        if (!Objects.equals(oldState, newState)) {
+            invokePreLifecycleListeners();
+            CaseInstanceLifeCycleListenerUtil.callLifecycleListeners(commandContext, caseInstanceEntity, caseInstanceEntity.getState(), newState);
+            invokePostLifecycleListeners();
+            caseInstanceEntity.setState(newState);
+
+            internalExecute();
+        }
+    }
+
+    /**
+     * Internal hook to be implemented to invoke any listeners BEFORE the lifecycle listeners are being invoked and before the new state is set
+     * on the case instance.
+     */
+    protected void invokePreLifecycleListeners() {
+
+    }
+
+    /**
+     * Internal hook to be implemented to invoke any listeners AFTER the lifecycle listeners are being invoked and before the new state is set
+     * on the case instance.
+     */
+    protected void invokePostLifecycleListeners() {
+
+    }
+
+    public void preRunCheck() {
+        // Meant to be overridden
     }
     
-    protected abstract String getNewState();
-    
-    protected abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    public abstract String getNewState();
+
+    public abstract void internalExecute();
+
+    public abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
 }

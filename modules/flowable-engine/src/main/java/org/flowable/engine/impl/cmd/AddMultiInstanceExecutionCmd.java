@@ -19,9 +19,9 @@ import java.util.Map;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,7 +36,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
 
     private static final long serialVersionUID = 1L;
     
-    protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
+    protected static final String NUMBER_OF_INSTANCES = "nrOfInstances";
     
     protected String activityId;
     protected String parentExecutionId;
@@ -81,7 +81,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
             miExecution.setScope(false);
             
             childExecution.setCurrentFlowElement(miActivityElement);
-            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, currentNumberOfInstances);
+            CommandContextUtil.getAgenda().planContinueMultiInstanceOperation(childExecution, miExecution, currentNumberOfInstances);
         }
         
         return childExecution;
@@ -94,7 +94,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
         for (ExecutionEntity childExecution : childExecutions) {
             if (activityId.equals(childExecution.getActivityId()) && childExecution.isMultiInstanceRoot()) {
                 if (miExecution != null) {
-                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId);
+                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId + " in " + childExecution);
                 }
                 miExecution = childExecution;
             }
@@ -102,7 +102,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
             ExecutionEntity childMiExecution = searchForMultiInstanceActivity(activityId, childExecution.getId(), executionEntityManager);
             if (childMiExecution != null) {
                 if (miExecution != null) {
-                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId);
+                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId + " in " + childExecution);
                 }
                 miExecution = childMiExecution;
             }

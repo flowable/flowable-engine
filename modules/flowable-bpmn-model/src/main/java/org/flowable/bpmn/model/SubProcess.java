@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,6 +29,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
     protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
     protected List<FlowElement> flowElementList = new ArrayList<>();
+    protected Map<String, Artifact> artifactMap = new LinkedHashMap<>();
     protected List<Artifact> artifactList = new ArrayList<>();
     protected List<ValuedDataObject> dataObjects = new ArrayList<>();
 
@@ -80,6 +83,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
         }
     }
 
+    @Override
     public Map<String, FlowElement> getFlowElementMap() {
         return flowElementMap;
     }
@@ -90,6 +94,20 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
     public boolean containsFlowElementId(String id) {
         return flowElementMap.containsKey(id);
+    }
+
+    public <T extends FlowElement> T findFirstSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        Optional<FlowElement> first = flowElementMap.values().stream()
+            .filter(subFlowElement -> clazz.isInstance(subFlowElement))
+            .findFirst();
+        return (T) first.orElse(null);
+    }
+
+    public <T extends FlowElement> List<T> findAllSubFlowElementInFlowMapOfType(Class<T> clazz) {
+        return flowElementMap.values().stream()
+            .filter(clazz::isInstance)
+            .map(subFlowElement -> (T) subFlowElement)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -108,10 +126,26 @@ public class SubProcess extends Activity implements FlowElementsContainer {
     public Collection<Artifact> getArtifacts() {
         return artifactList;
     }
+    
+    @Override
+    public Map<String, Artifact> getArtifactMap() {
+        return artifactMap;
+    }
 
     @Override
     public void addArtifact(Artifact artifact) {
         artifactList.add(artifact);
+        addArtifactToMap(artifact);
+    }
+    
+    @Override
+    public void addArtifactToMap(Artifact artifact) {
+        if (artifact != null && StringUtils.isNotEmpty(artifact.getId())) {
+            artifactMap.put(artifact.getId(), artifact);
+            if (getParentContainer() != null) {
+                getParentContainer().addArtifactToMap(artifact);
+            }
+        }
     }
 
     @Override
@@ -142,6 +176,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
             for (ValuedDataObject otherObject : otherElement.getDataObjects()) {
                 if (thisObject.getId().equals(otherObject.getId())) {
                     exists = true;
+                    break;
                 }
             }
             if (!exists) {
@@ -165,12 +200,12 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
         flowElementList.clear();
         for (FlowElement flowElement : otherElement.getFlowElements()) {
-            addFlowElement(flowElement);
+            addFlowElement(flowElement.clone());
         }
 
         artifactList.clear();
         for (Artifact artifact : otherElement.getArtifacts()) {
-            addArtifact(artifact);
+            addArtifact(artifact.clone());
         }
     }
 

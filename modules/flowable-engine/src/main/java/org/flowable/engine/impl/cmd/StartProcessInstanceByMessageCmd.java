@@ -15,18 +15,19 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 
 /**
  * @author Joram Barrez
@@ -36,27 +37,44 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
 
     protected String messageName;
     protected String businessKey;
+    protected String businessStatus;
     protected Map<String, Object> processVariables;
     protected Map<String, Object> transientVariables;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
+    protected String ownerId;
+    protected String assigneeId;
 
     public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId) {
+        this(messageName, businessKey, processVariables, tenantId, null, null);
+    }
+
+    public StartProcessInstanceByMessageCmd(String messageName, String businessKey, Map<String, Object> processVariables, String tenantId,
+        String ownerId, String assigneeId) {
         this.messageName = messageName;
         this.businessKey = businessKey;
         this.processVariables = processVariables;
         this.tenantId = tenantId;
+        this.ownerId = ownerId;
+        this.assigneeId = assigneeId;
     }
 
     public StartProcessInstanceByMessageCmd(ProcessInstanceBuilderImpl processInstanceBuilder) {
         this(processInstanceBuilder.getMessageName(),
-             processInstanceBuilder.getBusinessKey(),
-             processInstanceBuilder.getVariables(),
-             processInstanceBuilder.getTenantId());
+                processInstanceBuilder.getBusinessKey(),
+                processInstanceBuilder.getVariables(),
+                processInstanceBuilder.getTenantId(),
+                processInstanceBuilder.getOwnerId(),
+                processInstanceBuilder.getAssigneeId());
         this.transientVariables = processInstanceBuilder.getTransientVariables();
         this.callbackId = processInstanceBuilder.getCallbackId();
         this.callbackType = processInstanceBuilder.getCallbackType();
+        this.referenceId = processInstanceBuilder.getReferenceId();
+        this.referenceType = processInstanceBuilder.getReferenceType();
+        this.businessStatus = processInstanceBuilder.getBusinessStatus();
     }
 
     @Override
@@ -66,7 +84,9 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableIllegalArgumentException("Cannot start process instance by message: message name is null");
         }
 
-        MessageEventSubscriptionEntity messageEventSubscription = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).findMessageStartEventSubscriptionByName(messageName, tenantId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        MessageEventSubscriptionEntity messageEventSubscription = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                .findMessageStartEventSubscriptionByName(messageName, tenantId);
 
         if (messageEventSubscription == null) {
             throw new FlowableObjectNotFoundException("Cannot start process instance by message: no subscription to message with name '" + messageName + "' found.", MessageEventSubscriptionEntity.class);
@@ -77,21 +97,17 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
             throw new FlowableException("Cannot start process instance by message: subscription to message with name '" + messageName + "' is not a message start event.");
         }
 
-        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
+        DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
 
         ProcessDefinition processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("No process definition found for id '" + processDefinitionId + "'", ProcessDefinition.class);
         }
 
-        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition, 
-                                                                                                       messageName, 
-                                                                                                       businessKey, 
-                                                                                                       processVariables, 
-                                                                                                       transientVariables,
-                                                                                                       callbackId,
-                                                                                                       callbackType);
+        ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
+        ProcessInstance processInstance = processInstanceHelper.createAndStartProcessInstanceByMessage(processDefinition,
+                messageName, businessKey, businessStatus, processVariables, transientVariables, callbackId, callbackType, referenceId, referenceType,
+                ownerId, assigneeId);
 
         return processInstance;
     }

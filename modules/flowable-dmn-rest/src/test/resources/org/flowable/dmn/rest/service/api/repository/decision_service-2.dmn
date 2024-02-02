@@ -1,0 +1,245 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_c0e9d8ba-4b7f-11e7-8197-a26608126000" name="Risk Rating Decision Table"
+             namespace="http://www.flowable.org/dmn">
+    <decision id="evaluateMortgageRequest" name="Evaluate Mortgage Request">
+        <informationRequirement id="infoRequirement1_1">
+            <requiredDecision href="#determineRegionValueIncrease" />
+        </informationRequirement>
+        <informationRequirement id="infoRequirement1_2">
+            <requiredDecision href="#determineBuyerRiskCategory" />
+        </informationRequirement>
+        <decisionTable id="evaluateMortgageRequestTable" hitPolicy="FIRST">
+            <input label="House Price">
+                <inputExpression id="inputExpression1_1" typeRef="number">
+                    <text>housePrice</text>
+                </inputExpression>
+            </input>
+            <input label="Region Value Increase Category">
+                <inputExpression id="inputExpression1_4" typeRef="string">
+                    <text>regionValueIncreaseCategory</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"LOW","MEDIUM","HIGH"</text>
+                </inputValues>
+            </input>
+            <input label="BuyerRiskCategory">
+                <inputExpression id="inputExpression1_3" typeRef="string">
+                    <text>buyerRiskCategory</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"LOW","MEDIUM","HIGH"</text>
+                </inputValues>
+            </input>
+            <output id="outputExpression1_2" label="Approval" name="approval" typeRef="string">
+                <outputValues>
+                    <text>"APPROVED","DECLINED"</text>
+                </outputValues>
+            </output>
+            <rule>
+                <inputEntry id="inputEntry1_1_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_4_1">
+                    <text><![CDATA[== "LOW"]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_3_1">
+                    <text><![CDATA[== "HIGH"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2_1">
+                    <text><![CDATA["DECLINED"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry1_1_2">
+                    <text><![CDATA[< 200000]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_4_2">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_3_2">
+                    <text><![CDATA[!= "HIGH"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2_2">
+                    <text><![CDATA["APPROVED"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry1_1_3">
+                    <text><![CDATA[>= 200000]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_4_3">
+                    <text><![CDATA[== "HIGH"]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_3_3">
+                    <text><![CDATA[== "LOW"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2_3">
+                    <text><![CDATA["APPROVED"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry1_1_4">
+                    <text><![CDATA[>= 200000]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_4_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry1_3_4">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2_4">
+                    <text><![CDATA["DECLINED"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="determineRegionValueIncrease" name="Determine Region Value Increase">
+        <decisionTable id="determineRegionValueIncreaseTable" hitPolicy="FIRST">
+            <input label="Region">
+                <inputExpression id="inputExpression2_1" typeRef="string">
+                    <text>region</text>
+                </inputExpression>
+                <inputValues>
+                    <text>"CITY_CENTRE","COUNTRY_SIDE","COMMERCIAL_AREA"</text>
+                </inputValues>
+            </input>
+            <output id="outputExpression2_2" label="Region Value Increase" name="regionValueIncreaseCategory" typeRef="string">
+                <outputValues>
+                    <text>"LOW","MEDIUM","HIGH"</text>
+                </outputValues>
+            </output>
+            <rule>
+                <inputEntry id="inputEntry2_1_1">
+                    <text><![CDATA[== "CITY_CENTRE"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_1">
+                    <text><![CDATA["HIGH"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_1_2">
+                    <text><![CDATA[== "COMMERCIAL_AREA"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_2">
+                    <text><![CDATA["MEDIUM"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_1_3">
+                    <text><![CDATA[== "COUNTRY_SIDE"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2_3">
+                    <text><![CDATA["LOW"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="determineBuyerRiskCategory" name="Determine Buyer Risk Category">
+        <informationRequirement id="infoRequirement2_1">
+            <requiredDecision href="#determineMedicalHistory" />
+        </informationRequirement>
+        <decisionTable id="determineBuyerRiskCategoryTable" hitPolicy="UNIQUE">
+            <input label="Age">
+                <inputExpression id="inputExpression3_1" typeRef="number">
+                    <text>age</text>
+                </inputExpression>
+            </input>
+            <input label="Medical History">
+                <inputExpression id="inputExpression3_3" typeRef="boolean">
+                    <text>medicalHistory</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression3_2" label="Buyer Risk Category" name="buyerRiskCategory" typeRef="string">
+                <outputValues>
+                    <text>"LOW","MEDIUM","HIGH"</text>
+                </outputValues>
+            </output>
+            <rule>
+                <inputEntry id="inputEntry3_1_1">
+                    <text><![CDATA[< 65]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry3_3_1">
+                    <text><![CDATA[== false]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_2_1">
+                    <text><![CDATA["LOW"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry3_1_2">
+                    <text><![CDATA[< 65]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry3_3_2">
+                    <text><![CDATA[== true]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_2_2">
+                    <text><![CDATA["MEDIUM"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry3_1_3">
+                    <text><![CDATA[>= 65]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry3_3_3">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_2_3">
+                    <text><![CDATA["HIGH"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="determineMedicalHistory" name="Determine Medical History">
+        <decisionTable id="determineMedicalHistoryTable" hitPolicy="FIRST">
+            <input label="Doctor Visit">
+                <inputExpression id="inputExpression4_1" typeRef="boolean">
+                    <text>doctorVisit</text>
+                </inputExpression>
+            </input>
+            <input label="Hospital Visit">
+                <inputExpression id="inputExpression4_3" typeRef="boolean">
+                    <text>hospitalVisit</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression4_2" label="Medical History" name="medicalHistory" typeRef="boolean"></output>
+            <rule>
+                <inputEntry id="inputEntry4_1_1">
+                    <text><![CDATA[== true]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4_3_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_2_1">
+                    <text><![CDATA[true]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry4_1_2">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4_3_2">
+                    <text><![CDATA[== true]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_2_2">
+                    <text><![CDATA[true]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry4_1_3">
+                    <text><![CDATA[== false]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4_3_3">
+                    <text><![CDATA[== false]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_2_3">
+                    <text><![CDATA[false]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="evaluateMortgageRequestService" name="Evaluate Mortgage Request Service">
+        <outputDecision href="#evaluateMortgageRequest"/>
+        <encapsulatedDecision href="#determineRegionValueIncrease"/>
+        <encapsulatedDecision href="#determineBuyerRiskCategory"/>
+        <encapsulatedDecision href="#determineMedicalHistory"/>
+    </decisionService>
+</definitions>

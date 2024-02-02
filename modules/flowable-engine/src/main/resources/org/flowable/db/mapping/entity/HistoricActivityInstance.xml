@@ -35,13 +35,13 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{processDefinitionId, jdbcType=VARCHAR},
+        1, #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
         #{activityId ,jdbcType=VARCHAR},
@@ -52,6 +52,7 @@
         #{assignee ,jdbcType=VARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
+        #{transactionOrder ,jdbcType=INTEGER},
         #{durationInMillis ,jdbcType=BIGINT},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR}
@@ -73,14 +74,14 @@
         ASSIGNEE_,
         START_TIME_,
         END_TIME_,
+        TRANSACTION_ORDER_,
         DURATION_,
         DELETE_REASON_,
         TENANT_ID_
       ) values 
       <foreach collection="list" item="historicActivityInstance" index="index" separator=",">
          (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-          1,
-          #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+          1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
           #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
           #{historicActivityInstance.executionId, jdbcType=VARCHAR},
           #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
@@ -91,8 +92,9 @@
           #{historicActivityInstance.assignee ,jdbcType=VARCHAR},
           #{historicActivityInstance.startTime, jdbcType=TIMESTAMP},
           #{historicActivityInstance.endTime, jdbcType=TIMESTAMP},
-          #{historicActivityInstance.durationInMillis ,jdbcType=BIGINT},
-          #{historicActivityInstance.deleteReason ,jdbcType=VARCHAR},
+          #{historicActivityInstance.transactionOrder, jdbcType=INTEGER},
+          #{historicActivityInstance.durationInMillis, jdbcType=BIGINT},
+          #{historicActivityInstance.deleteReason, jdbcType=VARCHAR},
           #{historicActivityInstance.tenantId, jdbcType=VARCHAR})
       </foreach>
   </insert>
@@ -114,13 +116,13 @@
           ASSIGNEE_,
           START_TIME_,
           END_TIME_,
+          TRANSACTION_ORDER_,
           DURATION_,
           DELETE_REASON_,
           TENANT_ID_
         ) VALUES 
            (#{historicActivityInstance.id ,jdbcType=VARCHAR},
-            1,
-            #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+            1, #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
             #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
             #{historicActivityInstance.executionId, jdbcType=VARCHAR},
             #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
@@ -131,6 +133,7 @@
             #{historicActivityInstance.assignee ,jdbcType=VARCHAR},
             #{historicActivityInstance.startTime, jdbcType=TIMESTAMP},
             #{historicActivityInstance.endTime, jdbcType=TIMESTAMP},
+            #{historicActivityInstance.transactionOrder, jdbcType=INTEGER},
             #{historicActivityInstance.durationInMillis ,jdbcType=BIGINT},
             #{historicActivityInstance.deleteReason ,jdbcType=VARCHAR},
             #{historicActivityInstance.tenantId, jdbcType=VARCHAR})
@@ -144,6 +147,9 @@
     update ${prefix}ACT_HI_ACTINST
     <set>
         REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
         <if test="originalPersistentState.executionId != executionId">
             EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
         </if>
@@ -156,6 +162,9 @@
         <if test="originalPersistentState.endTime != endTime">
             END_TIME_ = #{endTime, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.transactionOrder != transactionOrder">
+        	TRANSACTION_ORDER_ = #{transactionOrder, jdbcType=INTEGER}, 
+        </if>
         <if test="originalPersistentState.durationInMillis != durationInMillis">
             DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
         </if>
@@ -163,7 +172,13 @@
             DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
-            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR}
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.activityId != activityId">
+            ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.activityName != activityName">
+            ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
         </if>
     </set>
     where ID_ = #{id}
@@ -174,6 +189,17 @@
   
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
+  </delete>
+
+  <delete id="deleteHistoricActivityInstance">
+    delete from ${prefix}ACT_HI_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstance" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_HI_ACTINST where
+        <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+            ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+        </foreach>
   </delete>
   
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->
@@ -192,6 +218,7 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -199,93 +226,168 @@
 
   <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
   
-  <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
+  <select id="selectHistoricActivityInstanceByActivityIdAndProcessInstanceId" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST where ACT_ID_ = #{activityId} and PROC_INST_ID_ = #{processInstanceId}
   </select>
 
+  <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
+    select * from ${prefix}ACT_HI_ACTINST where ID_ =#{id}
+  </select>
+
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
-    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value="RES"/>
+        <property name="queryTablePrefix" value="RES."/>
+    </include>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
     select count(RES.ID_)
-    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value="RES"/>
+        <property name="queryTablePrefix" value="RES."/>
+    </include>
   </select>
   
+  <delete id="bulkDeleteHistoricActivityInstances">
+    delete 
+    <include refid="selectHistoricActivityInstancesByQueryCriteriaSql">
+        <property name="queryTablePrefixSelect" value=""/>
+        <property name="queryTablePrefix" value=""/>
+    </include>
+  </delete>
+  
+  <delete id="bulkDeleteHistoricActivityInstancesForProcessInstanceIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_ACTINST where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PROC_INST_ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> ACTINST </if> from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and ACTINST.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+      delete from ${prefix}ACT_HI_ACTINST ACTINST where ACTINST.PROC_INST_ID_ is not null and
+      NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where ACTINST.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
+  <delete id="bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+  
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_ACTINST RES
+    from ${prefix}ACT_HI_ACTINST ${queryTablePrefixSelect}
     <where>
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="activityInstanceId != null">
-        and RES.ID_ = #{activityInstanceId}
+        and ${queryTablePrefix}ID_ = #{activityInstanceId}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+        and ${queryTablePrefix}EXECUTION_ID_ = #{executionId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and ${queryTablePrefix}PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+        and ${queryTablePrefix}ACT_ID_ = #{activityId}
       </if>
       <if test="activityName != null">
-        and RES.ACT_NAME_ = #{activityName}
+        and ${queryTablePrefix}ACT_NAME_ = #{activityName}
       </if>
       <if test="activityType != null">
-        and RES.ACT_TYPE_ = #{activityType}
+        and ${queryTablePrefix}ACT_TYPE_ = #{activityType}
+      </if>
+      <if test="activityTypes != null and !activityTypes.empty">
+        and ${queryTablePrefix}ACT_TYPE_ in
+         <foreach item="item" index="index" collection="activityTypes" open="(" separator="," close=")">
+              #{item}
+         </foreach>
+      </if>
+      <if test="startedBefore != null">
+          and ${queryTablePrefix}START_TIME_ &lt;= #{startedBefore}
+      </if>
+      <if test="startedAfter != null">
+          and ${queryTablePrefix}START_TIME_ &gt;= #{startedAfter}
+      </if>
+      <if test="finishedBefore != null">
+          and ${queryTablePrefix}END_TIME_ &lt;= #{finishedBefore}
+      </if>
+      <if test="finishedAfter != null">
+        and ${queryTablePrefix}END_TIME_ &gt;= #{finishedAfter}
       </if>
       <if test="assignee != null">
-        and RES.ASSIGNEE_ = #{assignee}
+        and ${queryTablePrefix}ASSIGNEE_ = #{assignee}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIds != null &amp;&amp; !tenantIds.empty">
+        and ${queryTablePrefix}TENANT_ID_ in
+        <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
+            #{tenantId}
+         </foreach>
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
-        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+        and (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
       </if>
       <if test="unfinished">
-        and RES.END_TIME_ is null
+        and ${queryTablePrefix}END_TIME_ is null
       </if>
       <if test="finished">
-       and RES.END_TIME_ is not null
+       and ${queryTablePrefix}END_TIME_ is not null
       </if>
       <if test="deleteReason != null">
-        and RES.DELETE_REASON_ = #{deleteReason}
+        and ${queryTablePrefix}DELETE_REASON_ = #{deleteReason}
       </if>
       <if test="deleteReasonLike != null">
-        and RES.DELETE_REASON_ like #{deleteReasonLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}DELETE_REASON_ like #{deleteReasonLike}${wildcardEscapeClause}
       </if>
     </where>
   </sql>
   
   <select id="selectHistoricActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicActivityInstanceResultMap">
-  	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+  	<include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
   
   <select id="selectHistoricActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>
   
-  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+  <select id="selectUnfinishedHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>
   
-  <select id="selectHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+  <select id="selectHistoricActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
   </select>
   
-   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
+   <select id="selectUnfinishedHistoricActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicActivityInstanceResultMap">
     select * from ${prefix}ACT_HI_ACTINST RES
     where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
   </select>

@@ -13,20 +13,20 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Map;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.rest.api.DataResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -42,8 +42,8 @@ public class HistoricTaskInstanceQueryResource extends HistoricTaskInstanceBaseR
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     // FIXME Naming issue ?
     @PostMapping(value = "/query/historic-task-instances", produces = "application/json")
-    public DataResponse<HistoricTaskInstanceResponse> queryProcessInstances(@RequestBody HistoricTaskInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> queryProcessInstances(@RequestBody HistoricTaskInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/query/historic-task-instances", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

@@ -12,28 +12,28 @@
  */
 package org.activiti.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.activiti.engine.impl.variable.BooleanType;
-import org.activiti.engine.impl.variable.DateType;
-import org.activiti.engine.impl.variable.DoubleType;
-import org.activiti.engine.impl.variable.IntegerType;
-import org.activiti.engine.impl.variable.LongStringType;
-import org.activiti.engine.impl.variable.LongType;
-import org.activiti.engine.impl.variable.SerializableType;
-import org.activiti.engine.impl.variable.ShortType;
-import org.activiti.engine.impl.variable.StringType;
-import org.activiti.engine.impl.variable.UUIDType;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.DateType;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez

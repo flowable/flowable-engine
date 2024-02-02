@@ -12,13 +12,13 @@
  */
 package org.flowable.job.service.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
-import org.flowable.engine.common.impl.event.FlowableEntityEventImpl;
-import org.flowable.engine.common.impl.event.FlowableEntityExceptionEventImpl;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.event.FlowableEntityExceptionEventImpl;
 import org.flowable.job.api.Job;
 
 /**
@@ -61,13 +61,21 @@ public class FlowableJobEventBuilder {
         return newEvent;
     }
     
-    protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
+    protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {
-                event.setExecutionId(((Job) persistedObject).getExecutionId());
-                event.setProcessInstanceId(((Job) persistedObject).getProcessInstanceId());
-                event.setProcessDefinitionId(((Job) persistedObject).getProcessDefinitionId());   
+                Job jobObject = (Job) persistedObject;
+                if (jobObject.getScopeType() == null) {
+                    event.setExecutionId(jobObject.getExecutionId());
+                    event.setProcessInstanceId(jobObject.getProcessInstanceId());
+                    event.setProcessDefinitionId(jobObject.getProcessDefinitionId());
+                } else {
+                    event.setScopeType(jobObject.getScopeType());
+                    event.setScopeId(jobObject.getScopeId());
+                    event.setSubScopeId(jobObject.getSubScopeId());
+                    event.setScopeDefinitionId(jobObject.getScopeDefinitionId());
+                }
             }
         }
     }

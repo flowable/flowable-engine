@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="task1" />
+            <planItem id="planItem2" name="Task Two" definitionRef="task2">
+                <entryCriterion sentryRef="sentry1" />
+                <entryCriterion sentryRef="sentry2" />
+            </planItem>
+            <planItem id="planItem3" definitionRef="eventListener" />
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry2">
+                <planItemOnPart sourceRef="planItem3">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="task1" name="Task 1" flowable:assignee="kermit" />
+            <userEventListener id="eventListener"></userEventListener>
+            <humanTask id="task2" name="Task 2" flowable:candidateGroups="test" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

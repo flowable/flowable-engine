@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:flowable="http://flowbable.org/bpmn" targetNamespace="Examples">
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
 
-  <process id="startNestedSubProcess">
+    <process id="startNestedSubProcess">
 
-    <startEvent id="theStart" />
+        <startEvent id="theStart"/>
 
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore" />
-    
-    <userTask id="taskBefore" name="Task before sub process" />
-    
-    <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore"/>
 
-    <subProcess id="subProcess">
+        <userTask id="taskBefore" name="Task before sub process"/>
 
-      <startEvent id="theSubProcessStart" />
+        <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="subProcess"/>
 
-      <sequenceFlow id="subflow1" sourceRef="theSubProcessStart" targetRef="subtask" />
+        <subProcess id="subProcess">
 
-      <userTask id="subtask" name="Task in subprocess" />
+            <startEvent id="theSubProcessStart"/>
 
-      <sequenceFlow id="subflow2" sourceRef="subtask" targetRef="nestedSubProcess" />
-      
-      <subProcess id="nestedSubProcess">
+            <sequenceFlow id="subflow1" sourceRef="theSubProcessStart" targetRef="subTask"/>
 
-        <startEvent id="theNestedSubProcessStart" />
+            <userTask id="subTask" name="Task in subprocess"/>
 
-        <sequenceFlow id="nestedSubflow1" sourceRef="theNestedSubProcessStart" targetRef="nestedSubtask" />
+            <sequenceFlow id="subflow2" sourceRef="subTask" targetRef="nestedSubProcess"/>
 
-        <userTask id="nestedSubtask" name="Task in nested subprocess" />
+            <subProcess id="nestedSubProcess">
 
-        <sequenceFlow id="nestedSubflow2" sourceRef="nestedSubtask" targetRef="theNestedSubProcessEnd" />
+                <startEvent id="theNestedSubProcessStart"/>
 
-        <endEvent id="theNestedSubProcessEnd" />
+                <sequenceFlow id="nestedSubflow1" sourceRef="theNestedSubProcessStart" targetRef="nestedSubTask"/>
 
-      </subProcess>
-      
-      <sequenceFlow id="subflow3" sourceRef="nestedSubProcess" targetRef="subtaskAfter" />
-      
-      <userTask id="subtaskAfter" name="Task in subprocess" />
+                <userTask id="nestedSubTask" name="Task in nested subprocess"/>
 
-      <sequenceFlow id="subflow4" sourceRef="subtaskAfter" targetRef="theSubProcessEnd" />
+                <sequenceFlow id="nestedSubflow2" sourceRef="nestedSubTask" targetRef="theNestedSubProcessEnd"/>
 
-      <endEvent id="theSubProcessEnd" />
+                <endEvent id="theNestedSubProcessEnd"/>
 
-    </subProcess>
+            </subProcess>
 
-    <sequenceFlow id="flow3" sourceRef="subProcess" targetRef="taskAfter" />
-    
-    <userTask id="taskAfter" name="Task after sub process" />
-    
-    <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd" />
+            <sequenceFlow id="subflow3" sourceRef="nestedSubProcess" targetRef="subTaskAfter"/>
 
-    <endEvent id="theEnd" />
+            <userTask id="subTaskAfter" name="Task in subprocess"/>
 
-  </process>
+            <sequenceFlow id="subflow4" sourceRef="subTaskAfter" targetRef="theSubProcessEnd"/>
+
+            <endEvent id="theSubProcessEnd"/>
+
+        </subProcess>
+
+        <sequenceFlow id="flow3" sourceRef="subProcess" targetRef="taskAfter"/>
+
+        <userTask id="taskAfter" name="Task after sub process"/>
+
+        <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
 
 </definitions>

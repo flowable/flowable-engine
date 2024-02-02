@@ -14,10 +14,10 @@ package org.flowable.cdi;
 
 import java.util.Map;
 
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.flowable.cdi.annotation.ProcessVariable;
 import org.flowable.cdi.impl.ProcessVariableMap;

@@ -15,21 +15,21 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Collections;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,7 +38,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 /**
  * @author Frederik Heremans
  */
-public class TaskVariableBaseResource extends TaskBaseResource {
+public class TaskVariableBaseResource extends TaskBaseResource implements InitializingBean {
 
     @Autowired
     protected Environment env;
@@ -48,13 +48,23 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
     protected boolean isSerializableVariableAllowed;
 
-    @PostConstruct
-    protected void postConstruct() {
+    @Override
+    public void afterPropertiesSet() {
         isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskVariable(task, variableName);
+        }
+        return getVariableFromRequestWithoutAccessCheck(task, variableName, scope, includeBinary);
+    }
+
+    public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, String scope, boolean includeBinary) {
+
+        String taskId = task.getId();
         boolean variableFound = false;
         Object value = null;
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
@@ -66,9 +76,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 variableScope = RestVariableScope.LOCAL;
                 variableFound = true;
             } else {
-                // Revert to execution-variable when not present local on the
-                // task
-                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+                // Revert to execution-variable when not present local on the task
                 if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                     value = runtimeService.getVariable(task.getExecutionId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
@@ -77,7 +85,6 @@ public class TaskVariableBaseResource extends TaskBaseResource {
             }
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
                 value = runtimeService.getVariable(task.getExecutionId(), variableName);
                 variableFound = true;
@@ -91,7 +98,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         }
 
         if (!variableFound) {
-            throw new FlowableObjectNotFoundException("Task '" + taskId + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Task '" + taskId + "' does not have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
             return restResponseFactory.createRestVariable(variableName, value, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
         }
@@ -136,13 +143,13 @@ public class TaskVariableBaseResource extends TaskBaseResource {
 
             if (paramMap.get(parameterName).length > 0) {
 
-                if (parameterName.equalsIgnoreCase("scope")) {
+                if ("scope".equalsIgnoreCase(parameterName)) {
                     variableScope = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("name")) {
+                } else if ("name".equalsIgnoreCase(parameterName)) {
                     variableName = paramMap.get(parameterName)[0];
 
-                } else if (parameterName.equalsIgnoreCase("type")) {
+                } else if ("type".equalsIgnoreCase(parameterName)) {
                     variableType = paramMap.get(parameterName)[0];
                 }
             }
@@ -183,12 +190,12 @@ public class TaskVariableBaseResource extends TaskBaseResource {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            return restResponseFactory.createBinaryRestVariable(variableName, scope, variableType, task.getId(), null, null);
+            return getVariableFromRequestWithoutAccessCheck(task, variableName, scope.name(), false);
 
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Error getting binary variable", ioe);
         } catch (ClassNotFoundException ioe) {
-            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class is nog found: " + ioe.getMessage());
+            throw new FlowableContentNotSupportedException("The provided body contains a serialized object for which the class was not found: " + ioe.getMessage());
         }
 
     }
@@ -207,7 +214,7 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
         setVariable(task, restVariable.getName(), actualVariableValue, scope, isNew);
 
-        return restResponseFactory.createRestVariable(restVariable.getName(), actualVariableValue, scope, task.getId(), RestResponseFactory.VARIABLE_TASK, false);
+        return getVariableFromRequestWithoutAccessCheck(task, restVariable.getName(), scope.name(), false);
     }
 
     protected void setVariable(Task task, String name, Object value, RestVariableScope scope, boolean isNew) {
@@ -219,7 +226,15 @@ public class TaskVariableBaseResource extends TaskBaseResource {
         }
 
         if (!isNew && !hasVariable) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable with name: '" + name + "'.", null);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a variable with name: '" + name + "'.", null);
+        }
+
+        if (restApiInterceptor != null) {
+            if (isNew) {
+                restApiInterceptor.createTaskVariables(task, Collections.singletonMap(name, value), scope);
+            } else {
+                restApiInterceptor.updateTaskVariables(task, Collections.singletonMap(name, value), scope);
+            }
         }
 
         if (scope == RestVariableScope.LOCAL) {

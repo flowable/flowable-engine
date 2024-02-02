@@ -1,0 +1,17 @@
+{
+    "key": "blockingDeadLetterChannel",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "blocking-retry-dlt-test"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "retry": {
+        "attempts": "3",
+        "dltTopicSuffix": "-dlt"
+    }
+}

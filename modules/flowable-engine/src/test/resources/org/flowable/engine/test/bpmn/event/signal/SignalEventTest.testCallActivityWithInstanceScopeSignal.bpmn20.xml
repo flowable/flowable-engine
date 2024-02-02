@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn" targetNamespace="Examples">
+
+  <signal id="theSignal" name="The Signal" flowable:scope="processInstance" />
+
+  <process id="throwingProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeThrowTask" />
+    
+    <userTask id="beforeThrowTask" />
+    
+    <sequenceFlow id="flow2" sourceRef="beforeThrowTask" targetRef="signalThrow" />
+
+    <intermediateThrowEvent id="signalThrow" >
+        <signalEventDefinition signalRef="theSignal" />
+    </intermediateThrowEvent>
+    <sequenceFlow id="flow3" sourceRef="signalThrow" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+  </process>
+  
+  <process id="processWithSignalCatch">
+  
+    <startEvent id="theStart2" />
+    <sequenceFlow id="flow4" sourceRef="theStart2" targetRef="fork" />
+    
+    <parallelGateway id="fork" />
+    
+    <sequenceFlow id="flow5" sourceRef="fork" targetRef="callActivity" />
+    
+    <callActivity id="callActivity" calledElement="throwingProcess" />
+    
+    <sequenceFlow id="flow6" sourceRef="fork" targetRef="userTaskWithSignalCatch" />
+
+    <userTask id="userTaskWithSignalCatch" name="userTaskWithSignalCatch"/>
+    <boundaryEvent id="signalCatch" attachedToRef="userTaskWithSignalCatch" cancelActivity="true">
+      <signalEventDefinition signalRef="theSignal" />
+    </boundaryEvent>
+    <sequenceFlow id="flow7" sourceRef="userTaskWithSignalCatch" targetRef="gateway" />
+    <sequenceFlow id="flow8" sourceRef="signalCatch" targetRef="userTaskAfterSignalCatch" />
+    
+    <userTask id="userTaskAfterSignalCatch" name="userTaskAfterSignalCatch" />
+    
+    <sequenceFlow id="flow9" sourceRef="userTaskAfterSignalCatch" targetRef="gateway" />
+    
+    <exclusiveGateway id="gateway" />
+    
+    <sequenceFlow id="flow10" sourceRef="gateway" targetRef="join" />
+    <sequenceFlow id="flow11" sourceRef="callActivity" targetRef="join" />
+    
+    <parallelGateway id="join" />
+    
+    <sequenceFlow id="flow12" sourceRef="join" targetRef="theEnd2" />
+    
+    <endEvent id="theEnd2" />
+  
+  </process>
+  
+
+</definitions>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="org.flowable.engine.impl.webservice"
+  xmlns:tns="org.flowable.engine.impl.webservice"
+  xmlns:webservice="http://webservice.flowable.org/">
+
+  <import importType="http://schemas.xmlsoap.org/wsdl/"
+          location="http://localhost:63081/webservicemock?wsdl"
+          namespace="http://webservice.flowable.org/" />
+
+   <process id="jsonBeanVariableInvocationByAttribute">
+
+      <startEvent id="theStart">
+         <extensionElements>
+            <activiti:formProperty id="bean" name="Values to add" type="json" required="true" />
+         </extensionElements>
+      </startEvent>
+
+      <sequenceFlow id="flow1" sourceRef="theStart" targetRef="webService" />
+
+      <serviceTask id="webService" name="Web service invocation" implementation="##WebService"
+         operationRef="tns:additionOperation">
+         <ioSpecification>
+            <dataInput itemSubjectRef="tns:additionRequestItem" id="dataInputOfAdditionRequest" />
+            <inputSet>
+               <dataInputRefs>dataInputOfAdditionRequest</dataInputRefs>
+            </inputSet>
+            <outputSet />
+         </ioSpecification>
+         <dataInputAssociation>
+            <targetRef>dataInputOfAdditionRequest</targetRef>
+            <assignment>
+               <from>${bean.value1}</from>
+               <to>${dataInputOfAdditionRequest.value1}</to>
+            </assignment>
+            <assignment>
+               <from>${bean.value2}</from>
+               <to>${dataInputOfAdditionRequest.value2}</to>
+            </assignment>
+         </dataInputAssociation>
+      </serviceTask>
+
+      <sequenceFlow id="flow2" sourceRef="webService" targetRef="theEnd" />
+
+      <endEvent id="theEnd" />
+
+   </process>
+
+   <itemDefinition id="additionRequestItem" structureRef="webservice:addition" />
+   <itemDefinition id="additionResponseItem" structureRef="webservice:additionResponse" />
+
+   <message id="additionRequestMessage" itemRef="tns:additionRequestItem" name="additionRequestMessage" />
+   <message id="additionResponseMessage" itemRef="tns:additionResponseItem" name="additionResponseMessage" />
+
+   <interface name="Webservice Interface">
+      <operation id="additionOperation" name="Addition Operation with two values" implementationRef="webservice:addition">
+         <inMessageRef>tns:additionRequestMessage</inMessageRef>
+         <outMessageRef>tns:additionResponseMessage</outMessageRef>
+      </operation>
+   </interface>
+
+</definitions>

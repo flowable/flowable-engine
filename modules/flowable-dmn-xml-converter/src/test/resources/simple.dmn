@@ -6,18 +6,28 @@
                 <inputExpression id="inputExpression1" typeRef="string">
                     <text>inputVariable1</text>
                 </inputExpression>
+                <inputValues>
+                    <text>"val1","val2"</text>
+                </inputValues>
             </input>
             <input id="input1" label="Input 2">
-                <inputExpression id="inputExpression1" typeRef="double">
+                <inputExpression id="inputExpression1" typeRef="number">
                     <text>inputVariable2</text>
                 </inputExpression>
+                <inputValues>
+                    <text>10,20</text>
+                </inputValues>
             </input>
             <input id="input1" label="Input 3">
                 <inputExpression id="inputExpression1" typeRef="date">
                     <text>inputVariable3</text>
                 </inputExpression>
             </input>
-            <output id="output1" label="Output 1" name="outputVariable1" typeRef="string" />
+            <output id="output1" label="Output 1" name="outputVariable1" typeRef="string">
+                <outputValues>
+                    <text>"val1","val2"</text>
+                </outputValues>
+            </output>
             <rule id="rule1">
                 <inputEntry id="inputEntry1">
                     <text><![CDATA[>10]]></text>

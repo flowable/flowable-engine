@@ -13,10 +13,11 @@
 
 package org.flowable.engine.repository;
 
+import java.util.Collection;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessDefinition}s.
@@ -58,6 +59,12 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
     ProcessDefinitionQuery processDefinitionNameLike(String processDefinitionNameLike);
 
     /**
+     * Only select process definitions where the name matches the given parameter, ignoring upper/lower case.
+     * The syntax that should be used is the same as in SQL, eg. %test%
+     */
+    ProcessDefinitionQuery processDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase);
+
+    /**
      * Only select process definitions that are deployed in a deployment with the given deployment id
      */
     ProcessDefinitionQuery deploymentId(String deploymentId);
@@ -66,6 +73,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Select process definitions that are deployed in deployments with the given set of ids
      */
     ProcessDefinitionQuery deploymentIds(Set<String> deploymentIds);
+
+    /**
+     * Only select process definitions that are deployed in a deployment with the given parent deployment id
+     */
+    ProcessDefinitionQuery parentDeploymentId(String deploymentId);
 
     /**
      * Only select process definition with the given key.
@@ -108,7 +120,7 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Can also be used without any other criteria (ie. query.latest().list()), which will then give all the latest versions of all the deployed process definitions.
      * 
      * @throws FlowableIllegalArgumentException
-     *             if used in combination with {@link #groupId(string)}, {@link #processDefinitionVersion(int)} or {@link #deploymentId(String)}
+     *             if used in combination with {@link #processDefinitionVersion(Integer)} or {@link #deploymentId(String)}
      */
     ProcessDefinitionQuery latestVersion();
 
@@ -122,6 +134,11 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Only selects process definitions which given userId is authorized to start
      */
     ProcessDefinitionQuery startableByUser(String userId);
+
+    /**
+     * Only selects process definition which the given userId or groups are authorized to start.
+     */
+    ProcessDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups);
 
     /**
      * Only selects process definitions which are suspended
@@ -159,6 +176,16 @@ public interface ProcessDefinitionQuery extends Query<ProcessDefinitionQuery, Pr
      * Selects the single process definition which has a start message event with the messageName.
      */
     ProcessDefinitionQuery messageEventSubscriptionName(String messageName);
+
+    /**
+     * Localize process definition name and description to specified locale.
+     */
+    ProcessDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    ProcessDefinitionQuery withLocalizationFallback();
 
     // ordering ////////////////////////////////////////////////////////////
 

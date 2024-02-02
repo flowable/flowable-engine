@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.converter.util;
 
+import java.text.StringCharacterIterator;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -43,8 +45,90 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         graphicInfo.setXmlRowNumber(location.getLineNumber());
         graphicInfo.setXmlColumnNumber(location.getColumnNumber());
     }
+    
+    public static ExtensionElement parseExtensionElement(XMLStreamReader xtr) throws Exception {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setName(xtr.getLocalName());
+        addXMLLocation(extensionElement, xtr);
+        if (StringUtils.isNotEmpty(xtr.getNamespaceURI())) {
+            extensionElement.setNamespace(xtr.getNamespaceURI());
+        }
+        if (StringUtils.isNotEmpty(xtr.getPrefix())) {
+            extensionElement.setNamespacePrefix(xtr.getPrefix());
+        }
 
-    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
+        for (int i = 0; i < xtr.getAttributeCount(); i++) {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+            extensionAttribute.setName(xtr.getAttributeLocalName(i));
+            extensionAttribute.setValue(xtr.getAttributeValue(i));
+            if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+            }
+            if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+            }
+            extensionElement.addAttribute(extensionAttribute);
+        }
+
+        boolean readyWithExtensionElement = false;
+        while (!readyWithExtensionElement && xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
+                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                    extensionElement.setElementText(xtr.getText().trim());
+                }
+            } else if (xtr.isStartElement()) {
+                ExtensionElement childExtensionElement = parseExtensionElement(xtr);
+                extensionElement.addChildElement(childExtensionElement);
+            } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
+                readyWithExtensionElement = true;
+            }
+        }
+        return extensionElement;
+    }
+    
+    public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
+        String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
+
+        return attributeValue;
+    }
+    
+    public static List<String> parseDelimitedList(String s) {
+        List<String> result = new ArrayList<>();
+        if (StringUtils.isNotEmpty(s)) {
+
+            StringCharacterIterator iterator = new StringCharacterIterator(s);
+            char c = iterator.first();
+
+            StringBuilder strb = new StringBuilder();
+            boolean insideExpression = false;
+
+            while (c != StringCharacterIterator.DONE) {
+                if (c == '{' || c == '$') {
+                    insideExpression = true;
+                } else if (c == '}') {
+                    insideExpression = false;
+                } else if (c == ',' && !insideExpression) {
+                    result.add(strb.toString().trim());
+                    strb.delete(0, strb.length());
+                }
+
+                if (c != ',' || insideExpression) {
+                    strb.append(c);
+                }
+
+                c = iterator.next();
+            }
+
+            if (strb.length() > 0) {
+                result.add(strb.toString().trim());
+            }
+
+        }
+        return result;
+    }
+
+    public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws XMLStreamException {
         if (StringUtils.isNotEmpty(value) && !"null".equalsIgnoreCase(value)) {
             xtw.writeAttribute(attributeName, value);
         }
@@ -63,7 +147,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     public static boolean writeExtensionElements(BaseElement baseElement, boolean didWriteExtensionStartElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (!baseElement.getExtensionElements().isEmpty()) {
             if (!didWriteExtensionStartElement) {
-                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
                 didWriteExtensionStartElement = true;
             }
 
@@ -142,7 +226,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     }
 
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
-        writeCustomAttributes(attributes, xtw, new LinkedHashMap<String, String>(), blackLists);
+        writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
 
     /**
@@ -161,9 +245,9 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                 for (ExtensionAttribute attribute : attributeList) {
                     if (!isBlacklisted(attribute, blackLists)) {
                         if (attribute.getNamespacePrefix() == null) {
-                            if (attribute.getNamespace() == null)
+                            if (attribute.getNamespace() == null) {
                                 xtw.writeAttribute(attribute.getName(), attribute.getValue());
-                            else {
+                            } else {
                                 xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
                             }
                         } else {
@@ -177,6 +261,20 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
                 }
             }
         }
+    }
+    
+    public static String convertToDelimitedString(List<String> stringList) {
+        StringBuilder resultString = new StringBuilder();
+
+        if (stringList != null) {
+            for (String result : stringList) {
+                if (resultString.length() > 0) {
+                    resultString.append(",");
+                }
+                resultString.append(result);
+            }
+        }
+        return resultString.toString();
     }
 
     public static boolean isBlacklisted(ExtensionAttribute attribute, List<ExtensionAttribute>... blackLists) {

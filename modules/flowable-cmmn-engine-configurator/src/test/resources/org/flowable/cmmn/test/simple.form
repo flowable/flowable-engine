@@ -1,0 +1,13 @@
+{
+    "key": "form1",
+    "name": "My first form",
+    "fields": [
+        {
+            "id": "doNotThrowException",
+            "name": "Input1",
+            "type": "text",
+            "required": false,
+            "placeholder": "empty"
+        }
+    ]
+}

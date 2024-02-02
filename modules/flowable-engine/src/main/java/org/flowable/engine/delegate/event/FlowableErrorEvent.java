@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * An {@link FlowableEvent} related to an error being sent to an activity.
@@ -24,8 +24,8 @@ public interface FlowableErrorEvent extends FlowableActivityEvent {
     /**
      * @return the error-code of the error. Returns null, if no specific error-code has been specified when the error was thrown.
      */
-    public String getErrorCode();
+    String getErrorCode();
 
-    public String getErrorId();
+    String getErrorId();
 
 }

@@ -14,9 +14,9 @@ package org.activiti.engine.impl.bpmn.helper;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 /**
  * An {@link FlowableEventListener} implementation which uses a classname to create a delegate {@link FlowableEventListener} instance to use for event notification. <br>

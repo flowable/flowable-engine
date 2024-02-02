@@ -1,0 +1,17 @@
+{
+  "key": "kafkaChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Kafka channel",
+  "channelType": "inbound",
+  "type": "kafka",
+
+  "topics": [
+    "customer"
+  ],
+
+  "deserializerType": "json",
+  "channelEventKeyDetection": {
+    "jsonField": "eventKey"
+  }
+}

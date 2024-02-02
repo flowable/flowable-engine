@@ -12,8 +12,7 @@
  */
 package org.flowable.engine.test.bpmn.dynamic;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 
@@ -21,6 +20,7 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -30,9 +30,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implements DynamicBpmnConstants {
 
     private static final String TASK_ONE_SID = "sid-B94D5D22-E93E-4401-ADC5-C5C073E1EEB4";
-    private static final String TASK_TWO_SID = "sid-B1C37EBE-A273-4DDE-B909-89302638526A";
-    private static final String SCRIPT_TASK_SID = "sid-A403BAE0-E367-449A-90B2-48834FCAA2F9";
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testIsShouldBePossibleToChangeCandidateGroups() {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -48,10 +47,11 @@ public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implem
         long hrTaskCount = taskService.createTaskQuery().taskCandidateGroup("HR").count();
         long salesTaskCount = taskService.createTaskQuery().taskCandidateGroup("SALES").count();
 
-        assertThat(hrTaskCount, is(1L));
-        assertThat(salesTaskCount, is(1L));
+        assertThat(hrTaskCount).isEqualTo(1);
+        assertThat(salesTaskCount).isEqualTo(1);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/dynamic/dynamic-bpmn-test-process.bpmn20.xml" })
     public void testIsShouldBePossibleToResetChangeCandidateGroups() {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("dynamicServiceTest");
@@ -71,7 +71,7 @@ public class DynamicCandidateGroupsTest extends PluggableFlowableTestCase implem
         long hrTaskCount = taskService.createTaskQuery().taskCandidateGroup("HR").count();
         long salesTaskCount = taskService.createTaskQuery().taskCandidateGroup("SALES").count();
 
-        assertThat(hrTaskCount, is(0L));
-        assertThat(salesTaskCount, is(0L));
+        assertThat(hrTaskCount).isZero();
+        assertThat(salesTaskCount).isZero();
     }
 }

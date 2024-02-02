@@ -12,107 +12,28 @@
  */
 package org.flowable.test.ldap;
 
-import java.lang.reflect.Method;
-import java.util.Vector;
-
-import javax.annotation.Resource;
-
-import junit.framework.Test;
-
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.springframework.security.ldap.server.ApacheDSContainer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 
 /**
- * Parts of this class come from http://www.kimchy.org/before_after_testcase_with_junit/
- * 
  * @author Joram Barrez
  */
+@Tag("ldap")
 public class LDAPTestCase extends SpringFlowableTestCase {
 
-    private static int testCount;
-    private static int totalTestCount = -1;
-    private static boolean disableAfterTestCase;
 
-    @Resource(name = "org.springframework.security.apacheDirectoryServerContainer")
-    private ApacheDSContainer apacheDSContainer;
-
-    protected LDAPTestCase() {
-        super();
-    }
-
-    @Override
-    public void runBare() throws Throwable {
-        Throwable exception = null;
-        if (totalTestCount == -1) {
-            totalTestCount = countTotalTests();
-        }
-        if (testCount == 0) {
-            beforeTestCase();
-        }
-        testCount++;
-        try {
-            super.runBare();
-        } catch (Throwable running) {
-            exception = running;
-        }
-        if (testCount == totalTestCount) {
-            totalTestCount = -1;
-            testCount = 0;
-            if (!disableAfterTestCase) {
-                try {
-                    afterTestCase();
-                } catch (Exception afterTestCase) {
-                    if (exception == null)
-                        exception = afterTestCase;
-                }
-            } else {
-                disableAfterTestCase = false;
-            }
-        }
-        if (exception != null)
-            throw exception;
-    }
-
-    protected static void disableAfterTestCase() {
-        disableAfterTestCase = true;
-    }
-
-    protected void beforeTestCase() throws Exception {
-
-    }
-
-    protected void afterTestCase() throws Exception {
+    @AfterAll
+    static void closeInMemoryDirectoryServer(@Autowired InMemoryDirectoryServer inMemoryDirectoryServer) {
         // Need to do this 'manually', or otherwise the ldap server won't be
         // shut down properly
         // on the QA machine, failing the next tests
-        apacheDSContainer.stop();
-    }
-
-    private int countTotalTests() {
-        int count = 0;
-        Class superClass = getClass();
-        Vector names = new Vector();
-        while (Test.class.isAssignableFrom(superClass)) {
-            Method[] methods = superClass.getDeclaredMethods();
-            for (Method method : methods) {
-                String name = method.getName();
-                if (names.contains(name))
-                    continue;
-                names.addElement(name);
-                if (isTestMethod(method)) {
-                    count++;
-                }
-            }
-            superClass = superClass.getSuperclass();
+        if (inMemoryDirectoryServer != null) {
+            inMemoryDirectoryServer.shutDown(true);
         }
-        return count;
-    }
-
-    private boolean isTestMethod(Method m) {
-        String name = m.getName();
-        Class[] parameters = m.getParameterTypes();
-        Class returnType = m.getReturnType();
-        return parameters.length == 0 && name.startsWith("test") && returnType.equals(Void.TYPE);
     }
 
 }

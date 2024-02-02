@@ -13,12 +13,12 @@
 
 package org.flowable.variable.service.impl.types;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.common.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.common.engine.impl.interceptor.SessionFactory;
 
 /**
  * @author Frederik Heremans
@@ -34,7 +34,7 @@ public class EntityManagerSessionFactory implements SessionFactory {
             throw new FlowableIllegalArgumentException("entityManagerFactory is null");
         }
         if (!(entityManagerFactory instanceof EntityManagerFactory)) {
-            throw new FlowableIllegalArgumentException("EntityManagerFactory must implement 'javax.persistence.EntityManagerFactory'");
+            throw new FlowableIllegalArgumentException("EntityManagerFactory must implement 'jakarta.persistence.EntityManagerFactory'");
         }
 
         this.entityManagerFactory = (EntityManagerFactory) entityManagerFactory;

@@ -14,11 +14,11 @@ package org.flowable.engine.test.bpmn.event.timer.compatibility;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -35,7 +35,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
         CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
         final String finalActivityId = activityId;
-        commandExecutor.execute(config, new Command<Object>() {
+        commandExecutor.execute(config, new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
@@ -47,7 +47,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
             }
         });
 
-        commandExecutor.execute(config, new Command<Object>() {
+        commandExecutor.execute(config, new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
@@ -55,7 +55,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
 
                 finalJob.setJobHandlerConfiguration(finalActivityId);
                 finalJob.setId(null);
-                session.insert(finalJob);
+                session.insert(finalJob, processEngineConfiguration.getJobServiceConfiguration().getIdGenerator());
 
                 session.flush();
                 session.commit();

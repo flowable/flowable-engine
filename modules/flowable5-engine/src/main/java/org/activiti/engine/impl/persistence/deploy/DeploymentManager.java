@@ -30,10 +30,11 @@ import org.activiti.engine.impl.persistence.entity.ResourceEntity;
 import org.activiti.engine.repository.Deployment;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.util.io.BytesStreamSource;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -218,7 +219,8 @@ public class DeploymentManager {
             // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
             if (eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(ActivitiEventBuilder.createEntityEvent(
-                        FlowableEngineEventType.ENTITY_DELETED, processDefinition));
+                        FlowableEngineEventType.ENTITY_DELETED, processDefinition),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
 
@@ -228,7 +230,8 @@ public class DeploymentManager {
         // Since we use a delete by query, delete-events are not automatically dispatched
         if (eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
-                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
+                    ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment),
+                    EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
 
         for (ProcessDefinition processDefinition : processDefinitions) {

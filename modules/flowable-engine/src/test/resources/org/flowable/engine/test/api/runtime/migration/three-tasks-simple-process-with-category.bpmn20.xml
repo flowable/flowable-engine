@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+    <process id="myProcess" name="MyProcess" isExecutable="true">
+        <startEvent id="startEvent1" />
+        <sequenceFlow id="seqFlow1Id" sourceRef="startEvent1" targetRef="userTaskA" />
+
+        <userTask id="userTaskA" name="A" flowable:formKey="taskAFormKey" flowable:category="taskACategory"/>
+        <sequenceFlow id="seqFlow2Id" sourceRef="userTaskA" targetRef="userTaskB" />
+
+        <userTask id="userTaskB" name="B" flowable:formKey="taskBFormKey" flowable:category="taskBCategory"/>
+        <sequenceFlow id="seqFlow3Id" sourceRef="userTaskB" targetRef="userTaskC" />
+
+        <userTask id="userTaskC" name="C" flowable:formKey="taskCFormKey" flowable:category="taskCCategory"/>
+        <sequenceFlow id="seqFlow4Id" sourceRef="userTaskC" targetRef="endEvent1" />
+
+        <endEvent id="endEvent1" />
+
+    </process>
+</definitions>

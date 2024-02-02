@@ -12,11 +12,14 @@
  */
 package org.flowable.spring.test.expression.callactivity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -28,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/callactivity/testCallActivityByExpression-context.xml")
 public class CallActivityBasedOnSpringBeansExpressionTest extends SpringFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/spring/test/expression/callactivity/CallActivityBasedOnSpringBeansExpressionTest.testCallActivityByExpression.bpmn20.xml",
             "org/flowable/spring/test/expression/callactivity/simpleSubProcess.bpmn20.xml" })
     public void testCallActivityByExpression() throws Exception {
@@ -38,19 +42,19 @@ public class CallActivityBasedOnSpringBeansExpressionTest extends SpringFlowable
         // process instance
         TaskQuery taskQuery = taskService.createTaskQuery();
         Task taskBeforeSubProcess = taskQuery.singleResult();
-        assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+        assertThat(taskBeforeSubProcess.getName()).isEqualTo("Task before subprocess");
 
         // Completing the task continues the process which leads to calling the
         // subprocess. The sub process we want to
         // call is passed in as a variable into this task
         taskService.complete(taskBeforeSubProcess.getId());
         Task taskInSubProcess = taskQuery.singleResult();
-        assertEquals("Task in subprocess", taskInSubProcess.getName());
+        assertThat(taskInSubProcess.getName()).isEqualTo("Task in subprocess");
 
         // Completing the task in the subprocess, finishes the subprocess
         taskService.complete(taskInSubProcess.getId());
         Task taskAfterSubProcess = taskQuery.singleResult();
-        assertEquals("Task after subprocess", taskAfterSubProcess.getName());
+        assertThat(taskAfterSubProcess.getName()).isEqualTo("Task after subprocess");
 
         // Completing this task end the process instance
         taskService.complete(taskAfterSubProcess.getId());

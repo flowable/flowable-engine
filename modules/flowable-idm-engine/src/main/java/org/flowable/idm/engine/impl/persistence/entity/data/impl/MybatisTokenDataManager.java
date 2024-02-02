@@ -45,7 +45,7 @@ public class MybatisTokenDataManager extends AbstractIdmDataManager<TokenEntity>
     @SuppressWarnings("unchecked")
     @Override
     public List<Token> findTokenByQueryCriteria(TokenQueryImpl query) {
-        return getDbSqlSession().selectList("selectTokenByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectTokenByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd
+                    http://www.omg.org/spec/CMMN/20151109/DC https://www.omg.org/spec/CMMN/20151109/DC.xsd
+                    http://www.omg.org/spec/CMMN/20151109/DI https://www.omg.org/spec/CMMN/20151109/DI.xsd
+                    http://www.omg.org/spec/CMMN/20151109/CMMNDI https://www.omg.org/spec/CMMN/20151109/CMMNDI11.xsd"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    
+    <case id="scriptCase" flowable:initiatorVariableName="test">
+        <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+        
+            <planItem id="planItemTaskA" definitionRef="taskA" />
+            <planItem id="planItemTaskB" definitionRef="taskB" />
+            <task id="taskA" name="A" flowable:type="script" flowable:scriptFormat="javascript" flowable:resultVariableName="scriptResult" flowable:autoStoreVariables="false">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string><![CDATA[var a = 5;]]></string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
+            <task id="taskB" name="B" flowable:type="script" flowable:scriptFormat="groovy" flowable:autoStoreVariables="true">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string><![CDATA[var b = 5;]]></string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
+        </casePlanModel>
+    </case>
+    
+</definitions>

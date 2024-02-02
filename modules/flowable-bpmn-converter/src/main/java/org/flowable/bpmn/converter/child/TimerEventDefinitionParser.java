@@ -33,8 +33,9 @@ public class TimerEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         TimerEventDefinition eventDefinition = new TimerEventDefinition();
         String calendarName = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALENDAR_NAME, xtr);

@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,20 +22,11 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.junit.jupiter.api.Test;
 
 public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCase {
 
     private static final String XML_FILE_PATH = "org/flowable/engine/test/repository/latest/";
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     protected List<String> deploy(List<String> xmlFileNameList) throws Exception {
         List<String> deploymentIdList = new ArrayList<>();
@@ -54,6 +48,7 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         }
     }
 
+    @Test
     public void testQueryByLatestAndId() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",
@@ -68,22 +63,25 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
 
         ProcessDefinitionQuery idQuery1 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(0)).latestVersion();
         List<ProcessDefinition> processDefinitions = idQuery1.list();
-        assertEquals(0, processDefinitions.size());
+        assertThat(processDefinitions).isEmpty();
 
         ProcessDefinitionQuery idQuery2 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(1)).latestVersion();
         processDefinitions = idQuery2.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess1", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess1");
 
         ProcessDefinitionQuery idQuery3 = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionIdList.get(2)).latestVersion();
         processDefinitions = idQuery3.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess2");
 
         // Undeploy
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndName() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",
@@ -93,21 +91,22 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // name
         ProcessDefinitionQuery nameQuery = repositoryService.createProcessDefinitionQuery().processDefinitionName("one").latestVersion();
         List<ProcessDefinition> processDefinitions = nameQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals(1, processDefinitions.get(0).getVersion());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getVersion, ProcessDefinition::getKey)
+                .containsExactly(tuple(1, "testProcess2"));
 
         // nameLike
         ProcessDefinitionQuery nameLikeQuery = repositoryService.createProcessDefinitionQuery().processDefinitionName("one").latestVersion();
         processDefinitions = nameLikeQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals(1, processDefinitions.get(0).getVersion());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getVersion, ProcessDefinition::getKey)
+                .containsExactly(tuple(1, "testProcess2"));
 
         // Undeploy
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndVersion() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("version_testProcess1_one.bpmn20.xml",
@@ -117,13 +116,15 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // version
         ProcessDefinitionQuery nameQuery = repositoryService.createProcessDefinitionQuery().processDefinitionVersion(1).latestVersion();
         List<ProcessDefinition> processDefinitions = nameQuery.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess2", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess2");
 
         // Undeploy
         unDeploy(deploymentIdList);
     }
 
+    @Test
     public void testQueryByLatestAndDeploymentId() throws Exception {
         // Deploy
         List<String> xmlFileNameList = Arrays.asList("name_testProcess1_one.bpmn20.xml",
@@ -133,12 +134,14 @@ public class ProcessDefinitionQueryByLatestTest extends PluggableFlowableTestCas
         // deploymentId
         ProcessDefinitionQuery deploymentQuery1 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdList.get(0)).latestVersion();
         List<ProcessDefinition> processDefinitions = deploymentQuery1.list();
-        assertEquals(0, processDefinitions.size());
+        assertThat(processDefinitions).isEmpty();
 
         ProcessDefinitionQuery deploymentQuery2 = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdList.get(1)).latestVersion();
         processDefinitions = deploymentQuery2.list();
-        assertEquals(1, processDefinitions.size());
-        assertEquals("testProcess1", processDefinitions.get(0).getKey());
+        assertThat(processDefinitions)
+                .extracting(ProcessDefinition::getKey)
+                .containsExactly("testProcess1");
+
 
         // Undeploy
         unDeploy(deploymentIdList);

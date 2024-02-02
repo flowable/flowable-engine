@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="testCatchErrorThrownByExpressionWithFutureOnServiceTask">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask" />
+    
+    <serviceTask id="serviceTask" flowable:expression="#{bpmnErrorBean.throwBpmnErrorInFuture()}" />
+    
+    <boundaryEvent id="catchError" attachedToRef="serviceTask">
+      <errorEventDefinition />
+    </boundaryEvent>
+    
+    <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
+    
+    <userTask id="escalatedTask" name="Escalated Task" />
+    <sequenceFlow id="flow4" sourceRef="serviceTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

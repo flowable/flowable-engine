@@ -17,17 +17,19 @@ import java.util.Map;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
+import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableConditionalEvent;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
+import org.flowable.engine.delegate.event.FlowableEscalationEvent;
 import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
@@ -59,12 +61,12 @@ public class FlowableEventBuilder {
      * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
      */
     public static FlowableEvent createGlobalEvent(FlowableEngineEventType type) {
-        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
+        FlowableEngineEventImpl newEvent = new FlowableProcessEventImpl(type);
         return newEvent;
     }
 
     public static FlowableEvent createEvent(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
-        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
+        FlowableEngineEventImpl newEvent = new FlowableProcessEventImpl(type);
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
@@ -354,8 +356,8 @@ public class FlowableEventBuilder {
         return newEvent;
     }
 
-    public static FlowableMessageEvent createMessageEvent(FlowableEngineEventType type, String activityId, String messageName, Object payload, String executionId, String processInstanceId,
-            String processDefinitionId) {
+    public static FlowableMessageEvent createMessageEvent(FlowableEngineEventType type, String activityId, String messageName, Object payload, 
+                    String executionId, String processInstanceId, String processDefinitionId) {
         FlowableMessageEventImpl newEvent = new FlowableMessageEventImpl(type);
         newEvent.setActivityId(activityId);
         newEvent.setExecutionId(executionId);
@@ -363,6 +365,30 @@ public class FlowableEventBuilder {
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setMessageName(messageName);
         newEvent.setMessageData(payload);
+        return newEvent;
+    }
+    
+    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression,
+                    String executionId, String processInstanceId, String processDefinitionId) {
+        
+        FlowableConditionalEventImpl newEvent = new FlowableConditionalEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setConditionExpression(conditionExpression);
+        return newEvent;
+    }
+    
+    public static FlowableEscalationEvent createEscalationEvent(FlowableEngineEventType type, String activityId, String escalationCode, String escalationName,
+                    String executionId, String processInstanceId, String processDefinitionId) {
+        FlowableEscalationEventImpl newEvent = new FlowableEscalationEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setEscalationCode(escalationCode);
+        newEvent.setEscalationName(escalationName);
         return newEvent;
     }
 
@@ -379,7 +405,7 @@ public class FlowableEventBuilder {
     }
 
     public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, String executionId,
-            String processInstanceId, String processDefinitionId) {
+            String processInstanceId, String processDefinitionId, String variableInstanceId) {
         FlowableVariableEventImpl newEvent = new FlowableVariableEventImpl(type);
         newEvent.setVariableName(variableName);
         newEvent.setVariableValue(variableValue);
@@ -388,10 +414,11 @@ public class FlowableEventBuilder {
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setVariableInstanceId(variableInstanceId);
         return newEvent;
     }
 
-    protected static void populateEventWithCurrentContext(FlowableEventImpl event) {
+    protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
             if (persistedObject instanceof Job) {

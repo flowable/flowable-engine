@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class MembershipEntityImpl extends AbstractEntityNoRevision implements MembershipEntity, Serializable {
+public class MembershipEntityImpl extends AbstractIdmEngineNoRevisionEntity implements MembershipEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

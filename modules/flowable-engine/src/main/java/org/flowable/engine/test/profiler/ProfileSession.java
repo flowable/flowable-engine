@@ -50,7 +50,7 @@ public class ProfileSession {
 
     public synchronized void addCommandExecution(String classFqn, CommandExecutionResult commandExecutionResult) {
         if (!commandExecutionResults.containsKey(classFqn)) {
-            commandExecutionResults.put(classFqn, new ArrayList<CommandExecutionResult>());
+            commandExecutionResults.put(classFqn, new ArrayList<>());
         }
         commandExecutionResults.get(classFqn).add(commandExecutionResult);
     }

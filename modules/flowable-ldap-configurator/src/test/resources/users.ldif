@@ -30,7 +30,7 @@ dn: cn=User,ou=groups,o=flowable
 objectClass: groupOfUniqueNames
 objectClass: top
 cn: User
-uid : user
+uid: user
 uniqueMember: uid=kermit, ou=users,o=flowable
 uniqueMember: uid=pepe, ou=users,o=flowable
 uniqueMember: uid=gonzo, ou=users,o=flowable
@@ -41,7 +41,7 @@ dn: cn=Admin,ou=groups,o=flowable
 objectClass: groupOfUniqueNames
 objectClass: top
 cn: Admin
-uid : admin
+uid: admin
 uniqueMember: uid=kermit, ou=users,o=flowable
 uniqueMember: uid=fozzie, ou=users,o=flowable
 
@@ -49,7 +49,7 @@ dn: cn=Sales,ou=groups,o=flowable
 objectClass: groupOfUniqueNames
 objectClass: top
 cn: Sales
-uid : sales
+uid: sales
 uniqueMember: uid=pepe, ou=users,o=flowable
 uniqueMember: uid=gonzo, ou=users,o=flowable
 uniqueMember: cn=Dr\, Bunsen,ou=users,o=flowable

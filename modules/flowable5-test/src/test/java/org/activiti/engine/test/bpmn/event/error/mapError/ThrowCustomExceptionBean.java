@@ -13,7 +13,7 @@
 package org.activiti.engine.test.bpmn.event.error.mapError;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**

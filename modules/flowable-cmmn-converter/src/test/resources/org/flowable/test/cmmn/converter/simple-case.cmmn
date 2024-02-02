@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions
         xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+        xmlns:flowable="http://flowable.org/cmmn"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         targetNamespace="http://flowable.org/cmmn" xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL ">
 
     <case id="myCase">
-        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="casePlanForm">
 
             <planItem id="planItemTaskA" definitionRef="taskA">
                 <entryCriterion id="criterion4" sentryRef="ifPart"/>

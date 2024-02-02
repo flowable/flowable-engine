@@ -14,18 +14,18 @@ package org.flowable.job.service.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,18 +38,20 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeleteJobCmd.class);
     private static final long serialVersionUID = 1L;
+    
+    protected JobServiceConfiguration jobServiceConfiguration;
 
     protected String jobId;
 
-    public DeleteJobCmd(String jobId) {
+    public DeleteJobCmd(String jobId, JobServiceConfiguration jobServiceConfiguration) {
         this.jobId = jobId;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Object execute(CommandContext commandContext) {
         JobEntity jobToDelete = getJobToDelete(commandContext);
 
-        JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
         InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager(); 
         if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(jobToDelete)) {
             internalJobCompatibilityManager.deleteV5Job(jobToDelete.getId());
@@ -58,13 +60,15 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
 
         sendCancelEvent(jobToDelete);
 
-        CommandContextUtil.getJobEntityManager(commandContext).delete(jobToDelete);
+        jobServiceConfiguration.getJobEntityManager().delete(jobToDelete);
         return null;
     }
 
     protected void sendCancelEvent(JobEntity jobToDelete) {
-        if (CommandContextUtil.getJobServiceConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getJobServiceConfiguration().getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete),
+                    jobServiceConfiguration.getEngineName());
         }
     }
 
@@ -76,16 +80,16 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
             LOGGER.debug("Deleting job {}", jobId);
         }
 
-        JobEntity job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
+        JobEntity job = jobServiceConfiguration.getJobEntityManager().findById(jobId);
         if (job == null) {
             throw new FlowableObjectNotFoundException("No job found with id '" + jobId + "'", Job.class);
         }
 
         // We need to check if the job was locked, ie acquired by the job acquisition thread
-        // This happens if the the job was already acquired, but not yet executed.
+        // This happens if the job was already acquired, but not yet executed.
         // In that case, we can't allow to delete the job.
         if (job.getLockOwner() != null) {
-            throw new FlowableException("Cannot delete job when the job is being executed. Try again later.");
+            throw new FlowableException("Cannot delete " + job + " when the job is being executed. Try again later.");
         }
         return job;
     }

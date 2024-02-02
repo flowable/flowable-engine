@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.idm.engine.impl.persistence.entity;
 
 import java.io.Serializable;
@@ -49,7 +61,7 @@ public class ByteArrayRef implements Serializable {
     private void setBytes(byte[] bytes) {
         if (id == null) {
             if (bytes != null) {
-                ByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getByteArrayEntityManager();
+                ByteArrayEntityManager byteArrayEntityManager = CommandContextUtil.getIdmByteArrayEntityManager();
                 entity = byteArrayEntityManager.create();
                 entity.setName(name);
                 entity.setBytes(bytes);
@@ -72,9 +84,9 @@ public class ByteArrayRef implements Serializable {
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                CommandContextUtil.getByteArrayEntityManager().delete(entity);
+                CommandContextUtil.getIdmByteArrayEntityManager().delete(entity);
             } else {
-                CommandContextUtil.getByteArrayEntityManager().deleteByteArrayById(id);
+                CommandContextUtil.getIdmByteArrayEntityManager().deleteByteArrayById(id);
             }
             entity = null;
             id = null;
@@ -84,8 +96,11 @@ public class ByteArrayRef implements Serializable {
 
     private void ensureInitialized() {
         if (id != null && entity == null) {
-            entity = CommandContextUtil.getByteArrayEntityManager().findById(id);
-            name = entity.getName();
+            entity = CommandContextUtil.getIdmByteArrayEntityManager().findById(id);
+
+            if (entity != null) {
+                name = entity.getName();
+            }
         }
     }
 

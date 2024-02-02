@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testVariableEventListener" name="testVariableEventListener">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItemA" name="A" definitionRef="taskA"/>
+            <planItem id="variableEventListenerItem" definitionRef="variableListener"/>
+            <planItem id="planItemB" name="B" definitionRef="taskB">
+                <entryCriterion id="entryTaskB" sentryRef="sentryOnVariableEventListener"/>
+            </planItem>
+            
+            <sentry id="sentryOnVariableEventListener">
+                <planItemOnPart id="sentryOnVariableEvent" sourceRef="variableEventListenerItem">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="taskA" name="A"/>
+            <eventListener id="variableListener" name="myVariableEventListener" flowable:eventType="variable" 
+            	flowable:variableName="var1" flowable:variableChangeType="all"  />
+            <humanTask id="taskB" name="B"/>
+        </casePlanModel>
+    </case>
+</definitions>

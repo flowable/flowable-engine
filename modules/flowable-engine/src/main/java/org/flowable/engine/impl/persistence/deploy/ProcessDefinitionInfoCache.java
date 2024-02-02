@@ -12,16 +12,18 @@
  */
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -36,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * 
  * @author Tijs Rademakers
  */
-public class ProcessDefinitionInfoCache {
+public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefinitionInfoCacheObject> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessDefinitionInfoCache.class);
 
@@ -46,13 +48,14 @@ public class ProcessDefinitionInfoCache {
     /** Cache with no limit */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new HashMap<String, ProcessDefinitionInfoCacheObject>());
+        this.cache = Collections.synchronizedMap(new HashMap<>());
     }
 
     /** Cache which has a hard limit: no more elements will be cached than the limit. */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor, final int limit) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, ProcessDefinitionInfoCacheObject>(limit + 1, 0.75f, true) {
+        this.cache = Collections.synchronizedMap(new LinkedHashMap<>(limit + 1, 0.75f, true) {
+
             // +1 is needed, because the entry is inserted first, before it is removed
             // 0.75 is the default (see javadocs)
             // true will keep the 'access-order', which is needed to have a real LRU cache
@@ -70,9 +73,10 @@ public class ProcessDefinitionInfoCache {
         });
     }
 
+    @Override
     public ProcessDefinitionInfoCacheObject get(final String processDefinitionId) {
         ProcessDefinitionInfoCacheObject infoCacheObject = null;
-        Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<ProcessDefinitionInfoCacheObject>() {
+        Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<>() {
 
             @Override
             public ProcessDefinitionInfoCacheObject execute(CommandContext commandContext) {
@@ -89,19 +93,32 @@ public class ProcessDefinitionInfoCache {
         return infoCacheObject;
     }
 
+    @Override
+    public boolean contains(String id) {
+        return cache.containsKey(id);
+    }
+
+    @Override
     public void add(String id, ProcessDefinitionInfoCacheObject obj) {
         cache.put(id, obj);
     }
 
+    @Override
     public void remove(String id) {
         cache.remove(id);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }
 
-    // For testing purposes only
+    @Override
+    public Collection<ProcessDefinitionInfoCacheObject> getAll() {
+        return cache.values();
+    }
+
+    @Override
     public int size() {
         return cache.size();
     }

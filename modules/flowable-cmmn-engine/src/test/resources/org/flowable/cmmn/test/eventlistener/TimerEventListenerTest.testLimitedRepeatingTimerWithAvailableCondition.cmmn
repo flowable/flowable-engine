@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="repeatingTimer" name="repeatingTimer" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItemhumanTask1" name="Human task" definitionRef="humanTask1"></planItem>
+      <planItem id="planItemhumanTask2" name="A" definitionRef="humanTask2">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter">
+            <extensionElements></extensionElements>
+          </repetitionRule>
+        </itemControl>
+        <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1"></entryCriterion>
+      </planItem>
+      <planItem id="planItemtimerEventListener1" name="Timer" definitionRef="timerEventListener1"></planItem>
+      <sentry id="sentryentryCriterion1">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartentryCriterion1" sourceRef="planItemtimerEventListener1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="humanTask1" name="Human task" flowable:assignee="${initiator}" flowable:formKey="testHumanTask1" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+          <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </humanTask>
+      <humanTask id="humanTask2" name="A" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+          <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </humanTask>
+      <timerEventListener id="timerEventListener1" flowable:availableCondition="${true}">
+        <extensionElements>
+          <design:stencilid><![CDATA[TimerEventListener]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
+        </extensionElements>
+        <timerExpression><![CDATA[R4/PT20S]]></timerExpression>
+      </timerEventListener>
+    </casePlanModel>
+  </case>
+</definitions>

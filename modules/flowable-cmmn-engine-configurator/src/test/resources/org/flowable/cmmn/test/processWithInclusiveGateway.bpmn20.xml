@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="inclusiveGateway">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="gatewayFork" />
+        <inclusiveGateway id="gatewayFork" />
+        <sequenceFlow id="flow2" sourceRef="gatewayFork" targetRef="theTask" />
+        <userTask id="theTask" name="my task" />
+        <sequenceFlow id="flow3" sourceRef="gatewayFork" targetRef="theTask2" />
+        <userTask id="theTask2" name="my task2" />
+        <inclusiveGateway id="gatewayJoin" />
+        <sequenceFlow id="flow4" sourceRef="theTask" targetRef="gatewayJoin" />
+        <sequenceFlow id="flow5" sourceRef="theTask2" targetRef="gatewayJoin" />
+        <sequenceFlow id="flow6" sourceRef="gatewayJoin" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

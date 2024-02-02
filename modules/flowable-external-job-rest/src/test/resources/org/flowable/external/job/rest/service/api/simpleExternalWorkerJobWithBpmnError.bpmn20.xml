@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+>
+    <error id="errorOne" name="Error One" errorCode="errorOne" />
+
+    <process id="simpleExternalWorkerWithError">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart" targetRef="externalWorkerTask"/>
+
+        <serviceTask id="externalWorkerTask" flowable:type="external-worker" flowable:topic="simple"/>
+
+        <boundaryEvent id="catchError" attachedToRef="externalWorkerTask" cancelActivity="true">
+            <errorEventDefinition id="one" errorRef="errorOne" />
+        </boundaryEvent>
+
+        <sequenceFlow sourceRef="catchError" targetRef="taskAfterError"/>
+
+        <userTask id="taskAfterError"/>
+
+        <sequenceFlow sourceRef="taskAfterError" targetRef="theEnd"/>
+
+        <sequenceFlow sourceRef="externalWorkerTask" targetRef="taskAfter"/>
+
+        <userTask id="taskAfter"/>
+
+        <sequenceFlow sourceRef="taskAfter" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

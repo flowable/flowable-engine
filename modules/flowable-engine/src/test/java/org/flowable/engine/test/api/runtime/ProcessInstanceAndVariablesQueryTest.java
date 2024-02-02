@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +22,9 @@ import java.util.Map;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -28,17 +34,19 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String PROCESS_DEFINITION_KEY_2 = "oneTaskProcess2";
     private static final String PROCESS_DEFINITION_KEY_3 = "oneTaskProcess3";
+    private static final String PROCESS_DEFINITION_KEY_4 = "oneTaskProcess4";
 
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
+     * oneTaskProcess4 contains a task variable added via an execution task listener (which shouldn't be returned in the query)
      */
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess3.bpmn20.xml")
+            .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess4.bpmn20.xml")
                 .deploy();
 
         Map<String, Object> startMap = new HashMap<>();
@@ -55,129 +63,148 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         startMap.clear();
         startMap.put("casetest", "MyCaseTest");
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap);
+
+        startMap.clear();
+        startMap.put("test4", "test4");
+        runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_4, "1", startMap);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        super.tearDown();
     }
 
+    @Test
     public void testQuery() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().variableValueEquals("anothertest", 123).singleResult();
         Map<String, Object> variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
-        assertEquals(6, instanceList.size());
+        assertThat(instanceList).hasSize(7);
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLike("casetest", "MyCase%").singleResult();
         variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals("MyCaseTest", variableMap.get("casetest"));
+        assertThat(variableMap)
+                .containsOnly(entry("casetest", "MyCaseTest"));
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLikeIgnoreCase("casetest", "mycase%").singleResult();
         variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals("MyCaseTest", variableMap.get("casetest"));
+        assertThat(variableMap)
+                .containsOnly(entry("casetest", "MyCaseTest"));
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .variableValueLikeIgnoreCase("casetest", "mycase2%").singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
-        assertEquals(4, instanceList.size());
+        assertThat(instanceList).hasSize(4);
         processInstance = instanceList.get(0);
         variableMap = processInstance.getProcessVariables();
-        assertEquals(2, variableMap.size());
-        assertEquals("test", variableMap.get("test"));
-        assertEquals("test2", variableMap.get("test2"));
+        assertThat(variableMap)
+                .containsOnly(
+                        entry("test", "test"),
+                        entry("test2", "test2")
+                );
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY_2).singleResult();
         variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(0, 5);
-        assertEquals(4, instanceList.size());
+        assertThat(instanceList).hasSize(4);
         processInstance = instanceList.get(0);
         variableMap = processInstance.getProcessVariables();
-        assertEquals(2, variableMap.size());
-        assertEquals("test", variableMap.get("test"));
-        assertEquals("test2", variableMap.get("test2"));
+        assertThat(variableMap)
+                .containsOnly(
+                        entry("test", "test"),
+                        entry("test2", "test2")
+                );
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(0, 1);
-        assertEquals(1, instanceList.size());
+        assertThat(instanceList).hasSize(1);
         processInstance = instanceList.get(0);
         variableMap = processInstance.getProcessVariables();
-        assertEquals(2, variableMap.size());
-        assertEquals("test", variableMap.get("test"));
-        assertEquals("test2", variableMap.get("test2"));
+        assertThat(variableMap)
+                .containsOnly(
+                        entry("test", "test"),
+                        entry("test2", "test2")
+                );
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).orderByProcessDefinitionKey().asc().listPage(2, 4);
-        assertEquals(2, instanceList.size());
+        assertThat(instanceList).hasSize(2);
         processInstance = instanceList.get(0);
         variableMap = processInstance.getProcessVariables();
-        assertEquals(2, variableMap.size());
-        assertEquals("test", variableMap.get("test"));
-        assertEquals("test2", variableMap.get("test2"));
+        assertThat(variableMap)
+                .containsOnly(
+                        entry("test", "test"),
+                        entry("test2", "test2")
+                );
 
         instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).orderByProcessDefinitionKey().asc().listPage(4, 5);
-        assertEquals(0, instanceList.size());
+        assertThat(instanceList).isEmpty();
+
+        processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().variableValueEquals("test4", "test4").singleResult();
+        variableMap = processInstance.getProcessVariables();
+        assertThat(variableMap)
+                .containsOnly(entry("test4", "test4"));
     }
 
+    @Test
     public void testOrQuery() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("undefined", 999).variableValueEquals("anothertest", 123).endOr().singleResult();
         Map<String, Object> variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("undefined", 999).endOr().singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("anothertest", 123).variableValueEquals("undefined", 999).endOr().singleResult();
         variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("anothertest", 999).endOr().singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables()
                 .or().variableValueEquals("anothertest", 999).variableValueEquals("anothertest", 123).endOr().singleResult();
         variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
     }
 
+    @Test
     public void testOrQueryMultipleVariableValues() {
         ProcessInstanceQuery query0 = runtimeService.createProcessInstanceQuery().includeProcessVariables().or();
         for (int i = 0; i < 20; i++) {
             query0 = query0.variableValueEquals("anothertest", i);
         }
         query0 = query0.endOr();
-        assertNull(query0.singleResult());
+        assertThat(query0.singleResult()).isNull();
 
         ProcessInstanceQuery query1 = runtimeService.createProcessInstanceQuery().includeProcessVariables().or().variableValueEquals("anothertest", 123);
         for (int i = 0; i < 20; i++) {
             query1 = query1.variableValueEquals("anothertest", i);
         }
         query1 = query1.endOr();
-        assertNull(query0.singleResult());
+        assertThat(query0.singleResult()).isNull();
 
         ProcessInstance processInstance = query1.singleResult();
         Map<String, Object> variableMap = processInstance.getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
 
         ProcessInstanceQuery query2 = runtimeService.createProcessInstanceQuery().includeProcessVariables().or();
         for (int i = 0; i < 20; i++) {
@@ -188,7 +215,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
                 .processDefinitionKey(PROCESS_DEFINITION_KEY_2)
                 .processDefinitionId("undefined")
                 .endOr();
-        assertNull(query2.singleResult());
+        assertThat(query2.singleResult()).isNull();
 
         ProcessInstanceQuery query3 = runtimeService.createProcessInstanceQuery().includeProcessVariables().or().variableValueEquals("anothertest", 123);
         for (int i = 0; i < 20; i++) {
@@ -200,17 +227,18 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
                 .processDefinitionId("undefined")
                 .endOr();
         variableMap = query3.singleResult().getProcessVariables();
-        assertEquals(1, variableMap.size());
-        assertEquals(123, variableMap.get("anothertest"));
+        assertThat(variableMap)
+                .containsOnly(entry("anothertest", 123));
     }
 
+    @Test
     public void testOrProcessVariablesLikeIgnoreCase() {
         List<ProcessInstance> instanceList = runtimeService
                 .createProcessInstanceQuery().or()
                 .variableValueLikeIgnoreCase("test", "TES%")
                 .variableValueLikeIgnoreCase("test", "%XYZ").endOr()
                 .list();
-        assertEquals(4, instanceList.size());
+        assertThat(instanceList).hasSize(4);
     }
 
 }

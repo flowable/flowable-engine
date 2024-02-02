@@ -49,7 +49,7 @@ public class ProcessExecutionLogger {
         // Store debug info
         String threadName = Thread.currentThread().getName();
         if (!debugInfoMap.containsKey(threadName)) {
-            debugInfoMap.put(threadName, new ArrayList<DebugInfo>());
+            debugInfoMap.put(threadName, new ArrayList<>());
         }
         debugInfoMap.get(threadName).add(debugInfo);
 
@@ -71,7 +71,7 @@ public class ProcessExecutionLogger {
                     processInstances.add(executionEntity);
                 } else {
                     if (!parentMapping.containsKey(executionEntity.getParentId())) {
-                        parentMapping.put(executionEntity.getParentId(), new ArrayList<ExecutionEntity>());
+                        parentMapping.put(executionEntity.getParentId(), new ArrayList<>());
                     }
                     parentMapping.get(executionEntity.getParentId()).add(executionEntity);
                 }

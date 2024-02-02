@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="toCcAndBcc" >
+
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="sendMailWithoutanything" />
+    
+    <serviceTask id="sendMailWithoutanything" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="subject">
+          <activiti:string>Hello world</activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string>This is the content</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    
+    <sequenceFlow sourceRef="sendMailWithoutanything" targetRef="sendMailWithTo" />
+    <serviceTask id="sendMailWithTo" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:string>kermit@activiti.org</activiti:string>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string>Hello world</activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string>This is the content</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    
+    <sequenceFlow sourceRef="sendMailWithTo" targetRef="sendMailWithCC" />
+    <serviceTask id="sendMailWithCC" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="subject">
+          <activiti:string>Hello world</activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string>This is the content</activiti:string>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:string>fozzie@activiti.org</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    
+    <sequenceFlow sourceRef="sendMailWithCC" targetRef="sendMailWithBCC" />
+    <serviceTask id="sendMailWithBCC" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="subject">
+          <activiti:string>Hello world</activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string>This is the content</activiti:string>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:string>mispiggy@activiti.org</activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow sourceRef="sendMailWithBCC" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

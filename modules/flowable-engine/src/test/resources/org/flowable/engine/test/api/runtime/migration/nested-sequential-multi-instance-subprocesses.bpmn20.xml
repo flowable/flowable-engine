@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="sequentialMultiInstanceSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="beforeMultiInstance"/>
+        <userTask id="beforeMultiInstance"/>
+        <sequenceFlow sourceRef="beforeMultiInstance" targetRef="sequentialMISubProcess"/>
+
+        <subProcess id="sequentialMISubProcess" name="Multi Instance Sequential SubProcess">
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <loopCardinality>${nrOfLoops}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+            <startEvent id="seqSubProcStart"/>
+            <sequenceFlow id="subFlow1" sourceRef="seqSubProcStart" targetRef="subTask1"/>
+
+            <userTask id="subTask1"/>
+            <sequenceFlow id="subFlow2" sourceRef="subTask1" targetRef="nestedSequentialMISubProcess"/>
+
+            <subProcess id="nestedSequentialMISubProcess" name="Nested Multi Instance Sequential SubProcess">
+                <multiInstanceLoopCharacteristics isSequential="true">
+                    <loopCardinality>${nestedNrOfLoops}</loopCardinality>
+                </multiInstanceLoopCharacteristics>
+
+                <startEvent id="nestedSeqSubProcStart"/>
+                <sequenceFlow id="nestedSubFlow1" sourceRef="nestedSeqSubProcStart" targetRef="nestedSubTask1"/>
+                <userTask id="nestedSubTask1"/>
+                <sequenceFlow id="nestedSubFlow2" sourceRef="nestedSubTask1" targetRef="nestedSubTask2"/>
+                <userTask id="nestedSubTask2"/>
+                <sequenceFlow id="nestedSubFlow3" sourceRef="nestedSubTask2" targetRef="nestedSeqSubProcEnd"/>
+                <endEvent id="nestedSeqSubProcEnd"/>
+            </subProcess>
+            <sequenceFlow id="subFlow3" sourceRef="nestedSequentialMISubProcess" targetRef="subTask2"/>
+
+            <userTask id="subTask2"/>
+            <sequenceFlow id="subFlow4" sourceRef="subTask2" targetRef="seqSubProcEnd"/>
+            <endEvent id="seqSubProcEnd"/>
+        </subProcess>
+
+        <sequenceFlow id="flow2" sourceRef="sequentialMISubProcess" targetRef="afterMultiInstance"/>
+        <userTask id="afterMultiInstance"/>
+        <sequenceFlow id="flow3" sourceRef="afterMultiInstance" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

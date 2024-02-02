@@ -14,10 +14,12 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.VariableListenerUtil;
 
 /**
  * @author Tom Baeyens
@@ -64,12 +66,18 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         // variable. If not, duplicate variables may occur since optimistic
         // locking doesn't work on inserts
         execution.forceUpdate();
+        
+        if (VariableListenerUtil.hasVariableListenerEventDefinitions(execution.getProcessDefinitionId())) {
+            CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
+                    execution.getProcessDefinitionId(), execution.getProcessInstanceId());
+        }
+        
         return null;
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot set variables because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot set variables to";
     }
 
 }

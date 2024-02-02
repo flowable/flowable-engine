@@ -12,11 +12,14 @@
  */
 package org.flowable.engine.test.bpmn.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
 
@@ -29,12 +32,13 @@ public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment
     public void testIntermediateNoneTimerEvent() throws Exception {
-        assertFalse(listenerExecuted);
+        assertThat(listenerExecuted).isFalse();
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateNoneEventExample");
         assertProcessEnded(pi.getProcessInstanceId());
-        assertTrue(listenerExecuted);
+        assertThat(listenerExecuted).isTrue();
     }
 
 }

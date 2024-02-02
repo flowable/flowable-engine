@@ -14,8 +14,9 @@ package org.flowable.engine.runtime;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
 
 /**
  * Helper for starting new ProcessInstance.
@@ -41,9 +42,25 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey);
 
     /**
+     * When looking up for a process definition by key it would first lookup for a process definition
+     * within the given parent deployment.
+     * Then it would fallback to the latest process definition with the given key.
+     * <p>
+     * This is typically needed when the ProcessInstanceBuilder is called for example
+     * from the case engine to start a process instance and it needs to
+     * look up the process definition in the same deployment as the case.
+     */
+    ProcessInstanceBuilder processDefinitionParentDeploymentId(String parentDeploymentId);
+
+    /**
      * Set the message name that needs to be used to look up the process definition that needs to be used to start the process instance.
      */
     ProcessInstanceBuilder messageName(String messageName);
+    
+    /**
+     * Set the start event in case of an event registry start event that is triggered to start the process instance.
+     */
+    ProcessInstanceBuilder startEventId(String startEventId);
 
     /**
      * Set the name of process instance
@@ -54,7 +71,12 @@ public interface ProcessInstanceBuilder {
      * Set the businessKey of process instance
      **/
     ProcessInstanceBuilder businessKey(String businessKey);
-    
+
+    /**
+     * Set the businessStatus of process instance
+     **/
+    ProcessInstanceBuilder businessStatus(String businessStatus);
+
     /**
      * Sets the callback identifier of the process instance.
      */
@@ -66,9 +88,50 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder callbackType(String callbackType);
 
     /**
-     * Set the tenantId of process instance
+     * Sets the reference identifier of the process instance.
+     */
+    ProcessInstanceBuilder referenceId(String referenceId);
+
+    /**
+     * Sets the reference type of the process instance.
+     */
+    ProcessInstanceBuilder referenceType(String referenceType);
+
+    /**
+     * Set the optional instance id of the stage this process instance belongs to, if it runs in the context of a CMMN case.
+     */
+    ProcessInstanceBuilder stageInstanceId(String stageInstanceId);
+
+    /**
+     * Set the tenantId of to lookup the process definition
      **/
     ProcessInstanceBuilder tenantId(String tenantId);
+    
+    /**
+     * Indicator to override the tenant id of the process definition with the provided value.
+     * The tenantId to lookup the process definition should still be provided if needed.
+     */
+    ProcessInstanceBuilder overrideProcessDefinitionTenantId(String tenantId);
+    
+    /**
+     * When starting a process instance from the CMMN engine process task, the process instance id needs to be known beforehand
+     * to store entity links and callback references before the process instance is started.
+     */
+    ProcessInstanceBuilder predefineProcessInstanceId(String processInstanceId);
+
+    /**
+     * Set the owner of the process instance to be created to the given user id.
+     * @param userId the id of the user to become the owner of the process instance
+     * @return the process instance builder for method chaining
+     */
+    ProcessInstanceBuilder owner(String userId);
+
+    /**
+     * Set the assignee of the process instance to be created to the given user id.
+     * @param userId the id of the user to become the owner of the process instance
+     * @return the process instance builder for method chaining
+     */
+    ProcessInstanceBuilder assignee(String userId);
 
     /**
      * Sets the process variables
@@ -91,6 +154,32 @@ public interface ProcessInstanceBuilder {
     ProcessInstanceBuilder transientVariable(String variableName, Object value);
 
     /**
+     * Adds variables from a start form to the process instance.
+     */
+    ProcessInstanceBuilder startFormVariables(Map<String, Object> startFormVariables);
+
+    /**
+     * Adds one variable from a start form to the process instance.
+     */
+    ProcessInstanceBuilder startFormVariable(String variableName, Object value);
+
+    /**
+     * Allows to set an outcome for a start form.
+     */
+    ProcessInstanceBuilder outcome(String outcome);
+
+    /**
+     * Start the process instance with the given form variables from the given {@code formInfo}.
+     * This is different than {@link #startFormVariables(Map)} and it can be used in addition to that.
+     */
+    ProcessInstanceBuilder formVariables(Map<String, Object> formVariables, FormInfo formInfo, String formOutcome);
+
+    /**
+     * Use default tenant as a fallback in the case when process definition was not found by key and tenant id
+     */
+    ProcessInstanceBuilder fallbackToDefaultTenant();
+
+    /**
      * Start the process instance
      * 
      * @throws FlowableIllegalArgumentException
@@ -99,5 +188,15 @@ public interface ProcessInstanceBuilder {
      *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
      **/
     ProcessInstance start();
+
+    /**
+     * Start the process instance asynchronously
+     *
+     * @throws FlowableIllegalArgumentException
+     *             if processDefinitionKey and processDefinitionId are null
+     * @throws FlowableObjectNotFoundException
+     *             when no process definition is deployed with the given processDefinitionKey or processDefinitionId
+     **/
+    ProcessInstance startAsync();
 
 }

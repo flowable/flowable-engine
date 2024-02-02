@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="stagePropagationSubprocessTest" name="Stage Propagation Subprocess Test" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:language><![CDATA[English]]></design:language>
+            <design:creationdate><![CDATA[2019-11-25T12:49:02.199Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2019-11-25T13:11:27.802Z]]></design:modificationdate>
+        </extensionElements>
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <userTask id="formTask1" name="Task C" flowable:formFieldValidation="false">
+            <extensionElements>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                <design:name-run><![CDATA[Task C]]></design:name-run>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="formTask1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <endEvent id="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <sequenceFlow id="sequenceFlow2" sourceRef="formTask1" targetRef="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_stagePropagationSubprocessTest">
+        <bpmndi:BPMNPlane bpmnElement="stagePropagationSubprocessTest" id="BPMNPlane_stagePropagationSubprocessTest">
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="261.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="formTask1" id="BPMNShape_formTask1">
+                <omgdc:Bounds height="80.0" width="100.0" x="192.0" y="236.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+                <omgdc:Bounds height="28.0" width="28.0" x="337.0" y="262.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1">
+                <omgdi:waypoint x="146.9499984899576" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="191.9999999999917" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2">
+                <omgdi:waypoint x="291.949999999934" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="337.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

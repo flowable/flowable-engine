@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.identity;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +27,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -36,6 +42,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all groups.
      */
+    @Test
     @Deployment
     public void testGetGroups() throws Exception {
         List<Group> savedGroups = new ArrayList<>();
@@ -53,11 +60,14 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
             savedGroups.add(group2);
 
             Group group3 = identityService.createGroupQuery().groupId("admin").singleResult();
-            assertNotNull(group3);
+            assertThat(group3).isNotNull();
+            
+            Group group4 = identityService.createGroupQuery().groupId("sales").singleResult();
+            assertThat(group4).isNotNull();
 
             // Test filter-less
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION);
-            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId());
+            assertResultsPresentInDataResponse(url, group1.getId(), group2.getId(), group3.getId(), group4.getId());
 
             // Test based on name
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_COLLECTION) + "?name=" + encode("Test group");
@@ -86,6 +96,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroup() throws Exception {
         try {
             ObjectNode requestNode = objectMapper.createObjectNode();
@@ -98,13 +109,17 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("testgroup", responseNode.get("id").textValue());
-            assertEquals("Test group", responseNode.get("name").textValue());
-            assertEquals("Test type", responseNode.get("type").textValue());
-            assertTrue(responseNode.get("url").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup")));
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'testgroup',"
+                            + " name: 'Test group',"
+                            + " type: 'Test type',"
+                            + " url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "testgroup") + "'"
+                            + "}");
 
-            assertNotNull(identityService.createGroupQuery().groupId("testgroup").singleResult());
+            assertThat(identityService.createGroupQuery().groupId("testgroup").singleResult()).isNotNull();
         } finally {
             try {
                 identityService.deleteGroup("testgroup");
@@ -114,6 +129,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroupExceptions() throws Exception {
         // Create without ID
         ObjectNode requestNode = objectMapper.createObjectNode();

@@ -21,24 +21,24 @@ import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.cfg.TransactionContext;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionListener;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.delegate.BaseExecutionListener;
-import org.flowable.engine.delegate.BaseTaskListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.delegate.BaseTaskListener;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -68,6 +68,8 @@ public class ListenerNotificationHelper {
                         }
                     } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
                         executionListener = (ExecutionListener) listener.getInstance();
+                    } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+                        executionListener = listenerFactory.createScriptTypeExecutionListener(listener);
                     }
 
                     if (executionListener != null) {
@@ -86,7 +88,9 @@ public class ListenerNotificationHelper {
         }
     }
 
-    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+    protected void planTransactionDependentExecutionListener(ListenerFactory listenerFactory, DelegateExecution execution, 
+                    TransactionDependentExecutionListener executionListener, FlowableListener listener) {
+        
         Map<String, Object> executionVariablesToUse = execution.getVariables();
         CustomPropertiesResolver customPropertiesResolver = createCustomPropertiesResolver(listener);
         Map<String, Object> customPropertiesMapToUse = invokeCustomPropertiesResolver(execution, customPropertiesResolver);
@@ -94,7 +98,8 @@ public class ListenerNotificationHelper {
         TransactionDependentExecutionListenerExecutionScope scope = new TransactionDependentExecutionListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
 
-        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope));
+        addTransactionListener(listener, new ExecuteExecutionListenerTransactionListener(executionListener, scope, 
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     public void executeTaskListeners(TaskEntity taskEntity, String eventType) {
@@ -111,11 +116,16 @@ public class ListenerNotificationHelper {
     public void executeTaskListeners(UserTask userTask, TaskEntity taskEntity, String eventType) {
         for (FlowableListener listener : userTask.getTaskListeners()) {
             String event = listener.getEvent();
+            if (event == null) {
+                throw new FlowableIllegalStateException(
+                        "No event defined for taskListener in UserTask '" + userTask.getName() + "'. Line: " + listener.getXmlRowNumber());
+            }
             if (event.equals(eventType) || event.equals(TaskListener.EVENTNAME_ALL_EVENTS)) {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
                 if (listener.getOnTransaction() != null) {
-                    planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
+                    ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
+                    planTransactionDependentTaskListener(executionEntity, (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
                     taskEntity.setEventHandlerId(listener.getId());
@@ -123,8 +133,6 @@ public class ListenerNotificationHelper {
                     try {
                         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                                 .handleInvocation(new TaskListenerInvocation((TaskListener) taskListener, taskEntity));
-                    } catch (Exception e) {
-                        throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
                     } finally {
                         taskEntity.setEventName(null);
                     }
@@ -149,6 +157,12 @@ public class ListenerNotificationHelper {
             }
         } else if (ImplementationType.IMPLEMENTATION_TYPE_INSTANCE.equalsIgnoreCase(listener.getImplementationType())) {
             taskListener = (TaskListener) listener.getInstance();
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equalsIgnoreCase(listener.getImplementationType())) {
+            taskListener = listenerFactory.createScriptTypeTaskListener(listener);
+        } else {
+            throw new FlowableIllegalStateException(
+                    "No TaskListener implementation found for implementationType=" + listener.getImplementationType() + " implementation="
+                            + listener.getImplementation());
         }
         return taskListener;
     }
@@ -160,7 +174,8 @@ public class ListenerNotificationHelper {
 
         TransactionDependentTaskListenerExecutionScope scope = new TransactionDependentTaskListenerExecutionScope(
                 execution.getProcessInstanceId(), execution.getId(), (Task) execution.getCurrentFlowElement(), executionVariablesToUse, customPropertiesMapToUse);
-        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope));
+        addTransactionListener(listener, new ExecuteTaskListenerTransactionListener(taskListener, scope,
+                        CommandContextUtil.getProcessEngineConfiguration().getCommandExecutor()));
     }
 
     protected CustomPropertiesResolver createCustomPropertiesResolver(FlowableListener listener) {

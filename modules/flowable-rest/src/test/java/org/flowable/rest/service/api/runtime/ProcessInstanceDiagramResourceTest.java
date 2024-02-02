@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -20,23 +22,27 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 /**
  * @author Frederik Heremans
  */
 public class ProcessInstanceDiagramResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment
     public void testGetProcessDiagram() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleProcess");
 
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
                 HttpStatus.SC_OK);
-        assertNotNull(response.getEntity().getContent());
-        assertEquals("image/png", response.getEntity().getContentType().getValue());
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
         closeResponse(response);
     }
 
+    @Test
     @Deployment
     public void testGetProcessDiagramWithoutDiagram() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -46,7 +52,21 @@ public class ProcessInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting process instance.
      */
+    @Test
     public void testGetUnexistingProcessInstance() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
+    }
+
+    @Test
+    @Deployment
+    public void testGetProcessDiagramWithAnnotationOnSequenceFlow() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleProcess");
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_DIAGRAM, processInstance.getId())),
+                HttpStatus.SC_OK);
+        assertThat(response.getEntity().getContent()).isNotNull();
+        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("image/png");
+        closeResponse(response);
     }
 }

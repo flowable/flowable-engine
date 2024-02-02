@@ -18,9 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -46,8 +47,10 @@ public class GetTasksLocalVariablesCmd implements Command<List<VariableInstance>
             throw new FlowableIllegalArgumentException("Set of taskIds is empty");
         }
 
-        List<VariableInstance> instances = new ArrayList<>();
-        List<VariableInstanceEntity> entities = CommandContextUtil.getVariableService().findVariableInstancesByTaskIds(taskIds);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        List<VariableInstanceEntity> entities = processEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery().taskIds(taskIds).list();
+        List<VariableInstance> instances = new ArrayList<>(entities.size());
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();
             instances.add(entity);

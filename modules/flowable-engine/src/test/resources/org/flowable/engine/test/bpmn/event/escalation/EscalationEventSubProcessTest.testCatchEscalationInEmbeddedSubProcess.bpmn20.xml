@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+	
+	<escalation id="myEscalation" escalationCode="123" />
+
+	<process id="catchEscalationInEmbeddedSubProcess">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />
+
+        <subProcess id="subprocess">
+            <startEvent id="subprocessStart" />
+            <sequenceFlow id="subFlow1" sourceRef="subprocessStart" targetRef="subprocessEnd" />
+            <endEvent id="subprocessEnd">
+                <escalationEventDefinition escalationRef="myEscalation" />
+            </endEvent>
+          
+            <subProcess id="eventSubProcess" triggeredByEvent="true">
+    		    <startEvent id="catchEscalation">
+    		          <escalationEventDefinition /> <!-- no escalationCode: catch any error -->
+    		    </startEvent>
+    		    <sequenceFlow id="flow2" sourceRef="catchEscalation" targetRef="taskAfterEscalationCatch" />
+    		    <userTask id="taskAfterEscalationCatch" name="Escalated Task" />
+            </subProcess>
+    
+        </subProcess>
+        
+        <sequenceFlow id="flow3" sourceRef="subprocess" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

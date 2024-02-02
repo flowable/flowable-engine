@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,7 @@ public abstract class DmnEngines {
             }
             for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
                 URL resource = iterator.next();
-                LOGGER.info("Initializing dmn engine using configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using configuration '{}'", resource);
                 initDmnEngineFromResource(resource);
             }
 
@@ -84,7 +83,7 @@ public abstract class DmnEngines {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-                LOGGER.info("Initializing dmn engine using Spring configuration '{}'", resource.toString());
+                LOGGER.info("Initializing dmn engine using Spring configuration '{}'", resource);
                 initDmnEngineFromSpringResource(resource);
             }
 
@@ -106,7 +105,7 @@ public abstract class DmnEngines {
             dmnEngineInfosByResourceUrl.put(resource.toString(), dmnEngineInfo);
 
         } catch (Exception e) {
-            throw new FlowableException("couldn't initialize dmn engine from spring configuration resource " + resource.toString() + ": " + e.getMessage(), e);
+            throw new FlowableException("couldn't initialize dmn engine from spring configuration resource " + resource + ": " + e.getMessage(), e);
         }
     }
 
@@ -157,16 +156,12 @@ public abstract class DmnEngines {
     }
 
     protected static DmnEngine buildDmnEngine(URL resource) {
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.openStream();
+        try (InputStream inputStream = resource.openStream()) {
             DmnEngineConfiguration dmnEngineConfiguration = DmnEngineConfiguration.createDmnEngineConfigurationFromInputStream(inputStream);
             return dmnEngineConfiguration.buildDmnEngine();
 
         } catch (IOException e) {
             throw new FlowableException("couldn't open resource stream: " + e.getMessage(), e);
-        } finally {
-            IOUtils.closeQuietly(inputStream);
         }
     }
 

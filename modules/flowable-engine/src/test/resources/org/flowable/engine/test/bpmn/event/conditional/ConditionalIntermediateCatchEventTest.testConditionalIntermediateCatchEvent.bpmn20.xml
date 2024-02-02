@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+	
+	<process id="conditionalCatchEvent">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBeforeConditionalCatch" />
+
+        <userTask id="taskBeforeConditionalCatch" />
+            
+        <sequenceFlow id="flow2" sourceRef="taskBeforeConditionalCatch" targetRef="catchConditional" />
+
+		<intermediateCatchEvent id="catchConditional">
+			<conditionalEventDefinition>
+                <condition>${myVar == 'test'}</condition>
+            </conditionalEventDefinition>
+		</intermediateCatchEvent>
+        
+		<sequenceFlow id="flow3" sourceRef="catchConditional" targetRef="taskAfterConditionalCatch" />
+		<userTask id="taskAfterConditionalCatch" />
+        
+        <sequenceFlow id="flow4" sourceRef="taskAfterConditionalCatch" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

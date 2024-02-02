@@ -12,16 +12,16 @@
  */
 package org.flowable.cdi.impl;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * {@link ProcessEngineLookup} for looking up or building a local {@link ProcessEngine} using the provided processEngineName ( {@link ProcessEngines#NAME_DEFAULT} is used as default value). Can be
  * used for looking up existing {@link ProcessEngine}s in the same ClassLoader as this Class.
- * <p />
+ * <p>
  * Use this Strategy if you want to build and manage a {@link ProcessEngine} local to your application.
- * <p />
+ * <p>
  * Note: Requires an "flowable.cfg.xml" to be available on the classpath.
  * 
  * @author Daniel Meyer

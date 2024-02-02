@@ -12,9 +12,10 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 
 /**
@@ -26,4 +27,23 @@ public interface HistoricIdentityLinkDataManager extends DataManager<HistoricIde
 
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
 
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType);
+    
+    void deleteHistoricIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
+    void deleteHistoricIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+    
+    void deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricTaskIdentityLinksForNonExistingInstances();
 }

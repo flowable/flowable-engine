@@ -20,11 +20,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class ByteArrayType implements VariableType {
 
+    public static final String TYPE_NAME = "bytes";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "bytes";
+        return TYPE_NAME;
     }
 
     @Override

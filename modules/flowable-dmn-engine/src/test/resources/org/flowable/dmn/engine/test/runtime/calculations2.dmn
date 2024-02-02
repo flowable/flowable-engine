@@ -1,0 +1,73 @@
+<!--
+https://github.com/flowable/flowable-engine/issues/1264
+Doubles were converted to BigDecimal with not enough scale.
+This resulted in a not equals for #{var1 == 0.40} expression when var1 = 0.40
+-->
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_e7fdca2d-aedb-11e8-b2ea-0e94de0b652e" name="DMN with expression and decimals" namespace="http://www.flowable.org/dmn">
+  <decision id="dmnWithExpressionAndDecimals" name="DMN with expression and decimals">
+    <decisionTable id="decisionTable_e7fdca2d-aedb-11e8-b2ea-0e94de0b652e" hitPolicy="FIRST">
+      <input label="Sample Input">
+        <inputExpression id="inputExpression_inputExpression_1" typeRef="number">
+          <text>sample_input</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_outputExpression_1" label="Score" name="score" typeRef="number"></output>
+      <output id="outputExpression_outputExpression_2" label="Notes" name="notes" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_inputExpression_1_1">
+          <text><![CDATA[#{sample_input >= 0.75}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_outputExpression_1_1">
+          <text><![CDATA[1150]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_outputExpression_2_1">
+          <text><![CDATA["This works"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_inputExpression_1_2">
+          <text><![CDATA[#{sample_input >= 0.40 && sample_input <= 0.74}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_outputExpression_1_2">
+          <text><![CDATA[750]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_outputExpression_2_2">
+          <text><![CDATA["If 0.40 is passed then this rule is NOT executed, but works fine for 0.74"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_inputExpression_1_3">
+          <text><![CDATA[#{sample_input >= 0.20 && sample_input <= 0.39}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_outputExpression_1_3">
+          <text><![CDATA[500]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_outputExpression_2_3">
+          <text><![CDATA["If 0.20 is passed then this rule is NOT executed, but works fine for 0.21 and 0.39"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_inputExpression_1_4">
+          <text><![CDATA[#{sample_input < 0.20}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_outputExpression_1_4">
+          <text><![CDATA[0]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_outputExpression_2_4">
+          <text><![CDATA["This works"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_inputExpression_1_5">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_outputExpression_1_5">
+          <text><![CDATA[0]]></text>
+        </outputEntry>
+        <outputEntry id="outputEntry_outputExpression_2_5">
+          <text><![CDATA["Fall back rule"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

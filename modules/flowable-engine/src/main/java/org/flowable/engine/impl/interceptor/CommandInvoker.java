@@ -12,14 +12,27 @@
  */
 package org.flowable.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
+import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
+import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.agenda.AbstractOperation;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +44,21 @@ public class CommandInvoker extends AbstractCommandInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandInvoker.class);
 
+    protected AgendaOperationRunner agendaOperationRunner;
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
+
+    public CommandInvoker(AgendaOperationRunner agendaOperationRunner, Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
+        this.agendaOperationRunner = agendaOperationRunner;
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T execute(final CommandConfig config, final Command<T> command) {
+    public <T> T execute(final CommandConfig config, final Command<T> command, CommandExecutor commandExecutor) {
         final CommandContext commandContext = Context.getCommandContext();
         
         FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        if (commandContext.isReused() && !agenda.isEmpty()) {
+        if (commandContext.isReused() && !agenda.isEmpty()) { // there is already an agenda loop being executed
             return (T) command.execute(commandContext);
             
         } else {
@@ -56,10 +77,35 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             executeOperations(commandContext);
     
             // At the end, call the execution tree change listeners.
-            // TODO: optimization: only do this when the tree has actually changed (ie check dbSqlSession).
-            if (!commandContext.isReused() && CommandContextUtil.hasInvolvedExecutions(commandContext)) {
-                agenda.planExecuteInactiveBehaviorsOperation();
+            Map<String, ExecutionEntity> involvedExecutions = CommandContextUtil.getInvolvedExecutions(commandContext);
+            if (!commandContext.isReused() && involvedExecutions != null && !involvedExecutions.isEmpty()) {
+                agenda.planExecuteInactiveBehaviorsOperation(involvedExecutions.values());
+                CommandContextUtil.clearInvolvedExecutions(commandContext);
                 executeOperations(commandContext);
+            }
+            
+            VariableListenerSession variableListenerSession = commandContext.getSession(VariableListenerSession.class);
+            Map<String, List<VariableListenerSessionData>> variableSessionData = variableListenerSession.getVariableData();
+            
+            List<String> processInstanceIds = new ArrayList<>();
+            if (variableSessionData != null) {
+                for (String variableName : variableSessionData.keySet()) {
+                    List<VariableListenerSessionData> variableListenerDataList = variableSessionData.get(variableName);
+                    for (VariableListenerSessionData variableListenerData : variableListenerDataList) {
+                        if (!ScopeTypes.BPMN.equals(variableListenerData.getScopeType())) {
+                            continue;
+                        }
+                        
+                        if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
+                            processInstanceIds.add(variableListenerData.getScopeId());
+                            agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                        }
+                    }
+                }
+                
+                if (!processInstanceIds.isEmpty()) {
+                    executeOperations(commandContext);
+                }
             }
     
             return (T) commandContext.getResult();
@@ -67,13 +113,45 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     }
 
     protected void executeOperations(final CommandContext commandContext) {
-        while (!CommandContextUtil.getAgenda(commandContext).isEmpty()) {
-            Runnable runnable = CommandContextUtil.getAgenda(commandContext).getNextOperation();
-            executeOperation(runnable);
+        FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+        while (!agenda.isEmpty()) {
+            Runnable runnable = agenda.getNextOperation();
+            executeExecutionListenersBeforeExecute(commandContext, runnable);
+            try {
+                executeOperation(commandContext, runnable);
+            } catch (Throwable throwable) {
+                executeExecutionListenersAfterException(commandContext, runnable, throwable);
+                ExceptionUtil.sneakyThrow(throwable);
+            }
+            executeExecutionListenersAfterExecute(commandContext, runnable);
         }
     }
 
-    public void executeOperation(Runnable runnable) {
+    protected void executeExecutionListenersBeforeExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterException(CommandContext commandContext, Runnable runnable, Throwable throwable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecuteException(commandContext, runnable, throwable);
+            }
+        }
+    }
+
+    public void executeOperation(CommandContext commandContext, Runnable runnable) {
         if (runnable instanceof AbstractOperation) {
             AbstractOperation operation = (AbstractOperation) runnable;
 
@@ -82,14 +160,19 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             if (operation.getExecution() == null || !operation.getExecution().isEnded()) {
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Executing operation {} ", operation.getClass());
+                    LOGGER.debug("Executing operation {}", operation.getClass());
                 }
 
-                runnable.run();
+                agendaOperationRunner.executeOperation(commandContext, operation);
 
             }
 
         } else {
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Executing operation {}", runnable.getClass());
+            }
+
             runnable.run();
         }
     }
@@ -104,4 +187,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
         throw new UnsupportedOperationException("CommandInvoker must be the last interceptor in the chain");
     }
 
+    public AgendaOperationRunner getAgendaOperationRunner() {
+        return agendaOperationRunner;
+    }
+    public void setAgendaOperationRunner(AgendaOperationRunner agendaOperationRunner) {
+        this.agendaOperationRunner = agendaOperationRunner;
+    }
 }

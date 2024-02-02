@@ -20,7 +20,7 @@ import java.util.Map;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**
@@ -50,7 +50,9 @@ public class AdhocSubProcessActivityBehavior extends AbstractBpmnActivityBehavio
         if (flowElement instanceof SubProcess) {
             subProcess = (SubProcess) flowElement;
         } else {
-            throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
+            throw new FlowableException(
+                    "Programmatic error: sub process behaviour can only be applied to a SubProcess instance, but got an instance of " + flowElement + " for "
+                            + execution);
         }
         return subProcess;
     }

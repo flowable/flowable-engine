@@ -16,6 +16,10 @@ create table ACT_HI_PROCINST (
   NAME_ varchar(255),
   CALLBACK_ID_ varchar(255),
   CALLBACK_TYPE_ varchar(255),
+  REFERENCE_ID_ varchar(255),
+  REFERENCE_TYPE_ varchar(255),
+  PROPAGATED_STAGE_INST_ID_ varchar(255),
+  BUSINESS_STATUS_ varchar(255),
   primary key (ID_),
   unique (PROC_INST_ID_)
 );
@@ -34,6 +38,7 @@ create table ACT_HI_ACTINST (
   ASSIGNEE_ varchar(255),
   START_TIME_ timestamp not null,
   END_TIME_ timestamp,
+  TRANSACTION_ORDER_ integer,
   DURATION_ bigint,
   DELETE_REASON_ varchar(4000),
   TENANT_ID_ varchar(255) default '',
@@ -89,6 +94,7 @@ create table ACT_HI_ATTACHMENT (
 
 create index ACT_IDX_HI_PRO_INST_END on ACT_HI_PROCINST(END_TIME_);
 create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
+create index ACT_IDX_HI_PRO_SUPER_PROCINST on ACT_HI_PROCINST(SUPER_PROCESS_INSTANCE_ID_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
 create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
 create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);

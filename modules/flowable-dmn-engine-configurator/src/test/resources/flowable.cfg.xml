@@ -6,17 +6,18 @@
 
   <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
-    <property name="jdbcDriver" value="org.h2.Driver" />
-    <property name="jdbcUsername" value="sa" />
-    <property name="jdbcPassword" value="" />
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+    <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+    <property name="jdbcUsername" value="${jdbc.username:sa}" />
+    <property name="jdbcPassword" value="${jdbc.password:}" />
     
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="drop-create" />
+    <property name="databaseSchemaUpdate" value="true" />
 
     <!-- job executor configurations -->
-    <property name="asyncExecutor" ref="asyncExecutor" />
     <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+    <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     
     <property name="asyncFailedJobWaitTime" value="1" />
 
@@ -26,7 +27,7 @@
     <property name="mailServers">
       <map>
         <entry key="myEmailTenant">
-          <bean class="org.flowable.engine.cfg.MailServerInfo">
+          <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
             <property name="mailServerHost" value="localhost" />
             <property name="mailServerPort" value="5025" />
             <property name="mailServerUseSSL" value="false" />
@@ -42,21 +43,28 @@
     <property name="history" value="full" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
+    <property name="enableEntityLinks" value="true" />
 
     <property name="configurators">
       <list>
+        <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator">
+            <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration" />
+        </bean>
         <bean class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
+            <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration" />
         </bean>
       </list>
     </property>
 
   </bean>
   
-  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-    <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+  <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="enableEntityLinks" value="true" />
   </bean>
-
-
-
+  
+  <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.DmnEngineConfiguration">
+    <property name="historyEnabled" value="true" />
+  </bean>
+  
 </beans>

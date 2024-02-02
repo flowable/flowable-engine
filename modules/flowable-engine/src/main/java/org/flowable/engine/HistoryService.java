@@ -14,6 +14,7 @@
 
 package org.flowable.engine;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -27,10 +28,16 @@ import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
+import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskLogEntry;
+import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
+import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
+import org.flowable.task.api.history.NativeHistoricTaskLogEntryQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
@@ -65,7 +72,7 @@ public interface HistoryService {
     HistoricDetailQuery createHistoricDetailQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricDetailQuery createNativeHistoricDetailQuery();
 
@@ -75,7 +82,7 @@ public interface HistoryService {
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
     /**
-     * Returns a new {@link org.flowable.engine.common.api.query.NativeQuery} for process definitions.
+     * Returns a new {@link org.flowable.common.engine.api.query.NativeQuery} for process definitions.
      */
     NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery();
 
@@ -89,6 +96,21 @@ public interface HistoryService {
      * Deletes historic process instance. All historic activities, historic task and historic details (variable updates, form properties) are deleted as well.
      */
     void deleteHistoricProcessInstance(String processInstanceId);
+    
+    /**
+     * Performs a bulk delete with the provided process instance ids. All historic activities, historic tasks and historic details (variable updates, form properties) are deleted as well.
+     */
+    void bulkDeleteHistoricProcessInstances(Collection<String> instanceIds);
+
+    /**
+     * Deletes historic task and activity data for removed process instances
+     */
+    void deleteTaskAndActivityDataOfRemovedHistoricProcessInstances();
+    
+    /**
+     * Deletes historic identity links, detail info, variable data and entity links for removed process instances
+     */
+    void deleteRelatedDataOfRemovedHistoricProcessInstances();
 
     /**
      * creates a native query to search for {@link HistoricProcessInstance}s via SQL
@@ -116,10 +138,65 @@ public interface HistoryService {
      * certain process instance, even if the instance is completed as opposed to {@link IdentityLink}s which only exist for active instances.
      */
     List<HistoricIdentityLink> getHistoricIdentityLinksForProcessInstance(String processInstanceId);
+    
+    /**
+     * Retrieves the {@link HistoricEntityLink}s associated with the given process instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenForProcessInstance(String processInstanceId);
+
+    /**
+     * Retrieves all the {@link HistoricEntityLink}s associated with same root as the given process instance.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenWithSameRootAsProcessInstance(String processInstanceId);
+
+    /**
+     * Retrieves the {@link HistoricEntityLink}s associated with the given task.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkChildrenForTask(String taskId);
+
+    /**
+     * Retrieves the {@link HistoricEntityLink}s where the given process instance is referenced.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForProcessInstance(String processInstanceId);
+
+    /**
+     * Retrieves the {@link HistoricEntityLink}s where the given task is referenced.
+     */
+    List<HistoricEntityLink> getHistoricEntityLinkParentsForTask(String taskId);
 
     /**
      * Allows to retrieve the {@link ProcessInstanceHistoryLog} for one process instance.
      */
     ProcessInstanceHistoryLogQuery createProcessInstanceHistoryLogQuery(String processInstanceId);
+
+    /**
+     * Deletes user task log entry by its log number
+     *
+     * @param logNumber user task log entry identifier
+     */
+    void deleteHistoricTaskLogEntry(long logNumber);
+
+    /**
+     * Create new task log entry builder to the log task event
+     *
+     * @param task to which is log related to
+     */
+    HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder(TaskInfo task);
+
+    /**
+     * Create new task log entry builder to the log task event without predefined values from the task
+     *
+     */
+    HistoricTaskLogEntryBuilder createHistoricTaskLogEntryBuilder();
+
+    /**
+     * Returns a new {@link HistoricTaskLogEntryQuery} that can be used to dynamically query task log entries.
+     */
+    HistoricTaskLogEntryQuery createHistoricTaskLogEntryQuery();
+
+    /**
+     * Returns a new {@link NativeHistoricTaskLogEntryQuery} for {@link HistoricTaskLogEntry}s.
+     */
+    NativeHistoricTaskLogEntryQuery createNativeHistoricTaskLogEntryQuery();
 
 }

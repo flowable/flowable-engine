@@ -14,7 +14,7 @@ package org.activiti.engine.impl.webservice;
 
 import java.util.Date;
 
-import javax.jws.WebService;
+import jakarta.jws.WebService;
 
 /**
  * An implementation of a Counter WS

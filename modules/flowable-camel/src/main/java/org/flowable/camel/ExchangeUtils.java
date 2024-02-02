@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import org.apache.camel.Exchange;
 import org.apache.camel.TypeConversionException;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * This class contains one method - prepareVariables - that is used to copy variables from Camel into the process engine.
@@ -40,8 +40,8 @@ public class ExchangeUtils {
      * the Object as it comes.
      * <ul>
      * <li>If the copyVariablesFromProperties parameter is set on the endpoint, the properties are copied instead</li>
-     * <li>If the copyCamelBodyToBodyAsString parameter is set on the endpoint, the camelBody is converted to java.lang.String and added as a camelBody variable, unless it is a Map&lt;String,
-     * Object&gt;</li>
+     * <li>If the copyCamelBodyToBodyAsString parameter is set on the endpoint, the camelBody is converted to java.lang.String and added as a camelBody variable, unless it is a {@code Map<String,
+     * Object>}</li>
      * <li>If the copyVariablesFromHeader parameter is set on the endpoint, each Camel Header will be copied to an individual process variable.</li>
      * </ul>
      */
@@ -65,7 +65,7 @@ public class ExchangeUtils {
         }
 
         String lower = booleanString.toLowerCase();
-        return lower.equals("true") || lower.equals("false");
+        return "true".equals(lower) || "false".equals(lower);
     }
 
     public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint endpoint) {
@@ -107,8 +107,8 @@ public class ExchangeUtils {
         }
 
         Object camelBody = null;
-        if (exchange.hasOut()) {
-            camelBody = exchange.getOut().getBody();
+        if (exchange.getMessage() != null) {
+            camelBody = exchange.getMessage().getBody();
         } else {
             camelBody = exchange.getIn().getBody();
         }

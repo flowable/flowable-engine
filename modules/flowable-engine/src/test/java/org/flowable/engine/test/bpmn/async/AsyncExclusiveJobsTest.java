@@ -12,18 +12,26 @@
  */
 package org.flowable.engine.test.bpmn.async;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobExecutorConfiguration;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
 
     /**
      * Test for https://activiti.atlassian.net/browse/ACT-4035.
      */
+    @Test
     @Deployment
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testExclusiveJobs() {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -33,7 +41,7 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("testExclusiveJobs");
             waitForJobExecutorToProcessAllJobs(20000L, 500L);
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             HistoricActivityInstance scriptTaskAInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskA").singleResult();
             HistoricActivityInstance scriptTaskBInstance = historyService.createHistoricActivityInstanceQuery().activityId("scriptTaskB").singleResult();
@@ -46,9 +54,40 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
             } else {
                 endTimeDifference = endTimeA - endTimeB;
             }
-            assertTrue(endTimeDifference > 6000); // > 6000 -> jobs were executed in parallel
+            assertThat(endTimeDifference).isGreaterThan(6000); // > 6000 -> jobs were executed in parallel
         }
 
     }
 
+    @Test
+    @Deployment
+    public void testParallelGatewayExclusiveJobs() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("parallelExclusiveServiceTasks")
+                .variable("counter", 0L)
+                .start();
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter"))
+                .isEqualTo(0L);
+
+        AsyncJobExecutorConfiguration asyncExecutorConfiguration = processEngineConfiguration.getAsyncExecutorConfiguration();
+        boolean originalGlobalAcquireLockEnabled = asyncExecutorConfiguration.isGlobalAcquireLockEnabled();
+        CollectingAsyncRunnableExecutionExceptionHandler executionExceptionHandler = new CollectingAsyncRunnableExecutionExceptionHandler();
+        try {
+            asyncExecutorConfiguration.setGlobalAcquireLockEnabled(true);
+            processEngineConfiguration.getJobServiceConfiguration()
+                    .getAsyncRunnableExecutionExceptionHandlers()
+                    .add(0, executionExceptionHandler);
+            waitForJobExecutorToProcessAllJobs(15000, 200);
+        } finally {
+            asyncExecutorConfiguration.setGlobalAcquireLockEnabled(originalGlobalAcquireLockEnabled);
+            processEngineConfiguration.getJobServiceConfiguration()
+                    .getAsyncRunnableExecutionExceptionHandlers()
+                    .remove(executionExceptionHandler);
+        }
+
+        assertThat(executionExceptionHandler.getExceptions()).isEmpty();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter"))
+                .isEqualTo(3L);
+    }
 }

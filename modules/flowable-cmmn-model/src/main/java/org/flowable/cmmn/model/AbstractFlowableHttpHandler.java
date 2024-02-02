@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Tijs Rademakers
@@ -65,6 +65,7 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
     public abstract AbstractFlowableHttpHandler clone();
 
     public void setValues(AbstractFlowableHttpHandler otherHandler) {
+        super.setValues(otherHandler);
         setImplementation(otherHandler.getImplementation());
         setImplementationType(otherHandler.getImplementationType());
 

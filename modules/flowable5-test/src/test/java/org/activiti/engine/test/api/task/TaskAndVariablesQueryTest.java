@@ -96,7 +96,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
         assertEquals(3, task.getProcessVariables().size());
-        assertEquals(0, task.getTaskLocalVariables().size());
         assertEquals(true, task.getProcessVariables().get("processVar"));
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
         assertEquals("This is a binary process variable", new String((byte[]) task.getProcessVariables().get("binaryVariable")));
@@ -119,7 +118,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("kermit").taskVariableValueEquals("localVar", "test").singleResult();
         assertEquals(3, task.getProcessVariables().size());
-        assertEquals(0, task.getTaskLocalVariables().size());
         assertEquals(true, task.getProcessVariables().get("processVar"));
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 
@@ -202,40 +200,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         for (org.flowable.task.api.Task task : tasks) {
             assertNotNull(task.getCategory());
             assertEquals("testCategory", task.getCategory());
-        }
-    }
-
-    public void testQueryWithLimitAndVariables() throws Exception {
-
-        int taskVariablesLimit = 2000;
-        int expectedNumberOfTasks = 103;
-
-        try {
-            // setup - create 100 tasks
-            multipleTaskIds = generateMultipleTestTasks();
-
-            // limit results to 2000 and set maxResults for paging to 200
-            // please see MNT-16040
-            List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .limitTaskVariables(taskVariablesLimit)
-                    .orderByTaskPriority()
-                    .asc()
-                    .listPage(0, 200);
-            // 100 tasks created by generateMultipleTestTasks and 3 created previously at setUp
-            assertEquals(expectedNumberOfTasks, tasks.size());
-
-            tasks = taskService.createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskPriority()
-                    .limitTaskVariables(taskVariablesLimit)
-                    .asc()
-                    .listPage(50, 100);
-            assertEquals(53, tasks.size());
-        } finally {
-            taskService.deleteTasks(multipleTaskIds, true);
         }
     }
 

@@ -13,14 +13,13 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -29,7 +28,7 @@ import org.flowable.job.service.JobServiceConfiguration;
  *
  * @author Tijs Rademakers
  */
-public abstract class AbstractJobEntityImpl extends AbstractEntity implements AbstractRuntimeJobEntity, Serializable {
+public abstract class AbstractJobEntityImpl extends AbstractJobServiceEntity implements AbstractRuntimeJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,10 +39,17 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     protected String processInstanceId;
     protected String processDefinitionId;
     
+    protected String category;
+    protected String jobType;
+    
+    protected String elementId;
+    protected String elementName;
+    
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String correlationId;
 
     protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
@@ -55,13 +61,12 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
-    protected JobByteArrayRef customValuesByteArrayRef;
+    protected ByteArrayRef customValuesByteArrayRef;
 
-    protected JobByteArrayRef exceptionByteArrayRef;
+    protected ByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
 
     protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
-    protected String jobType;
 
     @Override
     public Object getPersistentState() {
@@ -71,12 +76,18 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
+        persistentState.put("processDefinitionId", processDefinitionId);
+        persistentState.put("category", category);
+        persistentState.put("jobType", jobType);
+        persistentState.put("elementId", elementId);
+        persistentState.put("elementName", elementName);
+        persistentState.put("correlationId", correlationId);
 
         if (customValuesByteArrayRef != null) {
             persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
         }
 
-        if (exceptionByteArrayRef != null) {
+        if (exceptionByteArrayRef != null && exceptionByteArrayRef.getId() != null) {
             persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
 
@@ -155,38 +166,96 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         this.processDefinitionId = processDefinitionId;
     }
     
+    @Override
+    public String getElementId() {
+        return elementId;
+    }
+
+    @Override
+    public void setElementId(String elementId) {
+        this.elementId = elementId;
+    }
+
+    @Override
+    public String getElementName() {
+        return elementName;
+    }
+
+    @Override
+    public void setElementName(String elementName) {
+        this.elementName = elementName;
+    }
+
+    @Override
     public String getScopeId() {
         return scopeId;
     }
 
+    @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
     }
 
+    @Override
     public String getSubScopeId() {
         return subScopeId;
     }
 
+    @Override
     public void setSubScopeId(String subScopeId) {
         this.subScopeId = subScopeId;
     }
 
+    @Override
     public String getScopeType() {
         return scopeType;
     }
 
+    @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
     }
 
+    @Override
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
     }
 
+    @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
     }
 
+    @Override
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    @Override
+    public void setCorrelationId(String correlationId) {
+        this.correlationId = correlationId;
+    }
+    
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    @Override
+    public String getJobType() {
+        return jobType;
+    }
+
+    @Override
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+    
     @Override
     public String getRepeat() {
         return repeat;
@@ -238,8 +307,13 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     }
 
     @Override
-    public JobByteArrayRef getCustomValuesByteArrayRef() {
+    public ByteArrayRef getCustomValuesByteArrayRef() {
         return customValuesByteArrayRef;
+    }
+
+    @Override
+    public void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef) {
+        this.customValuesByteArrayRef = customValuesByteArrayRef;
     }
 
     @Override
@@ -249,20 +323,10 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     @Override
     public void setCustomValues(String customValues) {
-        if(customValuesByteArrayRef == null) {
-            customValuesByteArrayRef = new JobByteArrayRef();
+        if (customValuesByteArrayRef == null) {
+            customValuesByteArrayRef = new ByteArrayRef();
         }
-        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
-    }
-
-    @Override
-    public String getJobType() {
-        return jobType;
-    }
-
-    @Override
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());
     }
 
     @Override
@@ -283,9 +347,10 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
-            exceptionByteArrayRef = new JobByteArrayRef();
+            exceptionByteArrayRef = new ByteArrayRef();
         }
-        exceptionByteArrayRef.setValue("stacktrace", exception);
+
+        exceptionByteArrayRef.setValue("stacktrace", exception, getEngineType());
     }
 
     @Override
@@ -299,20 +364,73 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     }
 
     @Override
-    public JobByteArrayRef getExceptionByteArrayRef() {
+    public ByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }
 
-    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+    @Override
+    public void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef) {
+        this.exceptionByteArrayRef = exceptionByteArrayRef;
+    }
+
+    private String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }
-        return jobByteArrayRef.asString();
+        return jobByteArrayRef.asString(getEngineType());
     }
 
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
+    }
+    
     @Override
     public String toString() {
-        return getClass().getName() + " [id=" + id + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName().replace("Impl", "")).append("[")
+                .append("id=").append(id)
+                .append(", jobHandlerType=").append(jobHandlerType)
+                .append(", jobType=").append(jobType);
+
+        if (category != null) {
+            sb.append(", category=").append(category);
+        }
+
+        if (elementId != null) {
+            sb.append(", elementId=").append(elementId);
+        }
+
+        if (correlationId != null) {
+            sb.append(", correlationId=").append(correlationId);
+        }
+
+        if (executionId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId);
+        } else if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeType=").append(scopeType);
+        }
+
+        if (processDefinitionId != null) {
+            sb.append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeDefinitionId != null) {
+            if (scopeId == null) {
+                sb.append(", scopeType=").append(scopeType);
+            }
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

@@ -14,11 +14,12 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -45,14 +46,19 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
             throw new FlowableIllegalArgumentException("taskId is null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
         }
 
+        if (task.isDeleted()) {
+            throw new FlowableException(task + " is already deleted");
+        }
+
         if (task.isSuspended()) {
-            throw new FlowableException(getSuspendedTaskException());
+            throw new FlowableException(getSuspendedTaskExceptionPrefix() + " a suspended " + task);
         }
 
         return execute(commandContext, task);
@@ -66,8 +72,8 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
     /**
      * Subclasses can override this method to provide a customized exception message that will be thrown when the task is suspended.
      */
-    protected String getSuspendedTaskException() {
-        return "Cannot execute operation: task is suspended";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot execute operation for";
     }
 
 }

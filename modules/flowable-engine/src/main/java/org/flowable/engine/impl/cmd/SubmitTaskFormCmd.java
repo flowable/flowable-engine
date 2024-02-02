@@ -15,13 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -56,16 +57,19 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
-        CommandContextUtil.getHistoryManager(commandContext).recordFormPropertiesSubmitted(executionEntity, properties, taskId);
+        CommandContextUtil.getHistoryManager(commandContext)
+            .recordFormPropertiesSubmitted(executionEntity, properties, taskId, processEngineConfiguration.getClock().getCurrentTime());
 
-        TaskFormHandler taskFormHandler = FormHandlerUtil.getTaskFormHandlder(task);
+        FormHandlerHelper formHandlerHelper = processEngineConfiguration.getFormHandlerHelper();
+        TaskFormHandler taskFormHandler = formHandlerHelper.getTaskFormHandlder(task);
 
         if (taskFormHandler != null) {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, false, commandContext);
+                TaskHelper.completeTask(task, null, null, null, null, null, commandContext);
             }
         }
 
@@ -73,8 +77,8 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot submit a form to a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot submit a form to";
     }
 
 }

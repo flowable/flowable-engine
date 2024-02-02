@@ -21,8 +21,6 @@ import org.flowable.engine.impl.bpmn.webservice.MessageDefinition;
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.bpmn.webservice.OperationImplementation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a WS implementation of a {@link Operation}
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
  * @author Esteban Robles Luna
  */
 public class WSOperation implements OperationImplementation {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WSOperation.class);
 
     protected String id;
 
@@ -57,13 +53,29 @@ public class WSOperation implements OperationImplementation {
 
     @Override
     public MessageInstance sendFor(MessageInstance message, Operation operation, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {
-        Object[] arguments = this.getArguments(message);
+        Object[] inArguments = this.getInArguments(message);
+        Object[] outArguments = this.getOutArguments(operation);
+
+        // For each out parameters, a value 'null' must be set in arguments passed to the Apache CXF API to invoke
+        // web-service operation
+        Object[] arguments = new Object[inArguments.length + outArguments.length];
+        System.arraycopy(inArguments, 0, arguments, 0, inArguments.length);
         Object[] results = this.safeSend(arguments, overridenEndpointAddresses);
         return this.createResponseMessage(results, operation);
     }
 
-    private Object[] getArguments(MessageInstance message) {
+    private Object[] getInArguments(MessageInstance message) {
         return message.getStructureInstance().toArray();
+    }
+
+    private Object[] getOutArguments(Operation operation) {
+
+        MessageDefinition outMessage = operation.getOutMessage();
+        if (outMessage != null) {
+            return outMessage.createInstance().getStructureInstance().toArray();
+        } else {
+            return new Object[] {};
+        }
     }
 
     private Object[] safeSend(Object[] arguments, ConcurrentMap<QName, URL> overridenEndpointAddresses) throws Exception {

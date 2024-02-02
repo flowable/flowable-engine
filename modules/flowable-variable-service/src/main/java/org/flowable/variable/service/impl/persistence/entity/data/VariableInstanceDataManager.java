@@ -14,9 +14,12 @@ package org.flowable.variable.service.impl.persistence.entity.data;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.VariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -24,32 +27,26 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface VariableInstanceDataManager extends DataManager<VariableInstanceEntity> {
 
-    List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId);
+    List<VariableInstanceEntity> findVariablesInstancesByQuery(InternalVariableInstanceQueryImpl internalVariableInstanceQuery);
 
-    List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds);
-
-    VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names);
-
-    VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName);
-
-    List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names);
+    VariableInstanceEntity findVariablesInstanceByQuery(InternalVariableInstanceQueryImpl internalVariableInstanceQuery);
     
-    List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType);
+    long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
+
+    List<VariableInstance> findVariableInstancesByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery);
+
+    List<VariableInstance> findVariableInstancesByNativeQuery(Map<String, Object> parameterMap);
+
+    long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
     
-    VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName);
+    void deleteVariablesByTaskId(String taskId);
     
-    List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
+    void deleteVariablesByExecutionId(String executionId);
     
-    List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType);
-    
-    VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName);
-    
-    List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames);
+    void deleteByScopeIdAndScopeType(String scopeId, String scopeType);
+
+    void deleteByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
+
+    void deleteBySubScopeIdAndScopeTypes(String subScopeId, Collection<String> scopeTypes);
 
 }

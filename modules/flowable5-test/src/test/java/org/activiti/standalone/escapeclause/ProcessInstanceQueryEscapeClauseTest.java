@@ -68,92 +68,92 @@ public class ProcessInstanceQueryEscapeClauseTest extends AbstractEscapeClauseTe
 
     public void testQueryByTenantIdLike() {
         // tenantIdLike
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantIdLike("%\\%%").singleResult();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantIdLike("%|%%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantIdLike("%\\_%").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceTenantIdLike("%|_%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
 
         // orQuery
-        processInstance = runtimeService.createProcessInstanceQuery().or().processInstanceTenantIdLike("%\\%%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().processInstanceTenantIdLike("%|%%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().or().processInstanceTenantIdLike("%\\_%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().processInstanceTenantIdLike("%|_%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
     }
 
     public void testQueryByProcessInstanceNameLike() {
         // processInstanceNameLike
-        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLike("%\\%%").singleResult());
-        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLike("%\\%%").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLike("%|%%").singleResult());
+        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLike("%|%%").singleResult().getId());
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLike("%\\_%").singleResult());
-        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLike("%\\_%").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLike("%|_%").singleResult());
+        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLike("%|_%").singleResult().getId());
 
         // orQuery
-        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%\\%%").processDefinitionId("undefined").singleResult());
-        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%\\%%").processDefinitionId("undefined").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%|%%").processDefinitionId("undefined").singleResult());
+        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%|%%").processDefinitionId("undefined").singleResult().getId());
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%\\_%").processDefinitionId("undefined").singleResult());
-        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%\\_%").processDefinitionId("undefined").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%|_%").processDefinitionId("undefined").singleResult());
+        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLike("%|_%").processDefinitionId("undefined").singleResult().getId());
     }
 
     public void testQueryProcessInstanceNameLikeIgnoreCase() {
         // processInstanceNameLike
-        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\%%").singleResult());
-        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\%%").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|%%").singleResult());
+        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|%%").singleResult().getId());
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\_%").singleResult());
-        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%\\_%").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|_%").singleResult());
+        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().processInstanceNameLikeIgnoreCase("%|_%").singleResult().getId());
 
         // orQuery
-        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").singleResult());
-        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\%%").processDefinitionId("undefined").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|%%").processDefinitionId("undefined").singleResult());
+        assertEquals(processInstance1.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|%%").processDefinitionId("undefined").singleResult().getId());
 
-        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").singleResult());
-        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%\\_%").processDefinitionId("undefined").singleResult().getId());
+        assertNotNull(runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|_%").processDefinitionId("undefined").singleResult());
+        assertEquals(processInstance2.getId(), runtimeService.createProcessInstanceQuery().or().processInstanceNameLikeIgnoreCase("%|_%").processDefinitionId("undefined").singleResult().getId());
     }
 
     public void testQueryLikeByQueryVariableValue() {
         // queryVariableValue
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLike("var1", "%\\%%").singleResult();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLike("var1", "%|%%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().variableValueLike("var1", "%\\_%").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().variableValueLike("var1", "%|_%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
 
         // orQuery
-        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLike("var1", "%\\%%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLike("var1", "%|%%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLike("var1", "%\\_%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLike("var1", "%|_%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
     }
 
     public void testQueryLikeByQueryVariableValueIgnoreCase() {
         // queryVariableValueIgnoreCase
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\%%").singleResult();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%|%%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%\\_%").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().variableValueLikeIgnoreCase("var1", "%|_%").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
 
         // orQuery
-        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%\\%%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%|%%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance1.getId(), processInstance.getId());
 
-        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%\\_%").processDefinitionId("undefined").singleResult();
+        processInstance = runtimeService.createProcessInstanceQuery().or().variableValueLikeIgnoreCase("var1", "%|_%").processDefinitionId("undefined").singleResult();
         assertNotNull(processInstance);
         assertEquals(processInstance2.getId(), processInstance.getId());
     }

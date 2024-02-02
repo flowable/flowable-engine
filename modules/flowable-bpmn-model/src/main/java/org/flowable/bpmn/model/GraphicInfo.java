@@ -25,6 +25,21 @@ public class GraphicInfo {
     protected Boolean expanded;
     protected int xmlRowNumber;
     protected int xmlColumnNumber;
+    protected double rotation;
+    
+    public GraphicInfo() {}
+
+    public GraphicInfo(double x, double y, double height, double width) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    public GraphicInfo(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
 
     public double getX() {
         return x;
@@ -90,6 +105,14 @@ public class GraphicInfo {
         this.xmlColumnNumber = xmlColumnNumber;
     }
 
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
     public boolean equals(GraphicInfo ginfo) {
     	if (this.getX() != ginfo.getX()) {
     		return false;
@@ -103,6 +126,9 @@ public class GraphicInfo {
     	if (this.getWidth() != ginfo.getWidth()) {
     		return false;
     	}
+        if (this.getRotation() != ginfo.getRotation()) {
+            return false;
+        }
 
     	// check for zero value in case we are comparing model value to BPMN DI value
     	// model values do not have xml location information
@@ -114,7 +140,7 @@ public class GraphicInfo {
     	}
 
     	// only check for elements that support this value
-    	if (null != this.getExpanded() && null != ginfo.getExpanded() && this.getExpanded() != ginfo.getExpanded()) {
+    	if (null != this.getExpanded() && null != ginfo.getExpanded() && !this.getExpanded().equals(ginfo.getExpanded())) {
     		return false;
     	}
     	return true;

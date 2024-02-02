@@ -21,8 +21,8 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
@@ -57,6 +57,8 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
     protected List<Group> executeQuery() {
         if (getUserId() != null) {
             return findGroupsByUser(getUserId());
+        } else if (getId() != null) {
+            return findGroupsById(getId());
         } else {
             return findAllGroups();
         }
@@ -81,6 +83,11 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
         }
 
         return groups;
+    }
+
+    protected List<Group> findGroupsById(String id) {
+        String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryGroupsById(ldapConfigurator, id);
+        return executeGroupQuery(searchExpression);
     }
 
     protected List<Group> findAllGroups() {

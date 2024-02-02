@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testInvalidStart" name="testDisableHumanTask" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="A" definitionRef="sid-5204F45A-90BF-4BB0-B7C5-395FC6F748E8"></planItem>
+      <planItem id="planItem2" name="B" definitionRef="sid-800120C5-2746-41DA-BC78-3FF63729F2B5">
+        <itemControl>
+          <manualActivationRule></manualActivationRule>
+        </itemControl>
+      </planItem>
+      <humanTask id="sid-5204F45A-90BF-4BB0-B7C5-395FC6F748E8" name="A"></humanTask>
+      <humanTask id="sid-800120C5-2746-41DA-BC78-3FF63729F2B5" name="B"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testDisableHumanTask">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="30.0" y="30.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="201.0" y="241.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="375.0" y="218.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

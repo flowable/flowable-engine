@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+    <process id="testNonExclusiveJobs" name="Asynchronous" isExecutable="true">
+        <startEvent id="startevent1" name="Start"/>
+
+        <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="parallelGateway1"/>
+        <parallelGateway id="parallelGateway1" name="Parallel Gateway"/>
+
+        <sequenceFlow id="flowToService1" sourceRef="parallelGateway1" targetRef="serviceTaskSleep1"/>
+        <serviceTask id="serviceTaskSleep1" name="Service Task Sleep 1" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+
+        <sequenceFlow id="flowToService2" sourceRef="parallelGateway1" targetRef="serviceTaskSleep2"/>
+        <serviceTask id="serviceTaskSleep2" name="Service Task Sleep 2" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+
+        <sequenceFlow id="flowToService3" sourceRef="parallelGateway1" targetRef="serviceTaskSleep3"/>
+        <serviceTask id="serviceTaskSleep3" name="Service Task Sleep 3" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+
+        <sequenceFlow id="flowToService4" sourceRef="parallelGateway1" targetRef="serviceTaskSleep4"/>
+        <serviceTask id="serviceTaskSleep4" name="Service Task Sleep 4" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+
+        <sequenceFlow id="flowToService5" sourceRef="parallelGateway1" targetRef="serviceTaskSleep5"/>
+        <serviceTask id="serviceTaskSleep5" name="Service Task Sleep 5" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+
+
+        <sequenceFlow id="flow5" sourceRef="serviceTaskSleep1" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow6" sourceRef="serviceTaskSleep2" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow7" sourceRef="serviceTaskSleep3" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow8" sourceRef="serviceTaskSleep4" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow9" sourceRef="serviceTaskSleep5" targetRef="parallelGateway2"/>
+        <parallelGateway id="parallelGateway2" name="Parallel Gateway" flowable:async="true" flowable:exclusive="true" />
+
+        <sequenceFlow id="flow25" sourceRef="parallelGateway2" targetRef="endevent1"/>
+        <endEvent id="endevent1" name="End"/>
+
+    </process>
+</definitions>

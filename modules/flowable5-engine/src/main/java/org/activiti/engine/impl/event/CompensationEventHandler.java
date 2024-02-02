@@ -25,7 +25,8 @@ import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 /**
  * @author Daniel Meyer
@@ -72,7 +73,8 @@ public class CompensationEventHandler implements EventHandler {
                                     compensatingExecution.getProcessInstanceId(),
                                     compensatingExecution.getProcessDefinitionId(),
                                     (String) compensatingExecution.getActivity().getProperties().get("type"),
-                                    compensatingExecution.getActivity().getActivityBehavior().getClass().getCanonicalName()));
+                                    compensatingExecution.getActivity().getActivityBehavior().getClass().getCanonicalName()),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
                 compensatingExecution.setActivity(compensationHandler);
 

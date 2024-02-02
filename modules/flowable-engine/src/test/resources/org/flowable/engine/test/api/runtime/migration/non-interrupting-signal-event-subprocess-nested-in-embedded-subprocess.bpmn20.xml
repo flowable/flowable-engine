@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <signal id="mySignal" name="someSignal"/>
+
+    <process id="NES" name="Nested Event SubProcess" isExecutable="true">
+
+        <startEvent id="procStart"/>
+        <sequenceFlow id="seqFlow1" sourceRef="procStart" targetRef="beforeSubProcessTask"/>
+        <userTask id="beforeSubProcessTask" name="outsideTask"/>
+        <sequenceFlow id="seqFlow2" sourceRef="beforeSubProcessTask" targetRef="subProcess"/>
+
+        <subProcess id="subProcess" name="subProcess">
+
+            <subProcess id="nestedSignalEventSubProcess" name="Simple Event Nested SubProcess" triggeredByEvent="true">
+                <startEvent id="nestedSignalEventSubProcessStart" isInterrupting="false">
+                    <signalEventDefinition signalRef="mySignal"/>
+                </startEvent>
+                <sequenceFlow id="subSeqFlow1" sourceRef="nestedSignalEventSubProcessStart" targetRef="nestedSignalEventSubProcessTask"/>
+                <userTask id="nestedSignalEventSubProcessTask" name="insideEventSubProcess"/>
+                <sequenceFlow id="subSeqFlow2" sourceRef="nestedSignalEventSubProcessTask" targetRef="nestedEventSubProcEnd"/>
+                <endEvent id="nestedEventSubProcEnd" name="nestedEventSubProcEnd"/>
+            </subProcess>
+
+            <startEvent id="subProcStart" name="subProcStart"/>
+            <sequenceFlow id="outerSubSeqFlow1" sourceRef="subProcStart" targetRef="subProcessTask"/>
+            <userTask id="subProcessTask" name="insideSubProcess"/>
+            <sequenceFlow id="outerSubSeqFlow2" sourceRef="subProcessTask" targetRef="subProcEnd"/>
+            <endEvent id="subProcEnd" name="subProcEnd"/>
+
+        </subProcess>
+
+        <sequenceFlow id="seqFlow3" sourceRef="subProcess" targetRef="afterSubProcessTask"/>
+        <userTask id="afterSubProcessTask" name="afterSubProcess"/>
+        <sequenceFlow id="seqFlow4" sourceRef="afterSubProcessTask" targetRef="procEnd"/>
+        <endEvent id="procEnd" name="procEnd"/>
+    </process>
+</definitions>

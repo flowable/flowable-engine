@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+    <process id="OneTaskSubProcess" name="One Task Inside SubProcess" isExecutable="true">
+        <startEvent id="start" name="start"/>
+        <sequenceFlow id="seqFlow1" sourceRef="start" targetRef="BeforeSubProcess"/>
+        <userTask id="BeforeSubProcess" name="BeforeSubProcess"/>
+        <sequenceFlow id="seqFlow2" sourceRef="BeforeSubProcess" targetRef="SimpleSubProcess"/>
+        <subProcess id="SimpleSubProcess" name="Simple SubProcess">
+            <startEvent id="subProcessStart" name="subProcessStart"/>
+            <sequenceFlow id="subSeqFlow1" sourceRef="subProcessStart" targetRef="InsideSimpleSubProcess1"/>
+            <userTask id="InsideSimpleSubProcess1" name="InsideSimpleSubProcess1"/>
+            <sequenceFlow id="subSeqFlow2" sourceRef="InsideSimpleSubProcess1" targetRef="subProcessEnd"/>
+            <endEvent id="subProcessEnd" name="subProcessEnd"></endEvent>
+        </subProcess>
+        <sequenceFlow id="seqFlow3" sourceRef="SimpleSubProcess" targetRef="AfterSubProcess"></sequenceFlow>
+        <userTask id="AfterSubProcess" name="AfterSubProcess"/>
+        <sequenceFlow id="seqFlow4" sourceRef="AfterSubProcess" targetRef="end"></sequenceFlow>
+        <endEvent id="end" name="end"></endEvent>
+    </process>
+</definitions>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <signal id="aSignal" name="A Signal" flowable:scope="global"></signal>
+  <process id="testProcessForJobsAndEventSubscriptions" name="Test Process For Jobs and Event Subscriptions" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:language><![CDATA[English]]></design:language>
+      <design:creationdate><![CDATA[2021-09-17T11:43:07.576Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2021-09-17T12:04:42.954Z]]></design:modificationdate>
+    </extensionElements>
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </startEvent>
+    <parallelGateway id="parallelGateway1">
+      <extensionElements>
+        <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+      </extensionElements>
+    </parallelGateway>
+    <intermediateCatchEvent id="intermediateTimerEvent1" name="Timer">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>P1Y</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <serviceTask id="externalWorkerTask1" name="External Worker task" flowable:type="external-worker" flowable:topic="aJobTopic" flowable:exclusive="false">
+      <extensionElements>
+        <design:stencilid><![CDATA[ExternalWorkerTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="serviceTask1" name="Async Service task" flowable:async="true" flowable:expression="${true}">
+      <extensionElements>
+        <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+    </serviceTask>
+    <intermediateCatchEvent id="intermediateTimerEvent2" name="Timer to create a suspended job">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>P1Y</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="intermediateTimerEvent3" name="Timer to create a deadletter job">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateTimerEvent]]></design:stencilid>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>P1Y</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <parallelGateway id="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+      </extensionElements>
+    </parallelGateway>
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="parallelGateway1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow2" sourceRef="parallelGateway1" targetRef="intermediateTimerEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow3" sourceRef="parallelGateway1" targetRef="intermediateTimerEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow4" sourceRef="parallelGateway1" targetRef="intermediateTimerEvent3">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow5" sourceRef="parallelGateway1" targetRef="externalWorkerTask1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <intermediateCatchEvent id="intermediateSignalEventCatching1">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateSignalEventCatching]]></design:stencilid>
+      </extensionElements>
+      <signalEventDefinition signalRef="aSignal"></signalEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="sequenceFlow6" sourceRef="parallelGateway1" targetRef="intermediateSignalEventCatching1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow7" sourceRef="parallelGateway1" targetRef="serviceTask1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow8" sourceRef="intermediateTimerEvent1" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow9" sourceRef="intermediateTimerEvent2" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow10" sourceRef="intermediateTimerEvent3" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow11" sourceRef="externalWorkerTask1" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow12" sourceRef="intermediateSignalEventCatching1" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow13" sourceRef="serviceTask1" targetRef="parallelGateway2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow14" sourceRef="parallelGateway2" targetRef="endNoneEvent1">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testProcessForJobsAndEventSubscriptions">
+    <bpmndi:BPMNPlane bpmnElement="testProcessForJobsAndEventSubscriptions" id="BPMNPlane_testProcessForJobsAndEventSubscriptions">
+      <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="349.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelGateway1" id="BPMNShape_parallelGateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="180.0" y="344.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="intermediateTimerEvent1" id="BPMNShape_intermediateTimerEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="300.0" y="75.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="externalWorkerTask1" id="BPMNShape_externalWorkerTask1">
+        <omgdc:Bounds height="80.0" width="100.0" x="265.0" y="275.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="serviceTask1" id="BPMNShape_serviceTask1">
+        <omgdc:Bounds height="80.0" width="100.0" x="265.0" y="467.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="intermediateTimerEvent2" id="BPMNShape_intermediateTimerEvent2">
+        <omgdc:Bounds height="30.0" width="30.0" x="300.0" y="137.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="intermediateTimerEvent3" id="BPMNShape_intermediateTimerEvent3">
+        <omgdc:Bounds height="30.0" width="30.0" x="300.0" y="212.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelGateway2" id="BPMNShape_parallelGateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="341.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="intermediateSignalEventCatching1" id="BPMNShape_intermediateSignalEventCatching1">
+        <omgdc:Bounds height="30.0" width="30.0" x="300.0" y="408.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+        <omgdc:Bounds height="28.0" width="28.0" x="505.0" y="347.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="200.5" y="344.5"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="265.0" y="315.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow6" id="BPMNEdge_sequenceFlow6" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="200.49999999999994" y="383.43383105802053"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="423.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="423.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow3" id="BPMNEdge_sequenceFlow3" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="200.5" y="344.5"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="152.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="152.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow4" id="BPMNEdge_sequenceFlow4" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="200.5" y="344.5"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="119.94999797575196" y="364.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="364.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="15.0" flowable:targetDockerY="15.0">
+        <omgdi:waypoint x="200.49999999999994" y="344.5"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow11" id="BPMNEdge_sequenceFlow11" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="364.94999999987795" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="341.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow10" id="BPMNEdge_sequenceFlow10" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="329.94999883049303" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="341.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow9" id="BPMNEdge_sequenceFlow9" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="329.94999883049303" y="152.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="152.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="341.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow7" id="BPMNEdge_sequenceFlow7" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="200.5" y="383.44335553997195"></omgdi:waypoint>
+        <omgdi:waypoint x="200.5" y="507.0"></omgdi:waypoint>
+        <omgdi:waypoint x="265.0" y="507.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow8" id="BPMNEdge_sequenceFlow8" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="329.94999883049303" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="341.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow14" id="BPMNEdge_sequenceFlow14" flowable:sourceDockerX="20.5" flowable:sourceDockerY="20.5" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="459.5591869398117" y="361.37820512820514"></omgdi:waypoint>
+        <omgdi:waypoint x="505.00027555248823" y="361.08885188426405"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow13" id="BPMNEdge_sequenceFlow13" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="364.95000000000005" y="507.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="507.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="380.9068026045237"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow12" id="BPMNEdge_sequenceFlow12" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
+        <omgdi:waypoint x="329.94999883049303" y="423.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="423.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="380.91603392568663"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

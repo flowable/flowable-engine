@@ -13,7 +13,7 @@
 package org.flowable.standalone.event;
 
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;

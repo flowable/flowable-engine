@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="myProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />
+
+    <subProcess id="subprocess" flowable:async="true" flowable:exclusive="false">
+
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:noWaitStatesAsyncLeave="true">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+
+      <startEvent id="subStart" />
+      <sequenceFlow id="sub0" sourceRef="subStart" targetRef="serviceTask1" />
+
+      <serviceTask id="serviceTask1" flowable:expression="${true}"/>
+      <sequenceFlow id="sub1" sourceRef="serviceTask1" targetRef="nestedSubprocess" />
+
+      <subProcess id="nestedSubprocess" flowable:async="true" flowable:exclusive="false">
+
+        <multiInstanceLoopCharacteristics isSequential="false" flowable:noWaitStatesAsyncLeave="true">
+          <loopCardinality>${nrOfLoops}</loopCardinality>
+        </multiInstanceLoopCharacteristics>
+
+        <startEvent id="subSubStart" />
+        <sequenceFlow id="subSub1" sourceRef="subSubStart" targetRef="subSubServiceTask1" />
+
+        <serviceTask id="subSubServiceTask1" flowable:expression="${true}"/>
+        <sequenceFlow id="subSub2" sourceRef="subSubServiceTask1" targetRef="subSubServiceTask2" />
+
+        <serviceTask id="subSubServiceTask2" flowable:expression="${true}"/>
+        <sequenceFlow id="subSub3" sourceRef="subSubServiceTask2" targetRef="subSubServiceTask3" />
+
+        <serviceTask id="subSubServiceTask3" flowable:expression="${true}"/>
+        <sequenceFlow id="subSub4" sourceRef="subSubServiceTask3" targetRef="subSubServiceTask4" />
+
+        <serviceTask id="subSubServiceTask4" flowable:expression="${true}"/>
+        <sequenceFlow id="subSub5" sourceRef="subSubServiceTask4" targetRef="subSubServiceTask5" />
+
+        <serviceTask id="subSubServiceTask5" flowable:expression="${true}"/>
+        <sequenceFlow id="subSub6" sourceRef="subSubServiceTask5" targetRef="subSubEnd" />
+
+        <endEvent id="subSubEnd" />
+
+      </subProcess>
+      <sequenceFlow id="sub2" sourceRef="nestedSubprocess" targetRef="serviceTask2" />
+
+      <serviceTask id="serviceTask2" flowable:expression="${true}"/>
+      <sequenceFlow id="sub3" sourceRef="serviceTask2" targetRef="subEnd" />
+
+      <endEvent id="subEnd" />
+
+    </subProcess>
+
+    <sequenceFlow id="flow3" sourceRef="subprocess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

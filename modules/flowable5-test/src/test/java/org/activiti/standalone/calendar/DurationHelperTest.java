@@ -14,8 +14,7 @@
 
 package org.activiti.standalone.calendar;
 
-import static groovy.util.GroovyTestCase.assertEquals;
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,9 +23,9 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.flowable.engine.common.impl.calendar.DurationHelper;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.junit.Test;
 
 public class DurationHelperTest {
@@ -113,9 +112,9 @@ public class DurationHelperTest {
         testingClock.setCurrentCalendar(parseCalendar("20131103-00:45:00", TimeZone.getTimeZone("US/Eastern")));
 
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT1H", testingClock);
-        Calendar expected = parseCalendarWithOffset("20131103-01:45:00 -04:00", TimeZone.getTimeZone("US/Eastern"));
+        Calendar expected = parseCalendarWithOffset("20131103-01:45:00-04:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertEquals(expected, dh.getCalendarAfter());
+        assertEquals(0, expected.compareTo(dh.getCalendarAfter()));
     }
 
     @Test
@@ -124,9 +123,9 @@ public class DurationHelperTest {
         testingClock.setCurrentCalendar(parseCalendar("20131103-00:45:00", TimeZone.getTimeZone("US/Eastern")));
 
         DurationHelper dh = new DurationHelper("R2/2013-11-03T00:45:00-04:00/PT2H", testingClock);
-        Calendar expected = parseCalendarWithOffset("20131103-01:45:00 -05:00", TimeZone.getTimeZone("US/Eastern"));
+        Calendar expected = parseCalendarWithOffset("20131103-01:45:00-05:00", TimeZone.getTimeZone("US/Eastern"));
 
-        assertEquals(expected, dh.getCalendarAfter());
+        assertEquals(0, expected.compareTo(dh.getCalendarAfter()));
     }
 
     @Test
@@ -196,7 +195,6 @@ public class DurationHelperTest {
     }
 
     private Calendar parseCalendarWithOffset(String str, TimeZone timeZone) throws Exception {
-
         Calendar cal = Calendar.getInstance();
         cal.setTime(DateUtils.parseDate(str, "yyyyMMdd-HH:mm:ssZZ"));
         return cal;

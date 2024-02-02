@@ -20,7 +20,10 @@ import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.dmn.api.DmnDecision;
+import org.flowable.form.api.FormDefinition;
+import org.flowable.identitylink.api.IdentityLink;
 
 public interface CmmnRepositoryService {
 
@@ -88,11 +91,93 @@ public interface CmmnRepositoryService {
     CaseDefinitionQuery createCaseDefinitionQuery();
     
     /**
+     * Authorizes a candidate user for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or user doesn't exist.
+     */
+    void addCandidateStarterUser(String caseDefinitionId, String userId);
+
+    /**
+     * Authorizes a candidate group for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param groupId
+     *            id of the group involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or group doesn't exist.
+     */
+    void addCandidateStarterGroup(String caseDefinitionId, String groupId);
+
+    /**
+     * Removes the authorization of a candidate user for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or user doesn't exist.
+     */
+    void deleteCandidateStarterUser(String caseDefinitionId, String userId);
+
+    /**
+     * Removes the authorization of a candidate group for a case definition.
+     * 
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     * @param groupId
+     *            id of the group involve, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the case definition or group doesn't exist.
+     */
+    void deleteCandidateStarterGroup(String caseDefinitionId, String groupId);
+    
+    /**
+     * Retrieves the {@link IdentityLink}s associated with the given case definition. Such an {@link IdentityLink} informs how a certain identity (eg. group or user) is authorized for a certain
+     * case definition
+     */
+    List<IdentityLink> getIdentityLinksForCaseDefinition(String caseDefinitionId);
+    
+    /**
      * Sets the category of the case definition. Case definitions can be queried by category: see {@link CaseDefinitionQuery#caseDefinitionCategory(String)}.
      * 
      * @throws FlowableObjectNotFoundException
      *             if no case definition with the provided id can be found.
      */
     void setCaseDefinitionCategory(String caseDefinitionId, String category);
+    
+    /**
+     * Changes the parent deployment id of a deployment. This is used to move deployments to a different app deployment parent.
+     * 
+     * @param deploymentId
+     *              The id of the deployment of which the parent deployment identifier will be changed.
+     * @param newParentDeploymentId
+     *              The new parent deployment identifier.
+     */
+    void changeDeploymentParentDeploymentId(String deploymentId, String newParentDeploymentId);
+    
+    /**
+     * Retrieves the {@link DmnDecision}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     *
+     */
+    List<DmnDecision> getDecisionsForCaseDefinition(String caseDefinitionId);
 
+    /**
+     * Retrieves the {@link FormDefinition}s associated with the given case definition.
+     *
+     * @param caseDefinitionId
+     *            id of the case definition, cannot be null.
+     *
+     */
+    List<FormDefinition> getFormDefinitionsForCaseDefinition(String caseDefinitionId);
 }

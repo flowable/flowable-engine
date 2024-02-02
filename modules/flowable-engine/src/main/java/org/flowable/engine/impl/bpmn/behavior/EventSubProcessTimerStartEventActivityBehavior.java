@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +24,10 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -69,13 +71,15 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
         if (startEvent.isInterrupting()) {
             List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionEntity.getParent());
+            Collection<String> executionIdsNotToDelete = new ArrayList<>();
             for (int i = childExecutions.size() - 1; i >= 0; i--) {
                 ExecutionEntity childExecutionEntity = childExecutions.get(i);
-                if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(executionEntity.getId())) {
-                    executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
-                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                if (childExecutionEntity.isEnded() || childExecutionEntity.getId().equals(executionEntity.getId())) {
+                    executionIdsNotToDelete.add(childExecutionEntity.getId());
                 }
             }
+            executionEntityManager.deleteChildExecutions(executionEntity.getParent(), executionIdsNotToDelete, null,
+                    DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", true, executionEntity.getCurrentFlowElement());
         }
 
         ExecutionEntity newSubProcessExecution = executionEntityManager.createChildExecution(executionEntity.getParent());
@@ -83,10 +87,15 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
 
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(newSubProcessExecution);
+
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
-        
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getActivityInstanceEntityManager(commandContext).recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                startEvent, outgoingFlowExecution, ExecutionListener.EVENTNAME_START);
 
         leave(outgoingFlowExecution);
     }

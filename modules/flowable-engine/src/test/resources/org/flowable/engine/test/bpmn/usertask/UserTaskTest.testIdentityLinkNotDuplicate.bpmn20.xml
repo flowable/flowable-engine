@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <process id="holidayRequest" name="Holiday Request" isExecutable="true">
+
+        <startEvent id="startEvent"/>
+        <sequenceFlow sourceRef="startEvent" targetRef="approveTask"/>
+
+        <userTask id="approveTask" name="Approve or reject request"  flowable:candidateGroups="managers">
+            <extensionElements>
+                <flowable:taskListener event="create" class="org.flowable.engine.test.bpmn.usertask.TestListener" />
+            </extensionElements>
+        </userTask>
+        <sequenceFlow sourceRef="approveTask" targetRef="decision"/>
+
+        <exclusiveGateway id="decision"/>
+        <sequenceFlow sourceRef="decision" targetRef="approveEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow  sourceRef="decision" targetRef="rejectEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[
+          ${!approved}
+        ]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <endEvent id="approveEnd"/>
+        <endEvent id="rejectEnd"/>
+
+    </process>
+</definitions>

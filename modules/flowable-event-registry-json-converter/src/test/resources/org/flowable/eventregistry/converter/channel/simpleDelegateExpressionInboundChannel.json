@@ -1,0 +1,16 @@
+{
+  "key": "expressionChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Expression channel",
+  "channelType": "inbound",
+  "type": "expression",
+  "adapterDelegateExpression": "${channelAdapter}",
+  "deserializerDelegateExpression": "${deserializer}",
+  "payloadExtractorDelegateExpression": "${payloadExtractor}",
+  "eventTransformerDelegateExpression": "${eventTransformer}",
+  "deserializerType": "expression",
+  "channelEventKeyDetection": {
+    "delegateExpression": "${keyDetector}"
+  }
+}

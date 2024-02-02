@@ -12,15 +12,12 @@
  */
 package org.flowable.engine.impl.el;
 
-import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.DynamicBeanPropertyELResolver;
-import org.flowable.engine.common.impl.javax.el.BeanELResolver;
-import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.common.impl.javax.el.ValueExpression;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.DynamicBeanPropertyELResolver;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
@@ -44,6 +41,7 @@ public class ProcessExpressionManager extends VariableScopeExpressionManager {
     public ProcessExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans) {
         super(beans);
         this.delegateInterceptor = delegateInterceptor;
+        addPreBeanResolver(new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
     }
     
     @Override
@@ -52,22 +50,8 @@ public class ProcessExpressionManager extends VariableScopeExpressionManager {
     }
     
     @Override
-    protected ELResolver createVariableElResolver(VariableContainer variableContainer) {
-        return new ProcessVariableScopeELResolver(variableContainer);
+    protected ELResolver createVariableElResolver() {
+        return new ProcessVariableScopeELResolver();
     }
 
-    @Override
-    protected void configureResolvers(List<ELResolver> elResolvers) {
-        int beanElResolverIndex = -1;
-        for (int i=0; i<elResolvers.size(); i++) {
-            if (elResolvers.get(i) instanceof BeanELResolver) {
-                beanElResolverIndex = i;
-            }
-        }
-        
-        if (beanElResolverIndex > 0) {
-            elResolvers.add(beanElResolverIndex, new DynamicBeanPropertyELResolver(ItemInstance.class, "getFieldValue", "setFieldValue"));
-        }
-    }
-    
 }

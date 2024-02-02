@@ -1,7 +1,7 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
   <bean id="dataSource" class="org.h2.jdbcx.JdbcDataSource">
-    <property name="URL" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+    <property name="URL" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
     <property name="user" value="sa" />
     <property name="password" value="" />
   </bean>
@@ -9,6 +9,7 @@
   <bean id="configurationFactory" class="org.flowable.osgi.blueprint.ConfigurationFactory">
     <property name="dataSource" ref="dataSource" />
     <property name="databaseSchemaUpdate" value="true" />
+    <property name="disableEventRegistry" value="true" />
   </bean>
 
   <bean id="configuration" factory-ref="configurationFactory" factory-method="getConfiguration" />

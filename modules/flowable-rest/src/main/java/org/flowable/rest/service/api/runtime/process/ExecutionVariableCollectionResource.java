@@ -13,6 +13,24 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.List;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,20 +39,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -43,23 +47,27 @@ import java.util.List;
 @Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableCollectionResource extends BaseVariableCollectionResource {
 
+    public ExecutionVariableCollectionResource() {
+        super(RestResponseFactory.VARIABLE_EXECUTION);
+    }
+
     @ApiOperation(value = "List variables for an execution", tags = { "Executions" }, nickname = "listExecutionVariables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found.")
     })
     @GetMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json")
-    public List<RestVariable> getVariables(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
+    public List<RestVariable> getVariables(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestParam(value = "scope", required = false) String scope) {
 
-        Execution execution = getExecutionFromRequest(executionId);
-        return processVariables(execution, scope, RestResponseFactory.VARIABLE_EXECUTION);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
+        return processVariables(execution, scope);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update variables on an execution", tags = { "Executions" }, nickname = "createOrUpdateExecutionVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (array of RestVariable) or by passing a multipart/form-data Object.\n"
             + "Any number of variables can be passed into the request body array.\n"
-            + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+            + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -78,15 +86,15 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @PutMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getExecutionFromRequest(executionId);
-        return createExecutionVariable(execution, true, RestResponseFactory.VARIABLE_EXECUTION, request, response);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
+        return createExecutionVariable(execution, true, request, response);
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create variables on an execution", tags = { "Executions" }, nickname = "createExecutionVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (array of RestVariable) or by passing a multipart/form-data Object.\n"
             + "Any number of variables can be passed into the request body array.\n"
-            + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+            + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -107,19 +115,20 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
     @PostMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
-        Execution execution = getExecutionFromRequest(executionId);
-        return createExecutionVariable(execution, false, RestResponseFactory.VARIABLE_EXECUTION, request, response);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
+        return createExecutionVariable(execution, false, request, response);
     }
 
-    @ApiOperation(value = "Delete all variables for an execution", tags = { "Executions" })
+    @ApiOperation(value = "Delete all variables for an execution", tags = { "Executions" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the execution was found and variables have been deleted."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found.")
     })
     @DeleteMapping(value = "/runtime/executions/{executionId}/variables")
-    public void deleteLocalVariables(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletResponse response) {
-        Execution execution = getExecutionFromRequest(executionId);
-        deleteAllLocalVariables(execution, response);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteLocalVariables(@ApiParam(name = "executionId") @PathVariable String executionId) {
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(executionId);
+        deleteAllLocalVariables(execution);
     }
 
 }

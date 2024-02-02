@@ -1,0 +1,12 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/test">
+
+    <process id="process" name="process1" isExecutable="true">
+        <startEvent id="start" flowable:formKey="start-form" flowable:sameDeployment="true"/>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="end"/>
+        <endEvent id="end"/>
+    </process>
+</definitions>

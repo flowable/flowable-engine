@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.test.bpmn.event;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.handler.MessageEventDefinitionParseHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class MessageEventDefinitionWithExtensionElementsTest {
@@ -32,20 +33,22 @@ public class MessageEventDefinitionWithExtensionElementsTest {
         MessageEventDefinition messageEventDefinitionMock = Mockito.mock(MessageEventDefinition.class);
         BpmnModel bpmnModelMock = Mockito.mock(BpmnModel.class);
         Message messageMock = Mockito.mock(Message.class);
-        @SuppressWarnings("unchecked")
-        Map<String, List<ExtensionElement>> extensionElementMap = Mockito.mock(Map.class);
+
+        ExtensionElement extensionElementMock = Mockito.mock(ExtensionElement.class);
+        Map<String, List<ExtensionElement>> messageExtensionElementMap = 
+                Collections.singletonMap("messageId", Collections.singletonList(extensionElementMock));
 
         Mockito.when(bpmnParseMock.getBpmnModel()).thenReturn(bpmnModelMock);
         Mockito.when(messageEventDefinitionMock.getMessageRef()).thenReturn("messageId");
         Mockito.when(bpmnModelMock.containsMessageId("messageId")).thenReturn(true);
         Mockito.when(bpmnModelMock.getMessage("messageId")).thenReturn(messageMock);
         Mockito.when(messageMock.getName()).thenReturn("MessageWithExtensionElements");
-        Mockito.when(messageMock.getExtensionElements()).thenReturn(extensionElementMap);
+        Mockito.when(messageMock.getExtensionElements()).thenReturn(messageExtensionElementMap);
 
         MessageEventDefinitionParseHandler handler = new MessageEventDefinitionParseHandler();
         handler.parse(bpmnParseMock, messageEventDefinitionMock);
 
         Mockito.verify(messageEventDefinitionMock).setMessageRef("MessageWithExtensionElements");
-        Mockito.verify(messageEventDefinitionMock).setExtensionElements(extensionElementMap);
+        Mockito.verify(messageEventDefinitionMock).addExtensionElement(extensionElementMock);
     }
 }

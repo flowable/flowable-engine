@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+    <case id="testPlanItemLifecycleListeners" name="testPlanItemLifecycleListeners" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="class delegate" definitionRef="sid-7C171B55-7612-4CBF-BAAB-E8081E80C1FF"></planItem>
+            <planItem id="planItem3" definitionRef="sid-EF333AD8-1E8D-4C34-BF54-6FD1D39D7AD5"></planItem>
+            <humanTask id="sid-7C171B55-7612-4CBF-BAAB-E8081E80C1FF" name="class delegate">
+                <extensionElements>
+                    <flowable:planItemLifecycleListener sourceState="available" targetState="active" class="org.flowable.cmmn.test.listener.TestLifecycleListener"></flowable:planItemLifecycleListener>
+                    <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${planItemInstance.setVariable('expressionVar', 'planItemIsActive')}"></flowable:planItemLifecycleListener>
+                    <flowable:planItemLifecycleListener sourceState="available" targetState="active" delegateExpression="${delegateListener}"></flowable:planItemLifecycleListener>
+                </extensionElements>
+            </humanTask>
+            <stage id="sid-EF333AD8-1E8D-4C34-BF54-6FD1D39D7AD5">
+                <extensionElements>
+                    <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${planItemInstance.setVariable('stageActive', true)}"></flowable:planItemLifecycleListener>
+                </extensionElements>
+                <planItem id="planItem2" name="M1" definitionRef="sid-38A8A03C-BF2B-4B88-A3AE-81A3A98E4B68"></planItem>
+                <milestone id="sid-38A8A03C-BF2B-4B88-A3AE-81A3A98E4B68" name="M1">
+                    <extensionElements>
+                        <flowable:planItemLifecycleListener sourceState="active" targetState="completed" expression="${planItemInstance.setVariable('milestoneReached', true)}"></flowable:planItemLifecycleListener>
+                    </extensionElements>
+                </milestone>
+            </stage>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_testPlanItemLifecycleListeners">
+            <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+                <dc:Bounds height="714.0" width="718.0" x="30.0" y="30.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="140.0" y="149.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="170.0" width="370.0" x="150.0" y="360.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="54.0" width="146.0" x="240.0" y="409.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

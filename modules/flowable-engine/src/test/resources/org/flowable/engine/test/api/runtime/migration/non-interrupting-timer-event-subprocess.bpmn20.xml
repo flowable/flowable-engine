@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="changeStateForEventSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="processTask"/>
+        <userTask id="processTask"/>
+        <sequenceFlow id="flow2" sourceRef="processTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+        <subProcess id="eventSubProcess" triggeredByEvent="true">
+            <startEvent id="eventSubProcessStart" isInterrupting="false">
+                <timerEventDefinition>
+                    <timeCycle>R/PT15M</timeCycle>
+                </timerEventDefinition>
+            </startEvent>
+            <sequenceFlow id="eventSubProcessFlow1" sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+            <userTask id="eventSubProcessTask"/>
+            <sequenceFlow id="eventSubProcessFlow2" sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <endEvent id="eventSubProcessEnd" />
+        </subProcess>
+    </process>
+
+</definitions>

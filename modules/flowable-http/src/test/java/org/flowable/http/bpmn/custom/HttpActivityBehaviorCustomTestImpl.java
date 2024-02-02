@@ -12,20 +12,28 @@
  */
 package org.flowable.http.bpmn.custom;
 
+import java.util.concurrent.CompletableFuture;
+
+import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.http.bpmn.impl.HttpActivityBehaviorImpl;
+import org.flowable.engine.impl.bpmn.http.DefaultBpmnHttpActivityDelegate;
 
 /**
  * Implementation of HttpActivityBehavior to test custom behavior class
  *
  * @author Harsha Teja Kanna.
  */
-public class HttpActivityBehaviorCustomTestImpl extends HttpActivityBehaviorImpl {
+public class HttpActivityBehaviorCustomTestImpl extends DefaultBpmnHttpActivityDelegate {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void execute(DelegateExecution execution) {
-        leave(execution);
+    public CompletableFuture<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public void afterExecution(DelegateExecution execution, ExecutionData result) {
+        // nothing to do
     }
 }

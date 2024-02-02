@@ -7,14 +7,17 @@
 	<bean id="processEngineConfiguration"
 		class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
 		
-		<property name="jdbcUrl" value="jdbc:h2:mem:flowable-uuid-generator-test;DB_CLOSE_DELAY=1000;MVCC=TRUE" />
+		<property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable-uuid-generator;DB_CLOSE_DELAY=1000}" />
+		<property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+		<property name="jdbcUsername" value="${jdbc.username:sa}" />
+		<property name="jdbcPassword" value="${jdbc.password:}" />
 
 		<property name="databaseSchemaUpdate" value="true" />
 		
 		<property name="flowable5CompatibilityEnabled" value="true" />
 		
 		<property name="idGenerator">
-			<bean class="org.flowable.engine.common.impl.persistence.StrongUuidGenerator" />
+			<bean class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator" />
 		</property>
 
 	</bean>

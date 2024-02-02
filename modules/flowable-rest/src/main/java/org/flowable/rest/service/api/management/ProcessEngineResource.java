@@ -13,10 +13,12 @@
 
 package org.flowable.rest.service.api.management;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineInfo;
+import org.flowable.common.rest.api.EngineInfoResponse;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.common.EngineInfo;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,14 +40,21 @@ public class ProcessEngineResource {
     @Autowired
     @Qualifier("processEngine")
     protected ProcessEngine engine;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get engine info", tags = { "Engine" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
     @GetMapping(value = "/management/engine", produces = "application/json")
-    public ProcessEngineInfoResponse getEngineInfo() {
-        ProcessEngineInfoResponse response = new ProcessEngineInfoResponse();
+    public EngineInfoResponse getEngineInfo() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessManagementInfo();
+        }
+        
+        EngineInfoResponse response = new EngineInfoResponse();
 
         try {
             EngineInfo engineInfo = ProcessEngines.getProcessEngineInfo(engine.getName());
@@ -61,7 +70,7 @@ public class ProcessEngineResource {
             throw new FlowableException("Error retrieving process info", e);
         }
 
-        response.setVersion(ProcessEngine.VERSION);
+        response.setVersion(ProcessEngine.class.getPackage().getImplementationVersion());
         return response;
     }
 }

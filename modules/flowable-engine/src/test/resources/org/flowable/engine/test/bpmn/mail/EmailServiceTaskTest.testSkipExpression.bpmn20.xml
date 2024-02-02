@@ -1,0 +1,30 @@
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="simpleTextOnly" >
+
+    <startEvent id="theStart" />
+    <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
+    
+    <serviceTask id="sendMail" flowable:type="mail" flowable:skipExpression="${skip}">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:string>kermit@flowable.org</flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:string>Hello Kermit!</flowable:string>
+        </flowable:field>
+        <flowable:field name="text">
+          <flowable:string>This a text only e-mail.</flowable:string>
+        </flowable:field>      
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

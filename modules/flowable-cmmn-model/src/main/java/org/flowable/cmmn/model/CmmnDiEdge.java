@@ -22,7 +22,10 @@ public class CmmnDiEdge extends BaseElement {
 
     protected String cmmnElementRef;
     protected String targetCmmnElementRef;
+    protected GraphicInfo sourceDockerInfo;
+    protected GraphicInfo targetDockerInfo;
     protected List<GraphicInfo> waypoints = new ArrayList<>();
+    protected GraphicInfo labelGraphicInfo;
     
     public String getCmmnElementRef() {
         return cmmnElementRef;
@@ -40,6 +43,22 @@ public class CmmnDiEdge extends BaseElement {
         this.targetCmmnElementRef = targetCmmnElementRef;
     }
     
+    public GraphicInfo getSourceDockerInfo() {
+        return sourceDockerInfo;
+    }
+
+    public void setSourceDockerInfo(GraphicInfo sourceDockerInfo) {
+        this.sourceDockerInfo = sourceDockerInfo;
+    }
+
+    public GraphicInfo getTargetDockerInfo() {
+        return targetDockerInfo;
+    }
+
+    public void setTargetDockerInfo(GraphicInfo targetDockerInfo) {
+        this.targetDockerInfo = targetDockerInfo;
+    }
+
     public void addWaypoint(GraphicInfo graphicInfo) {
         this.waypoints.add(graphicInfo);
     }
@@ -50,5 +69,13 @@ public class CmmnDiEdge extends BaseElement {
 
     public void setWaypoints(List<GraphicInfo> waypoints) {
         this.waypoints = waypoints;
+    }
+
+    public GraphicInfo getLabelGraphicInfo() {
+        return labelGraphicInfo;
+    }
+
+    public void setLabelGraphicInfo(GraphicInfo labelGraphicInfo) {
+        this.labelGraphicInfo = labelGraphicInfo;
     }
 }

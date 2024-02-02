@@ -14,9 +14,10 @@ package org.flowable.content.api;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 
 /**
  * Service for admin and maintenance operations on the content engine.
@@ -47,4 +48,11 @@ public interface ContentManagementService {
      */
     TablePageQuery createTablePageQuery();
 
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the content instances.
+     * <p>
+     * You must provide the source tenant id and the destination tenant id.
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+    
 }

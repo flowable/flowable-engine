@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="conditionStage" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItemreferenceStage" name="Reference stage" definitionRef="referenceStage"></planItem>
+      <planItem id="planItemstageToBeClosedConditionally" name="Stage to be closed conditionally" definitionRef="stageToBeClosedConditionally">
+        <exitCriterion id="exitCriterion1" sentryRef="sentryexitCriterion1"></exitCriterion>
+      </planItem>
+      <sentry id="sentryexitCriterion1" flowable:triggerMode="onEvent">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExitCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartexitCriterion1" sourceRef="planItemcloseStage">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+        <ifPart id="sentryIfPart_exitCriterion1">
+          <condition><![CDATA[${cmmnEngineConfiguration.getCmmnRuntimeService().createPlanItemInstanceQuery().caseInstanceId(planItemInstance.caseInstanceId).planItemDefinitionId('dummyCase').planItemInstanceStateActive().count() == 0}]]></condition>
+        </ifPart>
+      </sentry>
+      <stage id="referenceStage" name="Reference stage" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planItemdummyCase" name="Dummy case" definitionRef="dummyCase">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter">
+              <extensionElements></extensionElements>
+            </repetitionRule>
+          </itemControl>
+          <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1"></entryCriterion>
+        </planItem>
+        <planItem id="planItemtriggerDummyCase" name="Trigger dummy case" definitionRef="triggerDummyCase">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter">
+              <extensionElements></extensionElements>
+            </repetitionRule>
+          </itemControl>
+        </planItem>
+        <sentry id="sentryentryCriterion1">
+          <extensionElements>
+            <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+          </extensionElements>
+          <planItemOnPart id="sentryOnPartentryCriterion1" sourceRef="planItemtriggerDummyCase">
+            <standardEvent>occur</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <caseTask id="dummyCase" name="Dummy case" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
+          <caseRefExpression><![CDATA[dummyCase]]></caseRefExpression>
+        </caseTask>
+        <userEventListener id="triggerDummyCase" name="Trigger dummy case" />
+      </stage>
+      <stage id="stageToBeClosedConditionally" name="Stage to be closed conditionally" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planItemcloseStage" name="Close stage" definitionRef="closeStage"></planItem>
+        <planItem id="planItemhumanTask2" name="Human task" definitionRef="humanTask2"></planItem>
+        <sentry id="sentryentryCriterion2">
+          <extensionElements>
+            <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+          </extensionElements>
+          <planItemOnPart id="sentryOnPartentryCriterion2" sourceRef="planItemcloseStage">
+            <standardEvent>complete</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <humanTask id="closeStage" name="Close stage" flowable:assignee="${initiator}" />
+        <humanTask id="humanTask2" name="Human task" flowable:assignee="${initiator}" />
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

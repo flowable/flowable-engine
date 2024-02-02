@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class MultiInstanceLoopCharacteristics extends BaseElement {
 
@@ -25,6 +26,9 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     protected String elementVariable;
     protected String elementIndexVariable;
     protected boolean sequential;
+    protected boolean noWaitStatesAsyncLeave;
+
+    protected VariableAggregationDefinitions aggregations;
 
     public String getInputDataItem() {
         return inputDataItem;
@@ -90,6 +94,30 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.sequential = sequential;
     }
 
+    public boolean isNoWaitStatesAsyncLeave() {
+        return noWaitStatesAsyncLeave;
+    }
+
+    public void setNoWaitStatesAsyncLeave(boolean noWaitStatesAsyncLeave) {
+        this.noWaitStatesAsyncLeave = noWaitStatesAsyncLeave;
+    }
+
+    public VariableAggregationDefinitions getAggregations() {
+        return aggregations;
+    }
+
+    public void setAggregations(VariableAggregationDefinitions aggregations) {
+        this.aggregations = aggregations;
+    }
+
+    public void addAggregation(VariableAggregationDefinition aggregation) {
+        if (this.aggregations == null) {
+            this.aggregations = new VariableAggregationDefinitions();
+        }
+
+        this.aggregations.getAggregations().add(aggregation);
+    }
+
     @Override
     public MultiInstanceLoopCharacteristics clone() {
         MultiInstanceLoopCharacteristics clone = new MultiInstanceLoopCharacteristics();
@@ -98,6 +126,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     }
 
     public void setValues(MultiInstanceLoopCharacteristics otherLoopCharacteristics) {
+        super.setValues(otherLoopCharacteristics);
         setInputDataItem(otherLoopCharacteristics.getInputDataItem());
         setCollectionString(otherLoopCharacteristics.getCollectionString());
         if (otherLoopCharacteristics.getHandler() != null) {
@@ -108,5 +137,10 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         setElementVariable(otherLoopCharacteristics.getElementVariable());
         setElementIndexVariable(otherLoopCharacteristics.getElementIndexVariable());
         setSequential(otherLoopCharacteristics.isSequential());
+        setNoWaitStatesAsyncLeave(otherLoopCharacteristics.isNoWaitStatesAsyncLeave());
+
+        if (otherLoopCharacteristics.getAggregations() != null) {
+            setAggregations(otherLoopCharacteristics.getAggregations().clone());
+        }
     }
 }

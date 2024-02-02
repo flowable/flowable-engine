@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="startParallelProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore"/>
+
+        <userTask id="taskBefore" name="Task before sub process"/>
+        <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="parallelFork"/>
+
+        <parallelGateway id="parallelFork"/>
+
+        <sequenceFlow id="flow3" sourceRef="parallelFork" targetRef="callActivity1"/>
+        <callActivity id="callActivity1" calledElement="MP" />
+
+        <sequenceFlow id="flow5" sourceRef="parallelFork" targetRef="callActivity2"/>
+        <callActivity id="callActivity2" calledElement="oneTaskProcess" />
+
+        <sequenceFlow id="flow7" sourceRef="callActivity1" targetRef="parallelJoin"/>
+        <sequenceFlow id="flow8" sourceRef="callActivity2" targetRef="parallelJoin"/>
+
+        <parallelGateway id="parallelJoin"/>
+
+        <sequenceFlow id="flow9" sourceRef="parallelJoin" targetRef="taskAfter"/>
+        <userTask id="taskAfter" name="Task after sub process"/>
+
+        <sequenceFlow id="flow10" sourceRef="taskAfter" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="dataSource" class="org.flowable.common.engine.impl.test.ClosingDataSource">
+		<constructor-arg>
+			<bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+				<constructor-arg>
+					<bean class="com.zaxxer.hikari.HikariConfig">
+						<property name="minimumIdle" value="0" />
+						<property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable-prefixid-test;DB_CLOSE_DELAY=1000}"/>
+						<property name="driverClassName" value="${jdbc.driver:org.h2.Driver}"/>
+						<property name="username" value="${jdbc.username:sa}"/>
+						<property name="password" value="${jdbc.password:}"/>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="processEngineConfiguration"
+		class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+		<property name="dataSource" ref="dataSource"/>
+
+		<property name="engineLifecycleListeners">
+			<list>
+				<ref bean="dataSource"/>
+			</list>
+		</property>
+		
+		<property name="databaseSchemaUpdate" value="true" />
+		
+		<property name="idGenerator" ref="idGenerator"/>
+		
+		<property name="usePrefixId" value="true" />
+	</bean>
+
+	<bean id="idGenerator" class="org.flowable.common.engine.impl.persistence.StrongUuidGenerator"/>
+
+</beans>

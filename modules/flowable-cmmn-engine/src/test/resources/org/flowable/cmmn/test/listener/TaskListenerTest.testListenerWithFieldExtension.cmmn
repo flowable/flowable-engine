@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+    <case id="testTaskListeners" name="testTaskListeners" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="Class" definitionRef="sid-76EE6CD0-6531-48D6-ACDE-5F20A7E90000"></planItem>
+            <planItem id="planItem2" name="Expression" definitionRef="sid-36995D0E-BAB2-44F2-ADD4-FD9070AFD6CA"></planItem>
+            <planItem id="planItem3" name="DelegateExpression" definitionRef="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65A"></planItem>
+            <humanTask id="sid-76EE6CD0-6531-48D6-ACDE-5F20A7E90000" name="Class">
+                <extensionElements>
+                    <flowable:taskListener event="create" class="org.flowable.cmmn.test.listener.TaskListenerTest$TaskListenerWithFieldExtensions">
+                         <flowable:field name="myField" stringValue="Hello from field" />
+                    </flowable:taskListener>
+                </extensionElements>
+            </humanTask>
+            <humanTask id="sid-36995D0E-BAB2-44F2-ADD4-FD9070AFD6CA" name="Expression">
+            </humanTask>
+            <humanTask id="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65A" name="DelegateExpression">
+            </humanTask>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_testTaskListeners">
+            <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+                <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="135.0" y="180.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="330.0" y="180.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="525.0" y="180.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

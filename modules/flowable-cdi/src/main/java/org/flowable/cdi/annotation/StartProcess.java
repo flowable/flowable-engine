@@ -17,14 +17,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.enterprise.util.Nonbinding;
-import javax.interceptor.InterceptorBinding;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.interceptor.InterceptorBinding;
 
 import org.flowable.cdi.BusinessProcess;
 
 /**
  * Starts a new process instance after the annotated method returns. The process instance is subsequently managed.
- * <p/>
+ * <p>
  * Each process variable set through {@link BusinessProcess#setVariable(String, Object)} within this conversation is flushed to the process instance at process instantiation. The same is true for
  * instances of {@link BusinessProcessScoped} beans.
  * 

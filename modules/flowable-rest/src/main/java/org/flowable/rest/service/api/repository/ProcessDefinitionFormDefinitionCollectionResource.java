@@ -12,19 +12,20 @@
  */
 package org.flowable.rest.service.api.repository;
 
+import java.util.List;
+
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.form.api.FormDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.form.api.FormDefinition;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author Yvo Swillens
@@ -40,10 +41,11 @@ public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProce
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", produces = "application/json")
     public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
-            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-            HttpServletRequest request) {
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
+        
+        ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
-        List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForProcessDefinition(processDefinitionId);
+        List<FormDefinition> formDefinitions = repositoryService.getFormDefinitionsForProcessDefinition(processDefinition.getId());
 
         return restResponseFactory.createFormDefinitionResponseList(formDefinitions, processDefinitionId);
     }

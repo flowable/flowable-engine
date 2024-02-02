@@ -13,7 +13,7 @@
 package org.activiti.engine.test.api.repository;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -32,7 +32,7 @@ public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableT
             runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
             fail();
         } catch (FlowableException e) {
-            assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
+            assertTextPresent("No process definition found for key 'oneTaskProcessNonExecutable'", e.getMessage());
         }
     }
 

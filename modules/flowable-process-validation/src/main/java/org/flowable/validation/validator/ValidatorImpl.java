@@ -33,18 +33,34 @@ public abstract class ValidatorImpl implements Validator {
     }
 
     protected void addError(List<ValidationError> validationErrors, String problem, BaseElement baseElement, String description) {
-        addError(validationErrors, problem, null, baseElement, description);
+        addError(validationErrors, problem, null, null, baseElement, description);
+    }
+
+    protected void addError(List<ValidationError> validationErrors, String problem, FlowElement flowElement, BaseElement baseElement, String description) {
+        addError(validationErrors, problem, null, flowElement, baseElement, description);
     }
 
     protected void addError(List<ValidationError> validationErrors, String problem, Process process, BaseElement baseElement, String description) {
-        addError(validationErrors, problem, process, baseElement, description, false);
+        addError(validationErrors, problem, process, null, baseElement, description);
+    }
+
+    protected void addError(List<ValidationError> validationErrors, String problem, Process process, FlowElement flowElement, BaseElement baseElement, String description) {
+        addError(validationErrors, problem, process, flowElement, baseElement, description, false);
     }
 
     protected void addWarning(List<ValidationError> validationErrors, String problem, Process process, BaseElement baseElement, String description) {
-        addError(validationErrors, problem, process, baseElement, description, true);
+        addWarning(validationErrors, problem, process, null, baseElement, description);
+    }
+
+    protected void addWarning(List<ValidationError> validationErrors, String problem, Process process, FlowElement flowElement, BaseElement baseElement, String description) {
+        addError(validationErrors, problem, process, flowElement, baseElement, description, true);
     }
 
     protected void addError(List<ValidationError> validationErrors, String problem, Process process, BaseElement baseElement, String description, boolean isWarning) {
+        addError(validationErrors, problem, process, null, baseElement, description, isWarning);
+    }
+
+    protected void addError(List<ValidationError> validationErrors, String problem, Process process, FlowElement flowElement, BaseElement baseElement, String description, boolean isWarning) {
         ValidationError error = new ValidationError();
         error.setWarning(isWarning);
 
@@ -60,8 +76,11 @@ public abstract class ValidatorImpl implements Validator {
         error.setProblem(problem);
         error.setDefaultDescription(description);
 
-        if (baseElement instanceof FlowElement) {
-            FlowElement flowElement = (FlowElement) baseElement;
+        if (flowElement == null && baseElement instanceof FlowElement) {
+            flowElement = (FlowElement) baseElement;
+        }
+
+        if (flowElement != null) {
             error.setActivityId(flowElement.getId());
             error.setActivityName(flowElement.getName());
         }

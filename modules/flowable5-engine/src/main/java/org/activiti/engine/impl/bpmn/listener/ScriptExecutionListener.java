@@ -15,9 +15,9 @@ package org.activiti.engine.impl.bpmn.listener;
 
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.common.api.delegate.Expression;
 
 public class ScriptExecutionListener implements ExecutionListener {
 

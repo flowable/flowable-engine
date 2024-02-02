@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:flowable="http://flowable.org/bpmn" 
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+	typeLanguage="http://www.w3.org/2001/XMLSchema" 
+	expressionLanguage="http://www.w3.org/1999/XPath" 
+	targetNamespace="http://www.flowable.org/processdef">
+  <process id="asyncScript" name="asyncScript" isExecutable="true">
+    <startEvent id="startEvent1"/>
+    <sequenceFlow id="flow1" sourceRef="startEvent1" targetRef="task"/>
+    <scriptTask id="task" name="The Script task" flowable:async="true" flowable:exclusive="false" scriptFormat="javascript" flowable:autoStoreVariables="false">
+      <extensionElements>
+      	<flowable:jobCategory>myCategory</flowable:jobCategory>
+      </extensionElements>
+      <script>this should really fail!</script>
+    </scriptTask>
+    <userTask id="task2" name="Task after script"/>
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="task2"/>
+    <endEvent id="endEvent"/>
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="endEvent"/>
+  </process>
+</definitions>

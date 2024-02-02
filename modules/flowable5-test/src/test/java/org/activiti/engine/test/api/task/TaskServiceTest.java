@@ -13,8 +13,7 @@
 
 package org.activiti.engine.test.api.task;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -26,12 +25,12 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.FlowableTaskAlreadyClaimedException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
@@ -43,7 +42,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
@@ -590,7 +589,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         String taskId = task.getId();
-        taskService.complete(taskId, null);
+        taskService.complete(taskId);
 
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             historyService.deleteHistoricTaskInstance(taskId);
@@ -1345,15 +1344,20 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.resolveTask(taskId, null);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            historyService.deleteHistoricTaskInstance(taskId);
-        }
-
         // Fetch the task again
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertEquals(DelegationState.RESOLVED, task.getDelegationState());
 
-        taskService.deleteTask(taskId, true);
+        taskService.complete(taskId);
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            historyService.deleteHistoricTaskInstance(taskId);
+        }
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertNull(historicTaskInstance);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1365,15 +1369,20 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         taskService.resolveTask(taskId, Collections.EMPTY_MAP);
 
-        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            historyService.deleteHistoricTaskInstance(taskId);
-        }
-
         // Fetch the task again
         task = taskService.createTaskQuery().taskId(taskId).singleResult();
         assertEquals(DelegationState.RESOLVED, task.getDelegationState());
 
-        taskService.deleteTask(taskId, true);
+        taskService.complete(taskId);
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            historyService.deleteHistoricTaskInstance(taskId);
+        }
+
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertNull(historicTaskInstance);
+        }
     }
 
     @Deployment(resources = { "org/activiti/engine/test/api/twoTasksProcess.bpmn20.xml" })
@@ -1502,11 +1511,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariableLocal(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariableLocal(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariableLocal(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     @Deployment(resources = {
@@ -1544,10 +1550,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
         taskService.setVariable(currentTask.getId(), "variable1", "value1");
 
-        catchException(taskService).getVariable(currentTask.getId(), "variable1", Boolean.class);
-
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> taskService.getVariable(currentTask.getId(), "variable1", Boolean.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 }

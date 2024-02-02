@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="myProcess">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theSubProcess" />
+
+        <subProcess id="theSubProcess">
+
+            <multiInstanceLoopCharacteristics isSequential="false" flowable:elementIndexVariable="subProcessLoopCounter">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews" class="org.flowable.engine.test.bpmn.multiinstance.MultiInstanceVariableAggregationTest$CustomVariableAggregator" createOverviewVariable="true">
+                        <variable source="taskOneReviews" />
+                        <variable source="taskTwoReviews" />
+                    </flowable:variableAggregation>
+                </extensionElements>
+                <loopCardinality>${nrOfLoops}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+            <startEvent id="subStart"  />
+            <sequenceFlow id="subflow0" sourceRef="subStart" targetRef="userTaskOne" />
+
+            <userTask id="userTaskOne" name="task one" flowable:category="Category ${subProcessLoopCounter * 10 + loopCounter}" >
+                <multiInstanceLoopCharacteristics isSequential="false">
+                    <extensionElements>
+                        <flowable:variableAggregation target="taskOneReviews" createOverviewVariable="true">
+                            <variable source="approved"  />
+                            <variable source="description" />
+                            <variable sourceExpression="${subProcessLoopCounter * 10 + loopCounter}" target="task" />
+                        </flowable:variableAggregation>
+                    </extensionElements>
+                    <loopCardinality>${nrOfLoops}</loopCardinality>
+                </multiInstanceLoopCharacteristics>
+
+            </userTask>
+            <sequenceFlow id="subflow1" sourceRef="userTaskOne" targetRef="userTaskTwo" />
+
+            <userTask id="userTaskTwo" name="task two" flowable:category="Category ${subProcessLoopCounter * 10 + loopCounter}" >
+                <multiInstanceLoopCharacteristics isSequential="false">
+                    <extensionElements>
+                        <flowable:variableAggregation target="taskTwoReviews" createOverviewVariable="true">
+                            <variable sourceExpression="${vars:getOrDefault(myScore, 0) * 2}" target="score" />
+                        </flowable:variableAggregation>
+                    </extensionElements>
+                    <loopCardinality>${nrOfLoops}</loopCardinality>
+                </multiInstanceLoopCharacteristics>
+
+            </userTask>
+            <sequenceFlow id="subflow2" sourceRef="userTaskTwo" targetRef="subEnd" />
+
+            <endEvent id="subEnd" />
+
+        </subProcess>
+
+        <sequenceFlow id="flow2" sourceRef="theSubProcess" targetRef="afterMiTasks" />
+        <userTask id="afterMiTasks" name="Task after Mi"/>
+
+        <sequenceFlow id="flow5" sourceRef="afterMiTasks" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

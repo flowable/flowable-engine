@@ -26,7 +26,7 @@ import org.activiti.engine.impl.interceptor.CommandConfig;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.apache.ibatis.session.SqlSession;
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
+import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

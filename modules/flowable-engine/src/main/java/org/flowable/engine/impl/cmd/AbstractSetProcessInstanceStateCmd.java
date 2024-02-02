@@ -15,12 +15,13 @@ package org.flowable.engine.impl.cmd;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.SuspensionStateUtil;
@@ -28,7 +29,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -53,21 +56,22 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
             throw new FlowableIllegalArgumentException("ProcessInstanceId cannot be null.");
         }
 
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         ExecutionEntity executionEntity = executionEntityManager.findById(processInstanceId);
 
         if (executionEntity == null) {
             throw new FlowableObjectNotFoundException("Cannot find processInstance for id '" + processInstanceId + "'.", Execution.class);
         }
         if (!executionEntity.isProcessInstanceType()) {
-            throw new FlowableException("Cannot set suspension state for execution '" + processInstanceId + "': not a process instance.");
+            throw new FlowableException("Cannot set suspension state for execution '" + executionEntity + "': not a process instance.");
         }
 
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, executionEntity.getProcessDefinitionId())) {
             if (getNewState() == SuspensionState.ACTIVE) {
-                CommandContextUtil.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().activateProcessInstance(processInstanceId);
+                processEngineConfiguration.getFlowable5CompatibilityHandler().activateProcessInstance(processInstanceId);
             } else {
-                CommandContextUtil.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().suspendProcessInstance(processInstanceId);
+                processEngineConfiguration.getFlowable5CompatibilityHandler().suspendProcessInstance(processInstanceId);
             }
             return null;
         }
@@ -85,14 +89,15 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         }
 
         // All tasks are suspended
-        List<TaskEntity> tasks = CommandContextUtil.getTaskService().findTasksByProcessInstanceId(processInstanceId);
+        List<TaskEntity> tasks = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().findTasksByProcessInstanceId(processInstanceId);
         for (TaskEntity taskEntity : tasks) {
             SuspensionStateUtil.setSuspensionState(taskEntity, getNewState());
-            CommandContextUtil.getTaskService().updateTask(taskEntity, false);
+            processEngineConfiguration.getTaskServiceConfiguration().getTaskService().updateTask(taskEntity, false);
         }
 
         // All jobs are suspended
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobServiceConfiguration jobServiceConfiguration = processEngineConfiguration.getJobServiceConfiguration();
+        JobService jobService = jobServiceConfiguration.getJobService();
         if (getNewState() == SuspensionState.ACTIVE) {
             List<SuspendedJobEntity> suspendedJobs = jobService.findSuspendedJobsByProcessInstanceId(processInstanceId);
             for (SuspendedJobEntity suspendedJob : suspendedJobs) {
@@ -100,7 +105,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
             }
 
         } else {
-            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            TimerJobService timerJobService = jobServiceConfiguration.getTimerJobService();
             List<TimerJobEntity> timerJobs = timerJobService.findTimerJobsByProcessInstanceId(processInstanceId);
             for (TimerJobEntity timerJob : timerJobs) {
                 jobService.moveJobToSuspendedJob(timerJob);
@@ -110,6 +115,14 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
             for (JobEntity job : jobs) {
                 jobService.moveJobToSuspendedJob(job);
             }
+
+            List<ExternalWorkerJobEntity> externalWorkerJobs = jobServiceConfiguration.getExternalWorkerJobEntityManager()
+                    .findJobsByProcessInstanceId(processInstanceId);
+
+            for (ExternalWorkerJobEntity externalWorkerJob : externalWorkerJobs) {
+                jobService.moveJobToSuspendedJob(externalWorkerJob);
+            }
+
         }
 
         return null;

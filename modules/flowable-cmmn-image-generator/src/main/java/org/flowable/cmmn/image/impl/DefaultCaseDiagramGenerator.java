@@ -31,15 +31,21 @@ import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.DecisionTask;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
+import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.UserEventListener;
+import org.flowable.cmmn.model.VariableEventListener;
 
 /**
  * Class to generate an image based the diagram interchange information in a CMMN 1.1 case.
@@ -57,6 +63,15 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     // The instructions on how to draw a certain construct is
     // created statically and stored in a map for performance.
     public DefaultCaseDiagramGenerator(final double scaleFactor) {
+        // generic event listener
+        activityDrawInstructions.put(GenericEventListener.class, new ActivityDrawInstruction() {
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawGenericEventListener(graphicInfo, scaleFactor);
+            }
+        });
+        
         // timer event listener
         activityDrawInstructions.put(TimerEventListener.class, new ActivityDrawInstruction() {
 
@@ -66,6 +81,25 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawTimerEventListener(graphicInfo, scaleFactor);
             }
         });
+
+        // user event listener
+        activityDrawInstructions.put(UserEventListener.class, new ActivityDrawInstruction() {
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawUserEventListener(graphicInfo, scaleFactor);
+            }
+        });
+        
+        // variable event listener
+        activityDrawInstructions.put(VariableEventListener.class, new ActivityDrawInstruction() {
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawVariableEventListener(graphicInfo, scaleFactor);
+            }
+        });
+
         // task
         activityDrawInstructions.put(Task.class, new ActivityDrawInstruction() {
 
@@ -83,6 +117,26 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
             public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
                 GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
                 caseDiagramCanvas.drawUserTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+        
+        // send event task
+        activityDrawInstructions.put(SendEventServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawSendEventTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+
+        // external worker service task
+        activityDrawInstructions.put(ExternalWorkerServiceTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawServiceTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
 
@@ -319,6 +373,9 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         ActivityDrawInstruction drawInstruction = activityDrawInstructions.get(planItem.getPlanItemDefinition().getClass());
         if (drawInstruction != null) {
             drawInstruction.draw(caseDiagramCanvas, cmmnModel, planItem);
+        
+        } else if (planItem.getPlanItemDefinition() instanceof Task) {
+            activityDrawInstructions.get(Task.class).draw(caseDiagramCanvas, cmmnModel, planItem);
         }
 
         // Nested elements
@@ -347,18 +404,36 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         BaseElement sourceElement = cmmnModel.getCriterion(sourceRef);
         if (sourceElement == null) {
             sourceElement = cmmnModel.findPlanItem(sourceRef);
+            if (sourceElement == null) {
+                PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition(sourceRef);
+                if (planItemDefinition != null) {
+                    sourceElement = cmmnModel.findPlanItem(planItemDefinition.getPlanItemRef());
+                }
+                if (sourceElement == null) {
+                    sourceElement = cmmnModel.findTextAnnotation(sourceRef);
+                }
+            }
         }
 
         BaseElement targetElement = cmmnModel.getCriterion(targetRef);
         if (targetElement == null) {
             targetElement = cmmnModel.findPlanItem(targetRef);
+            if (targetElement == null) {
+                PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition(targetRef);
+                if (planItemDefinition != null) {
+                    targetElement = cmmnModel.findPlanItem(planItemDefinition.getPlanItemRef());
+                }
+                if (targetElement == null) {
+                    targetElement = cmmnModel.findTextAnnotation(targetRef);
+                }
+            }
         }
 
         List<GraphicInfo> graphicInfoList = cmmnModel.getFlowLocationGraphicInfo(association.getId());
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             graphicInfoList = connectionPerfectionizer(caseDiagramCanvas, cmmnModel, sourceElement, targetElement, graphicInfoList);
-            int xPoints[] = new int[graphicInfoList.size()];
-            int yPoints[] = new int[graphicInfoList.size()];
+            int[] xPoints = new int[graphicInfoList.size()];
+            int[] yPoints = new int[graphicInfoList.size()];
 
             for (int i = 1; i < graphicInfoList.size(); i++) {
                 GraphicInfo graphicInfo = graphicInfoList.get(i);
@@ -377,7 +452,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         }
     }
 
-    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas processDiagramCanvas, CmmnModel cmmnModel,
+    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel,
                     BaseElement sourceElement, BaseElement targetElement, List<GraphicInfo> graphicInfoList) {
 
         GraphicInfo sourceGraphicInfo = cmmnModel.getGraphicInfo(sourceElement.getId());
@@ -386,7 +461,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         DefaultCaseDiagramCanvas.SHAPE_TYPE sourceShapeType = getShapeType(sourceElement);
         DefaultCaseDiagramCanvas.SHAPE_TYPE targetShapeType = getShapeType(targetElement);
 
-        return processDiagramCanvas.connectionPerfectionizer(sourceShapeType, targetShapeType, sourceGraphicInfo, targetGraphicInfo, graphicInfoList);
+        return caseDiagramCanvas.connectionPerfectionizer(sourceShapeType, targetShapeType, sourceGraphicInfo, targetGraphicInfo, graphicInfoList);
     }
 
     /**
@@ -394,7 +469,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
      * Each element can be presented as rectangle, rhombus, or ellipse.
      *
      * @param baseElement
-     * @return DefaultProcessDiagramCanvas.SHAPE_TYPE
+     * @return DefaultCaseDiagramCanvas.SHAPE_TYPE
      */
     protected static DefaultCaseDiagramCanvas.SHAPE_TYPE getShapeType(BaseElement baseElement) {
         if (baseElement instanceof Task || baseElement instanceof Stage) {
@@ -412,8 +487,8 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     protected static GraphicInfo getLineCenter(List<GraphicInfo> graphicInfoList) {
         GraphicInfo gi = new GraphicInfo();
 
-        int xPoints[] = new int[graphicInfoList.size()];
-        int yPoints[] = new int[graphicInfoList.size()];
+        int[] xPoints = new int[graphicInfoList.size()];
+        int[] yPoints = new int[graphicInfoList.size()];
 
         double length = 0;
         double[] lengths = new double[graphicInfoList.size()];

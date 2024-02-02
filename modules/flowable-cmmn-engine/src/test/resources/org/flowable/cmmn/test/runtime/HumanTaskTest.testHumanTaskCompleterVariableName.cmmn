@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase" flowable:initiatorVariableName="var1">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="task1" />
+            <planItem id="planItem2" name="Task Two" definitionRef="task2" />
+            <planItem id="planItem3" name="Task Three" definitionRef="task3" />
+            <planItem id="planItem4" name="Dummy Task" definitionRef="task4" />
+
+            <humanTask id="task1" name="Task One" flowable:taskCompleterVariableName="completerTask1" />
+            <humanTask id="task2" name="Task Two" flowable:taskCompleterVariableName="completerTask2" />
+            <humanTask id="task3" name="Task Three" flowable:taskCompleterVariableName="${dynamicVariable}" />
+            <humanTask id="task4" name="Dummy Task" />
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -39,9 +39,13 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected List<EventListener> eventListeners = new ArrayList<>();
     protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
+    protected Map<String, Artifact> artifactMap = new LinkedHashMap<>();
 
     // Added during process definition parsing
     protected FlowElement initialFlowElement;
+    
+    // Performance settings
+    protected boolean enableEagerExecutionTreeFetching;
 
     public Process() {
 
@@ -97,6 +101,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         this.lanes = lanes;
     }
 
+    @Override
     public Map<String, FlowElement> getFlowElementMap() {
         return flowElementMap;
     }
@@ -115,7 +120,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     }
 
     /**
-     * @param searchRecursive:
+     * @param searchRecursive
      *            searches the whole process, including subprocesses
      */
     public FlowElement getFlowElement(String flowElementId, boolean searchRecursive) {
@@ -253,10 +258,23 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     public Collection<Artifact> getArtifacts() {
         return artifactList;
     }
+    
+    @Override
+    public Map<String, Artifact> getArtifactMap() {
+        return artifactMap;
+    }
 
     @Override
     public void addArtifact(Artifact artifact) {
         artifactList.add(artifact);
+        addArtifactToMap(artifact);
+    }
+    
+    @Override
+    public void addArtifactToMap(Artifact artifact) {
+        if (artifact != null && StringUtils.isNotEmpty(artifact.getId())) {
+            artifactMap.put(artifact.getId(), artifact);
+        }
     }
 
     @Override
@@ -386,6 +404,8 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         if (otherElement.getCandidateStarterGroups() != null && !otherElement.getCandidateStarterGroups().isEmpty()) {
             candidateStarterGroups.addAll(otherElement.getCandidateStarterGroups());
         }
+        
+        enableEagerExecutionTreeFetching = otherElement.enableEagerExecutionTreeFetching;
 
         eventListeners = new ArrayList<>();
         if (otherElement.getEventListeners() != null && !otherElement.getEventListeners().isEmpty()) {
@@ -404,6 +424,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
             for (ValuedDataObject otherObject : otherElement.getDataObjects()) {
                 if (thisObject.getId().equals(otherObject.getId())) {
                     exists = true;
+                    break;
                 }
             }
             if (!exists) {
@@ -440,6 +461,14 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
 
     public void setInitialFlowElement(FlowElement initialFlowElement) {
         this.initialFlowElement = initialFlowElement;
+    }
+
+    public boolean isEnableEagerExecutionTreeFetching() {
+        return enableEagerExecutionTreeFetching;
+    }
+
+    public void setEnableEagerExecutionTreeFetching(boolean enableEagerExecutionTreeFetching) {
+        this.enableEagerExecutionTreeFetching = enableEagerExecutionTreeFetching;
     }
 
 }

@@ -15,9 +15,9 @@ package org.flowable.standalone.jpa;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 /**
  * @author Frederik Heremans
@@ -26,7 +26,7 @@ import javax.persistence.Id;
 public class BigDecimalIdJPAEntity {
 
     @Id
-    @Column(name = "ID_")
+    @Column(name = "ID_", precision = 50, scale = 20)
     private BigDecimal bigDecimalId;
 
     public BigDecimal getBigDecimalId() {

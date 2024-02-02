@@ -12,33 +12,28 @@
  */
 package org.flowable.variable.service;
 
-import org.flowable.engine.common.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
+import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableServiceImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityManagerImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManagerImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
-import org.flowable.variable.service.impl.persistence.entity.data.VariableByteArrayDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
-import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableByteArrayDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableInstanceDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class VariableServiceConfiguration extends AbstractServiceConfiguration {
+public class VariableServiceConfiguration extends AbstractServiceConfiguration<VariableServiceConfiguration> {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(VariableServiceConfiguration.class);
-    
     public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
     public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
 
@@ -51,38 +46,48 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     // DATA MANAGERS ///////////////////////////////////////////////////
 
     protected VariableInstanceDataManager variableInstanceDataManager;
-    protected VariableByteArrayDataManager byteArrayDataManager;
     protected HistoricVariableInstanceDataManager historicVariableInstanceDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    
+
     protected VariableInstanceEntityManager variableInstanceEntityManager;
-    protected VariableByteArrayEntityManager byteArrayEntityManager;
     protected HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager;
-    
     protected VariableTypes variableTypes;
-    
     protected InternalHistoryVariableManager internalHistoryVariableManager;
-    
+    protected ExpressionManager expressionManager;
     protected int maxLengthString;
-    
+    protected boolean loggingSessionEnabled;
+
+    protected VariableInstanceValueModifier variableInstanceValueModifier;
+
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
-     *
-     * MySerializableVariable myVariable = (MySerializableVariable) execution.getVariable("myVariable"); myVariable.setNumber(123);
-     *
-     * And the changes to the java object will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
-     *
-     * By default true for backwards compatibility.
+     * MySerializableVariable myVariable = (MySerializableVariable) execution.getVariable("myVariable"); myVariable.setNumber(123); And the changes to
+     * the java object will be reflected in the database. Otherwise, a manual call to setVariable will be needed. By default true for backwards
+     * compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+
+    public VariableServiceConfiguration(String engineName) {
+        super(engineName);
+    }
+
+    @Override
+    protected VariableServiceConfiguration getService() {
+        return this;
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
+        initVariableInstanceValueModifier();
+
+        configuratorsAfterInit();
     }
 
     // Data managers
@@ -90,13 +95,10 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (variableInstanceDataManager == null) {
-            variableInstanceDataManager = new MybatisVariableInstanceDataManager();
-        }
-        if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisVariableByteArrayDataManager();
+            variableInstanceDataManager = new MybatisVariableInstanceDataManager(this);
         }
         if (historicVariableInstanceDataManager == null) {
-            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager();
+            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager(this);
         }
     }
 
@@ -104,11 +106,14 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         if (variableInstanceEntityManager == null) {
             variableInstanceEntityManager = new VariableInstanceEntityManagerImpl(this, variableInstanceDataManager);
         }
-        if (byteArrayEntityManager == null) {
-            byteArrayEntityManager = new VariableByteArrayEntityManagerImpl(this, byteArrayDataManager);
-        }
         if (historicVariableInstanceEntityManager == null) {
             historicVariableInstanceEntityManager = new HistoricVariableInstanceEntityManagerImpl(this, historicVariableInstanceDataManager);
+        }
+    }
+
+    public void initVariableInstanceValueModifier() {
+        if (variableInstanceValueModifier == null) {
+            variableInstanceValueModifier = new DefaultVariableInstanceValueModifier(this);
         }
     }
 
@@ -118,7 +123,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     public VariableServiceConfiguration getVariableServiceConfiguration() {
         return this;
     }
-    
+
     public VariableService getVariableService() {
         return variableService;
     }
@@ -127,7 +132,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.variableService = variableService;
         return this;
     }
-    
+
     public HistoricVariableService getHistoricVariableService() {
         return historicVariableService;
     }
@@ -145,16 +150,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.variableInstanceDataManager = variableInstanceDataManager;
         return this;
     }
-    
-    public VariableByteArrayDataManager getByteArrayDataManager() {
-        return byteArrayDataManager;
-    }
 
-    public VariableServiceConfiguration setByteArrayDataManager(VariableByteArrayDataManager byteArrayDataManager) {
-        this.byteArrayDataManager = byteArrayDataManager;
-        return this;
-    }
-    
     public HistoricVariableInstanceDataManager getHistoricVariableInstanceDataManager() {
         return historicVariableInstanceDataManager;
     }
@@ -172,16 +168,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.variableInstanceEntityManager = variableInstanceEntityManager;
         return this;
     }
-    
-    public VariableByteArrayEntityManager getByteArrayEntityManager() {
-        return byteArrayEntityManager;
-    }
 
-    public VariableServiceConfiguration setByteArrayEntityManager(VariableByteArrayEntityManager byteArrayEntityManager) {
-        this.byteArrayEntityManager = byteArrayEntityManager;
-        return this;
-    }
-    
     public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
         return historicVariableInstanceEntityManager;
     }
@@ -190,22 +177,31 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.historicVariableInstanceEntityManager = historicVariableInstanceEntityManager;
         return this;
     }
-    
+
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }
-    
+
     public VariableServiceConfiguration setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
         return this;
     }
-    
+
     public InternalHistoryVariableManager getInternalHistoryVariableManager() {
         return internalHistoryVariableManager;
     }
 
     public VariableServiceConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
         this.internalHistoryVariableManager = internalHistoryVariableManager;
+        return this;
+    }
+
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public VariableServiceConfiguration setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
         return this;
     }
 
@@ -217,12 +213,29 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         this.maxLengthString = maxLengthString;
         return this;
     }
-    
+
+    public boolean isLoggingSessionEnabled() {
+        return loggingSessionEnabled;
+    }
+
+    public VariableServiceConfiguration setLoggingSessionEnabled(boolean loggingSessionEnabled) {
+        this.loggingSessionEnabled = loggingSessionEnabled;
+        return this;
+    }
+
     public boolean isSerializableVariableTypeTrackDeserializedObjects() {
         return serializableVariableTypeTrackDeserializedObjects;
     }
 
     public void setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public VariableInstanceValueModifier getVariableInstanceValueModifier() {
+        return variableInstanceValueModifier;
+    }
+
+    public void setVariableInstanceValueModifier(VariableInstanceValueModifier variableInstanceValueModifier) {
+        this.variableInstanceValueModifier = variableInstanceValueModifier;
     }
 }

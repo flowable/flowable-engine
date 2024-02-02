@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;

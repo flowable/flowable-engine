@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task One" definitionRef="serviceTask"/>
+            <planItem id="planItem2" name="Task Two" definitionRef="task">
+                <entryCriterion sentryRef="sentry1"/>
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="serviceTask" flowable:type="java" flowable:class="org.flowable.cmmn.test.runtime.ServiceTaskTest$TestJavaDelegate02">
+                <extensionElements>
+                    <flowable:field name="delegateField">
+                        <flowable:expression><![CDATA[${1 + 1}]]></flowable:expression>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+            <task id="task" name="The Task" isBlocking="true"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

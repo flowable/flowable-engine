@@ -15,9 +15,9 @@ package org.flowable.engine.impl.bpmn.listener;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**

@@ -54,6 +54,8 @@ public class ApacheDigester implements PasswordEncoder {
                 return DigestUtils.sha384Hex(salt);
             case SHA512:
                 return DigestUtils.sha512Hex(salt);
+            default:
+                break;
         }
         return null;
     }

@@ -15,9 +15,7 @@ package org.flowable.idm.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
-public class PrivilegeMappingEntityImpl extends AbstractEntity implements PrivilegeMappingEntity {
+public class PrivilegeMappingEntityImpl extends AbstractIdmEngineEntity implements PrivilegeMappingEntity {
 
     protected String privilegeId;
     protected String userId;

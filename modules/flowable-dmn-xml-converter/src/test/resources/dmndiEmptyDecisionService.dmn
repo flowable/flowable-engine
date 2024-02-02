@@ -1,0 +1,16 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="definition_decisionServiceTest" name="Decision Service Test" namespace="http://www.flowable.org/dmn">
+    <decisionService id="decisionServiceTest" name="Decision Service Test">
+    </decisionService>
+    <dmndi:DMNDI>
+        <dmndi:DMNDiagram id="DMNDiagram_decisionServiceTest" name="Decision Service Test">
+            <dmndi:Size height="1050.0" width="1485.0"></dmndi:Size>
+            <dmndi:DMNShape id="DMNShape_8e0129d4-4cf9-493b-8c9d-9a16761bb9ac" dmnElementRef="decisionServiceTest">
+                <dc:Bounds height="570.0" width="729.0" x="30.0" y="45.0"></dc:Bounds>
+                <dmndi:DMNDecisionServiceDividerLine>
+                    <di:waypoint x="30.0" y="285.0"></di:waypoint>
+                    <di:waypoint x="759.0" y="285.0"></di:waypoint>
+                </dmndi:DMNDecisionServiceDividerLine>
+            </dmndi:DMNShape>
+        </dmndi:DMNDiagram>
+    </dmndi:DMNDI>
+</definitions>

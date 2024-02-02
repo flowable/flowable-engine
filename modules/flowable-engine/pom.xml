@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -44,6 +44,22 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-entitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry</artifactId>
+        </dependency>
+       <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-event-registry-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-eventsubscription-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-task-service</artifactId>
         </dependency>
         <dependency>
@@ -52,11 +68,19 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
+            <artifactId>flowable-batch-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-engine-configurator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -79,12 +103,12 @@
             <artifactId>flowable-content-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-http-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-mail</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -104,8 +128,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -119,19 +158,34 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <groupId>jakarta.transaction</groupId>
+            <artifactId>jakarta.transaction-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.enterprise.concurrent</groupId>
-            <artifactId>javax.enterprise.concurrent-api</artifactId>
+            <groupId>jakarta.enterprise.concurrent</groupId>
+            <artifactId>jakarta.enterprise.concurrent-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -144,18 +198,23 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.subethamail</groupId>
-            <artifactId>subethasmtp-wiser</artifactId>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>subethasmtp</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -173,6 +232,7 @@
             <artifactId>java-uuid-generator</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <!-- required for DiagramQueryTest -->
             <groupId>commons-io</groupId>
@@ -197,8 +257,18 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.catch-exception</groupId>
-            <artifactId>catch-exception</artifactId>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -210,6 +280,18 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.nashorn</groupId>
+            <artifactId>nashorn-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <properties>
@@ -217,25 +299,31 @@
             org.flowable.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.db.mapping.entity
+            org.flowable.db.create,
+            org.flowable.db.update,
+            org.flowable.db.mapping,
+            org.flowable.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             junit*;resolution:=optional,
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
-            javax.activation*;resolution:=optional,
-            javax.persistence*;resolution:=optional,
-            org.apache.commons.codec*;resolution:=optional,
-            org.apache.commons.mail*;resolution:=optional,
+            jakarta.activation*;resolution:=optional,
+            jakarta.persistence*;resolution:=optional,
+            jakarta.mail*;resolution:=optional,
             org.apache.xerces*;resolution:=optional,
             org.flowable.camel;resolution:=optional,
             org.flowable.camel.impl;resolution:=optional,
             org.springframework*;resolution:=optional,
             org.drools*;resolution:=optional,
+            org.kie*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
-            javax.transaction;resolution:=optional,
-            javax.enterprise.concurrent;resolution:=optional,
+            jakarta.transaction;resolution:=optional,
+            jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
+        <exclude.tests>nothing-to-exclude</exclude.tests>
+        <exclude.tests2>nothing-to-exclude</exclude.tests2>
+        <exclude.tests3>nothing-to-exclude</exclude.tests3>
     </properties>
 
     <build>
@@ -246,8 +334,11 @@
                     <excludes>
                         <exclude>**/*TestCase.java</exclude>
                         <exclude>**/RepeatingServiceTaskTest.java</exclude>
+                        <exclude>${exclude.tests}</exclude>
+                        <exclude>${exclude.tests2}</exclude>
+                        <exclude>${exclude.tests3}</exclude>
                     </excludes>
-                    <runOrder>alphabetical</runOrder>
+                    <argLine>${argLine} -Xmx5g</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -316,7 +407,6 @@
     </build>
 
     <profiles>
-
         <profile>
             <id>checkspring</id>
             <properties>
@@ -331,7 +421,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>2.2</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -355,20 +444,23 @@
             </properties>
         </profile>
         <profile>
-            <id>distro</id>
+            <id>cleanDb</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
+                                <id>drop-idm-schema</id>
+                                <phase>prepare-package</phase>
                                 <goals>
-                                    <goal>jar-no-fork</goal>
+                                    <goal>java</goal>
                                 </goals>
+                                <configuration>
+                                    <mainClass>org.flowable.engine.impl.db.DbSchemaDrop</mainClass>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -387,10 +479,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -444,10 +534,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -501,10 +589,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -517,12 +603,28 @@
                                         <echo
                                             message="updating flowable configuration to db ${databasemssql}" />
                                         <copy
-                                            file="${basedir}/../../qa/db/mssql/flowable.cfg.xml"
-                                            todir="target/test-classes"
+                                            file="${basedir}/../../qa/db/flowable.mssql.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
                                             overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssql}.properties" />
                                         </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="dropping schema in ${databasemssql}" />
+                                        <java
+                                            classname="org.flowable.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -539,13 +641,17 @@
                     <name>databaseasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
+                <exclude.tests4>**/BulkDeleteHistoric*Test</exclude.tests4>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -596,13 +702,17 @@
                     <name>databasewithschemaasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
+                <exclude.tests4>**/BulkDeleteHistoric*Test</exclude.tests4>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -653,13 +763,17 @@
                     <name>databasemssqlasynchistory</name>
                 </property>
             </activation>
+            <properties>
+                <exclude.tests>**/ProcessInstanceMigration*Test.java</exclude.tests>
+                <exclude.tests2>**/ChangeState*Test.java</exclude.tests2>
+                <exclude.tests3>**/Historic*DeleteTest.java</exclude.tests3>
+                <exclude.tests4>**/BulkDeleteHistoric*Test</exclude.tests4>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -693,10 +807,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>configExecution</id>
@@ -741,13 +853,12 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -766,10 +877,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>configExecution</id>
@@ -816,13 +925,12 @@
                         <configuration>
                             <excludes>
                                 <exclude>**/*TestCase.java</exclude>
-
                                 <!-- Disabling tests that run exclusively 
                                     using standalone config -->
                                 <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -843,8 +951,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -876,8 +984,9 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -889,10 +998,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -961,10 +1068,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1033,8 +1138,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1066,8 +1171,9 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1080,8 +1186,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1113,16 +1219,23 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/Historic*InstanceTest.java</exclude>
                                 <exclude>**/HistoryServiceTest.java</exclude>
+                                <exclude>**/HistoryLevelServiceTest.java</exclude>
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/HistoryServiceTaskLogTest.java</exclude>
+                                <exclude>**/HistoryServiceDisableTaskLogTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryVersionTest.java</exclude>
                                 <exclude>**/NonCascadeDeleteTest.java</exclude>
                                 <exclude>**/HistoricProcessInstanceQueryAndWithExceptionTest.java</exclude>
                                 <exclude>**/HistoricJPAVariableTest.java</exclude>
                                 <exclude>**/VerifyDatabaseOperationsTest.java</exclude>
+                                <exclude>**/AsyncHistoryTest.java</exclude>
+                                <exclude>**/AsyncHistoryUpgradeTest.java</exclude>
+                                <exclude>**/ProcessInstanceLogQueryTest.java</exclude>
+                                <exclude>**/FlowableJupiterSubclassTest.java</exclude>
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1134,8 +1247,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1167,8 +1280,12 @@
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
                                 <exclude>**/RepeatingServiceTaskTest.java</exclude>
                                 <exclude>org/flowable/standalone/**</exclude>
+                                <exclude>**/ProcessInstanceMigration*Test.java</exclude>
+                                <exclude>**/CacheTaskTest.java</exclude>
+                                <exclude>**/CompensateEventTest</exclude> <!-- Needs investigation -->
+                                <exclude>**/MultipleExternalWorkerAcquireServiceTaskTest</exclude> <!-- Fails occasionally when system has lots of concurrency. Excluded, as the external workers don't use async history -->
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
+                            <argLine>${argLine} -Xmx5g</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -1191,12 +1308,11 @@
                                 <include>**/JdbcMetaDataTest.java</include>
                             </includes>
                             <excludes />
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
                     </plugin>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1261,8 +1377,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-test-create-schema</id>
@@ -1297,8 +1413,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1314,8 +1430,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1331,8 +1447,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.oracle.jdbc</groupId>
-                    <artifactId>ojdbc7</artifactId>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1348,8 +1464,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1365,8 +1481,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.ibm.db2.jcc</groupId>
-                    <artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1399,8 +1515,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -1445,10 +1561,8 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
-                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
-                        <version>1.4</version>
                         <executions>
                             <execution>
                                 <id>database-copy-logging</id>
@@ -1463,6 +1577,44 @@
                                         <copy
                                             file="${basedir}/../../qa/logging/log4j.properties"
                                             todir="target/test-classes"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>mongodb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-mongodb</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>change config</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating flowable configuration to mongodb.flowable.cfg.xml" />
+                                        <copy
+                                            file="${basedir}/../../qa/mongodb/mongodb.flowable.cfg.xml"
+                                            tofile="target/test-classes/flowable.cfg.xml"
                                             overwrite="true" />
                                     </tasks>
                                 </configuration>

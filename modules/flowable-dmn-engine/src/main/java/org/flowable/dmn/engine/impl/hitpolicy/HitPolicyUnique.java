@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.RuleExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
@@ -39,11 +39,16 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
         //TODO: not on audit container
         for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
             if (entry.getKey().equals(ruleNumber) == false && entry.getValue().isValid()) {
-                String hitPolicyViolatedMessage = String.format("HitPolicy UNIQUE violated: rule %d is valid but rule %d was already valid", ruleNumber, entry.getKey());
+                String hitPolicyViolatedMessage = String.format("HitPolicy %s violated; at least rule %d and rule %d are valid.", getHitPolicyName(), ruleNumber, entry.getKey());
 
                 if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                     executionContext.getAuditContainer().getRuleExecutions().get(ruleNumber).setExceptionMessage(hitPolicyViolatedMessage);
-                    throw new FlowableException("HitPolicy UNIQUE violated");
+                    executionContext.getAuditContainer().getRuleExecutions().get(entry.getKey()).setExceptionMessage(hitPolicyViolatedMessage);
+                    throw new FlowableException("HitPolicy UNIQUE violated.");
+                } else {
+                    executionContext.getAuditContainer().getRuleExecutions().get(ruleNumber).setValidationMessage(hitPolicyViolatedMessage);
+                    executionContext.getAuditContainer().getRuleExecutions().get(entry.getKey()).setValidationMessage(hitPolicyViolatedMessage);
+                    break;
                 }
             }
         }
@@ -52,9 +57,9 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
     @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
-        List<Map<String, Object>> decisionResult = null;
+        List<Map<String, Object>> decisionResults;
 
-        if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false) {
+        if (ruleResults.size() > 1 && CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false) {
             Map<String, Object> lastResult = new HashMap<>();
 
             for (Map<String, Object> ruleResult : ruleResults) {
@@ -64,12 +69,14 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
                     }
                 }
             }
-            decisionResult = Collections.singletonList(lastResult);
-            
+
+            executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; multiple valid rules. Setting last valid rule result as final result.", getHitPolicyName()));
+            decisionResults = Collections.singletonList(lastResult);
         } else {
-            decisionResult = ruleResults;
+            decisionResults = ruleResults;
         }
 
-        executionContext.getAuditContainer().setDecisionResult(decisionResult);
+        updateStackWithDecisionResults(decisionResults, executionContext);
+        executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 }

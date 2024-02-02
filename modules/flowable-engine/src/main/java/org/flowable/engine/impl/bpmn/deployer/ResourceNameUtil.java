@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.deployer;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 /**

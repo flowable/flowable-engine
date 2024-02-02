@@ -15,18 +15,22 @@ package org.flowable.engine.test;
 
 import java.util.Date;
 
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.ProcessEngineImpl;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.mock.FlowableMockSupport;
+import org.flowable.eventregistry.api.EventRegistry;
+import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 
 import junit.framework.TestCase;
 
@@ -45,7 +49,7 @@ import junit.framework.TestCase;
  * 
  * <p>
  * You can declare a deployment with the {@link Deployment} annotation. This base class will make sure that this deployment gets deployed in the setUp and
- * {@link RepositoryService#deleteDeploymentCascade(String, boolean) cascade deleted} in the tearDown.
+ * {@link RepositoryService#deleteDeployment(String, boolean) cascade deleted} in the tearDown.
  * </p>
  * 
  * <p>
@@ -61,7 +65,7 @@ public abstract class FlowableTestCase extends TestCase {
     protected String configurationResource = "flowable.cfg.xml";
     protected String deploymentId;
 
-    protected ProcessEngineConfiguration processEngineConfiguration;
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected ProcessEngine processEngine;
     protected RepositoryService repositoryService;
     protected RuntimeService runtimeService;
@@ -87,10 +91,10 @@ public abstract class FlowableTestCase extends TestCase {
 
         if (processEngine == null) {
             initializeProcessEngine();
-            initializeServices();
-            initializeMockSupport();
         }
-
+        
+        initializeServices();
+        initializeMockSupport();
     }
 
     @Override
@@ -132,6 +136,19 @@ public abstract class FlowableTestCase extends TestCase {
         if (FlowableMockSupport.isMockSupportPossible(processEngine)) {
             this.mockSupport = new FlowableMockSupport(processEngine);
         }
+    }
+    
+    protected EventRepositoryService getEventRepositoryService() {
+        return getEventRegistryEngineConfiguration().getEventRepositoryService();
+    }
+    
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+    
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
+                        .get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 
     @Override

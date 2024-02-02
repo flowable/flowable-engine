@@ -1,0 +1,121 @@
+name: Flowable Oracle Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
+env:
+  MAVEN_ARGS: >-
+    -Dmaven.javadoc.skip=true
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  test_oracle:
+    name: Oracle ${{ matrix.oracle }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        oracle: [ "18-slim", "21-slim" ]
+        include:
+          - oracle: 18-slim
+            driverVersion: 18.3.0.0
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
+          - oracle: 21-slim
+            driverVersion: 21.6.0.0.1
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
+    services:
+      oracle:
+        image: gvenzl/oracle-xe:${{ matrix.oracle }}
+        env:
+          ORACLE_PASSWORD: flowable
+          APP_USER: flowable
+          APP_USER_PASSWORD: flowable
+        ports:
+          - 1521/tcp
+        options: >-
+          --shm-size=2g
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use oracle for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -PcleanDb,oracle
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=oracle.jdbc.driver.OracleDriver
+          -Doracle.jdbc.version=${{ matrix.driverVersion }}
+          -Doracle.jdbc.artifact=${{ matrix.driverArtifact }}
+          -Dmaven.test.redirectTestOutputToFile=false
+  test_oracle_dmn:
+    name: Oracle ${{ matrix.oracle }} DMN
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        oracle: [ "18-slim", "21-slim" ]
+        include:
+          - oracle: 18-slim
+            driverVersion: 18.3.0.0
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
+          - oracle: 21-slim
+            driverVersion: 21.6.0.0.1
+            driverArtifact: ojdbc8
+            serviceName: XEPDB1
+    services:
+      oracle:
+        image: gvenzl/oracle-xe:${{ matrix.oracle }}
+        env:
+          ORACLE_PASSWORD: flowable
+          APP_USER: flowable
+          APP_USER_PASSWORD: flowable
+        ports:
+          - 1521/tcp
+        options: >-
+          --shm-size=2g
+          --health-cmd healthcheck.sh
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use oracle for the host here because we have specified a container for the job.
+        # If we were running the job on the VM this would be localhost
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -Pdmn,oracle
+          -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=oracle.jdbc.driver.OracleDriver
+          -Doracle.jdbc.version=${{ matrix.driverVersion }}
+          -Doracle.jdbc.artifact=${{ matrix.driverArtifact }}
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-dmn-engine -am

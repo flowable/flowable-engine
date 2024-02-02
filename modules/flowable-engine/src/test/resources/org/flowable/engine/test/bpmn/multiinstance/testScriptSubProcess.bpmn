@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <process id="testSubproc" name="Test Subproc" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" />
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="scriptTask1" />
+    <endEvent id="endNoneEvent1" />
+    <scriptTask id="scriptTask1" name="Script task" flowable:async="true" flowable:exclusive="false" scriptFormat="groovy" flowable:autoStoreVariables="false">
+      <script><![CDATA[var value = execution.getVariable("el").get("value");
+
+System.out.println("<<Process>> " + value);
+]]></script>
+    </scriptTask>
+    <sequenceFlow id="sequenceFlow2" sourceRef="scriptTask1" targetRef="endNoneEvent1" />
+  </process>
+</definitions>

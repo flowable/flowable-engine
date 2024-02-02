@@ -27,9 +27,15 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.jobexecutor.AsyncJobAddedNotification;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.cfg.TransactionContext;
+import org.flowable.common.engine.impl.cfg.TransactionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.JobAddedTransactionListener;
 
 /**
  * @author Tom Baeyens
@@ -55,11 +61,21 @@ public class JobEntityManager extends AbstractManager {
     }
 
     protected void hintAsyncExecutor(Job job) {
-        AsyncExecutor asyncExecutor = Context.getProcessEngineConfiguration().getAsyncExecutor();
 
-        // notify job executor:
-        CommandContextCloseListener commandContextCloseListener = new AsyncJobAddedNotification(job, asyncExecutor);
-        Context.getCommandContext().addCloseListener(commandContextCloseListener);
+        AsyncExecutor asyncExecutor = Context.getProcessEngineConfiguration().getAsyncExecutor();
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+
+        TransactionContext transactionContext = org.flowable.common.engine.impl.context.Context.getTransactionContext();
+        if (transactionContext != null) {
+            JobAddedTransactionListener jobAddedTransactionListener = new JobAddedTransactionListener(job, asyncExecutor,
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor());
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, jobAddedTransactionListener);
+
+        } else {
+            CommandContextCloseListener commandContextCloseListener = new AsyncJobAddedNotification(job, asyncExecutor);
+            Context.getCommandContext().addCloseListener(commandContextCloseListener);
+
+        }
     }
 
     public void cancelTimers(ExecutionEntity execution) {
@@ -71,7 +87,8 @@ public class JobEntityManager extends AbstractManager {
         for (TimerJobEntity timer : timers) {
             if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timer));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timer),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
             timer.delete();
         }

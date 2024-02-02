@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:flowable="http://flowable.org/bpmn" 
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="caseTask">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+        <userTask id="theTask" name="my task" />
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theTask2" />
+        <serviceTask flowable:type="case" id="theTask2" flowable:caseDefinitionKey="myCase" flowable:idVariableName="myCaseInstanceId"/>
+        <sequenceFlow id="flow3" sourceRef="theTask2" targetRef="theTask3" />
+        <userTask id="theTask3" name="my task2" />
+        <sequenceFlow id="flow4" sourceRef="theTask3" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="myProcess" name="Parallel and sequential future service tasks" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:language><![CDATA[English]]></design:language>
+            <design:creationdate><![CDATA[2020-07-08T11:40:51.813Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2020-07-08T12:09:35.928Z]]></design:modificationdate>
+        </extensionElements>
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <serviceTask id="serviceTask1_1" name="Service task 1.1" flowable:delegateExpression="${futureDelegate1_1}">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <serviceTask id="serviceTask2_1" name="Service task 2.1" flowable:delegateExpression="${futureDelegate2_1}">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <serviceTask id="serviceTask1_2" name="Service task 1.2" flowable:delegateExpression="${futureDelegate1_2}">
+            <extensionElements>
+                <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </serviceTask>
+        <parallelGateway id="parallelGateway1">
+            <extensionElements>
+                <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+            </extensionElements>
+        </parallelGateway>
+        <parallelGateway id="parallelGateway2">
+            <extensionElements>
+                <design:stencilid><![CDATA[ParallelGateway]]></design:stencilid>
+            </extensionElements>
+        </parallelGateway>
+        <endEvent id="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <sequenceFlow id="sequenceFlow1" sourceRef="parallelGateway2" targetRef="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow2" sourceRef="startnoneevent1" targetRef="parallelGateway1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow3" sourceRef="parallelGateway1" targetRef="serviceTask1_1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow4" sourceRef="parallelGateway1" targetRef="serviceTask2_1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow5" sourceRef="serviceTask2_1" targetRef="parallelGateway2">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow6" sourceRef="serviceTask1_1" targetRef="serviceTask1_2">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="sequenceFlow7" sourceRef="serviceTask1_2" targetRef="parallelGateway2">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <textAnnotation id="textAnnotation2">
+            <extensionElements>
+                <design:stencilid><![CDATA[TextAnnotation]]></design:stencilid>
+                <design:text><![CDATA[Service task 1.1 will execute when Service task 2.1 starts executing]]></design:text>
+            </extensionElements>
+            <text>Service task 1.1 will execute when Service task 2.1 starts executing</text>
+        </textAnnotation>
+        <association id="associationUndirected2" sourceRef="serviceTask1_1" targetRef="textAnnotation2" associationDirection="None">
+            <extensionElements>
+                <design:stencilid><![CDATA[AssociationUndirected]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Association_Undirected]]></design:stencilsuperid>
+            </extensionElements>
+        </association>
+        <textAnnotation id="textAnnotation3">
+            <extensionElements>
+                <design:stencilid><![CDATA[TextAnnotation]]></design:stencilid>
+                <design:text><![CDATA[Service task 1.2 will execute when Service task 2.1 starts executing and 1.1 is done]]></design:text>
+            </extensionElements>
+            <text>Service task 1.2 will execute when Service task 2.1 starts executing and 1.1 is done</text>
+        </textAnnotation>
+        <association id="associationUndirected3" sourceRef="serviceTask1_2" targetRef="textAnnotation3" associationDirection="None">
+            <extensionElements>
+                <design:stencilid><![CDATA[AssociationUndirected]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Association_Undirected]]></design:stencilsuperid>
+            </extensionElements>
+        </association>
+        <textAnnotation id="textAnnotation4">
+            <extensionElements>
+                <design:stencilid><![CDATA[TextAnnotation]]></design:stencilid>
+                <design:text><![CDATA[Service task 2.1 will execute when 1.2 is done]]></design:text>
+            </extensionElements>
+            <text>Service task 2.1 will execute when 1.2 is done</text>
+        </textAnnotation>
+        <association id="associationUndirected4" sourceRef="serviceTask2_1" targetRef="textAnnotation4" associationDirection="None">
+            <extensionElements>
+                <design:stencilid><![CDATA[AssociationUndirected]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Association_Undirected]]></design:stencilsuperid>
+            </extensionElements>
+        </association>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+        <bpmndi:BPMNPlane bpmnElement="myProcess" id="BPMNPlane_myProcess">
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="261.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="serviceTask1_1" id="BPMNShape_serviceTask1_1">
+                <omgdc:Bounds height="80.0" width="100.0" x="376.0" y="121.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="serviceTask2_1" id="BPMNShape_serviceTask2_1">
+                <omgdc:Bounds height="80.0" width="100.0" x="376.0" y="376.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="serviceTask1_2" id="BPMNShape_serviceTask1_2">
+                <omgdc:Bounds height="80.0" width="100.0" x="586.0" y="121.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="parallelGateway1" id="BPMNShape_parallelGateway1">
+                <omgdc:Bounds height="40.0" width="40.0" x="240.0" y="256.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="parallelGateway2" id="BPMNShape_parallelGateway2">
+                <omgdc:Bounds height="40.0" width="40.0" x="795.0" y="256.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+                <omgdc:Bounds height="28.0" width="28.0" x="880.0" y="262.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="textAnnotation2" id="BPMNShape_textAnnotation2">
+                <omgdc:Bounds height="65.0" width="145.0" x="285.0" y="15.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="associationUndirected2" id="BPMNShape_associationUndirected2">
+                <omgdc:Bounds height="50.0" width="80.0" x="295.0" y="79.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="textAnnotation3" id="BPMNShape_textAnnotation3">
+                <omgdc:Bounds height="76.0" width="141.0" x="675.0" y="15.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="associationUndirected3" id="BPMNShape_associationUndirected3">
+                <omgdc:Bounds height="65.0" width="24.0" x="650.0" y="55.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="textAnnotation4" id="BPMNShape_textAnnotation4">
+                <omgdc:Bounds height="50.0" width="100.0" x="506.0" y="296.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="associationUndirected4" id="BPMNShape_associationUndirected4">
+                <omgdc:Bounds height="54.0" width="45.0" x="460.0" y="321.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5">
+                <omgdi:waypoint x="475.95000000000005" y="416.0"></omgdi:waypoint>
+                <omgdi:waypoint x="815.0" y="416.0"></omgdi:waypoint>
+                <omgdi:waypoint x="815.0" y="295.9070943531094"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow6" id="BPMNEdge_sequenceFlow6">
+                <omgdi:waypoint x="475.94999999995036" y="161.0"></omgdi:waypoint>
+                <omgdi:waypoint x="585.999999999997" y="161.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow3" id="BPMNEdge_sequenceFlow3">
+                <omgdi:waypoint x="260.5" y="256.5"></omgdi:waypoint>
+                <omgdi:waypoint x="260.5" y="161.0"></omgdi:waypoint>
+                <omgdi:waypoint x="375.9999999999475" y="161.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow4" id="BPMNEdge_sequenceFlow4">
+                <omgdi:waypoint x="260.5" y="295.4432127507163"></omgdi:waypoint>
+                <omgdi:waypoint x="260.5" y="416.0"></omgdi:waypoint>
+                <omgdi:waypoint x="375.9999999999475" y="416.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1">
+                <omgdi:waypoint x="834.5591869398207" y="276.37820512820514"></omgdi:waypoint>
+                <omgdi:waypoint x="880.0002755524882" y="276.08885188426405"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2">
+                <omgdi:waypoint x="146.94999888464991" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="240.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="associationUndirected4" id="BPMNEdge_associationUndirected4">
+                <omgdi:waypoint x="459.7078125" y="376.0"></omgdi:waypoint>
+                <omgdi:waypoint x="506.0" y="321.12592592592586"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="associationUndirected3" id="BPMNEdge_associationUndirected3">
+                <omgdi:waypoint x="650.7404994521548" y="121.0"></omgdi:waypoint>
+                <omgdi:waypoint x="675.0" y="55.16589952981939"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="associationUndirected2" id="BPMNEdge_associationUndirected2">
+                <omgdi:waypoint x="376.0" y="129.75"></omgdi:waypoint>
+                <omgdi:waypoint x="296.2913772807534" y="79.95"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow7" id="BPMNEdge_sequenceFlow7">
+                <omgdi:waypoint x="685.9499999999051" y="161.0"></omgdi:waypoint>
+                <omgdi:waypoint x="815.0" y="161.0"></omgdi:waypoint>
+                <omgdi:waypoint x="815.0" y="256.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

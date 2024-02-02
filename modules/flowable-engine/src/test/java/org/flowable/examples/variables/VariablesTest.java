@@ -12,26 +12,38 @@
  */
 package org.flowable.examples.variables;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -40,6 +52,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class VariablesTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testBasicVariableOperations() {
         processEngineConfiguration.getVariableTypes().addType(CustomVariableType.instance);
@@ -90,18 +103,20 @@ public class VariablesTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
         variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(928374L, variables.get("longVar"));
-        assertEquals((short) 123, variables.get("shortVar"));
-        assertEquals(1234, variables.get("integerVar"));
-        assertEquals("coca-cola", variables.get("stringVar"));
-        assertEquals(long2000StringBuilder.toString(), variables.get("longString2000chars"));
-        assertEquals(now, variables.get("dateVar"));
-        assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
-        assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
-        assertEquals(new CustomType(bytes2), variables.get("customVar1"));
-        assertNull(variables.get("customVar2"));
-        assertEquals(11, variables.size());
+        assertThat(variables)
+                .containsOnly(
+                        entry("longVar", 928374L),
+                        entry("shortVar", (short) 123),
+                        entry("integerVar", 1234),
+                        entry("stringVar", "coca-cola"),
+                        entry("longString2000chars", long2000StringBuilder.toString()),
+                        entry("dateVar", now),
+                        entry("nullVar", null),
+                        entry("serializableVar", serializable),
+                        entry("bytesVar", bytes1),
+                        entry("customVar1", new CustomType(bytes2)),
+                        entry("customVar2", null)
+                );
 
         // Set all existing variables values to null
         runtimeService.setVariable(processInstance.getId(), "longVar", null);
@@ -118,19 +133,21 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "customVar2", null);
 
         variables = runtimeService.getVariables(processInstance.getId());
-        assertNull(variables.get("longVar"));
-        assertNull(variables.get("shortVar"));
-        assertNull(variables.get("integerVar"));
-        assertNull(variables.get("stringVar"));
-        assertNull(variables.get("longString2000chars"));
-        assertNull(variables.get("longString4000chars"));
-        assertNull(variables.get("dateVar"));
-        assertNull(variables.get("nullVar"));
-        assertNull(variables.get("serializableVar"));
-        assertNull(variables.get("bytesVar"));
-        assertNull(variables.get("customVar1"));
-        assertNull(variables.get("customVar2"));
-        assertEquals(12, variables.size());
+        assertThat(variables)
+                .containsOnly(
+                        entry("longVar", null),
+                        entry("shortVar", null),
+                        entry("integerVar", null),
+                        entry("stringVar", null),
+                        entry("longString2000chars", null),
+                        entry("longString4000chars", null),
+                        entry("dateVar", null),
+                        entry("nullVar", null),
+                        entry("serializableVar", null),
+                        entry("bytesVar", null),
+                        entry("customVar1", null),
+                        entry("customVar2", null)
+                );
 
         // Update existing variable values again, and add a new variable
         runtimeService.setVariable(processInstance.getId(), "new var", "hi");
@@ -147,41 +164,41 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "customVar2", new CustomType(bytes1));
 
         variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals("hi", variables.get("new var"));
-        assertEquals(9987L, variables.get("longVar"));
-        assertEquals((short) 456, variables.get("shortVar"));
-        assertEquals(4567, variables.get("integerVar"));
-        assertEquals("colgate", variables.get("stringVar"));
-        assertEquals(long2001StringBuilder.toString(), variables.get("longString2000chars"));
-        assertEquals(long4001StringBuilder.toString(), variables.get("longString4000chars"));
-        assertEquals(now, variables.get("dateVar"));
-        assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
-        assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
-        assertEquals(new CustomType(bytes2), variables.get("customVar1"));
-        assertEquals(new CustomType(bytes1), variables.get("customVar2"));
-        assertEquals(13, variables.size());
+        assertThat(variables)
+                .containsOnly(
+                        entry("new var", "hi"),
+                        entry("longVar", 9987L),
+                        entry("shortVar", (short) 456),
+                        entry("integerVar", 4567),
+                        entry("stringVar", "colgate"),
+                        entry("longString2000chars", long2001StringBuilder.toString()),
+                        entry("longString4000chars", long4001StringBuilder.toString()),
+                        entry("dateVar", now),
+                        entry("nullVar", null),
+                        entry("serializableVar", serializable),
+                        entry("bytesVar", bytes1),
+                        entry("customVar1", new CustomType(bytes2)),
+                        entry("customVar2", new CustomType(bytes1))
+                );
 
         Collection<String> varFilter = new ArrayList<>(2);
         varFilter.add("stringVar");
         varFilter.add("integerVar");
 
         Map<String, Object> filteredVariables = runtimeService.getVariables(processInstance.getId(), varFilter);
-        assertEquals(2, filteredVariables.size());
-        assertTrue(filteredVariables.containsKey("stringVar"));
-        assertTrue(filteredVariables.containsKey("integerVar"));
+        assertThat(filteredVariables)
+                .containsOnlyKeys("stringVar", "integerVar");
 
         // Try setting the value of the variable that was initially created with value 'null'
         runtimeService.setVariable(processInstance.getId(), "nullVar", "a value");
         Object newValue = runtimeService.getVariable(processInstance.getId(), "nullVar");
-        assertNotNull(newValue);
-        assertEquals("a value", newValue);
+        assertThat(newValue).isEqualTo("a value");
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
-
     }
 
+    @Test
     @Deployment
     public void testLocalizeVariables() {
         // Start process instance with different types of variables
@@ -190,77 +207,80 @@ public class VariablesTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("localizeVariables", variables);
 
         Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(processInstance.getId());
-        assertEquals(1, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("coca-cola", variableInstances.get("stringVar").getValue());
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         List<String> variableNames = new ArrayList<>();
         variableNames.add("stringVar");
 
         // getVariablesInstances via names
         variableInstances = runtimeService.getVariableInstances(processInstance.getId(), variableNames);
-        assertEquals(1, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("coca-cola", variableInstances.get("stringVar").getValue());
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         // getVariableInstancesLocal via names
         variableInstances = runtimeService.getVariableInstancesLocal(processInstance.getId(), variableNames);
-        assertEquals(1, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("coca-cola", variableInstances.get("stringVar").getValue());
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         // getVariableInstance
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "stringVar");
-        assertNotNull(variableInstance);
-        assertEquals("stringVar", variableInstance.getName());
-        assertEquals("coca-cola", variableInstance.getValue());
+        assertThat(variableInstance)
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         // getVariableInstanceLocal
         variableInstance = runtimeService.getVariableInstanceLocal(processInstance.getId(), "stringVar");
-        assertNotNull(variableInstance);
-        assertEquals("stringVar", variableInstance.getName());
-        assertEquals("coca-cola", variableInstance.getValue());
+        assertThat(variableInstance)
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         // Verify TaskService behavior
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         variableInstances = taskService.getVariableInstances(task.getId());
-        assertEquals(2, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("coca-cola", variableInstances.get("stringVar").getValue());
-        assertEquals("intVar", variableInstances.get("intVar").getName());
-        assertNull(variableInstances.get("intVar").getValue());
+        assertThat(variableInstances).hasSize(2);
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
+        assertThat(variableInstances.get("intVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("intVar", null);
 
         variableNames = new ArrayList<>();
         variableNames.add("stringVar");
 
         // getVariablesInstances via names
         variableInstances = taskService.getVariableInstances(task.getId(), variableNames);
-        assertEquals(1, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("coca-cola", variableInstances.get("stringVar").getValue());
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "coca-cola");
 
         taskService.setVariableLocal(task.getId(), "stringVar", "pepsi-cola");
 
         // getVariableInstancesLocal via names
         variableInstances = taskService.getVariableInstancesLocal(task.getId(), variableNames);
-        assertEquals(1, variableInstances.size());
-        assertEquals("stringVar", variableInstances.get("stringVar").getName());
-        assertEquals("pepsi-cola", variableInstances.get("stringVar").getValue());
+        assertThat(variableInstances.get("stringVar"))
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "pepsi-cola");
 
         // getVariableInstance
         variableInstance = taskService.getVariableInstance(task.getId(), "stringVar");
-        assertNotNull(variableInstance);
-        assertEquals("stringVar", variableInstance.getName());
-        assertEquals("pepsi-cola", variableInstance.getValue());
+        assertThat(variableInstance)
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "pepsi-cola");
 
         // getVariableInstanceLocal
         variableInstance = taskService.getVariableInstanceLocal(task.getId(), "stringVar");
-        assertNotNull(variableInstance);
-        assertEquals("stringVar", variableInstance.getName());
-        assertEquals("pepsi-cola", variableInstance.getValue());
+        assertThat(variableInstance)
+                .extracting(VariableInstance::getName, VariableInstance::getValue)
+                .containsExactly("stringVar", "pepsi-cola");
     }
 
+    @Test
     @Deployment
     public void testLocalizeDataObjects() {
         // Start process instance with different types of variables
@@ -287,1403 +307,1558 @@ public class VariablesTest extends PluggableFlowableTestCase {
         dynamicBpmnService.saveProcessDefinitionInfo(processInstance.getProcessDefinitionId(), infoNode);
 
         Map<String, DataObject> dataObjects = runtimeService.getDataObjects(processInstance.getId(), "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        DataObject dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjects
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         List<String> variableNames = new ArrayList<>();
         variableNames.add("stringVar");
 
         // getDataObjects via names
-        dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
 
+        // no locale/default
+        dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames);
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+
+        dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "es", false);
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjects(processInstance.getId(), variableNames, "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjectsLocal
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), "ja-JA", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjectsLocal via names
+
+        // no locale/default
+        dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames);
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(processInstance.getId(), variableNames, "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObject
-        DataObject dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "es", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'es' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "es", false);
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "it", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'it' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "en-US", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-US' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "en-AU", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "en-GB", true);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(processInstance.getId(), "stringVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjectLocal
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "es", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'es' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "it", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'it' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "en-US", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-US' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "en-AU", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "en-GB", true);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(processInstance.getId(), "stringVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         Execution subprocess = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subprocess1").singleResult();
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "es", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjects
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "es", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'es' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "it", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'it' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "en-US", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-US' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "en-AU", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-AU' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "en-GB", true);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), "en-GB", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         // getDataObjects via names (from subprocess)
 
         variableNames.add("intVar");
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "es", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'es' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "it", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'it' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "en-US", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-US' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "en-AU", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-AU' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "en-GB", true);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = runtimeService.getDataObjects(subprocess.getId(), variableNames, "en-GB", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getValue()).isNull();
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         // getDataObjectsLocal
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'es' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'it' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-US' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-AU' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), "ja-JA", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjectsLocal via names
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'es' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'it' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-US' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en-AU' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar 'en' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = runtimeService.getDataObjectsLocal(subprocess.getId(), variableNames, "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertNull(dataObjects.get("intVar").getValue());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObject (in subprocess)
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "es", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'es' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "it", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'it' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar", dataObject.getLocalizedName());
-        assertEquals("intVar 'default' description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "en-US", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en-US' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "en-AU", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en-AU' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "en-GB", true);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObject(subprocess.getId(), "intVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar", dataObject.getLocalizedName());
-        assertEquals("intVar 'default' description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObjectLocal (in subprocess)
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "es", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'es' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "it", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'it' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "en-US", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en-US' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "en-AU", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en-AU' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "en-GB", true);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar 'en' Name", dataObject.getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = runtimeService.getDataObjectLocal(subprocess.getId(), "intVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("intVar", dataObject.getName());
-        assertNull(dataObject.getValue());
-        assertEquals("intVar", dataObject.getLocalizedName());
-        assertEquals("intVar 'default' description", dataObject.getDescription());
-        assertEquals("intVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("int", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getValue()).isNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // Verify TaskService behavior
         dataObjects = taskService.getDataObjects(task.getId());
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObject.getName());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         // getDataObjects
         dataObjects = taskService.getDataObjects(task.getId());
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObject.getName());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "es", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObject.getName());
-        assertEquals("intVar 'es' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'es' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'es' Name");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "it", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObject.getName());
-        assertEquals("intVar 'it' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'it' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'it' Name");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "en-US", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObject.getName());
-        assertEquals("intVar 'en-US' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-US' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-US' Name");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "en-AU", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertEquals("intVar 'en-AU' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en-AU' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "en-GB", true);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertEquals("intVar 'en' Name", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'en' Description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         dataObjects = taskService.getDataObjects(task.getId(), "en-GB", false);
-        assertEquals(2, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals("intVar", dataObjects.get("intVar").getName());
-        assertEquals("intVar", dataObjects.get("intVar").getLocalizedName());
-        assertEquals("intVar 'default' description", dataObjects.get("intVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("intVarId", dataObjects.get("intVar").getDataObjectDefinitionKey());
-        assertEquals("int", dataObjects.get("intVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertEquals(processInstance.getId(), dataObjects.get("intVar").getProcessInstanceId());
-        assertEquals(subprocess.getId(), dataObjects.get("intVar").getExecutionId());
-        assertNotNull(dataObjects.get("intVar").getId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(2);
+        dataObject = dataObjects.get("intVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("intVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("intVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(subprocess.getId());
+        assertThat(dataObject.getId()).isNotNull();
+        assertThat(dataObject.getLocalizedName()).isEqualTo("intVar");
+        assertThat(dataObject.getName()).isEqualTo("intVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("int");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
 
         variableNames = new ArrayList<>();
         variableNames.add("stringVar");
 
         // getDataObjects via names
+
+        // no locale/default
+        dataObjects = taskService.getDataObjects(task.getId(), variableNames);
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
+
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "es", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'es' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "it", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'it' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "en-US", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-US' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "en-AU", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "en-GB", true);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar 'en' Name", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObjects = taskService.getDataObjects(task.getId(), variableNames, "en-GB", false);
-        assertEquals(1, dataObjects.size());
-        assertEquals("stringVar", dataObjects.get("stringVar").getName());
-        assertEquals("coca-cola", dataObjects.get("stringVar").getValue());
-        assertEquals("stringVar", dataObjects.get("stringVar").getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObjects.get("stringVar").getDescription());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("stringVarId", dataObjects.get("stringVar").getDataObjectDefinitionKey());
-        assertEquals("string", dataObjects.get("stringVar").getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObjects).hasSize(1);
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         // getDataObject
         dataObject = taskService.getDataObject(task.getId(), "stringVar");
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "es", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'es' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'es' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'es' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'es' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "it", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'it' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'it' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'it' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'it' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "en-US", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-US' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-US' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-US' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-US' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "en-AU", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en-AU' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en-AU' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en-AU' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en-AU' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "en-GB", true);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar 'en' Name", dataObject.getLocalizedName());
-        assertEquals("stringVar 'en' Description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar 'en' Name");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'en' Description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
 
         dataObject = taskService.getDataObject(task.getId(), "stringVar", "en-GB", false);
-        assertNotNull(dataObject);
-        assertEquals("stringVar", dataObject.getName());
-        assertEquals("coca-cola", dataObject.getValue());
-        assertEquals("stringVar", dataObject.getLocalizedName());
-        assertEquals("stringVar 'default' description", dataObject.getDescription());
-        assertEquals("stringVarId", dataObject.getDataObjectDefinitionKey());
-        assertEquals("string", dataObject.getType());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getProcessInstanceId());
-        assertEquals(processInstance.getId(), dataObjects.get("stringVar").getExecutionId());
-        assertNotNull(dataObjects.get("stringVar").getId());
+        assertThat(dataObject).isNotNull();
+        assertThat(dataObject.getName()).isEqualTo("stringVar");
+        assertThat(dataObject.getValue()).isEqualTo("coca-cola");
+        assertThat(dataObject.getLocalizedName()).isEqualTo("stringVar");
+        assertThat(dataObject.getDescription()).isEqualTo("stringVar 'default' description");
+        assertThat(dataObject.getDataObjectDefinitionKey()).isEqualTo("stringVarId");
+        assertThat(dataObject.getType()).isEqualTo("string");
+        dataObject = dataObjects.get("stringVar");
+        assertThat(dataObject.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getExecutionId()).isEqualTo(processInstance.getId());
+        assertThat(dataObject.getId()).isNotNull();
     }
 
     // Test case for ACT-1839
+    @Test
     @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testChangeTypeSerializable.bpmn20.xml" })
     public void testChangeTypeSerializable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variable-type-change-test");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Activiti is awesome!", task.getName());
+        assertThat(task.getName()).isEqualTo("Activiti is awesome!");
         SomeSerializable myVar = (SomeSerializable) runtimeService.getVariable(processInstance.getId(), "myVar");
-        assertEquals("someValue", myVar.getValue());
+        assertThat(myVar.getValue()).isEqualTo("someValue");
     }
 
     public String getVariableInstanceId(String executionId, String name) {
@@ -1692,6 +1867,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     // test case for ACT-1082
+    @Test
     @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
     public void testChangeVariableType() {
 
@@ -1715,15 +1891,17 @@ public class VariablesTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
         variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(928374L, variables.get("longVar"));
-        assertEquals((short) 123, variables.get("shortVar"));
-        assertEquals(1234, variables.get("integerVar"));
-        assertEquals("coca-cola", variables.get("stringVar"));
-        assertEquals(now, variables.get("dateVar"));
-        assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
-        assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
-        assertEquals(8, variables.size());
+        assertThat(variables)
+                .containsOnly(
+                        entry("longVar", 928374L),
+                        entry("shortVar", (short) 123),
+                        entry("integerVar", 1234),
+                        entry("stringVar", "coca-cola"),
+                        entry("dateVar", now),
+                        entry("nullVar", null),
+                        entry("serializableVar", serializable),
+                        entry("bytesVar", bytes)
+                );
 
         // check if the id of the variable is the same or not
 
@@ -1736,25 +1914,28 @@ public class VariablesTest extends PluggableFlowableTestCase {
             newVariables.put("serializableVar", (short) 222);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
-            assertEquals((short) 222, variables.get("serializableVar"));
+            assertThat(variables)
+                    .containsEntry("serializableVar", (short) 222);
 
             String newSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
 
-            assertEquals(oldSerializableVarId, newSerializableVarId);
+            assertThat(newSerializableVarId).isEqualTo(oldSerializableVarId);
 
             // Change type of a longVar from Long to Short
             newVariables = new HashMap<>();
             newVariables.put("longVar", (short) 123);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
-            assertEquals((short) 123, variables.get("longVar"));
+            assertThat(variables)
+                    .containsEntry("longVar", (short) 123);
 
             String newLongVar = getVariableInstanceId(processInstance.getId(), "longVar");
-            assertEquals(oldLongVar, newLongVar);
+            assertThat(newLongVar).isEqualTo(oldLongVar);
         }
     }
 
     // test case for ACT-1428
+    @Test
     @Deployment
     public void testNullVariable() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
@@ -1766,38 +1947,34 @@ public class VariablesTest extends PluggableFlowableTestCase {
         formService.submitTaskFormData(task.getId(), variables);
         String resultVar = (String) runtimeService.getVariable(processInstance.getId(), "testProperty");
 
-        assertEquals("434", resultVar);
+        assertThat(resultVar).isEqualTo("434");
 
         task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // If no variable is given, no variable should be set and script test should throw exception
         processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
-        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        variables = new HashMap<>();
+        String processId = processInstance.getId();
+        task = taskService.createTaskQuery().processInstanceId(processId).singleResult();
+        String taskId = task.getId();
         try {
-            formService.submitTaskFormData(task.getId(), variables);
-            fail("Should throw exception as testProperty is not defined and used in Script task");
-        } catch (Exception e) {
-            runtimeService.deleteProcessInstance(processInstance.getId(), "intentional exception in script task");
-
-            assertEquals("class org.flowable.engine.common.api.FlowableException", e.getClass().toString());
+            assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<>()))
+                    .isExactlyInstanceOf(FlowableScriptEvaluationException.class);
+        } finally {
+            runtimeService.deleteProcessInstance(processId, "intentional exception in script task");
         }
 
         // No we put null property, This should be put into the variable. We do not expect exceptions
         processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        variables = new HashMap<>();
-        variables.put("testProperty", null);
-
-        try {
-            formService.submitTaskFormData(task.getId(), variables);
-        } catch (Exception e) {
-            fail("Should not throw exception as the testProperty is defined, although null");
-        }
+        String finalTaskId = task.getId();
+        Map<String, String> finalVariables = new HashMap<>();
+        finalVariables.put("testProperty", null);
+        assertThatCode(() -> formService.submitTaskFormData(finalTaskId, finalVariables))
+                .doesNotThrowAnyException();
         resultVar = (String) runtimeService.getVariable(processInstance.getId(), "testProperty");
 
-        assertNull(resultVar);
+        assertThat(resultVar).isNull();
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "intentional exception in script task");
     }
@@ -1805,20 +1982,21 @@ public class VariablesTest extends PluggableFlowableTestCase {
     /**
      * Test added to validate UUID variable type + querying (ACT-1665)
      */
+    @Test
     @Deployment
     public void testUUIDVariableAndQuery() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
         // Check UUID variable type query on task
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
         UUID randomUUID = UUID.randomUUID();
         taskService.setVariableLocal(task.getId(), "conversationId", randomUUID);
 
         org.flowable.task.api.Task resultingTask = taskService.createTaskQuery().taskVariableValueEquals("conversationId", randomUUID).singleResult();
-        assertNotNull(resultingTask);
-        assertEquals(task.getId(), resultingTask.getId());
+        assertThat(resultingTask).isNotNull();
+        assertThat(resultingTask.getId()).isEqualTo(task.getId());
 
         randomUUID = UUID.randomUUID();
 
@@ -1826,8 +2004,384 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "uuidVar", randomUUID);
         ProcessInstance result = runtimeService.createProcessInstanceQuery().variableValueEquals("uuidVar", randomUUID).singleResult();
 
-        assertNotNull(result);
-        assertEquals(processInstance.getId(), result.getId());
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
+    public void testAccessToProcessInstanceIdWhenSettingVariable() {
+        addVariableTypeIfNotExists(CustomAccessProcessInstanceVariableType.INSTANCE);
+
+        CustomAccessProcessType customVar = new CustomAccessProcessType();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("taskAssigneeProcess")
+            .variable("customVar", customVar)
+            .start();
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isNull();
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+
+        customVar = runtimeService.getVariable(processInstance.getId(), "customVar", CustomAccessProcessType.class);
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isNull();
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
+    public void testAccessToTaskIdWhenSettingLocalVariableOnTask() {
+        addVariableTypeIfNotExists(CustomAccessProcessInstanceVariableType.INSTANCE);
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("taskAssigneeProcess")
+            .start();
+
+        Task task = taskService.createTaskQuery()
+            .processInstanceId(processInstance.getId())
+            .singleResult();
+
+        assertThat(task).isNotNull();
+
+        CustomAccessProcessType customVar = new CustomAccessProcessType();
+        taskService.setVariableLocal(task.getId(), "customTaskVar", customVar);
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(task.getExecutionId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isEqualTo(task.getId());
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+
+        customVar = taskService.getVariableLocal(task.getId(), "customTaskVar", CustomAccessProcessType.class);
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(task.getExecutionId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isEqualTo(task.getId());
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
+    public void testAccessToExecutionIdWhenSettingLocalVariableOnExecution() {
+        addVariableTypeIfNotExists(CustomAccessProcessInstanceVariableType.INSTANCE);
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("taskAssigneeProcess")
+            .start();
+
+        Execution execution = runtimeService.createExecutionQuery()
+            .activityId("theTask")
+            .singleResult();
+
+        assertThat(execution).isNotNull();
+
+        CustomAccessProcessType customVar = new CustomAccessProcessType();
+        runtimeService.setVariableLocal(execution.getId(), "customExecutionVar", customVar);
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(execution.getId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isNull();
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+
+        customVar = runtimeService.getVariableLocal(execution.getId(), "customExecutionVar", CustomAccessProcessType.class);
+
+        assertThat(customVar.getProcessInstanceId())
+            .as("custom var process instance id")
+            .isEqualTo(processInstance.getId());
+
+        assertThat(customVar.getExecutionId())
+            .as("custom var execution id")
+            .isEqualTo(execution.getId());
+
+        assertThat(customVar.getTaskId())
+            .as("custom var task id")
+            .isNull();
+
+        assertThat(customVar.getScopeId())
+            .as("custom var scope id")
+            .isNull();
+
+        assertThat(customVar.getSubScopeId())
+            .as("custom var sub scope id")
+            .isNull();
+
+        assertThat(customVar.getScopeType())
+            .as("custom var scope type")
+            .isNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
+    public void testImmutableEmptyCollectionVariable() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("taskAssigneeProcess")
+                .variable("listVar", Collections.emptyList())
+                .variable("setVar", Collections.emptySet())
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
+        assertThat(variableInstance.getValue()).asList().isEmpty();
+
+        variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
+        assertThat(variableInstance.getValue())
+                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
+    public void testEmptyCollectionVariable() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("taskAssigneeProcess")
+                .variable("listVar", new ArrayList<>())
+                .variable("setVar", new HashSet<>())
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
+        assertThat(variableInstance.getValue()).asList().isEmpty();
+
+        variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
+
+        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
+        assertThat(variableInstance.getValue())
+                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
+    }
+
+    protected void addVariableTypeIfNotExists(VariableType variableType) {
+        // We can't remove the VariableType after every test since it would cause the test
+        // to fail due to not being able to get the variable value during deleting
+        if (processEngineConfiguration.getVariableTypes().getTypeIndex(variableType) == -1) {
+            processEngineConfiguration.getVariableTypes().addType(variableType);
+        }
+    }
+
+    static class CustomAccessProcessType {
+
+        protected String processInstanceId;
+        protected String executionId;
+        protected String taskId;
+        protected String scopeId;
+        protected String subScopeId;
+        protected String scopeType;
+
+        public String getProcessInstanceId() {
+            return processInstanceId;
+        }
+
+        public void setProcessInstanceId(String processInstanceId) {
+            this.processInstanceId = processInstanceId;
+        }
+
+        public String getExecutionId() {
+            return executionId;
+        }
+
+        public void setExecutionId(String executionId) {
+            this.executionId = executionId;
+        }
+
+        public String getTaskId() {
+            return taskId;
+        }
+
+        public void setTaskId(String taskId) {
+            this.taskId = taskId;
+        }
+
+        public String getScopeId() {
+            return scopeId;
+        }
+
+        public void setScopeId(String scopeId) {
+            this.scopeId = scopeId;
+        }
+
+        public String getSubScopeId() {
+            return subScopeId;
+        }
+
+        public void setSubScopeId(String subScopeId) {
+            this.subScopeId = subScopeId;
+        }
+
+        public String getScopeType() {
+            return scopeType;
+        }
+
+        public void setScopeType(String scopeType) {
+            this.scopeType = scopeType;
+        }
+    }
+    static class CustomAccessProcessInstanceVariableType implements  VariableType {
+
+        static final CustomAccessProcessInstanceVariableType INSTANCE = new CustomAccessProcessInstanceVariableType();
+
+        @Override
+        public String getTypeName() {
+            return "CustomAccessProcessInstanceVariableType";
+        }
+
+        @Override
+        public boolean isCachable() {
+            return true;
+        }
+
+        @Override
+        public boolean isAbleToStore(Object value) {
+            return value instanceof CustomAccessProcessType;
+        }
+
+        @Override
+        public void setValue(Object value, ValueFields valueFields) {
+            CustomAccessProcessType customValue = (CustomAccessProcessType) value;
+
+            customValue.setProcessInstanceId(valueFields.getProcessInstanceId());
+            customValue.setExecutionId(valueFields.getExecutionId());
+            customValue.setTaskId(valueFields.getTaskId());
+            customValue.setScopeId(valueFields.getScopeId());
+            customValue.setSubScopeId(valueFields.getSubScopeId());
+            customValue.setScopeType(valueFields.getScopeType());
+
+            String textValue = new StringJoiner(",")
+                .add(customValue.getProcessInstanceId())
+                .add(customValue.getExecutionId())
+                .add(customValue.getTaskId())
+                .add(customValue.getScopeId())
+                .add(customValue.getSubScopeId())
+                .add(customValue.getScopeType())
+                .toString();
+            valueFields.setTextValue(textValue);
+        }
+
+        @Override
+        public Object getValue(ValueFields valueFields) {
+            String textValue = valueFields.getTextValue();
+            String[] values = textValue.split(",");
+
+            CustomAccessProcessType customValue = new CustomAccessProcessType();
+            customValue.setProcessInstanceId(valueAt(values, 0));
+            customValue.setExecutionId(valueAt(values, 1));
+            customValue.setTaskId(valueAt(values, 2));
+            customValue.setScopeId(valueAt(values, 3));
+            customValue.setSubScopeId(valueAt(values, 4));
+            customValue.setScopeType(valueAt(values, 5));
+
+            return customValue;
+        }
+
+        protected String valueAt(String[] array, int index) {
+            if (array.length > index) {
+                return getValue(array[index]);
+            }
+
+            return null;
+        }
+        protected String getValue(String value) {
+            return "null".equals(value) ? null : value;
+        }
     }
 
 }

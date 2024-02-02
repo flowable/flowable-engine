@@ -110,7 +110,7 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
         }
 
         // TODO: support payload
-        // if(payload != null) {
+        // if (payload != null) {
         // message.setEventPayload(payload);
         // }
 

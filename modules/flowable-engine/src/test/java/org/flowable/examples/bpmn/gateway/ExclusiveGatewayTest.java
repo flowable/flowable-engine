@@ -12,13 +12,17 @@
  */
 package org.flowable.examples.bpmn.gateway;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * Example of using the exclusive gateway.
@@ -31,6 +35,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
      * The test process has an XOR gateway where, the 'input' variable is used to select one of the outgoing sequence flow. Every one of those sequence flow goes to another task, allowing us to test
      * the decision very easily.
      */
+    @Test
     @Deployment
     public void testDecisionFunctionality() {
 
@@ -40,29 +45,25 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         variables.put("input", 1);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Send e-mail for more information", task.getName());
+        assertThat(task.getName()).isEqualTo("Send e-mail for more information");
 
         // Test with input == 2
         variables.put("input", 2);
         pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Check account balance", task.getName());
+        assertThat(task.getName()).isEqualTo("Check account balance");
 
         // Test with input == 3
         variables.put("input", 3);
         pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
-        assertEquals("Call customer", task.getName());
+        assertThat(task.getName()).isEqualTo("Call customer");
 
         // Test with input == 4
         variables.put("input", 4);
-        try {
-            runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
-            fail();
-        } catch (FlowableException e) {
-            // Exception is expected since no outgoing sequence flow matches
-        }
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("exclusiveGateway", variables))
+                .as("Exception is expected since no outgoing sequence flow matches")
+                .isInstanceOf(FlowableException.class);
     }
 
 }

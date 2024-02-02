@@ -15,21 +15,28 @@ package org.flowable.cmmn.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.spring.autodeployment.AutoDeploymentStrategy;
+import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.SpringEngineConfiguration;
+import org.flowable.common.spring.SpringTransactionContextFactory;
+import org.flowable.common.spring.SpringTransactionInterceptor;
+import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -39,7 +46,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration implements ApplicationContextAware {
+public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -47,10 +54,14 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringCmmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;
+        this.handleCmmnEngineExecutorsAfterEngineCreate = false;
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
@@ -59,8 +70,21 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     @Override
     public CmmnEngine buildCmmnEngine() {
         CmmnEngine cmmnEngine = super.buildCmmnEngine();
-        autoDeployResources(cmmnEngine);
+        CmmnEngines.setInitialized(true);
+        enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;
+    }
+
+    @Override
+    public void initBeans() {
+        if (beans == null) {
+            beans = new SpringBeanFactoryProxyMap(applicationContext);
+        }
+    }
+
+    @Override
+    protected EngineConfigurator createDefaultEventRegistryEngineConfigurator() {
+        return new SpringEventRegistryConfigurator();
     }
 
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {
@@ -92,8 +116,8 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
 
     protected void autoDeployResources(CmmnEngine cmmnEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
-            final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentName, deploymentResources, cmmnEngine.getCmmnRepositoryService());
+            final AutoDeploymentStrategy<CmmnEngine> strategy = getAutoDeploymentStrategy(deploymentMode);
+            strategy.deployResources(deploymentName, deploymentResources, cmmnEngine);
         }
     }
 
@@ -108,30 +132,37 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
+    @Override
     public void setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -141,10 +172,12 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }
@@ -157,9 +190,9 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
      *            the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
-    protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
-        AutoDeploymentStrategy result = new DefaultAutoDeploymentStrategy();
-        for (final AutoDeploymentStrategy strategy : deploymentStrategies) {
+    protected AutoDeploymentStrategy<CmmnEngine> getAutoDeploymentStrategy(final String mode) {
+        AutoDeploymentStrategy<CmmnEngine> result = new DefaultAutoDeploymentStrategy();
+        for (final AutoDeploymentStrategy<CmmnEngine> strategy : deploymentStrategies) {
             if (strategy.handlesMode(mode)) {
                 result = strategy;
                 break;
@@ -168,4 +201,37 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
         return result;
     }
 
+    public Collection<AutoDeploymentStrategy<CmmnEngine>> getDeploymentStrategies() {
+        return deploymentStrategies;
+    }
+
+    public void setDeploymentStrategies(Collection<AutoDeploymentStrategy<CmmnEngine>> deploymentStrategies) {
+        this.deploymentStrategies = deploymentStrategies;
+    }
+
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> {
+                    CmmnEngine cmmnEngine = CmmnEngines.getCmmnEngine(name);
+                    cmmnEngine.startExecutors();
+                    autoDeployResources(cmmnEngine);
+                });
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
 }

@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.test.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.dmn.engine.impl.test.ResourceFlowableDmnTestCase;
 import org.flowable.dmn.engine.test.DmnDeployment;
 
@@ -30,7 +32,7 @@ public class HistoryNoneTest extends ResourceFlowableDmnTestCase {
                 .decisionKey("decision1")
                 .variable("inputVariable1", 11)
                 .executeWithSingleResult();
-        
-        assertEquals(0, historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").list().size());
+
+        assertThat(historyService.createHistoricDecisionExecutionQuery().decisionKey("decision1").list()).isEmpty();
     }
 }

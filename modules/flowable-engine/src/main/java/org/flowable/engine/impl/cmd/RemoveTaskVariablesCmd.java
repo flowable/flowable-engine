@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -55,8 +55,8 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot remove variables from a suspended task.";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot remove variables from";
     }
 
 }

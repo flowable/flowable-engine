@@ -21,4 +21,9 @@ public interface DeploymentSettings {
 
     String IS_PROCESS_VALIDATION_ENABLED = "isProcessValidationEnabled";
 
+    String IS_DERIVED_DEPLOYMENT = "isDerivedDeployment";
+
+    String DERIVED_PROCESS_DEFINITION_ID = "derivedProcessDefinitionId";
+
+    String DERIVED_PROCESS_DEFINITION_ROOT_ID = "derivedProcessDefinitionRootId";
 }

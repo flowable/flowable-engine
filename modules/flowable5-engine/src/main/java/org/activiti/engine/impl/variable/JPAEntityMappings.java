@@ -20,12 +20,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.util.ReflectUtil;
+import org.flowable.variable.service.impl.types.EntityMetaData;
+import org.flowable.variable.service.impl.types.JPAEntityScanner;
 
 /**
  * @author Frederik Heremans
@@ -153,7 +155,7 @@ public class JPAEntityMappings {
         } else if (type == Double.class || type == double.class) {
             return Double.parseDouble(string);
         } else if (type == Character.class || type == char.class) {
-            return new Character(string.charAt(0));
+            return Character.valueOf(string.charAt(0));
         } else if (type == java.util.Date.class) {
             return new java.util.Date(Long.parseLong(string));
         } else if (type == java.sql.Date.class) {

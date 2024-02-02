@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -36,8 +37,6 @@ public interface AsyncExecutor {
      * full in the {@link DefaultAsyncJobExecutor}).
      */
     boolean executeAsyncJob(JobInfo job);
-
-    int getRemainingCapacity();
 
     /* Getters and Setters */
 
@@ -69,9 +68,9 @@ public interface AsyncExecutor {
 
     void setDefaultAsyncJobAcquireWaitTimeInMillis(int waitTimeInMillis);
 
-    public int getDefaultQueueSizeFullWaitTimeInMillis();
+    int getDefaultQueueSizeFullWaitTimeInMillis();
 
-    public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
+    void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTimeInMillis);
 
     int getMaxAsyncJobsDuePerAcquisition();
 
@@ -81,10 +80,6 @@ public interface AsyncExecutor {
 
     void setMaxTimerJobsPerAcquisition(int maxJobs);
 
-    int getRetryWaitTimeInMillis();
-
-    void setRetryWaitTimeInMillis(int retryWaitTimeInMillis);
-
     int getResetExpiredJobsInterval();
 
     void setResetExpiredJobsInterval(int resetExpiredJobsInterval);
@@ -92,5 +87,18 @@ public interface AsyncExecutor {
     int getResetExpiredJobsPageSize();
 
     void setResetExpiredJobsPageSize(int resetExpiredJobsPageSize);
+
+    /**
+     * The optional task executor for the async executor
+     * @return the task executor used by this async executor
+     */
+    AsyncTaskExecutor getTaskExecutor();
+
+    /**
+     * Set the task executor for this async executor.
+     *
+     * @param taskExecutor
+     */
+    void setTaskExecutor(AsyncTaskExecutor taskExecutor);
 
 }

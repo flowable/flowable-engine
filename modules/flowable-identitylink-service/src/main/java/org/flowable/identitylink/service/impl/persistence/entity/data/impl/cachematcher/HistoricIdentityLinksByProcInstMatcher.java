@@ -12,7 +12,7 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 
 /**
@@ -23,7 +23,7 @@ public class HistoricIdentityLinksByProcInstMatcher extends CachedEntityMatcherA
     @Override
     public boolean isRetained(HistoricIdentityLinkEntity historicIdentityLinkEntity, Object parameter) {
         return historicIdentityLinkEntity.getProcessInstanceId() != null
-                && historicIdentityLinkEntity.getProcessInstanceId().equals((String) parameter);
+                && historicIdentityLinkEntity.getProcessInstanceId().equals(parameter);
     }
 
 }

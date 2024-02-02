@@ -12,21 +12,29 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import static org.flowable.engine.impl.util.CommandContextUtil.getDbSqlSession;
+
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.db.EntityToTableMap;
 
 public class GetTableNameCmd implements Command<String>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> entityClass;
+    protected Class<?> entityClass;
+    protected boolean withPrefix = true;
 
     public GetTableNameCmd(Class<?> entityClass) {
         this.entityClass = entityClass;
+    }
+
+    public GetTableNameCmd(Class<?> entityClass, boolean withPrefix) {
+        this.entityClass = entityClass;
+        this.withPrefix = withPrefix;
     }
 
     @Override
@@ -34,7 +42,15 @@ public class GetTableNameCmd implements Command<String>, Serializable {
         if (entityClass == null) {
             throw new FlowableIllegalArgumentException("entityClass is null");
         }
-        return CommandContextUtil.getTableDataManager(commandContext).getTableName(entityClass, true);
+
+        String databaseTablePrefix = getDbSqlSession(commandContext).getDbSqlSessionFactory().getDatabaseTablePrefix();
+        String tableName = EntityToTableMap.getTableName(entityClass);
+
+        if (withPrefix) {
+            return databaseTablePrefix + tableName;
+        } else {
+            return tableName;
+        }
     }
 
 }

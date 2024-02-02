@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.service.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +26,6 @@ import java.util.Map;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -47,7 +49,6 @@ import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
 import org.flowable.task.api.Task;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -183,7 +184,7 @@ public class SerializableVariablesDiabledTest {
 
             response = (CloseableHttpResponse) client.execute(request);
             int statusCode = response.getStatusLine().getStatusCode();
-            Assert.assertEquals(expectedStatusCode, statusCode);
+            assertThat(statusCode).isEqualTo(expectedStatusCode);
 
             if (client instanceof CloseableHttpClient) {
                 ((CloseableHttpClient) client).close();
@@ -191,10 +192,8 @@ public class SerializableVariablesDiabledTest {
 
             response.close();
 
-        } catch (ClientProtocolException e) {
-            Assert.fail(e.getMessage());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
 
     }

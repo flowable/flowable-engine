@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="Examples" xmlns:tns="Examples">
+
+	<process id="process">
+
+		<startEvent id="theStart" />
+		<sequenceFlow sourceRef="theStart" targetRef="subProcess" />
+        
+        <subProcess id="subProcess">
+            <startEvent id="subProcessStart" />
+            <sequenceFlow sourceRef="subProcessStart" targetRef="task" />
+            <userTask id="task" name="Task" />
+            <sequenceFlow sourceRef="task" targetRef="subTheEnd" />
+            <endEvent id="subTheEnd" />
+            
+            <subProcess id="eventSubProcess" triggeredByEvent="true">
+                <startEvent id="eventProcessStart" isInterrupting="true">
+                    <conditionalEventDefinition>
+                        <condition>${myVar == 'test'}</condition>
+                    </conditionalEventDefinition>
+                </startEvent>
+                <sequenceFlow sourceRef="eventProcessStart" targetRef="nestedSubProcess" />
+                <subProcess id="nestedSubProcess">
+                    <startEvent id="nestedStart" />
+                    <sequenceFlow sourceRef="nestedStart" targetRef="eventSubProcessTask" />
+                    <userTask id="eventSubProcessTask" name="Task" />
+                    <sequenceFlow sourceRef="eventSubProcessTask" targetRef="nestedEnd" />
+                    <endEvent id="nestedEnd" />
+                </subProcess>
+                <sequenceFlow sourceRef="nestedSubProcess" targetRef="eventSubProcessEnd" />
+                <endEvent id="eventSubProcessEnd" />
+            </subProcess>
+        </subProcess>
+        
+		<sequenceFlow sourceRef="subProcess" targetRef="theEnd" />
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

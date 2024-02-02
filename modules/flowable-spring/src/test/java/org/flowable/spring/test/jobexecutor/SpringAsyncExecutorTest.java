@@ -12,29 +12,30 @@
  */
 package org.flowable.spring.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
+import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.spring.impl.test.CleanTestExecutionListener;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Pablo Ganga
  * @author Joram Barrez
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@TestExecutionListeners(CleanTestExecutionListener.class)
+@CleanTest
+// We need to use per class as the test uses auto deployments. If they are deleted then the other tests will fail
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration("classpath:org/flowable/spring/test/components/SpringjobExecutorTest-context.xml")
 public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
 
@@ -53,14 +54,14 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testHappyJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("process1");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
         waitForTasksToExpire(instance, 0);
 
         List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
-        assertTrue(activeTasks.isEmpty());
+        assertThat(activeTasks).isEmpty();
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }
@@ -68,7 +69,7 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testAsyncJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncProcess");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
@@ -77,7 +78,7 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(instance.getId())
                 .singleResult();
-        assertNull(processInstance);
+        assertThat(processInstance).isNull();
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }
@@ -85,14 +86,14 @@ public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
     @Test
     public void testRollbackJobExecutorPath() throws Exception {
         ProcessInstance instance = runtimeService.startProcessInstanceByKey("errorProcess1");
-        assertNotNull(instance);
+        assertThat(instance).isNotNull();
 
         processEngineConfiguration.getAsyncExecutor().start();
 
         waitForTasksToExpire(instance, 1);
 
         List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
-        assertEquals(1, activeTasks.size());
+        assertThat(activeTasks).hasSize(1);
 
         processEngineConfiguration.getAsyncExecutor().shutdown();
     }

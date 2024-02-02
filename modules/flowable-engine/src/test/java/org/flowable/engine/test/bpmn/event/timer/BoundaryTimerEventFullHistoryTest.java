@@ -16,6 +16,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans
@@ -26,6 +27,7 @@ public class BoundaryTimerEventFullHistoryTest extends ResourceFlowableTestCase 
         super("org/flowable/standalone/history/fullhistory.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testSetProcessVariablesFromTaskWhenTimerOnTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");

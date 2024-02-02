@@ -86,9 +86,9 @@ public class EventSubscriptionDeclaration implements Serializable {
 
     public EventSubscriptionEntity prepareEventSubscriptionEntity(ExecutionEntity execution) {
         EventSubscriptionEntity eventSubscriptionEntity = null;
-        if (eventType.equals("message")) {
+        if ("message".equals(eventType)) {
             eventSubscriptionEntity = new MessageEventSubscriptionEntity(execution);
-        } else if (eventType.equals("signal")) {
+        } else if ("signal".equals(eventType)) {
             eventSubscriptionEntity = new SignalEventSubscriptionEntity(execution);
         } else {
             throw new ActivitiIllegalArgumentException("Found event definition of unknown type: " + eventType);

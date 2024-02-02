@@ -13,16 +13,20 @@
 
 package org.flowable.standalone.calendar;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.util.DefaultClockImpl;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 public class CycleBusinessCalendarTest extends AbstractTestCase {
 
+    @Test
     public void testSimpleCron() throws Exception {
         Clock testingClock = new DefaultClockImpl();
         CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar(testingClock);
@@ -35,9 +39,10 @@ public class CycleBusinessCalendarTest extends AbstractTestCase {
 
         Date expectedDuedate = simpleDateFormat.parse("2011 04 1 - 00:00");
 
-        assertEquals(expectedDuedate, duedate);
+        assertThat(duedate).isEqualTo(expectedDuedate);
     }
 
+    @Test
     public void testSimpleDuration() throws Exception {
         Clock testingClock = new DefaultClockImpl();
         CycleBusinessCalendar businessCalendar = new CycleBusinessCalendar(testingClock);
@@ -50,7 +55,7 @@ public class CycleBusinessCalendarTest extends AbstractTestCase {
 
         Date expectedDuedate = simpleDateFormat.parse("2010 06 13 - 23:33");
 
-        assertEquals(expectedDuedate, duedate);
+        assertThat(duedate).isEqualTo(expectedDuedate);
     }
 
 }

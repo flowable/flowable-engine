@@ -80,34 +80,37 @@ public class DefaultCaseDiagramCanvas {
     protected static final int LINE_HEIGHT = FONT_SIZE + FONT_SPACING;
 
     // Colors
-    protected static Color TASK_BOX_COLOR = new Color(249, 249, 249);
-    protected static Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
-    protected static Color EVENT_COLOR = new Color(255, 255, 255);
-    protected static Color CONNECTION_COLOR = new Color(88, 88, 88);
-    protected static Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
-    protected static Color HIGHLIGHT_COLOR = Color.RED;
-    protected static Color LABEL_COLOR = new Color(112, 146, 190);
-    protected static Color TASK_BORDER_COLOR = new Color(187, 187, 187);
-    protected static Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
-    protected static Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
+    protected static final Color TASK_BOX_COLOR = new Color(249, 249, 249);
+    protected static final Color SUBPROCESS_BOX_COLOR = new Color(255, 255, 255);
+    protected static final Color EVENT_COLOR = new Color(255, 255, 255);
+    protected static final Color CONNECTION_COLOR = new Color(88, 88, 88);
+    protected static final Color CONDITIONAL_INDICATOR_COLOR = new Color(255, 255, 255);
+    protected static final Color HIGHLIGHT_COLOR = Color.RED;
+    protected static final Color LABEL_COLOR = new Color(112, 146, 190);
+    protected static final Color TASK_BORDER_COLOR = new Color(187, 187, 187);
+    protected static final Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
+    protected static final Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
 
     // Fonts
     protected static Font LABEL_FONT;
     protected static Font ANNOTATION_FONT;
 
     // Strokes
-    protected static Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
-    protected static Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
-    protected static Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
+    protected static final Stroke THICK_TASK_BORDER_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke GATEWAY_TYPE_STROKE = new BasicStroke(3.0f);
+    protected static final Stroke ASSOCIATION_STROKE = new BasicStroke(2.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, new float[] { 2.0f, 2.0f }, 0.0f);
 
     // icons
-    protected static int ICON_PADDING = 5;
+    protected static final int ICON_PADDING = 5;
     protected static BufferedImage TIMER_IMAGE;
+    protected static BufferedImage USERLISTENER_IMAGE;
+    protected static BufferedImage VARIABLELISTENER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage PROCESSTASK_IMAGE;
     protected static BufferedImage DECISIONTASK_IMAGE;
+    protected static BufferedImage SENDEVENTTASK_IMAGE;
 
     protected int canvasWidth = -1;
     protected int canvasHeight = -1;
@@ -195,11 +198,14 @@ public class DefaultCaseDiagramCanvas {
 
         try {
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
+            USERLISTENER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/user.png", customClassLoader));
+            VARIABLELISTENER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/variablelistener.png", customClassLoader));
             USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/userTask.png", customClassLoader));
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             PROCESSTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/processTask.png", customClassLoader));
             DECISIONTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/decisionTask.png", customClassLoader));
+            SENDEVENTTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/sendEventTask.png", customClassLoader));
 
         } catch (IOException e) {
             LOGGER.warn("Could not load image for case diagram creation: {}", e.getMessage());
@@ -216,22 +222,12 @@ public class DefaultCaseDiagramCanvas {
             throw new FlowableImageException("CaseDiagramGenerator already closed");
         }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             ImageIO.write(caseDiagram, imageType, out);
-
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             throw new FlowableImageException("Error while generating case image", e);
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ignore) {
-                // Exception is silently ignored
-            }
         }
-        return new ByteArrayInputStream(out.toByteArray());
     }
 
     /**
@@ -248,9 +244,7 @@ public class DefaultCaseDiagramCanvas {
         minX = (minX <= 5) ? 5 : minX;
         minY = (minY <= 5) ? 5 : minY;
         BufferedImage imageToSerialize = caseDiagram;
-        if (minX >= 0 && minY >= 0) {
-            imageToSerialize = caseDiagram.getSubimage(minX - 5, minY - 5, canvasWidth - minX + 5, canvasHeight - minY + 5);
-        }
+        imageToSerialize = caseDiagram.getSubimage(minX - 5, minY - 5, canvasWidth - minX + 5, canvasHeight - minY + 5);
         return imageToSerialize;
     }
 
@@ -272,15 +266,15 @@ public class DefaultCaseDiagramCanvas {
         Stroke originalStroke = g.getStroke();
 
         g.setPaint(CONNECTION_COLOR);
-        if (connectionType.equals("association")) {
+        if ("association".equals(connectionType)) {
             g.setStroke(ASSOCIATION_STROKE);
         }
 
         for (int i = 1; i < xPoints.length; i++) {
-            Integer sourceX = xPoints[i - 1];
-            Integer sourceY = yPoints[i - 1];
-            Integer targetX = xPoints[i];
-            Integer targetY = yPoints[i];
+            int sourceX = xPoints[i - 1];
+            int sourceY = yPoints[i - 1];
+            int targetX = xPoints[i];
+            int targetY = yPoints[i];
             Line2D.Double line = new Line2D.Double(sourceX, sourceY, targetX, targetY);
             g.draw(line);
         }
@@ -321,11 +315,23 @@ public class DefaultCaseDiagramCanvas {
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
     }
-    
+
+    public void drawGenericEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, null, scaleFactor);
+    }
+
     public void drawTimerEventListener(GraphicInfo graphicInfo, double scaleFactor) {
         drawEventListener(graphicInfo, TIMER_IMAGE, scaleFactor);
     }
+
+    public void drawUserEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, USERLISTENER_IMAGE, scaleFactor);
+    }
     
+    public void drawVariableEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, VARIABLELISTENER_IMAGE, scaleFactor);
+    }
+
     public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
         Paint originalPaint = g.getPaint();
         g.setPaint(EVENT_COLOR);
@@ -447,6 +453,7 @@ public class DefaultCaseDiagramCanvas {
 
         g.setPaint(originalPaint);
         // text
+
         if (scaleFactor == 1.0 && name != null && name.length() > 0) {
             int boxWidth = width - (2 * TEXT_PADDING);
             int boxHeight = height - 16 - ICON_PADDING - ICON_PADDING - MARKER_WIDTH - 2 - 2;
@@ -548,6 +555,10 @@ public class DefaultCaseDiagramCanvas {
     public void drawServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SERVICETASK_IMAGE, name, graphicInfo, scaleFactor);
     }
+    
+    public void drawSendEventTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SENDEVENTTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
 
     public void drawCaseTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(CASETASK_IMAGE, name, graphicInfo, scaleFactor);
@@ -620,7 +631,7 @@ public class DefaultCaseDiagramCanvas {
     public List<GraphicInfo> connectionPerfectionizer(SHAPE_TYPE sourceShapeType, SHAPE_TYPE targetShapeType, GraphicInfo sourceGraphicInfo, GraphicInfo targetGraphicInfo, List<GraphicInfo> graphicInfoList) {
         Shape shapeFirst = createShape(sourceShapeType, sourceGraphicInfo);
         Shape shapeLast = createShape(targetShapeType, targetGraphicInfo);
-
+        
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             GraphicInfo graphicInfoFirst = graphicInfoList.get(0);
             GraphicInfo graphicInfoLast = graphicInfoList.get(graphicInfoList.size() - 1);
@@ -636,8 +647,10 @@ public class DefaultCaseDiagramCanvas {
             Point p = null;
 
             if (shapeFirst != null) {
-                Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
-                p = getIntersection(shapeFirst, lineFirst);
+                if (graphicInfoList.size() > 1) {
+                    Line2D.Double lineFirst = new Line2D.Double(graphicInfoFirst.getX(), graphicInfoFirst.getY(), graphicInfoList.get(1).getX(), graphicInfoList.get(1).getY());
+                    p = getIntersection(shapeFirst, lineFirst);
+                }
                 if (p != null) {
                     graphicInfoFirst.setX(p.getX());
                     graphicInfoFirst.setY(p.getY());
@@ -645,8 +658,10 @@ public class DefaultCaseDiagramCanvas {
             }
 
             if (shapeLast != null) {
-                Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
-                p = getIntersection(shapeLast, lineLast);
+                if (graphicInfoList.size() >= 2) {
+                    Line2D.Double lineLast = new Line2D.Double(graphicInfoLast.getX(), graphicInfoLast.getY(), graphicInfoList.get(graphicInfoList.size() - 2).getX(), graphicInfoList.get(graphicInfoList.size() - 2).getY());
+                    p = getIntersection(shapeLast, lineLast);
+                }
                 if (p != null) {
                     graphicInfoLast.setX(p.getX());
                     graphicInfoLast.setY(p.getY());

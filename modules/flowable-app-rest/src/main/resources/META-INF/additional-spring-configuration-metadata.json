@@ -1,0 +1,67 @@
+{
+  "properties": [
+    {
+      "name": "create.demo.definitions",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.create-demo-definitions"
+      }
+    },
+    {
+      "name": "rest.authentication.mode",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.authentication-mode"
+      }
+    },
+    {
+      "name": "rest.docs.swagger.enabled",
+      "type": "java.lang.Boolean",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.swagger-docs-enabled"
+      }
+    },
+    {
+      "name": "rest-admin.userid",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.admin.user-id"
+      }
+    },
+    {
+      "name": "rest-admin.password",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.admin.password"
+      }
+    },
+    {
+      "name": "rest-admin.firstname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.admin.first-name"
+      }
+    },
+    {
+      "name": "rest-admin.lastname",
+      "type": "java.lang.String",
+      "deprecation": {
+        "level": "error",
+        "reason": "Using improved setup for Spring Boot.",
+        "replacement": "flowable.rest.app.admin.last-name"
+      }
+    }
+  ]
+}

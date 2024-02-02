@@ -13,6 +13,40 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
+import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.ZipInputStream;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.impl.DeploymentQueryProperty;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.repository.DeploymentQuery;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,34 +55,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.impl.DeploymentQueryProperty;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.DeploymentBuilder;
-import org.flowable.engine.repository.DeploymentQuery;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipInputStream;
 
 /**
  * @author Tijs Rademakers
@@ -74,13 +80,18 @@ public class DeploymentCollectionResource {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "List Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return deployments with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which do not have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return deployments with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentDeploymentIdLike", dataType = "string", value = "Only return deployments with a parent deployment id like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
@@ -90,7 +101,7 @@ public class DeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
     @GetMapping(value = "/repository/deployments", produces = "application/json")
-    public DataResponse<DeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<DeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -106,6 +117,12 @@ public class DeploymentCollectionResource {
         if (allRequestParams.containsKey("categoryNotEquals")) {
             deploymentQuery.deploymentCategoryNotEquals(allRequestParams.get("categoryNotEquals"));
         }
+        if (allRequestParams.containsKey("parentDeploymentId")) {
+            deploymentQuery.parentDeploymentId(allRequestParams.get("parentDeploymentId"));
+        }
+        if (allRequestParams.containsKey("parentDeploymentIdLike")) {
+            deploymentQuery.parentDeploymentIdLike(allRequestParams.get("parentDeploymentIdLike"));
+        }
         if (allRequestParams.containsKey("tenantId")) {
             deploymentQuery.deploymentTenantId(allRequestParams.get("tenantId"));
         }
@@ -113,19 +130,24 @@ public class DeploymentCollectionResource {
             deploymentQuery.deploymentTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            Boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 deploymentQuery.deploymentWithoutTenantId();
             }
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessDeploymentsWithQuery(deploymentQuery);
+        }
 
-        return new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
+        return paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties, restResponseFactory::createDeploymentResponseList);
     }
 
     @ApiOperation(value = "Create a new deployment", tags = {
             "Deployment" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. If multiple resources need to be deployed in a single deployment, compress the resources in a zip and make sure the file-name ends with .bar or .zip.\n"
                     + "\n"
-                    + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
+                    + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.",
+            code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
@@ -135,13 +157,18 @@ public class DeploymentCollectionResource {
             @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
     })
     @PostMapping(value = "/repository/deployments", produces = "application/json", consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.CREATED)
     public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,
-            HttpServletRequest request, HttpServletResponse response) {
+            HttpServletRequest request) {
 
         if (!(request instanceof MultipartHttpServletRequest)) {
             throw new FlowableIllegalArgumentException("Multipart request is required");
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
         }
 
         String queryString = request.getQueryString();
@@ -164,9 +191,17 @@ public class DeploymentCollectionResource {
             }
 
             if (fileName.endsWith(".bpmn20.xml") || fileName.endsWith(".bpmn")) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+            	try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+            	
             } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
-                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
+            	try (InputStream fileInputStream = file.getInputStream();
+                        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+            		
+            		deploymentBuilder.addZipInputStream(zipInputStream);
+            	}
+
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
             }
@@ -179,11 +214,12 @@ public class DeploymentCollectionResource {
                 }
 
                 deploymentBuilder.name(fileName);
+                
             } else {
                 deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }
 
-            if (decodedQueryStrings.containsKey("deploymentKey") || StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
+            if (decodedQueryStrings.containsKey("deploymentKey") && StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
                 deploymentBuilder.key(decodedQueryStrings.get("deploymentKey"));
             }
 
@@ -191,9 +227,11 @@ public class DeploymentCollectionResource {
                 deploymentBuilder.tenantId(tenantId);
             }
 
-            Deployment deployment = deploymentBuilder.deploy();
+            if (restApiInterceptor != null) {
+                restApiInterceptor.enhanceDeployment(deploymentBuilder);
+            }
 
-            response.setStatus(HttpStatus.CREATED.value());
+            Deployment deployment = deploymentBuilder.deploy();
 
             return restResponseFactory.createDeploymentResponse(deployment);
 
@@ -218,11 +256,7 @@ public class DeploymentCollectionResource {
 
     protected String decode(String string) {
         if (string != null) {
-            try {
-                return URLDecoder.decode(string, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-            }
+            return URLDecoder.decode(string, StandardCharsets.UTF_8);
         }
         return null;
     }

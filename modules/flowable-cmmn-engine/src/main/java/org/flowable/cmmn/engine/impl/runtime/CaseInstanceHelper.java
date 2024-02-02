@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.callback.CallbackData;
 
 /**
  * @author Joram Barrez
@@ -23,7 +23,19 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public interface CaseInstanceHelper {
     
     CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder);
-    
-    void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
+
+    CaseInstanceEntity startCaseInstanceAsync(CaseInstanceBuilder caseInstanceBuilder);
+
+    /**
+     * Creates a new case instance within the runtime based on the given historic and ended case instance to be reactivated later on. This method only copies
+     * all relevant data like the case instance, its plan items and variables to the runtime, but does not further reactivate plan items or trigger the
+     * reactivation listener. But it also sets the state of the runtime case instance to active and keeps the historic one in sync.
+     *
+     * @param caseInstance the historic case instance to copy back to the runtime
+     * @return the copied case instance entity added back to the runtime
+     */
+    CaseInstanceEntity copyHistoricCaseInstanceToRuntime(HistoricCaseInstance caseInstance);
+
+    void callCaseInstanceStateChangeCallbacks(CallbackData callbackData);
     
 }

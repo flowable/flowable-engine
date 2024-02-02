@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,7 +12,12 @@
  */
 package org.flowable.standalone.escapeclause;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.repository.DeploymentQuery;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DeploymentQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -20,7 +25,7 @@ public class DeploymentQueryEscapeClauseTest extends AbstractEscapeClauseTestCas
 
     private String deploymentTwoId;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         deploymentOneId = repositoryService
                 .createDeployment()
@@ -39,44 +44,45 @@ public class DeploymentQueryEscapeClauseTest extends AbstractEscapeClauseTestCas
                 .deploy()
                 .getId();
 
-        super.setUp();
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         repositoryService.deleteDeployment(deploymentOneId, true);
         repositoryService.deleteDeployment(deploymentTwoId, true);
     }
 
+    @Test
     public void testQueryByNameLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%\\%%");
-        assertEquals("one%", query.singleResult().getName());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentNameLike("%|%%");
+        assertThat(query.singleResult().getName()).isEqualTo("one%");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
 
-        query = repositoryService.createDeploymentQuery().deploymentNameLike("%\\_%");
-        assertEquals("two_", query.singleResult().getName());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        query = repositoryService.createDeploymentQuery().deploymentNameLike("%|_%");
+        assertThat(query.singleResult().getName()).isEqualTo("two_");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 
+    @Test
     public void testQueryByProcessDefinitionKeyLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%\\_%");
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        DeploymentQuery query = repositoryService.createDeploymentQuery().processDefinitionKeyLike("%|_%");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 
+    @Test
     public void testQueryByTenantIdLike() {
-        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%\\%%");
-        assertEquals("One%", query.singleResult().getTenantId());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        DeploymentQuery query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%|%%");
+        assertThat(query.singleResult().getTenantId()).isEqualTo("One%");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
 
-        query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%\\_%");
-        assertEquals("Two_", query.singleResult().getTenantId());
-        assertEquals(1, query.list().size());
-        assertEquals(1, query.count());
+        query = repositoryService.createDeploymentQuery().deploymentTenantIdLike("%|_%");
+        assertThat(query.singleResult().getTenantId()).isEqualTo("Two_");
+        assertThat(query.list()).hasSize(1);
+        assertThat(query.count()).isEqualTo(1);
     }
 
 }

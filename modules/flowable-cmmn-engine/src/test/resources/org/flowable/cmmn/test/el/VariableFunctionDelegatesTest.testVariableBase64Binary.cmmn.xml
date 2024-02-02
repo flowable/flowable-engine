@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testVariableGet" name="testElFunction" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="The Task" definitionRef="sid-3D4B7A72-8A16-40ED-A41D-A57D36457FE8"></planItem>
+      <planItem id="planItem2" name="Guarded Task" definitionRef="sid-B8631F0D-DA56-42D3-AFA2-46E147559E2A">
+        <entryCriterion id="sid-73C946BB-815E-4CF7-8290-5DD83E47C4DB" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <ifPart>
+          <condition><![CDATA[${var:base64(myVar) == 'aGVsbG8='}]]></condition>
+        </ifPart>
+      </sentry>
+      <humanTask id="sid-3D4B7A72-8A16-40ED-A41D-A57D36457FE8" name="The Task"></humanTask>
+      <humanTask id="sid-B8631F0D-DA56-42D3-AFA2-46E147559E2A" name="Guarded Task"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testElFunction">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="165.0" y="213.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="420.0" y="213.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-73C946BB-815E-4CF7-8290-5DD83E47C4DB" cmmnElementRef="sid-73C946BB-815E-4CF7-8290-5DD83E47C4DB">
+        <dc:Bounds height="22.0" width="14.0" x="412.52723935207854" y="239.67941330354384"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

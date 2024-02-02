@@ -1,0 +1,20 @@
+{
+    "key": "myEvent",
+    "name": "My event2",
+    "correlationParameters": [
+        {
+            "name": "customerId2",
+            "type": "string"
+        }
+    ],
+    "payload": [
+        {
+            "name": "payload3",
+            "type": "string"
+        },
+        {
+            "name": "payload4",
+            "type": "integer"
+        }
+    ]
+}

@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 
 /**
@@ -32,8 +33,9 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     
     protected HistoricVariableInstanceQueryImpl wrappedHistoricVariableInstanceQuery;
     
-    public CmmnHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor) {
-        this.wrappedHistoricVariableInstanceQuery = new HistoricVariableInstanceQueryImpl(commandExecutor);
+    public CmmnHistoricVariableInstanceQueryImpl(CommandExecutor commandExecutor, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        this.wrappedHistoricVariableInstanceQuery = new HistoricVariableInstanceQueryImpl(commandExecutor, 
+                cmmnEngineConfiguration.getVariableServiceConfiguration());
     }
 
     @Override
@@ -45,14 +47,14 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     @Override
     public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
         wrappedHistoricVariableInstanceQuery.scopeId(caseInstanceId);
-        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
+        wrappedHistoricVariableInstanceQuery.scopeType(ScopeTypes.CMMN);
         return this;
     }
     
     @Override
     public HistoricVariableInstanceQuery planItemInstanceId(String planItemInstanceId) {
         wrappedHistoricVariableInstanceQuery.subScopeId(planItemInstanceId);
-        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
+        wrappedHistoricVariableInstanceQuery.scopeType(ScopeTypes.CMMN);
         return this;
     }
 
@@ -83,6 +85,12 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     @Override
     public HistoricVariableInstanceQuery excludeTaskVariables() {
         wrappedHistoricVariableInstanceQuery.excludeTaskVariables();
+        return this;
+    }
+
+    @Override
+    public HistoricVariableInstanceQuery excludeLocalVariables() {
+        wrappedHistoricVariableInstanceQuery.excludeLocalVariables();
         return this;
     }
 

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="myProcess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miServiceTask" />
+
+    <serviceTask id="miServiceTask" flowable:async="true" flowable:exclusive="false" flowable:expression="${true}">
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:noWaitStatesAsyncLeave="true">
+        <loopCardinality>${nrOfLoops}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </serviceTask>
+
+    <boundaryEvent id="boundaryEvent" attachedToRef="miServiceTask">
+      <errorEventDefinition /> <!-- no errorCode: catch any error -->
+    </boundaryEvent>
+    <sequenceFlow id="flow4" sourceRef="boundaryEvent" targetRef="escalate" />
+
+    <userTask id="escalate" />
+
+    <sequenceFlow id="flow5" sourceRef="miServiceTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

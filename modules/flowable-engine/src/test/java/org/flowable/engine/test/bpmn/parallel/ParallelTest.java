@@ -15,12 +15,14 @@ package org.flowable.engine.test.bpmn.parallel;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class ParallelTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testParallel() {
         runtimeService.startProcessInstanceByKey("myProc");

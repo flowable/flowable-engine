@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/bpmn" 
+    xmlns:custom="http://custom.org/bpmn"
+    targetNamespace="ExamplesCategory">
+    <process id="oneTaskProcess">
+        <extensionElements>
+            <custom:test name="test">test</custom:test>
+        </extensionElements>
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask">
+            <extensionElements>
+                <flowable:condition name="test">
+                    <flowable:condition ref="test"></flowable:condition>
+                </flowable:condition>
+                <custom:test name="test"><![CDATA[test]]></custom:test>
+            </extensionElements>
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${test}]]></conditionExpression>
+        </sequenceFlow>
+        <userTask id="theTask" name="my task">
+            <extensionElements>
+                <custom:test name="test"></custom:test>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

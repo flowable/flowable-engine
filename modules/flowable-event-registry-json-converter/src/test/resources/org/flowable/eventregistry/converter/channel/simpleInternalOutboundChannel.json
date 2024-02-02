@@ -1,0 +1,11 @@
+{
+  "key": "internalChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Internal channel",
+  "channelType": "outbound",
+  "type": "internal",
+  "serializerType": "json",
+
+  "inboundChannelKey": "internalInboundChannel"
+}

@@ -22,7 +22,7 @@
 
     <insert id="insertHistoricVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
         insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
-            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_)
+            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values (
             #{id, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
@@ -39,6 +39,7 @@
             #{longValue, jdbcType=BIGINT},
             #{textValue, jdbcType=VARCHAR},
             #{textValue2, jdbcType=VARCHAR},
+            #{metaInfo, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{lastUpdatedTime, jdbcType=TIMESTAMP}
         )
@@ -46,7 +47,7 @@
 
     <insert id="bulkInsertHistoricVariableInstance" parameterType="java.util.List">
         insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
-            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_)
+            BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values
         <foreach collection="list" item="historicVariable" index="index" separator=",">
             (
@@ -65,6 +66,7 @@
                 #{historicVariable.longValue, jdbcType=BIGINT},
                 #{historicVariable.textValue, jdbcType=VARCHAR},
                 #{historicVariable.textValue2, jdbcType=VARCHAR},
+                #{historicVariable.metaInfo, jdbcType=VARCHAR},
                 #{historicVariable.createTime, jdbcType=TIMESTAMP},
                 #{historicVariable.lastUpdatedTime, jdbcType=TIMESTAMP}
             )
@@ -75,7 +77,7 @@
         INSERT ALL
         <foreach collection="list" item="historicVariable" index="index">
             INTO ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
-                BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_) VALUES
+                BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_) VALUES
             (
                 #{historicVariable.id, jdbcType=VARCHAR},
                 #{historicVariable.processInstanceId, jdbcType=VARCHAR},
@@ -92,6 +94,7 @@
                 #{historicVariable.longValue, jdbcType=BIGINT},
                 #{historicVariable.textValue, jdbcType=VARCHAR},
                 #{historicVariable.textValue2, jdbcType=VARCHAR},
+                #{historicVariable.metaInfo, jdbcType=VARCHAR},
                 #{historicVariable.createTime, jdbcType=TIMESTAMP},
                 #{historicVariable.lastUpdatedTime, jdbcType=TIMESTAMP}
             )
@@ -106,9 +109,9 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR}
+                NAME_ = #{name, jdbcType=VARCHAR},
             </if>
-            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
+            <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef != null and originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.doubleValue != doubleValue">
@@ -123,11 +126,14 @@
             <if test="originalPersistentState.textValue2 != textValue2">
                 TEXT2_ = #{textValue2, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.metaInfo != metaInfo">
+                META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
+            </if>
             <if test="(originalPersistentState.typeName == null and variableType != null) or (originalPersistentState.typeName != null and variableType == null) or (originalPersistentState.typeName != variableType.typeName)">
                 VAR_TYPE_ = #{variableType, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.lastUpdatedTime != lastUpdatedTime">
-                LAST_UPDATED_TIME_ = #{lastUpdatedTime, jdbcType=TIMESTAMP}
+                LAST_UPDATED_TIME_ = #{lastUpdatedTime, jdbcType=TIMESTAMP},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
@@ -146,6 +152,174 @@
             ID_ = #{variable.id, jdbcType=VARCHAR}
         </foreach>
     </delete>
+    
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForProcessInstanceIds" parameterType="java.util.Collection">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where 
+            <foreach item="listItem" index="listIndex" collection="collection">
+                <if test="listIndex &gt; 0">
+                or
+                </if>
+                VARINST.PROC_INST_ID_ in 
+                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{item}
+                </foreach>
+            </foreach>
+        )
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForProcessInstanceIds" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_HI_VARINST where 
+        <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            PROC_INST_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
+    </delete>
+    
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForTaskIds" parameterType="java.util.Collection">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where 
+            <foreach item="listItem" index="listIndex" collection="collection">
+                <if test="listIndex &gt; 0">
+                or
+                </if>
+                VARINST.TASK_ID_ in 
+                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{item}
+                </foreach>
+            </foreach>
+        )
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForTaskIds" parameterType="java.util.Collection">
+        delete from ${prefix}ACT_HI_VARINST where 
+        <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            TASK_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>
+    </delete>
+    
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeType" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where 
+            (<foreach item="listItem" index="listIndex" collection="scopeIds">
+                <if test="listIndex &gt; 0">
+                or
+                </if>
+                VARINST.SCOPE_ID_ in 
+                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{item}
+                </foreach>
+            </foreach>)
+            and VARINST.SCOPE_TYPE_ = #{scopeType}
+        )
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeType" parameterType="map">
+        delete from ${prefix}ACT_HI_VARINST where 
+        (<foreach item="listItem" index="listIndex" collection="scopeIds">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            SCOPE_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+        </foreach>)
+        and SCOPE_TYPE_ = #{scopeType}
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
+        delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
+        NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where VARINST.PROC_INST_ID_ = PROCINST.ID_)
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+        delete from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and
+        NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where VARINST.PROC_INST_ID_ = PROCINST.ID_)
+    </delete>
+
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+        PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+    </delete>
+
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+        PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+    </delete>
+
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where VARINST.PROC_INST_ID_ is not null
+                <if test="_databaseId != 'oracle'">and VARINST.PROC_INST_ID_ != ''</if>
+                and not exists (
+                    select PROCINST.ID_
+                    from ${prefix}ACT_HI_PROCINST PROCINST
+                    where VARINST.PROC_INST_ID_ = PROCINST.ID_
+                )
+                and VARINST.BYTEARRAY_ID_ is not null
+        )
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map">
+        delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_ID_ != '' and VARINST.SCOPE_TYPE_ = 'cmmn' and
+        NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where VARINST.SCOPE_ID_ = CASEINST.ID_)
+    </delete>
+    
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" parameterType="java.util.Map" databaseId="oracle">
+        delete from ${prefix}ACT_HI_VARINST VARINST where VARINST.SCOPE_ID_ is not null and VARINST.SCOPE_TYPE_ = 'cmmn' and
+        NOT EXISTS (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST where VARINST.SCOPE_ID_ = CASEINST.ID_)
+    </delete>
+
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" databaseId="h2" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+        SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
+    </delete>
+
+    <delete id="bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances" databaseId="hsql" parameterType="java.util.Map">
+        delete from ${prefix}ACT_HI_VARINST where SCOPE_ID_ is not null and SCOPE_ID_ != '' and SCOPE_TYPE_ = 'cmmn' and
+        SCOPE_ID_ NOT IN (select CASEINST.ID_ from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST)
+    </delete>
+
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForNonExistingCaseInstances" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where VARINST.SCOPE_ID_ is not null
+                <if test="_databaseId != 'oracle'">and VARINST.SCOPE_ID_ != ''</if>
+                and VARINST.SCOPE_TYPE_ = 'cmmn'
+                and not exists (
+                    select CASEINST.ID_
+                    from ${prefix}ACT_CMMN_HI_CASE_INST CASEINST
+                    where VARINST.SCOPE_ID_ = CASEINST.ID_
+                )
+                and VARINST.BYTEARRAY_ID_ is not null
+        )
+    </delete>
 
     <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
     <resultMap id="historicProcessVariableResultMap" type="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
@@ -163,6 +337,7 @@
         <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
         <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
         <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
+        <result property="metaInfo" column="META_INFO_" jdbcType="VARCHAR" />
         <result property="longValue" column="LONG_" jdbcType="BIGINT" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="lastUpdatedTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
@@ -172,12 +347,11 @@
 
     <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl"
         resultMap="historicProcessVariableResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.*
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectHistoricVariableInstanceByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectHistoricVariableInstanceCountByQueryCriteria" parameterType="org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl" resultType="long">
@@ -197,7 +371,7 @@
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId}
             </if>
-            <if test="executionIds != null and !executionIds.isEmpty()">
+            <if test="executionIds != null and !executionIds.empty">
                 and RES.EXECUTION_ID_ in
                 <foreach item="item" index="index" collection="executionIds" open="(" separator="," close=")">
                     #{item}
@@ -206,7 +380,7 @@
             <if test="taskId != null">
                 and RES.TASK_ID_ = #{taskId}
             </if>
-            <if test="taskIds != null and !taskIds.isEmpty()">
+            <if test="taskIds != null and !taskIds.empty">
                 and RES.TASK_ID_ in
                 <foreach item="item" index="index" collection="taskIds" open="(" separator="," close=")">
                     #{item}
@@ -214,6 +388,11 @@
             </if>
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
+            </if>
+            <if test="excludeLocalVariables">
+                and RES.TASK_ID_ is NULL
+                and (RES.EXECUTION_ID_ = RES.PROC_INST_ID_ or (RES.EXECUTION_ID_ is NULL and RES.PROC_INST_ID_ is NULL))
+                and RES.SUB_SCOPE_ID_ is NULL
             </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId}
@@ -233,12 +412,11 @@
 
             <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
             <if test="queryVariableValue != null">
-                <if test="!queryVariableValue.type.equals('null')">
-                    <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                <if test="queryVariableValue.needsTypeCheck()">
                     and RES.VAR_TYPE_ = #{queryVariableValue.type}
                 </if>
                 <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                    and RES.TEXT_
+                    and (RES.TEXT_
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                         <otherwise>
@@ -249,6 +427,10 @@
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.TEXT_ is null
+                    </if>
+                    )
                 </if>
                 <if test="queryVariableValue.textValue2 != null">
                     and RES.TEXT2_
@@ -264,14 +446,22 @@
                     </choose>
                 </if>
                 <if test="queryVariableValue.longValue != null">
-                    and RES.LONG_
+                    and (RES.LONG_
                     <include refid="executionVariableOperator" />
                     #{queryVariableValue.longValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.LONG_ is null
+                    </if>
+                    )
                 </if>
                 <if test="queryVariableValue.doubleValue != null">
-                    and RES.DOUBLE_
+                    and (RES.DOUBLE_
                     <include refid="executionVariableOperator" />
                     #{queryVariableValue.doubleValue}
+                    <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                        or RES.DOUBLE_ is null
+                    </if>
+                    )
                 </if>
                 <!-- Null variable type -->
                 <if
@@ -325,7 +515,7 @@
     </select>
 
     <select id="selectHistoricVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessVariableResultMap">
-        <include refid="org.flowable.variable.service.db.common.selectByNativeQuery" />
+        <include refid="org.flowable.common.engine.db.selectByNativeQuery" />
     </select>
 
     <select id="selectHistoricVariableInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

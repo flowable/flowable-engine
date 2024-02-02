@@ -17,9 +17,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Tijs Rademakers
@@ -45,6 +45,7 @@ public interface DmnDeploymentEntity extends DmnDeployment, Entity {
 
     void setDeploymentTime(Date deploymentTime);
 
+    @Override
     boolean isNew();
 
     void setNew(boolean isNew);

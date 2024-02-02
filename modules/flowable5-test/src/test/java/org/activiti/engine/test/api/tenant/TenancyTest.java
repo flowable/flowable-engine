@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.engine.test.api.tenant;
 
 import java.util.ArrayList;
@@ -5,9 +17,9 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
@@ -485,10 +497,10 @@ public class TenancyTest extends PluggableFlowableTestCase {
                 assertEquals(TEST_TENANT_ID, historicActivityInstance.getTenantId());
             }
             assertEquals("", historyService.createHistoricActivityInstanceQuery().processDefinitionId(processDefinitionIdNoTenant).list().get(0).getTenantId());
-            assertEquals(3 * (nrOfProcessInstancesWithTenant + nrOfProcessInstancesNoTenant), historyService.createHistoricActivityInstanceQuery().list().size());
+            assertEquals((3 * nrOfProcessInstancesWithTenant) + (5 * nrOfProcessInstancesNoTenant), historyService.createHistoricActivityInstanceQuery().list().size());
             assertEquals(3 * nrOfProcessInstancesWithTenant, historyService.createHistoricActivityInstanceQuery().activityTenantId(TEST_TENANT_ID).list().size());
             assertEquals(3 * nrOfProcessInstancesWithTenant, historyService.createHistoricActivityInstanceQuery().activityTenantIdLike("my%").list().size());
-            assertEquals(3 * nrOfProcessInstancesNoTenant, historyService.createHistoricActivityInstanceQuery().activityWithoutTenantId().list().size());
+            assertEquals(5 * nrOfProcessInstancesNoTenant, historyService.createHistoricActivityInstanceQuery().activityWithoutTenantId().list().size());
 
         }
 

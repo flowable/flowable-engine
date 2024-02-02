@@ -6,7 +6,7 @@ Utility project to build a static web site for the Public REST API
 
 ## Tooling
 
-We're using the [widdershins](https://github.com/mermade/widdershins) library to translate swagger defintions into slate compatible markdown. This needs to be installed on your system too: 
+We're using the [widdershins](https://github.com/mermade/widdershins) library to translate swagger definitions into slate compatible markdown. This needs to be installed on your system too: 
 
 ```ruby 
 npm install [-g] widdershins

@@ -31,11 +31,14 @@ import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.CancelEventDefinitionParser;
 import org.flowable.bpmn.converter.child.CompensateEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ConditionExpressionParser;
+import org.flowable.bpmn.converter.child.ConditionParser;
+import org.flowable.bpmn.converter.child.ConditionalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.DataInputAssociationParser;
 import org.flowable.bpmn.converter.child.DataOutputAssociationParser;
 import org.flowable.bpmn.converter.child.DataStateParser;
 import org.flowable.bpmn.converter.child.DocumentationParser;
 import org.flowable.bpmn.converter.child.ErrorEventDefinitionParser;
+import org.flowable.bpmn.converter.child.EscalationEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
 import org.flowable.bpmn.converter.child.FieldExtensionParser;
 import org.flowable.bpmn.converter.child.FlowNodeRefParser;
@@ -46,8 +49,11 @@ import org.flowable.bpmn.converter.child.FlowableHttpResponseHandlerParser;
 import org.flowable.bpmn.converter.child.FlowableMapExceptionParser;
 import org.flowable.bpmn.converter.child.FormPropertyParser;
 import org.flowable.bpmn.converter.child.IOSpecificationParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.MessageEventDefinitionParser;
 import org.flowable.bpmn.converter.child.MultiInstanceParser;
+import org.flowable.bpmn.converter.child.OutParameterParser;
+import org.flowable.bpmn.converter.child.ScriptInfoParser;
 import org.flowable.bpmn.converter.child.SignalEventDefinitionParser;
 import org.flowable.bpmn.converter.child.TaskListenerParser;
 import org.flowable.bpmn.converter.child.TerminateEventDefinitionParser;
@@ -60,6 +66,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.IOParameter;
 
 public class BpmnXMLUtil implements BpmnXMLConstants {
 
@@ -68,14 +75,18 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     static {
         addGenericParser(new CancelEventDefinitionParser());
         addGenericParser(new CompensateEventDefinitionParser());
+        addGenericParser(new ConditionalEventDefinitionParser());
+        addGenericParser(new ConditionParser());
         addGenericParser(new ConditionExpressionParser());
         addGenericParser(new DataInputAssociationParser());
         addGenericParser(new DataOutputAssociationParser());
         addGenericParser(new DataStateParser());
         addGenericParser(new DocumentationParser());
         addGenericParser(new ErrorEventDefinitionParser());
+        addGenericParser(new EscalationEventDefinitionParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
+        addGenericParser(new ScriptInfoParser());
         addGenericParser(new FlowableEventListenerParser());
         addGenericParser(new FlowableHttpRequestHandlerParser());
         addGenericParser(new FlowableHttpResponseHandlerParser());
@@ -158,6 +169,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
     public static ExtensionElement parseExtensionElement(XMLStreamReader xtr) throws Exception {
         ExtensionElement extensionElement = new ExtensionElement();
+        BpmnXMLUtil.addXMLLocation(extensionElement, xtr);
         extensionElement.setName(xtr.getLocalName());
         if (StringUtils.isNotEmpty(xtr.getNamespaceURI())) {
             extensionElement.setNamespace(xtr.getNamespaceURI());
@@ -200,9 +212,103 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
         if (attributeValue == null) {
             attributeValue = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, attributeName);
+            if (attributeValue == null) {
+                attributeValue = xtr.getAttributeValue(CAMUNDA_EXTENSIONS_NAMESPACE, attributeName);
+            }
         }
 
         return attributeValue;
+    }
+    
+    public static IOParameter parseInIOParameter(XMLStreamReader xtr) {
+        IOParameter parameter = null;
+        String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
+        String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && StringUtils.isNotEmpty(target)) {
+
+            parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
+
+            parameter.setTarget(target);
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
+        }
+        
+        return parameter;
+    }
+    
+    public static IOParameter parseOutIOParameter(XMLStreamReader xtr) {
+        IOParameter parameter = null;
+        String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
+        String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String target = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET);
+        String targetExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
+        if ((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && 
+                        (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
+
+            parameter = new IOParameter();
+            if (StringUtils.isNotEmpty(sourceExpression)) {
+                parameter.setSourceExpression(sourceExpression);
+            } else {
+                parameter.setSource(source);
+            }
+
+            if (StringUtils.isNotEmpty(targetExpression)) {
+                parameter.setTargetExpression(targetExpression);
+            } else {
+                parameter.setTarget(target);
+            }
+            
+            for (int i = 0; i < xtr.getAttributeCount(); i++) {
+                String attributeName = xtr.getAttributeLocalName(i);
+                if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
+                                ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
+                    
+                    continue;
+                }
+                
+                ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+                extensionAttribute.setName(attributeName);
+                extensionAttribute.setValue(xtr.getAttributeValue(i));
+                if (StringUtils.isNotEmpty(xtr.getAttributeNamespace(i))) {
+                    extensionAttribute.setNamespace(xtr.getAttributeNamespace(i));
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                parameter.addAttribute(extensionAttribute);
+            }
+
+            String transientString = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
+            if ("true".equalsIgnoreCase(transientString)) {
+                parameter.setTransient(true);
+            }
+        }
+        
+        return parameter;
     }
 
     public static void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
@@ -271,6 +377,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
                                     xtw.writeNamespace(attribute.getNamespacePrefix(), attribute.getNamespace());
                                     namespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
+                                    localNamespaceMap.put(attribute.getNamespacePrefix(), attribute.getNamespace());
                                 }
 
                                 xtw.writeAttribute(attribute.getNamespacePrefix(), attribute.getNamespace(), attribute.getName(), attribute.getValue());
@@ -301,6 +408,54 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             xtw.writeEndElement();
         }
     }
+    
+    public static boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+
+        if (parameterList == null || parameterList.isEmpty()) {
+            return didWriteExtensionStartElement;
+        }
+
+        for (IOParameter ioParameter : parameterList) {
+            if (!didWriteExtensionStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                didWriteExtensionStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression(), xtw);
+                
+            } else if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
+            }
+            
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE))) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE), xtw);
+            }
+            
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression(), xtw);
+                
+            } else if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
+            }
+            
+            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE))) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE), xtw);
+            }
+            
+            if (ioParameter.isTransient()) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT, "true", xtw);
+            }
+
+            writeCustomAttributes(ioParameter.getAttributes().values(), xtw,
+                    InParameterParser.defaultInParameterAttributes, OutParameterParser.defaultOutParameterAttributes);
+
+            xtw.writeEndElement();
+        }
+
+        return didWriteExtensionStartElement;
+    }
 
     public static List<String> parseDelimitedList(String s) {
         List<String> result = new ArrayList<>();
@@ -322,7 +477,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                     strb.delete(0, strb.length());
                 }
 
-                if (c != ',' || (insideExpression)) {
+                if (c != ',' || insideExpression) {
                     strb.append(c);
                 }
 
@@ -376,7 +531,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     }
 
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
-        writeCustomAttributes(attributes, xtw, new LinkedHashMap<String, String>(), blackLists);
+        writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
 
     /**
@@ -395,9 +550,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 for (ExtensionAttribute attribute : attributeList) {
                     if (!isBlacklisted(attribute, blackLists)) {
                         if (attribute.getNamespacePrefix() == null) {
-                            if (attribute.getNamespace() == null)
+                            if (attribute.getNamespace() == null) {
                                 xtw.writeAttribute(attribute.getName(), attribute.getValue());
-                            else {
+                            } else {
                                 xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
                             }
                         } else {
@@ -419,7 +574,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 for (ExtensionAttribute blackAttribute : blackList) {
                     if (blackAttribute.getName().equals(attribute.getName())) {
                         if (attribute.getNamespace() != null && (FLOWABLE_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
-                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
+                                ACTIVITI_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()) ||
+                                CAMUNDA_EXTENSIONS_NAMESPACE.equals(attribute.getNamespace()))) {
 
                             return true;
                         }
@@ -432,5 +588,30 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             }
         }
         return false;
+    }
+
+    public static void parseLabelElement(XMLStreamReader xtr, BpmnModel model, String BpmnElementId) throws Exception {
+        GraphicInfo labelGraphicInfo = new GraphicInfo();
+        BpmnXMLUtil.addXMLLocation(labelGraphicInfo, xtr);
+
+        if (xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION) != null
+                && !xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION).isEmpty()) {
+            labelGraphicInfo.setRotation(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION)).intValue());
+        }
+
+        while (xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isStartElement() && ELEMENT_DI_BOUNDS.equalsIgnoreCase(xtr.getLocalName())) {
+
+                labelGraphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_X)).intValue());
+                labelGraphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_Y)).intValue());
+                labelGraphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_WIDTH)).intValue());
+                labelGraphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_HEIGHT)).intValue());
+                model.addLabelGraphicInfo(BpmnElementId, labelGraphicInfo);
+                break;
+            } else if (xtr.isEndElement() && ELEMENT_DI_LABEL.equalsIgnoreCase(xtr.getLocalName())) {
+                break;
+            }
+        }
     }
 }

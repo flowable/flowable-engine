@@ -34,17 +34,19 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Activity))
+        if (!(parentElement instanceof Activity)) {
             return;
+        }
 
         String errorCode = xtr.getAttributeValue(null, MAP_EXCEPTION_ERRORCODE);
         String andChildren = xtr.getAttributeValue(null, MAP_EXCEPTION_ANDCHILDREN);
+        String rootCause = xtr.getAttributeValue(null, MAP_EXCEPTION_ROOTCAUSE);
         String exceptionClass = xtr.getElementText();
         boolean hasChildrenBool = false;
 
-        if (StringUtils.isEmpty(andChildren) || andChildren.toLowerCase().equals("false")) {
+        if (StringUtils.isEmpty(andChildren) || "false".equals(andChildren.toLowerCase())) {
             hasChildrenBool = false;
-        } else if (andChildren.toLowerCase().equals("true")) {
+        } else if ("true".equals(andChildren.toLowerCase())) {
             hasChildrenBool = true;
         } else {
             throw new XMLException("'" + andChildren + "' is not valid boolean in mapException with errorCode=" + errorCode + " and class=" + exceptionClass);
@@ -54,6 +56,6 @@ public class FlowableMapExceptionParser extends BaseChildElementParser {
             throw new XMLException("No errorCode defined mapException with errorCode=" + errorCode + " and class=" + exceptionClass);
         }
 
-        ((Activity) parentElement).getMapExceptions().add(new MapExceptionEntry(errorCode, exceptionClass, hasChildrenBool));
+        ((Activity) parentElement).getMapExceptions().add(new MapExceptionEntry(errorCode, exceptionClass, hasChildrenBool, rootCause));
     }
 }

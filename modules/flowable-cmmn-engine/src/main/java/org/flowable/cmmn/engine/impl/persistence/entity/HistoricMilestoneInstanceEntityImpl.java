@@ -17,18 +17,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-
 /**
  * @author Joram Barrez
  */
-public class HistoricMilestoneInstanceEntityImpl extends AbstractEntity implements HistoricMilestoneInstanceEntity {
+public class HistoricMilestoneInstanceEntityImpl extends AbstractCmmnEngineEntity implements HistoricMilestoneInstanceEntity {
     
     protected String name;
     protected Date timeStamp;
     protected String caseInstanceId;
     protected String caseDefinitionId;
     protected String elementId;
+    protected String tenantId;
     
     @Override
     public Object getPersistentState() {
@@ -39,38 +38,57 @@ public class HistoricMilestoneInstanceEntityImpl extends AbstractEntity implemen
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("caseDefinitionId", caseDefinitionId);
         persistentState.put("elementId", elementId);
+        persistentState.put("tenantId", tenantId);
         return persistentState;
     }
     
+    @Override
     public String getName() {
         return name;
     }
+    @Override
     public void setName(String name) {
         this.name = name;
     }
+    @Override
     public Date getTimeStamp() {
         return timeStamp;
     }
+    @Override
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
+    @Override
     public String getCaseInstanceId() {
         return caseInstanceId;
     }
+    @Override
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
     }
+    @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+    @Override
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
+    @Override
     public String getElementId() {
         return elementId;
     }
+    @Override
     public void setElementId(String elementId) {
         this.elementId = elementId;
+    }
+    @Override
+    public String getTenantId() {
+        return tenantId;
+    }
+    @Override
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
     
 }

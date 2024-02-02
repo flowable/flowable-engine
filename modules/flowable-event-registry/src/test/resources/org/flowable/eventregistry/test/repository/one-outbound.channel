@@ -1,0 +1,8 @@
+{
+    "name": "One Outbound",
+    "key": "one-outbound",
+    "channelType": "outbound",
+    "type": "rabbit",
+    "exchange": "testQueue",
+    "serializerType": "json"
+}

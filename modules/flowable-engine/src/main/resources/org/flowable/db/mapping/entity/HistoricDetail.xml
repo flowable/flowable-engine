@@ -153,6 +153,104 @@
     delete from ${prefix}ACT_HI_DETAIL where ID_ = #{id}
   </delete>
   
+  <delete id="bulkDeleteBytesForHistoricDetailForProcessInstanceIds" parameterType="java.util.Collection">
+      delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+      where BYTES_.ID_ in (
+          select HIDETAIL.BYTEARRAY_ID_
+          from ${prefix}ACT_HI_DETAIL HIDETAIL
+          where 
+          <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            HIDETAIL.PROC_INST_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </foreach>
+      )
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDetailForProcessInstanceIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_DETAIL where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        PROC_INST_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
+  <delete id="bulkDeleteBytesForHistoricDetailForTaskIds" parameterType="java.util.Collection">
+      delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+      where BYTES_.ID_ in (
+          select HIDETAIL.BYTEARRAY_ID_
+          from ${prefix}ACT_HI_DETAIL HIDETAIL
+          where 
+          <foreach item="listItem" index="listIndex" collection="collection">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            HIDETAIL.TASK_ID_ in 
+            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+              #{item}
+            </foreach>
+          </foreach>
+      )
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDetailForTaskIds" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_HI_DETAIL where 
+    <foreach item="listItem" index="listIndex" collection="collection">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        TASK_ID_ in
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" parameterType="java.util.Map">
+    delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> HIDETAIL </if> from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and HIDETAIL.PROC_INST_ID_ != '' and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" parameterType="java.util.Map" databaseId="oracle">
+    delete from ${prefix}ACT_HI_DETAIL HIDETAIL where HIDETAIL.PROC_INST_ID_ is not null and
+    NOT EXISTS (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_)
+  </delete>
+
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" databaseId="h2" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and 
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
+  <delete id="bulkDeleteHistoricDetailForNonExistingProcessInstances" databaseId="hsql" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_DETAIL where PROC_INST_ID_ is not null and PROC_INST_ID_ != '' and
+    PROC_INST_ID_ NOT IN (select PROCINST.ID_ from ${prefix}ACT_HI_PROCINST PROCINST)
+  </delete>
+
+  <delete id="bulkDeleteBytesForHistoricDetailForNonExistingProcessInstances" parameterType="map">
+      delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+      where BYTES_.ID_ in (
+          select HIDETAIL.BYTEARRAY_ID_
+          from ${prefix}ACT_HI_DETAIL HIDETAIL
+          where HIDETAIL.PROC_INST_ID_ is not null
+              <if test="_databaseId != 'oracle'">and HIDETAIL.PROC_INST_ID_ != ''</if>
+              and not exists (
+                  select PROCINST.ID_
+                  from ${prefix}ACT_HI_PROCINST PROCINST
+                  where HIDETAIL.PROC_INST_ID_ = PROCINST.ID_
+              )
+              and HIDETAIL.BYTEARRAY_ID_ is not null
+      )
+  </delete>
+
   <!-- HISTORIC DETAILS RESULTMAP -->
   <resultMap id="historicDetailResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -186,22 +284,22 @@
 
   <!-- HISTORIC VARIABLE SELECT -->
   
-  <select id="selectHistoricDetailByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+  <select id="selectHistoricDetailByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
     select * from ${prefix}ACT_HI_DETAIL
     where PROC_INST_ID_ = #{parameter}
   </select>
   
-  <select id="selectHistoricDetailByTaskId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
+  <select id="selectHistoricDetailByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicDetailResultMap">
     select * from ${prefix}ACT_HI_DETAIL
     where TASK_ID_ = #{parameter}
   </select>
 
   <select id="selectHistoricDetailsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultMap="historicDetailResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectHistoricDetailsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
   <select id="selectHistoricDetailCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricDetailQueryImpl" resultType="long">
@@ -245,7 +343,7 @@
   </sql>
 
   <select id="selectHistoricDetailByNativeQuery" parameterType="java.util.Map" resultMap="historicDetailResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricDetailCountByNativeQuery" parameterType="java.util.Map" resultType="long">

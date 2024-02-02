@@ -13,6 +13,13 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Map;
+
+import org.flowable.common.rest.api.DataResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,13 +28,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.rest.api.DataResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -51,7 +51,7 @@ public class HistoricDetailCollectionResource extends HistoricDetailBaseResource
             @ApiResponse(code = 200, message = "Indicates that historic detail could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/history/historic-detail", produces = "application/json")
-    public DataResponse<HistoricDetailResponse> getHistoricDetailInfo(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricDetailResponse> getHistoricDetailInfo(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricDetailQueryRequest queryRequest = new HistoricDetailQueryRequest();
 

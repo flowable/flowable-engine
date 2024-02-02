@@ -1,0 +1,14 @@
+{
+  "key": "testChannel",
+  "category": "channel",
+  "name": "Test channel",
+  "channelType": "inbound",
+  "type": "rabbit",
+  "queues": [
+    "test-customer"
+  ],
+  "deserializerType": "json",
+  "channelEventKeyDetection": {
+    "jsonField": "eventKey"
+  }
+}

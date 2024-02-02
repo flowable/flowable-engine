@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.bpmn.servicetask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
 
 import org.flowable.engine.delegate.DelegateExecution;
@@ -20,6 +22,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
@@ -74,6 +77,7 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesBothAsync() {
 
@@ -83,17 +87,18 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("process");
 
         Job job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
         job = managementService.createJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
         managementService.executeJob(job.getId());
 
-        assertTrue(isOkInDelegate2);
-        assertTrue(isOkInDelegate3);
+        assertThat(isOkInDelegate2).isTrue();
+        assertThat(isOkInDelegate3).isTrue();
     }
 
+    @Test
     @Deployment
     public void testSerializedVariablesThirdAsync() {
 
@@ -103,8 +108,8 @@ public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(10000, 500);
 
         synchronized (ServiceTaskVariablesTest.class) {
-            assertTrue(isOkInDelegate2);
-            assertTrue(isOkInDelegate3);
+            assertThat(isOkInDelegate2).isTrue();
+            assertThat(isOkInDelegate3).isTrue();
         }
 
     }

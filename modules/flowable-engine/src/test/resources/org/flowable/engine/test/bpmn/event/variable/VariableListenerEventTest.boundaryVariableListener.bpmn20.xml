@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+
+	<process id="boundaryVariableListener">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="task" />
+		
+		<userTask id="task" />
+
+		<boundaryEvent id="variableListenerEvent" name="Variable listener" cancelActivity="true" attachedToRef="task">
+			<extensionElements>
+				<flowable:variableListenerEventDefinition variableName="var1" />
+			</extensionElements>
+		</boundaryEvent>
+		
+		<userTask id="aftertask" />
+		
+		<sequenceFlow sourceRef="task" targetRef="end" />
+
+		<sequenceFlow sourceRef="variableListenerEvent" targetRef="aftertask" />
+		
+		<sequenceFlow sourceRef="aftertask" targetRef="end" />
+
+		<endEvent id="end" />
+
+	</process>
+
+</definitions>

@@ -13,14 +13,14 @@
 
 package org.flowable.rest.service.api.history;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.TaskService;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.SimpleFormModel;
+import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
+import org.flowable.rest.service.api.FormModelResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,48 +28,78 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
 @Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricTaskInstanceResource {
+public class HistoricTaskInstanceResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
     protected HistoryService historyService;
-
+    
+    @Autowired
+    protected TaskService taskService;
+    
+    @Autowired(required=false)
+    protected FormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
+    
     @ApiOperation(value = "Get a single historic task instance", tags = { "History Task" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that the historic task instances could be found."),
             @ApiResponse(code = 404, message = "Indicates that the historic task instances could not be found.") })
     @GetMapping(value = "/history/historic-task-instances/{taskId}", produces = "application/json")
-    public HistoricTaskInstanceResponse getTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public HistoricTaskInstanceResponse getTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId) {
         return restResponseFactory.createHistoricTaskInstanceResponse(getHistoricTaskInstanceFromRequest(taskId));
     }
 
-    @ApiOperation(value = "Delete a historic task instance", tags = { "History Task" }, notes = "")
+    @ApiOperation(value = "Delete a historic task instance", tags = { "History Task" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates that the historic task instance was deleted."),
             @ApiResponse(code = 404, message = "Indicates that the historic task instance could not be found.") })
     @DeleteMapping(value = "/history/historic-task-instances/{taskId}")
-    public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        historyService.deleteHistoricTaskInstance(taskId);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
-    }
-
-    protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
-        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-        if (taskInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTaskInstance(@ApiParam(name = "taskId") @PathVariable String taskId) {
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteHistoricTask(task);
         }
-        return taskInstance;
+        
+        historyService.deleteHistoricTaskInstance(taskId);
+    }
+    
+    @ApiOperation(value = "Get a historic task instance form", tags = { "History Task" }, nickname = "getHistoricTaskForm")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+    })
+    @GetMapping(value = "/history/historic-task-instances/{taskId}/form", produces = "application/json")
+    public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId) {
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+        if (StringUtils.isEmpty(task.getFormKey())) {
+            throw new FlowableIllegalArgumentException("Task has no form defined");
+        }
+        
+        FormInfo formInfo = taskService.getTaskFormModel(task.getId());
+        if (formHandlerRestApiInterceptor != null) {
+            return formHandlerRestApiInterceptor.convertHistoricTaskFormInfo(formInfo, task);
+        } else {
+            SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+            return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
+        }
     }
 }

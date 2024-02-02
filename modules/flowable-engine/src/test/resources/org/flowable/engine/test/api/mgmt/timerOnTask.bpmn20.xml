@@ -16,7 +16,7 @@
 
 		<endEvent id="normalEnd" />
 
-		<boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="firstLineSupport">
+		<boundaryEvent id="escalationTimer" name="Escalation" cancelActivity="true" attachedToRef="firstLineSupport">
 			<timerEventDefinition>
 				<timeDuration>PT1H</timeDuration>
 			</timerEventDefinition>

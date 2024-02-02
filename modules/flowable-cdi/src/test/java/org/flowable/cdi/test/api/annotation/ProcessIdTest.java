@@ -12,11 +12,12 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,7 +32,7 @@ public class ProcessIdTest extends CdiFlowableTestCase {
     @Deployment
     public void testProcessIdInjectable() {
         getBeanInstance(BusinessProcess.class).startProcessByKey("keyOfTheProcess");
-        Assert.assertNotNull(getBeanInstance("processInstanceId"));
+        assertThat(getBeanInstance("processInstanceId")).isNotNull();
     }
 
 }

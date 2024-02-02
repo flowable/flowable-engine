@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="process" name="process1" isExecutable="true">
+    <endEvent id="sid-F7795B38-72CD-41A4-9549-6CFB7D3E5FB5"></endEvent>
+    <sequenceFlow id="sid-C6C56AC3-9561-49E0-A58A-624F6CB8BB82" sourceRef="sid-F62B554B-FF4F-475E-94FF-A3F44EDA6A6A" targetRef="servicetask"></sequenceFlow>
+    <serviceTask id="servicetask" name="Service task" flowable:async="true" flowable:exclusive="false" flowable:class="org.test.TestClass">
+      <extensionElements>
+        <flowable:failedJobRetryTimeCycle>R5/PT5M</flowable:failedJobRetryTimeCycle>
+      </extensionElements>
+    </serviceTask>
+    <startEvent id="sid-F62B554B-FF4F-475E-94FF-A3F44EDA6A6A"></startEvent>
+    <sequenceFlow id="sid-91C0F3A0-649F-462E-A1C1-1CE499FEDE3E" sourceRef="servicetask" targetRef="sid-F7795B38-72CD-41A4-9549-6CFB7D3E5FB5"></sequenceFlow>
+  </process>
+</definitions>

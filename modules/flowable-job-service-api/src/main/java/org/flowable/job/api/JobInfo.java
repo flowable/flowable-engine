@@ -18,7 +18,7 @@ package org.flowable.job.api;
  */
 public interface JobInfo {
 
-    int MAX_EXCEPTION_MESSAGE_LENGTH = 255;
+    int MAX_EXCEPTION_MESSAGE_LENGTH = 2000;
 
     /**
      * Returns the unique identifier for this job.

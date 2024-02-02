@@ -13,7 +13,7 @@
 
 package org.flowable.engine.history;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -28,7 +28,7 @@ public interface HistoricDetailQuery extends Query<HistoricDetailQuery, Historic
     HistoricDetailQuery id(String id);
 
     /**
-     * Only select historic variable updates with the given process instance. {@link ProcessInstance) ids and {@link HistoricProcessInstance} ids match.
+     * Only select historic variable updates with the given process instance. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
      */
     HistoricDetailQuery processInstanceId(String processInstanceId);
 

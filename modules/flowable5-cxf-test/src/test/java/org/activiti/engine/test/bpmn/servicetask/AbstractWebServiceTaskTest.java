@@ -12,13 +12,13 @@
  */
 package org.activiti.engine.test.bpmn.servicetask;
 
+import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.webservice.WebServiceMock;
 import org.activiti.engine.impl.webservice.WebServiceMockImpl;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
 /**
  * @author Esteban Robles Luna
@@ -50,47 +50,7 @@ public abstract class AbstractWebServiceTaskTest extends PluggableFlowableTestCa
         server.destroy();
     }
 
-    // @Override
-    // protected void setUp() throws Exception {
-    // super.setUp();
-    // MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    // List<ConfigurationBuilder> builders = new
-    // ArrayList<ConfigurationBuilder>();
-    // builders.add(new
-    // SpringXmlConfigurationBuilder("org/activiti/test/mule/mule-cxf-webservice-config.xml"));
-    // MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-    // context = muleContextFactory.createMuleContext(builders, contextBuilder);
-    // context.start();
-    //
-    // DeploymentBuilder deploymentBuilder =
-    // processEngine.getRepositoryService()
-    // .createDeployment()
-    // .name(ClassNameUtil.getClassNameWithoutPackage(this.getClass()) + "." +
-    // this.getName());
-    //
-    // String resource =
-    // TestHelper.getBpmnProcessDefinitionResource(this.getClass(),
-    // this.getName());
-    // deploymentBuilder.addClasspathResource(resource);
-    //
-    // DeploymentBuilderImpl impl = (DeploymentBuilderImpl) deploymentBuilder;
-    // impl.getDeployment().setValidatingSchema(this.isValidating());
-    //
-    // deploymentId = deploymentBuilder.deploy().getId();
-    //
-    // counter = (Counter)
-    // context.getRegistry().lookupObject(org.mule.component.DefaultJavaComponent.class).getObjectFactory().getInstance(context);
-    //
-    // counter.initialize();
-    // }
-
     protected boolean isValidating() {
         return true;
     }
-
-    // @Override
-    // protected void tearDown() throws Exception {
-    // super.tearDown();
-    // context.stop();
-    // }
 }

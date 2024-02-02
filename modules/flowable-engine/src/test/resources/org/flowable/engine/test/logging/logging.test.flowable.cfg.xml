@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="dataSource" class="org.flowable.common.engine.impl.test.ClosingDataSource">
+    <constructor-arg>
+      <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg>
+          <bean class="com.zaxxer.hikari.HikariConfig">
+            <property name="minimumIdle" value="0" />
+            <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}"/>
+            <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}"/>
+            <property name="username" value="${jdbc.username:sa}"/>
+            <property name="password" value="${jdbc.password:}"/>
+          </bean>
+        </constructor-arg>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="dataSource" ref="dataSource" />
+    <property name="engineLifecycleListeners">
+      <list>
+        <ref bean="dataSource"/>
+      </list>
+    </property>
+
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="drop-create" />
+
+    <!-- job executor configurations -->
+    <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+    <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
+
+    <property name="asyncFailedJobWaitTime" value="1" />
+
+    <property name="history" value="full" />
+    <property name="asyncHistoryEnabled" value="false" />
+    <property name="enableEntityLinks" value="true" />
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
+    
+    <property name="enableProcessDefinitionInfoCache" value="true" />
+
+    <property name="clock">
+        <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
+    </property>
+
+    <property name="enableHistoricTaskLogging" value="true"/>
+    <property name="loggingListener">
+        <bean id="flowableLoggingListener" class="org.flowable.engine.test.logging.FlowableLoggingListener" />
+    </property>
+
+  </bean>
+  
+</beans>

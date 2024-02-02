@@ -18,8 +18,9 @@
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
         <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="advancedJobHandlerConfigurationByteArrayRef" column="ADV_HANDLER_CFG_ID_" typeHandler="JobByteArrayRefTypeHandler" />
-        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- HISTORY JOB SELECT -->
@@ -28,42 +29,58 @@
         select * from ${prefix}ACT_RU_HISTORY_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectHistoryJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <select id="selectHistoryJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
-        where LOCK_EXP_TIME_ is null
+        <where> 
+            <if test="parameter == null">
+                SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter != null and parameter != 'all'">
+                SCOPE_TYPE_ = #{parameter, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter != null and parameter == 'all'">
+                LOCK_EXP_TIME_ is null
+            </if>
+        </where>
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
-    <select id="selectExpiredHistoryJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <select id="selectExpiredHistoryJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_HISTORY_JOB RES
-        where (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-              or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP})
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <where> 
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+            </if>
+            and (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+        </where>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
-    <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
+    <select id="selectHistoryJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historyJobResultMap">
         select * from ${prefix}ACT_RU_HISTORY_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
     </select>
 
     <select id="selectHistoryJobByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultMap="historyJobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectHistoryJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectHistoryJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.HistoryJobQueryImpl" resultType="long">
-        select count(distinct RES.ID_)
+        select count(RES.ID_)
         <include refid="selectHistoryJobByQueryCriteriaSql" />
     </select>
 
@@ -76,11 +93,20 @@
             <if test="handlerType != null">
                 and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
+            <if test="handlerTypes != null">
+                and RES.HANDLER_TYPE_ in
+                <foreach item="item" index="index" collection="handlerTypes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="withException">
                 and (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
             </if>
             <if test="exceptionMessage">
                 and RES.EXCEPTION_MSG_ = #{exceptionMessage}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
             </if>
             <if test="lockOwner != null">
                 and RES.LOCK_OWNER_ = #{lockOwner}
@@ -99,6 +125,9 @@
             </if>
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+            </if>
+            <if test="withoutScopeType">
+                and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
             </if>
         </where>
     </sql>
@@ -131,8 +160,9 @@
         HANDLER_CFG_,
         CUSTOM_VALUES_ID_,
         ADV_HANDLER_CFG_ID_,
-        TENANT_ID_,
-        CREATE_TIME_)
+        CREATE_TIME_,
+        SCOPE_TYPE_,
+        TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
         #{lockOwner, jdbcType=VARCHAR},
@@ -144,8 +174,9 @@
         #{jobHandlerConfiguration, jdbcType=VARCHAR},
         #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-        #{tenantId, jdbcType=VARCHAR},
-        #{createTime, jdbcType=TIMESTAMP}
+        #{createTime, jdbcType=TIMESTAMP},
+        #{scopeType, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -162,8 +193,10 @@
         HANDLER_CFG_,
         CUSTOM_VALUES_ID_,
         ADV_HANDLER_CFG_ID_,
-        TENANT_ID_,
-        CREATE_TIME_) VALUES
+        CREATE_TIME_,
+        SCOPE_TYPE_,
+        TENANT_ID_
+        ) VALUES
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
@@ -176,8 +209,10 @@
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
             #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.tenantId, jdbcType=VARCHAR},
-            #{job.createTime, jdbcType=TIMESTAMP})
+            #{job.createTime, jdbcType=TIMESTAMP},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.tenantId, jdbcType=VARCHAR}
+            )
         </foreach>
     </insert>
 
@@ -196,8 +231,9 @@
             HANDLER_CFG_,
             CUSTOM_VALUES_ID_,
             ADV_HANDLER_CFG_ID_,
-            TENANT_ID_,
-            CREATE_TIME_) VALUES
+            CREATE_TIME_,
+            SCOPE_TYPE_,
+            TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
             #{job.lockOwner, jdbcType=VARCHAR},
@@ -209,8 +245,9 @@
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
             #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.tenantId, jdbcType=VARCHAR},
-            #{job.createTime, jdbcType=TIMESTAMP})
+            #{job.createTime, jdbcType=TIMESTAMP},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.tenantId, jdbcType=VARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -237,17 +274,28 @@
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.scopeType != scopeType">
+                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <update id="resetExpiredHistoryJob" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+    <update id="resetExpiredHistoryJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
         update ${prefix}ACT_RU_HISTORY_JOB
         set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null
         where ID_ = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateHistoryJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_HISTORY_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="historyJobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
     </update>
 
 </mapper>

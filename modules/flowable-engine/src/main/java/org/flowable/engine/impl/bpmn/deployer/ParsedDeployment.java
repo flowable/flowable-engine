@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;

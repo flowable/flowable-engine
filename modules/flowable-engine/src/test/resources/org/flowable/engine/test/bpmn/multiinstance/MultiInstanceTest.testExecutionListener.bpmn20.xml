@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:flowable="http://flowable.org/bpmn" 
+xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+typeLanguage="http://www.w3.org/2001/XMLSchema" 
+expressionLanguage="http://www.w3.org/1999/XPath" 
+targetNamespace="http://www.flowable.org/processdef">
+  <process id="approve-process" name="approve-process-definition" isExecutable="true">
+    <startEvent id="sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4" name="start"></startEvent>
+    <userTask id="step1" name="AUDIT" flowable:assignee="${csAssignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" class="org.flowable.engine.test.bpmn.multiinstance.CounterExecutionListener"></flowable:executionListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${countersignAssigneeList}" flowable:elementVariable="csAssignee">
+        <completionCondition>${nrOfCompletedInstances == nrOfInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <exclusiveGateway id="step2"></exclusiveGateway>
+    <userTask id="step3" name="Im not pass"></userTask>
+    <sequenceFlow id="line1" sourceRef="sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4" targetRef="step1"></sequenceFlow>
+    <sequenceFlow id="line5" sourceRef="step3" targetRef="step4"></sequenceFlow>
+    <sequenceFlow id="line3" name="notpass" sourceRef="step2" targetRef="step3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approveResult == "notpass"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="line4" name="pass" sourceRef="step2" targetRef="step4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approveResult == "pass"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="line2" sourceRef="step1" targetRef="step2"></sequenceFlow>
+    <endEvent id="step4" name="end"></endEvent>
+  </process>
+</definitions>

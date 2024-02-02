@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * An {@link FlowableEvent} related to a signal being sent to an activity.
@@ -24,11 +24,11 @@ public interface FlowableSignalEvent extends FlowableActivityEvent {
     /**
      * @return the name of the signal. Returns null, if no specific signal name has been specified when signaling.
      */
-    public String getSignalName();
+    String getSignalName();
 
     /**
      * @return the payload that was passed when signaling. Returns null, if no payload was passed.
      */
-    public Object getSignalData();
+    Object getSignalData();
 
 }

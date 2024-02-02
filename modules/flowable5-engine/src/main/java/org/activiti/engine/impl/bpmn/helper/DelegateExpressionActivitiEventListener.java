@@ -14,10 +14,10 @@ package org.activiti.engine.impl.bpmn.helper;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.el.NoExecutionVariableScope;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 /**
  * An {@link FlowableEventListener} implementation which resolves an expression to a delegate {@link FlowableEventListener} instance and uses this for event notification. <br>

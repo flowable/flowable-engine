@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.repository;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

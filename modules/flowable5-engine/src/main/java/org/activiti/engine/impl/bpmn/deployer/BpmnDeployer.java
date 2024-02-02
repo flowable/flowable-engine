@@ -12,10 +12,6 @@
  */
 package org.activiti.engine.impl.bpmn.deployer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,13 +66,18 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.job.api.Job;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -156,7 +157,7 @@ public class BpmnDeployer implements Deployer {
                             try {
                                 byte[] diagramBytes = IoUtil.readInputStream(processEngineConfiguration.getProcessDiagramGenerator().generateDiagram(bpmnParse.getBpmnModel(), "png", processEngineConfiguration.getActivityFontName(),
                                         processEngineConfiguration.getLabelFontName(), processEngineConfiguration.getAnnotationFontName(),
-                                        processEngineConfiguration.getClassLoader()), null);
+                                        processEngineConfiguration.getClassLoader(),processEngineConfiguration.isDrawSequenceFlowNameWithNoLabelDI()), null);
                                 diagramResourceName = getProcessImageResourceName(resourceName, processDefinition.getKey(), "png");
                                 createResource(diagramResourceName, diagramBytes, deployment);
 
@@ -224,7 +225,8 @@ public class BpmnDeployer implements Deployer {
 
                 if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
                 removeObsoleteTimers(processDefinition);
@@ -241,7 +243,8 @@ public class BpmnDeployer implements Deployer {
 
                 if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                     commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinition));
+                            ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinition),
+                            EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
                 }
 
                 scheduleTimers(timers);
@@ -304,7 +307,7 @@ public class BpmnDeployer implements Deployer {
                 try {
                     infoNode = (ObjectNode) objectMapper.readTree(infoBytes);
                 } catch (Exception e) {
-                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId());
+                    throw new ActivitiException("Error deserializing json info for process definition " + processDefinition.getId(), e);
                 }
             }
         }
@@ -396,7 +399,7 @@ public class BpmnDeployer implements Deployer {
 
             Set<String> messageNames = new HashSet<>();
             for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-                if (eventDefinition.getEventType().equals("message") && eventDefinition.isStartEvent()) {
+                if ("message".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                     if (!messageNames.contains(eventDefinition.getEventName())) {
                         messageNames.add(eventDefinition.getEventName());
@@ -470,7 +473,7 @@ public class BpmnDeployer implements Deployer {
         List<EventSubscriptionDeclaration> eventDefinitions = (List<EventSubscriptionDeclaration>) processDefinition.getProperty(BpmnParse.PROPERTYNAME_EVENT_SUBSCRIPTION_DECLARATION);
         if (eventDefinitions != null) {
             for (EventSubscriptionDeclaration eventDefinition : eventDefinitions) {
-                if (eventDefinition.getEventType().equals("signal") && eventDefinition.isStartEvent()) {
+                if ("signal".equals(eventDefinition.getEventType()) && eventDefinition.isStartEvent()) {
 
                     SignalEventSubscriptionEntity subscriptionEntity = new SignalEventSubscriptionEntity();
                     subscriptionEntity.setEventName(eventDefinition.getEventName());

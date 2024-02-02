@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testOrphanEventListenerMultipleSentries" name="testOrphanEventListenerMultipleSentries" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" definitionRef="sid-E41C34A4-B4DE-499C-BEAF-01A22DCEEDB9"></planItem>
+      <planItem id="planItem2" name="A" definitionRef="sid-4CE0A3AA-E119-462C-9FD5-871A33DA5295">
+        <exitCriterion id="sid-59D637B5-C5C4-4E9D-9F4F-EB7FAC8C265D" sentryRef="sentry1"></exitCriterion>
+      </planItem>
+      <planItem id="planItem3" name="B" definitionRef="sid-6F26E9CF-CD2B-47EE-A52A-9BB7A0848012">
+        <entryCriterion id="sid-793D88FC-F698-4D60-81AA-205898A5915C" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <planItem id="planItem4" name="C" definitionRef="sid-11A3DABD-5CBB-4F8D-BF85-9A8809EBC61A">
+        <exitCriterion id="sid-DFA5FACE-91F1-4449-89CF-B2E5A5179404" sentryRef="sentry3"></exitCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry3">
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <eventListener id="sid-E41C34A4-B4DE-499C-BEAF-01A22DCEEDB9"></eventListener>
+      <humanTask id="sid-4CE0A3AA-E119-462C-9FD5-871A33DA5295" name="A"></humanTask>
+      <humanTask id="sid-6F26E9CF-CD2B-47EE-A52A-9BB7A0848012" name="B"></humanTask>
+      <humanTask id="sid-11A3DABD-5CBB-4F8D-BF85-9A8809EBC61A" name="C"></humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**

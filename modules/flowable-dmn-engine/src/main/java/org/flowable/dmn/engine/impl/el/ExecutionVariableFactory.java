@@ -12,12 +12,14 @@
  */
 package org.flowable.dmn.engine.impl.el;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +38,14 @@ public class ExecutionVariableFactory {
             throw new FlowableException("could not create result variable");
         }
 
-        Object executionVariable = null;
+        Object executionVariable;
 
         try {
             if (StringUtils.equals("boolean", type)) {
                 if (expressionResult instanceof Boolean) {
                     executionVariable = expressionResult;
                 } else {
-                    executionVariable = new Boolean(expressionResult.toString());
+                    executionVariable = Boolean.valueOf(expressionResult.toString());
                 }
             } else if (StringUtils.equals("string", type)) {
                 if (expressionResult instanceof String) {
@@ -54,6 +56,10 @@ public class ExecutionVariableFactory {
             } else if (StringUtils.equals("number", type)) {
                 if (expressionResult instanceof Double) {
                     executionVariable = expressionResult;
+                } else if (expressionResult instanceof BigDecimal) {
+                    executionVariable = ((BigDecimal) expressionResult).doubleValue();
+                } else if (expressionResult instanceof BigInteger) {
+                    executionVariable = ((BigInteger) expressionResult).longValue();
                 } else {
                     executionVariable = Double.valueOf(expressionResult.toString());
                 }

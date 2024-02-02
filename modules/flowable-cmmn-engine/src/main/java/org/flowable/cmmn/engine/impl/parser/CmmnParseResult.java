@@ -20,22 +20,32 @@ import java.util.Map;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.repository.EngineDeployment;
-import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineResource;
 
 /**
  * @author Joram Barrez
  */
 public class CmmnParseResult {
 
+    protected EngineResource resourceEntity; // will not be part of a 'merged root' parse result, but is used during parsing of one cmmn model
     protected EngineDeployment deployment;
+    protected CmmnModel cmmnModel; // will not be part of a 'merged root' parse result, but is used during parsing of one cmmn model
     protected List<CaseDefinitionEntity> definitions = new ArrayList<>();
     protected Map<CaseDefinitionEntity, CmmnModel> mapDefinitionsToCmmnModel = new HashMap<>();
     protected Map<CaseDefinitionEntity, EngineResource> mapDefinitionsToResources = new HashMap<>();
     
     public CmmnParseResult() {
         
+    }
+
+    public EngineResource getResourceEntity() {
+        return resourceEntity;
+    }
+
+    public void setResourceEntity(EngineResource resourceEntity) {
+        this.resourceEntity = resourceEntity;
     }
 
     public CmmnParseResult(EngineDeployment deployment) {
@@ -45,7 +55,15 @@ public class CmmnParseResult {
     public EngineDeployment getDeployment() {
         return deployment;
     }
-    
+
+    public CmmnModel getCmmnModel() {
+        return cmmnModel;
+    }
+
+    public void setCmmnModel(CmmnModel cmmnModel) {
+        this.cmmnModel = cmmnModel;
+    }
+
     public void addCaseDefinition(CaseDefinitionEntity caseDefinitionEntity) {
         definitions.add(caseDefinitionEntity);
     }

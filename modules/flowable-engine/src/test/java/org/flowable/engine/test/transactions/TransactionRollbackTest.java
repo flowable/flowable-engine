@@ -13,14 +13,25 @@
 
 package org.flowable.engine.test.transactions;
 
-import org.flowable.engine.common.api.FlowableException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
@@ -34,32 +45,54 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
         }
     }
 
+    public static class NestedCommandDelegate implements JavaDelegate {
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            try {
+                ManagementService managementService = CommandContextUtil.getProcessEngineConfiguration().getManagementService();
+                managementService.executeCommand((Command<Void>) commandContext -> { throw new RuntimeException("exception from service task"); });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            execution.setVariable("theVariable", "test");
+        }
+
+    }
+
+    @Test
     @Deployment
     public void testRollback() {
-        try {
-            runtimeService.startProcessInstanceByKey("RollbackProcess");
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("RollbackProcess"))
+                .as("Starting the process instance should throw an exception")
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Buzzz");
 
-            fail("Starting the process instance should throw an exception");
-
-        } catch (Exception e) {
-            assertEquals("Buzzz", e.getMessage());
-        }
-
-        assertEquals(0, runtimeService.createExecutionQuery().count());
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/transactions/trivial.bpmn20.xml", "org/flowable/engine/test/transactions/rollbackAfterSubProcess.bpmn20.xml" })
     public void testRollbackAfterSubProcess() {
-        try {
-            runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");
-
-            fail("Starting the process instance should throw an exception");
-
-        } catch (Exception e) {
-            assertEquals("Buzzz", e.getMessage());
-        }
-
-        assertEquals(0, runtimeService.createExecutionQuery().count());
-
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess"))
+                .as("Starting the process instance should throw an exception")
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Buzzz");
+        assertThat(runtimeService.createExecutionQuery().count()).isZero();
     }
+
+    @Test
+    @Deployment
+    public void testNoRollbackInNestedCommand() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("testProcess").start();
+
+        // The task should be created, as the service task with an exception is try-catched in the delegate.
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        String variable = (String) runtimeService.getVariable(processInstance.getId(), "theVariable");
+        assertThat(variable).isEqualTo("test");
+    }
+
 }

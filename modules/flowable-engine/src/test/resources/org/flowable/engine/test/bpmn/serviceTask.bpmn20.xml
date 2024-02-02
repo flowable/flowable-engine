@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="startToEnd" name="Start to end">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="task" />
+    <serviceTask id="task" name="Test task" flowable:class="org.flowable.engine.test.logging.ServiceTaskLoggingTest$ExceptionServiceTaskDelegate" />
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>

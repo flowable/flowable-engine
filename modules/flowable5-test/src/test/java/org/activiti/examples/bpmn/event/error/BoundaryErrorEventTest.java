@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.test.Deployment;
 
 /**

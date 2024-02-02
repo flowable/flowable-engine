@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <process id="cancelStartOnEventSubProcess" name="test error event" isExecutable="true">
+        <startEvent id="start"/>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="serviceTask"/>
+        <serviceTask id="serviceTask" flowable:delegateExpression="${throwingDelegate}"/>
+        <sequenceFlow id="flow2" sourceRef="serviceTask" targetRef="end"/>
+        <endEvent id="end"/>
+        <subProcess id="cancelStartEventSubProcess" name="Cancel Event Sub Process" triggeredByEvent="true">
+            <startEvent id="eventStart" isInterrupting="true">
+                <cancelEventDefinition/>
+            </startEvent>
+            <sequenceFlow id="eventFlow1" sourceRef="eventStart" targetRef="eventEnd"/>
+            <endEvent id="eventEnd">
+                <errorEventDefinition errorRef="handledError"/>
+            </endEvent>
+        </subProcess>
+    </process>
+</definitions>

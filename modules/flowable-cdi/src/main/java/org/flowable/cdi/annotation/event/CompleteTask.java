@@ -15,7 +15,7 @@ package org.flowable.cdi.annotation.event;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 /**
  * Can be used to qualify events fired when a task is completed
@@ -32,5 +32,5 @@ import javax.inject.Qualifier;
 @Qualifier
 public @interface CompleteTask {
     /** the id of the task that has been completed */
-    public String value();
+    String value();
 }

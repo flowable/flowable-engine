@@ -14,7 +14,7 @@ package org.flowable.form.api;
 
 public interface FormEngineConfigurationApi {
 
-    public FormManagementService getFormManagementService();
-    public FormRepositoryService getFormRepositoryService();
-    public FormService getFormService();
+    FormManagementService getFormManagementService();
+    FormRepositoryService getFormRepositoryService();
+    FormService getFormService();
 }

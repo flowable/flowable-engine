@@ -20,9 +20,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.context.Context;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -166,10 +166,8 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
             }
 
             return (String[]) read;
-        } catch (IOException ioe) {
+        } catch (IOException | ClassNotFoundException ioe) {
             throw new FlowableException("Unexpected exception when deserializing JPA id's", ioe);
-        } catch (ClassNotFoundException e) {
-            throw new FlowableException("Unexpected exception when deserializing JPA id's", e);
         }
     }
 

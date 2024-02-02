@@ -12,13 +12,18 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.util.CriterionUtil.generateEntryCriterionId;
+import static org.flowable.cmmn.converter.util.CriterionUtil.generateExitCriterionId;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnDiEdge;
@@ -26,6 +31,7 @@ import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -35,7 +41,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -52,6 +58,7 @@ public class ConversionHelper {
     protected PlanItem currentPlanItem;
     protected CmmnDiShape currentDiShape;
     protected CmmnDiEdge currentDiEdge;
+    protected GraphicInfo currentLabelGraphicInfo;
 
     protected Map<Case, List<CaseElement>> caseElements = new HashMap<>();
     protected List<Stage> stages = new ArrayList<>();
@@ -69,7 +76,7 @@ public class ConversionHelper {
 
     public void addCaseElement(CaseElement caseElement) {
         if (!caseElements.containsKey(currentCase)) {
-            caseElements.put(currentCase, new ArrayList<CaseElement>());
+            caseElements.put(currentCase, new ArrayList<>());
         }
         caseElements.get(currentCase).add(caseElement);
     }
@@ -103,11 +110,18 @@ public class ConversionHelper {
             CmmnElement cmmnElement = iterator.previous();
             if (cmmnElement instanceof HasEntryCriteria) {
                 hasEntryCriteria = (HasEntryCriteria) cmmnElement;
-                entryCriterion.setAttachedToRefId(cmmnElement.getId());
             }
         }
         if (hasEntryCriteria != null) {
+
+            if (StringUtils.isEmpty(entryCriterion.getId())) {
+                // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+                entryCriterion.setId(generateEntryCriterionId(hasEntryCriteria));
+            }
+
+            entryCriterion.setAttachedToRefId(hasEntryCriteria.getId());
             hasEntryCriteria.getEntryCriteria().add(entryCriterion);
+
         } else {
             throw new FlowableException("Cannot add an entry criteria " + entryCriterion.getId() + " no matching plan item found to attach it to");
         }
@@ -126,15 +140,20 @@ public class ConversionHelper {
             CmmnElement cmmnElement = iterator.previous();
             if (cmmnElement instanceof HasExitCriteria) {
                 hasExitCriteria = (HasExitCriteria) cmmnElement;
-                exitCriterion.setAttachedToRefId(cmmnElement.getId());
             }
         }
 
-        if (hasExitCriteria != null) {
-            hasExitCriteria.getExitCriteria().add(exitCriterion);
-        } else {
-            getCurrentCase().getPlanModel().getExitCriteria().add(exitCriterion);
+        if (hasExitCriteria == null) {
+            hasExitCriteria = getCurrentCase().getPlanModel();
         }
+
+        if (StringUtils.isEmpty(exitCriterion.getId())) {
+            // An id is expected by the evaluation algorithm, so setting an internal one if there isn't one
+            exitCriterion.setId(generateExitCriterionId(hasExitCriteria));
+        }
+
+        exitCriterion.setAttachedToRefId(hasExitCriteria.getId());
+        hasExitCriteria.getExitCriteria().add(exitCriterion);
     }
 
     public void addSentry(Sentry sentry) {
@@ -188,6 +207,12 @@ public class ConversionHelper {
     public void addDiEdge(CmmnDiEdge diEdge) {
         diEdges.add(diEdge);
         setCurrentDiEdge(diEdge);
+    }
+
+    public Optional<PlanItem> findPlanItem(String planItemId) {
+        return planItems.stream()
+                        .filter(planItem -> planItem.getId().equals(planItemId))
+                        .findFirst();
     }
 
     public CmmnModel getCmmnModel() {
@@ -330,6 +355,14 @@ public class ConversionHelper {
 
     public List<CmmnDiEdge> getDiEdges() {
         return diEdges;
+    }
+
+    public GraphicInfo getCurrentLabelGraphicInfo() {
+        return currentLabelGraphicInfo;
+    }
+
+    public void setCurrentLabelGraphicInfo(GraphicInfo labelGraphicInfo) {
+        this.currentLabelGraphicInfo = labelGraphicInfo;
     }
 
 }

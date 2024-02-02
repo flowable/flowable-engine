@@ -25,12 +25,23 @@
       </rule>
       <rule>
         <inputEntry id="inputEntry3">
-          <text>== 1</text>
+          <text>1.0</text>
         </inputEntry>
         <inputEntry id="inputEntry4">
-          <text>"test2"</text>
+          <text>"test1"</text>
         </inputEntry>
         <outputEntry id="outputEntry2">
+          <text>"result1"</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry5">
+          <text>== 1</text>
+        </inputEntry>
+        <inputEntry id="inputEntry6">
+          <text>"test2"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry3">
           <text>"result2"</text>
         </outputEntry>
       </rule>

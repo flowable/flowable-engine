@@ -13,6 +13,8 @@
 
 package org.flowable.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -20,11 +22,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.ibatis.exceptions.PersistenceException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +41,16 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConcurrentEngineUsageTest.class);
     private static final int MAX_RETRIES = 5;
 
+    @Test
     @Deployment
     public void testConcurrentUsage() throws Exception {
 
-        if (!processEngineConfiguration.getDatabaseType().equals("h2") && !processEngineConfiguration.getDatabaseType().equals("db2")) {
+        if (!"h2".equals(processEngineConfiguration.getDatabaseType()) && !"db2".equals(processEngineConfiguration.getDatabaseType())) {
             int numberOfThreads = 5;
             int numberOfProcessesPerThread = 5;
             int totalNumberOfTasks = 2 * numberOfThreads * numberOfProcessesPerThread;
 
-            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<Runnable>(numberOfThreads));
+            ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(numberOfThreads));
 
             for (int i = 0; i < numberOfThreads; i++) {
                 executor.execute(new ConcurrentProcessRunnerRunnable(numberOfProcessesPerThread, "kermit" + i));
@@ -61,15 +65,15 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                 executor.shutdownNow();
 
             }
-            assertEquals(0, executor.getActiveCount());
+            assertThat(executor.getActiveCount()).isZero();
 
             // Check there are no processes active anymore
-            assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+            assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
 
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
                 // Check if all processes and tasks are complete
-                assertEquals(numberOfProcessesPerThread * numberOfThreads, historyService.createHistoricProcessInstanceQuery().finished().count());
-                assertEquals(totalNumberOfTasks, historyService.createHistoricTaskInstanceQuery().finished().count());
+                assertThat(historyService.createHistoricProcessInstanceQuery().finished().count()).isEqualTo(numberOfProcessesPerThread * numberOfThreads);
+                assertThat(historyService.createHistoricTaskInstanceQuery().finished().count()).isEqualTo(totalNumberOfTasks);
             }
         }
     }

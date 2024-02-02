@@ -14,31 +14,45 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
  */
 public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemInstanceEntity> {
-    
-    PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, 
-            String caseInstanceId, String stagePlanItemInstanceId, String tenantId, boolean addToParent);
-    
-    List<PlanItemInstanceEntity> findImmediateChildPlanItemInstancesForCaseInstance(String caseInstance);
-    
-    List<PlanItemInstanceEntity> findAllChildPlanItemInstancesForCaseInstance(String caseInstance);
-    
-    List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId);
+
+    PlanItemInstanceEntity create(HistoricPlanItemInstance historicPlanItemInstance);
+
+    /**
+     * Returns a builder to create a new plan item instance.
+     * @return the plan item instance builder
+     */
+    PlanItemInstanceEntityBuilder createPlanItemInstanceEntityBuilder();
 
     PlanItemInstanceQuery createPlanItemInstanceQuery();
-    
+
     long countByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
     
     List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
+
+    List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId);
+
+    List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId);
     
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
+
+    List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+
+    void deleteSentryRelatedData(String planItemId);
+
     void deleteByCaseDefinitionId(String caseDefinitionId);
-    
+
+    void deleteByStageInstanceId(String stageInstanceId);
+
+    void deleteByCaseInstanceId(String caseInstanceId);
+
+    void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 }

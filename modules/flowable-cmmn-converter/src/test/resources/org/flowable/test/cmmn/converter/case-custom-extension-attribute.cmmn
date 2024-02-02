@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+        xmlns:flowable="http://flowable.org/cmmn"
+        xmlns:test="http://flowable.org/test"
+        flowable:customAttribute="Hello World"
+        test:customAttribute="Hi"
+        test:customAttributeTwo="there"
+        targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItem1" name="Task One" definitionRef="rootTask"/>
+            <task id="rootTask" name="The Task" isBlocking="true"/>
+        </casePlanModel>
+    </case>
+
+</definitions>

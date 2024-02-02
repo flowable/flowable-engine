@@ -17,13 +17,12 @@ package org.flowable.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Christian Stettler
  */
-public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity implements HistoricScopeInstanceEntity, Serializable {
+public abstract class HistoricScopeInstanceEntityImpl extends AbstractBpmnEngineEntity implements HistoricScopeInstanceEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -35,10 +34,14 @@ public abstract class HistoricScopeInstanceEntityImpl extends AbstractEntity imp
     protected String deleteReason;
 
     @Override
-    public void markEnded(String deleteReason) {
+    public void markEnded(String deleteReason, Date endTime) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
-            this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+            if (endTime != null) {
+                this.endTime = endTime;
+            } else {
+                this.endTime = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+            }
             if (endTime != null && startTime != null) {
                 this.durationInMillis = endTime.getTime() - startTime.getTime();
             }

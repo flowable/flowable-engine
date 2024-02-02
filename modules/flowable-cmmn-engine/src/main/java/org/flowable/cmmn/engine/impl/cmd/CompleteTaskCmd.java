@@ -12,15 +12,25 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import static org.flowable.cmmn.engine.impl.task.TaskHelper.logUserTaskCompleted;
+
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
+import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -29,13 +39,36 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class CompleteTaskCmd implements Command<Void> {
     
     protected String taskId;
+    protected String userId;
     protected Map<String, Object> variables;
+    protected Map<String, Object> variablesLocal;
     protected Map<String, Object> transientVariables;
+    protected Map<String, Object> transientVariablesLocal;
     
-    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {  
         this.taskId = taskId;
         this.variables = variables;
         this.transientVariables = transientVariables;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {  
+        this(taskId, variables, transientVariables);
+        this.userId = userId;
+    }
+
+    public CompleteTaskCmd(String taskId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, variables, transientVariables);
+        this.variablesLocal = variablesLocal;
+        this.transientVariablesLocal = transientVariablesLocal;
+    }
+    
+    public CompleteTaskCmd(String taskId, String userId, Map<String, Object> variables, Map<String, Object> variablesLocal,
+            Map<String, Object> transientVariables, Map<String, Object> transientVariablesLocal) {
+        
+        this(taskId, variables, variablesLocal, transientVariables, transientVariablesLocal);
+        this.userId = userId;
     }
     
     @Override
@@ -45,25 +78,77 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        TaskEntity taskEntity = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
         
+        if (StringUtils.isNotEmpty(taskEntity.getProcessInstanceId())) {
+            throw new FlowableException(taskEntity + " is created by the process engine and should be completed via the process engine API");
+        }
+        
         String planItemInstanceId = taskEntity.getSubScopeId();
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
-        if (planItemInstanceEntity == null) {
-            throw new FlowableException("Could not find plan item instance for task " + taskId);
+        PlanItemInstanceEntity planItemInstanceEntity = null;
+        if (planItemInstanceId != null) {
+            planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(planItemInstanceId);
+            if (planItemInstanceEntity == null) {
+                throw new FlowableException("Could not find plan item instance for " + taskEntity);
+            }
         }
         
         if (variables != null) {
             taskEntity.setVariables(variables);
         }
+        if (variablesLocal != null) {
+            taskEntity.setVariablesLocal(variablesLocal);
+        }
         if (transientVariables != null) {
             taskEntity.setTransientVariables(transientVariables);
         }
+        if (transientVariablesLocal != null) {
+            taskEntity.setTransientVariablesLocal(transientVariablesLocal);
+        }
+
+        logUserTaskCompleted(taskEntity, cmmnEngineConfiguration);
         
-        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+        if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
+            cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(taskEntity);
+        }
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createTaskCompletedEvent(taskEntity), cmmnEngineConfiguration.getEngineCfgKey());
+        }
+
+        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+
+        if (planItemInstanceEntity != null) {
+            if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+                String taskLabel = null;
+                if (StringUtils.isNotEmpty(taskEntity.getName())) {
+                    taskLabel = taskEntity.getName();
+                } else {
+                    taskLabel = taskEntity.getId();
+                }
+            
+                CmmnLoggingSessionUtil.addLoggingData(CmmnLoggingSessionConstants.TYPE_HUMAN_TASK_COMPLETE, 
+                        "Human task '" + taskLabel + "' completed", taskEntity, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+            }
+            
+            if (userId != null) {
+                taskEntity.setTempCompletedBy(userId);
+            }
+            
+            CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
+            
+        } else {
+            TaskHelper.completeTask(taskEntity, userId, cmmnEngineConfiguration);
+        }
+        
+        if (cmmnEngineConfiguration.getHumanTaskStateInterceptor() != null) {
+            cmmnEngineConfiguration.getHumanTaskStateInterceptor().handleComplete(taskEntity, userId);
+        }
         
         return null;
     }

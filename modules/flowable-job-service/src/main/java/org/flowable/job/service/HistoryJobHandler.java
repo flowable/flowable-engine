@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 /**
@@ -22,5 +22,5 @@ public interface HistoryJobHandler {
 
     String getType();
 
-    void execute(HistoryJobEntity job, String configuration, CommandContext commandContext);
+    void execute(HistoryJobEntity job, String configuration, CommandContext commandContext, JobServiceConfiguration jobServiceConfiguration);
 }

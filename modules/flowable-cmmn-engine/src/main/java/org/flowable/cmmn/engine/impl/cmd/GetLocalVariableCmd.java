@@ -12,11 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -38,8 +39,13 @@ public class GetLocalVariableCmd implements Command<Object> {
             throw new FlowableIllegalArgumentException("planItemInstanceId is null");
         }
         
-        VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceBySubScopeIdAndScopeTypeAndName(planItemInstanceId, VariableScopeType.CMMN, variableName);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        VariableInstanceEntity variableInstanceEntity = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .subScopeId(planItemInstanceId)
+                .scopeType(ScopeTypes.CMMN)
+                .name(variableName)
+                .singleResult();
         if (variableInstanceEntity != null) {
             return variableInstanceEntity.getValue();
         } 

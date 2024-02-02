@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.annotation.CompleteTaskInterceptor;
@@ -45,7 +45,7 @@ public class CompleteTaskTest extends CdiFlowableTestCase {
         getBeanInstance(DeclarativeProcessController.class).completeTask();
 
         // assert that now the task is completed
-        assertNull(taskService.createTaskQuery().singleResult());
+        assertThat(taskService.createTaskQuery().singleResult()).isNull();
     }
 
 }

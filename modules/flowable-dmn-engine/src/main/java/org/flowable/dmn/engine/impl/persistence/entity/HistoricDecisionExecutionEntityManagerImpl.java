@@ -13,66 +13,63 @@
 
 package org.flowable.dmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.HistoricDecisionExecutionDataManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class HistoricDecisionExecutionEntityManagerImpl extends AbstractEntityManager<HistoricDecisionExecutionEntity> implements HistoricDecisionExecutionEntityManager {
-
-    protected HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager;
+public class HistoricDecisionExecutionEntityManagerImpl
+    extends AbstractEngineEntityManager<DmnEngineConfiguration, HistoricDecisionExecutionEntity, HistoricDecisionExecutionDataManager>
+    implements HistoricDecisionExecutionEntityManager {
 
     public HistoricDecisionExecutionEntityManagerImpl(DmnEngineConfiguration dmnEngineConfiguration, 
                     HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager) {
         
-        super(dmnEngineConfiguration);
-        this.historicDecisionExecutionDataManager = historicDecisionExecutionDataManager;
-    }
-
-    @Override
-    protected DataManager<HistoricDecisionExecutionEntity> getDataManager() {
-        return historicDecisionExecutionDataManager;
+        super(dmnEngineConfiguration, historicDecisionExecutionDataManager);
     }
     
     @Override
     public void deleteHistoricDecisionExecutionsByDeploymentId(String deploymentId) {
-        historicDecisionExecutionDataManager.deleteHistoricDecisionExecutionsByDeploymentId(deploymentId);
+        dataManager.deleteHistoricDecisionExecutionsByDeploymentId(deploymentId);
     }
 
     @Override
     public List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
-        return historicDecisionExecutionDataManager.findHistoricDecisionExecutionsByQueryCriteria(decisionExecutionQuery);
+        return dataManager.findHistoricDecisionExecutionsByQueryCriteria(decisionExecutionQuery);
     }
 
     @Override
     public long findHistoricDecisionExecutionCountByQueryCriteria(HistoricDecisionExecutionQueryImpl decisionExecutionQuery) {
-        return historicDecisionExecutionDataManager.findHistoricDecisionExecutionCountByQueryCriteria(decisionExecutionQuery);
+        return dataManager.findHistoricDecisionExecutionCountByQueryCriteria(decisionExecutionQuery);
     }
 
     @Override
     public List<DmnHistoricDecisionExecution> findHistoricDecisionExecutionsByNativeQuery(Map<String, Object> parameterMap) {
-        return historicDecisionExecutionDataManager.findHistoricDecisionExecutionsByNativeQuery(parameterMap);
+        return dataManager.findHistoricDecisionExecutionsByNativeQuery(parameterMap);
     }
 
     @Override
     public long findHistoricDecisionExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
-        return historicDecisionExecutionDataManager.findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
+        return dataManager.findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
     }
 
-    public HistoricDecisionExecutionDataManager getHistoricDecisionExecutionDataManager() {
-        return historicDecisionExecutionDataManager;
+    @Override
+    public void delete(HistoricDecisionExecutionQueryImpl query) {
+        dataManager.delete(query);
     }
 
-    public void setHistoricDecisionExecutionDataManager(HistoricDecisionExecutionDataManager historicDecisionExecutionDataManager) {
-        this.historicDecisionExecutionDataManager = historicDecisionExecutionDataManager;
+    @Override
+    public void bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType(Collection<String> instanceIds, String scopeType) {
+        dataManager.bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType(instanceIds, scopeType);
     }
-
+    
 }

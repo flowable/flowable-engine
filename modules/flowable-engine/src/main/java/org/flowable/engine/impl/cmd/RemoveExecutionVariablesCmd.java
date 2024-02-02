@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -54,8 +54,8 @@ public class RemoveExecutionVariablesCmd extends NeedsActiveExecutionCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot remove variables because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot remove variables from";
     }
 
 }

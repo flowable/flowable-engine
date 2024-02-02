@@ -1,0 +1,5 @@
+{
+  "key": "ymlInbound",
+  "channelType": "inbound",
+  "type": "jms"
+}

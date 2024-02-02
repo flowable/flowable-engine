@@ -15,15 +15,16 @@ package org.flowable.job.service.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -32,10 +33,11 @@ public class SetTimerJobRetriesCmd implements Command<Void>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final String jobId;
-    private final int retries;
+    protected final String jobId;
+    protected final int retries;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public SetTimerJobRetriesCmd(String jobId, int retries) {
+    public SetTimerJobRetriesCmd(String jobId, int retries, JobServiceConfiguration jobServiceConfiguration) {
         if (jobId == null || jobId.length() < 1) {
             throw new FlowableIllegalArgumentException("The job id is mandatory, but '" + jobId + "' has been provided.");
         }
@@ -44,17 +46,20 @@ public class SetTimerJobRetriesCmd implements Command<Void>, Serializable {
         }
         this.jobId = jobId;
         this.retries = retries;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        TimerJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
+        TimerJobEntity job = jobServiceConfiguration.getTimerJobEntityManager().findById(jobId);
         if (job != null) {
 
             job.setRetries(retries);
 
-            if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job));
+            FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, job),
+                        jobServiceConfiguration.getEngineName());
             }
         } else {
             throw new FlowableObjectNotFoundException("No timer job found with id '" + jobId + "'.", Job.class);

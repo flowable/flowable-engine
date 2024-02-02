@@ -15,8 +15,8 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.lang.reflect.Method;
 
+import org.flowable.common.engine.impl.el.AbstractFlowableFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.util.DateUtil;
-import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
 
 /**
  * A date function mapper that can be used in EL expressions

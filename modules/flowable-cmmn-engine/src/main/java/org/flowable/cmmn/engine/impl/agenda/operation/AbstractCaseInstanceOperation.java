@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -32,15 +32,15 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
     
     @Override
     public void run() {
-        if (caseInstanceEntity == null) {
-            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
-        }
+        getCaseInstanceEntity();
+        getCaseInstanceId();
+    }
+
+    @Override
+    public String getCaseInstanceId() {
         if (caseInstanceEntityId == null) {
             caseInstanceEntityId = caseInstanceEntity.getId();
         }
-    }
-
-    public String getCaseInstanceEntityId() {
         return caseInstanceEntityId;
     }
 
@@ -49,6 +49,9 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
     }
 
     public CaseInstanceEntity getCaseInstanceEntity() {
+        if (caseInstanceEntity == null) {
+            caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
+        }
         return caseInstanceEntity;
     }
 

@@ -14,7 +14,7 @@
 package org.activiti.spring.test.expression;
 
 import org.activiti.spring.impl.test.SpringFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
@@ -30,8 +30,7 @@ public class SpringLimitedExpressionsTest extends SpringFlowableTestCase {
 
     @Deployment
     public void testLimitedBeansExposed() throws Exception {
-        // Start process, which has a service-task which calls 'bean1', which is
-        // exposed
+        // Start process, which has a service-task which calls 'bean1', which is exposed
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("limitedExpressionProcess");
 
         String beanOutput = (String) runtimeService.getVariable(processInstance.getId(), "beanOutput");

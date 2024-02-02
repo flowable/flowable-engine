@@ -17,8 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ProcessInstance}s.
@@ -43,6 +42,19 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select process instance with the given business key, unique for the given process definition
      */
     ProcessInstanceQuery processInstanceBusinessKey(String processInstanceBusinessKey, String processDefinitionKey);
+
+    /**
+     * Select process instances with a business key like the given value.
+     */
+    ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
+    
+    /** Select process instances with the given business status */
+    ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus);
+
+    /**
+     * Select process instances with a business status like the given value.
+     */
+    ProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
 
     /**
      * Only select process instances that have the given tenant id.
@@ -122,15 +134,40 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Exclude sub processes from the query result;
      */
     ProcessInstanceQuery excludeSubprocesses(boolean excludeSubprocesses);
+    
+    /**
+     * Select the process instances which have an active activity instance like the provided id.
+     */
+    ProcessInstanceQuery activeActivityId(String activityId);
+    
+    /**
+     * Select the process instances which have an active activity instance like the provided ids.
+     */
+    ProcessInstanceQuery activeActivityIds(Set<String> activityIds);
 
     /**
      * Select the process instances with which the user with the given id is involved.
      */
     ProcessInstanceQuery involvedUser(String userId);
+    
+    /**
+     * Select the process instances with which the user with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedUser(String userId, String identityLinkType);
+    
+    /**
+     * Select the process instances with which the group with the given id and identity link type is involved.
+     */
+    ProcessInstanceQuery involvedGroup(String groupId, String identityLinkType);
+
+    /**
+     * Select the process instances with which the {@link org.flowable.idm.api.Group}s with the given ids are involved.
+     */
+    ProcessInstanceQuery involvedGroups(Set<String> groupIds);
 
     /**
      * Only select process instances which have a global variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      * 
      * @param name
      *            name of the variable, cannot be null.
@@ -139,7 +176,7 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /**
      * Only select process instances which have at least one global variable with the given value. The type of variable is determined based on the value, using types configured in
-     * {@link ProcessEngineConfiguration#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * {@link org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl#getVariableTypes()}. Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
      */
     ProcessInstanceQuery variableValueEquals(Object value);
 
@@ -285,6 +322,17 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      */
     ProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
+
+    /**
+     * Only select process instances with a root instance with a name like the given value.
+     */
+    ProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
+
+    /**
+     * Only select process instances with the given parent process instance id.
+     */
+    ProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
     /**
      * Only select process instances with the given callback id. 
      */
@@ -294,6 +342,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with the given callback type.
      */
     ProcessInstanceQuery processInstanceCallbackType(String callbackType);
+
+    /**
+     * Only select process instances with the given reference id.
+     */
+    ProcessInstanceQuery processInstanceReferenceId(String referenceId);
+
+    /**
+     * Only select process instances with the given callback type.
+     */
+    ProcessInstanceQuery processInstanceReferenceType(String referenceType);
 
     /**
      * Localize process name and description to specified locale.
@@ -309,11 +367,6 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Include process variables in the process query result
      */
     ProcessInstanceQuery includeProcessVariables();
-
-    /**
-     * Limit process instance variables
-     */
-    ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
 
     /**
      * Only select process instances that failed due to an exception happening during a job execution.
@@ -360,6 +413,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Order by process definition id (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     ProcessInstanceQuery orderByProcessDefinitionId();
+
+    /**
+     * Order by start time (needs to be followed by {@link #asc()} or {@link #desc()}).
+     */
+    ProcessInstanceQuery orderByStartTime();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

@@ -12,11 +12,12 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,23 +30,22 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
 
 public abstract class AbstractConverterTest implements BpmnXMLConstants {
 
     protected BpmnModel readXMLFile() throws Exception {
         InputStream xmlStream = this.getClass().getClassLoader().getResourceAsStream(getResource());
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(xmlStream, "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new BpmnXMLConverter().convertToBpmnModel(xtr);
+        return readXMLFile(xmlStream);
+    }
+    
+    protected BpmnModel readXMLFile(InputStream inputStream) throws Exception {
+        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(inputStream), true, false, "UTF-8");
     }
 
     protected BpmnModel exportAndReadXMLFile(BpmnModel bpmnModel) throws Exception {
         byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel);
-        XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
-        XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        return new BpmnXMLConverter().convertToBpmnModel(xtr);
+        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -55,7 +55,7 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
     	Map<String, GraphicInfo> shapesMap = null;
 
         XMLInputFactory xif = XMLInputFactory.newInstance();
-        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), "UTF-8");
+        InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(xml), StandardCharsets.UTF_8);
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
 
     	String diagramId = null;
@@ -149,26 +149,18 @@ public abstract class AbstractConverterTest implements BpmnXMLConstants {
 		for (GraphicInfo ginfo : info) {
 			for (GraphicInfo gdInfo : diInfo) {
 				// entries may not be in the same order
-				if (foundMatch == true) {
+				if (foundMatch) {
 					// found one match so reset and try next set of values
 					info.remove(ginfo);
 					foundMatch = false;
 					continue;
-					
+
 				} else {
-					assertTrue(ginfo.equals(gdInfo));
+					assertThat(ginfo.equals(gdInfo)).isTrue();
 					foundMatch = true;
 				}
 			}
 		}
-    }
-
-    protected void deployProcess(BpmnModel bpmnModel) {
-        /*
-         * byte[] xml = new BpmnXMLConverter().convertToXML(bpmnModel); ProcessEngineConfiguration configuration = ProcessEngineConfiguration. createStandaloneInMemProcessEngineConfiguration();
-         * ProcessEngine processEngine = configuration.buildProcessEngine(); try { Deployment deployment = processEngine.getRepositoryService().createDeployment().name
-         * ("test").addString("test.bpmn20.xml", new String(xml)).deploy(); processEngine .getRepositoryService().deleteDeployment(deployment.getId()); } finally { processEngine.close(); }
-         */
     }
 
     protected abstract String getResource();

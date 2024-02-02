@@ -19,13 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.BeforeShutdown;
-import javax.enterprise.inject.spi.Extension;
+import jakarta.enterprise.event.Observes;
+import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
+import jakarta.enterprise.inject.spi.AfterDeploymentValidation;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeforeBeanDiscovery;
+import jakarta.enterprise.inject.spi.BeforeShutdown;
+import jakarta.enterprise.inject.spi.Extension;
 
 import org.flowable.cdi.annotation.BusinessProcessScoped;
 import org.flowable.cdi.impl.context.BusinessProcessContext;
@@ -33,8 +33,8 @@ import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.spi.ProcessEngineLookup;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

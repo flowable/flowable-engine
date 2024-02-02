@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,12 +12,15 @@
  */
 package org.flowable.standalone.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
@@ -28,6 +31,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/history/nohistory.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testLargeAmountOfVariableBulkDelete() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -39,12 +43,12 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertNotNull(task);
+        assertThat(task).isNotNull();
 
         // Completing the task will cause a bulk delete of 4001 entities
         taskService.complete(task.getId());
 
         // Check if process is gone
-        assertEquals(0L, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

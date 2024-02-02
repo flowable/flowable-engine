@@ -13,9 +13,10 @@
 
 package org.flowable.identitylink.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 
@@ -23,28 +24,40 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricId
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkEntityManager {
+public class HistoricIdentityLinkEntityManagerImpl
+    extends AbstractServiceEngineEntityManager<IdentityLinkServiceConfiguration, HistoricIdentityLinkEntity, HistoricIdentityLinkDataManager>
+    implements HistoricIdentityLinkEntityManager {
 
-    protected HistoricIdentityLinkDataManager historicIdentityLinkDataManager;
 
     public HistoricIdentityLinkEntityManagerImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration, HistoricIdentityLinkDataManager historicIdentityLinkDataManager) {
-        super(identityLinkServiceConfiguration);
-        this.historicIdentityLinkDataManager = historicIdentityLinkDataManager;
+        super(identityLinkServiceConfiguration, identityLinkServiceConfiguration.getEngineName(), historicIdentityLinkDataManager);
     }
 
     @Override
-    protected DataManager<HistoricIdentityLinkEntity> getDataManager() {
-        return historicIdentityLinkDataManager;
+    public HistoricIdentityLinkEntity create() {
+        HistoricIdentityLinkEntity identityLinkEntity = super.create();
+        identityLinkEntity.setCreateTime(getClock().getCurrentTime());
+        return identityLinkEntity;
     }
 
     @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId) {
-        return historicIdentityLinkDataManager.findHistoricIdentityLinksByTaskId(taskId);
+        return dataManager.findHistoricIdentityLinksByTaskId(taskId);
     }
 
     @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId) {
-        return historicIdentityLinkDataManager.findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
+        return dataManager.findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return dataManager.findHistoricIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return dataManager.findHistoricIdentityLinksBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override
@@ -56,23 +69,53 @@ public class HistoricIdentityLinkEntityManagerImpl extends AbstractEntityManager
     }
 
     @Override
-    public void deleteHistoricIdentityLinksByProcInstance(final String processInstanceId) {
-
-        List<HistoricIdentityLinkEntity> identityLinks = historicIdentityLinkDataManager
+    public void deleteHistoricIdentityLinksByProcInstance(String processInstanceId) {
+        List<HistoricIdentityLinkEntity> identityLinks = dataManager
                 .findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
 
         for (HistoricIdentityLinkEntity identityLink : identityLinks) {
             delete(identityLink);
         }
-
+    }
+    
+    @Override
+    public void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        dataManager.deleteHistoricIdentityLinksByScopeIdAndType(scopeId, scopeType);
+    }
+    
+    @Override
+    public void deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
+        dataManager.deleteHistoricIdentityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds) {
+        dataManager.bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
     }
 
-    public HistoricIdentityLinkDataManager getHistoricIdentityLinkDataManager() {
-        return historicIdentityLinkDataManager;
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds) {
+        dataManager.bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
     }
 
-    public void setHistoricIdentityLinkDataManager(HistoricIdentityLinkDataManager historicIdentityLinkDataManager) {
-        this.historicIdentityLinkDataManager = historicIdentityLinkDataManager;
+    @Override
+    public void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        dataManager.bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
+    @Override
+    public void deleteHistoricProcessIdentityLinksForNonExistingInstances() {
+        dataManager.deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricCaseIdentityLinksForNonExistingInstances() {
+        dataManager.deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    }
+    
+    @Override
+    public void deleteHistoricTaskIdentityLinksForNonExistingInstances() {
+        dataManager.deleteHistoricTaskIdentityLinksForNonExistingInstances();
     }
 
 }

@@ -13,16 +13,21 @@
 
 package org.flowable.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -30,29 +35,30 @@ import org.flowable.task.api.history.HistoricTaskInstance;
  */
 public class SubTaskTest extends PluggableFlowableTestCase {
 
+    @Test
     public void testSubTask() {
-        org.flowable.task.api.Task gonzoTask = taskService.newTask();
+        Task gonzoTask = taskService.newTask();
         gonzoTask.setName("gonzoTask");
         taskService.saveTask(gonzoTask);
 
-        org.flowable.task.api.Task subTaskOne = taskService.newTask();
+        Task subTaskOne = taskService.newTask();
         subTaskOne.setName("subtask one");
         String gonzoTaskId = gonzoTask.getId();
         subTaskOne.setParentTaskId(gonzoTaskId);
         taskService.saveTask(subTaskOne);
 
-        org.flowable.task.api.Task subTaskTwo = taskService.newTask();
+        Task subTaskTwo = taskService.newTask();
         subTaskTwo.setName("subtask two");
         subTaskTwo.setParentTaskId(gonzoTaskId);
         taskService.saveTask(subTaskTwo);
-
+        
         String subTaskId = subTaskOne.getId();
-        assertTrue(taskService.getSubTasks(subTaskId).isEmpty());
-        assertTrue(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list().isEmpty());
+        assertThat(taskService.getSubTasks(subTaskId)).isEmpty();
+        assertThat(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list()).isEmpty();
 
-        List<org.flowable.task.api.Task> subTasks = taskService.getSubTasks(gonzoTaskId);
+        List<Task> subTasks = taskService.getSubTasks(gonzoTaskId);
         Set<String> subTaskNames = new HashSet<>();
-        for (org.flowable.task.api.Task subTask : subTasks) {
+        for (Task subTask : subTasks) {
             subTaskNames.add(subTask.getName());
         }
 
@@ -61,7 +67,7 @@ public class SubTaskTest extends PluggableFlowableTestCase {
             expectedSubTaskNames.add("subtask one");
             expectedSubTaskNames.add("subtask two");
 
-            assertEquals(expectedSubTaskNames, subTaskNames);
+            assertThat(subTaskNames).isEqualTo(expectedSubTaskNames);
 
             List<HistoricTaskInstance> historicSubTasks = historyService.createHistoricTaskInstanceQuery().taskParentTaskId(gonzoTaskId).list();
 
@@ -70,54 +76,97 @@ public class SubTaskTest extends PluggableFlowableTestCase {
                 subTaskNames.add(historicSubTask.getName());
             }
 
-            assertEquals(expectedSubTaskNames, subTaskNames);
+            assertThat(subTaskNames).isEqualTo(expectedSubTaskNames);
         }
 
         taskService.deleteTask(gonzoTaskId, true);
     }
+    
+    @Test
+    public void testMakeSubTaskStandaloneTask() {
+        Task parentTask = taskService.newTask();
+        parentTask.setName("parent");
+        taskService.saveTask(parentTask);
 
+        Task subTaskOne = taskService.newTask();
+        subTaskOne.setName("subtask one");
+        subTaskOne.setParentTaskId(parentTask.getId());
+        taskService.saveTask(subTaskOne);
+
+        Task subTaskTwo = taskService.newTask();
+        subTaskTwo.setName("subtask two");
+        subTaskTwo.setParentTaskId(parentTask.getId());
+        taskService.saveTask(subTaskTwo);
+
+        assertThat(taskService.getSubTasks(parentTask.getId())).hasSize(2);
+        
+        if (processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts()) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+            assertThat(countingTaskEntity.getSubTaskCount()).isEqualTo(2);
+        }
+        
+        subTaskTwo = taskService.createTaskQuery().taskId(subTaskTwo.getId()).singleResult();
+        subTaskTwo.setParentTaskId(null);
+        taskService.saveTask(subTaskTwo);
+        
+        if (processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts()) {
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskService.createTaskQuery().taskId(parentTask.getId()).singleResult();
+            assertThat(countingTaskEntity.getSubTaskCount()).isEqualTo(1);
+        }
+        
+        assertThat(taskService.getSubTasks(parentTask.getId())).hasSize(1);
+        taskService.deleteTask(parentTask.getId(), true);
+        taskService.deleteTask(subTaskTwo.getId(), true);
+    }
+
+    @Test
     public void testSubTaskDeleteOnProcessInstanceDelete() {
         Deployment deployment = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .deploy();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.setAssignee(task.getId(), "test");
 
-        org.flowable.task.api.Task subTask1 = taskService.newTask();
+        Task subTask1 = taskService.newTask();
         subTask1.setName("Sub task 1");
         subTask1.setParentTaskId(task.getId());
         subTask1.setAssignee("test");
         taskService.saveTask(subTask1);
 
-        org.flowable.task.api.Task subTask2 = taskService.newTask();
+        Task subTask2 = taskService.newTask();
         subTask2.setName("Sub task 2");
         subTask2.setParentTaskId(task.getId());
         subTask2.setAssignee("test");
         taskService.saveTask(subTask2);
 
-        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("test").list();
-        assertEquals(3, tasks.size());
+        List<Task> tasks = taskService.createTaskQuery().taskAssignee("test").list();
+        assertThat(tasks).hasSize(3);
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "none");
 
         tasks = taskService.createTaskQuery().taskAssignee("test").list();
-        assertEquals(0, tasks.size());
+        assertThat(tasks).isEmpty();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
-            assertEquals(3, historicTasks.size());
+            assertThat(historicTasks).hasSize(3);
 
             historyService.deleteHistoricProcessInstance(processInstance.getId());
             
-            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
 
             historicTasks = historyService.createHistoricTaskInstanceQuery().taskAssignee("test").list();
-            assertEquals(0, historicTasks.size());
+            assertThat(historicTasks).isEmpty();
         }
 
         repositoryService.deleteDeployment(deployment.getId(), true);
+        managementService.executeCommand(commandContext -> {
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(subTask1.getId());
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForTaskId(subTask2.getId());
+            return null;
+        });
     }
 
 }

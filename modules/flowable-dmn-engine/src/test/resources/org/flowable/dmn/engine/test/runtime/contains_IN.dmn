@@ -1,0 +1,260 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_3fa3bde4-1645-11e8-b1df-be031b97f836" name="asdasd" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="collection decision">
+    <decisionTable id="decisionTable_3fa3bde4-1645-11e8-b1df-be031b97f836" hitPolicy="RULE ORDER">
+      <input>
+        <inputExpression id="inputExpression_1" typeRef="collection">
+          <text>collection1</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[${collection:contains(collection1, "test1")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["test1 in collection"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[${collection:contains(collection4, 10)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["test1 in collection"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[== collection2]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA["collection1 same as collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[!= collection3]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA["collection1 not same as collection3"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_5">
+          <text><![CDATA[${collection:contains(collection1, "test4")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_5">
+          <text><![CDATA["test4 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_6">
+          <text><![CDATA[${collection:contains(collection4, 60)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_6">
+          <text><![CDATA["60 in collection4"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_7">
+          <text><![CDATA[${collection:contains(collection1, '"test1","test3"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_7">
+          <text><![CDATA["test1 and test3 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_8">
+          <text><![CDATA[${collection:contains(collection4, '10,50')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_8">
+          <text><![CDATA["10 and 50 in collection4"]]></text>
+        </outputEntry>
+      </rule>
+       <rule>
+        <inputEntry id="inputEntry_1_9">
+          <text><![CDATA[${collection:contains(collection1, '"test1","test4"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_9">
+          <text><![CDATA["test1 and test4 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_10">
+          <text><![CDATA[${collection:contains(collection4, '10,60')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_10">
+          <text><![CDATA["10 and 60 not in collection4"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_11">
+          <text><![CDATA[${collection:contains(collection1, collection3)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_11">
+          <text><![CDATA["collection3 (test1, test2) in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_12">
+          <text><![CDATA[${collection:contains(collection1, collection5)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_12">
+          <text><![CDATA["collection5 (test3 and test5) in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_13">
+          <text><![CDATA[${collection:contains(arrayNode1, '"test1", "test2"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_13">
+          <text><![CDATA["test1 and test2 in arrayNode1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_14">
+          <text><![CDATA[${collection:contains(arrayNode2, '10, 20')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_14">
+          <text><![CDATA["10 and 20 in arrayNode2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_15">
+          <text><![CDATA[${collection:contains(arrayNode3, '10.5, 20.5')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_15">
+          <text><![CDATA["10.5 and 20.5 in arrayNode3"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_16">
+          <text><![CDATA[${collection:contains(arrayNode4, '10.5555, 20.5555')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_16">
+          <text><![CDATA["10.5555 and 20.5555 in arrayNode4"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_17">
+          <text><![CDATA[${collection:contains(arrayNode4, arrayNode5)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_17">
+          <text><![CDATA["arrayNode5 (5.5555 and 10.5555) in arrayNode4"]]></text>
+        </outputEntry>
+      </rule>
+        <rule>
+          <inputEntry id="inputEntry_1_18">
+            <text><![CDATA[${collection:contains(nestedArrayNode1.property1, '"test1", "test2"')}]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_2_18">
+            <text><![CDATA["test1 and test2 in property1 of nestedArrayNode1"]]></text>
+          </outputEntry>
+        </rule>
+        <rule>
+          <inputEntry id="inputEntry_1_19">
+            <text><![CDATA[${collection:contains(collection6, '"tes,t6", "te,st5"')}]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_2_19">
+            <text><![CDATA['"tes,t6" and "te,st5" in collection6']]></text>
+          </outputEntry>
+        </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_20">
+          <text><![CDATA[${collection:allOf('100,101,102', bigInteger1)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_20">
+          <text><![CDATA['101 in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_21">
+          <text><![CDATA[${collection:allOf('100,101,102', collection7)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_21">
+          <text><![CDATA['100 and 101 in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_22">
+          <text><![CDATA[${collection:allOf('100,101,102', 101)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_22">
+          <text><![CDATA[' 101 in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_23">
+          <text><![CDATA[${collection:allOf('100,101,102', '100,101')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_23">
+          <text><![CDATA['100 and 101 in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_24">
+          <text><![CDATA[${collection:allOf('100,101,102', "101")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_24">
+          <text><![CDATA['"101" in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_25">
+          <text><![CDATA[${collection:allOf('100,101,102', collection8)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_25">
+          <text><![CDATA['"100" and "101" in 100, 101, 102']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_26">
+          <text><![CDATA[${collection:allOf('"100","101","102"', "101")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_26">
+          <text><![CDATA['"101" in "100", "101", "102"']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_27">
+          <text><![CDATA[${collection:allOf('"100","101","102"', collection8)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_27">
+          <text><![CDATA['"100" and "101" in "100", "101", "102"']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_28">
+          <text><![CDATA[${collection:allOf('"100","101","102"', bigInteger1)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_28">
+          <text><![CDATA['101 in "100", "101", "102"']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_29">
+          <text><![CDATA[${collection:allOf('"100","101","102"', collection7)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_29">
+          <text><![CDATA['100 and 101 in "100", "101", "102"']]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+          <inputEntry id="inputEntry_1_30">
+            <text><![CDATA[${collection:contains('"2021-02-01","2021-02-02"', date1)}]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_2_30">
+            <text><![CDATA['"2021-02-02" in "2021-02-01","2021-02-02"']]></text>
+          </outputEntry>
+        </rule>
+       <rule>
+          <inputEntry id="inputEntry_1_31">
+            <text><![CDATA[${collection:contains('"2021-02-01","2021-02-02"', "2021-02-02")}]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_2_31">
+            <text><![CDATA['"2021-02-02" in "2021-02-01","2021-02-02"']]></text>
+          </outputEntry>
+        </rule>
+    </decisionTable>
+  </decision>
+</definitions>

@@ -12,9 +12,12 @@
  */
 package org.flowable.engine.test.api.repository;
 
-import org.flowable.engine.common.api.FlowableException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author jbarrez
@@ -26,14 +29,12 @@ public class DeployNonExecutableProcessDefinitionTest extends PluggableFlowableT
      * 
      * In this test, a process definition is deployed together with one that is not executable. The none-executable should not be startable.
      */
+    @Test
     @Deployment
     public void testDeployNonExecutableProcessDefinition() {
-        try {
-            runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable");
-            fail();
-        } catch (FlowableException e) {
-            assertTextPresent("no processes deployed with key 'oneTaskProcessNonExecutable'", e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneTaskProcessNonExecutable"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No process definition found for key 'oneTaskProcessNonExecutable'");
     }
 
 }

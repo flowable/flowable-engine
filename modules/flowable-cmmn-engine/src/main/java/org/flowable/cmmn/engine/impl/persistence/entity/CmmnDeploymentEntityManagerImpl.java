@@ -16,29 +16,31 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<CmmnDeploymentEntity> implements CmmnDeploymentEntityManager {
-
-    protected CmmnDeploymentDataManager deploymentDataManager;
+public class CmmnDeploymentEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, CmmnDeploymentEntity, CmmnDeploymentDataManager>
+    implements CmmnDeploymentEntityManager {
 
     public CmmnDeploymentEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnDeploymentDataManager deploymentDataManager) {
-        super(cmmnEngineConfiguration);
-        this.deploymentDataManager = deploymentDataManager;
-    }
-
-    @Override
-    protected DataManager<CmmnDeploymentEntity> getDataManager() {
-        return deploymentDataManager;
+        super(cmmnEngineConfiguration, deploymentDataManager);
     }
 
     @Override
@@ -56,47 +58,125 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
         CaseDefinitionEntityManager caseDefinitionEntityManager = getCaseDefinitionEntityManager();
         List<CaseDefinition> caseDefinitions = caseDefinitionEntityManager.createCaseDefinitionQuery().deploymentId(deploymentId).list();
         for (CaseDefinition caseDefinition : caseDefinitions) {
+            engineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()
+                .deleteIdentityLinksByScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
+            engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                .deleteEventSubscriptionsForScopeDefinitionIdAndType(caseDefinition.getId(), ScopeTypes.CMMN);
+            
             if (cascade) {
                 caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId(), true);
             } else {
                 caseDefinitionEntityManager.delete(caseDefinition.getId());
             }
+
+            // If previous case definition version has an event registry start event, it must be added
+            // Only if the currently deleted case definition is the latest version,
+            // we fall back to the previous event registry start event
+            restorePreviousStartEventsIfNeeded(caseDefinition);
         }
         getCmmnResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));
     }
 
+    protected void restorePreviousStartEventsIfNeeded(CaseDefinition caseDefinition) {
+        CaseDefinitionEntity latestCaseDefinition = findLatestCaseDefinition(caseDefinition);
+        if (latestCaseDefinition != null && caseDefinition.getId().equals(latestCaseDefinition.getId())) {
+
+            // Try to find a previous version (it could be some versions are missing due to deletions)
+            CaseDefinition previousCaseDefinition = findNewLatestCaseDefinitionAfterRemovalOf(caseDefinition);
+            if (previousCaseDefinition != null) {
+                CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
+                Case caseModel = cmmnModel.getPrimaryCase();
+                String startEventType = caseModel.getStartEventType();
+                if (startEventType != null) {
+                    restoreEventRegistryStartEvent(previousCaseDefinition, caseModel, startEventType);
+                }
+            }
+        }
+    }
+
+    protected void restoreEventRegistryStartEvent(CaseDefinition previousCaseDefinition, Case caseModel, String startEventType) {
+        engineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService()
+                .createEventSubscriptionBuilder()
+                .eventType(startEventType)
+                .configuration(CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel))
+                .scopeDefinitionId(previousCaseDefinition.getId())
+                .scopeType(ScopeTypes.CMMN)
+                .tenantId(previousCaseDefinition.getTenantId())
+                .create();
+    }
+
+    protected CaseDefinitionEntity findLatestCaseDefinition(CaseDefinition caseDefinition) {
+        CaseDefinitionEntity latestCaseDefinition = null;
+        if (caseDefinition.getTenantId() != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinition.getTenantId())) {
+            latestCaseDefinition = getCaseDefinitionEntityManager()
+                    .findLatestCaseDefinitionByKeyAndTenantId(caseDefinition.getKey(), caseDefinition.getTenantId());
+        } else {
+            latestCaseDefinition = getCaseDefinitionEntityManager()
+                    .findLatestCaseDefinitionByKey(caseDefinition.getKey());
+        }
+        return latestCaseDefinition;
+    }
+
+    protected CaseDefinition findNewLatestCaseDefinitionAfterRemovalOf(CaseDefinition caseDefinitionToBeRemoved) {
+
+        // The case definition is not necessarily the one with 'version -1' (some versions could have been deleted)
+        // Hence, the following logic
+
+        CaseDefinitionQuery query = getCaseDefinitionEntityManager().createCaseDefinitionQuery();
+        query.caseDefinitionKey(caseDefinitionToBeRemoved.getKey());
+
+        if (caseDefinitionToBeRemoved.getTenantId() != null
+                && !CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinitionToBeRemoved.getTenantId())) {
+            query.caseDefinitionTenantId(caseDefinitionToBeRemoved.getTenantId());
+        } else {
+            query.caseDefinitionWithoutTenantId();
+        }
+
+        if (caseDefinitionToBeRemoved.getVersion() > 0) {
+            query.caseDefinitionVersionLowerThan(caseDefinitionToBeRemoved.getVersion());
+        }
+        query.orderByCaseDefinitionVersion().desc();
+
+        List<CaseDefinition> caseDefinitions = query.listPage(0, 1);
+        if (caseDefinitions != null && caseDefinitions.size() > 0) {
+            return caseDefinitions.get(0);
+        }
+        return null;
+    }
+
     @Override
     public CmmnDeploymentEntity findLatestDeploymentByName(String deploymentName) {
-        return deploymentDataManager.findLatestDeploymentByName(deploymentName);
+        return dataManager.findLatestDeploymentByName(deploymentName);
     }
     
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return deploymentDataManager.getDeploymentResourceNames(deploymentId);
+        return dataManager.getDeploymentResourceNames(deploymentId);
     }
     
     @Override
     public CmmnDeploymentQuery createDeploymentQuery() {
-        return new CmmnDeploymentQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new CmmnDeploymentQueryImpl(engineConfiguration.getCommandExecutor());
     }
     
     @Override
     public List<CmmnDeployment> findDeploymentsByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentsByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
     
     @Override
     public long findDeploymentCountByQueryCriteria(CmmnDeploymentQuery deploymentQuery) {
-        return deploymentDataManager.findDeploymentCountByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
+        return dataManager.findDeploymentCountByQueryCriteria((CmmnDeploymentQueryImpl) deploymentQuery);
     }
 
-    public CmmnDeploymentDataManager getDeploymentDataManager() {
-        return deploymentDataManager;
+    protected CmmnResourceEntityManager getCmmnResourceEntityManager() {
+        return engineConfiguration.getCmmnResourceEntityManager();
     }
 
-    public void setDeploymentDataManager(CmmnDeploymentDataManager deploymentDataManager) {
-        this.deploymentDataManager = deploymentDataManager;
+    protected CaseDefinitionEntityManager getCaseDefinitionEntityManager() {
+        return engineConfiguration.getCaseDefinitionEntityManager();
     }
 
 }

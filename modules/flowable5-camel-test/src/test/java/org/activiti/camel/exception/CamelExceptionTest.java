@@ -22,9 +22,9 @@ import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -61,7 +61,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
-            camelContext.stopRoute(r.getId());
+            camelContext.getRouteController().stopRoute(r.getId());
             camelContext.removeRoute(r.getId());
         }
     }
@@ -86,8 +86,8 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         try {
             runtimeService.startProcessInstanceByKey("exceptionInRouteSynchron");
         } catch (FlowableException e) {
-            assertEquals(Exception.class, e.getCause().getCause().getClass());
-            assertEquals("arbitrary non bpmn exception", e.getCause().getCause().getMessage());
+            assertEquals(Exception.class, e.getCause().getClass());
+            assertEquals("arbitrary non bpmn exception", e.getCause().getMessage());
 
             assertFalse(ExceptionServiceMock.isCalled());
             assertFalse(NoExceptionServiceMock.isCalled());

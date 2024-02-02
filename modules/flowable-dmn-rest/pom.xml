@@ -10,13 +10,14 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jetty.version>11.0.16</jetty.version>
         <flowable.artifact>
-            org.flowable.rest.dmn.service
+            org.flowable.dmn.rest.service
         </flowable.artifact>
     </properties>
 
@@ -115,15 +116,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>jsr250-api</artifactId>
-            <version>1.0</version>
-        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -134,6 +126,16 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.json-unit</groupId>
+            <artifactId>json-unit-assertj</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -180,61 +182,64 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
-            <groupId>org.eclipse.jetty.orbit</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0.0.v201112011016</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-io</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>8.1.16.v20140903</version>
+            <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -242,40 +247,12 @@
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>1.5.16</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-models</artifactId>
-            <version>1.5.16</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

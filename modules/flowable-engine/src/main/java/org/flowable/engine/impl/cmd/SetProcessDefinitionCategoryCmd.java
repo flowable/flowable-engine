@@ -12,14 +12,16 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -46,7 +48,8 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Process definition id is null");
         }
 
-        ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessDefinitionEntity processDefinition = processEngineConfiguration.getProcessDefinitionEntityManager().findById(processDefinitionId);
 
         if (processDefinition == null) {
             throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
@@ -61,14 +64,16 @@ public class SetProcessDefinitionCategoryCmd implements Command<Void> {
         // Update category
         processDefinition.setCategory(category);
 
-        // Remove process definition from cache, it will be refetched later
-        DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessDefinitionCache();
+        // Remove process definition from cache, it will be refetch later
+        DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache = processEngineConfiguration.getProcessDefinitionCache();
         if (processDefinitionCache != null) {
             processDefinitionCache.remove(processDefinitionId);
         }
 
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition));
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, processDefinition),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return null;

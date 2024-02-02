@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * An event related to group memberships.

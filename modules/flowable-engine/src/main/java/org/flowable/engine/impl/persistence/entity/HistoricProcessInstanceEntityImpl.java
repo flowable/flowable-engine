@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.context.Context;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -34,6 +35,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     protected String endActivityId;
     protected String businessKey;
+    protected String businessStatus;
     protected String startUserId;
     protected String startActivityId;
     protected String superProcessInstanceId;
@@ -45,9 +47,13 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String processDefinitionKey;
     protected String processDefinitionName;
     protected Integer processDefinitionVersion;
+    protected String processDefinitionCategory;
     protected String deploymentId;
     protected String callbackId;
     protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String propagatedStageInstanceId;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -55,25 +61,30 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     public HistoricProcessInstanceEntityImpl(ExecutionEntity processInstance) {
-        id = processInstance.getId();
-        processInstanceId = processInstance.getId();
-        businessKey = processInstance.getBusinessKey();
-        name = processInstance.getName();
-        processDefinitionId = processInstance.getProcessDefinitionId();
-        processDefinitionKey = processInstance.getProcessDefinitionKey();
-        processDefinitionName = processInstance.getProcessDefinitionName();
-        processDefinitionVersion = processInstance.getProcessDefinitionVersion();
-        deploymentId = processInstance.getDeploymentId();
-        startActivityId = processInstance.getStartActivityId();
-        startTime = processInstance.getStartTime();
-        startUserId = processInstance.getStartUserId();
-        superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
-        callbackId = processInstance.getCallbackId();
-        callbackType = processInstance.getCallbackType();
-        
+        this.id = processInstance.getId();
+        this.processInstanceId = processInstance.getId();
+        this.businessKey = processInstance.getBusinessKey();
+        this.businessStatus = processInstance.getBusinessStatus();
+        this.name = processInstance.getName();
+        this.processDefinitionId = processInstance.getProcessDefinitionId();
+        this.processDefinitionKey = processInstance.getProcessDefinitionKey();
+        this.processDefinitionName = processInstance.getProcessDefinitionName();
+        this.processDefinitionVersion = processInstance.getProcessDefinitionVersion();
+        this.processDefinitionCategory = processInstance.getProcessDefinitionCategory();
+        this.deploymentId = processInstance.getDeploymentId();
+        this.startActivityId = processInstance.getStartActivityId();
+        this.startTime = processInstance.getStartTime();
+        this.startUserId = processInstance.getStartUserId();
+        this.superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
+        this.callbackId = processInstance.getCallbackId();
+        this.callbackType = processInstance.getCallbackType();
+        this.referenceId = processInstance.getReferenceId();
+        this.referenceType = processInstance.getReferenceType();
+        this.propagatedStageInstanceId = processInstance.getPropagatedStageInstanceId();
+
         // Inherit tenant id (if applicable)
         if (processInstance.getTenantId() != null) {
-            tenantId = processInstance.getTenantId();
+            this.tenantId = processInstance.getTenantId();
         }
     }
 
@@ -83,6 +94,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("startTime", startTime);
         persistentState.put("endTime", endTime);
         persistentState.put("businessKey", businessKey);
+        persistentState.put("businessStatus", businessStatus);
         persistentState.put("name", name);
         persistentState.put("durationInMillis", durationInMillis);
         persistentState.put("deleteReason", deleteReason);
@@ -92,9 +104,13 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("processDefinitionKey", processDefinitionKey);
         persistentState.put("processDefinitionName", processDefinitionName);
         persistentState.put("processDefinitionVersion", processDefinitionVersion);
+        persistentState.put("processDefinitionCategory", processDefinitionCategory);
         persistentState.put("deploymentId", deploymentId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
+        persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         return persistentState;
     }
 
@@ -118,6 +134,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    @Override
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    @Override
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     @Override
@@ -237,6 +263,16 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     }
 
     @Override
+    public String getProcessDefinitionCategory() {
+        return processDefinitionCategory;
+    }
+
+    @Override
+    public void setProcessDefinitionCategory(String processDefinitionCategory) {
+        this.processDefinitionCategory = processDefinitionCategory;
+    }
+
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -264,6 +300,36 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    @Override
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    @Override
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @Override
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    @Override
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    @Override
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
     }
 
     @Override
@@ -296,6 +362,22 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     @Override
     public String toString() {
-        return "HistoricProcessInstanceEntity[superProcessInstanceId=" + superProcessInstanceId + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricProcessInstanceEntity[id=").append(getId())
+                .append(", definition=").append(getProcessDefinitionId());
+        if (superProcessInstanceId != null) {
+            sb.append(", superProcessInstanceId=").append(superProcessInstanceId);
+        }
+
+        if (referenceId != null) {
+            sb.append(", referenceId=").append(referenceId)
+                    .append(", referenceType=").append(referenceType);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

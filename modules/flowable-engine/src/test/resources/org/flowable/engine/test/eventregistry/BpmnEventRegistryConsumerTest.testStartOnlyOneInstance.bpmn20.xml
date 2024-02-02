@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="correlation">
+  
+    <startEvent id="theStart">
+        <extensionElements>
+            <flowable:eventType>myEvent</flowable:eventType>
+            <flowable:startEventCorrelationConfiguration><![CDATA[storeAsUniqueReferenceId]]></flowable:startEventCorrelationConfiguration>
+        </extensionElements>
+    </startEvent>
+    
+    <sequenceFlow sourceRef="theStart" targetRef="task" />
+    
+    <userTask id="task" />
+  	
+  	<sequenceFlow sourceRef="task" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -17,21 +17,29 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.query.AbstractQuery;
 
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance> implements MilestoneInstanceQuery {
-    
+public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQuery, MilestoneInstance>
+        implements MilestoneInstanceQuery, CacheAwareQuery<MilestoneInstanceEntity> {
+
+    protected String milestoneInstanceId;
     protected String name;
     protected String caseInstanceId;
     protected String caseDefinitionId;
     protected Date reachedBefore;
     protected Date reachedAfter;
+    protected String tenantId;
+    protected String tenantIdLike;
+    protected boolean withoutTenantId;
     
     public MilestoneInstanceQueryImpl() {
         
@@ -39,6 +47,12 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
     
     public MilestoneInstanceQueryImpl(CommandExecutor commandExecutor) {
         super(commandExecutor);
+    }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceId(String milestoneInstanceId) {
+        this.milestoneInstanceId = milestoneInstanceId;
+        return this;
     }
 
     @Override
@@ -70,6 +84,30 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
         this.reachedAfter = reachedAfter;
         return this;
     }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceTenantIdLike(String tenantIdLike) {
+        if (tenantIdLike == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        this.tenantIdLike = tenantIdLike;
+        return this;
+    }
+    
+    @Override
+    public MilestoneInstanceQuery milestoneInstanceWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
     @Override
     public MilestoneInstanceQuery orderByMilestoneName() {
@@ -91,6 +129,15 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
         return CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).findMilestoneInstancesByQueryCriteria(this);
     }
 
+    public String getMilestoneInstanceId() {
+        return milestoneInstanceId;
+    }
+    
+    @Override
+    public String getId() {
+        return milestoneInstanceId;
+    }
+
     public String getName() {
         return name;
     }
@@ -109,6 +156,18 @@ public class MilestoneInstanceQueryImpl extends AbstractQuery<MilestoneInstanceQ
 
     public Date getReachedAfter() {
         return reachedAfter;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public String getTenantIdLike() {
+        return tenantIdLike;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
     }
     
 }

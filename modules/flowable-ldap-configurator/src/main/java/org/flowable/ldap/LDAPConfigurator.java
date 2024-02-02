@@ -12,11 +12,12 @@
  */
 package org.flowable.ldap;
 
-import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.EngineConfigurator;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
-import org.flowable.engine.impl.util.EngineServiceUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.EngineConfigurator;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 
 /**
  * A {@link EngineConfigurator} that integrates a LDAP system with the Flowable process engine. The LDAP system will be consulted primarily for getting user information and in particular for
@@ -58,8 +59,8 @@ public class LDAPConfigurator extends IdmEngineConfigurator {
         
         super.configure(engineConfiguration);
         
-        EngineServiceUtil.getIdmEngineConfiguration(engineConfiguration)
-                .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache));
+        getIdmEngineConfiguration(engineConfiguration)
+                .setIdmIdentityService(new LDAPIdentityServiceImpl(ldapConfiguration, ldapGroupCache, idmEngineConfiguration));
     }
 
     // Getters and Setters //////////////////////////////////////////////////
@@ -70,6 +71,10 @@ public class LDAPConfigurator extends IdmEngineConfigurator {
 
     public void setLdapConfiguration(LDAPConfiguration ldapConfiguration) {
         this.ldapConfiguration = ldapConfiguration;
+    }
+
+    protected static IdmEngineConfiguration getIdmEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (IdmEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
 
 }

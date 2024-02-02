@@ -16,6 +16,8 @@ package org.flowable.engine;
 import java.util.List;
 
 import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
+import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
+import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -25,6 +27,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public interface DynamicBpmnService {
+    
+    void injectUserTaskInProcessInstance(String processInstanceId, DynamicUserTaskBuilder dynamicUserTaskBuilder);
+
+    void injectParallelUserTask(String taskId, DynamicUserTaskBuilder dynamicUserTaskBuilder);
+    
+    void injectEmbeddedSubProcessInProcessInstance(String processInstanceId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder);
+
+    void injectParallelEmbeddedSubProcess(String taskId, DynamicEmbeddedSubProcessBuilder dynamicEmbeddedSubProcessBuilder);
 
     ObjectNode getProcessDefinitionInfo(String processDefinitionId);
 
@@ -45,6 +55,18 @@ public interface DynamicBpmnService {
     ObjectNode changeScriptTaskScript(String id, String script);
 
     void changeScriptTaskScript(String id, String script, ObjectNode infoNode);
+    
+    ObjectNode changeSkipExpression(String id, String skipExpression);
+
+    void changeSkipExpression(String id, String skipExpression, ObjectNode infoNode);
+    
+    void removeSkipExpression(String id, ObjectNode infoNode);
+    
+    ObjectNode enableSkipExpression();
+    
+    void enableSkipExpression(ObjectNode infoNode);
+    
+    void removeEnableSkipExpression(ObjectNode infoNode);
 
     ObjectNode changeUserTaskName(String id, String name);
 
@@ -89,9 +111,10 @@ public interface DynamicBpmnService {
     /**
      * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
+     *
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -105,9 +128,9 @@ public interface DynamicBpmnService {
      * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list. Previous values for the BPMN Element with
      * {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -121,9 +144,9 @@ public interface DynamicBpmnService {
     /**
      * Creates a new processDefinitionInfo with {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} for the given BPMN element.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -137,9 +160,9 @@ public interface DynamicBpmnService {
      * Updates a processDefinitionInfo's {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} with the new list. Previous values for the BPMN Element with
      * {@link DynamicBpmnConstants#USER_TASK_CANDIDATE_USERS} as key are ignored.
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to call {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param id
      *            the bpmn element id (ex. sid-3392FDEE-DD6F-484E-97FE-55F30BFEA77E)
@@ -162,6 +185,10 @@ public interface DynamicBpmnService {
 
     void changeSequenceFlowCondition(String id, String condition, ObjectNode infoNode);
 
+    ObjectNode changeCallActivityCalledElement(String id, String calledElement);
+
+    void changeCallActivityCalledElement(String id, String calledElement, ObjectNode infoNode);
+
     ObjectNode getBpmnElementProperties(String id, ObjectNode infoNode);
 
     ObjectNode changeLocalizationName(String language, String id, String value);
@@ -179,9 +206,9 @@ public interface DynamicBpmnService {
      * Clears the field from the infoNode. So the engine uses the {@link org.flowable.bpmn.model.BpmnModel} value On next instance.
      * </p>
      *
-     * <p color="red">
+     * <span style="color:red">
      * Don't forget to save the modified infoNode by calling {@link DynamicBpmnService#saveProcessDefinitionInfo(String, ObjectNode)}
-     * </p>
+     * </span>
      *
      * @param elementId
      *            the flow elements id.

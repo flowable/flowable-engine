@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 
 public class TestExceptionFlowableEventListener implements FlowableEventListener {
 
@@ -33,4 +33,13 @@ public class TestExceptionFlowableEventListener implements FlowableEventListener
         return failOnException;
     }
 
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return false;
+    }
+
+    @Override
+    public String getOnTransaction() {
+        return null;
+    }
 }

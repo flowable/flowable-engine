@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="parallelIntermediateTimers" name="Parallel timer intermediate events">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="gateway"/>
+
+        <parallelGateway id="gateway"/>
+        <sequenceFlow id="flow2.1" sourceRef="gateway" targetRef="timer1"/>
+        <sequenceFlow id="flow2.2" sourceRef="gateway" targetRef="timer2"/>
+
+        <intermediateCatchEvent id="timer1">
+            <timerEventDefinition>
+                <timeDuration>PT5M</timeDuration>
+            </timerEventDefinition>
+        </intermediateCatchEvent>
+        <serviceTask id="increaseCounterPath1" flowable:class="org.flowable.engine.test.bpmn.event.timer.IntermediateTimerEventTestCounter"/>
+
+        <intermediateCatchEvent id="timer2">
+            <timerEventDefinition>
+                <timeDuration>PT5M</timeDuration>
+            </timerEventDefinition>
+        </intermediateCatchEvent>
+        <serviceTask id="increaseCounterPath2"
+                     flowable:class="org.flowable.engine.test.bpmn.event.timer.IntermediateTimerEventTestCounter"/>
+
+
+        <sequenceFlow id="flow3.1" sourceRef="timer1" targetRef="increaseCounterPath1"/>
+        <sequenceFlow id="flow3.2" sourceRef="timer2" targetRef="increaseCounterPath2"/>
+        <sequenceFlow id="flow4.1" sourceRef="increaseCounterPath1" targetRef="theEnd1"/>
+        <sequenceFlow id="flow4.2" sourceRef="increaseCounterPath2" targetRef="theEnd2"/>
+
+        <endEvent id="theEnd1"/>
+        <endEvent id="theEnd2"/>
+
+    </process>
+
+</definitions>

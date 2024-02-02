@@ -25,8 +25,8 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,9 +126,9 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                     boolean reachable = false;
                     PvmTransition pvmTransition = ((ExecutionEntity) concurrentExecution).getTransitionBeingTaken();
                     if (pvmTransition != null) {
-                        reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<PvmActivity>());
+                        reachable = isReachable(pvmTransition.getDestination(), activity, new HashSet<>());
                     } else {
-                        reachable = isReachable(concurrentExecution.getActivity(), activity, new HashSet<PvmActivity>());
+                        reachable = isReachable(concurrentExecution.getActivity(), activity, new HashSet<>());
                     }
 
                     if (reachable) {

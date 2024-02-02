@@ -15,7 +15,7 @@ package org.activiti.engine.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 
 /**
  * A single process variable containing the last value when its process instance has finished. It is only available when HISTORY_LEVEL is set >= VARIABLE

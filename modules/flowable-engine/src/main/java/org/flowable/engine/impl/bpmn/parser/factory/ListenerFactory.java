@@ -14,15 +14,15 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FlowableListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.task.service.delegate.TaskListener;
 
 /**
  * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate the behaviour classes for {@link TaskListener} and {@link ExecutionListener} usages.
@@ -38,31 +38,35 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public interface ListenerFactory {
 
-    public abstract TaskListener createClassDelegateTaskListener(FlowableListener listener);
+    TaskListener createClassDelegateTaskListener(FlowableListener listener);
 
-    public abstract TaskListener createExpressionTaskListener(FlowableListener listener);
+    TaskListener createExpressionTaskListener(FlowableListener listener);
 
-    public abstract TaskListener createDelegateExpressionTaskListener(FlowableListener listener);
+    TaskListener createDelegateExpressionTaskListener(FlowableListener listener);
 
-    public abstract ExecutionListener createClassDelegateExecutionListener(FlowableListener listener);
+    TaskListener createScriptTypeTaskListener(FlowableListener listener);
 
-    public abstract ExecutionListener createExpressionExecutionListener(FlowableListener listener);
+    ExecutionListener createClassDelegateExecutionListener(FlowableListener listener);
 
-    public abstract ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener);
+    ExecutionListener createExpressionExecutionListener(FlowableListener listener);
 
-    public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener);
+    ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener);
 
-    public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
+    ExecutionListener createScriptTypeExecutionListener(FlowableListener listener);
 
-    public abstract FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
+    TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener);
 
-    public abstract FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
+    FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
 
-    public abstract CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener listener);
+    FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
 
-    public abstract CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener listener);
+    FlowableEventListener createEventThrowingEventListener(EventListener eventListener);
 
-    public abstract CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener listener);
+    CustomPropertiesResolver createClassDelegateCustomPropertiesResolver(FlowableListener listener);
 
-    public abstract TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener);
+    CustomPropertiesResolver createExpressionCustomPropertiesResolver(FlowableListener listener);
+
+    CustomPropertiesResolver createDelegateExpressionCustomPropertiesResolver(FlowableListener listener);
+
+    TransactionDependentTaskListener createTransactionDependentDelegateExpressionTaskListener(FlowableListener listener);
 }

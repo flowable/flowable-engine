@@ -12,8 +12,9 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -41,8 +42,9 @@ public class SetTaskPriorityCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setPriority(priority);
-        CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
-        CommandContextUtil.getTaskService().updateTask(task, true);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        processEngineConfiguration.getActivityInstanceEntityManager().recordTaskInfoChange(task, processEngineConfiguration.getClock().getCurrentTime());
+        processEngineConfiguration.getTaskServiceConfiguration().getTaskService().updateTask(task, true);
         return null;
     }
 

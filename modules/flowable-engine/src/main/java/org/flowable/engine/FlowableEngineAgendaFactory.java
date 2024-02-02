@@ -12,7 +12,7 @@
  */
 package org.flowable.engine;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 public interface FlowableEngineAgendaFactory {
 

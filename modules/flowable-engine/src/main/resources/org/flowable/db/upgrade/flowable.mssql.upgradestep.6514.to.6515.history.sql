@@ -1,0 +1,1 @@
+alter table ACT_HI_ACTINST add TRANSACTION_ORDER_ int;

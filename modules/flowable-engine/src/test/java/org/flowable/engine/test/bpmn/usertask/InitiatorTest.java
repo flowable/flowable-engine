@@ -13,14 +13,18 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
  */
 public class InitiatorTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testInitiator() {
         try {
@@ -30,10 +34,11 @@ public class InitiatorTest extends PluggableFlowableTestCase {
             identityService.setAuthenticatedUserId(null);
         }
 
-        assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
+        assertThat(taskService.createTaskQuery().taskAssignee("bono").count()).isEqualTo(1);
     }
 
     // See ACT-1372
+    @Test
     @Deployment
     public void testInitiatorWithWhiteSpaceInExpression() {
         try {
@@ -43,7 +48,7 @@ public class InitiatorTest extends PluggableFlowableTestCase {
             identityService.setAuthenticatedUserId(null);
         }
 
-        assertEquals(1, taskService.createTaskQuery().taskAssignee("bono").count());
+        assertThat(taskService.createTaskQuery().taskAssignee("bono").count()).isEqualTo(1);
     }
 
 }

@@ -1,0 +1,4 @@
+drop index ACT_IDX_ENT_LNK_SCOPE on ACT_RU_ENTITYLINK;
+drop index ACT_IDX_ENT_LNK_SCOPE_DEF on ACT_RU_ENTITYLINK;
+
+drop table if exists ACT_RU_ENTITYLINK;

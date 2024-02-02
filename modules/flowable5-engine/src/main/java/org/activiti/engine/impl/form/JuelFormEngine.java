@@ -12,9 +12,8 @@
  */
 package org.activiti.engine.impl.form;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.impl.context.Context;
@@ -67,14 +66,6 @@ public class JuelFormEngine implements FormEngine {
             throw new ActivitiObjectNotFoundException("Form with formKey '" + formKey + "' does not exist", String.class);
         }
 
-        byte[] resourceBytes = resourceStream.getBytes();
-        String encoding = "UTF-8";
-        String formTemplateString = "";
-        try {
-            formTemplateString = new String(resourceBytes, encoding);
-        } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("Unsupported encoding of :" + encoding, e);
-        }
-        return formTemplateString;
+        return new String(resourceStream.getBytes(), StandardCharsets.UTF_8);
     }
 }

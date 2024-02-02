@@ -17,13 +17,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 import org.flowable.task.api.Task;
 
 /**
  * Qualifier annotation for injecting the current taskId.
- * <p />
+ * <p>
  * Example:
  * 
  * <pre>

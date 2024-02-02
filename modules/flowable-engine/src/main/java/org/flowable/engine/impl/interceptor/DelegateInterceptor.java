@@ -20,7 +20,7 @@ import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
  * <ul>
  * <li>{@link org.flowable.engine.delegate.JavaDelegate}</li>
  * <li>{@link org.flowable.engine.delegate.ExecutionListener}</li>
- * <li>{@link org.flowable.engine.delegate.Expression}</li>
+ * <li>JUEL Expression</li>
  * <li>{@link org.flowable.engine.delegate.TaskListener}</li>
  * </ul>
  * 
@@ -30,6 +30,6 @@ import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
  */
 public interface DelegateInterceptor {
 
-    public void handleInvocation(DelegateInvocation invocation);
+    void handleInvocation(DelegateInvocation invocation);
 
 }

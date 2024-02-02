@@ -12,48 +12,34 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
-import org.junit.Test;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * Test for ACT-1657
  * 
  * @author Frederik Heremans
  */
-public class EventBasedGatewayConverterTest extends AbstractConverterTest {
+class EventBasedGatewayConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "eventgatewaymodel.bpmn";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("eventgatewaymodel.bpmn")
+    void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("eventBasedGateway");
-        assertNotNull(flowElement);
-        assertTrue(flowElement instanceof EventGateway);
+        assertThat(flowElement).isInstanceOf(EventGateway.class);
 
         EventGateway gateway = (EventGateway) flowElement;
         List<FlowableListener> listeners = gateway.getExecutionListeners();
-        assertEquals(1, listeners.size());
-        FlowableListener listener = listeners.get(0);
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
-        assertEquals("org.test.TestClass", listener.getImplementation());
-        assertEquals("start", listener.getEvent());
+        assertThat(listeners)
+                .extracting(FlowableListener::getImplementationType, FlowableListener::getImplementation, FlowableListener::getEvent)
+                .containsExactly(tuple(ImplementationType.IMPLEMENTATION_TYPE_CLASS, "org.test.TestClass", "start"));
     }
 }

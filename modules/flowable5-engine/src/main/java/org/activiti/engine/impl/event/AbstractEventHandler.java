@@ -23,6 +23,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
 /**
@@ -39,7 +40,7 @@ public abstract class AbstractEventHandler implements EventHandler {
 
         if (activity == null) {
             throw new ActivitiException("Error while sending signal for event subscription '" + eventSubscription.getId() + "': "
-                    + "no activity associated with event subscription");
+                    + "no activity associated with event subscription. Hint: The activityId of this event should be present in the BPMN.");
         }
 
         if (payload instanceof Map) {
@@ -109,7 +110,8 @@ public abstract class AbstractEventHandler implements EventHandler {
                         execution.getProcessInstanceId(), execution.getProcessDefinitionId(),
                         (String) activity.getProperties().get("type"),
                         activity.getActivityBehavior().getClass().getCanonicalName(),
-                        eventSubscription));
+                        eventSubscription),
+                EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
     }
 
 }

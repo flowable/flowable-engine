@@ -12,86 +12,29 @@
  */
 package org.flowable.engine.test.bpmn.servicetask;
 
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.PluggableFlowableExtension;
+import org.flowable.engine.impl.webservice.MockWebServiceExtension;
 import org.flowable.engine.impl.webservice.WebServiceMock;
-import org.flowable.engine.impl.webservice.WebServiceMockImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Esteban Robles Luna
  */
+@Tag("webservice")
+@Tag("pluggable")
+@ExtendWith(MockWebServiceExtension.class)
+@ExtendWith(PluggableFlowableExtension.class)
 public abstract class AbstractWebServiceTaskTest extends
-        PluggableFlowableTestCase {
+    AbstractFlowableTestCase {
 
     protected WebServiceMock webServiceMock;
-    private Server server;
 
-    @Override
-    protected void initializeProcessEngine() {
-        super.initializeProcessEngine();
-
-        webServiceMock = new WebServiceMockImpl();
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(WebServiceMock.class);
-        svrFactory.setAddress("http://localhost:63081/webservicemock");
-        svrFactory.setServiceBean(webServiceMock);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
-        server = svrFactory.create();
-        server.start();
+    @BeforeEach
+    protected void setUp(WebServiceMock webServiceMock) {
+        this.webServiceMock = webServiceMock;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        server.stop();
-        server.destroy();
-    }
-
-    // @Override
-    // protected void setUp() throws Exception {
-    // super.setUp();
-    // MuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-    // List<ConfigurationBuilder> builders = new
-    // ArrayList<ConfigurationBuilder>();
-    // builders.add(new
-    // SpringXmlConfigurationBuilder("org/activiti/test/mule/mule-cxf-webservice-config.xml"));
-    // MuleContextBuilder contextBuilder = new DefaultMuleContextBuilder();
-    // context = muleContextFactory.createMuleContext(builders, contextBuilder);
-    // context.start();
-    //
-    // DeploymentBuilder deploymentBuilder =
-    // processEngine.getRepositoryService()
-    // .createDeployment()
-    // .name(ClassNameUtil.getClassNameWithoutPackage(this.getClass()) + "." +
-    // this.getName());
-    //
-    // String resource =
-    // TestHelper.getBpmnProcessDefinitionResource(this.getClass(),
-    // this.getName());
-    // deploymentBuilder.addClasspathResource(resource);
-    //
-    // DeploymentBuilderImpl impl = (DeploymentBuilderImpl) deploymentBuilder;
-    // impl.getDeployment().setValidatingSchema(this.isValidating());
-    //
-    // deploymentId = deploymentBuilder.deploy().getId();
-    //
-    // counter = (Counter)
-    // context.getRegistry().lookupObject(org.mule.component.DefaultJavaComponent.class).getObjectFactory().getInstance(context);
-    //
-    // counter.initialize();
-    // }
-
-    protected boolean isValidating() {
-        return true;
-    }
-
-    // @Override
-    // protected void tearDown() throws Exception {
-    // super.tearDown();
-    // context.stop();
-    // }
 }

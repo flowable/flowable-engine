@@ -14,7 +14,7 @@ package org.activiti.engine.test.api.runtime;
 
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.HistoricProcessInstance;

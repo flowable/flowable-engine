@@ -14,6 +14,7 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,13 @@ public class BpmnModel {
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    protected Map<String, BpmnDiEdge> edgeMap = new LinkedHashMap<>();
     protected List<Signal> signals = new ArrayList<>();
     protected Map<String, MessageFlow> messageFlowMap = new LinkedHashMap<>();
     protected Map<String, Message> messageMap = new LinkedHashMap<>();
+    protected Map<String, List<String>> variableListenerToActivityMap = new HashMap<>();
     protected Map<String, String> errorMap = new LinkedHashMap<>();
+    protected Map<String, Escalation> escalationMap = new LinkedHashMap<>();
     protected Map<String, ItemDefinition> itemDefinitionMap = new LinkedHashMap<>();
     protected Map<String, DataStore> dataStoreMap = new LinkedHashMap<>();
     protected List<Pool> pools = new ArrayList<>();
@@ -49,8 +53,9 @@ public class BpmnModel {
     protected String sourceSystemId;
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
-    protected int nextFlowIdCounter = 1;
     protected Object eventSupport;
+    protected String exporter;
+    protected String exporterVersion;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
         return definitionsAttributes;
@@ -60,8 +65,9 @@ public class BpmnModel {
         List<ExtensionAttribute> attributes = getDefinitionsAttributes().get(name);
         if (attributes != null && !attributes.isEmpty()) {
             for (ExtensionAttribute attribute : attributes) {
-                if (namespace.equals(attribute.getNamespace()))
+                if (namespace.equals(attribute.getNamespace())) {
                     return attribute.getValue();
+                }
             }
         }
         return null;
@@ -84,10 +90,16 @@ public class BpmnModel {
 
     public Process getMainProcess() {
         if (!getPools().isEmpty()) {
-            return getProcess(getPools().get(0).getId());
-        } else {
-            return getProcess(null);
+            Process process = getProcess(getPools().get(0).getId());
+            if (process != null) {
+                return process;
+            }
         }
+        return getProcessWithoutPool();
+    }
+
+    private Process getProcessWithoutPool() {
+        return getProcess(null);
     }
 
     public Process getProcess(String poolRef) {
@@ -106,11 +118,15 @@ public class BpmnModel {
                 }
             }
 
-            if (poolRef == null && !foundPool) {
+            if (poolRef == null && !foundPool && process.isExecutable()) {
                 return process;
             } else if (poolRef != null && foundPool) {
                 return process;
             }
+        }
+        
+        if (poolRef == null && !processes.isEmpty()) {
+            return processes.get(0);
         }
 
         return null;
@@ -265,6 +281,14 @@ public class BpmnModel {
     public void removeFlowGraphicInfoList(String key) {
         flowLocationMap.remove(key);
     }
+    
+    public BpmnDiEdge getEdgeInfo(String key) {
+        return edgeMap.get(key);
+    }
+    
+    public void addEdgeInfo(String key, BpmnDiEdge edgeInfo) {
+        edgeMap.put(key, edgeInfo);
+    }
 
     public Map<String, GraphicInfo> getLocationMap() {
         return locationMap;
@@ -272,6 +296,10 @@ public class BpmnModel {
 
     public Map<String, List<GraphicInfo>> getFlowLocationMap() {
         return flowLocationMap;
+    }
+
+    public Map<String, BpmnDiEdge> getEdgeMap() {
+        return edgeMap;
     }
 
     public GraphicInfo getLabelGraphicInfo(String key) {
@@ -346,12 +374,16 @@ public class BpmnModel {
     }
 
     public Signal getSignal(String id) {
-        for (Signal signal : signals) {
-            if (id.equals(signal.getId())) {
-                return signal;
+        Signal foundSignal = null;
+        if (StringUtils.isNotEmpty(id)) {
+            for (Signal signal : signals) {
+                if (id.equals(signal.getId())) {
+                    foundSignal = signal;
+                    break;
+                }
             }
         }
-        return null;
+        return foundSignal;
     }
 
     public Map<String, MessageFlow> getMessageFlows() {
@@ -409,9 +441,35 @@ public class BpmnModel {
         }
         return result;
     }
-
+    
     public boolean containsMessageId(String messageId) {
         return messageMap.containsKey(messageId);
+    }
+    
+    public List<String> getActivityIdsForVariableListenerName(String variableName) {
+        return variableListenerToActivityMap.get(variableName);
+    }
+
+    public void addActivityIdForVariableListenerName(String variableName, String activityId) {
+        List<String> activityIds = null;
+        if (variableListenerToActivityMap.containsKey(variableName)) {
+            activityIds = variableListenerToActivityMap.get(variableName);
+        }
+        
+        if (activityIds == null) {
+            activityIds = new ArrayList<>();
+        }
+        
+        activityIds.add(activityId);
+        variableListenerToActivityMap.put(variableName, activityIds);
+    }
+
+    public boolean containsVariableListenerForVariableName(String variableName) {
+        return variableListenerToActivityMap.containsKey(variableName);
+    }
+    
+    public boolean hasVariableListeners() {
+        return !variableListenerToActivityMap.isEmpty();
     }
 
     public Map<String, String> getErrors() {
@@ -430,6 +488,34 @@ public class BpmnModel {
 
     public boolean containsErrorRef(String errorRef) {
         return errorMap.containsKey(errorRef);
+    }
+    
+    public Collection<Escalation> getEscalations() {
+        return escalationMap.values();
+    }
+
+    public void setEscalations(Map<String, Escalation> escalationMap) {
+        this.escalationMap = escalationMap;
+    }
+
+    public void addEscalation(String escalationRef, String escalationCode, String name) {
+        if (StringUtils.isNotEmpty(escalationRef)) {
+            escalationMap.put(escalationRef, new Escalation(escalationRef, name, escalationCode));
+        }
+    }
+    
+    public void addEscalation(Escalation escalation) {
+        if (StringUtils.isNotEmpty(escalation.getEscalationCode())) {
+            escalationMap.put(escalation.getEscalationCode(), escalation);
+        }
+    }
+
+    public boolean containsEscalationRef(String escalationRef) {
+        return escalationMap.containsKey(escalationRef);
+    }
+    
+    public Escalation getEscalation(String escalationRef) {
+        return escalationMap.get(escalationRef);
     }
 
     public Map<String, ItemDefinition> getItemDefinitions() {
@@ -563,5 +649,18 @@ public class BpmnModel {
 
     public void setEventSupport(Object eventSupport) {
         this.eventSupport = eventSupport;
+    }
+
+    public String getExporter() {
+        return exporter;
+    }
+    public void setExporter(String exporter) {
+        this.exporter = exporter;
+    }
+    public String getExporterVersion() {
+        return exporterVersion;
+    }
+    public void setExporterVersion(String exporterVersion) {
+        this.exporterVersion = exporterVersion;
     }
 }

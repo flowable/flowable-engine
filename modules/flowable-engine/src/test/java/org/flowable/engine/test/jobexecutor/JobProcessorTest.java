@@ -12,13 +12,17 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobProcessorContext;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the functionality of the {@link JobProcessor} and the persistence of the {@link JobInfo#getCustomValues()} field.
@@ -39,12 +43,12 @@ public class JobProcessorTest extends ResourceFlowableTestCase {
         super("org/flowable/engine/test/jobexecutor/JobProcessorTest.flowable.cfg.xml");
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        super.tearDown();
         CHECK_SUM.set(0);
     }
 
+    @Test
     @Deployment
     public void testIntermediateTimer() {
         // Arrange
@@ -62,6 +66,7 @@ public class JobProcessorTest extends ResourceFlowableTestCase {
         assertCheckSum(2);
     }
 
+    @Test
     @Deployment
     public void testAsyncTask() {
         // Arrange
@@ -96,13 +101,13 @@ public class JobProcessorTest extends ResourceFlowableTestCase {
             if (jobProcessorContext.isInPhase(JobProcessorContext.Phase.BEFORE_EXECUTE)) {
                 // check the random custom value as the before execute phase is executed in the async thread
                 String customValues = jobProcessorContext.getJobEntity().getCustomValues();
-                assertEquals("The custom values must be equal", randomCustomValues, customValues);
+                assertThat(customValues).as("The custom values must be equal").isEqualTo(randomCustomValues);
             }
         }
     }
 
     private static void assertCheckSum(int expectedCheckSum) {
-        assertEquals("The checksum must be equal", expectedCheckSum, CHECK_SUM.get());
+        assertThat(CHECK_SUM.get()).as("The checksum must be equal").isEqualTo(expectedCheckSum);
     }
 
 }

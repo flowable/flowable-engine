@@ -1,0 +1,26 @@
+{
+    "key": "partialPartitionsPart2",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topicPartitions": [
+        {
+            "topic": "test-customer-split-partitions",
+            "partitions": [
+                "3",
+                "5"
+            ]
+        }
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "partitionOutputName": "partition",
+    "customProperties": [
+        {
+            "name": "auto.offset.reset",
+            "value": "earliest"
+        }
+    ]
+}

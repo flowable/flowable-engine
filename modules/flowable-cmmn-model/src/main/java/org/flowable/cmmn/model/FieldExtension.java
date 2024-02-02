@@ -54,6 +54,7 @@ public class FieldExtension extends BaseElement {
         this.expression = expression;
     }
 
+    @Override
     public FieldExtension clone() {
         FieldExtension clone = new FieldExtension();
         clone.setValues(this);
@@ -63,14 +64,21 @@ public class FieldExtension extends BaseElement {
     @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FieldExtension)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof FieldExtension)) {
+            return false;
+        }
 
         FieldExtension that = (FieldExtension) o;
 
-        if (!getFieldName().equals(that.getFieldName())) return false;
-        if (getStringValue() != null ? !getStringValue().equals(that.getStringValue()) : that.getStringValue() != null)
+        if (!getFieldName().equals(that.getFieldName())) {
             return false;
+        }
+        if (getStringValue() != null ? !getStringValue().equals(that.getStringValue()) : that.getStringValue() != null) {
+            return false;
+        }
         return getExpression() != null ? getExpression().equals(that.getExpression()) : that.getExpression() == null;
     }
 
@@ -83,6 +91,7 @@ public class FieldExtension extends BaseElement {
     }
 
     public void setValues(FieldExtension otherExtension) {
+        super.setValues(otherExtension);
         setFieldName(otherExtension.getFieldName());
         setStringValue(otherExtension.getStringValue());
         setExpression(otherExtension.getExpression());

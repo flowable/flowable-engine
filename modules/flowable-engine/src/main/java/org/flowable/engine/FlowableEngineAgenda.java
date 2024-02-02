@@ -12,7 +12,11 @@
  */
 package org.flowable.engine;
 
+import java.util.Collection;
+
+import org.flowable.common.engine.impl.agenda.Agenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.interceptor.MigrationContext;
 
 /**
  * This interface exposes methods needed to manipulate the agenda implementation.
@@ -24,18 +28,30 @@ public interface FlowableEngineAgenda extends Agenda {
     void planContinueProcessOperation(ExecutionEntity execution);
 
     void planContinueProcessSynchronousOperation(ExecutionEntity execution);
+    
+    void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext);
 
     void planContinueProcessInCompensation(ExecutionEntity execution);
 
-    void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter);
+    void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter);
 
     void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions);
 
+    void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions);
+
     void planEndExecutionOperation(ExecutionEntity execution);
+    
+    void planEndExecutionOperationSynchronous(ExecutionEntity execution);
 
     void planTriggerExecutionOperation(ExecutionEntity execution);
 
+    void planAsyncTriggerExecutionOperation(ExecutionEntity execution);
+    
+    void planEvaluateConditionalEventsOperation(ExecutionEntity execution);
+    
+    void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId);
+
     void planDestroyScopeOperation(ExecutionEntity execution);
 
-    void planExecuteInactiveBehaviorsOperation();
+    void planExecuteInactiveBehaviorsOperation(Collection<ExecutionEntity> executions);
 }

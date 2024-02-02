@@ -12,39 +12,78 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Rich Kroll, Tijs Rademakers
+ * @author Filip Hrisafov
  */
 public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
     public void testScriptTaskListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Name does not match", "All your base are belong to us", task.getName());
+        assertThat(task.getName()).as("Name does not match").isEqualTo("All your base are belong to us");
 
         taskService.complete(task.getId());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
-            assertEquals("kermit", historicTask.getOwner());
+            assertThat(historicTask.getOwner()).isEqualTo("kermit");
 
             task = taskService.createTaskQuery().singleResult();
-            assertEquals("Task name not set with 'bar' variable", "BAR", task.getName());
+            assertThat(task.getName()).as("Task name not set with 'bar' variable").isEqualTo("BAR");
         }
 
         Object bar = runtimeService.getVariable(processInstance.getId(), "bar");
-        assertNull("Expected 'bar' variable to be local to script", bar);
+        assertThat(bar).as("Expected 'bar' variable to be local to script").isNull();
 
         Object foo = runtimeService.getVariable(processInstance.getId(), "foo");
-        assertEquals("Could not find the 'foo' variable in variable scope", "FOO", foo);
+        assertThat(foo).as("Could not find the 'foo' variable in variable scope").isEqualTo("FOO");
+    }
+
+    @Test
+    @Deployment
+    public void testThrowFlowableIllegalArgumentException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasNoCause()
+                .hasMessage("Illegal argument in listener");
+    }
+
+    /**
+     * Tests error trace enhancement by {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer} and
+     * {@link org.flowable.engine.impl.bpmn.listener.ScriptTaskListener}
+     */
+    @Test
+    @Deployment
+    public void testThrowNonFlowableException() {
+        ProcessDefinition processDef = repositoryService.createProcessDefinitionQuery().processDefinitionKey("scriptTaskListenerProcess")
+                .singleResult();
+
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess").getProcessDefinitionId())
+                .isInstanceOf(FlowableException.class)
+                .hasMessage(
+                        "JavaScript script evaluation failed: 'java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 7' Trace:"
+                                + " scopeType=bpmn, scopeDefinitionKey=scriptTaskListenerProcess, scopeDefinitionId=" + processDef.getId() + ","
+                                + " subScopeDefinitionKey=usertask1, tenantId=<empty>, type=taskListener")
+                .rootCause()
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Illegal argument in listener");
     }
 
 }

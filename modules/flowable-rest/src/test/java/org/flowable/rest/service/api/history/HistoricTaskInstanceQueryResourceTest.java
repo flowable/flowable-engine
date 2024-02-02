@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -50,6 +53,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic task instance. POST query/historic-task-instances
      */
+    @Test
     @Deployment
     public void testQueryTaskInstances() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();
@@ -125,6 +129,11 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("operation", "like");
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
 
+        variableNode.put("name", "stringVar");
+        variableNode.put("value", "AzEr%");
+        variableNode.put("operation", "likeIgnoreCase");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
         variableNode.put("name", "local");
         variableNode.put("value", "test");
         variableNode.put("operation", "equals");
@@ -150,6 +159,18 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processInstanceId", processInstance2.getId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task2.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("processInstanceIdWithChildren", processInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("processInstanceIdWithChildren", "nonexisting");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutProcessInstanceId", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskAssignee", "kermit");
@@ -234,6 +255,32 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("taskDefinitionKey", "processTask");
         assertResultsPresentInPostDataResponse(url, requestNode, finishedTaskProcess1.getId(), task2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("taskDefinitionKeys").add("processTask").add("processTask2");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId(), finishedTaskProcess1.getId(), task2.getId());
+        
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("withoutScopeId", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), finishedTaskProcess1.getId(), task2.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("taskCandidateGroup", "sales");
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
+
+        taskService.claim(task.getId(), "johnDoe");
+        requestNode.put("taskCandidateGroup", "sales");
+        requestNode.put("ignoreTaskAssignee", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {
@@ -243,7 +290,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (expectedTaskIds != null) {
@@ -253,7 +300,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
                 String id = it.next().get("id").textValue();
                 toBeFound.remove(id);
             }
-            assertTrue("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", "), toBeFound.isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
         }
     }
 }

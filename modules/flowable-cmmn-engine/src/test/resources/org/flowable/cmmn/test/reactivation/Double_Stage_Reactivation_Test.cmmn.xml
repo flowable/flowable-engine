@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="doubleStageReactivationTest" name="Double Stage Reactivation Test" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false" autoComplete="true">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItem2" name="Stage A" definitionRef="expandedStage1"></planItem>
+      <planItem id="planItem3" definitionRef="reactivateEventListener1"></planItem>
+      <planItem id="planItem5" name="Reactivation Stage" definitionRef="expandedStage2">
+        <entryCriterion id="entryCriterion1" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem3">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="expandedStage1" name="Stage A" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planItem1" name="Task A" definitionRef="humanTask1"></planItem>
+        <humanTask id="humanTask1" name="Task A" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+          <extensionElements>
+            <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+            <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+            <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          </extensionElements>
+        </humanTask>
+      </stage>
+      <eventListener id="reactivateEventListener1" flowable:eventType="reactivate">
+        <extensionElements>
+          <design:stencilid><![CDATA[ReactivateEventListener]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
+        </extensionElements>
+      </eventListener>
+      <stage id="expandedStage2" name="Reactivation Stage" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planItem4" name="Task B" definitionRef="humanTask2"></planItem>
+        <humanTask id="humanTask2" name="Task B" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+          <extensionElements>
+            <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+            <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+            <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          </extensionElements>
+        </humanTask>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_doubleStageReactivationTest">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="501.0" width="581.0" x="30.0" y="45.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="170.0" width="370.0" x="91.0" y="121.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="136.0" y="166.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="30.0" width="30.0" x="95.0" y="425.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="170.0" width="370.0" x="196.0" y="355.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_entryCriterion1" cmmnElementRef="entryCriterion1">
+        <dc:Bounds height="28.0" width="18.0" x="187.0" y="426.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="80.0" width="100.0" x="241.0" y="406.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector1" cmmnElementRef="planItem3" targetCMMNElementRef="entryCriterion1">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="124.94970104041296" y="440.08691739088107"></di:waypoint>
+        <di:waypoint x="187.00502211383454" y="440.44786925941247"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

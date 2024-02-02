@@ -13,17 +13,16 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.exception.FlowableConflictException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -35,16 +34,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -63,13 +66,12 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     })
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @GetMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json")
-    public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
+    public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope) {
 
-        List<RestVariable> result = new ArrayList<>();
         Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid task to get the variables for
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
         if (variableScope == null) {
@@ -84,17 +86,22 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             addLocalVariables(task, variableMap);
         }
 
+        if (restApiInterceptor != null) {
+            variableMap = restApiInterceptor.accessTaskVariables(task, variableMap);
+        }
+
         // Get unique variables from map
-        result.addAll(variableMap.values());
+        List<RestVariable> result = new ArrayList<>(variableMap.values());
         return result;
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create new variables on a task", tags = { "Tasks", "Task Variables" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "It's possible to create simple (non-binary) variable or list of variables or new binary variable \n"
+                    + "It is possible to create simple (non-binary) variable or list of variables or new binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.",
+            code = 201)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a task", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -113,9 +120,10 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
     })
     @PostMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
-    public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -138,7 +146,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             }
 
             if (inputVariables == null || inputVariables.size() == 0) {
-                throw new FlowableIllegalArgumentException("Request didn't contain a list of variables to create.");
+                throw new FlowableIllegalArgumentException("Request did not contain a list of variables to create.");
             }
 
             RestVariableScope sharedScope = null;
@@ -168,42 +176,55 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
                 variablesToSet.put(var.getName(), actualVariableValue);
-                resultVariables.add(restResponseFactory.createRestVariable(var.getName(), actualVariableValue, varScope, task.getId(), RestResponseFactory.VARIABLE_TASK, false));
             }
 
             if (!variablesToSet.isEmpty()) {
+                if (restApiInterceptor != null) {
+                    restApiInterceptor.createTaskVariables(task, variablesToSet, sharedScope);
+                }
+
+                Map<String, Object> setVariables;
                 if (sharedScope == RestVariableScope.LOCAL) {
                     taskService.setVariablesLocal(task.getId(), variablesToSet);
+                    setVariables = taskService.getVariablesLocal(task.getId(), variablesToSet.keySet());
                 } else {
                     if (task.getExecutionId() != null) {
                         // Explicitly set on execution, setting non-local
                         // variables on task will override local-variables if
                         // exists
                         runtimeService.setVariables(task.getExecutionId(), variablesToSet);
+                        setVariables = runtimeService.getVariables(task.getExecutionId(), variablesToSet.keySet());
                     } else {
                         // Standalone task, no global variables possible
                         throw new FlowableIllegalArgumentException("Cannot set global variables on task '" + task.getId() + "', task is not part of process.");
                     }
                 }
+
+                for (RestVariable inputVariable : inputVariables) {
+                    String variableName = inputVariable.getName();
+                    Object variableValue = setVariables.get(variableName);
+                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, varScope, task.getId(), RestResponseFactory.VARIABLE_TASK, false));
+                }
             }
         }
 
-        response.setStatus(HttpStatus.CREATED.value());
         return result;
     }
 
-    @ApiOperation(value = "Delete all local variables on a task", tags = { "Tasks" })
+    @ApiOperation(value = "Delete all local variables on a task", tags = { "Tasks" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates all local task variables have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/variables")
-    public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletResponse response) {
-        Task task = getTaskFromRequest(taskId);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId) {
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
         Collection<String> currentVariables = taskService.getVariablesLocal(task.getId()).keySet();
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskVariables(task, currentVariables, RestVariableScope.LOCAL);
+        }
         taskService.removeVariablesLocal(task.getId(), currentVariables);
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected void addGlobalVariables(Task task, Map<String, RestVariable> variableMap) {
@@ -211,10 +232,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             Map<String, Object> rawVariables = runtimeService.getVariables(task.getExecutionId());
             List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
 
-            // Overlay global variables over local ones. In case they are
-            // present the values are not overridden,
-            // since local variables get precedence over global ones at all
-            // times.
+            // Overlay global variables over local ones. In case they are present the values are not overridden,
+            // since local variables get precedence over global ones at all times.
             for (RestVariable var : globalVariables) {
                 if (!variableMap.containsKey(var.getName())) {
                     variableMap.put(var.getName(), var);

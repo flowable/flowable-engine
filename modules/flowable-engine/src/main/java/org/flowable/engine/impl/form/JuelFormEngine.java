@@ -12,16 +12,16 @@
  */
 package org.flowable.engine.impl.form;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
-import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -42,7 +42,11 @@ public class JuelFormEngine implements FormEngine {
         }
         String formTemplateString = getFormTemplateString(startForm, startForm.getFormKey());
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, null);
+        ScriptEngineRequest scriptEngineRequest = ScriptEngineRequest.builder()
+                .language(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE)
+                .script(formTemplateString)
+                .build();
+        return scriptingEngines.evaluate(scriptEngineRequest).getResult();
     }
 
     @Override
@@ -58,8 +62,12 @@ public class JuelFormEngine implements FormEngine {
         if (task.getExecutionId() != null) {
             executionEntity = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
         }
-        
-        return scriptingEngines.evaluate(formTemplateString, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE, executionEntity);
+
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(formTemplateString)
+                .language(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE)
+                .variableContainer(executionEntity);
+        return scriptingEngines.evaluate(builder.build()).getResult();
     }
 
     protected String getFormTemplateString(FormData formInstance, String formKey) {
@@ -71,14 +79,6 @@ public class JuelFormEngine implements FormEngine {
             throw new FlowableObjectNotFoundException("Form with formKey '" + formKey + "' does not exist", String.class);
         }
 
-        byte[] resourceBytes = resourceStream.getBytes();
-        String encoding = "UTF-8";
-        String formTemplateString = "";
-        try {
-            formTemplateString = new String(resourceBytes, encoding);
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unsupported encoding of :" + encoding, e);
-        }
-        return formTemplateString;
+        return new String(resourceStream.getBytes(), StandardCharsets.UTF_8);
     }
 }

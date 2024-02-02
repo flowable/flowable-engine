@@ -12,7 +12,13 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ReceiveTask;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
@@ -28,6 +34,20 @@ public class ReceiveTaskParseHandler extends AbstractActivityBpmnParseHandler<Re
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, ReceiveTask receiveTask) {
+
+        // Check if it's a receive task for receiving an eventregistry event
+        Map<String, List<ExtensionElement>> extensionElements = receiveTask.getExtensionElements();
+        if (!extensionElements.isEmpty()) {
+            List<ExtensionElement> eventTypeExtensionElements = receiveTask.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+            if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
+                String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventTypeValue)) {
+                    receiveTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createReceiveEventTaskActivityBehavior(receiveTask, eventTypeValue));
+                    return;
+                }
+            }
+        }
+
         receiveTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createReceiveTaskActivityBehavior(receiveTask));
     }
 

@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.management;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.job.service.impl.JobQueryProperty;
 
 /**
@@ -29,6 +29,7 @@ public class JobQueryProperties {
         PROPERTIES = new HashMap<>();
         PROPERTIES.put("id", JobQueryProperty.JOB_ID);
         PROPERTIES.put("dueDate", JobQueryProperty.DUEDATE);
+        PROPERTIES.put("createTime", JobQueryProperty.CREATE_TIME);
         PROPERTIES.put("executionId", JobQueryProperty.EXECUTION_ID);
         PROPERTIES.put("processInstanceId", JobQueryProperty.PROCESS_INSTANCE_ID);
         PROPERTIES.put("retries", JobQueryProperty.RETRIES);

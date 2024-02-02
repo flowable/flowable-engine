@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="caseForJobsAndEventSubscriptions" name="Case for Jobs and Event Subscriptions" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItemtimerEventListener1" name="Timer" definitionRef="timerEventListener1"></planItem>
+      <planItem id="planItemtimerEventListener2" name="Timer for a Deadletter Job" definitionRef="timerEventListener2"></planItem>
+      <planItem id="planItemserviceTask1" name="Service task for an async job" definitionRef="serviceTask1"></planItem>
+      <planItem id="planItemexternalWorkerTask1" name="External Worker task" definitionRef="externalWorkerTask1"></planItem>
+      <planItem id="planItemsignalEventListener1" name="A Signal" definitionRef="signalEventListener1"></planItem>
+      <sentry id="sentryexitCriterion2">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExitCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartexitCriterion2" sourceRef="planItemtimerEventListener2">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentryexitCriterion1">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExitCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartexitCriterion1" sourceRef="planItemtimerEventListener1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentryexitCriterion3">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExitCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartexitCriterion3" sourceRef="planItemsignalEventListener1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="timerEventListener1" name="Timer">
+        <extensionElements>
+          <design:stencilid><![CDATA[TimerEventListener]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
+        </extensionElements>
+        <timerExpression><![CDATA[P1Y]]></timerExpression>
+      </timerEventListener>
+      <timerEventListener id="timerEventListener2" name="Timer for a Deadletter Job">
+        <extensionElements>
+          <design:stencilid><![CDATA[TimerEventListener]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
+        </extensionElements>
+        <timerExpression><![CDATA[P1Y]]></timerExpression>
+      </timerEventListener>
+      <task id="serviceTask1" name="Service task for an async job" flowable:async="true" flowable:exclusive="true" flowable:type="java" flowable:expression="${true}">
+        <extensionElements>
+          <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </task>
+      <task id="externalWorkerTask1" name="External Worker task" flowable:type="external-worker" flowable:exclusive="false" flowable:topic="aJobTopic">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExternalWorkerTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </task>
+      <eventListener id="signalEventListener1" name="A Signal" flowable:eventType="signal" flowable:signalRef="aSignal">
+        <extensionElements>
+          <design:stencilid><![CDATA[SignalEventListener]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[EventListener]]></design:stencilsuperid>
+        </extensionElements>
+      </eventListener>
+      <exitCriterion id="exitCriterion2" sentryRef="sentryexitCriterion2"></exitCriterion>
+      <exitCriterion id="exitCriterion1" sentryRef="sentryexitCriterion1"></exitCriterion>
+      <exitCriterion id="exitCriterion3" sentryRef="sentryexitCriterion3"></exitCriterion>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_caseForJobsAndEventSubscriptions">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="339.0" width="581.0" x="30.0" y="30.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_exitCriterion2" cmmnElementRef="exitCriterion2">
+        <dc:Bounds height="28.0" width="18.0" x="375.0" y="355.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_exitCriterion1" cmmnElementRef="exitCriterion1">
+        <dc:Bounds height="28.0" width="18.0" x="210.0" y="355.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_exitCriterion3" cmmnElementRef="exitCriterion3">
+        <dc:Bounds height="28.0" width="18.0" x="525.0" y="355.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemtimerEventListener1" cmmnElementRef="planItemtimerEventListener1">
+        <dc:Bounds height="30.0" width="30.0" x="120.0" y="185.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemtimerEventListener2" cmmnElementRef="planItemtimerEventListener2">
+        <dc:Bounds height="30.0" width="30.0" x="285.0" y="185.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemserviceTask1" cmmnElementRef="planItemserviceTask1">
+        <dc:Bounds height="80.0" width="100.0" x="121.0" y="73.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemexternalWorkerTask1" cmmnElementRef="planItemexternalWorkerTask1">
+        <dc:Bounds height="80.0" width="100.0" x="300.0" y="73.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemsignalEventListener1" cmmnElementRef="planItemsignalEventListener1">
+        <dc:Bounds height="30.0" width="30.0" x="465.0" y="185.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector1" cmmnElementRef="planItemtimerEventListener1" targetCMMNElementRef="exitCriterion1">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="149.9499974112428" y="200.0"></di:waypoint>
+        <di:waypoint x="219.0" y="200.0"></di:waypoint>
+        <di:waypoint x="219.0" y="355.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector2" cmmnElementRef="planItemtimerEventListener2" targetCMMNElementRef="exitCriterion2">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="314.9499974112428" y="200.0"></di:waypoint>
+        <di:waypoint x="384.0" y="200.0"></di:waypoint>
+        <di:waypoint x="384.0" y="355.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector3" cmmnElementRef="planItemsignalEventListener1" targetCMMNElementRef="exitCriterion3">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="494.9499937399551" y="200.0"></di:waypoint>
+        <di:waypoint x="534.0" y="200.0"></di:waypoint>
+        <di:waypoint x="534.0" y="355.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

@@ -13,6 +13,8 @@
 
 package org.flowable.rest.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +28,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,6 +43,7 @@ public class HistoricDetailCollectionResourceTest extends BaseSpringRestTestCase
     /**
      * Test querying historic detail. GET history/historic-detail
      */
+    @Test
     @Deployment
     public void testQueryDetail() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();
@@ -81,11 +85,11 @@ public class HistoricDetailCollectionResourceTest extends BaseSpringRestTestCase
                 response = executeRequest(new HttpGet(valueUrl), HttpStatus.SC_OK);
                 byte[] varInput = IOUtils.toByteArray(response.getEntity().getContent());
                 closeResponse(response);
-                assertEquals("test", new String(varInput));
+                assertThat(new String(varInput)).isEqualTo("test");
                 break;
             }
         }
-        assertTrue(byteVarFound);
+        assertThat(byteVarFound).isTrue();
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
@@ -96,7 +100,7 @@ public class HistoricDetailCollectionResourceTest extends BaseSpringRestTestCase
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
 
-        assertEquals(numberOfResultsExpected, dataNode.size());
+        assertThat(dataNode).hasSize(numberOfResultsExpected);
 
         // Check presence of ID's
         if (variableName != null) {
@@ -108,15 +112,15 @@ public class HistoricDetailCollectionResourceTest extends BaseSpringRestTestCase
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
-                        assertTrue("Variable value is not equal", variableNode.get("value").asBoolean() == (Boolean) variableValue);
+                        assertThat((boolean) (Boolean) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asBoolean());
                     } else if (variableValue instanceof Integer) {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asInt(), (int) (Integer) variableValue);
+                        assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertEquals("Variable value is not equal", variableNode.get("value").asText(), (String) variableValue);
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
                     }
                 }
             }
-            assertTrue("Variable " + variableName + " is missing", variableFound);
+            assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
         }
     }
 }

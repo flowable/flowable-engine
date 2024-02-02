@@ -13,6 +13,23 @@
 
 package org.flowable.rest.service.api.repository;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.engine.repository.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,21 +38,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.repository.Model;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -53,7 +55,8 @@ public class ModelSourceResource extends BaseModelSourceResource {
     @GetMapping("/repository/models/{modelId}/source")
     @ResponseBody
     public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
-        byte[] editorSource = repositoryService.getModelEditorSource(modelId);
+        Model model = getModelFromRequest(modelId);
+        byte[] editorSource = repositoryService.getModelEditorSource(model.getId());
         if (editorSource == null) {
             throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have source available.", String.class);
         }
@@ -62,7 +65,8 @@ public class ModelSourceResource extends BaseModelSourceResource {
     }
 
     @ApiOperation(value = "Set the editor source for a model", tags = { "Models" }, consumes = "multipart/form-data",
-            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.",
+            code = 204)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
     })
@@ -71,28 +75,25 @@ public class ModelSourceResource extends BaseModelSourceResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @PutMapping(value = "/repository/models/{modelId}/source", consumes = "multipart/form-data")
-    public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request) {
         Model model = getModelFromRequest(modelId);
-        if (model != null) {
-
-            if (!(request instanceof MultipartHttpServletRequest)) {
+        if (!(request instanceof MultipartHttpServletRequest)) {
                 throw new FlowableIllegalArgumentException("Multipart request is required");
-            }
+        }
 
-            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
-            if (multipartRequest.getFileMap().size() == 0) {
-                throw new FlowableIllegalArgumentException("Multipart request with file content is required");
-            }
+        if (multipartRequest.getFileMap().size() == 0) {
+            throw new FlowableIllegalArgumentException("Multipart request with file content is required");
+        }
 
-            MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
+        MultipartFile file = multipartRequest.getFileMap().values().iterator().next();
 
-            try {
-                repositoryService.addModelEditorSource(modelId, file.getBytes());
-                response.setStatus(HttpStatus.NO_CONTENT.value());
-            } catch (Exception e) {
-                throw new FlowableException("Error adding model editor source extra", e);
-            }
+        try {
+            repositoryService.addModelEditorSource(model.getId(), file.getBytes());
+        } catch (Exception e) {
+            throw new FlowableException("Error adding model editor source extra", e);
         }
     }
 }

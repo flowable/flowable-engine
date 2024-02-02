@@ -14,10 +14,12 @@ package org.flowable.cmmn.engine.test.impl;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 
+import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 
@@ -31,14 +33,80 @@ public class CmmnJobTestHelper {
     
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngine cmmnEngine, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        
         waitForJobExecutorToProcessAllJobs(cmmnEngine.getCmmnEngineConfiguration(), maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
     
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
-
-        AsyncExecutor asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
         
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
+
+            @Override
+            public Boolean call() {
+                return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
+                        || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+            }
+
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+
+    public static void waitForJobExecutorToProcessAllAsyncJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait,
+            final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
+
+            @Override
+            public Boolean call() {
+                return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0;
+            }
+
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+
+    public static void waitForJobExecutorOnCondition(CmmnEngineConfiguration cmmnEngineConfiguration, long maxMillisToWait, long intervalMillis, Callable<Boolean> predicate) {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), () -> !predicate.call(), maxMillisToWait, intervalMillis, true);
+    }
+    
+    public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
+            final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+        
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<>() {
+
+            @Override
+            public Boolean call() {
+                return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
+            }
+
+        }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
+    }
+
+    public static void executeJobExecutorForTime(CmmnEngineConfiguration cmmnEngineConfiguration, long maxMillisToWait, long intervalMillis) {
+        AsyncExecutor asyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
+        asyncExecutor.start();
+
+        try {
+            Timer timer = new Timer();
+            InterruptTask task = new InterruptTask(Thread.currentThread());
+            timer.schedule(task, maxMillisToWait);
+            try {
+                while (!task.isTimeLimitExceeded()) {
+                    Thread.sleep(intervalMillis);
+                }
+            } catch (InterruptedException e) {
+                // ignore
+            } finally {
+                timer.cancel();
+            }
+
+        } finally {
+            asyncExecutor.shutdown();
+        }
+    }
+    
+    public static void waitForExecutorToProcessAllJobs(final AsyncExecutor asyncExecutor, Callable<Boolean> callable,
+            final long maxMillisToWait, final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
+
         if (asyncExecutor == null) {
             throw new FlowableException("No async executor set. Check the cmmn engine configuration.");
         }
@@ -47,16 +115,15 @@ public class CmmnJobTestHelper {
 
         try {
             Timer timer = new Timer();
-            JobInterruptionTask jobInterruptionTask = new JobInterruptionTask();
-            timer.schedule(jobInterruptionTask, maxMillisToWait);
+            InterruptTask interruptTask = new InterruptTask(Thread.currentThread());
+            timer.schedule(interruptTask, maxMillisToWait);
             
             boolean areJobsAvailable = true;
             try {
-                while (areJobsAvailable && !jobInterruptionTask.isMaxTimeUsed()) {
+                while (areJobsAvailable && !interruptTask.isTimeLimitExceeded()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
-                                || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+                        areJobsAvailable = callable.call();
                     } catch (Throwable t) { 
                         // ignore
                     }
@@ -76,23 +143,29 @@ public class CmmnJobTestHelper {
             }
         }
     }
-    
-    public static class JobInterruptionTask extends TimerTask {
-        
-        protected boolean maxTimeUsed;
+
+    public static boolean areJobsAvailable(CmmnManagementService managementService) {
+        return !managementService.createJobQuery().list().isEmpty();
+    }
+
+    public static class InterruptTask extends TimerTask {
+
+        protected boolean timeLimitExceeded;
+        protected Thread thread;
+
+        public InterruptTask(Thread thread) {
+            this.thread = thread;
+        }
+
+        public boolean isTimeLimitExceeded() {
+            return timeLimitExceeded;
+        }
 
         @Override
         public void run() {
-            maxTimeUsed = true;
+            timeLimitExceeded = true;
+            thread.interrupt();
         }
-        
-        public boolean isMaxTimeUsed() {
-            return maxTimeUsed;
-        }
-        public void setMaxTimeUsed(boolean maxTimeUsed) {
-            this.maxTimeUsed = maxTimeUsed;
-        }
-        
     }
 
 }

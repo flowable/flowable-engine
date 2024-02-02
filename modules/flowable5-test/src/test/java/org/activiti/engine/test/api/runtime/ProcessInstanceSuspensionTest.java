@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 
 /**
  * @author Daniel Meyer

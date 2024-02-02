@@ -12,8 +12,8 @@
  */
 package org.flowable.identitylink.service;
 
-import org.flowable.engine.common.AbstractServiceConfiguration;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.AbstractServiceConfiguration;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
@@ -24,18 +24,14 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricId
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisHistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
  */
-public class IdentityLinkServiceConfiguration extends AbstractServiceConfiguration {
+public class IdentityLinkServiceConfiguration extends AbstractServiceConfiguration<IdentityLinkServiceConfiguration> {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(IdentityLinkServiceConfiguration.class);
-    
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
@@ -51,23 +47,39 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     
     protected IdentityLinkEntityManager identityLinkEntityManager;
     protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
+
+    /** IdentityLink event handler */
+    protected IdentityLinkEventHandler identityLinkEventHandler;
     
     protected HistoryLevel historyLevel;
     
     protected ObjectMapper objectMapper;
+    
+    public IdentityLinkServiceConfiguration(String engineName) {
+        super(engineName);
+    }
+    
+    @Override
+    protected IdentityLinkServiceConfiguration getService() {
+        return this;
+    }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
+
+        configuratorsAfterInit();
     }
     
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
         }
         // Comparing enums actually compares the location of values declared in the enum
         return historyLevel.isAtLeast(level);
@@ -75,8 +87,8 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     @Override
     public boolean isHistoryEnabled() {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Current history level: {}", historyLevel);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
     }
@@ -86,10 +98,10 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     public void initDataManagers() {
         if (identityLinkDataManager == null) {
-            identityLinkDataManager = new MybatisIdentityLinkDataManager();
+            identityLinkDataManager = new MybatisIdentityLinkDataManager(this);
         }
         if (historicIdentityLinkDataManager == null) {
-            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager();
+            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager(this);
         }
     }
 
@@ -182,6 +194,15 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     @Override
     public IdentityLinkServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public IdentityLinkEventHandler getIdentityLinkEventHandler() {
+        return identityLinkEventHandler;
+    }
+
+    public IdentityLinkServiceConfiguration setIdentityLinkEventHandler(IdentityLinkEventHandler identityLinkEventHandler) {
+        this.identityLinkEventHandler = identityLinkEventHandler;
         return this;
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+  <typeAliases>
+    <typeAlias type="org.flowable.eventregistry.impl.persistence.ResourceRefTypeHandler" alias="EventRegistryResourceRefTypeHandler"/>
+  </typeAliases>
+  <typeHandlers>
+    <typeHandler handler="EventRegistryResourceRefTypeHandler" 
+                 javaType="org.flowable.eventregistry.impl.persistence.entity.ResourceRef"
+                 jdbcType="VARCHAR"/>
+  </typeHandlers>
+  <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+    <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/common/db/mapping/common.xml" />
+
+    <!-- Engine mappers -->
+    <mapper resource="org/flowable/eventregistry/db/mapping/entity/EventDeployment.xml" />
+    <mapper resource="org/flowable/eventregistry/db/mapping/entity/EventDefinition.xml" />
+    <mapper resource="org/flowable/eventregistry/db/mapping/entity/ChannelDefinition.xml" />
+    <mapper resource="org/flowable/eventregistry/db/mapping/entity/EventResource.xml" />
+  </mappers>
+</configuration>

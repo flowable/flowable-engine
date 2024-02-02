@@ -14,8 +14,8 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
@@ -25,13 +25,15 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
  */
 public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasRevision {
 
-    List<IdentityLinkEntity> getIdentityLinks();
-
     void setKey(String key);
 
     void setName(String name);
 
+    void setLocalizedName(String name);
+
     void setDescription(String description);
+
+    void setLocalizedDescription(String description);
 
     void setDeploymentId(String deploymentId);
 
@@ -62,10 +64,18 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
     int getSuspensionState();
 
     void setSuspensionState(int suspensionState);
+    
+    void setDerivedFrom(String derivedFrom);
+    
+    void setDerivedFromRoot(String derivedFromRoot);
 
+    void setDerivedVersion(int derivedVersion);
+    
     @Override
     String getEngineVersion();
 
     void setEngineVersion(String engineVersion);
-
+    
+    List<IdentityLinkEntity> getIdentityLinks();
+    
 }

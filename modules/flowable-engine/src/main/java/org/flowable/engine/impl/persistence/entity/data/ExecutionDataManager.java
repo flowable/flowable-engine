@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -63,12 +63,16 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
-    void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
+    long countActiveExecutionsByParentId(String parentId);
 
-    void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime);
+    void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId);
 
     void updateAllExecutionRelatedEntityCountFlags(boolean newValue);
 
+    void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, String lockOwner, Date expirationTime);
+
     void clearProcessInstanceLockTime(String processInstanceId);
+
+    void clearAllProcessInstanceLockTimes(String lockOwner);
 
 }

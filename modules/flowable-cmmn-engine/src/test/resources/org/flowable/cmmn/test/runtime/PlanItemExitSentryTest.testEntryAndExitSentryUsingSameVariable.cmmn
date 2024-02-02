@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+    <case id="myExample" name="myExample" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+            </extensionElements>
+            <planItem id="planItem5" definitionRef="expandedStage1">
+                <entryCriterion id="entryCriterion3" flowable:sentryRef="sentry5"></entryCriterion>
+            </planItem>
+            <planItem id="planItem6" name="Initialize variables" definitionRef="variableActivity3"></planItem>
+            <sentry id="sentry5">
+                <extensionElements>
+                    <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilid>
+                </extensionElements>
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem6">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="expandedStage1" flowable:includeInStageOverview="true">
+                <extensionElements>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                    <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+                </extensionElements>
+                <planItem id="planItem1" name="On Event Task" definitionRef="humanTask1">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter99" flowable:maxInstanceCount="1"></repetitionRule>
+                    </itemControl>
+                    <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
+                    <exitCriterion id="exitCriterion3" flowable:sentryRef="sentry4" flowable:exitType="activeInstances"></exitCriterion>
+                </planItem>
+                <planItem id="planItem2" name="Set true" definitionRef="variableActivity1">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter3"></repetitionRule>
+                        <manualActivationRule></manualActivationRule>
+                    </itemControl>
+                </planItem>
+                <planItem id="planItem3" name="Set false" definitionRef="variableActivity2">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter4"></repetitionRule>
+                        <manualActivationRule></manualActivationRule>
+                    </itemControl>
+                </planItem>
+                <planItem id="planItem4" name="Event deferred task" definitionRef="humanTask2">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter98" flowable:maxInstanceCount="1"></repetitionRule>
+                    </itemControl>
+                    <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry2"></entryCriterion>
+                    <exitCriterion id="exitCriterion2" flowable:sentryRef="sentry3" flowable:exitType="activeInstances"></exitCriterion>
+                </planItem>
+                <sentry id="sentry1" flowable:triggerMode="onEvent">
+                    <extensionElements>
+                        <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilid>
+                    </extensionElements>
+                    <ifPart>
+                        <condition><![CDATA[${test}]]></condition>
+                    </ifPart>
+                </sentry>
+                <sentry id="sentry4">
+                    <extensionElements>
+                        <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[ExitCriterion]]></design:stencilid>
+                    </extensionElements>
+                    <ifPart>
+                        <condition><![CDATA[${!test}]]></condition>
+                    </ifPart>
+                </sentry>
+                <sentry id="sentry2">
+                    <extensionElements>
+                        <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilid>
+                    </extensionElements>
+                    <ifPart>
+                        <condition><![CDATA[${test}]]></condition>
+                    </ifPart>
+                </sentry>
+                <sentry id="sentry3">
+                    <extensionElements>
+                        <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[ExitCriterion]]></design:stencilid>
+                    </extensionElements>
+                    <ifPart>
+                        <condition><![CDATA[${!test}]]></condition>
+                    </ifPart>
+                </sentry>
+                <humanTask id="humanTask1" name="On Event Task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                    <extensionElements>
+                        <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                        <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    </extensionElements>
+                </humanTask>
+                <task id="variableActivity1" name="Set true" flowable:type="java" flowable:expression="${planItemInstance.setVariable('test', true)}">
+                </task>
+                <task id="variableActivity2" name="Set false" flowable:type="java" flowable:expression="${planItemInstance.setVariable('test', false)}">
+                </task>
+                <humanTask id="humanTask2" name="Event deferred task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                    <extensionElements>
+                        <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                        <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                    </extensionElements>
+                </humanTask>
+            </stage>
+            <task id="variableActivity3" name="Initialize variables" flowable:type="java" flowable:expression="${planItemInstance.setVariable('test', false)}">
+            </task>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_myExample">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+                <dc:Bounds height="374.0" width="599.0" x="109.5" y="210.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion3" cmmnElementRef="entryCriterion3">
+                <dc:Bounds height="28.0" width="18.0" x="399.5" y="196.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="450.0" y="284.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion1" cmmnElementRef="entryCriterion1">
+                <dc:Bounds height="28.0" width="18.0" x="441.0" y="310.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_exitCriterion3" cmmnElementRef="exitCriterion3">
+                <dc:Bounds height="28.0" width="18.0" x="541.0" y="330.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="259.5" y="435.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="377.5" y="435.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+                <dc:Bounds height="80.0" width="100.0" x="285.0" y="284.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion2" cmmnElementRef="entryCriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="276.0" y="310.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_exitCriterion2" cmmnElementRef="exitCriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="376.0" y="330.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+                <dc:Bounds height="80.0" width="100.0" x="241.0" y="91.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector1" cmmnElementRef="planItem6" targetCMMNElementRef="entryCriterion3">
+                <di:waypoint x="291.0" y="170.95"></di:waypoint>
+                <di:waypoint x="291.0" y="190.5"></di:waypoint>
+                <di:waypoint x="408.5" y="190.5"></di:waypoint>
+                <di:waypoint x="408.5" y="196.0"></di:waypoint>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

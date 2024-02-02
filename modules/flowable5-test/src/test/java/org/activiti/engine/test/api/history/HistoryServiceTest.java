@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.test.api.runtime.ProcessInstanceQueryTest;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -548,9 +548,12 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("rootValue", "test").count());
 
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Receive Payment").count());
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Ship Order").count());
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue2", "test").count());
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Receive Payment").count());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue1", "Receive Payment").count());
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue1", "Ship Order").count());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue1", "Ship Order").count());
+        assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueEquals("parallelValue2", "test").count());
+        assertEquals(1, historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("parallelValue2", "test").count());
     }
 
     /**

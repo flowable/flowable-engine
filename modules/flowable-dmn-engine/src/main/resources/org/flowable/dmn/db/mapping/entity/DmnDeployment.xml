@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
+
+  <!-- DEPLOYMENT INSERT -->
+  
+  <insert id="insertDmnDeployment" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
+    insert into ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values(
+    	#{id, jdbcType=VARCHAR}, 
+    	#{name, jdbcType=VARCHAR}, 
+    	#{category, jdbcType=VARCHAR}, 
+    	#{tenantId, jdbcType=VARCHAR}, 
+    	#{deploymentTime, jdbcType=TIMESTAMP},
+    	#{parentDeploymentId, jdbcType=VARCHAR} 
+    )
+  </insert>
+  
+  <insert id="bulkInsertDmnDeployment" parameterType="java.util.List">
+    insert into ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values
+    <foreach collection="list" item="deployment" index="index" separator=",">
+    (
+        #{deployment.id, jdbcType=VARCHAR}, 
+        #{deployment.name, jdbcType=VARCHAR}, 
+        #{deployment.category, jdbcType=VARCHAR}, 
+        #{deployment.tenantId, jdbcType=VARCHAR}, 
+        #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+        #{deployment.parentDeploymentId, jdbcType=VARCHAR} 
+    )
+    </foreach>
+  </insert>
+  
+   <insert id="bulkInsertDmnDeployment" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="deployment" index="index">
+        INTO ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
+        (
+            #{deployment.id, jdbcType=VARCHAR}, 
+            #{deployment.name, jdbcType=VARCHAR}, 
+            #{deployment.category, jdbcType=VARCHAR}, 
+            #{deployment.tenantId, jdbcType=VARCHAR}, 
+            #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+            #{deployment.parentDeploymentId, jdbcType=VARCHAR} 
+        )
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <!-- DEPLOYMENT UPDATE -->
+  
+  <update id="updateDmnDeployment" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
+    update ${prefix}ACT_DMN_DEPLOYMENT
+    <set>
+      CATEGORY_ = #{category, jdbcType=VARCHAR},
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR},
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- DEPLOYMENT DELETE -->
+  
+  <delete id="deleteDmnDeployment" parameterType="string">
+    delete from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id}
+  </delete>
+
+  <!-- DEPLOYMENT RESULTMAP -->
+  
+  <resultMap id="deploymentResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!-- DEPLOYMENT SELECT -->
+
+  <select id="selectDmnDeploymentsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultMap="deploymentResultMap">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
+  <select id="selectDmnDeploymentCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectDmnDeploymentsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectDmnDeploymentsByQueryCriteriaSql">  
+    from ${prefix}ACT_DMN_DEPLOYMENT RES
+    <where>
+      <if test="deploymentId != null">
+        RES.ID_ = #{deploymentId}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="parentDeploymentId != null">
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+      </if>
+      <if test="parentDeploymentIdLike != null">
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+      </if>
+      <if test="decisionKey != null || decisionKeyLike != null">
+        and exists(select 1 from ${prefix}ACT_DMN_DECISION DECISION where RES.ID_ = DECISION.DEPLOYMENT_ID_
+        <if test="decisionKey != null">
+          and DECISION.KEY_ = #{decisionKey}
+        </if>
+        <if test="decisionKeyLike != null">
+          and DECISION.KEY_ like #{decisionKeyLike}
+        </if>
+        )
+      </if>
+    </where>
+  </sql>
+    
+  <select id="selectDmnDeployment" parameterType="string" resultMap="deploymentResultMap">
+    select * from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectDmnDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectDmnDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+
+</mapper>

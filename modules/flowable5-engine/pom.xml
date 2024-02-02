@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
@@ -31,8 +31,8 @@
 			<artifactId>flowable-image-generator</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-email</artifactId>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-mail</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -53,8 +53,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy-all</artifactId>
+			<groupId>org.apache.groovy</groupId>
+			<artifactId>groovy-jsr223</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -68,18 +68,23 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>persistence-api</artifactId>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-mvel</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.persistence</groupId>
+			<artifactId>jakarta.persistence-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<groupId>jakarta.transaction</groupId>
+			<artifactId>jakarta.transaction-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.enterprise.concurrent</groupId>
-			<artifactId>javax.enterprise.concurrent-api</artifactId>
+			<groupId>jakarta.enterprise.concurrent</groupId>
+			<artifactId>jakarta.enterprise.concurrent-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -88,23 +93,13 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
+			<groupId>com.github.davidmoten</groupId>
+			<artifactId>subethasmtp</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.openjpa</groupId>
-			<artifactId>openjpa</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.subethamail</groupId>
-			<artifactId>subethasmtp-wiser</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -146,8 +141,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.catch-exception</groupId>
-			<artifactId>catch-exception</artifactId>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -172,16 +167,17 @@
 			junit*;resolution:=optional,
 			org.junit*;resolution:=optional,
 			com.sun*;resolution:=optional,
-			javax.persistence*;resolution:=optional,
-			org.apache.commons.mail*;resolution:=optional,
+			jakarta.persistence*;resolution:=optional,
+			jakarta.mail*;resolution:=optional,
 			org.apache.xerces*;resolution:=optional,
 			org.activiti.camel;resolution:=optional,
 			org.activiti.camel.impl;resolution:=optional,
 			org.springframework*;resolution:=optional,
 			org.drools*;resolution:=optional,
+			org.kie*;resolution:=optional,
 			com.fasterxml*;resolution:=optional,
-			javax.transaction;resolution:=optional,
-			javax.enterprise.concurrent;resolution:=optional,
+			jakarta.transaction;resolution:=optional,
+			jakarta.enterprise.concurrent;resolution:=optional,
 		</flowable.osgi.import.additional>
 	</properties>
 
@@ -194,7 +190,6 @@
 						<exclude>**/*TestCase.java</exclude>
 						<exclude>**/RepeatingServiceTaskTest.java</exclude>
 					</excludes>
-					<runOrder>alphabetical</runOrder>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -278,7 +273,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.2</version>
 						<executions>
 							<execution>
 								<goals>
@@ -302,20 +296,23 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>distro</id>
+			<id>cleanDb</id>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
+								<id>drop-idm-schema</id>
+								<phase>prepare-package</phase>
 								<goals>
-									<goal>jar-no-fork</goal>
+									<goal>java</goal>
 								</goals>
+								<configuration>
+									<mainClass>org.activiti.engine.impl.db.DbSchemaDrop</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -334,10 +331,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -386,10 +381,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -439,10 +432,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -473,10 +464,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>configExecution</id>
@@ -518,12 +507,10 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*TestCase.java</exclude>
-
 								<!-- Disabling tests that run exclusively using standalone config -->
 								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -542,10 +529,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>configExecution</id>
@@ -588,12 +573,10 @@
 						<configuration>
 							<excludes>
 								<exclude>**/*TestCase.java</exclude>
-
 								<!-- Disabling tests that run exclusively using standalone config -->
 								<exclude>**/ProcessDiagramRetrievalTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -614,8 +597,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -646,7 +629,6 @@
 								<exclude>**/RepeatingServiceTaskTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -658,10 +640,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -709,8 +689,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -741,7 +721,6 @@
 								<exclude>**/RepeatingServiceTaskTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -754,8 +733,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -789,7 +768,6 @@
 								<exclude>**/ProcessInstanceLogQueryTest.java</exclude>
 								<exclude>org/activiti/standalone/**</exclude>
 							</excludes>
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -812,12 +790,11 @@
 								<include>**/JdbcMetaDataTest.java</include>
 							</includes>
 							<excludes />
-							<runOrder>alphabetical</runOrder>
 						</configuration>
 					</plugin>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -872,8 +849,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -889,8 +866,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -906,8 +883,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.ibm.db2.jcc</groupId>
-					<artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -940,8 +917,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>mysql</groupId>
-					<artifactId>mysql-connector-java</artifactId>
+					<groupId>com.mysql</groupId>
+					<artifactId>mysql-connector-j</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>

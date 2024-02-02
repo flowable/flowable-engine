@@ -20,13 +20,13 @@ import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.job.api.Job;
 import org.flowable.validation.validator.Problems;
 
@@ -105,7 +105,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         try {
             clock.setCurrentTime(new Date(System.currentTimeMillis() + 1000));
             processEngineConfiguration.setClock(clock);
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000, 200l);
+            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000, 200L);
 
             assertEquals(0, createEventSubscriptionQuery().count());
             assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -209,7 +209,7 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
     /**

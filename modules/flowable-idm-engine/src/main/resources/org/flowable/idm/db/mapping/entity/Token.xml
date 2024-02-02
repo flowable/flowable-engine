@@ -18,8 +18,7 @@
         TOKEN_DATA_
       ) values (
         #{id ,jdbcType=VARCHAR},
-        1,
-        #{tokenValue, jdbcType=VARCHAR},
+        1, #{tokenValue, jdbcType=VARCHAR},
         #{tokenDate, jdbcType=TIMESTAMP},
         #{ipAddress, jdbcType=VARCHAR},
         #{userAgent, jdbcType=VARCHAR},
@@ -42,8 +41,7 @@
       <foreach collection="list" item="token" index="index" separator=",">
       (
         #{token.id ,jdbcType=VARCHAR},
-        1,
-        #{token.tokenValue, jdbcType=VARCHAR},
+        1, #{token.tokenValue, jdbcType=VARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
         #{token.ipAddress, jdbcType=VARCHAR},
         #{token.userAgent, jdbcType=VARCHAR},
@@ -67,8 +65,7 @@
             TOKEN_DATA_
       ) VALUES (
         #{token.id ,jdbcType=VARCHAR},
-        1,
-        #{token.tokenValue, jdbcType=VARCHAR},
+        1, #{token.tokenValue, jdbcType=VARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
         #{token.ipAddress, jdbcType=VARCHAR},
         #{token.userAgent, jdbcType=VARCHAR},
@@ -91,7 +88,7 @@
       IP_ADDRESS_ = #{ipAddress, jdbcType=VARCHAR},
       USER_AGENT_ = #{userAgent, jdbcType=VARCHAR},
       USER_ID_ = #{userId, jdbcType=VARCHAR},
-      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR}
+      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR},
     </set>
     where ID_ = #{id, jdbcType=VARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
   </update>
@@ -121,11 +118,11 @@
   </select>
   
   <select id="selectTokenByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultMap="tokenResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectTokenByQueryCriteriaSql" />
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
   
    <select id="selectTokenCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultType="long">
@@ -139,7 +136,7 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
-      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+      <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids" 
                  open="(" separator="," close=")">
@@ -186,7 +183,7 @@
   </sql>
 
   <select id="selectTokenByNativeQuery" parameterType="java.util.Map" resultMap="tokenResultMap">
-    <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectTokenCountByNativeQuery" parameterType="java.util.Map" resultType="long">

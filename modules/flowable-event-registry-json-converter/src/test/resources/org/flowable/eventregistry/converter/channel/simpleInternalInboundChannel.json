@@ -1,0 +1,12 @@
+{
+  "key": "internalChannel",
+  "category": "test",
+  "name": "Test channel",
+  "description": "Test Internal channel",
+  "channelType": "inbound",
+  "type": "internal",
+  "deserializerType": "json",
+  "channelEventKeyDetection": {
+    "jsonField": "eventKey"
+  }
+}

@@ -12,81 +12,59 @@
  */
 package org.flowable.cmmn.engine.impl.parser;
 
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.converter.CmmnXMLException;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
-import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.HttpServiceTask;
-import org.flowable.cmmn.model.HumanTask;
-import org.flowable.cmmn.model.ImplementationType;
-import org.flowable.cmmn.model.Milestone;
-import org.flowable.cmmn.model.PlanFragment;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.ProcessTask;
-import org.flowable.cmmn.model.ServiceTask;
-import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
-import org.flowable.cmmn.model.TimerEventListener;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.io.BytesStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class CmmnParserImpl implements CmmnParser {
 
-    private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
 
+    protected CmmnParseHandlers cmmnParseHandlers;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected ExpressionManager expressionManager;
 
-    public CmmnParseResult parse(EngineResource resourceEntity) {
-        CmmnParseResult parseResult = new CmmnParseResult();
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
-            Pair<CmmnModel, List<CaseDefinitionEntity>> pair = parse(resourceEntity, parseResult, new InputStreamSource(inputStream));
-            for (CaseDefinitionEntity caseDefinitionEntity : pair.getRight()) {
-                parseResult.addCaseDefinition(caseDefinitionEntity, resourceEntity, pair.getLeft());
-            }
-
-            processDI(pair.getLeft(), pair.getRight());
-
-        } catch (IOException e) {
-            logger.error("Could not read bytes from CMMN resource", e);
-        }
-        return parseResult;
+    @Override
+    public CmmnParseResult parse(CmmnParseContext context) {
+        EngineResource resourceEntity = context.resource();
+        CmmnParseResult cmmnParseResult = parse(context, new BytesStreamSource(resourceEntity.getBytes()));
+        processDI(cmmnParseResult.getCmmnModel(), cmmnParseResult.getAllCaseDefinitions());
+        return cmmnParseResult;
     }
 
-    public Pair<CmmnModel, List<CaseDefinitionEntity>> parse(EngineResource resourceEntity, CmmnParseResult parseResult, StreamSource cmmnSource) {
+    public CmmnParseResult parse(CmmnParseContext context, StreamSource cmmnSource) {
         try {
-            boolean enableSafeBpmnXml = false;
-            String encoding = null;
-            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
-            if (cmmnEngineConfiguration != null) {
-                enableSafeBpmnXml = cmmnEngineConfiguration.isEnableSafeCmmnXml();
-                encoding = cmmnEngineConfiguration.getXmlEncoding();
+            CmmnParseResult cmmnParseResult = new CmmnParseResult();
+            cmmnParseResult.setResourceEntity(context.resource());
+
+            CmmnModel cmmnModel = convertToCmmnModel(context, cmmnSource);
+            cmmnParseResult.setCmmnModel(cmmnModel);
+
+            if (context.validateCmmnModel()) {
+                validateCmmnModel(context.caseValidator(), cmmnModel);
             }
-            CmmnModel cmmnModel = new CmmnXmlConverter().convertToCmmnModel(cmmnSource, true, enableSafeBpmnXml, encoding);
-            List<CaseDefinitionEntity> caseDefinitionEntities = processCmmnElements(resourceEntity, cmmnModel);
-            return Pair.of(cmmnModel, caseDefinitionEntities);
+
+            processCmmnElements(cmmnModel, cmmnParseResult);
+
+            return cmmnParseResult;
 
         } catch (Exception e) {
             if (e instanceof FlowableException) {
@@ -99,92 +77,52 @@ public class CmmnParserImpl implements CmmnParser {
         }
     }
 
-    protected List<CaseDefinitionEntity> processCmmnElements(EngineResource resourceEntity, CmmnModel cmmnModel) {
-        List<CaseDefinitionEntity> caseDefinitionEntities = new ArrayList<>();
-        for (Case caze : cmmnModel.getCases()) {
+    protected CmmnModel convertToCmmnModel(CmmnParseContext context, StreamSource cmmnSource) {
+        boolean enableSafeBpmnXml = context.enableSafeXml();
+        String encoding = context.xmlEncoding();
+        boolean validateCmmnXml = context.validateXml();
 
-            CaseDefinitionEntity caseDefinitionEntity = CommandContextUtil.getCaseDefinitionEntityManager().create();
-            caseDefinitionEntity.setKey(caze.getId());
-            caseDefinitionEntity.setName(caze.getName());
-            caseDefinitionEntity.setCategory(cmmnModel.getTargetNamespace());
-            caseDefinitionEntity.setDeploymentId(resourceEntity.getDeploymentId());
-            caseDefinitionEntities.add(caseDefinitionEntity);
-
-            processPlanFragment(caze.getPlanModel());
-        }
-        return caseDefinitionEntities;
+        return new CmmnXmlConverter().convertToCmmnModel(cmmnSource, validateCmmnXml, enableSafeBpmnXml, encoding);
     }
 
-    protected void processPlanFragment(PlanFragment planFragment) {
+    protected void validateCmmnModel(CaseValidator caseValidator, CmmnModel cmmnModel) {
+        if (caseValidator == null) {
+            logger.warn("Case should be validated, but no case validator is configured on the case engine configuration!");
+        } else {
+            List<ValidationEntry> validationEntries = caseValidator.validate(cmmnModel);
+            if (validationEntries != null && !validationEntries.isEmpty()) {
 
-        // TODO: do with parse handlers like bpmn engine?
+                StringBuilder warningBuilder = new StringBuilder();
+                StringBuilder errorBuilder = new StringBuilder();
 
-        for (PlanItem planItem : planFragment.getPlanItems()) {
-
-            PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-            if (planItemDefinition instanceof Stage) {
-                Stage stage = (Stage) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
-
-            } else if (planItemDefinition instanceof HumanTask) {
-                HumanTask humanTask = (HumanTask) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createHumanTaskActivityBehavior(planItem, humanTask));
-
-            } else if (planItemDefinition instanceof CaseTask) {
-                CaseTask caseTask = (CaseTask) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createCaseTaskActivityBehavior(planItem, caseTask));
-
-            } else if (planItemDefinition instanceof ProcessTask) {
-                ProcessTask processTask = (ProcessTask) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createProcessTaskActivityBehavior(planItem, processTask));
-
-            } else if (planItemDefinition instanceof DecisionTask) {
-                DecisionTask decisionTask = (DecisionTask) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createDecisionTaskActivityBehavior(planItem, decisionTask));
-
-            } else if (planItemDefinition instanceof Milestone) {
-                Milestone milestone = (Milestone) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
-
-            } else if (planItemDefinition instanceof TimerEventListener) {
-                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createTimerEventListenerActivityBehavior(planItem, timerEventListener));
-
-            } else if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-
-                if (task instanceof ServiceTask) {
-                    ServiceTask serviceTask = (ServiceTask) task;
-                    switch (serviceTask.getType()) {
-                        case HttpServiceTask.HTTP_TASK:
-                            planItem.setBehavior(activityBehaviorFactory.createHttpActivityBehavior(planItem, serviceTask));
-                            break;
-                        default:
-                            // java task type was not set in the version <= 6.2.0 that's why we have to assume that default
-                            // service task type is java
-                            if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
-                                if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
-                                    planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, serviceTask));
-
-                                } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
-                                    planItem.setBehavior(activityBehaviorFactory.createPlanItemExpressionActivityBehavior(planItem, serviceTask));
-
-                                } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
-                                    planItem.setBehavior(activityBehaviorFactory.createPlanItemDelegateExpressionActivityBehavior(planItem, serviceTask));
-                                }
-                            }
-                            break;
+                for (ValidationEntry entry : validationEntries) {
+                    if (entry.getLevel() == ValidationEntry.Level.Warning) {
+                        warningBuilder.append(entry).append("\n");
+                    } else {
+                        errorBuilder.append(entry).append("\n");
                     }
-                } else {
-                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
                 }
-            }
 
-            if (planItemDefinition instanceof PlanFragment) {
-                processPlanFragment((PlanFragment) planItemDefinition);
+                // Throw exception if there is any error
+                if (errorBuilder.length() > 0) {
+                    throw new FlowableException("Errors while parsing:\n" + errorBuilder);
+                }
+
+                // Write out warnings (if any)
+                if (warningBuilder.length() > 0) {
+                    logger.warn("Following warnings encountered during case validation: {}", warningBuilder);
+                }
+
             }
         }
     }
+
+    public void processCmmnElements(CmmnModel cmmnModel, CmmnParseResult parseResult) {
+        for (Case caze : cmmnModel.getCases()) {
+            cmmnParseHandlers.parseElement(this, parseResult, caze);
+        }
+    }
+
     public void processDI(CmmnModel cmmnModel, List<CaseDefinitionEntity> caseDefinitions) {
 
         if (caseDefinitions.isEmpty()) {
@@ -226,6 +164,14 @@ public class CmmnParserImpl implements CmmnParser {
             }
         }
         return null;
+    }
+
+    public CmmnParseHandlers getCmmnParseHandlers() {
+        return cmmnParseHandlers;
+    }
+
+    public void setCmmnParseHandlers(CmmnParseHandlers cmmnParseHandlers) {
+        this.cmmnParseHandlers = cmmnParseHandlers;
     }
 
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {

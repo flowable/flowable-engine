@@ -12,12 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public interface CmmnEngineAgendaFactory  {
+public interface CmmnEngineAgendaFactory {
 
     CmmnEngineAgenda createAgenda(CommandContext commandContext);
     

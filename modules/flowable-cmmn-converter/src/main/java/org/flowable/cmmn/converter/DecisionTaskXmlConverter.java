@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.converter;
 
+import javax.xml.stream.XMLStreamReader;
+
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.DecisionTask;
-
-import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author martin.grofcik
@@ -32,6 +32,7 @@ public class DecisionTaskXmlConverter extends TaskXmlConverter {
         DecisionTask decisionTask = new DecisionTask();
         convertCommonTaskAttributes(xtr, decisionTask);
         decisionTask.setDecisionRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DECISION_REF));
+        
         return decisionTask;
     }
 

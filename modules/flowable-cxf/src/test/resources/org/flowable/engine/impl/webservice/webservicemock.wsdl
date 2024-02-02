@@ -83,6 +83,22 @@
                <xs:element name="count" type="xs:int" />
             </xs:sequence>
          </xs:complexType>
+         <xs:element name="returnsSeveralParams">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element name="in-param-1" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="returnsSeveralParamsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="out-param-1" type="xs:string"/>
+                  <xs:element minOccurs="0" name="out-param-2" type="xs:int"/>
+                  <xs:element minOccurs="0" name="out-param-3" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
       </xs:schema>
       <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns1="http://impl.engine.flowable.org/test"
          attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://impl.engine.flowable.org/test">
@@ -155,6 +171,12 @@
       <wsdl:part element="tns1:MaxValueReachedFault" name="MaxValueReachedFault">
       </wsdl:part>
    </wsdl:message>
+   <wsdl:message name="returnsSeveralParams">
+      <wsdl:part element="tns:returnsSeveralParams" name="parameters" />
+   </wsdl:message>
+   <wsdl:message name="returnsSeveralParamsResponse">
+      <wsdl:part element="tns:returnsSeveralParamsResponse" name="parameters" />
+   </wsdl:message>
    <wsdl:portType name="Counter">
       <wsdl:operation name="reset">
          <wsdl:input message="tns:reset" name="reset">
@@ -199,6 +221,10 @@
          </wsdl:input>
          <wsdl:output message="tns:getCountResponse" name="getCountResponse">
          </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="returnsSeveralParams">
+         <wsdl:input message="tns:returnsSeveralParams" name="returnsSeveralParams" />
+         <wsdl:output message="tns:returnsSeveralParamsResponse" name="returnsSeveralParamsResponse" />
       </wsdl:operation>
    </wsdl:portType>
    <wsdl:binding name="CounterSoapBinding" type="tns:Counter">
@@ -268,6 +294,15 @@
          </wsdl:input>
          <wsdl:output name="getCountResponse">
             <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="returnsSeveralParams">
+         <soap:operation soapAction="http://flowable.org/test/unit/returnsSeveralParams" style="document"/>
+         <wsdl:input name="returnsSeveralParams">
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output name="returnsSeveralParamsResponse">
+            <soap:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
    </wsdl:binding>

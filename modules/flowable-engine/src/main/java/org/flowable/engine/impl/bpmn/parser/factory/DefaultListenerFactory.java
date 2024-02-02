@@ -14,15 +14,18 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.helper.BaseDelegateEventListener;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
@@ -40,6 +43,8 @@ import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionDepen
 import org.flowable.engine.impl.bpmn.listener.ExpressionCustomPropertiesResolver;
 import org.flowable.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.flowable.engine.impl.bpmn.listener.ExpressionTaskListener;
+import org.flowable.engine.impl.bpmn.listener.ScriptTypeExecutionListener;
+import org.flowable.engine.impl.bpmn.listener.ScriptTypeTaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -49,6 +54,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
+import org.flowable.task.service.delegate.TaskListener;
 
 /**
  * Default implementation of the {@link ListenerFactory}. Used when no custom {@link ListenerFactory} is injected on the {@link ProcessEngineConfigurationImpl}.
@@ -100,6 +106,24 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     }
 
     @Override
+    public TaskListener createScriptTypeTaskListener(FlowableListener listener) {
+        if (listener.getScriptInfo() != null) {
+            ScriptTypeTaskListener scriptListener = new ScriptTypeTaskListener(
+                    createExpression(listener.getScriptInfo().getLanguage()),
+                    listener.getScriptInfo().getScript());
+            Optional.ofNullable(listener.getScriptInfo().getResultVariable())
+                    .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
+            return scriptListener;
+        } else {
+            throw new FlowableIllegalStateException("Cannot create 'script' task listener. Missing ScriptInfo.");
+        }
+    }
+
+    protected Expression createExpression(Object value) {
+        return value instanceof String ? expressionManager.createExpression((String) value) : new FixedValue(value);
+    }
+
+    @Override
     public ExecutionListener createClassDelegateExecutionListener(FlowableListener listener) {
         return classDelegateFactory.create(listener.getImplementation(), createFieldDeclarations(listener.getFieldExtensions()));
     }
@@ -111,7 +135,22 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
 
     @Override
     public ExecutionListener createDelegateExpressionExecutionListener(FlowableListener listener) {
-        return new DelegateExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()), createFieldDeclarations(listener.getFieldExtensions()));
+        return new DelegateExpressionExecutionListener(expressionManager.createExpression(listener.getImplementation()),
+                createFieldDeclarations(listener.getFieldExtensions()));
+    }
+
+    @Override
+    public ExecutionListener createScriptTypeExecutionListener(FlowableListener listener) {
+        if (listener.getScriptInfo() != null) {
+            ScriptTypeExecutionListener scriptListener = new ScriptTypeExecutionListener(
+                    createExpression(listener.getScriptInfo().getLanguage()),
+                    listener.getScriptInfo().getScript());
+            Optional.ofNullable(listener.getScriptInfo().getResultVariable())
+                    .ifPresent(resultVar -> scriptListener.setResultVariable(createExpression(resultVar)));
+            return scriptListener;
+        } else {
+            throw new FlowableIllegalStateException("Cannot create 'script' type execution listener. Missing ScriptInfo.");
+        }
     }
 
     @Override
@@ -176,7 +215,7 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
      *            the name of the entity
      * @return
      * @throws FlowableIllegalArgumentException
-     *             when the given entity name
+     *             when the given entity type is not found
      */
     protected Class<?> getEntityType(String entityType) {
         if (entityType != null) {

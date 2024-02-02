@@ -13,8 +13,7 @@
 
 package org.activiti.engine.test.api.runtime;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,10 +23,10 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -82,7 +81,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("unexistingkey");
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
-            assertTextPresent("no processes deployed with key", ae.getMessage());
+            assertTextPresent("No process definition found for key", ae.getMessage());
             assertEquals(ProcessDefinition.class, ae.getObjectClass());
         }
     }
@@ -973,10 +972,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
-        catchException(runtimeService).getVariable(processInstance.getId(), "var1", String.class);
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> runtimeService.getVariable(processInstance.getId(), "var1", String.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     @Deployment(resources = {
@@ -1003,10 +1000,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
-        catchException(runtimeService).getVariableLocal(processInstance.getId(), "var1", String.class);
-        Exception e = caughtException();
-        assertNotNull(e);
-        assertTrue(e instanceof ClassCastException);
+        assertThatThrownBy(() -> runtimeService.getVariableLocal(processInstance.getId(), "var1", String.class))
+            .isExactlyInstanceOf(ClassCastException.class);
     }
 
     // Test for https://activiti.atlassian.net/browse/ACT-2186

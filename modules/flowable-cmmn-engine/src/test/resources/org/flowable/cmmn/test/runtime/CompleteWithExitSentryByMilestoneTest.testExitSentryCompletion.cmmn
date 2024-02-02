@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="exitSentryTriggeredByMilestoneTestCase" name="Exit Sentry Triggered By Milestone Test Case" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItem1" name="Milestone" definitionRef="milestone1">
+        <entryCriterion id="entryCriterion2" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <planItem id="planItem3" name="Stage" definitionRef="expandedStage1"></planItem>
+      <sentry id="sentry2">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExitCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry1">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem3">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <milestone id="milestone1" name="Milestone" flowable:milestoneVariable="Milestone">
+        <extensionElements>
+          <design:stencilid><![CDATA[Milestone]]></design:stencilid>
+        </extensionElements>
+      </milestone>
+      <stage id="expandedStage1" name="Stage" flowable:includeInStageOverview="true">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planItem2" name="Task" definitionRef="humanTask1"></planItem>
+        <humanTask id="humanTask1" name="Task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+          <extensionElements>
+            <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+            <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+            <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          </extensionElements>
+        </humanTask>
+      </stage>
+      <exitCriterion id="exitCriterion2" sentryRef="sentry2" flowable:exitEventType="complete"></exitCriterion>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_exitSentryTriggeredByMilestoneTestCase">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="330.0" width="600.0" x="30.0" y="45.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_exitCriterion2" cmmnElementRef="exitCriterion2">
+        <dc:Bounds height="28.0" width="18.0" x="621.0" y="206.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="54.0" width="146.0" x="375.0" y="193.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_entryCriterion2" cmmnElementRef="entryCriterion2">
+        <dc:Bounds height="28.0" width="18.0" x="366.0" y="206.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="165.0" width="225.0" x="90.0" y="138.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="135.0" y="183.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector3" cmmnElementRef="planItem3" targetCMMNElementRef="entryCriterion2">
+        <di:waypoint x="314.94999999995747" y="220.5"></di:waypoint>
+        <di:waypoint x="345.0" y="220.5"></di:waypoint>
+        <di:waypoint x="345.0" y="220.5"></di:waypoint>
+        <di:waypoint x="366.0" y="220.5"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_connector4" cmmnElementRef="planItem1" targetCMMNElementRef="exitCriterion2">
+        <di:waypoint x="520.9499999999048" y="212.43506493506493"></di:waypoint>
+        <di:waypoint x="571.0" y="212.43506493506493"></di:waypoint>
+        <di:waypoint x="571.0" y="220.0"></di:waypoint>
+        <di:waypoint x="621.0" y="220.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

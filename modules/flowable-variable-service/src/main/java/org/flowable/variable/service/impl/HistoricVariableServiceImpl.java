@@ -12,10 +12,13 @@
  */
 package org.flowable.variable.service.impl;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.persistence.cache.EntityCache;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -27,11 +30,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class HistoricVariableServiceImpl extends ServiceImpl implements HistoricVariableService {
-
-    public HistoricVariableServiceImpl() {
-
-    }
+public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServiceConfiguration> implements HistoricVariableService {
 
     public HistoricVariableServiceImpl(VariableServiceConfiguration variableServiceConfiguration) {
         super(variableServiceConfiguration);
@@ -58,12 +57,12 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     }
     
     @Override
-    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable) {
-        return getHistoricVariableInstanceEntityManager().createAndInsert(variable);
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable, Date createTime) {
+        return getHistoricVariableInstanceEntityManager().createAndInsert(variable, createTime);
     }
     
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity, Date updateTime) {
         HistoricVariableInstanceEntity historicVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
         if (historicVariable == null) {
@@ -71,9 +70,9 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
         }
 
         if (historicVariable != null) {
-            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity);
+            historicVariableInstanceEntityManager.copyVariableFields(historicVariable, variableInstanceEntity, updateTime);
         } else {
-            historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity);
+            historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity, updateTime);
         }
     }
     
@@ -107,5 +106,29 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
+        getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
+        getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+    }
+
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    }
+    
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesForNonExistingCaseInstances();
+    }
+
+    public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return configuration.getHistoricVariableInstanceEntityManager();
     }
 }

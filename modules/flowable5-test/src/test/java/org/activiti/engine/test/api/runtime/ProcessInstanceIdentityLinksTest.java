@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 
 import junit.framework.AssertionFailedError;
 

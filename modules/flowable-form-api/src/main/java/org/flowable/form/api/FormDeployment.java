@@ -19,10 +19,10 @@ import java.util.Date;
  * 
  * A deployment is a container for resources such as form definitions, image, etc.
  * 
- * When a deployment is 'deployed' through the {@link org.flowable.engine.RuntimeService}, the Flowable engine will recognize certain of such resource types and act upon them (eg form definitions
+ * When a deployment is 'deployed', the Flowable engine will recognize certain of such resource types and act upon them (eg form definitions
  * will be parsed to an executable Java artifact).
  * 
- * To create a Deployment, use the {@link org.flowable.engine.repository.DeploymentBuilder}. A Deployment on itself is a <b>read-only</b> object and its content cannot be changed after deployment
+ * To create a Deployment, use the {@link org.flowable.form.api.FormDeploymentBuilder}. A Deployment on itself is a <b>read-only</b> object and its content cannot be changed after deployment
  * (hence the builder that needs to be used).
  * 
  * @author Tijs Rademakers

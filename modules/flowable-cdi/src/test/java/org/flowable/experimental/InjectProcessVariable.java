@@ -12,7 +12,7 @@
  */
 package org.flowable.experimental;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.flowable.cdi.annotation.ProcessVariable;
 

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.event.logger.handler;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 

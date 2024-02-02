@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="testCallActivityProcessInstanceName" name="testCallActivityProcessInstanceName" isExecutable="true">
+    <startEvent id="startEvent1"></startEvent>
+    <callActivity id="sid-13FD99BB-EB60-49EC-86CE-3815D63EC74C" name="The call activity" calledElement="calledProcessId" flowable:processInstanceName="Process instance ${theElementVariable}">
+      <extensionElements>
+        <flowable:in source="theElementVariable" target="theElementVariable"></flowable:in>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="theCollection" flowable:elementVariable="theElementVariable"></multiInstanceLoopCharacteristics>
+    </callActivity>
+    <sequenceFlow id="sid-4DBC3B83-5B49-44B1-AC1C-29E2B25C2594" sourceRef="startEvent1" targetRef="sid-13FD99BB-EB60-49EC-86CE-3815D63EC74C"></sequenceFlow>
+    <endEvent id="sid-5432BDCA-6CD2-422B-BF37-4BBA4863CFAF"></endEvent>
+    <sequenceFlow id="sid-02F5B61B-7B01-4BBB-933E-09616F4737DB" sourceRef="sid-13FD99BB-EB60-49EC-86CE-3815D63EC74C" targetRef="sid-5432BDCA-6CD2-422B-BF37-4BBA4863CFAF"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testCallActivityProcessInstanceName">
+    <bpmndi:BPMNPlane bpmnElement="testCallActivityProcessInstanceName" id="BPMNPlane_testCallActivityProcessInstanceName">
+      <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="90.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-13FD99BB-EB60-49EC-86CE-3815D63EC74C" id="BPMNShape_sid-13FD99BB-EB60-49EC-86CE-3815D63EC74C">
+        <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="125.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-5432BDCA-6CD2-422B-BF37-4BBA4863CFAF" id="BPMNShape_sid-5432BDCA-6CD2-422B-BF37-4BBA4863CFAF">
+        <omgdc:Bounds height="28.0" width="28.0" x="345.0" y="151.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-02F5B61B-7B01-4BBB-933E-09616F4737DB" id="BPMNEdge_sid-02F5B61B-7B01-4BBB-933E-09616F4737DB">
+        <omgdi:waypoint x="294.95000000000005" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="345.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-4DBC3B83-5B49-44B1-AC1C-29E2B25C2594" id="BPMNEdge_sid-4DBC3B83-5B49-44B1-AC1C-29E2B25C2594">
+        <omgdi:waypoint x="119.94999906759469" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

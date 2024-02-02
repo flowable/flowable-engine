@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 
 /**
  * Event extends default {@link FlowableEntityEvent} with the cause of termination
@@ -23,5 +23,5 @@ public interface FlowableProcessTerminatedEvent extends FlowableEntityEvent {
     /**
      * @return the cause of the cancel event. Returns null, if no specific cause has been specified.
      */
-    public Object getCause();
+    Object getCause();
 }

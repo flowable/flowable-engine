@@ -12,13 +12,12 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
@@ -32,8 +31,6 @@ import org.junit.Test;
  * @author Yvo Swillens
  */
 public class CustomConfigRuntimeTest {
-
-    public static final String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
     protected static final String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
     protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
@@ -49,7 +46,7 @@ public class CustomConfigRuntimeTest {
     public void postCustomExpressionFunction() {
 
         DmnEngine dmnEngine = flowableRule1.getDmnEngine();
-        DmnRuleService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
@@ -58,9 +55,8 @@ public class CustomConfigRuntimeTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
-        
-        assertSame(String.class, result.get("output1").getClass());
-        assertEquals("test2", result.get("output1"));
+
+        assertThat(result).containsEntry("output1", "test2");
     }
 
     @Test
@@ -68,7 +64,7 @@ public class CustomConfigRuntimeTest {
     public void customExpressionFunctionMissingDefaultFunction() {
 
         DmnEngine dmnEngine = flowableRule2.getDmnEngine();
-        DmnRuleService ruleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
@@ -77,8 +73,8 @@ public class CustomConfigRuntimeTest {
                 .decisionKey("decision")
                 .variable("input1", localDate.toDate())
                 .executeWithAuditTrail();
-        
-        assertEquals(0, result.getDecisionResult().size());
-        assertEquals(true, result.isFailed());
+
+        assertThat(result.getDecisionResult()).isEmpty();
+        assertThat(result.isFailed()).isTrue();
     }
 }

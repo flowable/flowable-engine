@@ -13,7 +13,7 @@
 package org.activiti.engine.test.bpmn.event.end;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 

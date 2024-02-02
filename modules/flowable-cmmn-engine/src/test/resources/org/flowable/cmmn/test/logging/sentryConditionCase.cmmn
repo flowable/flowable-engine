@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+    <case id="conditionCase" name="Condition case">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="Task A" definitionRef="taskA" />
+            <planItem id="planItem2" name="Stage 1" definitionRef="stage1">
+                <entryCriterion id="entryCondition1" sentryRef="sentry3" />
+            </planItem>
+            <sentry id="sentry3" flowable:triggerMode="onEvent">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <ifPart>
+                    <condition><![CDATA[${gotoStage1}]]></condition>
+                </ifPart>
+            </sentry>
+            
+            <humanTask id="taskA" name="Task A" />
+            
+            <stage id="stage1" name="Stage 1">
+                <planItem id="planItem3" name="Task B" definitionRef="taskB" />
+                <humanTask id="taskB" name="Task B"></humanTask>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

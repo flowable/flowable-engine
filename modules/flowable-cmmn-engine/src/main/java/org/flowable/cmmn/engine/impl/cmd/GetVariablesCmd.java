@@ -12,15 +12,17 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -29,9 +31,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class GetVariablesCmd implements Command<Map<String, Object>> {
     
     protected String caseInstanceId;
-    
-    public GetVariablesCmd(String caseInstanceId) {
+    protected Collection<String> variableNames;
+
+    public GetVariablesCmd(String caseInstanceId, Collection<String> variableNames) {
         this.caseInstanceId = caseInstanceId;
+        this.variableNames = variableNames;
     }
     
     @Override
@@ -39,8 +43,22 @@ public class GetVariablesCmd implements Command<Map<String, Object>> {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
-        List<VariableInstanceEntity> variableInstanceEntities = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        List<VariableInstanceEntity> variableInstanceEntities;
+
+        if (variableNames == null || variableNames.isEmpty()) {
+            variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                    .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+        } else {
+            variableInstanceEntities = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                    .createInternalVariableInstanceQuery()
+                    .scopeId(caseInstanceId)
+                    .withoutSubScopeId()
+                    .scopeType(ScopeTypes.CMMN)
+                    .names(variableNames)
+                    .list();
+        }
         Map<String, Object> variables = new HashMap<>(variableInstanceEntities.size());
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
             variables.put(variableInstanceEntity.getName(), variableInstanceEntity.getValue());

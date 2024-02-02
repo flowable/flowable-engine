@@ -36,7 +36,7 @@ public class LongFormType extends AbstractFormType {
         if (propertyValue == null || "".equals(propertyValue)) {
             return null;
         }
-        return new Long(propertyValue);
+        return Long.valueOf(propertyValue);
     }
 
     @Override

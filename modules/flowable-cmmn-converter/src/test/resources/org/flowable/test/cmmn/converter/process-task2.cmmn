@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="processTaskModel" name="Process task model" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItem1" name="Human task" definitionRef="onehumantask1"></planItem>
+      <planItem id="planItem2" name="Process task" definitionRef="oneprocesstask1">
+        <entryCriterion id="oneentrycriterion2" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="onehumantask1" name="Human task" flowable:assignee="admin" flowable:owner="admin" flowable:formKey="aHumanTaskForm" 
+            flowable:priority="50" flowable:dueDate="2019-01-01" flowable:category="testCategory" flowable:formFieldValidation="validateFormFieldsValue">
+        <extensionElements>
+          <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+        </extensionElements>
+      </humanTask>
+      <processTask id="oneprocesstask1" name="Process task" flowable:sameDeployment="true">
+        <processRefExpression><![CDATA[myTestProcess]]></processRefExpression>
+      </processTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_processTaskModel">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="120.0" y="119.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="375.0" y="119.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_oneentrycriterion2" cmmnElementRef="oneentrycriterion2">
+        <dc:Bounds height="26.0" width="18.0" x="365.0" y="144.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_oneconnector2" cmmnElementRef="planItem1" targetCMMNElementRef="oneentrycriterion2">
+        <di:waypoint x="219.94999999999652" y="159.0"></di:waypoint>
+        <di:waypoint x="297.5" y="159.0"></di:waypoint>
+        <di:waypoint x="297.5" y="157.0"></di:waypoint>
+        <di:waypoint x="365.0" y="157.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

@@ -16,10 +16,9 @@ package org.flowable.rest.service.api.management;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +44,9 @@ public class TableResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = "Get a single table", tags = { "Database tables" })
     @ApiResponses(value = {
@@ -52,7 +54,11 @@ public class TableResource {
             @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
     })
     @GetMapping(value = "/management/tables/{tableName}", produces = "application/json")
-    public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName, HttpServletRequest request) {
+    public TableResponse getTable(@ApiParam(name = "tableName") @PathVariable String tableName) {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTableInfo();
+        }
+        
         Map<String, Long> tableCounts = managementService.getTableCount();
 
         TableResponse response = null;

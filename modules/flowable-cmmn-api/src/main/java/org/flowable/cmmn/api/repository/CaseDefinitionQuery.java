@@ -13,9 +13,10 @@
 
 package org.flowable.cmmn.api.repository;
 
+import java.util.Collection;
 import java.util.Set;
 
-import org.flowable.engine.common.api.query.Query;
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * @author Joram Barrez
@@ -36,9 +37,13 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
 
     CaseDefinitionQuery caseDefinitionNameLike(String caseDefinitionNameLike);
 
+    CaseDefinitionQuery caseDefinitionNameLikeIgnoreCase(String nameLikeIgnoreCase);
+
     CaseDefinitionQuery deploymentId(String deploymentId);
 
     CaseDefinitionQuery deploymentIds(Set<String> deploymentIds);
+
+    CaseDefinitionQuery parentDeploymentId(String parentDeploymentId);
 
     CaseDefinitionQuery caseDefinitionKey(String caseDefinitionKey);
 
@@ -59,12 +64,26 @@ public interface CaseDefinitionQuery extends Query<CaseDefinitionQuery, CaseDefi
     CaseDefinitionQuery caseDefinitionResourceName(String resourceName);
 
     CaseDefinitionQuery caseDefinitionResourceNameLike(String resourceNameLike);
+    
+    CaseDefinitionQuery startableByUser(String userId);
+
+    CaseDefinitionQuery startableByUserOrGroups(String userId, Collection<String> groups);
 
     CaseDefinitionQuery caseDefinitionTenantId(String tenantId);
 
     CaseDefinitionQuery caseDefinitionTenantIdLike(String tenantIdLike);
 
     CaseDefinitionQuery caseDefinitionWithoutTenantId();
+
+    /**
+     * Localize case definition name and description to specified locale.
+     */
+    CaseDefinitionQuery locale(String locale);
+
+    /**
+     * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
+     */
+    CaseDefinitionQuery withLocalizationFallback();
 
     CaseDefinitionQuery orderByCaseDefinitionCategory();
 

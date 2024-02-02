@@ -17,11 +17,14 @@ import java.util.Map;
 
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskExampleTest extends HttpServiceTaskTestCase {
+
+    @Test
     @Deployment
     public void testExampleUsage() {
         Map<String, Object> variables = new HashMap<>();

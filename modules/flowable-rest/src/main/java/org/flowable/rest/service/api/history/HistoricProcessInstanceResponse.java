@@ -13,14 +13,16 @@
 
 package org.flowable.rest.service.api.history;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModelProperty;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.util.DateToStringSerializer;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Tijs Rademakers
@@ -29,9 +31,13 @@ public class HistoricProcessInstanceResponse {
 
     protected String id;
     protected String url;
+    protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String processDefinitionName;
+    protected String processDefinitionDescription;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
@@ -43,6 +49,11 @@ public class HistoricProcessInstanceResponse {
     protected String deleteReason;
     protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
+    protected String callbackId;
+    protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
 
     @ApiModelProperty(example = "5")
@@ -62,6 +73,15 @@ public class HistoricProcessInstanceResponse {
     public void setUrl(String url) {
         this.url = url;
     }
+    
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @ApiModelProperty(example = "myKey")
     public String getBusinessKey() {
@@ -70,6 +90,15 @@ public class HistoricProcessInstanceResponse {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    
+    @ApiModelProperty(example = "myStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     @ApiModelProperty(example = "oneTaskProcess%3A1%3A4")
@@ -88,6 +117,24 @@ public class HistoricProcessInstanceResponse {
 
     public void setProcessDefinitionUrl(String processDefinitionUrl) {
         this.processDefinitionUrl = processDefinitionUrl;
+    }
+    
+    @ApiModelProperty(example = "A process definition name")
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A process definition description")
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
     }
 
     @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
@@ -173,8 +220,53 @@ public class HistoricProcessInstanceResponse {
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
+    
+    @ApiModelProperty(example = "3")
+    public String getCallbackId() {
+        return callbackId;
+    }
 
-    @ApiModelProperty(example = "null")
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-bpmn-2.0-process")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    @ApiModelProperty(value = "The stage plan item instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage")
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @ApiModelProperty(example = "someTenantId")
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+    <process id="process" isExecutable="true">
+        <startEvent id="startEvent" name="StartEvent">
+            <timerEventDefinition>
+                <timeCycle flowable:endDate="2021-07-02T19:22:00Z">R2/2021-07-01T19:22:00Z/P1D</timeCycle>
+            </timerEventDefinition>
+        </startEvent>
+        <sequenceFlow id="start2Script" sourceRef="startEvent" targetRef="scriptExecutor"></sequenceFlow>
+
+        <scriptTask id="scriptExecutor" name="Script Executor" scriptFormat="groovy">
+            <script>execution.setVariable("executed", true)</script>
+        </scriptTask>
+
+        <sequenceFlow id="script2Task" sourceRef="scriptExecutor" targetRef="task1"></sequenceFlow>
+        <userTask id="task1" name="Task A"/>
+        <sequenceFlow id="task2End" sourceRef="scriptExecutor" targetRef="endEvent"></sequenceFlow>
+        <endEvent id="endEvent"></endEvent>
+    </process>
+</definitions>

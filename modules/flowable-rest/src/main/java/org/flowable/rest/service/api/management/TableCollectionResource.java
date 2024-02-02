@@ -13,19 +13,20 @@
 
 package org.flowable.rest.service.api.management;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+
 import org.flowable.engine.ManagementService;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -39,13 +40,19 @@ public class TableCollectionResource {
 
     @Autowired
     protected ManagementService managementService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
     @ApiOperation(value = " List tables", tags = { "Database tables" }, nickname = "listTables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful.")
     })
     @GetMapping(value = "/management/tables", produces = "application/json")
-    public List<TableResponse> getTables(HttpServletRequest request) {
+    public List<TableResponse> getTables() {
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTableInfo();
+        }
         return restResponseFactory.createTableResponseList(managementService.getTableCount());
     }
 }

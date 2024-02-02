@@ -48,7 +48,7 @@ public class FlowableCollectionParser extends BaseChildElementParser {
         	collectionHandler.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
         }
 
-        if (collectionHandler != null)  {
+        if (collectionHandler != null) {
             BpmnXMLUtil.addXMLLocation(collectionHandler, xtr);
             multiInstanceLoopCharacteristics.setHandler(collectionHandler);
         }

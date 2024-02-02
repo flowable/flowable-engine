@@ -20,11 +20,13 @@ import org.flowable.variable.api.types.VariableType;
  */
 public class ShortType implements VariableType {
 
+    public static final String TYPE_NAME = "short";
+
     private static final long serialVersionUID = 1L;
 
     @Override
     public String getTypeName() {
-        return "short";
+        return TYPE_NAME;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class ShortType implements VariableType {
     @Override
     public Object getValue(ValueFields valueFields) {
         if (valueFields.getLongValue() != null) {
-            return new Short(valueFields.getLongValue().shortValue());
+            return Short.valueOf(valueFields.getLongValue().shortValue());
         }
         return null;
     }

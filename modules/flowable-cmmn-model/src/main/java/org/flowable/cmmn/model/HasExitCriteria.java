@@ -18,6 +18,8 @@ import java.util.List;
  * @author Joram Barrez
  */
 public interface HasExitCriteria {
+
+    String getId();
     
     void addExitCriterion(Criterion exitCriterion);
     

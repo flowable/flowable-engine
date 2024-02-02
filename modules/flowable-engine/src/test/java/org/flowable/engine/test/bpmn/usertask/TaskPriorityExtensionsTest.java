@@ -13,18 +13,22 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Thilo-Alexander Ginkel
  */
 public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testPriorityExtension() throws Exception {
         testPriorityExtension(25);
@@ -41,13 +45,14 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
 
         final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
-        assertEquals(priority, task.getPriority());
+        assertThat(task.getPriority()).isEqualTo(priority);
     }
 
+    @Test
     @Deployment
     public void testPriorityExtensionString() throws Exception {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
         final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals(42, task.getPriority());
+        assertThat(task.getPriority()).isEqualTo(42);
     }
 }

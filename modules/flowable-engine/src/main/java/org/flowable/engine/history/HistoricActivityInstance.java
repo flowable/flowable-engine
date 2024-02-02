@@ -16,7 +16,7 @@ package org.flowable.engine.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 
 /**
  * Represents one execution of an activity and it's stored permanent for statistics, audit and other business intelligence purposes.
@@ -64,6 +64,9 @@ public interface HistoricActivityInstance extends HistoricData {
 
     /** Difference between {@link #getEndTime()} and {@link #getStartTime()}. */
     Long getDurationInMillis();
+    
+    /** Get transaction order value */
+    Integer getTransactionOrder();
 
     /** Returns the delete reason for this activity, if any was set (if completed normally, no delete reason is set) */
     String getDeleteReason();

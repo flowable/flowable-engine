@@ -54,6 +54,14 @@ public class FlowableMockSupport {
         testActivityBehaviorFactory.addClassDelegateMock(originalClassFqn, mockedClassFqn);
     }
 
+    public void mockServiceTaskByIdWithClassDelegate(String taskId, Class<?> mockedClass) {
+        testActivityBehaviorFactory.addClassDelegateMockByTaskId(taskId, mockedClass);
+    }
+
+    public void mockServiceTaskByIdWithClassDelegate(String taskId, String mockedClassFqn) {
+        testActivityBehaviorFactory.addClassDelegateMockByTaskId(taskId, mockedClassFqn);
+    }
+
     public void setAllServiceTasksNoOp() {
         testActivityBehaviorFactory.setAllServiceTasksNoOp();
     }

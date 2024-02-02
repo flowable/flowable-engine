@@ -15,7 +15,7 @@ package org.flowable.cdi.annotation.event;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 import org.flowable.engine.repository.ProcessDefinition;
 

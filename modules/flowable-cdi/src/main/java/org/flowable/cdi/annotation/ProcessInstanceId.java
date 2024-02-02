@@ -17,19 +17,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.inject.Qualifier;
+import jakarta.inject.Qualifier;
 
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
  * Qualifier annotation for injecting the id of the current process instance.
- * <p />
+ * <p>
  * Example:
  * 
  * <pre>
  * {@code @Inject} @ProcessInstanceId String pid;
  * </pre>
- * <p />
+ * <p>
  * Note that the {@link ProcessInstance} is also available for injection:
  * 
  * <pre>

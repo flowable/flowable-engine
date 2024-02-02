@@ -15,9 +15,9 @@ package org.activiti.standalone.jpa;
 
 import java.math.BigInteger;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 /**
  * @author Frederik Heremans
@@ -26,7 +26,7 @@ import javax.persistence.Id;
 public class BigIntegerIdJPAEntity {
 
     @Id
-    @Column(name = "ID_")
+    @Column(name = "ID_", precision = 35)
     private BigInteger bigIntegerId;
 
     public BigInteger getBigIntegerId() {

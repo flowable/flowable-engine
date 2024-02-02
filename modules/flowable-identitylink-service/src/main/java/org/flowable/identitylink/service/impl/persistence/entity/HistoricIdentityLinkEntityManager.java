@@ -12,9 +12,10 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
@@ -24,9 +25,29 @@ public interface HistoricIdentityLinkEntityManager extends EntityManager<Histori
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId);
 
     List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId);
+    
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    List<HistoricIdentityLinkEntity> findHistoricIdentityLinksBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     void deleteHistoricIdentityLinksByTaskId(String taskId);
 
     void deleteHistoricIdentityLinksByProcInstance(String processInstanceId);
+    
+    void deleteHistoricIdentityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    void deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
+    
+    void bulkDeleteHistoricIdentityLinksForProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    void bulkDeleteHistoricIdentityLinksForTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+    
+    void deleteHistoricProcessIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricCaseIdentityLinksForNonExistingInstances();
+    
+    void deleteHistoricTaskIdentityLinksForNonExistingInstances();
 
 }

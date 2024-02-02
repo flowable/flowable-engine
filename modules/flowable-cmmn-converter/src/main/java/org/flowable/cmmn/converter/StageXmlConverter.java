@@ -14,13 +14,14 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.Stage;
 
 /**
  * @author Joram Barrez
  */
-public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
+public class StageXmlConverter extends PlanItemDefinitionXmlConverter {
     
     @Override
     public String getXMLElementName() {
@@ -35,12 +36,34 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Stage stage = new Stage();
+        
         stage.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+
+        stage.setAutoComplete(Boolean.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IS_AUTO_COMPLETE)));
+        stage.setAutoCompleteCondition(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_AUTO_COMPLETE_CONDITION));
+
+        String displayOrderString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DISPLAY_ORDER);
+        if (StringUtils.isNotEmpty(displayOrderString)) {
+            stage.setDisplayOrder(Integer.valueOf(displayOrderString));
+        }
+
+        String includeInStageOverviewString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW);
+        if (StringUtils.isNotEmpty(includeInStageOverviewString)) {
+            stage.setIncludeInStageOverview(includeInStageOverviewString);
+        } else {
+            stage.setIncludeInStageOverview("true");  // True by default
+        }
+
         stage.setCase(conversionHelper.getCurrentCase());
-        stage.setParent(conversionHelper.getCurrentStage());
+        stage.setParent(conversionHelper.getCurrentPlanFragment());
         
         conversionHelper.setCurrentStage(stage);
         conversionHelper.addStage(stage);
+
+        String businessStatus = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_BUSINESS_STATUS);
+        if (StringUtils.isNotEmpty(businessStatus)) {
+            stage.setBusinessStatus(businessStatus);
+        }
         
         return stage;
     }

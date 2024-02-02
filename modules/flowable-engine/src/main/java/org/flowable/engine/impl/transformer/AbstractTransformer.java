@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.transformer;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * A Transformer is responsible of transforming an object into a different object
@@ -27,7 +27,7 @@ public abstract class AbstractTransformer implements Transformer {
             return this.primTransform(anObject);
         } catch (Exception e) {
 
-            throw new FlowableException("Error while executing transformation from object: " + anObject + " using transformer " + this);
+            throw new FlowableException("Error while executing transformation from object: " + anObject + " using transformer " + this, e);
         }
     }
 

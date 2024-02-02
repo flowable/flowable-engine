@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
@@ -29,8 +29,8 @@ public interface MilestoneInstanceEntityManager extends EntityManager<MilestoneI
 
     long findMilestoneInstanceCountByQueryCriteria(MilestoneInstanceQuery query);
     
-    List<MilestoneInstanceEntity> findMilestoneInstancesByCaseInstanceId(String caseInstanceId);
-    
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteByCaseInstanceId(String caseInstanceId);
 
 }

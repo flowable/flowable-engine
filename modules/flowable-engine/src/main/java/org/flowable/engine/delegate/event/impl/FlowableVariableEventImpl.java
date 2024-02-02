@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,13 +12,13 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.flowable.variable.api.types.VariableType;
 
 /**
  * Implementation of {@link FlowableVariableEvent}.
- * 
+ *
  * @author Frederik Heremans
  */
 public class FlowableVariableEventImpl extends FlowableProcessEventImpl implements FlowableVariableEvent {
@@ -27,6 +27,7 @@ public class FlowableVariableEventImpl extends FlowableProcessEventImpl implemen
     protected Object variableValue;
     protected VariableType variableType;
     protected String taskId;
+    protected String variableInstanceId;
 
     public FlowableVariableEventImpl(FlowableEngineEventType type) {
         super(type);
@@ -68,4 +69,12 @@ public class FlowableVariableEventImpl extends FlowableProcessEventImpl implemen
         this.taskId = taskId;
     }
 
+    @Override
+    public String getVariableInstanceId() {
+        return variableInstanceId;
+    }
+
+    public void setVariableInstanceId(String variableInstanceId) {
+        this.variableInstanceId = variableInstanceId;
+    }
 }

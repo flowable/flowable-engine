@@ -13,36 +13,28 @@
 
 package org.flowable.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
-public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
+public class DisabledDefinitionInfoCacheTest extends ResourceFlowableTestCase {
 
-    protected static ProcessEngine cachedProcessEngine;
-
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/engine/test/bpmn/usertask/flowable.cfg.xml");
-
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-        }
-        processEngine = cachedProcessEngine;
+    public DisabledDefinitionInfoCacheTest() {
+        super("org/flowable/engine/test/bpmn/usertask/flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testChangeFormKey() {
         // first test without changing the form key
@@ -50,7 +42,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("test", task.getFormKey());
+        assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
@@ -62,12 +54,13 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        assertEquals("test", task.getFormKey());
+        assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
     @Deployment
     public void testChangeClassName() {
         // first test without changing the class name
@@ -79,8 +72,8 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
@@ -100,8 +93,8 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
-        assertEquals(1, runtimeService.getVariable(processInstance.getId(), "count"));
-        assertEquals(0, runtimeService.getVariable(processInstance.getId(), "count2"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count")).isEqualTo(1);
+        assertThat(runtimeService.getVariable(processInstance.getId(), "count2")).isEqualTo(0);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());

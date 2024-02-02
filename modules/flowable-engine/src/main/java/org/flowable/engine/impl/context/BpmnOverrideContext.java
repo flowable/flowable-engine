@@ -50,8 +50,7 @@ public class BpmnOverrideContext {
                         language, id, definitionInfoNode);
 
             } else {
-                HashSet<Locale> candidateLocales = new LinkedHashSet<>();
-                candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
+                HashSet<Locale> candidateLocales = new LinkedHashSet<>(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
                 for (Locale locale : candidateLocales) {
                     localizationProperties = CommandContextUtil.getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
                             locale.toLanguageTag(), id, definitionInfoNode);
@@ -69,7 +68,7 @@ public class BpmnOverrideContext {
         bpmnOverrideContextThreadLocal.remove();
     }
 
-    protected static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
+    public static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
         Map<String, ObjectNode> bpmnOverrideMap = getBpmnOverrideContext();
         if (!bpmnOverrideMap.containsKey(processDefinitionId)) {
             ProcessDefinitionInfoCacheObject cacheObject = CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()

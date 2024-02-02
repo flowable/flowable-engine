@@ -13,16 +13,16 @@
 
 package org.flowable.engine.impl.event;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Daniel Meyer
  */
 public interface EventHandler {
 
-    public String getEventHandlerType();
+    String getEventHandlerType();
 
-    public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext);
+    void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext);
 
 }

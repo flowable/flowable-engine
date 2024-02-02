@@ -13,18 +13,13 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import java.util.Collections;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.task.api.Task;
@@ -36,11 +31,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -56,12 +60,11 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope) {
 
         return getVariableFromRequest(taskId, variableName, scope, false);
     }
@@ -69,9 +72,9 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update an existing variable on a task", tags = { "Task Variables" }, nickname = "updateTaskInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "It's possible to update simple (non-binary) variable or  binary variable \n"
+                    + "It is possible to update simple (non-binary) variable or  binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a task variable", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
@@ -85,7 +88,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the variables was updated and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates the name of a variable to update was missing or that an attempt is done to update a variable on a standalone task (without a process associated) with scope global. Status message provides additional information."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name in the given scope. Status message contains additional information about the error."),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name in the given scope. Status message contains additional information about the error."),
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized."),
     })
     @PutMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
@@ -94,7 +97,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
@@ -126,19 +129,19 @@ public class TaskVariableResource extends TaskVariableBaseResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete a variable on a task", tags = { "Task Variables" }, nickname = "deleteTaskInstanceVariable")
+    @ApiOperation(value = "Delete a variable on a task", tags = { "Task Variables" }, nickname = "deleteTaskInstanceVariable", code = 204)
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task variable was found and has been deleted. Response-body is intentionally empty."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name. Status message contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name. Status message contains additional information about the error.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
-            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString,
-            HttpServletResponse response) {
+            @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         // Determine scope
         RestVariableScope scope = RestVariableScope.LOCAL;
@@ -147,7 +150,11 @@ public class TaskVariableResource extends TaskVariableBaseResource {
         }
 
         if (!hasVariableOnScope(task, variableName, scope)) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have a variable '" + variableName + "' in scope " + scope.name().toLowerCase(), VariableInstanceEntity.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have a variable '" + variableName + "' in scope " + scope.name().toLowerCase(), VariableInstanceEntity.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskVariables(task, Collections.singleton(variableName), scope);
         }
 
         if (scope == RestVariableScope.LOCAL) {
@@ -157,6 +164,5 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             // stopped a global-var update on standalone task
             runtimeService.removeVariable(task.getExecutionId(), variableName);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

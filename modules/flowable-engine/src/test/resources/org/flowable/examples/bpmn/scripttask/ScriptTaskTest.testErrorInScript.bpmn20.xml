@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="testErrorInScript">
+
+        <startEvent id="theStart"/>
+
+        <scriptTask id="theScriptTaskWithJuel" >
+            <script>execution.setVariable("myVar", scriptVar)</script>
+        </scriptTask>
+
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScriptTaskWithJuel"/>
+        <sequenceFlow id="flow2" sourceRef="theScriptTaskWithJuel" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

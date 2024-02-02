@@ -1,0 +1,231 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="definition_decisionServiceTest" name="Decision Service Test" namespace="http://www.flowable.org/dmn">
+  <decision id="decision4" name="DMN 4">
+      <informationRequirement id="informationRequirement8">
+        <requiredDecision href="#decision1"></requiredDecision>
+      </informationRequirement>
+      <decisionTable id="decisionTable_5c854aa9-8063-498d-bb78-a4ccfd531ee7" hitPolicy="FIRST">
+        <input label="D">
+          <inputExpression id="inputExpression_970a0606-cdeb-4b14-b1fc-5413607d0b61" typeRef="string">
+            <text>d</text>
+          </inputExpression>
+        </input>
+        <input label="E">
+          <inputExpression id="inputExpression_b028f5e6-1be5-48cb-9098-7637f2ca4f2f" typeRef="string">
+            <text>e</text>
+          </inputExpression>
+        </input>
+        <output id="outputExpression_3482d219-9785-42fc-8e3b-07c65af5ed67" label="H" name="h" typeRef="string"></output>
+        <rule>
+          <inputEntry id="inputEntry_970a0606-cdeb-4b14-b1fc-5413607d0b61_1">
+            <text><![CDATA[== "1"]]></text>
+          </inputEntry>
+          <inputEntry id="inputEntry_b028f5e6-1be5-48cb-9098-7637f2ca4f2f_1">
+            <text><![CDATA[== "1"]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_3482d219-9785-42fc-8e3b-07c65af5ed67_1">
+            <text><![CDATA["1000"]]></text>
+          </outputEntry>
+        </rule>
+        <rule>
+          <inputEntry id="inputEntry_970a0606-cdeb-4b14-b1fc-5413607d0b61_2">
+            <text><![CDATA[== "1"]]></text>
+          </inputEntry>
+          <inputEntry id="inputEntry_b028f5e6-1be5-48cb-9098-7637f2ca4f2f_2">
+            <text><![CDATA[-]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_3482d219-9785-42fc-8e3b-07c65af5ed67_2">
+            <text><![CDATA["100"]]></text>
+          </outputEntry>
+        </rule>
+        <rule>
+          <inputEntry id="inputEntry_970a0606-cdeb-4b14-b1fc-5413607d0b61_3">
+            <text><![CDATA[-]]></text>
+          </inputEntry>
+          <inputEntry id="inputEntry_b028f5e6-1be5-48cb-9098-7637f2ca4f2f_3">
+            <text><![CDATA[== "1"]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_3482d219-9785-42fc-8e3b-07c65af5ed67_3">
+            <text><![CDATA["10"]]></text>
+          </outputEntry>
+        </rule>
+        <rule>
+          <inputEntry id="inputEntry_970a0606-cdeb-4b14-b1fc-5413607d0b61_4">
+            <text><![CDATA[-]]></text>
+          </inputEntry>
+          <inputEntry id="inputEntry_b028f5e6-1be5-48cb-9098-7637f2ca4f2f_4">
+            <text><![CDATA[-]]></text>
+          </inputEntry>
+          <outputEntry id="outputEntry_3482d219-9785-42fc-8e3b-07c65af5ed67_4">
+            <text><![CDATA["1"]]></text>
+          </outputEntry>
+        </rule>
+      </decisionTable>
+    </decision>
+  <decision id="decision3" name="DMN 3">
+    <informationRequirement id="informationRequirement7">
+      <requiredDecision href="#decision2"></requiredDecision>
+    </informationRequirement>
+    <decisionTable id="decisionTable_017e54c5-76f6-40db-95b8-cca109fd1116" hitPolicy="FIRST">
+      <input label="D">
+        <inputExpression id="inputExpression_01e81d6f-7da4-4479-bbdc-987e795045eb" typeRef="string">
+          <text>d</text>
+        </inputExpression>
+      </input>
+      <input label="E">
+        <inputExpression id="inputExpression_211835fb-3a1a-4f40-a512-70def71e45ef" typeRef="string">
+          <text>e</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_8b6e1bbb-76ba-4721-b362-fbcbc7bc413c" label="G" name="g" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_01e81d6f-7da4-4479-bbdc-987e795045eb_1">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_211835fb-3a1a-4f40-a512-70def71e45ef_1">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8b6e1bbb-76ba-4721-b362-fbcbc7bc413c_1">
+          <text><![CDATA["1000"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_01e81d6f-7da4-4479-bbdc-987e795045eb_2">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_211835fb-3a1a-4f40-a512-70def71e45ef_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8b6e1bbb-76ba-4721-b362-fbcbc7bc413c_2">
+          <text><![CDATA["100"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_01e81d6f-7da4-4479-bbdc-987e795045eb_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_211835fb-3a1a-4f40-a512-70def71e45ef_3">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_8b6e1bbb-76ba-4721-b362-fbcbc7bc413c_3">
+          <text><![CDATA["10"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="decision2" name="DMN 2">
+    <decisionTable id="decisionTable_95ca937b-a8cc-4e4b-b644-4a6e5ac416bc" hitPolicy="FIRST">
+      <input label="A">
+        <inputExpression id="inputExpression_de0d78e8-8a41-4766-88b7-e65dcd4d5d6f" typeRef="string">
+          <text>a</text>
+        </inputExpression>
+      </input>
+      <input label="B">
+        <inputExpression id="inputExpression_39ce21f6-2843-4a79-a9bd-41e5fd01f879" typeRef="string">
+          <text>b</text>
+        </inputExpression>
+      </input>
+      <input label="C">
+        <inputExpression id="inputExpression_16631211-af92-470c-ac53-d588689b3243" typeRef="string">
+          <text>c</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_a46672b6-5736-4731-b621-f46801c7e0f2" label="E" name="e" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_de0d78e8-8a41-4766-88b7-e65dcd4d5d6f_1">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_39ce21f6-2843-4a79-a9bd-41e5fd01f879_1">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_16631211-af92-470c-ac53-d588689b3243_1">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_a46672b6-5736-4731-b621-f46801c7e0f2_1">
+          <text><![CDATA["1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_de0d78e8-8a41-4766-88b7-e65dcd4d5d6f_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_39ce21f6-2843-4a79-a9bd-41e5fd01f879_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_16631211-af92-470c-ac53-d588689b3243_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_a46672b6-5736-4731-b621-f46801c7e0f2_2">
+          <text><![CDATA["10"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="decision1" name="DMN 1">
+    <decisionTable id="decisionTable_621ef471-32e9-4a68-9ce6-d9532483ad83" hitPolicy="FIRST">
+      <input label="A">
+        <inputExpression id="inputExpression_6fdc3952-41ba-4751-85f1-8c0a57c4c8e6" typeRef="string">
+          <text>a</text>
+        </inputExpression>
+      </input>
+      <input label="B">
+        <inputExpression id="inputExpression_25a5c233-fe71-4d6d-b039-0630747d37cb" typeRef="string">
+          <text>b</text>
+        </inputExpression>
+      </input>
+      <input label="C">
+        <inputExpression id="inputExpression_94d1f3e6-f20b-4aeb-9816-6dec24c5c1b2" typeRef="string">
+          <text>c</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_fbe372ff-e9ec-4aa7-9a17-9a733f0b0fd4" label="D" name="d" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_6fdc3952-41ba-4751-85f1-8c0a57c4c8e6_1">
+          <text><![CDATA["1"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_25a5c233-fe71-4d6d-b039-0630747d37cb_1">
+          <text><![CDATA[== "1"]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_94d1f3e6-f20b-4aeb-9816-6dec24c5c1b2_1">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fbe372ff-e9ec-4aa7-9a17-9a733f0b0fd4_1">
+          <text><![CDATA["1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_6fdc3952-41ba-4751-85f1-8c0a57c4c8e6_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_25a5c233-fe71-4d6d-b039-0630747d37cb_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_94d1f3e6-f20b-4aeb-9816-6dec24c5c1b2_2">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fbe372ff-e9ec-4aa7-9a17-9a733f0b0fd4_2">
+          <text><![CDATA["10"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_6fdc3952-41ba-4751-85f1-8c0a57c4c8e6_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_25a5c233-fe71-4d6d-b039-0630747d37cb_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry_94d1f3e6-f20b-4aeb-9816-6dec24c5c1b2_3">
+          <text><![CDATA[-]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_fbe372ff-e9ec-4aa7-9a17-9a733f0b0fd4_3">
+          <text><![CDATA[""]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decisionService id="decisionServiceTest" name="Decision Service Test">
+    <outputDecision href="#decision4"></outputDecision>
+    <outputDecision href="#decision3"></outputDecision>
+    <encapsulatedDecision href="#decision2"></encapsulatedDecision>
+    <encapsulatedDecision href="#decision1"></encapsulatedDecision>
+  </decisionService>
+</definitions>

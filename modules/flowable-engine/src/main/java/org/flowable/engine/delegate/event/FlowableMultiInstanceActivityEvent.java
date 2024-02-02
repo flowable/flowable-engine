@@ -1,5 +1,3 @@
-package org.flowable.engine.delegate.event;
-
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +10,9 @@ package org.flowable.engine.delegate.event;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * A {@link FlowableEvent} related to a multi-instance activity within an execution.
@@ -21,5 +20,5 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  * @author Robert Hafner
  */
 public interface FlowableMultiInstanceActivityEvent extends FlowableActivityEvent {
-    public boolean isSequential();
+    boolean isSequential();
 }

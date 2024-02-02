@@ -13,8 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -24,9 +25,11 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic process instance identity links resource.
@@ -35,11 +38,10 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
  */
 public class HistoricProcessInstanceIdentityLinkCollectionResourceTest extends BaseSpringRestTestCase {
 
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
-
     /**
      * GET history/historic-process-instances/{processInstanceId}/identitylinks
      */
+    @Test
     @Deployment
     public void testGetIdentityLinks() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();
@@ -60,39 +62,37 @@ public class HistoricProcessInstanceIdentityLinkCollectionResourceTest extends B
 
         JsonNode linksArray = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertEquals(3, linksArray.size());
-        Map<String, JsonNode> linksMap = new HashMap<>();
-        for (JsonNode linkNode : linksArray) {
-            linksMap.put(linkNode.get("userId").asText(), linkNode);
-        }
-        JsonNode participantNode = linksMap.get("kermit");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("kermit", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(processInstance.getId(), participantNode.get("processInstanceId").asText());
-        assertNotNull(participantNode.get("processInstanceUrl").asText());
 
-        participantNode = linksMap.get("fozzie");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("fozzie", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(processInstance.getId(), participantNode.get("processInstanceId").asText());
-        assertNotNull(participantNode.get("processInstanceUrl").asText());
-
-        participantNode = linksMap.get("test");
-        assertNotNull(participantNode);
-        assertEquals("participant", participantNode.get("type").asText());
-        assertEquals("test", participantNode.get("userId").asText());
-        assertTrue(participantNode.get("groupId").isNull());
-        assertTrue(participantNode.get("taskId").isNull());
-        assertTrue(participantNode.get("taskUrl").isNull());
-        assertEquals(processInstance.getId(), participantNode.get("processInstanceId").asText());
-        assertNotNull(participantNode.get("processInstanceUrl").asText());
+        assertThatJson(linksArray)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + "{"
+                        + "    type: 'participant',"
+                        + "    userId: 'test',"
+                        + "    groupId: null,"
+                        + "    taskId: null,"
+                        + "    taskUrl: null,"
+                        + "    processInstanceId: '" + processInstance.getId() + "',"
+                        + "    processInstanceUrl: '${json-unit.any-string}'"
+                        + "},"
+                        + "{"
+                        + "    type: 'participant',"
+                        + "    userId: 'kermit',"
+                        + "    groupId: null,"
+                        + "    taskId: null,"
+                        + "    taskUrl: null,"
+                        + "    processInstanceId: '" + processInstance.getId() + "',"
+                        + "    processInstanceUrl: '${json-unit.any-string}'"
+                        + "},"
+                        + "{"
+                        + "    type: 'participant',"
+                        + "    userId: 'fozzie',"
+                        + "    groupId: null,"
+                        + "    taskId: null,"
+                        + "    taskUrl: null,"
+                        + "    processInstanceId: '" + processInstance.getId() + "',"
+                        + "    processInstanceUrl: '${json-unit.any-string}'"
+                        + "}"
+                        + "]");
     }
 }

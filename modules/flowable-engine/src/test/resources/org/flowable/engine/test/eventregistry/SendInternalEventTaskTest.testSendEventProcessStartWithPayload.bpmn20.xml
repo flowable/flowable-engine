@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+>
+
+    <process id="eventProcessStart">
+
+        <startEvent id="theStart">
+            <extensionElements>
+                <flowable:eventType>simpleTest</flowable:eventType>
+                <flowable:eventCorrelationParameter name="action" value="start"/>
+                <flowable:eventOutParameter source="customer" target="customerId"/>
+                <flowable:eventOutParameter source="name" target="customerName"/>
+            </extensionElements>
+        </startEvent>
+
+        <sequenceFlow sourceRef="theStart" targetRef="task"/>
+
+        <userTask id="task"/>
+
+        <sequenceFlow sourceRef="task" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

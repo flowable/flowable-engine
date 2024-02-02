@@ -13,21 +13,24 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.HitPolicy;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Yvo Swillens
  */
 public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDecisionResultBehavior {
+
+    public HitPolicyOutputOrder() {
+        super(true);
+    }
 
     @Override
     public String getHitPolicyName() {
@@ -48,31 +51,32 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
         }
         
         if (!outputValuesPresent) {
+            String hitPolicyViolatedMessage = String.format("HitPolicy: %s violated; no output values present", getHitPolicyName());
             if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
-                throw new FlowableException(String.format("HitPolicy: %s; no output values present", getHitPolicyName()));
+                throw new FlowableException(hitPolicyViolatedMessage);
+            } else {
+                executionContext.getAuditContainer().setValidationMessage(hitPolicyViolatedMessage);
             }
         }
 
         // sort on predefined list(s) of output values
-        Collections.sort(ruleResults, new Comparator<Map<String, Object>>() {
-
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                
-                CompareToBuilder compareToBuilder = new CompareToBuilder();
-                for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
-                    List<Object> outputValues = entry.getValue();
-                    if (outputValues != null && !outputValues.isEmpty()) {
-                        compareToBuilder.append(o1.get(entry.getKey()), o2.get(entry.getKey()), 
-                                        new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
-                        compareToBuilder.toComparison();
-                    }
+        ruleResults.sort((o1, o2) -> {
+            CompareToBuilder compareToBuilder = new CompareToBuilder();
+            for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
+                List<Object> outputValues = entry.getValue();
+                if (outputValues != null && !outputValues.isEmpty()) {
+                    compareToBuilder.append(o1.get(entry.getKey()), o2.get(entry.getKey()),
+                            new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                    compareToBuilder.toComparison();
                 }
-                
-                return compareToBuilder.toComparison();
             }
+            return compareToBuilder.toComparison();
         });
 
-        executionContext.getAuditContainer().setDecisionResult(ruleResults);
+        updateStackWithDecisionResults(ruleResults, executionContext);
+
+        DecisionExecutionAuditContainer auditContainer = executionContext.getAuditContainer();
+        auditContainer.setDecisionResult(ruleResults);
+        auditContainer.setMultipleResults(true);
     }
 }

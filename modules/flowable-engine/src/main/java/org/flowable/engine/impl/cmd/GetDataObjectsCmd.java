@@ -21,11 +21,11 @@ import java.util.Map.Entry;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.DataObjectImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
@@ -126,7 +126,7 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
                         }
                     }
                 } else {
-                    SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(execution.getActivityId());
+                    SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(executionEntity.getActivityId());
                     for (ValuedDataObject dataObject : subProcess.getDataObjects()) {
                         if (dataObject.getName().equals(variableEntity.getName())) {
                             foundDataObject = dataObject;

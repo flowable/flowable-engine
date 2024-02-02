@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.engine;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 public class FlowableDmnExpressionException extends FlowableException {
 

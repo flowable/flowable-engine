@@ -23,7 +23,7 @@ import org.activiti.engine.impl.HistoricTaskInstanceQueryImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 
 /**
  * @author Tom Baeyens

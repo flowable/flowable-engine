@@ -33,8 +33,9 @@ public class CompensateEventDefinitionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event))
+        if (!(parentElement instanceof Event)) {
             return;
+        }
 
         CompensateEventDefinition eventDefinition = new CompensateEventDefinition();
         BpmnXMLUtil.addXMLLocation(eventDefinition, xtr);

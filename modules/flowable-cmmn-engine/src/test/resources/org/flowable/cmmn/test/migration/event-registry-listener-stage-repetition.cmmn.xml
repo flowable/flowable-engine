@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="testCase" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      
+      <planItem id="planItem1" name="Stage" definitionRef="stage1" />
+      
+      <stage id="stage1" name="Stage">
+        <planItem id="planItem2" name="Event" definitionRef="eventListener1">
+            <itemControl>
+              <repetitionRule flowable:counterVariable="repetitionCounter" />
+            </itemControl>
+        </planItem>
+        <planItem id="planItem3" name="Task 1" definitionRef="humanTask1">
+            <itemControl>
+              <repetitionRule flowable:counterVariable="repetitionCounter" />
+            </itemControl>
+            <entryCriterion id="cmmnEntrySentry_1" sentryRef="sentrycmmnEntrySentry" />
+        </planItem>      
+        <planItem id="planItem4" name="Task 2" definitionRef="humanTask2" />
+        <sentry id="sentrycmmnEntrySentry">
+            <planItemOnPart id="sentryOnPartcmmnEntrySentry" sourceRef="planItem2">
+              <standardEvent>occur</standardEvent>
+            </planItemOnPart>
+        </sentry>
+        <humanTask id="humanTask1" name="Task 1" />
+        <humanTask id="humanTask2" name="Task 2" />
+        <eventListener id="eventListener1" name="Event">
+            <extensionElements>
+                <flowable:eventType>myEvent</flowable:eventType>
+            </extensionElements>
+        </eventListener>
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

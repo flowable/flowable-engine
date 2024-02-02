@@ -23,7 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -80,6 +80,23 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
     }
 
     @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("caseDefinitionKey", caseDefinitionKey);
+        return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByParentDeploymentAndKey", parameters);
+    }
+
+    @Override
+    public CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("caseDefinitionKey", caseDefinitionKey);
+        parameters.put("tenantId", tenantId);
+        return (CaseDefinitionEntity) getDbSqlSession().selectOne("selectCaseDefinitionByParentDeploymentAndKeyAndTenantId", parameters);
+    }
+
+    @Override
     public CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion) {
         Map<String, Object> params = new HashMap<>();
         params.put("caseDefinitionKey", caseDefinitionKey);
@@ -104,7 +121,9 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " case definitions with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'.");
+            throw new FlowableException(
+                    "There are " + results.size() + " case definitions with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion
+                            + "' in tenant = '" + tenantId + "'.");
         }
         return null;
     }
@@ -114,18 +133,25 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateCaseDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateCaseDefinitionTenantIdForDeploymentId", params);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<CaseDefinition> findCaseDefinitionsByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        setSafeInValueLists(caseDefinitionQuery);
         return getDbSqlSession().selectList("selectCaseDefinitionsByQueryCriteria", caseDefinitionQuery);
     }
 
     @Override
     public long findCaseDefinitionCountByQueryCriteria(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        setSafeInValueLists(caseDefinitionQuery);
         return (Long) getDbSqlSession().selectOne("selectCaseDefinitionCountByQueryCriteria", caseDefinitionQuery);
     }
 
+    protected void setSafeInValueLists(CaseDefinitionQueryImpl caseDefinitionQuery) {
+        if (caseDefinitionQuery.getAuthorizationGroups() != null) {
+            caseDefinitionQuery.setSafeAuthorizationGroups(createSafeInValuesList(caseDefinitionQuery.getAuthorizationGroups()));
+        }
+    }
 }

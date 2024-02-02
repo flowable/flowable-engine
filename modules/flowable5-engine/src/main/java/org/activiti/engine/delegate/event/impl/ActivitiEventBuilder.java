@@ -18,10 +18,10 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.context.ExecutionContext;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti.engine.task.Task;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableExceptionEvent;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -262,7 +262,7 @@ public class ActivitiEventBuilder {
     }
 
     public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId,
-            String executionId, String processInstanceId, String processDefinitionId) {
+            String executionId, String processInstanceId, String processDefinitionId, String variableInstanceId) {
         ActivitiVariableEventImpl newEvent = new ActivitiVariableEventImpl(type);
         newEvent.setVariableName(variableName);
         newEvent.setVariableValue(variableValue);
@@ -271,6 +271,7 @@ public class ActivitiEventBuilder {
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setVariableInstanceId(variableInstanceId);
         return newEvent;
     }
 

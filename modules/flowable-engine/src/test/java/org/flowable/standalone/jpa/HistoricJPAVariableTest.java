@@ -12,75 +12,66 @@
  */
 package org.flowable.standalone.jpa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Daisuke Yoshimoto
  */
-public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
+@Tag("jpa")
+public class HistoricJPAVariableTest extends ResourceFlowableTestCase {
 
-    protected static ProcessEngine cachedProcessEngine;
+    private EntityManagerFactory entityManagerFactory;
 
-    private static EntityManagerFactory entityManagerFactory;
-
-    private static FieldAccessJPAEntity simpleEntityFieldAccess;
-    private static boolean entitiesInitialized;
+    private FieldAccessJPAEntity simpleEntityFieldAccess;
 
     protected String processInstanceId;
 
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
+    public HistoricJPAVariableTest() {
+        super("org/flowable/standalone/jpa/flowable.cfg.xml");
+    }
 
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-
-            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration
-                    .getSessionFactories()
-                    .get(EntityManagerSession.class);
-
-            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-        }
-        processEngine = cachedProcessEngine;
+    @BeforeEach
+    protected void setUp() {
+        entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
+                .getEntityManagerFactory();
     }
 
     public void setupJPAEntities() {
-        if (!entitiesInitialized) {
-            EntityManager manager = entityManagerFactory.createEntityManager();
-            manager.getTransaction().begin();
+        EntityManager manager = entityManagerFactory.createEntityManager();
+        manager.getTransaction().begin();
 
-            // Simple test data
-            simpleEntityFieldAccess = new FieldAccessJPAEntity();
-            simpleEntityFieldAccess.setId(1L);
-            simpleEntityFieldAccess.setValue("value1");
-            manager.persist(simpleEntityFieldAccess);
+        // Simple test data
+        simpleEntityFieldAccess = new FieldAccessJPAEntity();
+        simpleEntityFieldAccess.setId(1L);
+        simpleEntityFieldAccess.setValue("value1");
+        manager.persist(simpleEntityFieldAccess);
 
-            manager.flush();
-            manager.getTransaction().commit();
-            manager.close();
-            entitiesInitialized = true;
-        }
+        manager.flush();
+        manager.getTransaction().commit();
+        manager.close();
     }
 
+    @Test
     @Deployment
     public void testGetJPAEntityAsHistoricVariable() {
         setupJPAEntities();
@@ -102,10 +93,11 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
                 .processInstanceId(processInstanceId).variableName("simpleEntityFieldAccess").singleResult();
 
         Object value = historicVariableInstance.getValue();
-        assertTrue(value instanceof FieldAccessJPAEntity);
-        assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+        assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
     }
 
+    @Test
     @Deployment
     public void testGetJPAEntityAsHistoricLog() {
         setupJPAEntities();
@@ -131,11 +123,12 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
 
         for (HistoricData event : events) {
             Object value = ((HistoricVariableInstanceEntity) event).getValue();
-            assertTrue(value instanceof FieldAccessJPAEntity);
-            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+            assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+            assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/HistoricJPAVariableTest.testGetJPAEntityAsHistoricLog.bpmn20.xml" })
     public void testGetJPAUpdateEntityAsHistoricLog() {
         setupJPAEntities();
@@ -162,8 +155,8 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
 
         for (HistoricData event : events) {
             Object value = ((HistoricDetailVariableInstanceUpdateEntity) event).getValue();
-            assertTrue(value instanceof FieldAccessJPAEntity);
-            assertEquals(((FieldAccessJPAEntity) value).getValue(), simpleEntityFieldAccess.getValue());
+            assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+            assertThat(simpleEntityFieldAccess.getValue()).isEqualTo(((FieldAccessJPAEntity) value).getValue());
         }
     }
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" targetNamespace="http://flowable.org/cmmn">
+    <case id="repeatingTask" name="repeatingTask">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="A" definitionRef="humanTask1"/>
+            <planItem id="planItem5" definitionRef="expandedStage1"/>
+            <humanTask id="humanTask1" name="A"/>
+            <stage id="expandedStage1">
+                <planItem id="planItem2" name="Stage task A" definitionRef="humanTask2">
+                    <itemControl>
+                        <repetitionRule>
+                            <extensionElements>
+                                <flowable:variableAggregation target="reviews" createOverviewVariable="true">
+                                    <variable source="approved" />
+                                    <variable source="description" />
+                                </flowable:variableAggregation>
+                            </extensionElements>
+                            <condition><![CDATA[${repetitionCounter < nrOfLoops}]]></condition>
+                        </repetitionRule>
+                    </itemControl>
+                </planItem>
+                <humanTask id="humanTask2" name="Stage task A" flowable:priority="${repetitionCounter}"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

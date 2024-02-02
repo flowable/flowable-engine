@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+
+    <process id="taskListenerTypeScriptProcess" name="Script Task Example">
+        <startEvent id="startevent1" name="Start"></startEvent>
+
+        <userTask id="usertask1" name="User Task with Script Task Listener">
+            <extensionElements>
+                <flowable:taskListener event="create" type="script">
+                    <flowable:script language="groovy" resultVariable="scriptResultVariable">
+                        <![CDATA[
+                        def localVariable = "User Task 2 name defined in script";
+                        def bar = "BAR";
+                        task.setVariable("scriptVar", "scriptVarValue"); // pushes variable to execution context
+                        String groovyScriptSyntaxString = "This is a FOO and this is a ${bar}";
+                        task.setVariable("groovyExpressionSyntaxString", groovyScriptSyntaxString);
+                        task.setOwner("kermit"); // test access to task instance
+                        task.setVariable("scriptLanguageAsExpression", "groovy");
+                        taskService.saveTask(task);
+                        localVariable; // implicit return
+                        ]]>
+                    </flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+
+        <endEvent id="endevent1" name="End"></endEvent>
+
+        <userTask id="usertask2" name="${scriptResultVariable}">
+            <extensionElements>
+                <flowable:taskListener event="create" type="script">
+                    <flowable:script language="${scriptLanguageAsExpression}" resultVariable="${resultVarAsExpression}">
+                        def foo = "usertask2ReturnVal"; return foo
+                    </flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="usertask1"/>
+        <sequenceFlow id="flow12" sourceRef="usertask1" targetRef="usertask2"/>
+        <sequenceFlow id="flow13" sourceRef="usertask2" targetRef="endevent1"/>
+    </process>
+    <process id="testProcess3" name="testProcessInvalidListenerDefinition">
+        <startEvent id="p3startevent1" name="Start"/>
+        <userTask id="p3usertask1" name="Task">
+            <extensionElements>
+                <flowable:taskListener event="create" type="script">
+                    <flowable:script language="groovy"></flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+        <endEvent id="p3endevent1" name="End"/>
+        <sequenceFlow id="p3flow10" sourceRef="p3startevent1" targetRef="p3usertask1"/>
+        <sequenceFlow id="p3flow12" sourceRef="p3usertask1" targetRef="p3endevent1"/>
+    </process>
+
+    <process id="testProcessErrorInScript" name="testProcessErrorInScript">
+        <startEvent id="p4startevent1" name="Start"/>
+        <userTask id="p4usertask1" name="Task">
+            <extensionElements>
+                <flowable:taskListener id="myFailingTaskListener" event="create" type="script">
+                    <flowable:script language="groovy">
+                        syntaxError
+                    </flowable:script>
+                </flowable:taskListener>
+            </extensionElements>
+        </userTask>
+        <endEvent id="p4endevent1" name="End"/>
+        <sequenceFlow id="p4flow10" sourceRef="p4startevent1" targetRef="p4usertask1"/>
+        <sequenceFlow id="p4flow12" sourceRef="p4usertask1" targetRef="p4endevent1"/>
+    </process>
+</definitions>

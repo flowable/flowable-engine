@@ -17,9 +17,9 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**
- * A receive task is a wait state that waits for the receival of some message.
+ * A receive task is a wait state that waits to receive some message.
  * 
- * Currently, the only message that is supported is the external trigger, given by calling the {@link RuntimeService#signal(String)} operation.
+ * Currently, the only message that is supported is the external trigger, given by calling the {@link RuntimeService#trigger(String)} operation.
  * 
  * @author Joram Barrez
  */

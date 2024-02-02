@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+	targetNamespace="Examples" xmlns:tns="Examples">
+
+	<process id="process">
+
+		<startEvent id="theStart" />
+		<sequenceFlow sourceRef="theStart" targetRef="task" />
+		<userTask id="task" name="Task" />
+		<sequenceFlow sourceRef="task" targetRef="theEnd" />
+		<endEvent id="theEnd" />
+
+		<subProcess triggeredByEvent="true">
+			<startEvent id="eventProcessStart" isInterrupting="false">
+				<extensionElements>
+					<flowable:variableListenerEventDefinition variableName="var1" />
+				</extensionElements>
+			</startEvent>
+			<startEvent id="eventProcessStart2" isInterrupting="false">
+				<extensionElements>
+					<flowable:variableListenerEventDefinition variableName="var2" />
+				</extensionElements>
+			</startEvent>
+			<sequenceFlow sourceRef="eventProcessStart" targetRef="eventSubProcessTask" />
+			<userTask id="eventSubProcessTask" name="Task" />
+			<sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+			<sequenceFlow sourceRef="eventProcessStart2" targetRef="eventSubProcessVar2Task" />
+			<userTask id="eventSubProcessVar2Task" name="var2 task" />
+			<sequenceFlow sourceRef="eventSubProcessVar2Task" targetRef="eventSubProcessEnd" />
+			<endEvent id="eventSubProcessEnd" />
+		</subProcess>
+
+	</process>
+
+</definitions>

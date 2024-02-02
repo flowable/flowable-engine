@@ -12,33 +12,90 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TerminatePlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+public class TerminatePlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
-    public TerminatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    protected String exitType;
+    protected String exitEventType;
+
+    public TerminatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         super(commandContext, planItemInstanceEntity);
+        this.exitType = exitType;
+        this.exitEventType = exitEventType;
     }
 
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.TERMINATED;
     }
 
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.TERMINATE;
     }
     
     @Override
-    protected boolean isEvaluateRepetitionRule() {
+    public boolean isEvaluateRepetitionRule() {
         return false;
     }
     
+    @Override
+    protected boolean shouldAggregateForSingleInstance() {
+        return false;
+    }
+
+    @Override
+    protected boolean shouldAggregateForMultipleInstances() {
+        return false;
+    }
+
+    @Override
+    protected void internalExecute() {
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+    }
+
+    @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put(OperationSerializationMetadata.FIELD_PLAN_ITEM_INSTANCE_ID, planItemInstanceEntity.getId());
+        metadata.put(OperationSerializationMetadata.FIELD_EXIT_TYPE, exitType);
+        metadata.put(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE, exitEventType);
+        return metadata;
+    }
+
+    @Override
+    public boolean abortOperationIfNewStateEqualsOldState() {
+        return true;
+    }
+
+    @Override
+    public String getOperationName() {
+        return "[Terminate plan item]";
+    }
+
+    public String getExitType() {
+        return exitType;
+    }
+    public void setExitType(String exitType) {
+        this.exitType = exitType;
+    }
+    public String getExitEventType() {
+        return exitEventType;
+    }
+    public void setExitEventType(String exitEventType) {
+        this.exitEventType = exitEventType;
+    }
 }

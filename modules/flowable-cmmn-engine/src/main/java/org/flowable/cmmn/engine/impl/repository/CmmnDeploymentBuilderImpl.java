@@ -12,8 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
@@ -24,12 +27,10 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.IoUtil;
 
 public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
-
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient CmmnRepositoryServiceImpl repositoryService;
     protected transient CmmnResourceEntityManager resourceEntityManager;
@@ -45,6 +46,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         this.resourceEntityManager = cmmnEngineConfiguration.getCmmnResourceEntityManager();
     }
 
+    @Override
     public CmmnDeploymentBuilder addInputStream(String resourceName, InputStream inputStream) {
         if (inputStream == null) {
             throw new FlowableException("inputStream for resource '" + resourceName + "' is null");
@@ -54,7 +56,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         try {
             bytes = IoUtil.readInputStream(inputStream, resourceName);
         } catch (Exception e) {
-            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'", e);
         }
 
         if (bytes == null) {
@@ -68,14 +70,20 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (inputStream == null) {
+                throw new FlowableException("resource '" + resource + "' not found");
+            }
+            return addInputStream(resource, inputStream);
+            
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
     }
 
+    @Override
     public CmmnDeploymentBuilder addString(String resourceName, String text) {
         if (text == null) {
             throw new FlowableException("text is null");
@@ -83,11 +91,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
         CmmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }
@@ -102,6 +106,27 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         resource.setName(resourceName);
         resource.setBytes(bytes);
         deployment.addResource(resource);
+        return this;
+    }
+
+    @Override
+    public CmmnDeploymentBuilder addZipInputStream(ZipInputStream zipInputStream) {
+        try {
+            ZipEntry entry = zipInputStream.getNextEntry();
+            while (entry != null) {
+                if (!entry.isDirectory()) {
+                    String entryName = entry.getName();
+                    byte[] bytes = IoUtil.readInputStream(zipInputStream, entryName);
+                    CmmnResourceEntity resource = resourceEntityManager.create();
+                    resource.setName(entryName);
+                    resource.setBytes(bytes);
+                    deployment.addResource(resource);
+                }
+                entry = zipInputStream.getNextEntry();
+            }
+        } catch (Exception e) {
+            throw new FlowableException("problem reading zip input stream", e);
+        }
         return this;
     }
 
@@ -122,31 +147,37 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return null;
     }
 
+    @Override
     public CmmnDeploymentBuilder name(String name) {
         deployment.setName(name);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder category(String category) {
         deployment.setCategory(category);
         return this;
     }
     
+    @Override
     public CmmnDeploymentBuilder key(String key) {
         deployment.setKey(key);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder disableSchemaValidation() {
         this.isCmmn20XsdValidationEnabled = false;
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder tenantId(String tenantId) {
         deployment.setTenantId(tenantId);
         return this;
     }
 
+    @Override
     public CmmnDeploymentBuilder parentDeploymentId(String parentDeploymentId) {
         deployment.setParentDeploymentId(parentDeploymentId);
         return this;
@@ -158,6 +189,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         return this;
     }
 
+    @Override
     public CmmnDeployment deploy() {
         return repositoryService.deploy(this);
     }

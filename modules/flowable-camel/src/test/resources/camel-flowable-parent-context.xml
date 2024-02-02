@@ -7,13 +7,16 @@
         	http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd
          	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
+    <!-- This bean is needed in context xml in order for the jdbc properties to work -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-                <property name="driverClass" value="org.h2.Driver"/>
-                <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
-                <property name="username" value="sa"/>
-                <property name="password" value=""/>
+                <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
+                <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+                <property name="username" value="${jdbc.username:sa}" />
+                <property name="password" value="${jdbc.password:}" />
             </bean>
         </property>
     </bean>
@@ -26,8 +29,9 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
-        <property name="asyncExecutor" ref="asyncExecutor" />
         <property name="asyncExecutorActivate" value="false" />
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
     </bean>
 
     <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
@@ -41,11 +45,6 @@
     <bean id="taskService" factory-bean="processEngine"  factory-method="getTaskService" />
     <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService"/>
     
-    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
-    </bean>
-
     <bean id="sleepBean" class="org.flowable.camel.util.SleepBean"/>
 
 </beans>

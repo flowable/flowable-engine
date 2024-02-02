@@ -12,18 +12,22 @@
  */
 package org.flowable.http.bpmn.async;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestCase;
 import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
 
+    @Test
     @Deployment
     public void testAsyncSimpleGetOnly() {
         String procId = runtimeService.startProcessInstanceByKey("asyncSimpleGetOnly").getId();
@@ -31,20 +35,20 @@ public class HttpServiceTaskAsyncTest extends HttpServiceTaskTestCase {
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 2000L);
 
         assertProcessEnded(procId);
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
     @Deployment
     public void testFailedJobRetryTimeCycle() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncFailedJobRetryTimeCycle");
 
-        List<Job> jobs = managementService.createJobQuery()
-                .processInstanceId(processInstance.getId()).list();
-        assertEquals(1, jobs.size());
+        List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(jobs).hasSize(1);
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 3000L);
 
-        assertEquals(0, managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().count()).isZero();
     }
 
 }

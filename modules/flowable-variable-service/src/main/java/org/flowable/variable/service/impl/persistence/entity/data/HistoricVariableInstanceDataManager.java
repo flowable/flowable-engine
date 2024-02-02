@@ -12,10 +12,11 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -42,5 +43,14 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
     List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
 
+    void deleteHistoricVariableInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricVariableInstancesForNonExistingCaseInstances();
 }

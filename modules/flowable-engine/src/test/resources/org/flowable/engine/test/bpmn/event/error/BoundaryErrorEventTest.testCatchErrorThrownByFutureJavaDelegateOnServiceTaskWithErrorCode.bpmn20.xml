@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <error id="error42" errorCode="42"/>
+    <error id="error23" errorCode="23"/>
+    <error id="errorBeforeExecution" errorCode="beforeExecution"/>
+    <error id="errorInExecute" errorCode="execute"/>
+    <error id="errorAfterExecution" errorCode="afterExecution"/>
+
+    <process id="catchErrorThrownByFutureJavaDelegateOnServiceTaskWithErrorCode">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"/>
+
+        <serviceTask id="serviceTask" flowable:class="org.flowable.engine.test.bpmn.event.error.ThrowBpmnErrorFutureDelegate"/>
+
+        <boundaryEvent id="ignoreError42" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="error42"/>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchErrorBeforeExecution" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="errorBeforeExecution"/>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchErrorInExecute" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="errorInExecute"/>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchErrorAfterExecution" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="errorAfterExecution"/>
+        </boundaryEvent>
+
+        <sequenceFlow id="flow3" sourceRef="catchErrorBeforeExecution" targetRef="escalatedTaskForBeforeExecution"/>
+        <userTask id="escalatedTaskForBeforeExecution" name="Escalated Task for before execution"/>
+
+        <sequenceFlow id="flow4" sourceRef="catchErrorInExecute" targetRef="escalatedTaskForExecute"/>
+        <userTask id="escalatedTaskForExecute" name="Escalated Task for execute"/>
+
+        <sequenceFlow id="flow5" sourceRef="catchErrorAfterExecution" targetRef="escalatedTaskForAfterExecution"/>
+        <userTask id="escalatedTaskForAfterExecution" name="Escalated Task for after execution"/>
+
+        <sequenceFlow id="flow6" sourceRef="serviceTask" targetRef="theEnd"/>
+        <sequenceFlow id="flow7" sourceRef="ignoreError42" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

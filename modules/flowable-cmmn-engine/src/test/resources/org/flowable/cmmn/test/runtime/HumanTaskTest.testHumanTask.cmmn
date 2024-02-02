@@ -11,7 +11,7 @@
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
 
             <planItem id="planItem1" name="Task One" definitionRef="task1" />
-            <planItem id="planItem2" name="The Case" definitionRef="task2">
+            <planItem id="planItem2" name="Task Two" definitionRef="task2">
                 <entryCriterion sentryRef="sentry1" />
             </planItem>
 
@@ -21,8 +21,8 @@
                 </planItemOnPart>
             </sentry>
 
-            <humanTask id="task1" name="Task 1" flowable:assignee="${var1}" />
-            <humanTask id="task2" name="Task 2" flowable:candidateUsers="test,test2" flowable:candidateGroups="test" />
+            <humanTask id="task1" name="Task One" flowable:assignee="${var1}" />
+            <humanTask id="task2" name="Task Two" flowable:candidateUsers="test,test2" flowable:candidateGroups="test" />
 
         </casePlanModel>
     </case>

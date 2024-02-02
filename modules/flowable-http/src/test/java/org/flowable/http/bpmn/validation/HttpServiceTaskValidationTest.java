@@ -12,67 +12,55 @@
  */
 package org.flowable.http.bpmn.validation;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.test.Deployment;
-import org.flowable.http.bpmn.HttpServiceTaskTestCase;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.flowable.http.common.impl.BaseHttpActivityDelegate.HTTP_TASK_REQUEST_FIELD_INVALID;
+import static org.flowable.http.common.impl.BaseHttpActivityDelegate.HTTP_TASK_REQUEST_METHOD_INVALID;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_HEADERS_INVALID;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_METHOD_INVALID;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.engine.test.Deployment;
+import org.flowable.http.bpmn.HttpServiceTaskTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
+
+    @Test
     @Deployment
     public void testInvalidProcess() {
-        try {
-            runtimeService.startProcessInstanceByKey("validateProcess");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertEquals(HTTP_TASK_REQUEST_METHOD_INVALID, e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("validateProcess"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage(HTTP_TASK_REQUEST_METHOD_INVALID);
     }
 
+    @Test
     @Deployment
     public void testInvalidHeaders() {
-        try {
-            runtimeService.startProcessInstanceByKey("invalidHeaders");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertEquals(HTTP_TASK_REQUEST_HEADERS_INVALID, e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidHeaders"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContainingAll("requestHeaders are invalid for Execution[", " - definition 'invalidHeaders:1:", " - activity 'httpGet'");
     }
 
+    @Test
     @Deployment
     public void testInvalidFlags() {
-        try {
-            runtimeService.startProcessInstanceByKey("invalidFlags");
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertThat(e.getMessage(), is("String value \"Accept application/json\" is not alloved in boolean expression"));
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidFlags"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessage("String value \"Accept application/json\" is not allowed in boolean expression");
     }
 
+    @Test
     @Deployment
     public void testInvalidTimeout() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("requestTimeout", "invalid");
 
-        try {
-            runtimeService.startProcessInstanceByKey("invalidTimeout", variables);
-            fail("FlowableException expected");
-        } catch (Exception e) {
-            assertTrue(e instanceof FlowableException);
-            assertTextPresent(HTTP_TASK_REQUEST_FIELD_INVALID, e.getMessage());
-        }
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidTimeout", variables))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining(HTTP_TASK_REQUEST_FIELD_INVALID);
     }
 }

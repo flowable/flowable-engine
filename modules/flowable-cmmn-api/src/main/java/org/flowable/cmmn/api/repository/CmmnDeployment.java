@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.api.repository;
 
-import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.common.engine.api.repository.EngineDeployment;
 
 public interface CmmnDeployment extends EngineDeployment{
 

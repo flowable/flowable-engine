@@ -57,7 +57,7 @@ public class DateFormType extends AbstractFormType {
         try {
             return dateFormat.parseObject(propertyValue);
         } catch (ParseException e) {
-            throw new ActivitiIllegalArgumentException("invalid date value " + propertyValue);
+            throw new ActivitiIllegalArgumentException("invalid date value " + propertyValue, e);
         }
     }
 

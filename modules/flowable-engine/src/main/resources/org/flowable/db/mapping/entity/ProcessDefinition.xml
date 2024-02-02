@@ -7,10 +7,9 @@
   <!-- PROCESSDEFINITION INSERT -->
 
   <insert id="insertProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
-    insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_)
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     values (#{id, jdbcType=VARCHAR},
-    		1,
-            #{category, jdbcType=VARCHAR},
+    		1, #{category, jdbcType=VARCHAR},
             #{name, jdbcType=VARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
@@ -21,17 +20,19 @@
             #{hasStartFormKey, jdbcType=BOOLEAN},
             #{isGraphicalNotationDefined, jdbcType=BOOLEAN},
             #{suspensionState, jdbcType=INTEGER},
+            #{derivedFrom, jdbcType=VARCHAR},
+            #{derivedFromRoot, jdbcType=VARCHAR},
+            #{derivedVersion, jdbcType=INTEGER},
             #{tenantId, jdbcType=VARCHAR},
             #{engineVersion, jdbcType=VARCHAR})
   </insert>
 
   <insert id="bulkInsertProcessDefinition" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_)
+    INSERT INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     VALUES 
       <foreach collection="list" item="processDefinition" index="index" separator=","> 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -42,6 +43,9 @@
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
+         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedVersion, jdbcType=INTEGER},
          #{processDefinition.tenantId, jdbcType=VARCHAR},
          #{processDefinition.engineVersion, jdbcType=VARCHAR})
     </foreach>
@@ -51,10 +55,9 @@
     INSERT ALL 
     <foreach collection="list" item="processDefinition" index="index"> 
       INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
-      DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, TENANT_ID_, ENGINE_VERSION_) VALUES 
+      DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_) VALUES 
         (#{processDefinition.id, jdbcType=VARCHAR},
-         1,
-         #{processDefinition.category, jdbcType=VARCHAR},
+         1, #{processDefinition.category, jdbcType=VARCHAR},
          #{processDefinition.name, jdbcType=VARCHAR},
          #{processDefinition.key, jdbcType=VARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
@@ -65,6 +68,9 @@
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
+         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedVersion, jdbcType=INTEGER},
          #{processDefinition.tenantId, jdbcType=VARCHAR},
          #{processDefinition.engineVersion, jdbcType=VARCHAR})
     </foreach>
@@ -81,7 +87,7 @@
               SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
           </if>
           <if test="originalPersistentState.category != category">
-              CATEGORY_ = #{category, jdbcType=VARCHAR}
+              CATEGORY_ = #{category, jdbcType=VARCHAR},
           </if>
       </set>
     where ID_ = #{id, jdbcType=VARCHAR}
@@ -93,6 +99,13 @@
       TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
     where
       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateProcessDefinitionVersionForProcessDefinitionId" parameterType="java.util.Map">
+    update ${prefix}ACT_RE_PROCDEF set
+      VERSION_ = #{version, jdbcType=INTEGER}
+    where
+      ID_ = #{processDefinitionId, jdbcType=VARCHAR}
   </update>
 
   <!-- PROCESSDEFINITION DELETE -->
@@ -118,6 +131,9 @@
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="isGraphicalNotationDefined" column="HAS_GRAPHICAL_NOTATION_" jdbcType="BOOLEAN" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="VARCHAR" />
+    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="VARCHAR" />
+    <result property="derivedVersion" column="DERIVED_VERSION_" jdbcType="INTEGER" />
     <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -132,11 +148,11 @@
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
@@ -146,9 +162,6 @@
   
   <sql id="selectProcessDefinitionsByQueryCriteriaSql">  
     from ${prefix}ACT_RE_PROCDEF RES
-    <if test="eventSubscriptionType != null">
-    	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
-    </if>
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -173,6 +186,9 @@
       </if>
       <if test="nameLike != null">
         and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+      </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key}
@@ -204,11 +220,14 @@
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null and !deploymentIds.isEmpty()">
+      <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
         <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
           #{item}
         </foreach>
+      </if>
+      <if test="parentDeploymentId != null">
+          and EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = RES.DEPLOYMENT_ID_)
       </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = RES.KEY_ 
@@ -242,19 +261,31 @@
       	and RES.ENGINE_VERSION_ = #{engineVersion}
       </if> 
       <if test="eventSubscriptionType != null">
-      	and (EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
+        and exists(select 1 from ${prefix}ACT_RU_EVENT_SUBSCR EVT where RES.ID_ = EVT.CONFIGURATION_ and EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
       </if>
-      <if test="authorizationUserId != null">
-        AND (exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
-        <if test="authorizationGroups != null &amp;&amp; authorizationGroups.size() &gt; 0">
-         OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.GROUP_ID_ IN
-            <foreach item="group" index="index" collection="authorizationGroups" 
-                     open="(" separator="," close=")">
-              #{group}
-            </foreach>
-         )
-         </if>
-        )
+      <if test="includeAuthorization">
+          AND
+          <trim prefix="(" prefixOverrides="OR" suffix=")">
+              <if test="authorizationUserId != null">
+                  exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
+              </if>
+              <if test="authorizationGroups != null &amp;&amp; !authorizationGroups.empty">
+                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and 
+                    (
+                    <foreach item="authorizationGroupListItem" index="groupIndex" collection="safeAuthorizationGroups">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        IDN.GROUP_ID_ IN
+                        <foreach item="group" index="index" collection="authorizationGroupListItem"
+                              open="(" separator="," close=")">
+                          #{group}
+                        </foreach>
+                    </foreach>
+                    )
+                  )
+              </if>
+          </trim>
       </if>
     </where>
   </sql>
@@ -274,15 +305,32 @@
       and KEY_ = #{processDefinitionKey}
       and TENANT_ID_ = #{tenantId}
   </select>
+
+    <!-- TODO when deploying cmmn from the Process engine then the BPMN resources do not have a parent deployment, they are the parent deployment   -->
+    <select id="selectProcessDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+
+    <select id="selectProcessDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF DEF
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
   
-  <select id="selectProcessDefinitionsByKeyAndVersion" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
+  <select id="selectProcessDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{parameter.processDefinitionKey} and VERSION_ = #{parameter.processDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
-   <select id="selectProcessDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
+   <select id="selectProcessDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{parameter.processDefinitionKey} and VERSION_ = #{parameter.processDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}
@@ -293,6 +341,7 @@
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{key} and
           (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+          DERIVED_FROM_ is null and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
   
@@ -301,26 +350,28 @@
     from ${prefix}ACT_RE_PROCDEF 
     where KEY_ = #{processDefinitionKey} and
           TENANT_ID_ = #{tenantId} and
+          DERIVED_FROM_ is null and
           VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
   
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select distinct RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
-    ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  <select id="selectLatestDerivedProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF 
+    where KEY_ = #{key} and
+    (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
 
-  <!-- mysql specific sql -->
-  <select id="selectProcessDefinitionCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
-    select distinct count(RES.ID_)
-    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+  <select id="selectLatestDerivedProcessDefinitionByKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF 
+    where KEY_ = #{processDefinitionKey} and
+    TENANT_ID_ = #{tenantId} and
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
   </select>
 
   <select id="selectProcessDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="processDefinitionResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectProcessDefinitionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

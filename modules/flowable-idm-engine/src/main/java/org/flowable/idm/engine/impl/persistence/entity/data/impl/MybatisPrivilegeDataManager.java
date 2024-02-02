@@ -45,7 +45,7 @@ public class MybatisPrivilegeDataManager extends AbstractIdmDataManager<Privileg
     @Override
     @SuppressWarnings("unchecked")
     public List<Privilege> findPrivilegeByQueryCriteria(PrivilegeQueryImpl query) {
-        return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query);
+        return getDbSqlSession().selectList("selectPrivilegeByQueryCriteria", query, getManagedEntityClass());
     }
 
     @Override

@@ -12,7 +12,7 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
@@ -34,7 +34,7 @@ public class TaskIdTest extends CdiFlowableTestCase {
         businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
 
         // assert that now the 'taskId'-bean can be looked up
-        assertNotNull(getBeanInstance("taskId"));
+        assertThat(getBeanInstance("taskId")).isNotNull();
 
         businessProcess.completeTask();
     }

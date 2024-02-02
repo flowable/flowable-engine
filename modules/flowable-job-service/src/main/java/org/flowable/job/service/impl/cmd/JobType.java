@@ -21,6 +21,6 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
  */
 public enum JobType {
 
-    ASYNC, TIMER, SUSPENDED, DEADLETTER
+    ASYNC, TIMER, SUSPENDED, DEADLETTER, EXTERNAL_WORKER
 
 }

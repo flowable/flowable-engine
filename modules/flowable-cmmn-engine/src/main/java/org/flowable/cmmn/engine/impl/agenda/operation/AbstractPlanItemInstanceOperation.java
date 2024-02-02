@@ -12,12 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Date;
+
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -38,25 +37,17 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     public void setPlanItemInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity) {
         this.planItemInstanceEntity = planItemInstanceEntity;
     }
-    
-    protected void deleteSentryPartInstances() {
-        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
-        if (planItemInstanceEntity.getPlanItem() != null 
-                && (!planItemInstanceEntity.getPlanItem().getEntryCriteria().isEmpty()
-                        || !planItemInstanceEntity.getPlanItem().getExitCriteria().isEmpty())) {
-            if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
-                for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
-                    sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
-                }
-            }
-        }
+
+    @Override
+    public String getCaseInstanceId() {
+        return planItemInstanceEntity.getCaseInstanceId();
     }
-    
-    protected boolean isPlanItemRepeatableOnComplete(PlanItem planItem) {
-        return  planItem != null
-                && planItem.getEntryCriteria().isEmpty()
-                && planItem.getItemControl() != null
-                && planItem.getItemControl().getRepetitionRule() != null;
+
+    protected void removeSentryRelatedData() {
+        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteSentryRelatedData(planItemInstanceEntity.getId());
     }
-    
+
+    protected Date getCurrentTime(CommandContext commandContext) {
+        return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime();
+    }
 }

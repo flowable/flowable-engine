@@ -12,13 +12,13 @@
  */
 package org.flowable.dmn.engine.impl.el;
 
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,13 +47,13 @@ public class ELExpressionExecutor {
         executionContext.checkExecutionContext(inputExpression);
         
         // pre parse expression
-        String parsedExpression = ELConditionExpressionPreParser.parse(inputEntry.getText(), inputExpression, inputClause.getInputExpression().getTypeRef());
+        String parsedExpression = ELInputEntryExpressionPreParser.parse(inputEntry.getText(), inputExpression, inputClause.getInputExpression().getTypeRef());
 
         Expression expression = expressionManager.createExpression(parsedExpression);
         RuleExpressionCondition condition = new RuleExpressionCondition(expression);
         
         try {
-            return condition.evaluate(executionContext.getStackVariables());
+            return condition.evaluate(executionContext.getStackVariables(), executionContext);
         } catch (Exception ex) {
             LOGGER.warn("Error while executing input entry: {}", parsedExpression, ex);
             throw new FlowableDmnExpressionException("error while executing input entry", parsedExpression, ex);
@@ -71,7 +71,7 @@ public class ELExpressionExecutor {
             throw new IllegalArgumentException("execution context is required");
         }
         
-        String parsedExpression = ELOutputExpressionPreParser.parse(outputEntry.getText());
+        String parsedExpression = ELOutputEntryExpressionPreParser.parse(outputEntry.getText());
         
         Expression expression = expressionManager.createExpression(parsedExpression);
         RuleExpressionOutput outputExpression = new RuleExpressionOutput(expression);

@@ -21,12 +21,13 @@ import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
-import org.apache.camel.impl.DefaultEndpoint;
+import org.apache.camel.support.DefaultEndpoint;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * This class has been modified to be consistent with the changes to CamelBehavior and its implementations. The set of changes significantly increases the flexibility of our Camel integration, as you
@@ -42,6 +43,8 @@ public class FlowableEndpoint extends DefaultEndpoint {
     protected RuntimeService runtimeService;
 
     protected RepositoryService repositoryService;
+
+    protected ManagementService managementService;
 
     protected FlowableConsumer flowableConsumer;
 
@@ -84,6 +87,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         producer.setRuntimeService(runtimeService);
         producer.setIdentityService(identityService);
         producer.setRepositoryService(repositoryService);
+        producer.setManagementService(managementService);
         return producer;
     }
 
@@ -118,6 +122,10 @@ public class FlowableEndpoint extends DefaultEndpoint {
 
     public void setRepositoryService(RepositoryService repositoryService) {
         this.repositoryService = repositoryService;
+    }
+
+    public void setManagementService(ManagementService managementService) {
+        this.managementService = managementService;
     }
 
     public boolean isCopyVariablesToProperties() {

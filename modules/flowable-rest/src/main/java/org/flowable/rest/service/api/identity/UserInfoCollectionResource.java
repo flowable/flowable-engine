@@ -13,16 +13,12 @@
 
 package org.flowable.rest.service.api.identity;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.IdentityService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
-import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,11 +26,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -55,13 +55,13 @@ public class UserInfoCollectionResource extends BaseUserResource {
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")
     })
     @GetMapping(value = "/identity/users/{userId}/info", produces = "application/json")
-    public List<UserInfoResponse> getUserInfo(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request) {
+    public List<UserInfoResponse> getUserInfo(@ApiParam(name = "userId") @PathVariable String userId) {
         User user = getUserFromRequest(userId);
 
         return restResponseFactory.createUserInfoKeysResponse(identityService.getUserInfoKeys(user.getId()), user.getId());
     }
 
-    @ApiOperation(value = "Create a new user’s info entry", tags = { "Users" }, nickname = "createUserInfo")
+    @ApiOperation(value = "Create a new user’s info entry", tags = { "Users" }, nickname = "createUserInfo", code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the user was found and the info has been created."),
             @ApiResponse(code = 400, message = "Indicates the key or value was missing from the request body. Status description contains additional information about the error."),
@@ -69,7 +69,8 @@ public class UserInfoCollectionResource extends BaseUserResource {
             @ApiResponse(code = 409, message = "Indicates there is already an info-entry with the given key for the user, update the resource instance (PUT).")
     })
     @PostMapping(value = "/identity/users/{userId}/info", produces = "application/json")
-    public UserInfoResponse setUserInfo(@ApiParam(name = "userId") @PathVariable String userId, @RequestBody UserInfoRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserInfoResponse setUserInfo(@ApiParam(name = "userId") @PathVariable String userId, @RequestBody UserInfoRequest userRequest) {
 
         User user = getUserFromRequest(userId);
 
@@ -87,7 +88,6 @@ public class UserInfoCollectionResource extends BaseUserResource {
 
         identityService.setUserInfo(user.getId(), userRequest.getKey(), userRequest.getValue());
 
-        response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createUserInfoResponse(userRequest.getKey(), userRequest.getValue(), user.getId());
     }
 }

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
+
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -26,21 +28,27 @@ public class DefaultHistoryVariableManager implements InternalHistoryVariableMan
     }
 
     @Override
-    public void recordVariableCreate(VariableInstanceEntity variable) {
-        getHistoryManager().recordVariableCreate(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+    public void recordVariableCreate(VariableInstanceEntity variable, Date createTime) {
+        getHistoryManager().recordVariableCreate(variable, createTime);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null, createTime);
+        }
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
-        getHistoryManager().recordVariableUpdate(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+    public void recordVariableUpdate(VariableInstanceEntity variable, Date updateTime) {
+        getHistoryManager().recordVariableUpdate(variable, updateTime);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null, updateTime);
+        }
     }
 
     @Override
-    public void recordVariableRemoved(VariableInstanceEntity variable) {
+    public void recordVariableRemoved(VariableInstanceEntity variable, Date removeTime) {
         getHistoryManager().recordVariableRemoved(variable);
-        getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false);
+        if (variable.getProcessInstanceId() != null || variable.getExecutionId() != null || variable.getTaskId() != null) {
+            getHistoryManager().recordHistoricDetailVariableCreate(variable, null, false, null, removeTime);
+        }
     }
     
     protected HistoryManager getHistoryManager() {

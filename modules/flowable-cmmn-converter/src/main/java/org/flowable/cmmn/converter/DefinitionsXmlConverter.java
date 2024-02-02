@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,29 @@ public class DefinitionsXmlConverter extends BaseCmmnXmlConverter {
                 model.setCreationDate(creationDate);
             } catch (ParseException e) {
                 LOGGER.warn("Ignoring creationDate attribute: invalid date format", e);
+            }
+        }
+
+        for (int i = 0; i < xtr.getNamespaceCount(); i++) {
+            String prefix = xtr.getNamespacePrefix(i);
+            if (StringUtils.isNotEmpty(prefix)) {
+                model.addNamespace(prefix, xtr.getNamespaceURI(i));
+            }
+        }
+
+        for (int i = 0; i < xtr.getAttributeCount(); i++) {
+            ExtensionAttribute extensionAttribute = new ExtensionAttribute();
+            extensionAttribute.setName(xtr.getAttributeLocalName(i));
+            extensionAttribute.setValue(xtr.getAttributeValue(i));
+            String namespace = xtr.getAttributeNamespace(i);
+            if (model.getNamespaces().containsValue(namespace)) {
+                if (StringUtils.isNotEmpty(namespace)) {
+                    extensionAttribute.setNamespace(namespace);
+                }
+                if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
+                    extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
+                }
+                model.addDefinitionsAttribute(extensionAttribute);
             }
         }
         

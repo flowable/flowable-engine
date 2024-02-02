@@ -73,12 +73,12 @@ When an error occurs (both client and server, 4XX and 5XX status-codes) the resp
 
 ### URL fragments
 
-Parameters that are part of the URL (for example, the deploymentId parameter in *http://host/flowable-rest/form-api/form-repository/deployments/{deploymentId}*) need to be properly escaped (see link [URL-encoding or Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding)) in case the segment contains special characters. Most frameworks have this functionality built in, but it should be taken into account. Especially for segments that can contain forward-slashes (for example, deployment resource), this is required.
+Parameters that are part of the URL (for example, the deploymentId parameter in *http://host/flowable-rest/process-api/repository/deployments/{deploymentId}*) need to be properly escaped (see link [URL-encoding or Percent-encoding](https://en.wikipedia.org/wiki/Percent-encoding)) in case the segment contains special characters. Most frameworks have this functionality built in, but it should be taken into account. Especially for segments that can contain forward-slashes (for example, deployment resource), this is required.
 
 
 ### Rest URL query parameters
 
-Parameters added as query-string in the URL (for example, the name parameter used in *http://host/flowable-rest/form-api/form-repository/deployments?name=Deployment*) can have the following types and are mentioned in the corresponding REST-API documentation:
+Parameters added as query-string in the URL (for example, the name parameter used in *http://host/flowable-rest/process-api/repository/deployments?name=Deployment*) can have the following types and are mentioned in the corresponding REST-API documentation:
 
 
 |Type|Format
@@ -87,7 +87,7 @@ Parameters added as query-string in the URL (for example, the name parameter use
 |Integer|Parameter representing an integer value. Can only contain numeric non-decimal values, between -2.147.483.648 and 2.147.483.647.
 |Long|Parameter representing a long value. Can only contain numeric non-decimal values, between -9.223.372.036.854.775.808 and 9.223.372.036.854.775.807.
 |Boolean|Parameter representing a boolean value. Can be either *true* or *false*. All other values other than these will cause a '**405 - Bad request**' response.
-|Date|Parameter representing a date value. Use the ISO-8601 date-format (see [ISO-8601 on wikipedia](http://en.wikipedia.org/wiki/ISO_8601) using both time and date-components (e.g. *2013-04-03T23:45Z*).
+|Date|Parameter representing a date value. Use the ISO-8601 date-format (see [ISO-8601 on wikipedia](http://en.wikipedia.org/wiki/ISO_8601) using both time and date-components (e.g. *2013-04-03T23:45:12Z*).
 
 
 ### JSON body parameters
@@ -103,7 +103,7 @@ Parameters added as query-string in the URL (for example, the name parameter use
 
 ### Paging and sorting
 
-Paging and order parameters can be added as query-string in the URL (for example, the name parameter used in *http://host/flowable-rest/form-api/form-repository/deployments?sort=name*).
+Paging and order parameters can be added as query-string in the URL (for example, the name parameter used in *http://host/flowable-rest/process-api/repository/deployments?sort=name*).
 
 
 |Parameter|Default value|Description
@@ -187,6 +187,6 @@ When working with variables (execute decision), the REST API uses some common pr
 |date|Value is treated as a **java.util.Date**. When writing, the JSON text will be converted using ISO-8601 date format.
 
 
-It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the **initializeVariableConverters()** method on *org.flowable.rest.dmn.service.api.DmnRestResponseFactory**, you can add additional **org.flowable.rest.variable.RestVariableConverter* classes to support converting your POJOs to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
+It's possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the **initializeVariableConverters()** method on *org.flowable.dmn.rest.service.api.DmnRestResponseFactory**, you can add additional **org.flowable.rest.variable.RestVariableConverter* classes to support converting your POJOs to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
 
 

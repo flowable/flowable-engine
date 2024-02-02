@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.delegate.event.impl;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
 
@@ -39,7 +39,7 @@ public class FlowableIdmEventBuilder {
      *            type of event
      * @param entity
      *            the entity this event targets
-     * @return an {@link FlowableEntityEvent}. In case an {@link ExecutionContext} is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
+     * @return an {@link FlowableEntityEvent}. In case an execution context is active, the execution related event fields will be populated. If not, execution details will be retrieved from the
      *         {@link Object} if possible.
      */
     public static FlowableEntityEvent createEntityEvent(FlowableIdmEventType type, Object entity) {

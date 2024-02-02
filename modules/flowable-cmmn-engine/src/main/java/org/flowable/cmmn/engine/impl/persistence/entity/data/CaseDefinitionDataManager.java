@@ -17,7 +17,7 @@ import java.util.List;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
@@ -33,6 +33,10 @@ public interface CaseDefinitionDataManager extends DataManager<CaseDefinitionEnt
     CaseDefinitionEntity findCaseDefinitionByDeploymentAndKey(String deploymentId, String caseDefinitionKey);
 
     CaseDefinitionEntity findCaseDefinitionByDeploymentAndKeyAndTenantId(String deploymentId, String caseDefinitionKey, String tenantId);
+
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey);
+
+    CaseDefinitionEntity findCaseDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String caseDefinitionKey, String tenantId);
 
     CaseDefinitionEntity findCaseDefinitionByKeyAndVersion(String caseDefinitionKey, Integer caseDefinitionVersion);
 

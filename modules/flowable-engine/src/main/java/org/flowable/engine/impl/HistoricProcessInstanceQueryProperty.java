@@ -16,7 +16,7 @@ package org.flowable.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricProcessInstanceQueryProperty}.
@@ -37,8 +37,6 @@ public class HistoricProcessInstanceQueryProperty implements QueryProperty {
     public static final HistoricProcessInstanceQueryProperty END_TIME = new HistoricProcessInstanceQueryProperty("RES.END_TIME_");
     public static final HistoricProcessInstanceQueryProperty DURATION = new HistoricProcessInstanceQueryProperty("RES.DURATION_");
     public static final HistoricProcessInstanceQueryProperty TENANT_ID = new HistoricProcessInstanceQueryProperty("RES.TENANT_ID_");
-
-    public static final HistoricProcessInstanceQueryProperty INCLUDED_VARIABLE_TIME = new HistoricProcessInstanceQueryProperty("VAR.LAST_UPDATED_TIME_");
 
     private String name;
 

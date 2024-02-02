@@ -12,38 +12,33 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import java.io.Serializable;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 
 /**
  * @author Joram Barrez
  */
-public class TriggerPlanItemInstanceCmd implements Command<Void>, Serializable {
-
-    protected String planItemInstanceId;
+public class TriggerPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
     public TriggerPlanItemInstanceCmd(String planItemInstanceId) {
-        this.planItemInstanceId = planItemInstanceId;
+        super(planItemInstanceId);
+    }
+
+    public TriggerPlanItemInstanceCmd(String planItemInstanceId, Map<String, Object> variables,
+            Map<String, Object> formVariables, String formOutcome, FormInfo formInfo,
+            Map<String, Object> localVariables,
+            Map<String, Object> transientVariables) {
+        
+        super(planItemInstanceId, variables, formVariables, formOutcome, formInfo, localVariables, transientVariables);
     }
 
     @Override
-    public Void execute(CommandContext commandContext) {
-        if (planItemInstanceId == null) {
-            throw new FlowableIllegalArgumentException("Plan item instance id is null");
-        }
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
-        if (planItemInstanceEntity == null) {
-            throw new FlowableObjectNotFoundException("Cannot find plan item instance for id " + planItemInstanceId, PlanItemInstanceEntity.class);
-        }
-        
+    protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
-        return null;
     }
-   
+    
 }

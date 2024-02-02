@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -26,9 +29,12 @@ import org.flowable.engine.task.Comment;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Frederik Heremans
@@ -38,6 +44,7 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
     /**
      * Test getting all comments for a historic process instance. GET history/historic-process-instances/{processInstanceId}/comments
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetComments() throws Exception {
         ProcessInstance pi = null;
@@ -50,28 +57,32 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
             Comment comment = taskService.addComment(null, pi.getId(), "This is a comment...");
             identityService.setAuthenticatedUserId(null);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT_COLLECTION, pi.getId())),
+            CloseableHttpResponse response = executeRequest(
+                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT_COLLECTION, pi.getId())),
                     HttpStatus.SC_OK);
 
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertTrue(responseNode.isArray());
-            assertEquals(1, responseNode.size());
-
-            ObjectNode commentNode = (ObjectNode) responseNode.get(0);
-            assertEquals("kermit", commentNode.get("author").textValue());
-            assertEquals("This is a comment...", commentNode.get("message").textValue());
-            assertEquals(comment.getId(), commentNode.get("id").textValue());
-            assertTrue(commentNode.get("processInstanceUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId())));
-            assertEquals(pi.getProcessInstanceId(), commentNode.get("processInstanceId").asText());
-            assertTrue(commentNode.get("taskUrl").isNull());
-            assertTrue(commentNode.get("taskId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo(" [{"
+                            + "   id: '" + comment.getId() + "',"
+                            + "   author: 'kermit',"
+                            + "   message: 'This is a comment...',"
+                            + "   taskId: null,"
+                            + "   taskUrl: null,"
+                            + "   processInstanceId: '" + pi.getProcessInstanceId() + "',"
+                            + "   processInstanceUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId()) + "'"
+                            + "}]");
 
             // Test with unexisting task
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT_COLLECTION, "unexistingtask")), HttpStatus.SC_NOT_FOUND));
+            closeResponse(
+                    executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COMMENT_COLLECTION, "unexistingtask")),
+                            HttpStatus.SC_NOT_FOUND));
 
         } finally {
             if (pi != null) {
@@ -86,6 +97,7 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
     /**
      * Test creating a comment for a process instance. POST history/historic-process-instances/{processInstanceId}/comments
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testCreateComment() throws Exception {
         ProcessInstance pi = null;
@@ -93,30 +105,34 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
         try {
             pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT_COLLECTION, pi.getId()));
+            HttpPost httpPost = new HttpPost(
+                    SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT_COLLECTION, pi.getId()));
             ObjectNode requestNode = objectMapper.createObjectNode();
             requestNode.put("message", "This is a comment...");
             httpPost.setEntity(new StringEntity(requestNode.toString()));
 
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
 
-            assertEquals(HttpStatus.SC_CREATED, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_CREATED);
 
             List<Comment> commentsOnProcess = taskService.getProcessInstanceComments(pi.getId());
-            assertNotNull(commentsOnProcess);
-            assertEquals(1, commentsOnProcess.size());
+            assertThat(commentsOnProcess).hasSize(1);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-            assertEquals("kermit", responseNode.get("author").textValue());
-            assertEquals("This is a comment...", responseNode.get("message").textValue());
-            assertEquals(commentsOnProcess.get(0).getId(), responseNode.get("id").textValue());
-            assertTrue(responseNode.get("processInstanceUrl").textValue()
-                    .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), commentsOnProcess.get(0).getId())));
-            assertEquals(pi.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-            assertTrue(responseNode.get("taskUrl").isNull());
-            assertTrue(responseNode.get("taskId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo(" {"
+                            + "   id: '" + commentsOnProcess.get(0).getId() + "',"
+                            + "   author: 'kermit',"
+                            + "   message: 'This is a comment...',"
+                            + "   taskId: null,"
+                            + "   taskUrl: null,"
+                            + "   processInstanceId: '" + pi.getProcessInstanceId() + "',"
+                            + "   processInstanceUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), commentsOnProcess.get(0).getId()) + "'"
+                            + "}");
 
         } finally {
             if (pi != null) {
@@ -131,6 +147,7 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
     /**
      * Test getting a comment for a historic process instance. GET history/historic -process-instances/{processInstanceId}/comments/{commentId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetComment() throws Exception {
         ProcessInstance pi = null;
@@ -143,28 +160,35 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
             Comment comment = taskService.addComment(null, pi.getId(), "This is a comment...");
             identityService.setAuthenticatedUserId(null);
 
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId())),
+            CloseableHttpResponse response = executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId())),
                     200);
 
-            assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+            assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
 
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            assertNotNull(responseNode);
-
-            assertEquals("kermit", responseNode.get("author").textValue());
-            assertEquals("This is a comment...", responseNode.get("message").textValue());
-            assertEquals(comment.getId(), responseNode.get("id").textValue());
-            assertTrue(responseNode.get("processInstanceUrl").textValue().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId())));
-            assertEquals(pi.getProcessInstanceId(), responseNode.get("processInstanceId").asText());
-            assertTrue(responseNode.get("taskUrl").isNull());
-            assertTrue(responseNode.get("taskId").isNull());
+            assertThat(responseNode).isNotNull();
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo(" {"
+                            + "   id: '" + comment.getId() + "',"
+                            + "   author: 'kermit',"
+                            + "   message: 'This is a comment...',"
+                            + "   taskId: null,"
+                            + "   taskUrl: null,"
+                            + "   processInstanceId: '" + pi.getProcessInstanceId() + "',"
+                            + "   processInstanceUrl: '" + SERVER_URL_PREFIX + RestUrls
+                            .createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), comment.getId()) + "'"
+                            + "}");
 
             // Test with unexisting process-instance
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, "unexistinginstance", "123")),
+            closeResponse(executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, "unexistinginstance", "123")),
                     HttpStatus.SC_NOT_FOUND));
 
-            closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), "unexistingcomment")),
+            closeResponse(executeRequest(new HttpGet(
+                            SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_COMMENT, pi.getId(), "unexistingcomment")),
                     HttpStatus.SC_NOT_FOUND));
 
         } finally {
@@ -180,6 +204,7 @@ public class HistoricProcessInstanceCommentResourceTest extends BaseSpringRestTe
     /**
      * Test deleting a comment for a task. DELETE runtime/tasks/{taskId}/comments/{commentId}
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testDeleteComment() throws Exception {
         ProcessInstance pi = null;

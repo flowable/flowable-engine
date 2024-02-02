@@ -24,7 +24,7 @@
           <text>"AAA"</text>
         </inputEntry>
         <inputEntry id="inputEntry_3_1">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_1">
           <text>"FIRST"</text>
@@ -35,7 +35,7 @@
           <text>"AAA"</text>
         </inputEntry>
         <inputEntry id="inputEntry_3_2">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_2">
           <text>"SECOND"</text>
@@ -46,7 +46,7 @@
           <text>"AAA"</text>
         </inputEntry>
         <inputEntry id="inputEntry_3_3">
-          <text>-</text>
+          <text><![CDATA[-]]></text>
         </inputEntry>
         <outputEntry id="outputEntry_2_3">
           <text>"THIRD"</text>

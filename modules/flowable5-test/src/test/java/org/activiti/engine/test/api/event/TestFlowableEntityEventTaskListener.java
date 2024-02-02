@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.Task;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * Records a copy of the tasks involved in the events

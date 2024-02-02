@@ -16,7 +16,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * An {@link FlowableEvent} related to an message being sent to an activity.
@@ -24,11 +24,11 @@ public interface FlowableMessageEvent extends FlowableActivityEvent {
     /**
      * @return the name of the message.
      */
-    public String getMessageName();
+    String getMessageName();
 
     /**
      * @return the payload that was passed when sending the message. Returns null, if no payload was passed.
      */
-    public Object getMessageData();
+    Object getMessageData();
 
 }

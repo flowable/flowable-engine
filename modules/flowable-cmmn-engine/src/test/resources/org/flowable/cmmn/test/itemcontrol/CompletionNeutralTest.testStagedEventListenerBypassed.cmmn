@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testStagedEventListenerBypassed">
+
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+            <documentation>Task B inside the Stage has a Exit Criteria on a Completion Neutral Event Listener, the stage should complete
+                when TaskB complete even it the event is not triggered
+            </documentation>
+
+            <planItem id="keepAliveTask" name="this task keeps alive the plan after the stage completes" definitionRef="taskA"/>
+            <planItem id="theStage" name="this stage should complete after taskB is completed" definitionRef="stageOne"/>
+
+            <task id="taskA"/>
+            <stage id="stageOne" name="A stage that will remain with only completion neutral items">
+                <planItem id="manuallyCompletedTask" name="manually completed task" definitionRef="taskB">
+                    <exitCriterion sentryRef="onUserEventAbortTaskSentry"/>
+                </planItem>
+                <planItem id="completionNeutraEventListener" name="A completion Neutral event listener" definitionRef="abortTaskUserEventListener">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                </planItem>
+                <sentry id="onUserEventAbortTaskSentry">
+                    <planItemOnPart sourceRef="completionNeutraEventListener">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <task id="taskB"/>
+                <userEventListener id="abortTaskUserEventListener" name="Abort Task"/>
+            </stage>
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -15,23 +15,27 @@ package org.flowable.dmn.spring;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.spring.AutoDeploymentStrategy;
+import org.flowable.common.spring.SpringEngineConfiguration;
+import org.flowable.common.spring.SpringTransactionContextFactory;
+import org.flowable.common.spring.SpringTransactionInterceptor;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
-import org.flowable.dmn.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -41,7 +45,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author David Syer
  * @author Joram Barrez
  */
-public class SpringDmnEngineConfiguration extends DmnEngineConfiguration implements ApplicationContextAware {
+public class SpringDmnEngineConfiguration extends DmnEngineConfiguration implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -49,7 +53,10 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies = new ArrayList<>();
+    protected volatile boolean running = false;
+    protected List<String> enginesBuild = new ArrayList<>();
+    protected final Object lifeCycleMonitor = new Object();
 
     public SpringDmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -62,8 +69,15 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     public DmnEngine buildDmnEngine() {
         DmnEngine dmnEngine = super.buildDmnEngine();
         DmnEngines.setInitialized(true);
-        autoDeployResources(dmnEngine);
+        enginesBuild.add(dmnEngine.getName());
         return dmnEngine;
+    }
+
+    @Override
+    public void initBeans() {
+        if (beans == null) {
+            beans = new SpringBeanFactoryProxyMap(applicationContext);
+        }
     }
 
     public void setTransactionSynchronizationAdapterOrder(Integer transactionSynchronizationAdapterOrder) {
@@ -95,8 +109,8 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
 
     protected void autoDeployResources(DmnEngine dmnEngine) {
         if (deploymentResources != null && deploymentResources.length > 0) {
-            final AutoDeploymentStrategy strategy = getAutoDeploymentStrategy(deploymentMode);
-            strategy.deployResources(deploymentName, deploymentResources, dmnEngine.getDmnRepositoryService());
+            final AutoDeploymentStrategy<DmnEngine> strategy = getAutoDeploymentStrategy(deploymentMode);
+            strategy.deployResources(deploymentName, deploymentResources, dmnEngine);
         }
     }
 
@@ -111,30 +125,38 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
         }
     }
 
+    @Override
     public PlatformTransactionManager getTransactionManager() {
         return transactionManager;
     }
 
+    @Override
     public void setTransactionManager(PlatformTransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public String getDeploymentName() {
         return deploymentName;
     }
 
+    @Override
     public void setDeploymentName(String deploymentName) {
         this.deploymentName = deploymentName;
     }
 
+    @Override
     public Resource[] getDeploymentResources() {
         return deploymentResources;
     }
 
-    public void setDeploymentResources(Resource[] deploymentResources) {
+    @Override
+    public void
+    setDeploymentResources(Resource[] deploymentResources) {
         this.deploymentResources = deploymentResources;
     }
 
+    @Override
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -144,10 +166,12 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public String getDeploymentMode() {
         return deploymentMode;
     }
 
+    @Override
     public void setDeploymentMode(String deploymentMode) {
         this.deploymentMode = deploymentMode;
     }
@@ -160,9 +184,9 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
      *            the mode to get the strategy for
      * @return the deployment strategy to use for the mode. Never <code>null</code>
      */
-    protected AutoDeploymentStrategy getAutoDeploymentStrategy(final String mode) {
-        AutoDeploymentStrategy result = new DefaultAutoDeploymentStrategy();
-        for (final AutoDeploymentStrategy strategy : deploymentStrategies) {
+    protected AutoDeploymentStrategy<DmnEngine> getAutoDeploymentStrategy(final String mode) {
+        AutoDeploymentStrategy<DmnEngine> result = new DefaultAutoDeploymentStrategy();
+        for (final AutoDeploymentStrategy<DmnEngine> strategy : deploymentStrategies) {
             if (strategy.handlesMode(mode)) {
                 result = strategy;
                 break;
@@ -171,4 +195,33 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
         return result;
     }
 
+    public Collection<AutoDeploymentStrategy<DmnEngine>> getDeploymentStrategies() {
+        return deploymentStrategies;
+    }
+
+    public void setDeploymentStrategies(Collection<AutoDeploymentStrategy<DmnEngine>> deploymentStrategies) {
+        this.deploymentStrategies = deploymentStrategies;
+    }
+
+    @Override
+    public void start() {
+        synchronized (lifeCycleMonitor) {
+            if (!isRunning()) {
+                enginesBuild.forEach(name -> autoDeployResources(DmnEngines.getDmnEngine(name)));
+                running = true;
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        synchronized (lifeCycleMonitor) {
+            running = false;
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
 }

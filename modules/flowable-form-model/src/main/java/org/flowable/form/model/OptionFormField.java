@@ -24,6 +24,7 @@ public class OptionFormField extends FormField {
     protected String optionType;
     protected Boolean hasEmptyValue;
     protected List<Option> options;
+    protected String optionsExpression;
 
     public String getOptionType() {
         return optionType;
@@ -48,4 +49,13 @@ public class OptionFormField extends FormField {
     public void setOptions(List<Option> options) {
         this.options = options;
     }
+    
+    public String getOptionsExpression() {
+        return optionsExpression;
+    }
+    
+    public void setOptionsExpression(String optionsExpression) {
+        this.optionsExpression = optionsExpression;
+    }
+    
 }

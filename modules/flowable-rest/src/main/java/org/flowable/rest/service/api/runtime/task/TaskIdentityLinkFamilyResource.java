@@ -13,13 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -28,9 +25,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -40,18 +40,22 @@ import java.util.List;
 public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
 
     @ApiOperation(value = "List identity links for a task for either groups or users", tags = { "Task Identity Links" },  nickname = "listIdentityLinksForFamily",
-            notes = "Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.")
+            notes = "Returns only identity links targeting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/identitylinks/{family}", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family, HttpServletRequest request) {
+    public List<RestIdentityLink> getIdentityLinksForFamily(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "family") @PathVariable("family") String family) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
             throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
         }
 
         boolean isUser = family.equals(RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS);

@@ -15,7 +15,7 @@ package org.flowable.task.api.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.task.api.TaskInfo;
 
 /**
@@ -31,11 +31,21 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
      */
     String getDeleteReason();
 
-    /** Time when the task started. */
+    /**
+     * Time when the task created.
+     *
+     * @deprecated use {@link #getCreateTime()} instead
+     */
+    @Deprecated
     Date getStartTime();
 
     /** Time when the task was deleted or completed. */
     Date getEndTime();
+    
+    /**
+     * User reference that has completed the task.
+     */
+    String getCompletedBy();
 
     /**
      * Difference between {@link #getEndTime()} and {@link #getStartTime()} in milliseconds.
@@ -46,9 +56,5 @@ public interface HistoricTaskInstance extends TaskInfo, HistoricData {
      * Difference between {@link #getEndTime()} and {@link #getClaimTime()} in milliseconds.
      */
     Long getWorkTimeInMillis();
-
-    /** Time when the task was claimed. */
-    @Override
-    Date getClaimTime();
 
 }

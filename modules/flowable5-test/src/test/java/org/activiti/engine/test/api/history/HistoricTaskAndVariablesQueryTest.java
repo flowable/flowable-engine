@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
@@ -96,7 +96,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("kermit").singleResult();
             assertEquals(2, task.getProcessVariables().size());
-            assertEquals(0, task.getTaskLocalVariables().size());
             assertEquals(true, task.getProcessVariables().get("processVar"));
             assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 
@@ -129,7 +128,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             task = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().taskAssignee("kermit").taskVariableValueEquals("localVar", "test").singleResult();
             assertEquals(2, task.getProcessVariables().size());
-            assertEquals(0, task.getTaskLocalVariables().size());
             assertEquals(true, task.getProcessVariables().get("processVar"));
             assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 
@@ -238,7 +236,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .endOr()
                     .singleResult();
             assertEquals(2, task.getProcessVariables().size());
-            assertEquals(0, task.getTaskLocalVariables().size());
             assertEquals(true, task.getProcessVariables().get("processVar"));
             assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 
@@ -315,7 +312,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .endOr()
                     .singleResult();
             assertEquals(2, task.getProcessVariables().size());
-            assertEquals(0, task.getTaskLocalVariables().size());
             assertEquals(true, task.getProcessVariables().get("processVar"));
             assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 

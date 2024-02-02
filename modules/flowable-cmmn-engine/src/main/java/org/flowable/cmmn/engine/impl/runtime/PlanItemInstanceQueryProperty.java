@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Joram Barrez
@@ -27,7 +27,8 @@ public class PlanItemInstanceQueryProperty implements QueryProperty {
 
     private static final Map<String, PlanItemInstanceQueryProperty> properties = new HashMap<>();
 
-    public static final PlanItemInstanceQueryProperty START_TIME = new PlanItemInstanceQueryProperty("RES.START_TIME_");
+    public static final PlanItemInstanceQueryProperty CREATE_TIME = new PlanItemInstanceQueryProperty("RES.CREATE_TIME_");
+    public static final PlanItemInstanceQueryProperty END_TIME = new PlanItemInstanceQueryProperty("RES.ENDED_TIME_");
     public static final PlanItemInstanceQueryProperty NAME = new PlanItemInstanceQueryProperty("RES.NAME_");
 
     private String name;
@@ -37,6 +38,7 @@ public class PlanItemInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

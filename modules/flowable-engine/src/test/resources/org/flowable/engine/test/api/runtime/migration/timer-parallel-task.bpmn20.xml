@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+    <process id="TAES" name="Timer parallel tasks" isExecutable="true">
+        <startEvent id="processStart"/>
+        <userTask id="processTask" name="processTask"/>
+        <boundaryEvent id="timerBound" attachedToRef="processTask" cancelActivity="false">
+            <timerEventDefinition>
+                <timeCycle>R/PT15M</timeCycle>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow3" sourceRef="timerBound" targetRef="parallelTask"/>
+        <sequenceFlow id="flow1" sourceRef="processStart" targetRef="processTask"/>
+        <userTask id="parallelTask" name="parallelTask"/>
+        <sequenceFlow id="flow2" sourceRef="processTask" targetRef="processEnd"/>
+        <sequenceFlow id="flow4" sourceRef="parallelTask" targetRef="processEnd"/>
+        <endEvent id="processEnd"/>
+    </process>
+
+</definitions>

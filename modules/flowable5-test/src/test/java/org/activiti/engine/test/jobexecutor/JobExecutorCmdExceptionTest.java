@@ -13,10 +13,9 @@
 package org.activiti.engine.test.jobexecutor;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
@@ -31,6 +30,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     public void setUp() throws Exception {
         processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        processEngineConfiguration.getJobServiceConfiguration().getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
@@ -43,7 +43,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                processEngineConfiguration.getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -83,7 +83,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                processEngineConfiguration.getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -127,7 +127,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
     }
 
     protected JobEntity createTweetExceptionMessage() {
-        JobEntity message = CommandContextUtil.getJobService().createJob();
+        JobEntity message = processEngineConfiguration.getJobServiceConfiguration().getJobService().createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType("tweet-exception");
         message.setRetries(3);

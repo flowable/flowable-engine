@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="testRedeploy">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+
+            <planItem id="eventListenerPlanItem" definitionRef="eventListener">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter"></repetitionRule>
+                </itemControl>
+            </planItem>
+            <planItem id="planItem1" name="My task 1" definitionRef="humanTask1"></planItem>
+            <planItem id="planItem2" name="My task 2" definitionRef="humanTask2">
+                <entryCriterion id="entryTaskB" sentryRef="sentryOnEventListener"/>
+            </planItem>
+
+            <sentry id="sentryOnEventListener">
+                <planItemOnPart id="sentryOnEvent" sourceRef="eventListenerPlanItem">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="humanTask1" name="My task 1" />
+            <humanTask id="humanTask2" name="My task 2" />
+
+            <eventListener id="eventListener" name="myEventListener" flowable:eventType="signal" flowable:signalRef="testSignal" />
+
+        </casePlanModel>
+    </case>
+</definitions>

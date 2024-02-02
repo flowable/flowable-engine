@@ -15,8 +15,8 @@ package org.flowable.cdi.test.impl.event;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 
 import org.flowable.cdi.BusinessProcessEvent;
 import org.flowable.cdi.annotation.event.AssignTask;

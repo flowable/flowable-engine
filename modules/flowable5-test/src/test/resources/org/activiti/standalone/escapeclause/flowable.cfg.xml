@@ -7,10 +7,10 @@
   <bean id="processEngineConfiguration"
     class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000" />
-    <property name="jdbcDriver" value="org.h2.Driver" />
-    <property name="jdbcUsername" value="sa" />
-    <property name="jdbcPassword" value="" />
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+    <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+    <property name="jdbcUsername" value="${jdbc.username:sa}" />
+    <property name="jdbcPassword" value="${jdbc.password:}" />
 
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="drop-create" />
@@ -30,7 +30,7 @@
     <property name="mailServers">
       <map>
         <entry key="myEmailTenant">
-          <bean class="org.flowable.engine.cfg.MailServerInfo">
+          <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
             <property name="mailServerHost" value="localhost" />
             <property name="mailServerPort" value="5025" />
             <property name="mailServerUseSSL" value="false" />
@@ -47,7 +47,7 @@
 
     <property name="enableProcessDefinitionInfoCache" value="true" />
 
-    <property name="databaseWildcardEscapeCharacter" value="\" />
+    <property name="databaseWildcardEscapeCharacter" value="|" />
     
   </bean>
 

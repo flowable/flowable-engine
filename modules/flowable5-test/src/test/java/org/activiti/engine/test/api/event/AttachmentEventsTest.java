@@ -15,11 +15,11 @@ package org.activiti.engine.test.api.event;
 import java.io.ByteArrayInputStream;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.identity.Authentication;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.test.Deployment;

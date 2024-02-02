@@ -15,14 +15,14 @@ package org.flowable.variable.service.impl;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.api.types.VariableTypes;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.types.NullType;
 
 /**
  * Represents a variable value used in queries.
@@ -35,8 +35,11 @@ public class QueryVariableValue implements Serializable {
     private Object value;
     private QueryOperator operator;
 
-    private VariableInstanceEntity variableInstanceEntity;
+    private ValueFields valueField;
+    private VariableType valueType;
     private boolean local;
+
+    private String scopeType;
 
     public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local) {
         this.name = name;
@@ -45,20 +48,29 @@ public class QueryVariableValue implements Serializable {
         this.local = local;
     }
 
-    public void initialize(VariableTypes types) {
-        if (variableInstanceEntity == null) {
-            VariableType type = types.findVariableType(value);
-            if (type instanceof ByteArrayType) {
+    public QueryVariableValue(String name, Object value, QueryOperator operator, boolean local, String scopeType) {
+        this(name, value, operator, local);
+        this.scopeType = scopeType;
+    }
+
+    public void initialize(VariableValueProvider valueProvider) {
+        if (valueField == null) {
+            valueType = valueProvider.findVariableType(value);
+            if (valueType instanceof ByteArrayType) {
                 throw new FlowableIllegalArgumentException("Variables of type ByteArray cannot be used to query");
-            } else if (type instanceof JPAEntityVariableType && operator != QueryOperator.EQUALS) {
+            } else if (valueType instanceof JPAEntityVariableType && operator != QueryOperator.EQUALS) {
                 throw new FlowableIllegalArgumentException("JPA entity variables can only be used in 'variableValueEquals'");
-            } else if (type instanceof JPAEntityListVariableType) {
+            } else if (valueType instanceof JPAEntityListVariableType) {
                 throw new FlowableIllegalArgumentException("Variables containing a list of JPA entities cannot be used to query");
             } else {
                 // Type implementation determines which fields are set on the entity
-                variableInstanceEntity = CommandContextUtil.getVariableInstanceEntityManager().create(name, type, value);
+                valueField = valueProvider.createValueFields(name, valueType, value);
             }
         }
+    }
+
+    public void initialize(VariableServiceConfiguration variableServiceConfiguration) {
+        initialize(new VariableServiceConfigurationVariableValueProvider(variableServiceConfiguration));
     }
 
     public String getName() {
@@ -73,41 +85,58 @@ public class QueryVariableValue implements Serializable {
     }
 
     public String getTextValue() {
-        if (variableInstanceEntity != null) {
-            return variableInstanceEntity.getTextValue();
+        if (valueField != null) {
+            return valueField.getTextValue();
         }
         return null;
     }
 
     public Long getLongValue() {
-        if (variableInstanceEntity != null) {
-            return variableInstanceEntity.getLongValue();
+        if (valueField != null) {
+            return valueField.getLongValue();
         }
         return null;
     }
 
     public Double getDoubleValue() {
-        if (variableInstanceEntity != null) {
-            return variableInstanceEntity.getDoubleValue();
+        if (valueField != null) {
+            return valueField.getDoubleValue();
         }
         return null;
     }
 
     public String getTextValue2() {
-        if (variableInstanceEntity != null) {
-            return variableInstanceEntity.getTextValue2();
+        if (valueField != null) {
+            return valueField.getTextValue2();
         }
         return null;
     }
 
     public String getType() {
-        if (variableInstanceEntity != null) {
-            return variableInstanceEntity.getType().getTypeName();
+        if (valueType != null) {
+            return valueType.getTypeName();
         }
         return null;
     }
 
+    public boolean needsTypeCheck() {
+        // When operator is not-equals or type of value is null, type doesn't matter!
+        if (operator == QueryOperator.NOT_EQUALS || operator == QueryOperator.NOT_EQUALS_IGNORE_CASE) {
+            return false;
+        }
+
+        if (valueField != null) {
+            return !NullType.TYPE_NAME.equals(valueType.getTypeName());
+        }
+
+        return false;
+    }
+
     public boolean isLocal() {
         return local;
+    }
+
+    public String getScopeType() {
+        return scopeType;
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.impl.event.FlowableEventSupport;
+import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;

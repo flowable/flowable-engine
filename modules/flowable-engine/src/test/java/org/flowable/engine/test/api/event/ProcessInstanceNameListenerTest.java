@@ -12,22 +12,24 @@
  */
 package org.flowable.engine.test.api.event;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link FlowableEngineEventType#PROCESS_CREATED} event.
@@ -38,54 +40,59 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
 
     private TestInitializedEntityEventListener listener;
 
-    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
     public void testProcessCreateProcessNameEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("oneTaskProcess").
                 name("oneTaskProcessInstanceName").
                 start();
 
-        assertNotNull(processInstance);
+        assertThat(processInstance).isNotNull();
 
-        assertThat("Process instance name must be initialized before PROCESS_CREATED event is fired.",
-                listener.getProcessName(), is("oneTaskProcessInstanceName"));
+        assertThat(listener.getProcessName()).as("Process instance name must be initialized before PROCESS_CREATED event is fired.")
+                .isEqualTo("oneTaskProcessInstanceName");
     }
 
+    @Test
     public void testCallActivityProcessCreatedDefinitionName() throws Exception {
-        BpmnModel mainBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml");
-        BpmnModel childBpmnModel = loadBPMNModel("org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml");
+        BpmnModel mainBpmnModel = loadBPMNModel(
+                "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_mainProcess.bpmn.xml");
+        BpmnModel childBpmnModel = loadBPMNModel(
+                "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSuspendedProcessCallActivity_childProcess.bpmn.xml");
 
-        org.flowable.engine.repository.Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment").addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+        org.flowable.engine.repository.Deployment childDeployment = processEngine.getRepositoryService().createDeployment().name("childProcessDeployment")
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
 
-        org.flowable.engine.repository.Deployment masterDeployment = processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment").addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
+        org.flowable.engine.repository.Deployment masterDeployment = processEngine.getRepositoryService().createDeployment().name("masterProcessDeployment")
+                .addBpmnModel("masterProcess.bpmn20.xml", mainBpmnModel).deploy();
 
         runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("masterProcess").
                 start();
 
-        assertThat("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set", listener.getProcessDefinitionName(), is("Child Process"));
+        assertThat(listener.getProcessDefinitionName()).as("SubProcessInstance PROCESS_CREATED event must have processDefinitionName set")
+                .isEqualTo("Child Process");
 
         repositoryService.deleteDeployment(masterDeployment.getId(), true);
         repositoryService.deleteDeployment(childDeployment.getId());
     }
 
-    @Override
-    protected void initializeServices() {
-        super.initializeServices();
+    @BeforeEach
+    protected void setUp() {
         this.listener = new TestInitializedEntityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(this.listener, FlowableEngineEventType.PROCESS_CREATED);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
     }
 
-    private class TestInitializedEntityEventListener implements FlowableEventListener {
+    private class TestInitializedEntityEventListener extends AbstractFlowableEngineEventListener {
 
         protected String processName = null;
         protected String processDefinitionName = null;
@@ -95,7 +102,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
             if (event instanceof FlowableEntityEvent && ProcessInstance.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
                 // check whether entity in the event is initialized before
                 // adding to the list.
-                assertNotNull(((FlowableEntityEvent) event).getEntity());
+                assertThat(((FlowableEntityEvent) event).getEntity()).isNotNull();
                 ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
                 processName = processInstance.getName();
                 processDefinitionName = processInstance.getProcessDefinitionName();

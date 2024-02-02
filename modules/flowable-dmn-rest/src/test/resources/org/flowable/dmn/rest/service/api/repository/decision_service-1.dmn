@@ -1,0 +1,47 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="definition_4ac12806-fcee-11ea-ad91-fe931497745f" name="Decision Service One" namespace="http://www.flowable.org/dmn">
+  <decision id="sid-43064EE9-3A80-4EF6-8D74-1195CDC120CB" name="Decision One">
+    <informationRequirement id="sid-81C5DE3D-F61D-4887-8BAF-0C8C075E50E1">
+      <requiredDecision href="#sid-3CF18AE0-6579-4527-A52A-9A45159BECF2"></requiredDecision>
+    </informationRequirement>
+  </decision>
+  <decision id="sid-3CF18AE0-6579-4527-A52A-9A45159BECF2" name="Decision Two">
+    <informationRequirement id="sid-F95555C9-5C83-451E-B495-6751385D337D">
+      <requiredDecision href="#sid-1465F22C-5E90-4407-BB82-812885B01A74"></requiredDecision>
+    </informationRequirement>
+  </decision>
+  <decision id="sid-1465F22C-5E90-4407-BB82-812885B01A74" name="Decision Three"></decision>
+  <decisionService id="decisionServiceOne" name="Decision Service One">
+    <outputDecision href="#sid-43064EE9-3A80-4EF6-8D74-1195CDC120CB"></outputDecision>
+    <encapsulatedDecision href="#sid-3CF18AE0-6579-4527-A52A-9A45159BECF2"></encapsulatedDecision>
+    <encapsulatedDecision href="#sid-1465F22C-5E90-4407-BB82-812885B01A74"></encapsulatedDecision>
+  </decisionService>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_decisionServiceOne">
+      <dmndi:Size height="1050.0" width="1200.0"></dmndi:Size>
+      <dmndi:DMNShape id="DMNShape_4a215a60-fd1a-44fd-ac50-a235b22952b3" dmnElementRef="decisionServiceOne">
+        <dc:Bounds height="422.0" width="575.0" x="150.0" y="74.0"></dc:Bounds>
+        <dmndi:DMNDecisionServiceDividerLine>
+          <di:waypoint x="150.0" y="314.0"></di:waypoint>
+          <di:waypoint x="725.0" y="314.0"></di:waypoint>
+        </dmndi:DMNDecisionServiceDividerLine>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_1c85ee12-de4c-4af5-8ea8-e05b103da88a" dmnElementRef="sid-43064EE9-3A80-4EF6-8D74-1195CDC120CB">
+        <dc:Bounds height="62.0" width="100.0" x="495.0" y="135.0"></dc:Bounds>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_253fd600-db6a-4bad-ad1d-097d9c2c74b7" dmnElementRef="sid-3CF18AE0-6579-4527-A52A-9A45159BECF2">
+        <dc:Bounds height="62.0" width="100.0" x="600.0" y="390.0"></dc:Bounds>
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_65cdae95-b736-458b-843e-946ee4a9a67c" dmnElementRef="sid-1465F22C-5E90-4407-BB82-812885B01A74">
+        <dc:Bounds height="110.0" width="158.0" x="182.0" y="330.0"></dc:Bounds>
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_7d39624c-e468-4e1d-bbff-bc8745701858" dmnElementRef="sid-81C5DE3D-F61D-4887-8BAF-0C8C075E50E1">
+        <di:waypoint x="638.055512792458" y="390.0"></di:waypoint>
+        <di:waypoint x="563.6721819725875" y="196.95000000000002"></di:waypoint>
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_541026e4-e315-485f-9120-6073ba08f4f2" dmnElementRef="sid-F95555C9-5C83-451E-B495-6751385D337D">
+        <di:waypoint x="339.95000000000005" y="392.3064267352185"></di:waypoint>
+        <di:waypoint x="599.9999999999998" y="416.3727506426735"></di:waypoint>
+      </dmndi:DMNEdge>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

@@ -13,10 +13,10 @@
 
 package org.flowable.dmn.engine.impl.test;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
-import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

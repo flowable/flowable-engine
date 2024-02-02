@@ -1,0 +1,211 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_c0e9d8ba-4b7f-11e7-8197-a26608126000" name="Risk Rating Decision Table"
+             namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <informationRequirement id="infoRequirement1_1">
+            <requiredDecision href="#decision3" />
+        </informationRequirement>
+        <informationRequirement id="infoRequirement1_2">
+            <requiredDecision href="#decision4" />
+        </informationRequirement>
+        <decisionTable id="decisionTable1">
+            <input>
+                <inputExpression id="inputExpression1_1" typeRef="string">
+                    <text>output3</text>
+                </inputExpression>
+            </input>
+            <input>
+                <inputExpression id="inputExpression1_2" typeRef="string">
+                    <text>output4</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry1_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_1">
+                    <text>'decision1_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <informationRequirement id="infoRequirement2_1">
+            <requiredDecision href="#decision7" />
+        </informationRequirement>
+        <decisionTable id="decisionTable2">
+            <input>
+                <inputExpression id="inputExpression2_1" typeRef="string">
+                    <text>output7</text>
+                </inputExpression>
+            </input>
+            <output id="output2" label="Output 2" name="output2" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry2_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_1">
+                    <text>'decision2_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision3" name="Decision 3">
+        <informationRequirement id="infoRequirement3_1">
+            <requiredDecision href="#decision5" />
+        </informationRequirement>
+        <informationRequirement id="infoRequirement3_2">
+            <requiredDecision href="#decision6" />
+        </informationRequirement>
+        <decisionTable id="decisionTable3">
+            <input>
+                <inputExpression id="inputExpression3_1" typeRef="string">
+                    <text>output5</text>
+                </inputExpression>
+            </input>
+            <input>
+                <inputExpression id="inputExpression3_2" typeRef="string">
+                    <text>output6</text>
+                </inputExpression>
+            </input>
+            <output id="output3" label="Output 3" name="output3" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry3_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_1">
+                    <text>'decision3_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision4" name="Decision 4">
+        <informationRequirement id="infoRequirement4_1">
+            <requiredDecision href="#decision7" />
+        </informationRequirement>
+        <decisionTable id="decisionTable4">
+            <input>
+                <inputExpression id="inputExpression4_1" typeRef="string">
+                    <text>input7</text>
+                </inputExpression>
+            </input>
+            <output id="output4" label="Output 4" name="output4" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry4_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry4_1">
+                    <text>'decision4_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision5" name="Decision 5">
+        <informationRequirement id="infoRequirement5_1">
+            <requiredDecision href="#decision7" />
+        </informationRequirement>
+        <decisionTable id="decisionTable5">
+            <input>
+                <inputExpression id="inputExpression5_1" typeRef="string">
+                    <text>input7</text>
+                </inputExpression>
+            </input>
+            <output id="output5" label="Output 5" name="output5" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry5_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry5_1">
+                    <text>'decision5_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision6" name="Decision 6">
+        <decisionTable id="decisionTable6">
+            <input>
+                <inputExpression id="inputExpression6_1" typeRef="string">
+                    <text>inputVar1</text>
+                </inputExpression>
+            </input>
+            <output id="output6" label="Output 6" name="output6" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry6_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry6_1">
+                    <text>'decision6_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision7" name="Decision 7">
+        <decisionTable id="decisionTable7">
+            <input>
+                <inputExpression id="inputExpression7_1" typeRef="string">
+                    <text>inputVar2</text>
+                </inputExpression>
+            </input>
+            <output id="output7" label="Output 7" name="output7" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry7_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry7_1">
+                    <text>'decision7_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision8" name="Decision 8">
+        <informationRequirement id="infoRequirement8_1">
+            <requiredDecision href="#decision9" />
+        </informationRequirement>
+        <decisionTable id="decisionTable8">
+            <input>
+                <inputExpression id="inputExpression8_1" typeRef="string">
+                    <text>input9</text>
+                </inputExpression>
+            </input>
+            <output id="output8" label="Output 8" name="output8" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry8_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry8_1">
+                    <text>'decision8_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision9" name="Decision 9">
+        <decisionTable id="decisionTable9">
+            <input>
+                <inputExpression id="inputExpression9_1" typeRef="string">
+                    <text>inputVar3</text>
+                </inputExpression>
+            </input>
+            <output id="output9" label="Output 9" name="output9" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry9_1">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry9_1">
+                    <text>'decision9_output'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+
+    <decisionService id="decisionService1" name="Decision Service 1">
+        <outputDecision href="#decision1"/>
+        <outputDecision href="#decision2"/>
+        <outputDecision href="#decision8"/>
+        <encapsulatedDecision href="#decision3"/>
+        <encapsulatedDecision href="#decision4"/>
+        <encapsulatedDecision href="#decision5"/>
+        <encapsulatedDecision href="#decision6"/>
+        <encapsulatedDecision href="#decision7"/>
+        <encapsulatedDecision href="#decision9"/>
+    </decisionService>
+</definitions>

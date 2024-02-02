@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  xmlns:tns="org.flowable.engine.impl.webservice"
+  xmlns:webservice="http://webservice.flowable.org/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  typeLanguage="http://www.w3.org/2001/XMLSchema"
+  expressionLanguage="http://www.w3.org/1999/XPath"
+  targetNamespace="org.flowable.engine.impl.webservice">
+
+  <import importType="http://schemas.xmlsoap.org/wsdl/"
+          location="http://localhost:63081/webservicemock?wsdl"
+          namespace="http://webservice.flowable.org/" />
+
+  <process id="webServiceInvocationReturningSeveralParams">
+  
+    <dataObject id="outParam1" name="outParam1" itemSubjectRef="xsd:string"/>
+    <dataObject id="outParam2" name="outParam2" itemSubjectRef="xsd:long"/>
+    <dataObject id="outParam3" name="outParam3" itemSubjectRef="xsd:string"/>
+
+    <startEvent id="theStart" >
+         <extensionElements>
+            <flowable:formProperty id="inParam" name="Input parameter of web service" type="string" required="true" />
+         </extensionElements>
+    </startEvent>
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="webService" />
+
+    <serviceTask id="webService"
+                 name="Web service invocation"
+                 implementation="##WebService"
+                 operationRef="tns:returnsSeveralParamsOperation">
+         <ioSpecification>
+            <dataInput itemSubjectRef="tns:returnsSeveralParamsRequestItem" id="dataInputOfServiceTaskRequest" />
+            <dataOutput itemSubjectRef="tns:returnsSeveralParamsResponseItem" id="dataOutputOfServiceTaskResponse" />
+            <inputSet>
+               <dataInputRefs>dataInputOfServiceTaskRequest</dataInputRefs>
+            </inputSet>
+            <outputSet>
+               <dataOutputRefs>dataOutputOfServiceTaskResponse</dataOutputRefs>
+            </outputSet>
+         </ioSpecification>
+         <dataInputAssociation>
+            <targetRef>dataInputOfServiceTaskRequest</targetRef>
+            <assignment>
+               <from>${inParam}</from>
+               <to>${dataInputOfServiceTaskRequest.inParam1}</to>
+            </assignment>
+         </dataInputAssociation>
+         <dataOutputAssociation>
+            <targetRef>outParam1</targetRef>
+            <transformation>${dataOutputOfServiceTaskResponse.outParam1}</transformation>
+         </dataOutputAssociation>
+         <dataOutputAssociation>
+            <targetRef>outParam2</targetRef>
+            <transformation>${dataOutputOfServiceTaskResponse.outParam2}</transformation>
+         </dataOutputAssociation>
+         <dataOutputAssociation>
+            <targetRef>outParam3</targetRef>
+            <transformation>${dataOutputOfServiceTaskResponse.outParam3}</transformation>
+         </dataOutputAssociation>
+    </serviceTask>
+
+    <sequenceFlow id="flow2" sourceRef="webService" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+
+  <itemDefinition id="returnsSeveralParamsRequestItem" structureRef="webservice:returnsSeveralParams" />
+  <itemDefinition id="returnsSeveralParamsResponseItem" structureRef="webservice:returnsSeveralParamsResponse" />
+
+  <message id="returnsSeveralParamsRequestMessage" itemRef="tns:returnsSeveralParamsRequestItem" name="returnsSeveralParamsRequestMessage" />
+  <message id="returnsSeveralParamsResponseMessage" itemRef="tns:returnsSeveralParamsResponseItem" name="returnsSeveralParamsResponseMessage" />
+
+
+  <interface name="Webservice Interface">
+    <operation id="returnsSeveralParamsOperation" name="Operation 'returnsSeveralParams'" implementationRef="webservice:returnsSeveralParams">
+      <inMessageRef>tns:returnsSeveralParamsRequestMessage</inMessageRef>
+      <outMessageRef>tns:returnsSeveralParamsResponseMessage</outMessageRef>
+    </operation>
+  </interface>
+
+
+</definitions>

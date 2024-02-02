@@ -12,16 +12,19 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 /**
@@ -37,27 +40,33 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItems.size());
-        assertEquals("A", planItems.get(0).getName());
-        assertEquals("B", planItems.get(1).getName());
-        
+        assertThat(planItems)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A", "B");
+
         // Completing A should trigger exit criteria of B. Case completes.
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaNonBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts() {
@@ -66,18 +75,21 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
-        assertEquals(5, planItems.size());
-        String[] expectedNames = new String[] {"A", "B", "C", "D"};
-        for (int i=0; i<4; i++) {
-            assertEquals(expectedNames[i], planItems.get(i).getName());
+        assertThat(planItems)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A", "B", "C", "D", "E");
+        for (int i = 0; i < 4; i++) {
             cmmnRuntimeService.triggerPlanItemInstance(planItems.get(i).getId());
         }
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts2() {
@@ -86,17 +98,20 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
-        assertEquals(5, planItems.size());
-       
+        assertThat(planItems).hasSize(5);
+
         // Triggering A and B exits C, which triggers the exit of D and E
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testExitPlanModelOnMilestoneReached() {
@@ -105,68 +120,192 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .orderByName().asc()
                 .list();
-        assertEquals(2, planItems.size());
-        assertEquals("D", planItems.get(0).getName());
-        assertEquals("The Milestone", planItems.get(1).getName());
-        
-         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
+        assertThat(planItems)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("D", "The Milestone");
+
+        planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
-        assertEquals(3, planItems.size());
-        String[] expectedNames = new String[] {"A", "B", "C"};
-        for (int i=0; i<3; i++) {
-            assertEquals(expectedNames[i], planItems.get(i).getName());
-        }
-        
+        assertThat(planItems)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A", "B", "C");
+
         // Triggering A and B enabled the milestone
         // Completing the milestone exits the whole planmodel
-        
+
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testExitThreeNestedStagesThroughPlanModel() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(8);
+
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(1);
+        }
     }
-    
+
     @Test
     @CmmnDeployment
     public void testExitPlanModelWithNestedCaseTasks() {
-        
+
         String oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").deploy().getId();
-        
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .deploy()
+                .getId();
+
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(4, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(4);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isZero();
+        }
+
         // Trigger the plan item should satisfy the sentry of the plan model exit criteria
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").singleResult();
-        assertNotNull(taskA);
+        assertThat(taskA).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
-        
-        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count()).isEqualTo(4);
+        }
+
         cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelUsingNestedEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testExitPlanModelUsingNestedEventListener")
+                .start();
+
+        UserEventListenerInstance userEventListenerInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userEventListenerInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitTriggersAnotherExit() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("exitTriggersAnotherExit")
+                .start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
+
+        // Completing A cascades into exiting B and C
+        cmmnTaskService.complete(tasks.get(0).getId());
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).isEmpty();
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testNestedPlanItemExitsOuterStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedPlanItemExitsOuterStage").start();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B", "C");
+
+        // Completing C should exit the outer stage and terminate all tasks
+        cmmnTaskService.complete(tasks.get(2).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelWithExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("minimalCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        // Completing the task should satisfy the exit criteria with the expression
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/ExitCriteriaTest.testStageExitCriteriaWithCondition.cmmn", "org/flowable/cmmn/test/runtime/dummyCase.cmmn"})
+    public void testStageExitCriteriaWithConditionNotTriggering() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("conditionStage").start();
+        UserEventListenerInstance userInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("triggerDummyCase").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(1);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("closeStage").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        CaseInstance dummyCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(dummyCaseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(0);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("referenceStage").singleResult();
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
     
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/test/runtime/ExitCriteriaTest.testStageExitCriteriaWithCondition.cmmn", "org/flowable/cmmn/test/runtime/dummyCase.cmmn"})
+    public void testStageExitCriteriaWithConditionTriggering() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("conditionStage").start();
+        UserEventListenerInstance userInstance = cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("triggerDummyCase").singleResult();
+        cmmnRuntimeService.completeUserEventListenerInstance(userInstance.getId());
+        
+        CaseInstance dummyCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(dummyCaseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dummyCase").planItemInstanceStateActive().count()).isEqualTo(0);
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(1);
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("closeStage").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("humanTask2").count()).isEqualTo(0);
+        
+        PlanItemInstance stagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("referenceStage").singleResult();
+        cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
 }

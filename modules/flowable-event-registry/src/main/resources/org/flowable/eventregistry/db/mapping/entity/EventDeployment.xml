@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
+
+  <!-- DEPLOYMENT INSERT -->
+  
+  <insert id="insertEventDeployment" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
+    insert into ${prefix}FLW_EVENT_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values
+    (#{id, jdbcType=VARCHAR}, 
+     #{name, jdbcType=VARCHAR}, 
+     #{category, jdbcType=VARCHAR}, 
+     #{tenantId, jdbcType=VARCHAR}, 
+     #{deploymentTime, jdbcType=TIMESTAMP}, 
+     #{parentDeploymentId, jdbcType=VARCHAR})
+  </insert>
+  
+   <insert id="bulkInsertEventDeployment" parameterType="java.util.List">
+    insert into ${prefix}FLW_EVENT_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values
+    <foreach collection="list" item="eventDeployment" index="index" separator=",">
+        (#{eventDeployment.id, jdbcType=VARCHAR}, 
+         #{eventDeployment.name, jdbcType=VARCHAR}, 
+         #{eventDeployment.category, jdbcType=VARCHAR}, 
+         #{eventDeployment.tenantId, jdbcType=VARCHAR}, 
+         #{eventDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
+         #{eventDeployment.parentDeploymentId, jdbcType=VARCHAR})
+    </foreach>         
+  </insert>
+  
+  <insert id="bulkInsertEventDeployment" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="eventDeployment" index="index">
+         INTO ${prefix}FLW_EVENT_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
+         (#{eventDeployment.id, jdbcType=VARCHAR}, 
+          #{eventDeployment.name, jdbcType=VARCHAR}, 
+          #{eventDeployment.category, jdbcType=VARCHAR}, 
+          #{eventDeployment.tenantId, jdbcType=VARCHAR}, 
+          #{eventDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
+          #{eventDeployment.parentDeploymentId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <!-- DEPLOYMENT UPDATE -->
+  
+  <update id="updateEventDeployment" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
+    update ${prefix}FLW_EVENT_DEPLOYMENT
+    <set>
+      CATEGORY_ = #{category, jdbcType=VARCHAR},
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+      PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR},
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- DEPLOYMENT DELETE -->
+  
+  <delete id="deleteEventDeployment" parameterType="string">
+    delete from ${prefix}FLW_EVENT_DEPLOYMENT where ID_ = #{id}
+  </delete>
+
+  <!-- DEPLOYMENT RESULTMAP -->
+  
+  <resultMap id="eventDeploymentResultMap" type="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- DEPLOYMENT SELECT -->
+
+  <select id="selectEventDeploymentsByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultMap="eventDeploymentResultMap">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectEventDeploymentsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
+  <select id="selectEventDeploymentCountByQueryCriteria" parameterType="org.flowable.eventregistry.impl.EventDeploymentQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectEventDeploymentsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectEventDeploymentsByQueryCriteriaSql">  
+    from ${prefix}FLW_EVENT_DEPLOYMENT RES
+    <where>
+      <if test="deploymentId != null">
+        RES.ID_ = #{deploymentId}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="eventDefinitionKey != null || eventDefinitionKeyLike != null">
+          and exists(select 1 from ${prefix}FLW_EVENT_DEFINITION EVENT where RES.ID_ = EVENT.DEPLOYMENT_ID_ 
+        <if test="eventDefinitionKey != null">
+          and EVENT.KEY_ = #{eventDefinitionKey}
+        </if>
+        <if test="eventDefinitionKeyLike != null">
+          and EVENT.KEY_ like #{eventDefinitionKeyLike}
+        </if>
+        )
+      </if>
+      <if test="channelDefinitionKey != null || channelDefinitionKeyLike != null">
+          and exists(select 1 from ${prefix}FLW_CHANNEL_DEFINITION CHANNEL where RES.ID_ = CHANNEL.DEPLOYMENT_ID_ 
+        <if test="channelDefinitionKey != null">
+          and CHANNEL.KEY_ = #{channelDefinitionKey}
+        </if>
+        <if test="channelDefinitionKeyLike != null">
+          and CHANNEL.KEY_ like #{channelDefinitionKeyLike}
+        </if>
+        )
+      </if>
+      <if test="parentDeploymentId != null">
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+      </if>
+      <if test="parentDeploymentIdLike != null">
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+      </if>
+    </where>
+  </sql>
+    
+  <select id="selectEventDeployment" parameterType="string" resultMap="eventDeploymentResultMap">
+    select * from ${prefix}FLW_EVENT_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectEventDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="eventDeploymentResultMap">
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectEventDeploymentCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+
+</mapper>

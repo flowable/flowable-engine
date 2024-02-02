@@ -30,8 +30,9 @@ public class ScriptTextParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof ScriptTask))
+        if (!(parentElement instanceof ScriptTask)) {
             return;
+        }
 
         ((ScriptTask) parentElement).setScript(xtr.getElementText());
     }

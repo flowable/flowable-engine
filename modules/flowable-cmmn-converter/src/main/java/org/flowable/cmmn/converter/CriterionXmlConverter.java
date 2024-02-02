@@ -25,6 +25,9 @@ public abstract class CriterionXmlConverter extends CaseElementXmlConverter {
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Criterion criterion = new Criterion();
+        // Even though the id is set in the CaseElementXmlConverter it is used in the implementations
+        // of this converter. Therefore we set it here as well.
+        criterion.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
         criterion.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
         criterion.setSentryRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_SENTRY_REF));
         return criterion;

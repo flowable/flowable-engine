@@ -15,11 +15,12 @@ package org.flowable.camel;
 import java.util.Map;
 
 import org.apache.camel.Exchange;
-import org.apache.camel.impl.DefaultProducer;
+import org.apache.camel.support.DefaultProducer;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
@@ -38,6 +39,8 @@ public class FlowableProducer extends DefaultProducer {
     protected RuntimeService runtimeService;
 
     protected RepositoryService repositoryService;
+
+    protected ManagementService managementService;
 
     public static final String PROCESS_KEY_PROPERTY = "PROCESS_KEY_PROPERTY";
 
@@ -83,8 +86,11 @@ public class FlowableProducer extends DefaultProducer {
 
             Map<String, Object> processVariables = null;
             if (repositoryService.isFlowable5ProcessDefinition(pi.getProcessDefinitionId())) {
-                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-                processVariables = compatibilityHandler.getVariables(pi);
+                // There is no command context at this, point, therefore we need to wrap it in one to get the v5 variables
+                processVariables = managementService.executeCommand(commandContext -> {
+                    Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                    return compatibilityHandler.getVariables(pi);
+                });
             } else {
                 processVariables = ((ExecutionEntity) pi).getVariables();
             }
@@ -115,7 +121,7 @@ public class FlowableProducer extends DefaultProducer {
             try {
                 Thread.sleep(timeResolution);
             } catch (InterruptedException e) {
-                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId);
+                throw new FlowableException("error occurred while waiting for activity=" + activity + " for processInstanceId=" + processInstanceId, e);
             }
             firstTime = false;
 
@@ -138,7 +144,8 @@ public class FlowableProducer extends DefaultProducer {
             }
         }
         if (execution == null) {
-            throw new FlowableException("Couldn't find activity " + activity + " for processId " + processInstanceId + " in defined timeout.");
+            throw new FlowableException("Could not find activity " + activity + " for processId " + processInstanceId +
+                    " in defined timeout of " + timeout + " ms.");
         }
 
         runtimeService.setVariables(execution.getId(), ExchangeUtils.prepareVariables(exchange, getFlowableEndpoint()));
@@ -201,5 +208,9 @@ public class FlowableProducer extends DefaultProducer {
 
     public void setRepositoryService(RepositoryService repositoryService) {
         this.repositoryService = repositoryService;
+    }
+
+    public void setManagementService(ManagementService managementService) {
+        this.managementService = managementService;
     }
 }

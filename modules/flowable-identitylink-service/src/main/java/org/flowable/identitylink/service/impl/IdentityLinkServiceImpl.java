@@ -15,18 +15,17 @@ package org.flowable.identitylink.service.impl;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 
 /**
  * @author Tijs Rademakers
  */
-public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLinkService {
-
-    public IdentityLinkServiceImpl() {
-
-    }
+public class IdentityLinkServiceImpl extends CommonServiceImpl<IdentityLinkServiceConfiguration> implements IdentityLinkService {
 
     public IdentityLinkServiceImpl(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
         super(identityLinkServiceConfiguration);
@@ -48,8 +47,23 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     }
     
     @Override
+    public List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
+        return getIdentityLinkEntityManager().findIdentityLinksByScopeIdAndType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType) {
+        return getIdentityLinkEntityManager().findIdentityLinksBySubScopeIdAndType(subScopeId, scopeType);
+    }
+    
+    @Override
     public List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId) {
         return getIdentityLinkEntityManager().findIdentityLinksByProcessDefinitionId(processDefinitionId);
+    }
+    
+    @Override
+    public List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        return getIdentityLinkEntityManager().findIdentityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
     }
     
     @Override
@@ -78,6 +92,18 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     }
     
     @Override
+    public IdentityLinkEntity createScopeIdentityLink(String scopeDefinitionId, String scopeId, String scopeType, String userId, String groupId, String type) {
+        return getIdentityLinkEntityManager().addScopeIdentityLink(scopeDefinitionId, scopeId, scopeType, userId, groupId, type);
+    }
+    
+    @Override
+    public IdentityLinkEntity createSubScopeIdentityLink(String scopeDefinitionId, String scopeId, String subScopeId, String scopeType, 
+                    String userId, String groupId, String type) {
+        
+        return getIdentityLinkEntityManager().addSubScopeIdentityLink(scopeDefinitionId, scopeId, subScopeId, scopeType, userId, groupId, type);
+    }
+    
+    @Override
     public IdentityLinkEntity createTaskIdentityLink(String taskId, String userId, String groupId, String type) {
         return getIdentityLinkEntityManager().addTaskIdentityLink(taskId, userId, groupId, type);
     }
@@ -88,10 +114,20 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     }
     
     @Override
+    public IdentityLinkEntity createScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId) {
+        return getIdentityLinkEntityManager().addScopeDefinitionIdentityLink(scopeDefinitionId, scopeType, userId, groupId);
+    }
+    
+    @Override
     public IdentityLinkEntity createIdentityLink() {
         return getIdentityLinkEntityManager().create();
     }
-    
+
+    @Override
+    public IdentityLinkEntity createIdentityLinkFromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink) {
+        return getIdentityLinkEntityManager().createIdentityLinkFromHistoricIdentityLink(historicIdentityLink);
+    }
+
     @Override
     public void insertIdentityLink(IdentityLinkEntity identityLink) {
         getIdentityLinkEntityManager().insert(identityLink);
@@ -108,6 +144,11 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     }
     
     @Override
+    public List<IdentityLinkEntity> deleteScopeIdentityLink(String scopeId, String scopeType, String userId, String groupId, String type) {
+        return getIdentityLinkEntityManager().deleteScopeIdentityLink(scopeId, scopeType, userId, groupId, type);
+    }
+    
+    @Override
     public List<IdentityLinkEntity> deleteTaskIdentityLink(String taskId, List<IdentityLinkEntity> currentIdentityLinks, String userId, String groupId, String type) {
         return getIdentityLinkEntityManager().deleteTaskIdentityLink(taskId, currentIdentityLinks, userId, groupId, type);
     }
@@ -118,12 +159,41 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     }
     
     @Override
-    public List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId) {
-        return getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
+    public List<IdentityLinkEntity> deleteScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId) {
+        return getIdentityLinkEntityManager().deleteScopeDefinitionIdentityLink(scopeDefinitionId, scopeType, userId, groupId);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByTaskId(String taskId) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByTaskId(taskId);
     }
     
     @Override
     public void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId) {
         getIdentityLinkEntityManager().deleteIdentityLinksByProcDef(processDefinitionId);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByScopeIdAndType(String scopeId, String scopeType) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
+    public void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        getIdentityLinkEntityManager().bulkDeleteIdentityLinksForScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
+    public IdentityLinkEntityManager getIdentityLinkEntityManager() {
+        return configuration.getIdentityLinkEntityManager();
     }
 }

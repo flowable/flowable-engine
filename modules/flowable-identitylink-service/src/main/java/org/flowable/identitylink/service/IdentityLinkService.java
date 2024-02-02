@@ -15,6 +15,7 @@ package org.flowable.identitylink.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
@@ -30,7 +31,13 @@ public interface IdentityLinkService {
     
     List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId);
     
+    List<IdentityLinkEntity> findIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
+    List<IdentityLinkEntity> findIdentityLinksBySubScopeIdAndType(String subScopeId, String scopeType);
+    
     List<IdentityLinkEntity> findIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    
+    List<IdentityLinkEntity> findIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
     
     IdentityLinkEntity addCandidateUser(String taskId, String userId);
     
@@ -42,24 +49,44 @@ public interface IdentityLinkService {
     
     IdentityLinkEntity createProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
     
+    IdentityLinkEntity createScopeIdentityLink(String scopeDefinitionId, String scopeId, String scopeType, String userId, String groupId, String type);
+    IdentityLinkEntity createSubScopeIdentityLink(String scopeDefinitionId, String scopeId, String subScopeId, String scopeType, 
+                    String userId, String groupId, String type);
+    
     IdentityLinkEntity createTaskIdentityLink(String taskId, String userId, String groupId, String type);
     
     IdentityLinkEntity createProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
     
-    IdentityLinkEntity createIdentityLink();
+    IdentityLinkEntity createScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
     
+    IdentityLinkEntity createIdentityLink();
+
+    IdentityLinkEntity createIdentityLinkFromHistoricIdentityLink(HistoricIdentityLink historicIdentityLink);
+
     void insertIdentityLink(IdentityLinkEntity identityLink);
     
     void deleteIdentityLink(IdentityLinkEntity identityLink);
     
     List<IdentityLinkEntity> deleteProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
     
+    List<IdentityLinkEntity> deleteScopeIdentityLink(String scopeId, String scopeType, String userId, String groupId, String type);
+    
     List<IdentityLinkEntity> deleteTaskIdentityLink(String taskId, List<IdentityLinkEntity> currentIdentityLinks, String userId, String groupId, String type);
     
     List<IdentityLinkEntity> deleteProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
     
-    List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
+    List<IdentityLinkEntity> deleteScopeDefinitionIdentityLink(String scopeDefinitionId, String scopeType, String userId, String groupId);
+    
+    void deleteIdentityLinksByTaskId(String taskId);
     
     void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId);
+    
+    void deleteIdentityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
+    
+    void deleteIdentityLinksByScopeIdAndType(String scopeId, String scopeType);
+    
+    void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
+    
+    void bulkDeleteIdentityLinksForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
     
 }

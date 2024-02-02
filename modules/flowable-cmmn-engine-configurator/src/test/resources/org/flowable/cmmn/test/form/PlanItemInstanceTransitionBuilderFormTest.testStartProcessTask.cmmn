@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testStartChildProcess">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Process" definitionRef="theProcess">
+                <itemControl>
+                    <manualActivationRule></manualActivationRule>
+                </itemControl>
+            </planItem>
+            <processTask id="theProcess" processRef="oneTaskProcess"/>
+        </casePlanModel>
+    </case>
+
+    <process id="oneTaskProcess" name="The One Task process" externalRef="oneTask"/>
+
+</definitions>

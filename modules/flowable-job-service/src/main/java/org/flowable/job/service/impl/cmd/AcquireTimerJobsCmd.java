@@ -16,48 +16,55 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
+public class AcquireTimerJobsCmd implements Command<List<TimerJobEntity>> {
 
-    private final AsyncExecutor asyncExecutor;
+    protected AsyncExecutor asyncExecutor;
 
     public AcquireTimerJobsCmd(AsyncExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
     }
 
     @Override
-    public AcquiredTimerJobEntities execute(CommandContext commandContext) {
-        AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
-        List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext)
-                .findTimerJobsToExecute(new Page(0, asyncExecutor.getMaxAsyncJobsDuePerAcquisition()));
+    public List<TimerJobEntity> execute(CommandContext commandContext) {
+        JobServiceConfiguration jobServiceConfiguration = asyncExecutor.getJobServiceConfiguration();
+        List<String> enabledCategories = jobServiceConfiguration.getEnabledJobCategories();
+        List<TimerJobEntity> timerJobs = jobServiceConfiguration.getTimerJobEntityManager()
+            .findJobsToExecute(enabledCategories, new Page(0, asyncExecutor.getMaxTimerJobsPerAcquisition()));
 
         for (TimerJobEntity job : timerJobs) {
-            lockJob(commandContext, job, asyncExecutor.getAsyncJobLockTimeInMillis());
-            acquiredJobs.addJob(job);
+            lockJob(commandContext, job, asyncExecutor.getTimerLockTimeInMillis(), jobServiceConfiguration);
         }
 
-        return acquiredJobs;
+        return timerJobs;
     }
 
-    protected void lockJob(CommandContext commandContext, TimerJobEntity job, int lockTimeInMillis) {
+    protected void lockJob(CommandContext commandContext, TimerJobEntity job, int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
 
+        // This will use the regular updates flush in the DbSqlSession
         // This will trigger an optimistic locking exception when two concurrent executors
         // try to lock, as the revision will not match.
 
-        GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        gregorianCalendar.setTime(CommandContextUtil.getJobServiceConfiguration(commandContext).getClock().getCurrentTime());
-        gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
+        GregorianCalendar jobExpirationTime = calculateLockExpirationTime(lockTimeInMillis, jobServiceConfiguration);
         job.setLockOwner(asyncExecutor.getLockOwner());
-        job.setLockExpirationTime(gregorianCalendar.getTime());
+        job.setLockExpirationTime(jobExpirationTime.getTime());
     }
+
+    protected GregorianCalendar calculateLockExpirationTime(int lockTimeInMillis, JobServiceConfiguration jobServiceConfiguration) {
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTime(jobServiceConfiguration.getClock().getCurrentTime());
+        gregorianCalendar.add(Calendar.MILLISECOND, lockTimeInMillis);
+        return gregorianCalendar;
+    }
+
 }

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.runtime.ProcessInstance;

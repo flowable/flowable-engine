@@ -16,13 +16,11 @@ package org.flowable.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public abstract class HistoricDetailEntityImpl extends AbstractEntityNoRevision implements HistoricDetailEntity, Serializable {
+public abstract class HistoricDetailEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements HistoricDetailEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 

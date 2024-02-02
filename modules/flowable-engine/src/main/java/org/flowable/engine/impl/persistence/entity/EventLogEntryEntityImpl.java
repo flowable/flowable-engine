@@ -14,14 +14,12 @@ package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-
 /**
  * An event log entry can only be inserted (and maybe deleted).
  * 
  * @author Joram Barrez
  */
-public class EventLogEntryEntityImpl extends AbstractEntityNoRevision implements EventLogEntryEntity {
+public class EventLogEntryEntityImpl extends AbstractBpmnEngineNoRevisionEntity implements EventLogEntryEntity {
 
     protected long logNumber; // cant use id here, it would clash with entity
     protected String type;

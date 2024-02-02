@@ -13,12 +13,15 @@
 package org.flowable.test.scripting.secure;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.scripting.secure.SecureJavascriptConfigurator;
@@ -35,6 +38,13 @@ public abstract class SecureScriptingBaseTest {
     protected RuntimeService runtimeService;
     protected RepositoryService repositoryService;
     protected TaskService taskService;
+    protected ExposedBean exposedBean = new ExposedBean();
+
+    public static class ExposedBean{
+        public int getNumber(){
+            return 123;
+        }
+    }
 
     @Before
     public void initProcessEngine() {
@@ -42,11 +52,17 @@ public abstract class SecureScriptingBaseTest {
         SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
                 .setWhiteListedClasses(new HashSet<>(Collections.singletonList("java.util.ArrayList")))
                 .setMaxStackDepth(10).setMaxScriptExecutionTime(3000L)
-                .setMaxMemoryUsed(3145728L);
+                .setMaxMemoryUsed(3145728L)
+                .setEnableAccessToBeans(true);
 
-        this.processEngine = new StandaloneInMemProcessEngineConfiguration()
-                .addConfigurator(configurator)
-                .setDatabaseSchemaUpdate("create-drop")
+        Map<Object, Object> beans = new HashMap<>();
+        beans.put("exposedBean", exposedBean);
+        final ProcessEngineConfigurationImpl processEngineConfiguration =
+                new StandaloneInMemProcessEngineConfiguration()
+                        .addConfigurator(configurator)
+                        .setDatabaseSchemaUpdate("create-drop");
+        processEngineConfiguration.setBeans(beans);
+        this.processEngine = processEngineConfiguration
                 .buildProcessEngine();
 
         this.runtimeService = processEngine.getRuntimeService();

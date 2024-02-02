@@ -13,6 +13,8 @@
 
 package org.flowable.camel.examples.multiinstance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -21,19 +23,23 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class MultiInstanceTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -45,15 +51,17 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
         });
     }
 
+    @Test
     @Deployment(resources = { "process/multiinstanceReceive.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miProcessExample");
         List<Job> jobList = managementService.createJobQuery().list();
-        assertEquals(5, jobList.size());
+        assertThat(jobList).hasSize(5);
 
-        assertEquals(5, runtimeService.createExecutionQuery()
+        assertThat(runtimeService.createExecutionQuery()
                 .processInstanceId(processInstance.getId())
-                .activityId("serviceTask1").count());
+                .activityId("serviceTask1")
+                .count()).isEqualTo(5);
 
         waitForJobExecutorToProcessAllJobs(3000, 500);
         int counter = 0;
@@ -63,6 +71,6 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
             processInstanceCount = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count();
             counter++;
         }
-        assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 }

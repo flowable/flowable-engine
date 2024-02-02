@@ -14,20 +14,21 @@
 package org.flowable.idm.engine.test;
 
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.IdmEngines;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@Tag("resource")
 public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTestCase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceFlowableIdmTestCase.class);
 
     protected String idmConfigurationResource;
     protected String idmEngineName;
+
+    @RegisterExtension
+    protected final ResourceFlowableIdmExtension extension;
 
     public ResourceFlowableIdmTestCase(String idmConfigurationResource) {
         this(idmConfigurationResource, null);
@@ -36,24 +37,7 @@ public abstract class ResourceFlowableIdmTestCase extends AbstractFlowableIdmTes
     public ResourceFlowableIdmTestCase(String idmConfigurationResource, String idmEngineName) {
         this.idmConfigurationResource = idmConfigurationResource;
         this.idmEngineName = idmEngineName;
-    }
-
-    @Override
-    protected void closeDownIdmEngine() {
-        super.closeDownIdmEngine();
-        IdmEngines.unregister(idmEngine);
-        idmEngine = null;
-    }
-
-    @Override
-    protected void initializeIdmEngine() {
-        IdmEngineConfiguration config = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(idmConfigurationResource);
-        if (idmEngineName != null) {
-            LOGGER.info("Initializing idm engine with name '{}'", idmEngineName);
-            config.setEngineName(idmEngineName);
-        }
-        additionalConfiguration(config);
-        idmEngine = config.buildIdmEngine();
+        this.extension = new ResourceFlowableIdmExtension(idmConfigurationResource, idmEngineName, this::additionalConfiguration);
     }
 
     protected void additionalConfiguration(IdmEngineConfiguration idmEngineConfiguration) {

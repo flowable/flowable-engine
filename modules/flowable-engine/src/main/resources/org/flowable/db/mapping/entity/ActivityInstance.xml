@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl">
+
+  <!-- ACTIVITY INSTANCE INSERT -->
+  
+  <insert id="insertActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl">
+      insert into ${prefix}ACT_RU_ACTINST (
+        ID_,
+        REV_,
+        PROC_DEF_ID_,
+        PROC_INST_ID_,
+        EXECUTION_ID_,
+        ACT_ID_,
+        TASK_ID_,
+        CALL_PROC_INST_ID_,
+        ACT_NAME_,
+        ACT_TYPE_,
+        ASSIGNEE_,
+        START_TIME_,
+        END_TIME_,
+        TRANSACTION_ORDER_,
+        DURATION_,
+        DELETE_REASON_,
+        TENANT_ID_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        1, #{processDefinitionId, jdbcType=VARCHAR},
+        #{processInstanceId, jdbcType=VARCHAR},
+        #{executionId, jdbcType=VARCHAR},
+        #{activityId ,jdbcType=VARCHAR},
+        #{taskId ,jdbcType=VARCHAR},
+        #{calledProcessInstanceId ,jdbcType=VARCHAR},
+        #{activityName ,jdbcType=VARCHAR},
+        #{activityType ,jdbcType=VARCHAR},
+        #{assignee ,jdbcType=VARCHAR},
+        #{startTime, jdbcType=TIMESTAMP},
+        #{endTime, jdbcType=TIMESTAMP},
+        #{transactionOrder ,jdbcType=INTEGER},
+        #{durationInMillis ,jdbcType=BIGINT},
+        #{deleteReason, jdbcType=VARCHAR},
+        #{tenantId, jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="bulkInsertActivityInstance" parameterType="java.util.List">
+      insert into ${prefix}ACT_RU_ACTINST (
+        ID_,
+        REV_,
+        PROC_DEF_ID_,
+        PROC_INST_ID_,
+        EXECUTION_ID_,
+        ACT_ID_,
+        TASK_ID_,
+        CALL_PROC_INST_ID_,
+        ACT_NAME_,
+        ACT_TYPE_,
+        ASSIGNEE_,
+        START_TIME_,
+        END_TIME_,
+        TRANSACTION_ORDER_,
+        DURATION_,
+        DELETE_REASON_,
+        TENANT_ID_
+      ) values 
+      <foreach collection="list" item="activityInstance" index="index" separator=",">
+         (#{activityInstance.id ,jdbcType=VARCHAR},
+          1, #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+          #{activityInstance.processInstanceId, jdbcType=VARCHAR},
+          #{activityInstance.executionId, jdbcType=VARCHAR},
+          #{activityInstance.activityId ,jdbcType=VARCHAR},
+          #{activityInstance.taskId ,jdbcType=VARCHAR},
+          #{activityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
+          #{activityInstance.activityName ,jdbcType=VARCHAR},
+          #{activityInstance.activityType ,jdbcType=VARCHAR},
+          #{activityInstance.assignee ,jdbcType=VARCHAR},
+          #{activityInstance.startTime, jdbcType=TIMESTAMP},
+          #{activityInstance.endTime, jdbcType=TIMESTAMP},
+          #{activityInstance.transactionOrder, jdbcType=INTEGER},
+          #{activityInstance.durationInMillis ,jdbcType=BIGINT},
+          #{activityInstance.deleteReason ,jdbcType=VARCHAR},
+          #{activityInstance.tenantId, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+  
+  <insert id="bulkInsertActivityInstance" databaseId="oracle" parameterType="java.util.List">
+      INSERT ALL 
+      <foreach collection="list" item="activityInstance" index="index">
+        INTO ${prefix}ACT_RU_ACTINST (
+          ID_,
+          REV_,
+          PROC_DEF_ID_,
+          PROC_INST_ID_,
+          EXECUTION_ID_,
+          ACT_ID_,
+          TASK_ID_,
+          CALL_PROC_INST_ID_,
+          ACT_NAME_,
+          ACT_TYPE_,
+          ASSIGNEE_,
+          START_TIME_,
+          END_TIME_,
+          TRANSACTION_ORDER_,
+          DURATION_,
+          DELETE_REASON_,
+          TENANT_ID_
+        ) VALUES 
+           (#{activityInstance.id ,jdbcType=VARCHAR},
+            1, #{activityInstance.processDefinitionId, jdbcType=VARCHAR},
+            #{activityInstance.processInstanceId, jdbcType=VARCHAR},
+            #{activityInstance.executionId, jdbcType=VARCHAR},
+            #{activityInstance.activityId ,jdbcType=VARCHAR},
+            #{activityInstance.taskId ,jdbcType=VARCHAR},
+            #{activityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
+            #{activityInstance.activityName ,jdbcType=VARCHAR},
+            #{activityInstance.activityType ,jdbcType=VARCHAR},
+            #{activityInstance.assignee ,jdbcType=VARCHAR},
+            #{activityInstance.startTime, jdbcType=TIMESTAMP},
+            #{activityInstance.endTime, jdbcType=TIMESTAMP},
+            #{activityInstance.transactionOrder, jdbcType=INTEGER},
+            #{activityInstance.durationInMillis ,jdbcType=BIGINT},
+            #{activityInstance.deleteReason ,jdbcType=VARCHAR},
+            #{activityInstance.tenantId, jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <!-- ACTIVITY INSTANCE UPDATE -->
+  
+  <update id="updateActivityInstance" parameterType="org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl">
+    update ${prefix}ACT_RU_ACTINST
+    <set>
+        REV_ = #{revisionNext, jdbcType=INTEGER},
+        <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+            PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.executionId != executionId">
+            EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.taskId != taskId">
+            TASK_ID_ = #{taskId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.assignee != assignee">
+            ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.endTime != endTime">
+            END_TIME_ = #{endTime, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.transactionOrder != transactionOrder">
+        	TRANSACTION_ORDER_ = #{transactionOrder, jdbcType=INTEGER}, 
+        </if>
+        <if test="originalPersistentState.durationInMillis != durationInMillis">
+            DURATION_ = #{durationInMillis, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.deleteReason != deleteReason">
+            DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.calledProcessInstanceId != calledProcessInstanceId">
+            CALL_PROC_INST_ID_ = #{calledProcessInstanceId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.activityId != activityId">
+            ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.activityName != activityName">
+            ACT_NAME_ = #{activityName, jdbcType=VARCHAR},
+        </if>
+    </set>
+    where ID_ = #{id}
+    and REV_ = #{revision, jdbcType=INTEGER}
+</update>
+
+  <!-- ACTIVITY INSTANCE DELETE -->
+  
+  <delete id="deleteActivityInstancesByProcessInstanceId">
+    delete from ${prefix}ACT_RU_ACTINST where PROC_INST_ID_ = #{processInstanceId}
+  </delete>
+  
+  <delete id="deleteActivityInstancesByProcessDefinitionId">
+    delete from ${prefix}ACT_RU_ACTINST where PROC_DEF_ID_ = #{processDefinitionId}
+  </delete>
+
+  <delete id="deleteActivityInstance">
+    delete from ${prefix}ACT_RU_ACTINST where ID_ = #{id}
+  </delete>
+
+  <delete id="bulkDeleteActivityInstance" parameterType="java.util.Collection">
+    delete from ${prefix}ACT_RU_ACTINST where
+    <foreach item="activityInstance" collection="list" index="index" separator=" or ">
+      ID_ = #{activityInstance.id, jdbcType=VARCHAR}
+    </foreach>
+  </delete>
+
+  <!-- ACTIVITY INSTANCE RESULT MAP -->
+
+  <resultMap id="ActivityInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="activityName" column="ACT_NAME_" jdbcType="VARCHAR" />
+    <result property="activityType" column="ACT_TYPE_" jdbcType="VARCHAR" />
+    <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
+    <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- ACTIVITY INSTANCE SELECT -->
+  
+  <select id="selectActivityInstance" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST where ID_ = #{id}
+  </select>
+
+  <select id="selectActivityInstancesByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="ActivityInstanceResultMap">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectActivityInstancesByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+  
+  <select id="selectActivityInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectActivityInstancesByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectActivityInstancesByQueryCriteriaSql">
+    from ${prefix}ACT_RU_ACTINST RES
+    <where>
+      <if test="processInstanceId != null">
+        RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="activityInstanceId != null">
+        and RES.ID_ = #{activityInstanceId}
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACT_ID_ = #{activityId}
+      </if>
+      <if test="activityName != null">
+        and RES.ACT_NAME_ = #{activityName}
+      </if>
+      <if test="activityType != null">
+        and RES.ACT_TYPE_ = #{activityType}
+      </if>
+      <if test="assignee != null">
+        and RES.ASSIGNEE_ = #{assignee}
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+      <if test="unfinished">
+        and RES.END_TIME_ is null
+      </if>
+      <if test="finished">
+       and RES.END_TIME_ is not null
+      </if>
+      <if test="deleteReason != null">
+        and RES.DELETE_REASON_ = #{deleteReason}
+      </if>
+      <if test="deleteReasonLike != null">
+        and RES.DELETE_REASON_ like #{deleteReasonLike}${wildcardEscapeClause}
+      </if>
+    </where>
+  </sql>
+  
+  <select id="selectActivityInstanceByNativeQuery" parameterType="java.util.Map" resultMap="ActivityInstanceResultMap">
+  	<include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
+  </select>
+  
+  <select id="selectActivityInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+  <select id="selectUnfinishedActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR} and END_TIME_ is null
+  </select>
+  
+  <select id="selectActivityInstanceExecutionIdAndActivityId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR} and ACT_ID_ = #{parameter.activityId, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectUnfinishedActivityInstanceByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR} and END_TIME_ is null
+  </select>
+  
+  <select id="selectActivityInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="ActivityInstanceResultMap">
+    select * from ${prefix}ACT_RU_ACTINST RES
+    where PROC_INST_ID_ = #{parameter}
+  </select>
+
+  <select id="selectActivityInstanceByTaskId" parameterType="string" resultMap="ActivityInstanceResultMap">
+    select *
+    from ${prefix}ACT_RU_ACTINST RES
+    where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
+  </select>
+  
+</mapper>

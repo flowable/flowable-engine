@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,19 +13,19 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.exception.FlowableForbiddenException;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableForbiddenException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.SimpleFormModel;
+import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
+import org.flowable.rest.service.api.FormModelResponse;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskCompletionBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,58 +37,68 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = {"Tasks"}, description = "Manage Tasks", authorizations = {@Authorization(value = "basicAuth")})
 public class TaskResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get a task", tags = { "Tasks" })
+    @Autowired(required = false)
+    protected FormHandlerRestApiInterceptor formHandlerRestApiInterceptor;
+
+    @ApiOperation(value = "Get a task", tags = {"Tasks"})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
-    public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId) {
         return restResponseFactory.createTaskResponse(getTaskFromRequest(taskId));
     }
 
     @ApiOperation(value = "Update a task", tags = {
-            "Tasks" }, notes = "All request values are optional. For example, you can only include the assignee attribute in the request body JSON-object, only updating the assignee of the task, leaving all other fields unaffected. When an attribute is explicitly included and is set to null, the task-value will be updated to null. Example: {\"dueDate\" : null} will clear the duedate of the task).")
+            "Tasks"}, notes = "All request values are optional. For example, you can only include the assignee attribute in the request body JSON-object, only updating the assignee of the task, leaving all other fields unaffected. When an attribute is explicitly included and is set to null, the task-value will be updated to null. Example: {\"dueDate\" : null} will clear the duedate of the task).")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was updated."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
             @ApiResponse(code = 409, message = "Indicates the requested task was updated simultaneously.")
     })
     @PutMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
-    public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest, HttpServletRequest request) {
+    public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest) {
 
         if (taskRequest == null) {
             throw new FlowableException("A request body was expected when updating the task.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.updateTask(task, taskRequest);
+        }
+
         // Save the task and fetch again, it's possible that an
         // assignment-listener has updated
-        // fields after it was saved so we can't use the in-memory task
+        // fields after it was saved so we can not use the in-memory task
         taskService.saveTask(task);
         task = taskService.createTaskQuery().taskId(task.getId()).singleResult();
 
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" },
-            notes = "")
+    @ApiOperation(value = "Tasks actions", tags = {"Tasks"}, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),
@@ -102,7 +112,11 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.executeTaskAction(task, actionRequest);
+        }
 
         if (TaskActionRequest.ACTION_COMPLETE.equals(actionRequest.getAction())) {
             completeTask(task, actionRequest);
@@ -121,7 +135,7 @@ public class TaskResource extends TaskBaseResource {
         }
     }
 
-    @ApiOperation(value = "Delete a task", tags = { "Tasks" })
+    @ApiOperation(value = "Delete a task", tags = {"Tasks"}, code = 204)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cascadeHistory", dataType = "string", value = "Whether or not to delete the HistoricTask instance when deleting the task (if applicable). If not provided, this value defaults to false.", paramType = "query"),
             @ApiImplicitParam(name = "deleteReason", dataType = "string", value = "Reason why the task is deleted. This value is ignored when cascadeHistory is true.", paramType = "query")
@@ -132,13 +146,20 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
-            @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+                           @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason) {
 
-        Task taskToDelete = getTaskFromRequest(taskId);
+        Task taskToDelete = getTaskFromRequestWithoutAccessCheck(taskId);
         if (taskToDelete.getExecutionId() != null) {
-            // Can't delete a task that is part of a process instance
-            throw new FlowableForbiddenException("Cannot delete a task that is part of a process-instance.");
+            // Can not delete a task that is part of a process instance
+            throw new FlowableForbiddenException("Cannot delete a task that is part of a process instance.");
+        } else if (taskToDelete.getScopeId() != null && ScopeTypes.CMMN.equals(taskToDelete.getScopeType())) {
+            throw new FlowableForbiddenException("Cannot delete a task that is part of a case instance.");
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTask(taskToDelete);
         }
 
         if (cascadeHistory != null) {
@@ -149,38 +170,68 @@ public class TaskResource extends TaskBaseResource {
             // Delete with delete-reason
             taskService.deleteTask(taskToDelete.getId(), deleteReason);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
+    }
+
+    @ApiOperation(value = "Get a task form", tags = {"Tasks"})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates request was successful and the task form is returned"),
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
+    })
+    @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json")
+    public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId) {
+        Task task = getTaskFromRequest(taskId);
+        if (StringUtils.isEmpty(task.getFormKey())) {
+            throw new FlowableIllegalArgumentException("Task has no form defined");
+        }
+
+        FormInfo formInfo = taskService.getTaskFormModel(task.getId());
+        if (formHandlerRestApiInterceptor != null) {
+            return formHandlerRestApiInterceptor.convertTaskFormInfo(formInfo, task);
+        } else {
+            SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+            return restResponseFactory.getFormModelString(new FormModelResponse(formInfo, formModel));
+        }
     }
 
     protected void completeTask(Task task, TaskActionRequest actionRequest) {
-        Map<String, Object> variablesToSet = null;
-        Map<String, Object> transientVariablesToSet = null;
+        TaskCompletionBuilder taskCompletionBuilder = taskService.createTaskCompletionBuilder();
 
         if (actionRequest.getVariables() != null) {
-            variablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required");
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                variablesToSet.put(var.getName(), actualVariableValue);
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    taskCompletionBuilder.variableLocal(var.getName(), actualVariableValue);
+                } else {
+                    taskCompletionBuilder.variable(var.getName(), actualVariableValue);
+                }
             }
         }
 
         if (actionRequest.getTransientVariables() != null) {
-            transientVariablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getTransientVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");
                 }
 
                 Object actualVariableValue = restResponseFactory.getVariableValue(var);
-                transientVariablesToSet.put(var.getName(), actualVariableValue);
+                if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
+                    taskCompletionBuilder.transientVariableLocal(var.getName(), actualVariableValue);
+                } else {
+                    taskCompletionBuilder.transientVariable(var.getName(), actualVariableValue);
+                }
             }
+
         }
 
-        taskService.complete(task.getId(), variablesToSet, transientVariablesToSet);
+        taskCompletionBuilder
+                .taskId(task.getId())
+                .formDefinitionId(actionRequest.getFormDefinitionId())
+                .outcome(actionRequest.getOutcome())
+                .complete();
     }
 
     protected void resolveTask(Task task, TaskActionRequest actionRequest) {

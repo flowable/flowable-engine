@@ -18,13 +18,16 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.Association;
+import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.TextAnnotation;
 
 public class CmmnDIExport implements CmmnXmlConstants {
     
@@ -45,6 +48,13 @@ public class CmmnDIExport implements CmmnXmlConstants {
                 PlanItem planItem = model.findPlanItem(elementId);
                 if (planItem != null) {
                     writePlanItem(planItem, model, xtw);
+
+                } else {
+                    TextAnnotation textAnnotation = model.findTextAnnotation(elementId);
+                    if (textAnnotation != null) {
+                        writeTextAnnotation(textAnnotation, model, xtw);
+                    }
+
                 }
             }
         }
@@ -57,7 +67,9 @@ public class CmmnDIExport implements CmmnXmlConstants {
             
             for (String elementId : model.getFlowLocationMap().keySet()) {
                 Association association = associationMap.get(elementId);
-                if (association == null) continue;
+                if (association == null) {
+                    continue;
+                }
                 
                 createCmmnEdge(model, association.getId(), association.getSourceRef(), association.getTargetRef(), xtw);
             }
@@ -85,15 +97,22 @@ public class CmmnDIExport implements CmmnXmlConstants {
             createCmmnShape(model, criterion.getId(), xtw);
         }
     }
+
+    protected static void writeTextAnnotation(TextAnnotation textAnnotation, CmmnModel model, XMLStreamWriter xtw) throws Exception {
+        createCmmnShape(model, textAnnotation.getId(), xtw);
+    }
     
     protected static void createCmmnShape(CmmnModel model, String elementId, XMLStreamWriter xtw) throws Exception {
+        GraphicInfo graphicInfo = model.getGraphicInfo(elementId);
+        if (graphicInfo == null) {
+            return;
+        }
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_SHAPE, CMMNDI_NAMESPACE);
         String shapeId = "CMMNShape_" + elementId;
         xtw.writeAttribute(ATTRIBUTE_ID, shapeId);
         xtw.writeAttribute(ATTRIBUTE_DI_CMMN_ELEMENT_REF, elementId);
 
-        GraphicInfo graphicInfo = model.getGraphicInfo(elementId);
-        
+
         xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
         xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(graphicInfo.getHeight()));
         xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(graphicInfo.getWidth()));
@@ -103,6 +122,10 @@ public class CmmnDIExport implements CmmnXmlConstants {
         
         // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        GraphicInfo labelGraphicInfo = model.getLabelGraphicInfo(elementId);
+        if (labelGraphicInfo != null) {
+            addLabelElementContent(labelGraphicInfo, xtw);
+        }
         xtw.writeEndElement();
 
         xtw.writeEndElement();
@@ -118,6 +141,25 @@ public class CmmnDIExport implements CmmnXmlConstants {
         xtw.writeAttribute(ATTRIBUTE_ID, edgeId);
         xtw.writeAttribute(ATTRIBUTE_DI_CMMN_ELEMENT_REF, sourceElementId);
         xtw.writeAttribute(ATTRIBUTE_DI_TARGET_CMMN_ELEMENT_REF, targetElementId);
+        
+        CmmnDiEdge edgeInfo = model.getEdgeInfo(associationId);
+        if (edgeInfo.getSourceDockerInfo() != null && edgeInfo.getTargetDockerInfo() != null) {
+            xtw.writeStartElement(OMGDI_PREFIX, ELEMENT_DI_EXTENSION, OMGDI_NAMESPACE);
+            
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DI_DOCKER, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeAttribute(ATTRIBUTE_TYPE, "source");
+            xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(edgeInfo.getSourceDockerInfo().getX()));
+            xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(edgeInfo.getSourceDockerInfo().getY()));
+            xtw.writeEndElement();
+            
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_DI_DOCKER, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeAttribute(ATTRIBUTE_TYPE, "target");
+            xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(edgeInfo.getTargetDockerInfo().getX()));
+            xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(edgeInfo.getTargetDockerInfo().getY()));
+            xtw.writeEndElement();
+            
+            xtw.writeEndElement();
+        }
 
         List<GraphicInfo> graphicInfoList = model.getFlowLocationGraphicInfo(associationId);
         for (GraphicInfo graphicInfo : graphicInfoList) {
@@ -129,8 +171,24 @@ public class CmmnDIExport implements CmmnXmlConstants {
         
         // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        GraphicInfo labelGraphicInfo = model.getLabelGraphicInfo(edgeId);
+        if (labelGraphicInfo != null) {
+            addLabelElementContent(labelGraphicInfo, xtw);
+        }
         xtw.writeEndElement();
 
+        xtw.writeEndElement();
+    }
+
+    protected static void addLabelElementContent(GraphicInfo labelGraphicInfo, XMLStreamWriter xtw) throws Exception {
+        if (labelGraphicInfo.getRotation() > 0) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_ROTATION, String.valueOf(labelGraphicInfo.getRotation()));
+        }
+        xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
+        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(labelGraphicInfo.getHeight()));
+        xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(labelGraphicInfo.getWidth()));
+        xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(labelGraphicInfo.getX()));
+        xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(labelGraphicInfo.getY()));
         xtw.writeEndElement();
     }
 }

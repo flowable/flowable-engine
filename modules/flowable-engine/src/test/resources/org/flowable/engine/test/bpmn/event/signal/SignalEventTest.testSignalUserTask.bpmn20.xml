@@ -10,20 +10,12 @@
 		<startEvent id="start" />
 		<sequenceFlow sourceRef="start" targetRef="waitState" />
 
-<!--
-		<receiveTask id="waitState" name="wait" />
--->
- 	 <userTask id="waitState" name="Test User Task" >
-          </userTask>
+ 	 	<userTask id="waitState" name="Test User Task" />
                 
-
 		<sequenceFlow sourceRef="waitState" targetRef="end" />
-
 
 		<endEvent id="end" />
 
 	</process>
-
-	
 
 </definitions>

@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.api.repository.EngineResource;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.repository.EngineResource;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.DeploymentQueryImpl;
@@ -80,38 +82,48 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             if (deployment.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
                 List<Deployment> deploymentEntities = new DeploymentQueryImpl(processEngineConfiguration.getCommandExecutor())
                         .deploymentName(deployment.getName())
-                        .orderByDeploymenTime().desc()
+                        .orderByDeploymentTime().desc()
                         .listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
                 
             } else {
-                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
-                        .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
+                List<Deployment> deploymentList = processEngineConfiguration.getRepositoryService().createDeploymentQuery()
+                        .deploymentName(deployment.getName())
+                        .deploymentTenantId(deployment.getTenantId())
+                        .orderByDeploymentTime().desc()
+                        .listPage(0, 1);
 
                 if (!deploymentList.isEmpty()) {
                     existingDeployments.addAll(deploymentList);
                 }
             }
 
-            DeploymentEntity existingDeployment = null;
             if (!existingDeployments.isEmpty()) {
-                existingDeployment = (DeploymentEntity) existingDeployments.get(0);
-            }
-
-            if (existingDeployment != null && !deploymentsDiffer(deployment, existingDeployment)) {
-                return existingDeployment;
+                DeploymentEntity existingDeployment = (DeploymentEntity) existingDeployments.get(0);
+                if (!deploymentsDiffer(deployment, existingDeployment)) {
+                    return existingDeployment;
+                }
             }
         }
 
         deployment.setNew(true);
 
         // Save the data
-        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
+        processEngineConfiguration.getDeploymentEntityManager().insert(deployment);
 
-        if (processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+        if (StringUtils.isEmpty(deployment.getParentDeploymentId())) {
+            // If no parent deployment id is set then set the current ID as the parent
+            // If something was deployed via this command than this deployment would
+            // be a parent deployment to other potential child deployments
+            deployment.setParentDeploymentId(deployment.getId());
+        }
+
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         // Deployment settings
@@ -126,8 +138,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             scheduleProcessDefinitionActivation(commandContext, deployment);
         }
 
-        if (processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return deployment;
@@ -154,8 +167,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         for (String resourceName : resources.keySet()) {
             EngineResource savedResource = savedResources.get(resourceName);
 
-            if (savedResource == null)
+            if (savedResource == null) {
                 return true;
+            }
 
             if (!savedResource.isGenerated()) {
                 EngineResource resource = resources.get(resourceName);

@@ -8,7 +8,7 @@
 
   <insert id="insertHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
     insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-    	ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+    	ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_)
     values (#{id, jdbcType=VARCHAR},
             #{decisionDefinitionId, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
@@ -19,12 +19,13 @@
             #{activityId, jdbcType=VARCHAR},
             #{failed, jdbcType=BOOLEAN},
             #{tenantId, jdbcType=VARCHAR},
-            #{executionJson, jdbcType=VARCHAR})
+            #{executionJson, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR})
   </insert>
   
   <insert id="bulkInsertHistoricDecisionExecution" parameterType="java.util.List">
     insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_)
     values
     <foreach collection="list" item="historicDecisionExecution" index="index" separator=",">
         (#{historicDecisionExecution.id, jdbcType=VARCHAR},
@@ -37,7 +38,8 @@
          #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
          #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
          #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
-         #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+         #{historicDecisionExecution.executionJson, jdbcType=VARCHAR},
+         #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
   </insert>
   
@@ -45,8 +47,7 @@
     INSERT ALL
     <foreach collection="list" item="historicDecisionExecution" index="index">
      INTO ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
-        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_) VALUES
-        values
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_, SCOPE_TYPE_) VALUES
             (#{historicDecisionExecution.id, jdbcType=VARCHAR},
              #{historicDecisionExecution.decisionDefinitionId, jdbcType=VARCHAR},
              #{historicDecisionExecution.deploymentId, jdbcType=VARCHAR},
@@ -57,7 +58,8 @@
              #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
              #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
              #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
-             #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+             #{historicDecisionExecution.executionJson, jdbcType=VARCHAR},
+             #{historicDecisionExecution.scopeType, jdbcType=VARCHAR})
     </foreach>
     SELECT * FROM dual   
   </insert>
@@ -65,7 +67,10 @@
   <!-- HISTORIC DECISION EXECUTION UPDATE -->
 
   <update id="updateHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
-    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION set EXECUTION_JSON_ = #{executionJson, jdbcType=VARCHAR}
+    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION
+    <set>
+        EXECUTION_JSON_ = #{executionJson, jdbcType=VARCHAR},
+    </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   
@@ -73,6 +78,42 @@
 
   <delete id="deleteHistoricDecisionExecutionsByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where DEPLOYMENT_ID_ = #{deploymenId} 
+  </delete>
+  
+  <delete id="bulkDeleteHistoricDecisionExecutionsByInstanceIdsAndScopeType" parameterType="map">
+    delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where 
+    (<foreach item="listItem" index="listIndex" collection="instanceIds">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        INSTANCE_ID_ in 
+        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </foreach>)
+    <choose>
+        <when test="scopeType == null">
+          and SCOPE_TYPE_ is null
+        </when>
+        <otherwise>
+          and SCOPE_TYPE_ = #{scopeType}
+        </otherwise>
+    </choose>
+  </delete>
+
+  <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl">
+    delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> DEL_RES </if>
+    from ${prefix}ACT_DMN_HI_DECISION_EXECUTION DEL_RES
+    where DEL_RES.ID_ in (
+        select RES.ID_
+        <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
+    )
+  </delete>
+
+  <!-- For MySQL / MariaDB we cannot use the table we want to delete from in a subquery -->
+  <delete id="bulkDeleteHistoricDecisionExecutions" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" databaseId="mysql">
+    delete RES
+    <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql" />
   </delete>
   
   <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
@@ -89,6 +130,10 @@
     <result property="failed" column="FAILED_" jdbcType="BOOLEAN"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="executionJson" column="EXECUTION_JSON_" jdbcType="VARCHAR" />
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+    <result property="decisionKey" column="DEC_DEF_KEY_" jdbcType="VARCHAR"/>
+    <result property="decisionName" column="DEC_DEF_NAME_" jdbcType="VARCHAR"/>
+    <result property="decisionVersion" column="DEC_DEF_VERSION_" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!-- DECISION TABLE SELECT -->
@@ -98,11 +143,11 @@
   </select>
 
   <select id="selectHistoricDecisionExecutionsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultMap="historicDecisionExecutionResultMap">
-  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>, DEF.KEY_ as DEC_DEF_KEY_, DEF.NAME_ as DEC_DEF_NAME_, DEF.VERSION_ as DEC_DEF_VERSION_
     <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
     ${orderBy}
-    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <if test="needsPaging">${limitAfter}</if>
   </select>
 
   <select id="selectHistoricDecisionExecutionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultType="long">
@@ -112,9 +157,8 @@
   
   <sql id="selectHistoricDecisionExecutionsByQueryCriteriaSql">  
     from ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
-    <if test="decisionKey != null">
-        left outer join ${prefix}ACT_DMN_DECISION_TABLE DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
-    </if> 
+        <!-- The definition relationship is 1:1. Therefore it is OK to use an inner join here -->
+        inner join ${prefix}ACT_DMN_DECISION DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
     <where>
       <if test="id != null">
         RES.ID_ = #{id}
@@ -143,6 +187,22 @@
       <if test="activityId != null">
         and RES.ACTIVITY_ID_ = #{activityId}
       </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
+      </if>
+      <if test="withoutScopeType">
+        and RES.SCOPE_TYPE_ is null
+      </if>
+      <if test="processInstanceIdWithChildren != null">
+        and (RES.INSTANCE_ID_ = #{processInstanceIdWithChildren} or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.INSTANCE_ID_))
+      </if>
+      <if test="caseInstanceIdWithChildren != null">
+        and (RES.INSTANCE_ID_ = #{caseInstanceIdWithChildren} or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and 
+            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and 
+            ELINK.REF_SCOPE_ID_ = RES.INSTANCE_ID_))
+      </if>
       <if test="failed != null">
         and RES.FAILED_ = #{failed}
       </if>
@@ -158,8 +218,8 @@
     </where>
   </sql>
 
-  <select id="selectHistoricDecisionExecutionByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
-    <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
+  <select id="selectHistoricDecisionExecutionsByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
   </select>
 
   <select id="selectHistoricDecisionExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">

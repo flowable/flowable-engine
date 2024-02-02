@@ -13,11 +13,16 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Modified to add a "completed" flag, which lets the caller know if the process instance has run to completion without encountering a wait state or experiencing an error/ exception.
@@ -26,15 +31,29 @@ import java.util.List;
  * @author Ryan Johnston (@rjfsu)
  */
 public class ProcessInstanceResponse {
+    
     protected String id;
     protected String url;
+    protected String name;
     protected String businessKey;
+    protected String businessStatus;
     protected boolean suspended;
     protected boolean ended;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
+    protected String processDefinitionName;
+    protected String processDefinitionDescription;
     protected String activityId;
+    protected String startUserId;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date startTime;
+    protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
+    protected String callbackId;
+    protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
+    protected String propagatedStageInstanceId;
     protected String tenantId;
 
     // Added by Ryan Johnston
@@ -57,6 +76,15 @@ public class ProcessInstanceResponse {
     public void setUrl(String url) {
         this.url = url;
     }
+    
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     @ApiModelProperty(example = "myBusinessKey")
     public String getBusinessKey() {
@@ -65,6 +93,15 @@ public class ProcessInstanceResponse {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    @ApiModelProperty(example = "myBusinessStatus")
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 
     public boolean isSuspended() {
@@ -100,6 +137,24 @@ public class ProcessInstanceResponse {
     public void setProcessDefinitionUrl(String processDefinitionUrl) {
         this.processDefinitionUrl = processDefinitionUrl;
     }
+    
+    @ApiModelProperty(example = "A process definition name")
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    @ApiModelProperty(example = "A process definition description")
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
+    }
 
     @ApiModelProperty(example = "processTask")
     public String getActivityId() {
@@ -108,6 +163,33 @@ public class ProcessInstanceResponse {
 
     public void setActivityId(String activityId) {
         this.activityId = activityId;
+    }
+    
+    @ApiModelProperty(example = "johnDoe")
+    public String getStartUserId() {
+        return startUserId;
+    }
+
+    public void setStartUserId(String startUserId) {
+        this.startUserId = startUserId;
+    }
+
+    @ApiModelProperty(example = "2018-04-17T10:17:43.902+0000", dataType = "string")
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+    
+    @ApiModelProperty(example = "3")
+    public String getSuperProcessInstanceId() {
+        return superProcessInstanceId;
+    }
+
+    public void setSuperProcessInstanceId(String superProcessInstanceId) {
+        this.superProcessInstanceId = superProcessInstanceId;
     }
 
     public List<RestVariable> getVariables() {
@@ -121,12 +203,57 @@ public class ProcessInstanceResponse {
     public void addVariable(RestVariable variable) {
         variables.add(variable);
     }
+    
+    @ApiModelProperty(example = "3")
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    @ApiModelProperty(example = "cmmn")
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+    }
+
+    @ApiModelProperty(example = "123")
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    @ApiModelProperty(example = "event-to-bpmn-2.0-process")
+    public String getReferenceType() {
+        return referenceType;
+    }
+
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
+
+    @ApiModelProperty(value = "The stage plan item instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage")
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
+    }
+
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    @ApiModelProperty(example = "null")
+    @ApiModelProperty(example = "someTenantId")
     public String getTenantId() {
         return tenantId;
     }

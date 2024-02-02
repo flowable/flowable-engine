@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.app.AppModel;
-import org.flowable.engine.common.EngineDeployer;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -44,7 +44,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 public class DeploymentManager {
 
     protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
-    protected ProcessDefinitionInfoCache processDefinitionInfoCache;
+    protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
     protected DeploymentCache<Object> appResourceCache;
     protected DeploymentCache<Object> knowledgeBaseCache; // Needs to be object to avoid an import to Drools in this core class
     protected List<EngineDeployer> deployers;
@@ -191,13 +191,15 @@ public class DeploymentManager {
 
         // Remove any process definition from the cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
 
         for (ProcessDefinition processDefinition : processDefinitions) {
 
             // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
-            if (eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition));
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
 
@@ -205,8 +207,9 @@ public class DeploymentManager {
         deploymentEntityManager.deleteDeployment(deploymentId, cascade);
 
         // Since we use a delete by query, delete-events are not automatically dispatched
-        if (eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         for (ProcessDefinition processDefinition : processDefinitions) {
@@ -237,11 +240,11 @@ public class DeploymentManager {
         this.processDefinitionCache = processDefinitionCache;
     }
 
-    public ProcessDefinitionInfoCache getProcessDefinitionInfoCache() {
+    public DeploymentCache<ProcessDefinitionInfoCacheObject> getProcessDefinitionInfoCache() {
         return processDefinitionInfoCache;
     }
 
-    public void setProcessDefinitionInfoCache(ProcessDefinitionInfoCache processDefinitionInfoCache) {
+    public void setProcessDefinitionInfoCache(DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache) {
         this.processDefinitionInfoCache = processDefinitionInfoCache;
     }
 

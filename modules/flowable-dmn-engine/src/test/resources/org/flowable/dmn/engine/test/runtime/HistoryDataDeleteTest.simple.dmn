@@ -1,0 +1,20 @@
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" id="definition_decision"
+             name="Simple Test DMN" namespace="http://www.flowable.org/dmn">
+    <decision id="decision" name="Simple Test DMN">
+        <decisionTable id="decisionTable_b3f9b9f7-1564-4965-82c7-cdbc9f72d0bd" hitPolicy="FIRST">
+            <input>
+                <inputExpression id="inputExpression_f907dfa0-e2cb-4789-b1ce-21ff0c8254fc" typeRef="string">
+                    <text>initiator</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_702df24a-0a53-473f-973a-4161312b9f1c" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_f907dfa0-e2cb-4789-b1ce-21ff0c8254fc_1">
+                    <text><![CDATA[== "test"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_702df24a-0a53-473f-973a-4161312b9f1c_1"></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <dmndi:DMNDI></dmndi:DMNDI>
+</definitions>

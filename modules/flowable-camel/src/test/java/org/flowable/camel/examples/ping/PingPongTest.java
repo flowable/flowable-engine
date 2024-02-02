@@ -12,6 +12,9 @@
  */
 package org.flowable.camel.examples.ping;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,29 +22,34 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class PingPongTest extends SpringFlowableTestCase {
 
     @Autowired
     protected CamelContext camelContext;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
             @Override
             public void configure() throws Exception {
-                from("flowable:PingPongProcess:ping").transform().simple("${property.input} World");
+                from("flowable:PingPongProcess:ping").transform().simple("${exchangeProperty.input} World");
             }
         });
     }
 
+    @Test
     @Deployment
     public void testPingPong() {
         Map<String, Object> variables = new HashMap<>();
@@ -51,9 +59,8 @@ public class PingPongTest extends SpringFlowableTestCase {
         variables.put("outputMap", outputMap);
 
         runtimeService.startProcessInstanceByKey("PingPongProcess", variables);
-        assertEquals(1, outputMap.size());
-        assertNotNull(outputMap.get("outputValue"));
-        assertEquals("Hello World", outputMap.get("outputValue"));
+        assertThat(outputMap)
+                .containsExactly(entry("outputValue", "Hello World"));
     }
 
 }

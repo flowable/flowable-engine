@@ -12,9 +12,9 @@
  */
 package org.activiti.examples.bpmn.tasklistener;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

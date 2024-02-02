@@ -1,0 +1,11 @@
+{
+    "key": "customPartitionDelegateExpression",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-custom-partition-delegate-expression",
+    "serializerType": "json",
+    "partition": {
+        "delegateExpression": "#{kafkaPartitionProvider}"
+    }
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="testCatchErrorThrownByFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"/>
+
+        <serviceTask id="serviceTask" flowable:delegateExpression="#{bpmnErrorBean}"/>
+
+        <boundaryEvent id="catchErrorBeforeExecution" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="beforeExecution"/>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchErrorInExecute" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="execute"/>
+        </boundaryEvent>
+
+        <boundaryEvent id="catchErrorAfterExecution" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="afterExecution"/>
+        </boundaryEvent>
+
+        <sequenceFlow id="flow3" sourceRef="catchErrorBeforeExecution" targetRef="escalatedTaskForBeforeExecution"/>
+        <userTask id="escalatedTaskForBeforeExecution" name="Escalated Task for before execution"/>
+
+        <sequenceFlow id="flow4" sourceRef="catchErrorInExecute" targetRef="escalatedTaskForExecute"/>
+        <userTask id="escalatedTaskForExecute" name="Escalated Task for execute"/>
+
+        <sequenceFlow id="flow5" sourceRef="catchErrorAfterExecution" targetRef="escalatedTaskForAfterExecution"/>
+        <userTask id="escalatedTaskForAfterExecution" name="Escalated Task for after execution"/>
+
+        <sequenceFlow id="flow6" sourceRef="serviceTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

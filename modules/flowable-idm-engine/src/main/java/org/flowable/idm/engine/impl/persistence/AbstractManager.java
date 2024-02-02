@@ -13,9 +13,9 @@
 
 package org.flowable.idm.engine.impl.persistence;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityManager;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntityManager;

@@ -12,12 +12,17 @@
  */
 package org.flowable.examples.runtime;
 
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.FlowableEngineAgendaFactory;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.interceptor.MigrationContext;
 
 /**
  * This class is a simple watchdog agenda implementation. It throws exception in the case when watchdog limit is exceeded for fetching operations from agenda.
@@ -46,8 +51,8 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public Runnable peekOperation() {
-            return agenda.peekOperation();
+        public <V> void planFutureOperation(CompletableFuture<V> future, BiConsumer<V, Throwable> completeAction) {
+            agenda.planFutureOperation(future, completeAction);
         }
 
         @Override
@@ -66,13 +71,18 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
+        public void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext) {
+            agenda.planContinueProcessWithMigrationContextOperation(execution, migrationContext);
+        }
+
+        @Override
         public void planContinueProcessInCompensation(ExecutionEntity execution) {
             agenda.planContinueProcessInCompensation(execution);
         }
 
         @Override
-        public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
-            agenda.planContinueMultiInstanceOperation(execution, loopCounter);
+        public void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceExecution, int loopCounter) {
+            agenda.planContinueMultiInstanceOperation(execution, multiInstanceExecution, loopCounter);
         }
 
         @Override
@@ -81,8 +91,18 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
+        public void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions) {
+            agenda.planTakeOutgoingSequenceFlowsSynchronousOperation(execution, evaluateConditions);
+        }
+
+        @Override
         public void planEndExecutionOperation(ExecutionEntity execution) {
             agenda.planEndExecutionOperation(execution);
+        }
+        
+        @Override
+        public void planEndExecutionOperationSynchronous(ExecutionEntity execution) {
+            agenda.planEndExecutionOperationSynchronous(execution);
         }
 
         @Override
@@ -91,13 +111,28 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
         }
 
         @Override
-        public void planDestroyScopeOperation(ExecutionEntity execution) {
-            agenda.planDestroyScopeOperation(execution);
+        public void planAsyncTriggerExecutionOperation(ExecutionEntity execution) {
+            agenda.planAsyncTriggerExecutionOperation(execution);
         }
 
         @Override
-        public void planExecuteInactiveBehaviorsOperation() {
-            agenda.planExecuteInactiveBehaviorsOperation();
+        public void planDestroyScopeOperation(ExecutionEntity execution) {
+            agenda.planDestroyScopeOperation(execution);
+        }
+        
+        @Override
+        public void planEvaluateConditionalEventsOperation(ExecutionEntity execution) {
+            agenda.planEvaluateConditionalEventsOperation(execution);
+        }
+
+        @Override
+        public void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId) {
+            agenda.planEvaluateVariableListenerEventsOperation(processDefinitionId, processInstanceId);
+        }
+
+        @Override
+        public void planExecuteInactiveBehaviorsOperation(Collection<ExecutionEntity> executions) {
+            agenda.planExecuteInactiveBehaviorsOperation(executions);
         }
 
         private WatchDogAgenda(FlowableEngineAgenda agenda) {
@@ -116,14 +151,12 @@ public class WatchDogAgendaFactory implements FlowableEngineAgendaFactory {
 
         @Override
         public void flush() {
-            // TODO Auto-generated method stub
-            
+            agenda.flush();
         }
 
         @Override
         public void close() {
-            // TODO Auto-generated method stub
-            
+            agenda.close();
         }
 
     }

@@ -16,13 +16,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 
 /**
  * @author Joram Barrez
  */
-public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements IdentityLinkEntity, Serializable {
+public class IdentityLinkEntityImpl extends AbstractIdentityLinkServiceNoRevisionEntity implements IdentityLinkEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,15 +32,31 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
     protected String taskId;
     protected String processInstanceId;
     protected String processDefId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
 
     public IdentityLinkEntityImpl() {
 
     }
 
+    public IdentityLinkEntityImpl(HistoricIdentityLink historicIdentityLink) {
+        this.id = ((HistoricIdentityLinkEntity) historicIdentityLink).getId();
+        this.type = historicIdentityLink.getType();
+        this.userId = historicIdentityLink.getUserId();
+        this.groupId = historicIdentityLink.getGroupId();
+        this.taskId = historicIdentityLink.getTaskId();
+        this.processInstanceId = historicIdentityLink.getProcessInstanceId();
+        this.scopeId = historicIdentityLink.getScopeId();
+        this.subScopeId = historicIdentityLink.getSubScopeId();
+        this.scopeType = historicIdentityLink.getScopeType();
+        this.scopeDefinitionId = historicIdentityLink.getScopeDefinitionId();
+    }
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("id", this.id);
         persistentState.put("type", this.type);
 
         if (this.userId != null) {
@@ -61,6 +77,22 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
 
         if (this.processDefId != null) {
             persistentState.put("processDefId", this.processDefId);
+        }
+        
+        if (this.scopeId != null) {
+            persistentState.put("scopeId", this.scopeId);
+        }
+        
+        if (this.subScopeId != null) {
+            persistentState.put("subScopeId", this.subScopeId);
+        }
+        
+        if (this.scopeType!= null) {
+            persistentState.put("scopeType", this.scopeType);
+        }
+        
+        if (this.scopeDefinitionId != null) {
+            persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
         }
 
         return persistentState;
@@ -148,6 +180,46 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
     }
 
     @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+    
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+    
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return this.scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("IdentityLinkEntity[id=").append(id);
@@ -166,6 +238,15 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
         }
         if (processDefId != null) {
             sb.append(", processDefId=").append(processDefId);
+        }
+        if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId);
+        }
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
         }
         sb.append("]");
         return sb.toString();

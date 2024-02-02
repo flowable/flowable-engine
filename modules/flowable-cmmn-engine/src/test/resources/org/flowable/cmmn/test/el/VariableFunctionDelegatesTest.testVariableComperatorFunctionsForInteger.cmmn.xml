@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testElFunctions" name="testElFunctions" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="LT 10" definitionRef="sid-82FD3F24-C9A7-4244-BC55-9BD2560681E4">
+        <entryCriterion id="sid-5EE412C8-36D9-4681-9B78-06821C47CE69" sentryRef="sentry1"></entryCriterion>
+      </planItem>
+      <planItem id="planItem2" name="LTE 10" definitionRef="sid-7F45CF95-FFB9-4A2A-9E54-C4102DC17361">
+        <entryCriterion id="sid-893C2401-F8E9-445D-BCE6-63225F8B1613" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <planItem id="planItem3" name="GT 10" definitionRef="sid-C75B8BFE-82E7-46B9-8360-B0A9D1422789">
+        <entryCriterion id="sid-1FA2E0EA-A449-45A2-AE38-AF2959BC6D88" sentryRef="sentry3"></entryCriterion>
+      </planItem>
+      <planItem id="planItem4" name="GTE 10" definitionRef="sid-873CF4C4-89D6-4673-BFF5-6F13EFE84A6E">
+        <entryCriterion id="sid-ED76A9D6-3473-411F-B37E-38BF2E11AE77" sentryRef="sentry4"></entryCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <ifPart>
+          <condition><![CDATA[${var:lt(myVar, 10)}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry2">
+        <ifPart>
+          <condition><![CDATA[${var:lowerThanOrEquals(myVar, 10)}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry3">
+        <ifPart>
+          <condition><![CDATA[${var:gt(myVar, 10)}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry4">
+        <ifPart>
+          <condition><![CDATA[${var:gte(myVar, 10)}]]></condition>
+        </ifPart>
+      </sentry>
+      <humanTask id="sid-82FD3F24-C9A7-4244-BC55-9BD2560681E4" name="LT 10"></humanTask>
+      <humanTask id="sid-7F45CF95-FFB9-4A2A-9E54-C4102DC17361" name="LTE 10"></humanTask>
+      <humanTask id="sid-C75B8BFE-82E7-46B9-8360-B0A9D1422789" name="GT 10"></humanTask>
+      <humanTask id="sid-873CF4C4-89D6-4673-BFF5-6F13EFE84A6E" name="GTE 10"></humanTask>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testElFunctions">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="120.0" y="135.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-5EE412C8-36D9-4681-9B78-06821C47CE69" cmmnElementRef="sid-5EE412C8-36D9-4681-9B78-06821C47CE69">
+        <dc:Bounds height="22.0" width="14.0" x="112.53602317690765" y="166.10266570096218"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="120.0" y="270.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-893C2401-F8E9-445D-BCE6-63225F8B1613" cmmnElementRef="sid-893C2401-F8E9-445D-BCE6-63225F8B1613">
+        <dc:Bounds height="22.0" width="14.0" x="112.13134765625" y="299.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="80.0" width="100.0" x="285.0" y="135.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-1FA2E0EA-A449-45A2-AE38-AF2959BC6D88" cmmnElementRef="sid-1FA2E0EA-A449-45A2-AE38-AF2959BC6D88">
+        <dc:Bounds height="22.0" width="14.0" x="277.14919246435784" y="173.73738867703787"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="80.0" width="100.0" x="285.0" y="270.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-ED76A9D6-3473-411F-B37E-38BF2E11AE77" cmmnElementRef="sid-ED76A9D6-3473-411F-B37E-38BF2E11AE77">
+        <dc:Bounds height="22.0" width="14.0" x="277.4942379274293" y="303.39180539761486"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

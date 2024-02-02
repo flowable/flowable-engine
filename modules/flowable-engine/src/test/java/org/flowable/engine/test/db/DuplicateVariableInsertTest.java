@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,20 +22,24 @@ import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
+@DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb") // Disabled due to having a retry interceptor for CRDB and barriers in this test
 public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
     /**
-     * Test for ACT-1887: Inserting the same new variable at the same time, from 2 different threads, using 2 modified commands that use a barrier for starting and a barrier for completing the
+     * Test for ACT-1887: Inserting the same new variable at the same time, froms 2 different threads, using 2 modified commands that use a barrier for starting and a barrier for completing the
      * command, so they each insert a new variable guaranteed.
      */
+    @Test
     public void testDuplicateVariableInsertOnExecution() throws Exception {
         String processDefinitionId = deployOneTaskTestProcess();
         final ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionId);
@@ -72,12 +79,12 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception
-        assertEquals(1, exceptions.size());
+        assertThat(exceptions).hasSize(1);
 
         // One variable should be set
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(1, variables.size());
-        assertEquals("12345", variables.get("var"));
+        assertThat(variables)
+            .containsExactly(entry("var", "12345"));
         runtimeService.deleteProcessInstance(processInstance.getId(), "ShouldNotFail");
     }
 
@@ -85,6 +92,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
      * Test for ACT-1887: Inserting the same new variable at the same time, from 2 different threads, using 2 modified commands that use a barrier for starting and a barrier for completing the
      * command, so they each insert a new variable guaranteed.
      */
+    @Test
     public void testDuplicateVariableInsertOnTask() throws Exception {
         String processDefinitionId = deployOneTaskTestProcess();
         final ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinitionId);
@@ -125,13 +133,13 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         secondInsertThread.join();
 
         // One of the 2 threads should get an optimistic lock exception
-        assertEquals(1, exceptions.size());
-        assertTrue(exceptions.get(0) instanceof FlowableOptimisticLockingException);
+        assertThat(exceptions).hasSize(1);
+        assertThat(exceptions.get(0)).isInstanceOf(FlowableOptimisticLockingException.class);
 
         // One variable should be set
         Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
-        assertEquals(1, variables.size());
-        assertEquals("12345", variables.get("var"));
+        assertThat(variables)
+            .containsExactly(entry("var", "12345"));
         runtimeService.deleteProcessInstance(processInstance.getId(), "ShouldNotFail");
     }
 
@@ -157,9 +165,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         public Void execute(CommandContext commandContext) {
             try {
                 startBarrier.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 throw new RuntimeException(e);
             }
 
@@ -167,9 +173,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
             try {
                 endBarrier.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 throw new RuntimeException(e);
             }
             return null;
@@ -198,9 +202,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
         public Void execute(CommandContext commandContext) {
             try {
                 startBarrier.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 throw new RuntimeException(e);
             }
 
@@ -208,9 +210,7 @@ public class DuplicateVariableInsertTest extends PluggableFlowableTestCase {
 
             try {
                 endBarrier.await();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 throw new RuntimeException(e);
             }
             return null;

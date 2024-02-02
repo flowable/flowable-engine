@@ -45,8 +45,10 @@ public class StartEventValidator extends ProcessLevelValidator {
                 if (!(eventDefinition instanceof MessageEventDefinition) &&
                         !(eventDefinition instanceof TimerEventDefinition) &&
                         !(eventDefinition instanceof SignalEventDefinition)) {
+                    
                     addError(errors, Problems.START_EVENT_INVALID_EVENT_DEFINITION,
                             process, startEvent,
+                            eventDefinition,
                             "Unsupported event definition on start event");
                 }
             }
@@ -60,7 +62,9 @@ public class StartEventValidator extends ProcessLevelValidator {
         List<StartEvent> noneStartEvents = new ArrayList<>();
         for (StartEvent startEvent : startEvents) {
             if (startEvent.getEventDefinitions() == null || startEvent.getEventDefinitions().isEmpty()) {
-                noneStartEvents.add(startEvent);
+                if (startEvent.getExtensionElements().get("eventType") == null || startEvent.getExtensionElements().get("eventType").size() == 0) {
+                    noneStartEvents.add(startEvent);
+                }
             }
         }
 

@@ -14,12 +14,11 @@ package org.flowable.engine.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.common.engine.api.history.HistoricData;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 
@@ -105,7 +104,8 @@ public class ProcessInstanceHistoryLogImpl implements ProcessInstanceHistoryLog 
     }
 
     public void orderHistoricData() {
-        Collections.sort(historicData, new Comparator<HistoricData>() {
+        historicData.sort(new Comparator<>() {
+
             @Override
             public int compare(HistoricData data1, HistoricData data2) {
                 return data1.getTime().compareTo(data2.getTime());

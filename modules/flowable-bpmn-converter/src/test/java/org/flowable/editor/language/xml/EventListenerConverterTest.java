@@ -12,87 +12,101 @@
  */
 package org.flowable.editor.language.xml;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
+
+import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
+import org.flowable.bpmn.model.FieldExtension;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.junit.Test;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.UserTask;
+import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 /**
  * Test for ACT-1657
  * 
  * @author Frederik Heremans
  */
-public class EventListenerConverterTest extends AbstractConverterTest {
+class EventListenerConverterTest {
 
-    @Test
-    public void convertXMLToModel() throws Exception {
-        BpmnModel bpmnModel = readXMLFile();
-        validateModel(bpmnModel);
-    }
-
-    @Override
-    protected String getResource() {
-        return "eventlistenersmodel.bpmn20.xml";
-    }
-
-    private void validateModel(BpmnModel model) {
+    @BpmnXmlConverterTest("eventlistenersmodel.bpmn20.xml")
+    void validateModel(BpmnModel model) {
         Process process = model.getMainProcess();
-        assertNotNull(process);
-        assertNotNull(process.getEventListeners());
-        assertEquals(8, process.getEventListeners().size());
+        assertThat(process).isNotNull();
+        assertThat(process.getEventListeners()).isNotNull();
+        assertThat(process.getEventListeners())
+                .extracting(EventListener::getEvents, EventListener::getImplementation, EventListener::getImplementationType, EventListener::getEntityType)
+                .containsExactly(
+                        // Listener with class
+                        tuple("ENTITY_CREATE", "org.activiti.test.MyListener", ImplementationType.IMPLEMENTATION_TYPE_CLASS, null),
+                        // Listener with class, but no specific event (== all events)
+                        tuple(null, "org.activiti.test.AllEventTypesListener", ImplementationType.IMPLEMENTATION_TYPE_CLASS, null),
+                        // Listener with delegate expression
+                        tuple("ENTITY_DELETE", "${myListener}", ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, null),
+                        // Listener that throws a signal-event
+                        tuple("ENTITY_DELETE", "theSignal", ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT, null),
+                        // Listener that throws a global signal-event
+                        tuple("ENTITY_DELETE", "theSignal", ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT, null),
+                        // Listener that throws a message-event
+                        tuple("ENTITY_DELETE", "theMessage", ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT, null),
+                        // Listener that throws an error-event
+                        tuple("ENTITY_DELETE", "123", ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, null),
+                        // Listener restricted to a specific entity
+                        tuple("ENTITY_DELETE", "123", ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, "job")
+                );
+    }
 
-        // Listener with class
-        EventListener listener = process.getEventListeners().get(0);
-        assertEquals("ENTITY_CREATE", listener.getEvents());
-        assertEquals("org.activiti.test.MyListener", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
+    @BpmnXmlConverterTest(value = "eventlistenerscript.bpmn20.xml")
+    void validateTaskListenerScriptParsing(BpmnModel model) {
+        Process process = model.getMainProcess();
+        UserTask userTask = (UserTask) process.getFlowElement("userTask");
+        assertThat(userTask).isNotNull();
+        assertThat(userTask.getTaskListeners()).hasSize(2);
 
-        // Listener with class, but no specific event (== all events)
-        listener = process.getEventListeners().get(1);
-        assertNull(listener.getEvents());
-        assertEquals("org.activiti.test.AllEventTypesListener", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_CLASS, listener.getImplementationType());
+        List<FlowableListener> taskListeners = userTask.getTaskListeners();
 
-        // Listener with delegate expression
-        listener = process.getEventListeners().get(2);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("${myListener}", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, listener.getImplementationType());
+        // Verify custom ScriptTaskListener
+        FlowableListener scriptTaskListenerClass = taskListeners.get(0);
 
-        // Listener that throws a signal-event
-        listener = process.getEventListeners().get(3);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theSignal", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT, listener.getImplementationType());
+        assertThat(scriptTaskListenerClass.getEvent()).isEqualTo("create");
+        assertThat(scriptTaskListenerClass.getImplementationType()).isEqualTo("class");
+        assertThat(scriptTaskListenerClass.getImplementation()).isEqualTo("org.flowable.engine.impl.bpmn.listener.ScriptTaskListener");
+        assertThat(scriptTaskListenerClass.getFieldExtensions())
+                .extracting(FieldExtension::getFieldName)
+                .containsExactly("script", "language", "resultVariable");
 
-        // Listener that throws a global signal-event
-        listener = process.getEventListeners().get(4);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theSignal", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT, listener.getImplementationType());
+        // Verify new type=script taskListener.
+        FlowableListener scriptTaskListenerType = taskListeners.get(1);
+        assertThat(scriptTaskListenerType.getEvent()).isEqualTo("create");
+        assertThat(scriptTaskListenerType.getImplementationType()).isEqualTo("script");
+        assertThat(scriptTaskListenerType.getImplementation()).isNull();
+        assertThat(scriptTaskListenerType.getScriptInfo()).isNotNull();
+        assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptTaskListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
+        assertThat(scriptTaskListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
+    }
 
-        // Listener that throws a message-event
-        listener = process.getEventListeners().get(5);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("theMessage", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT, listener.getImplementationType());
+    @BpmnXmlConverterTest(value = "eventlistenerscript.bpmn20.xml")
+    void validateExecutionListenerScriptParsing(BpmnModel model) {
+        Process process = model.getMainProcess();
+        SequenceFlow flow = (SequenceFlow) process.getFlowElement("flow10");
+        assertThat(flow).isNotNull();
+        assertThat(flow.getExecutionListeners()).hasSize(1);
 
-        // Listener that throws an error-event
-        listener = process.getEventListeners().get(6);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("123", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, listener.getImplementationType());
+        List<FlowableListener> taskListeners = flow.getExecutionListeners();
 
-        // Listener restricted to a specific entity
-        listener = process.getEventListeners().get(7);
-        assertEquals("ENTITY_DELETE", listener.getEvents());
-        assertEquals("123", listener.getImplementation());
-        assertEquals(ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT, listener.getImplementationType());
-        assertEquals("job", listener.getEntityType());
+        FlowableListener scriptListenerType = taskListeners.get(0);
+        assertThat(scriptListenerType.getEvent()).isEqualTo("take");
+        assertThat(scriptListenerType.getImplementationType()).isEqualTo("script");
+        assertThat(scriptListenerType.getImplementation()).isNull();
+        assertThat(scriptListenerType.getScriptInfo()).isNotNull();
+        assertThat(scriptListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
+        assertThat(scriptListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
     }
 }

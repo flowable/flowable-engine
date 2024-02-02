@@ -13,7 +13,7 @@
 package org.flowable.camel;
 
 import org.apache.camel.Processor;
-import org.apache.camel.impl.DefaultConsumer;
+import org.apache.camel.support.DefaultConsumer;
 
 public class FlowableConsumer extends DefaultConsumer {
 

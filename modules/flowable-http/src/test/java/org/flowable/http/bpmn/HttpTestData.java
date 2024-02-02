@@ -12,8 +12,16 @@
  */
 package org.flowable.http.bpmn;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import jakarta.servlet.http.Part;
+
+import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -31,6 +39,7 @@ public class HttpTestData {
     private String url;
     private SortedMap<String, String[]> args = new TreeMap<>();
     private SortedMap<String, String[]> headers = new TreeMap<>();
+    private SortedMap<String, Collection<HttpTestPart>> parts = new TreeMap<>();
 
     public int getCode() {
         return code;
@@ -86,5 +95,57 @@ public class HttpTestData {
 
     public void setHeaders(SortedMap<String, String[]> headers) {
         this.headers = headers;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public SortedMap<String, Collection<HttpTestPart>> getParts() {
+        return parts;
+    }
+
+    public void setParts(SortedMap<String, Collection<HttpTestPart>> parts) {
+        this.parts = parts;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class HttpTestPart {
+
+        private String contentType;
+        private String filename;
+        private String content;
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public void setContentType(String contentType) {
+            this.contentType = contentType;
+        }
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public void setFilename(String filename) {
+            this.filename = filename;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+
+        public static HttpTestPart fromPart(Part part) throws IOException {
+            HttpTestPart testPart = new HttpTestPart();
+            testPart.setContentType(part.getContentType());
+            testPart.setFilename(part.getSubmittedFileName());
+            try (InputStream partContentStream = part.getInputStream()) {
+                testPart.setContent(IOUtils.toString(partContentStream, StandardCharsets.UTF_8));
+            }
+
+            return testPart;
+        }
     }
 }

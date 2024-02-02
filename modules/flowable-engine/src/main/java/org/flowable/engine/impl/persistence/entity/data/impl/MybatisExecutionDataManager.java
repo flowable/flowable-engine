@@ -13,15 +13,14 @@
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableOptimisticLockingException;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
-import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
+import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.PerformanceSettings;
@@ -41,6 +40,7 @@ import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.Inacti
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.InactiveExecutionsInActivityMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ProcessInstancesByProcessDefinitionMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.SubProcessInstanceExecutionBySuperExecutionIdMatcher;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -89,50 +89,58 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
-    public ExecutionEntity findById(String entityId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            return findByIdAndFetchExecutionTree(entityId);
-        } else {
-            return super.findById(entityId);
+    public ExecutionEntity findById(String executionId) {
+        if (isExecutionTreeFetched(executionId)) {
+            return getEntityCache().findInCache(getManagedEntityClass(), executionId);
         }
+        return super.findById(executionId);
     }
-
-    protected ExecutionEntity findByIdAndFetchExecutionTree(final String executionId) {
-
-        // If it's in the cache, the tree must have been fetched before
-        ExecutionEntity cachedEntity = getEntityCache().findInCache(getManagedEntityClass(), executionId);
-        if (cachedEntity != null) {
-            return cachedEntity;
+    
+    /**
+     * Fetches the execution tree related to the execution (if the process definition has been configured to do so)
+     * @return True if the tree has been fetched, false otherwise or if fetching is disabled.  
+     */
+    protected boolean isExecutionTreeFetched(final String executionId) {
+        
+        // The setting needs to be globally enabled
+        if (!performanceSettings.isEnableEagerExecutionTreeFetching()) {
+            return false;
         }
-
-        // Fetches execution tree. This will store them in the cache.
-        List<ExecutionEntity> executionEntities = getList("selectExecutionsWithSameRootProcessInstanceId", executionId,
+        
+        // Need to get the cache result before doing the findById
+        ExecutionEntity cachedExecutionEntity = getEntityCache().findInCache(getManagedEntityClass(), executionId);
+        
+        // Find execution in db or cache to check process definition setting for execution fetch.
+        // If not set, no extra work is done. The execution is in the cache however now as a side-effect of calling this method.
+        ExecutionEntity executionEntity = (cachedExecutionEntity != null) ? cachedExecutionEntity : super.findById(executionId);
+        if (!ProcessDefinitionUtil.getProcess(executionEntity.getProcessDefinitionId()).isEnableEagerExecutionTreeFetching()) {
+            return false;
+        }
+        
+        // If it's in the cache, the execution and its tree have been fetched before. No need to do anything more.
+        if (cachedExecutionEntity != null) {
+            return true;
+        }
+        
+        // Fetches execution tree. This will store them in the cache and thus avoids extra database calls.
+        getList("selectExecutionsWithSameRootProcessInstanceId", executionId,
                 executionsWithSameRootProcessInstanceIdMatcher, true);
-
-        for (ExecutionEntity executionEntity : executionEntities) {
-            if (executionId.equals(executionEntity.getId())) {
-                return executionEntity;
-            }
-        }
-        return null;
+        
+        return true;
     }
 
     @Override
     public ExecutionEntity findSubProcessInstanceBySuperExecutionId(final String superExecutionId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(superExecutionId);
-        }
-
+        boolean treeFetched = isExecutionTreeFetched(superExecutionId);
         return getEntity("selectSubProcessInstanceBySuperExecutionId",
                 superExecutionId,
                 subProcessInstanceBySuperExecutionIdMatcher,
-                !performanceSettings.isEnableEagerExecutionTreeFetching());
+                !treeFetched);
     }
 
     @Override
     public List<ExecutionEntity> findChildExecutionsByParentExecutionId(final String parentExecutionId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(parentExecutionId);
+        if (isExecutionTreeFetched(parentExecutionId)) {
             return getListFromCache(executionsByParentIdMatcher, parentExecutionId);
         } else {
             return getList("selectExecutionsByParentExecutionId", parentExecutionId, executionsByParentIdMatcher, true);
@@ -141,8 +149,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(final String processInstanceId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(processInstanceId);
+        if (isExecutionTreeFetched(processInstanceId)) {
             return getListFromCache(executionsByProcessInstanceIdMatcher, processInstanceId);
         } else {
             return getList("selectChildExecutionsByProcessInstanceId", processInstanceId, executionsByProcessInstanceIdMatcher, true);
@@ -155,8 +162,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         parameters.put("parentExecutionId", parentExecutionId);
         parameters.put("activityIds", activityIds);
 
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(parentExecutionId);
+        if (isExecutionTreeFetched(parentExecutionId)) {
             return getListFromCache(executionsByParentExecutionIdAndActivityIdEntityMatcher, parameters);
         } else {
             return getList("selectExecutionsByParentExecutionAndActivityIds", parameters, executionsByParentExecutionIdAndActivityIdEntityMatcher, true);
@@ -165,8 +171,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public List<ExecutionEntity> findExecutionsByRootProcessInstanceId(final String rootProcessInstanceId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(rootProcessInstanceId);
+        if (isExecutionTreeFetched(rootProcessInstanceId)) {
             return getListFromCache(executionsByRootProcessInstanceMatcher, rootProcessInstanceId);
         } else {
             return getList("selectExecutionsByRootProcessInstanceId", rootProcessInstanceId, executionsByRootProcessInstanceMatcher, true);
@@ -175,8 +180,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public List<ExecutionEntity> findExecutionsByProcessInstanceId(final String processInstanceId) {
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(processInstanceId);
+        if (isExecutionTreeFetched(processInstanceId)) {
             return getListFromCache(executionByProcessInstanceMatcher, processInstanceId);
         } else {
             return getList("selectExecutionsByProcessInstanceId", processInstanceId, executionByProcessInstanceMatcher, true);
@@ -189,8 +193,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         params.put("processInstanceId", processInstanceId);
         params.put("isActive", false);
 
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(processInstanceId);
+        if (isExecutionTreeFetched(processInstanceId)) {
             return getListFromCache(inactiveExecutionsByProcInstMatcher, params);
         } else {
             return getList("selectInactiveExecutionsForProcessInstance", params, inactiveExecutionsByProcInstMatcher, true);
@@ -204,8 +207,7 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         params.put("processInstanceId", processInstanceId);
         params.put("isActive", false);
 
-        if (performanceSettings.isEnableEagerExecutionTreeFetching()) {
-            findByIdAndFetchExecutionTree(processInstanceId);
+        if (isExecutionTreeFetched(processInstanceId)) {
             return getListFromCache(inactiveExecutionsInActivityAndProcInstMatcher, params);
         } else {
             return getList("selectInactiveExecutionsInActivityAndProcessInstance", params, inactiveExecutionsInActivityAndProcInstMatcher, true);
@@ -215,11 +217,12 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     @SuppressWarnings("unchecked")
     @Override
     public List<String> findProcessInstanceIdsByProcessDefinitionId(String processDefinitionId) {
-        return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceIdsByProcessDefinitionId", processDefinitionId);
     }
 
     @Override
     public long findExecutionCountByQueryCriteria(ExecutionQueryImpl executionQuery) {
+        setSafeInValueLists(executionQuery);
         return (Long) getDbSqlSession().selectOne("selectExecutionCountByQueryCriteria", executionQuery);
     }
 
@@ -228,63 +231,38 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     public List<ExecutionEntity> findExecutionsByQueryCriteria(ExecutionQueryImpl executionQuery) {
         // False -> executions should not be cached if using executionTreeFetching
         boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        setSafeInValueLists(executionQuery);
         if (useCache) {
-            return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectList("selectExecutionsByQueryCriteria", executionQuery, getManagedEntityClass());
         } else {
-            return getDbSqlSession().selectListNoCacheCheck("selectExecutionsByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectExecutionsByQueryCriteria", executionQuery);
         }
     }
 
     @Override
-    public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
-        return (Long) getDbSqlSession().selectOne("selectProcessInstanceCountByQueryCriteria", executionQuery);
+    public long findProcessInstanceCountByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        setSafeInValueLists(processInstanceQuery);
+        return (Long) getDbSqlSession().selectOne("selectProcessInstanceCountByQueryCriteria", processInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
+    public List<ProcessInstance> findProcessInstanceByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
         // False -> executions should not be cached if using executionTreeFetching
         boolean useCache = !performanceSettings.isEnableEagerExecutionTreeFetching();
+        setSafeInValueLists(processInstanceQuery);
         if (useCache) {
-            return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectList("selectProcessInstanceByQueryCriteria", processInstanceQuery, getManagedEntityClass());
         } else {
-            return getDbSqlSession().selectListNoCacheCheck("selectProcessInstanceByQueryCriteria", executionQuery);
+            return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceByQueryCriteria", processInstanceQuery, getManagedEntityClass());
         }
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
-        // paging doesn't work for combining process instances and variables due
-        // to an outer join, so doing it in-memory
-
-        int firstResult = executionQuery.getFirstResult();
-        int maxResults = executionQuery.getMaxResults();
-
-        // setting max results, limit to 20000 results for performance reasons
-        if (executionQuery.getProcessInstanceVariablesLimit() != null) {
-            executionQuery.setMaxResults(executionQuery.getProcessInstanceVariablesLimit());
-        } else {
-            executionQuery.setMaxResults(getProcessEngineConfiguration().getExecutionQueryLimit());
-        }
-        executionQuery.setFirstResult(0);
-
-        List<ProcessInstance> instanceList = getDbSqlSession().selectListWithRawParameterNoCacheCheck("selectProcessInstanceWithVariablesByQueryCriteria", executionQuery);
-
-        if (instanceList != null && !instanceList.isEmpty()) {
-            if (firstResult > 0) {
-                if (firstResult <= instanceList.size()) {
-                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
-                    return instanceList.subList(firstResult, toIndex);
-                } else {
-                    return Collections.EMPTY_LIST;
-                }
-            } else {
-                int toIndex = maxResults > 0 ?  Math.min(maxResults, instanceList.size()) : instanceList.size();
-                return instanceList.subList(0, toIndex);
-            }
-        }
-        return Collections.EMPTY_LIST;
+    public List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        setSafeInValueLists(processInstanceQuery);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceWithVariablesByQueryCriteria", processInstanceQuery, getManagedEntityClass());
     }
 
     @Override
@@ -305,21 +283,30 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
 
     @Override
+    public long countActiveExecutionsByParentId(String parentId) {
+        Map<String, Object> parameterMap = new HashMap<>(2);
+        parameterMap.put("parentId", parentId);
+        parameterMap.put("isActive", true);
+        return (Long) getDbSqlSession().selectOne("countActiveExecutionsByParentId", parameterMap);
+    }
+
+    @Override
     public void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateExecutionTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateExecutionTenantIdForDeployment", params);
     }
 
     @Override
-    public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime) {
+    public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, String lockOwner, Date expirationTime) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
         params.put("lockTime", lockDate);
         params.put("expirationTime", expirationTime);
+        params.put("lockOwner", lockOwner);
 
-        int result = getDbSqlSession().update("updateProcessInstanceLockTime", params);
+        int result = getDbSqlSession().directUpdate("updateProcessInstanceLockTime", params);
         if (result == 0) {
             throw new FlowableOptimisticLockingException("Could not lock process instance");
         }
@@ -327,14 +314,44 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     public void updateAllExecutionRelatedEntityCountFlags(boolean newValue) {
-        getDbSqlSession().update("updateExecutionRelatedEntityCountEnabled", newValue);
+        getDbSqlSession().directUpdate("updateExecutionRelatedEntityCountEnabled", newValue);
     }
 
     @Override
     public void clearProcessInstanceLockTime(String processInstanceId) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
-        getDbSqlSession().update("clearProcessInstanceLockTime", params);
+        getDbSqlSession().directUpdate("clearProcessInstanceLockTime", params);
     }
 
+    @Override
+    public void clearAllProcessInstanceLockTimes(String lockOwner) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("lockOwner", lockOwner);
+        getDbSqlSession().directUpdate("clearAllProcessInstanceLockTimes", params);
+    }
+
+    protected void setSafeInValueLists(ExecutionQueryImpl executionQuery) {
+        if (executionQuery.getInvolvedGroups() != null) {
+            executionQuery.setSafeInvolvedGroups(createSafeInValuesList(executionQuery.getInvolvedGroups()));
+        }
+        
+        if (executionQuery.getOrQueryObjects() != null && !executionQuery.getOrQueryObjects().isEmpty()) {
+            for (ExecutionQueryImpl orExecutionQuery : executionQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orExecutionQuery);
+            }
+        }
+    }
+    
+    protected void setSafeInValueLists(ProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getInvolvedGroups() != null) {
+            processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
+        }
+        
+        if (processInstanceQuery.getOrQueryObjects() != null && !processInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (ProcessInstanceQueryImpl orProcessInstanceQuery : processInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(orProcessInstanceQuery);
+            }
+        }
+    }
 }

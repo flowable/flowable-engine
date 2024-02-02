@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="callActivityProcess">
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callActivity" />
+    <callActivity id="callActivity" calledElement="oneDecisionTaskProcess">
+        <extensionElements>
+            <flowable:in source="inputVariable1" target="inputVariable1" />
+        </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow2" sourceRef="callActivity" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

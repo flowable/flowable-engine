@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="twoTasksProcess">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstTask" />
+    <userTask id="firstTask" name="First task" />
+    <boundaryEvent id="boundaryEvent" attachedToRef="firstTask">
+      <extensionElements>
+        <flowable:eventType>myEvent</flowable:eventType>
+      </extensionElements>
+    </boundaryEvent>
+    <sequenceFlow id="flow2" sourceRef="boundaryEvent" targetRef="theEnd" />
+    <sequenceFlow id="flow3" sourceRef="firstTask" targetRef="secondTask" />
+    <userTask id="secondTask" name="Second task" />    
+    <sequenceFlow id="flow4" sourceRef="secondTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

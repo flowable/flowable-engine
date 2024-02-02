@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="myCase" name="testEventListener">
+        <casePlanModel id="casePlanModel">
+            <planItem id="eventListenerPlanItem" definitionRef="eventListener" />
+            <planItem id="planItemB" name="Task ${caseInstance.getTenantId()}" definitionRef="theTask">
+                <entryCriterion id="entryTaskB" sentryRef="sentryOnEventListener"/>
+            </planItem>
+            <sentry id="sentryOnEventListener">
+                <planItemOnPart id="sentryOnEvent" sourceRef="eventListenerPlanItem">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <eventListener id="eventListener" name="myEventListener">
+                <extensionElements>
+                    <flowable:eventType>defaultTenantSameKey</flowable:eventType>
+                </extensionElements>
+            </eventListener>
+            <humanTask id="theTask" name="Task ${caseInstance.getTenantId()}"/>
+        </casePlanModel>
+    </case>
+</definitions>

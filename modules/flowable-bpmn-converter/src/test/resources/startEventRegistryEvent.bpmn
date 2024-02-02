@@ -1,0 +1,30 @@
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/test">
+
+    <process id="process" name="process1" isExecutable="true">
+        <startEvent id="start">
+            <extensionElements>
+                <flowable:eventType xmlns:flowable="http://flowable.org/bpmn"><![CDATA[eventType1]]></flowable:eventType>
+                <flowable:eventName xmlns:flowable="http://flowable.org/bpmn"><![CDATA[eventName1]]></flowable:eventName>
+                <flowable:eventOutParameter xmlns:flowable="http://flowable.org/bpmn" source="source1" sourceType="string" target="target1"/>
+                <flowable:eventOutParameter xmlns:flowable="http://flowable.org/bpmn" source="source2" sourceType="string" target="target2"/>
+                <flowable:eventCorrelationParameter xmlns:flowable="http://flowable.org/bpmn" name="name1" type="string" value="value1"/>
+                <flowable:eventCorrelationParameter xmlns:flowable="http://flowable.org/bpmn" name="name2" type="string" value="value2"/>
+            </extensionElements>
+        </startEvent>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="end"/>
+        <endEvent id="end"/>
+        <subProcess id="subProcess" name="subProcess1" triggeredByEvent="true">
+            <startEvent id="subProcessStart" isInterrupting="false">
+                <extensionElements>
+                    <flowable:eventType xmlns:flowable="http://flowable.org/bpmn"><![CDATA[eventType2]]></flowable:eventType>
+                </extensionElements>
+            </startEvent>
+            <sequenceFlow id="subProcessStartFlow1" sourceRef="subProcessStart" targetRef="subProcessEnd"/>
+            <endEvent id="subProcessEnd"/>
+        </subProcess>
+    </process>
+</definitions>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="process" name="process1" isExecutable="true">
+    <startEvent id="theStart"/>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="servicetask1"/>
+    <serviceTask id="servicetask1" name="Service task 1" flowable:expression="${'test'}" flowable:storeResultVariableAsTransient="true"/>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="servicetask2"/>
+    <serviceTask id="servicetask2" name="Service task 2"  flowable:storeResultVariableAsTransient="false"/>
+    <sequenceFlow id="flow3" sourceRef="servicetask2" targetRef="servicetask3"/>
+    <serviceTask id="servicetask3" name="Service task 3" flowable:expression="${'test'}"/>
+    <sequenceFlow id="flow4" sourceRef="servicetask3" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+  </process>
+</definitions>

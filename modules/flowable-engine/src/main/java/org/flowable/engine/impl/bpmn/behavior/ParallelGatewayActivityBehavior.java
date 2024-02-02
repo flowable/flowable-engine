@@ -21,7 +21,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.ParallelGateway;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -64,7 +64,9 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         if (flowElement instanceof ParallelGateway) {
             parallelGateway = (ParallelGateway) flowElement;
         } else {
-            throw new FlowableException("Programmatic error: parallel gateway behaviour can only be applied" + " to a ParallelGateway instance, but got an instance of " + flowElement);
+            throw new FlowableException(
+                    "Programmatic error: parallel gateway behaviour can only be applied to a ParallelGateway instance, but got an instance of " + flowElement
+                            + " for " + execution);
         }
 
         lockFirstParentScope(execution);
@@ -86,13 +88,14 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         // Fork
 
         // Is needed to set the endTime for all historic activity joins
-        CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+        CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
 
         if (nbrOfExecutionsCurrentlyJoined == nbrOfExecutionsToJoin) {
 
             // Fork
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("parallel gateway '{}' activates: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+                LOGGER.debug("parallel gateway '{}' ({}) activates: {} of {} joined", execution.getCurrentActivityId(), 
+                        execution.getId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
             }
 
             if (parallelGateway.getIncomingFlows().size() > 1) {
@@ -102,7 +105,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
                     // The current execution will be reused and not deleted
                     if (!joinedExecution.getId().equals(execution.getId())) {
-                        executionEntityManager.deleteRelatedDataForExecution(joinedExecution, null);
+                        executionEntityManager.deleteRelatedDataForExecution(joinedExecution, null, false);
                         executionEntityManager.delete(joinedExecution);
                     }
 
@@ -113,7 +116,8 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, false); // false -> ignoring conditions on parallel gw
 
         } else if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("parallel gateway '{}' does not activate: {} of {} joined", execution.getCurrentActivityId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
+            LOGGER.debug("parallel gateway '{}' ({}) does not activate: {} of {} joined", execution.getCurrentActivityId(), 
+                    execution.getId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
         }
 
     }

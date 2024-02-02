@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,17 +12,22 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.api.event.FlowableIdmMembershipEvent;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for all {@link FlowableEvent}s related to groups.
- * 
+ *
  * @author Frederik Heremans
  */
 public class GroupEventsTest extends PluggableFlowableTestCase {
@@ -32,6 +37,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of Groups.
      */
+    @Test
     public void testGroupEntityEvents() throws Exception {
         Group group = null;
         try {
@@ -40,38 +46,38 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
             group.setType("type");
             identityService.saveGroup(group);
 
-            assertEquals(2, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(2);
             FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_CREATED, event.getType());
-            assertTrue(event.getEntity() instanceof Group);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_CREATED);
+            assertThat(event.getEntity()).isInstanceOf(Group.class);
             Group groupFromEvent = (Group) event.getEntity();
-            assertEquals("fred", groupFromEvent.getId());
+            assertThat(groupFromEvent.getId()).isEqualTo("fred");
 
             event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
-            assertEquals(FlowableIdmEventType.ENTITY_INITIALIZED, event.getType());
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_INITIALIZED);
             listener.clearEventsReceived();
 
             // Update Group
             group.setName("Another name");
             identityService.saveGroup(group);
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_UPDATED, event.getType());
-            assertTrue(event.getEntity() instanceof Group);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_UPDATED);
+            assertThat(event.getEntity()).isInstanceOf(Group.class);
             groupFromEvent = (Group) event.getEntity();
-            assertEquals("fred", groupFromEvent.getId());
-            assertEquals("Another name", groupFromEvent.getName());
+            assertThat(groupFromEvent.getId()).isEqualTo("fred");
+            assertThat(groupFromEvent.getName()).isEqualTo("Another name");
             listener.clearEventsReceived();
 
             // Delete Group
             identityService.deleteGroup(group.getId());
 
-            assertEquals(1, listener.getEventsReceived().size());
+            assertThat(listener.getEventsReceived()).hasSize(1);
             event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.ENTITY_DELETED, event.getType());
-            assertTrue(event.getEntity() instanceof Group);
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.ENTITY_DELETED);
+            assertThat(event.getEntity()).isInstanceOf(Group.class);
             groupFromEvent = (Group) event.getEntity();
-            assertEquals("fred", groupFromEvent.getId());
+            assertThat(groupFromEvent.getId()).isEqualTo("fred");
             listener.clearEventsReceived();
 
         } finally {
@@ -84,6 +90,7 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of Groups.
      */
+    @Test
     public void testGroupMembershipEvents() throws Exception {
         TestFlowableEventListener membershipListener = new TestFlowableEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(membershipListener);
@@ -100,22 +107,22 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
             // Add membership
             membershipListener.clearEventsReceived();
             identityService.createMembership("kermit", "sales");
-            assertEquals(1, membershipListener.getEventsReceived().size());
-            assertTrue(membershipListener.getEventsReceived().get(0) instanceof FlowableIdmMembershipEvent);
+            assertThat(membershipListener.getEventsReceived()).hasSize(1);
+            assertThat(membershipListener.getEventsReceived().get(0)).isInstanceOf(FlowableIdmMembershipEvent.class);
             FlowableIdmMembershipEvent event = (FlowableIdmMembershipEvent) membershipListener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.MEMBERSHIP_CREATED, event.getType());
-            assertEquals("sales", event.getGroupId());
-            assertEquals("kermit", event.getUserId());
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.MEMBERSHIP_CREATED);
+            assertThat(event.getGroupId()).isEqualTo("sales");
+            assertThat(event.getUserId()).isEqualTo("kermit");
             membershipListener.clearEventsReceived();
 
             // Delete membership
             identityService.deleteMembership("kermit", "sales");
-            assertEquals(1, membershipListener.getEventsReceived().size());
-            assertTrue(membershipListener.getEventsReceived().get(0) instanceof FlowableIdmMembershipEvent);
+            assertThat(membershipListener.getEventsReceived()).hasSize(1);
+            assertThat(membershipListener.getEventsReceived().get(0)).isInstanceOf(FlowableIdmMembershipEvent.class);
             event = (FlowableIdmMembershipEvent) membershipListener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.MEMBERSHIP_DELETED, event.getType());
-            assertEquals("sales", event.getGroupId());
-            assertEquals("kermit", event.getUserId());
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.MEMBERSHIP_DELETED);
+            assertThat(event.getGroupId()).isEqualTo("sales");
+            assertThat(event.getUserId()).isEqualTo("kermit");
             membershipListener.clearEventsReceived();
 
             // Deleting group will dispatch an event, informing ALL memberships are deleted
@@ -123,12 +130,12 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
             membershipListener.clearEventsReceived();
             identityService.deleteGroup(group.getId());
 
-            assertEquals(2, membershipListener.getEventsReceived().size());
-            assertTrue(membershipListener.getEventsReceived().get(0) instanceof FlowableIdmMembershipEvent);
+            assertThat(membershipListener.getEventsReceived()).hasSize(2);
+            assertThat(membershipListener.getEventsReceived().get(0)).isInstanceOf(FlowableIdmMembershipEvent.class);
             event = (FlowableIdmMembershipEvent) membershipListener.getEventsReceived().get(0);
-            assertEquals(FlowableIdmEventType.MEMBERSHIPS_DELETED, event.getType());
-            assertEquals("sales", event.getGroupId());
-            assertNull(event.getUserId());
+            assertThat(event.getType()).isEqualTo(FlowableIdmEventType.MEMBERSHIPS_DELETED);
+            assertThat(event.getGroupId()).isEqualTo("sales");
+            assertThat(event.getUserId()).isNull();
             membershipListener.clearEventsReceived();
         } finally {
             processEngineConfiguration.getEventDispatcher().removeEventListener(membershipListener);
@@ -141,16 +148,14 @@ public class GroupEventsTest extends PluggableFlowableTestCase {
         }
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         listener = new TestFlowableEntityEventListener(Group.class);
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         if (listener != null) {
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);

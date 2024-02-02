@@ -13,15 +13,17 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Modified to add a "returnVariables" flag, which determines whether the variables that exist within the process instance when the first wait state is encountered (or when the process instance
@@ -34,13 +36,17 @@ import java.util.List;
 @ApiModel(description = "Only one of processDefinitionId, processDefinitionKey or message can be used in the request body")
 public class ProcessInstanceCreateRequest {
 
-    private String processDefinitionId;
-    private String processDefinitionKey;
-    private String message;
-    private String businessKey;
-    private List<RestVariable> variables;
-    private List<RestVariable> transientVariables;
-    private String tenantId;
+    protected String processDefinitionId;
+    protected String processDefinitionKey;
+    protected String message;
+    protected String name;
+    protected String businessKey;
+    protected List<RestVariable> variables;
+    protected List<RestVariable> transientVariables;
+    protected List<RestVariable> startFormVariables;
+    protected String outcome;
+    protected String tenantId;
+    protected String overrideDefinitionTenantId;
 
     // Added by Ryan Johnston
     private boolean returnVariables;
@@ -61,6 +67,15 @@ public class ProcessInstanceCreateRequest {
 
     public void setProcessDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
+    }
+
+    @ApiModelProperty(example = "myProcessInstanceName")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @ApiModelProperty(example = "myBusinessKey")
@@ -89,6 +104,15 @@ public class ProcessInstanceCreateRequest {
     public String getTenantId() {
         return tenantId;
     }
+    
+    @ApiModelProperty(example = "overrideTenant1")
+    public String getOverrideDefinitionTenantId() {
+        return overrideDefinitionTenantId;
+    }
+
+    public void setOverrideDefinitionTenantId(String overrideDefinitionTenantId) {
+        this.overrideDefinitionTenantId = overrideDefinitionTenantId;
+    }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getVariables() {
@@ -106,6 +130,23 @@ public class ProcessInstanceCreateRequest {
 
     public void setTransientVariables(List<RestVariable> transientVariables) {
         this.transientVariables = transientVariables;
+    }
+    
+    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
+    public List<RestVariable> getStartFormVariables() {
+        return startFormVariables;
+    }
+
+    public void setStartFormVariables(List<RestVariable> startFormVariables) {
+        this.startFormVariables = startFormVariables;
+    }
+
+    public String getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(String outcome) {
+        this.outcome = outcome;
     }
 
     @JsonIgnore

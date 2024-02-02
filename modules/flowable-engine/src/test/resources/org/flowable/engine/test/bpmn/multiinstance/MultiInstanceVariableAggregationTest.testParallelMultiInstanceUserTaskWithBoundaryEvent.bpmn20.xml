@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <message id="Abort" name="Abort"/>
+
+    <process id="myProcess">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+
+        <userTask id="miTasks" name="My Task" flowable:taskIdVariableName="taskId" flowable:priority="${loopCounter}">
+
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <extensionElements>
+                    <flowable:variableAggregation target="reviews" createOverviewVariable="true">
+                        <variable sourceExpression="${task:get(taskId).assignee}" target="userId" />
+                        <variable source="approved"  />
+                        <variable source="description" />
+                    </flowable:variableAggregation>
+                </extensionElements>
+                <loopCardinality>${nrOfLoops}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+        </userTask>
+
+        <boundaryEvent id="boundary" name="Message" attachedToRef="miTasks" cancelActivity="true">
+            <messageEventDefinition messageRef="Abort"/>
+        </boundaryEvent>
+
+        <sequenceFlow id="flow4" sourceRef="miTasks" targetRef="afterMiTasks" />
+        <userTask id="afterMiTasks" />
+
+        <sequenceFlow id="flow6" sourceRef="boundary" targetRef="afterBoundary" />
+        <userTask id="afterBoundary" />
+
+        <sequenceFlow id="flow5" sourceRef="afterMiTasks" targetRef="theEnd" />
+        <sequenceFlow id="flow7" sourceRef="afterBoundary" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

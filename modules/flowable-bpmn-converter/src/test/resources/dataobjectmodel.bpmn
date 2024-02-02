@@ -7,6 +7,7 @@
     <dataObject id="dObj4" name="DoubleTest" itemSubjectRef="xsd:double"/>
     <dataObject id="dObj5" name="IntegerTest" itemSubjectRef="xsd:int"/>
     <dataObject id="dObj6" name="LongTest" itemSubjectRef="xsd:long"/>
+    <dataObject id="dObjJson" name="JsonTest" itemSubjectRef="xsd:json"/>
     <dataObject id="dObjWithoutType" name="UnknownTypeTest"/>
     <startEvent id="start1"></startEvent>
     <endEvent id="end1"></endEvent>
@@ -17,6 +18,7 @@
       <dataObject id="dObj10" name="DoubleSubTest" itemSubjectRef="xsd:double"/>
       <dataObject id="dObj11" name="IntegerSubTest" itemSubjectRef="xsd:int"/>
       <dataObject id="dObj12" name="LongSubTest" itemSubjectRef="xsd:long"/>
+      <dataObject id="dObjSubJson" name="JsonSubTest" itemSubjectRef="xsd:json"/>
       <userTask id="userTask2" name="Complete SubTask" activiti:assignee="kermit"></userTask>
       <endEvent id="end2"></endEvent>
       <startEvent id="start2"></startEvent>

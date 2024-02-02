@@ -27,10 +27,10 @@ import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
@@ -107,7 +107,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
             dataOutputAssociations = serviceTask.getDataOutputAssociations();
 
         } else {
-            throw new FlowableException("Unsupported flow element type " + flowElement);
+            throw new FlowableException("Unsupported flow element type " + flowElement + " in " + execution);
         }
 
         MessageInstance message = null;
@@ -120,7 +120,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                 initializeIoSpecification(ioSpecification, execution, bpmnModel);
                 if (ioSpecification.getDataInputRefs().size() > 0) {
                     String firstDataInputName = ioSpecification.getDataInputRefs().get(0);
-                    ItemInstance inputItem = (ItemInstance) execution.getVariable(firstDataInputName);
+                    ItemInstance inputItem = (ItemInstance) execution.getTransientVariable(firstDataInputName);
                     message = new MessageInstance(operation.getInMessage(), inputItem);
                 }
 
@@ -128,7 +128,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                 message = operation.getInMessage().createInstance();
             }
 
-            execution.setVariable(CURRENT_MESSAGE, message);
+            execution.setTransientVariable(CURRENT_MESSAGE, message);
 
             fillMessage(dataInputAssociations, execution);
 
@@ -136,19 +136,19 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
             MessageInstance receivedMessage = operation.sendMessage(message,
                     processEngineConfig.getWsOverridenEndpointAddresses());
 
-            execution.setVariable(CURRENT_MESSAGE, receivedMessage);
+            execution.setTransientVariable(CURRENT_MESSAGE, receivedMessage);
 
             if (ioSpecification != null && ioSpecification.getDataOutputRefs().size() > 0) {
                 String firstDataOutputName = ioSpecification.getDataOutputRefs().get(0);
                 if (firstDataOutputName != null) {
-                    ItemInstance outputItem = (ItemInstance) execution.getVariable(firstDataOutputName);
+                    ItemInstance outputItem = (ItemInstance) execution.getTransientVariable(firstDataOutputName);
                     outputItem.getStructureInstance().loadFrom(receivedMessage.getStructureInstance().toArray());
                 }
             }
 
             returnMessage(dataOutputAssociations, execution);
 
-            execution.setVariable(CURRENT_MESSAGE, null);
+            execution.setTransientVariable(CURRENT_MESSAGE, null);
             leave(execution);
         } catch (Exception exc) {
 
@@ -174,12 +174,12 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
 
         for (DataSpec dataSpec : activityIoSpecification.getDataInputs()) {
             ItemDefinition itemDefinition = itemDefinitionMap.get(dataSpec.getItemSubjectRef());
-            execution.setVariable(dataSpec.getId(), itemDefinition.createInstance());
+            execution.setTransientVariable(dataSpec.getId(), itemDefinition.createInstance());
         }
 
         for (DataSpec dataSpec : activityIoSpecification.getDataOutputs()) {
             ItemDefinition itemDefinition = itemDefinitionMap.get(dataSpec.getItemSubjectRef());
-            execution.setVariable(dataSpec.getId(), itemDefinition.createInstance());
+            execution.setTransientVariable(dataSpec.getId(), itemDefinition.createInstance());
         }
     }
 
@@ -264,11 +264,12 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected void fillImporterInfo(Import theImport, String sourceSystemId) {
         if (!xmlImporterMap.containsKey(theImport.getNamespace())) {
 
-            if (theImport.getImportType().equals("http://schemas.xmlsoap.org/wsdl/")) {
-                Class<?> wsdlImporterClass;
+            if ("http://schemas.xmlsoap.org/wsdl/".equals(theImport.getImportType())) {
                 try {
-                    wsdlImporterClass = Class.forName("org.flowable.engine.impl.webservice.CxfWSDLImporter", true, Thread.currentThread().getContextClassLoader());
-                    XMLImporter importerInstance = (XMLImporter) wsdlImporterClass.newInstance();
+                    ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration();
+                    XMLImporter importerInstance = processEngineConfig.getWsdlImporterFactory()
+                            .createXMLImporter(theImport);
+
                     xmlImporterMap.put(theImport.getNamespace(), importerInstance);
                     importerInstance.importFrom(theImport, sourceSystemId);
 
@@ -276,9 +277,8 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                     wsServiceMap.putAll(importerInstance.getServices());
                     wsOperationMap.putAll(importerInstance.getOperations());
 
-                } catch (ClassNotFoundException e) {
-                    throw new FlowableException("Could not find importer class for type " + theImport.getImportType(),
-                            e);
+                } catch (FlowableException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new FlowableException(String.format("Error importing '%s' as '%s'", theImport.getLocation(),
                             theImport.getImportType()), e);

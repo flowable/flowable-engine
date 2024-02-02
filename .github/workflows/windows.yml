@@ -1,0 +1,31 @@
+name: Flowable Windows Build
+
+on: [push]
+
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -D http.keepAlive=false -D maven.wagon.http.pool=false -D maven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  windows:
+    name: 'Windows'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 'Set up JDK 17'
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Cache Maven Repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Install
+        # Need to do install first in order for the OSGi tests to work
+        run: ./mvnw install %MAVEN_ARGS% -D skipTests=true -D maven.javadoc.skip=true
+      - name: Test
+        run: ./mvnw verify -P distro,ui,errorLogging %MAVEN_ARGS% -D maven.test.redirectTestOutputToFile=false

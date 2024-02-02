@@ -35,7 +35,7 @@ public class ServiceTaskSpringDelegationTest extends SpringFlowableTestCase {
     public void testAsyncDelegateExpression() throws Exception {
         ProcessInstance procInst = runtimeService.startProcessInstanceByKey("delegateExpressionToSpringBean");
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
-        waitForJobExecutorToProcessAllJobs(5000, 500);
+        waitForJobExecutorToProcessAllJobs(7000, 500);
         Thread.sleep(1000);
         assertEquals("Activiti BPMN 2.0 process engine", runtimeService.getVariable(procInst.getId(), "myVar"));
         assertEquals("fieldInjectionWorking", runtimeService.getVariable(procInst.getId(), "fieldInjection"));
@@ -51,7 +51,7 @@ public class ServiceTaskSpringDelegationTest extends SpringFlowableTestCase {
     public void testAsyncMethodExpressionOnSpringBean() {
         ProcessInstance procInst = runtimeService.startProcessInstanceByKey("methodExpressionOnSpringBean");
         assertTrue(JobTestHelper.areJobsAvailable(managementService));
-        waitForJobExecutorToProcessAllJobs(5000, 500);
+        waitForJobExecutorToProcessAllJobs(7000, 500);
         assertEquals("ACTIVITI BPMN 2.0 PROCESS ENGINE", runtimeService.getVariable(procInst.getId(), "myVar"));
     }
 

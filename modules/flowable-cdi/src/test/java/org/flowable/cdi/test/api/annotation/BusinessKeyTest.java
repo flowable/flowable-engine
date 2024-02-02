@@ -12,11 +12,12 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -33,7 +34,7 @@ public class BusinessKeyTest extends CdiFlowableTestCase {
         getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
 
         // assert that now the businessKey-Bean can be looked up:
-        Assert.assertEquals(businessKey, ProgrammaticBeanLookup.lookup("businessKey"));
+        assertThat(ProgrammaticBeanLookup.lookup("businessKey")).isEqualTo(businessKey);
 
     }
 }

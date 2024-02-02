@@ -1,0 +1,114 @@
+name: Flowable SQL Server Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
+
+env:
+  MAVEN_ARGS: >-
+    -Dmaven.javadoc.skip=true
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  test_mssql:
+    name: SQL Server ${{ matrix.mssql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mssql: [2017-latest-ubuntu, 2019-latest]
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
+        env:
+          SA_PASSWORD: flowableStr0ngPassword
+          ACCEPT_EULA: Y
+        ports:
+          - 1433/tcp
+        # needed because the mssql container does not provide a health check
+        options: >-
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Database
+        run: ./.github/actions/scripts/prepare-mssql.sh
+        env:
+          # use localhost for the host here because we have specified a vm for the job.
+          # If we were running the job on a container this would be mssql
+          MSSQL_HOST: localhost
+          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # If we were running the job on a container this would be mssql
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -PcleanDb,mssql
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
+  test_mssql_dmn:
+    name: DMN SQL Server ${{ matrix.mssql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mssql: [2017-latest-ubuntu, 2019-latest]
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
+        env:
+          SA_PASSWORD: flowableStr0ngPassword
+          ACCEPT_EULA: Y
+        ports:
+          - 1433/tcp
+        # needed because the mssql container does not provide a health check
+        options: >-
+          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Database
+        run: ./.github/actions/scripts/prepare-mssql.sh
+        env:
+          # use localhost for the host here because we have specified a vm for the job.
+          # If we were running the job on a container this would be mssql
+          MSSQL_HOST: localhost
+          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # If we were running the job on a container this would be mssql
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -Pdmn,mssql
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-dmn-engine -am

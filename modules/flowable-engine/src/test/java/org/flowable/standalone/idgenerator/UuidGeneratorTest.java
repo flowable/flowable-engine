@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,9 @@
  */
 package org.flowable.standalone.idgenerator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -29,6 +33,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         super("org/flowable/standalone/idgenerator/uuidgenerator.test.flowable.cfg.xml");
     }
 
+    @Test
     @Deployment
     public void testUuidGeneratorUsage() {
 
@@ -37,14 +42,12 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         // Start processes
         for (int i = 0; i < 50; i++) {
             executorService.execute(new Runnable() {
+
                 @Override
                 public void run() {
-                    try {
+                    assertThatCode(() -> {
                         runtimeService.startProcessInstanceByKey("simpleProcess");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        fail();
-                    }
+                    }).doesNotThrowAnyException();
                 }
             });
         }
@@ -76,15 +79,12 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
             }
         });
 
-        try {
+        assertThatCode(() -> {
             executorService.shutdown();
             executorService.awaitTermination(1, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            fail();
-        }
+        }).doesNotThrowAnyException();
 
-        assertEquals(50, historyService.createHistoricProcessInstanceQuery().count());
+        assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(50);
     }
 
 }

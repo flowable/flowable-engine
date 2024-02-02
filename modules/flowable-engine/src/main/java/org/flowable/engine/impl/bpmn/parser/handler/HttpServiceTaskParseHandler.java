@@ -16,15 +16,11 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class HttpServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<ServiceTask> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskParseHandler.class);
 
     @Override
     public Class<? extends BaseElement> getHandledType() {

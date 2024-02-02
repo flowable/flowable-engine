@@ -14,8 +14,8 @@
 package org.activiti.engine.impl.el;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is called. Setting of the value is not supported.

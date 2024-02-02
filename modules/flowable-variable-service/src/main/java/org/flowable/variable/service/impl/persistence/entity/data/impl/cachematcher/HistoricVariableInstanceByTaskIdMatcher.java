@@ -12,7 +12,7 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
@@ -23,7 +23,7 @@ public class HistoricVariableInstanceByTaskIdMatcher extends CachedEntityMatcher
     @Override
     public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
         return historicVariableInstanceEntity.getTaskId() != null
-                && historicVariableInstanceEntity.getTaskId().equals((String) parameter);
+                && historicVariableInstanceEntity.getTaskId().equals(parameter);
     }
 
 }

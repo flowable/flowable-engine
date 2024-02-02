@@ -1,0 +1,16 @@
+{
+    "key": "exposeConsumerRecordInformationChannel",
+    "category": "channel",
+    "channelType": "inbound",
+    "type": "kafka",
+    "topics": [
+        "test-customer-multi-partition"
+    ],
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "eventKey"
+    },
+    "topicOutputName": "receivedTopic",
+    "partitionOutputName": "receivedPartition",
+    "offsetOutputName": "receivedOffset"
+}

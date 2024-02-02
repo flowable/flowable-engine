@@ -1,0 +1,11 @@
+{
+    "name": "Two channel",
+    "key": "two",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "testQueue",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "fixedValue": "myEvent"
+    }
+}

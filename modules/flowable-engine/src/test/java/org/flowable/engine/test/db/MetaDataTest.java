@@ -17,11 +17,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 
 import org.apache.ibatis.session.SqlSession;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,9 @@ public class MetaDataTest extends PluggableFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataTest.class);
 
+    @Test
     public void testMetaData() {
-        ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
+        ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<>() {
             @Override
             public Object execute(CommandContext commandContext) {
                 // PRINT THE TABLE NAMES TO CHECK IF WE CAN USE METADATA INSTEAD
@@ -47,7 +49,8 @@ public class MetaDataTest extends PluggableFlowableTestCase {
                         ResultSetMetaData resultSetMetaData = tables.getMetaData();
                         int columnCount = resultSetMetaData.getColumnCount();
                         for (int i = 1; i <= columnCount; i++) {
-                            LOGGER.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i), tables.getString(i));
+                            LOGGER.info("result set column {}|{}|{}|{}", i, resultSetMetaData.getColumnName(i), resultSetMetaData.getColumnLabel(i),
+                                    tables.getString(i));
                         }
                         LOGGER.info("-------------------------------------------------------");
                     }

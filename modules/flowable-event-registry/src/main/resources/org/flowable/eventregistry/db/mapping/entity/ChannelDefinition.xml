@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
+  
+  <!-- DEFINITION INSERT -->
+
+  <insert id="insertChannelDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
+    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_,
+    	CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values (#{id, jdbcType=VARCHAR},
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR}, 
+            #{version, jdbcType=INTEGER}, 
+            #{type, jdbcType=VARCHAR},
+            #{implementation, jdbcType=VARCHAR},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{resourceName, jdbcType=VARCHAR},
+            #{description, jdbcType=VARCHAR},
+            #{tenantId, jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="bulkInsertChannelDefinition" parameterType="java.util.List">
+    insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="channelDefinition" index="index" separator=",">
+        (#{channelDefinition.id, jdbcType=VARCHAR},
+         #{channelDefinition.category, jdbcType=VARCHAR},
+         #{channelDefinition.name, jdbcType=VARCHAR},
+         #{channelDefinition.key, jdbcType=VARCHAR}, 
+         #{channelDefinition.version, jdbcType=INTEGER},
+         #{channelDefinition.type, jdbcType=VARCHAR},
+         #{channelDefinition.implementation, jdbcType=VARCHAR},
+         #{channelDefinition.deploymentId, jdbcType=VARCHAR},
+         #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
+         #{channelDefinition.resourceName, jdbcType=VARCHAR},
+         #{channelDefinition.description, jdbcType=VARCHAR},
+         #{channelDefinition.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertChannelDefinition" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="channelDefinition" index="index">
+        INTO ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES
+        (#{channelDefinition.id, jdbcType=VARCHAR},
+         #{channelDefinition.category, jdbcType=VARCHAR},
+         #{channelDefinition.name, jdbcType=VARCHAR},
+         #{channelDefinition.key, jdbcType=VARCHAR}, 
+         #{channelDefinition.version, jdbcType=INTEGER},
+         #{channelDefinition.type, jdbcType=VARCHAR},
+         #{channelDefinition.implementation, jdbcType=VARCHAR},
+         #{channelDefinition.deploymentId, jdbcType=VARCHAR},
+         #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
+         #{channelDefinition.resourceName, jdbcType=VARCHAR},
+         #{channelDefinition.description, jdbcType=VARCHAR},
+         #{channelDefinition.tenantId, jdbcType=VARCHAR})                        
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+  
+  <!-- DEFINITION UPDATE -->
+
+  <update id="updateChannelDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
+    update ${prefix}FLW_CHANNEL_DEFINITION
+    <set>
+       CATEGORY_ = #{category, jdbcType=VARCHAR},
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateChannelDefinitionTenantIdForDeploymentId" parameterType="java.util.Map">
+    update ${prefix}FLW_CHANNEL_DEFINITION set
+      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    where
+      DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+  </update>
+
+  <update id="updateChannelDefinitionTypeAndImplementationById" parameterType="java.util.Map">
+    update ${prefix}FLW_CHANNEL_DEFINITION
+    <set>
+      TYPE_ = #{type, jdbcType=VARCHAR},
+      IMPLEMENTATION_ = #{implementation, jdbcType=VARCHAR},
+    </set>
+    where
+      ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+
+  <!-- DEFINITION DELETE -->
+
+  <delete id="deleteChannelDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}FLW_CHANNEL_DEFINITION where DEPLOYMENT_ID_ = #{deploymenId} 
+  </delete>
+  
+  <!-- FORM DEFINITION RESULTMAP -->
+
+  <resultMap id="channelDefinitionResultMap" type="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
+    <result property="implementation" column="IMPLEMENTATION_" jdbcType="VARCHAR"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- DEFINITION SELECT -->
+
+  <select id="selectChannelDefinition" parameterType="string" resultMap="channelDefinitionResultMap">
+    select * from ${prefix}FLW_CHANNEL_DEFINITION where ID_ = #{channelDefinitionId, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectChannelDefinitionById" parameterType="string" resultMap="channelDefinitionResultMap">
+    select * from ${prefix}FLW_CHANNEL_DEFINITION where ID_ = #{channelDefinitionId}
+  </select>
+
+  <select id="selectChannelDefinitionsByQueryCriteria" parameterType="org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl" resultMap="channelDefinitionResultMap">
+    <if test="needsPaging">${limitBefore}</if>
+    SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+    <include refid="selectChannelDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="needsPaging">${limitAfter}</if>
+  </select>
+
+  <select id="selectChannelDefinitionCountByQueryCriteria" parameterType="org.flowable.eventregistry.impl.ChannelDefinitionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectChannelDefinitionsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectChannelDefinitionsByQueryCriteriaSql">  
+    from ${prefix}FLW_CHANNEL_DEFINITION RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null and ids">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike}
+      </if>
+      <if test="categoryNotEquals != null">
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="keyLikeIgnoreCase != null">
+        and lower(RES.KEY_) like lower(#{keyLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="versionGt != null">
+        and RES.VERSION_ &gt; #{versionGt}
+      </if>
+      <if test="versionGte != null">
+        and RES.VERSION_ &gt;= #{versionGte}
+      </if>
+      <if test="versionLt != null">
+        and RES.VERSION_ &lt; #{versionLt}
+      </if>
+      <if test="versionLte != null">
+        and RES.VERSION_ &lt;= #{versionLte}
+      </if>
+      <if test="onlyInbound">
+        and RES.TYPE_ = 'inbound'
+      </if>
+      <if test="onlyOutbound">
+        and RES.TYPE_ = 'outbound'
+      </if>
+      <if test="implementation != null">
+        and RES.IMPLEMENTATION_ = #{implementation}
+      </if>
+      <if test="createTime != null">
+        and RES.CREATE_TIME = #{createTime}
+      </if>
+      <if test="createTimeAfter != null">
+        and RES.CREATE_TIME &gt; #{createTimeAfter}
+      </if>
+      <if test="createTimeBefore != null">
+        and RES.CREATE_TIME &lt; #{createTimeBefore}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="deploymentIds != null and !deploymentIds.empty">
+        and RES.DEPLOYMENT_ID_ in
+        <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="parentDeploymentId != null">
+          and EXISTS (select 1 from ${prefix}FLW_EVENT_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = RES.DEPLOYMENT_ID_)
+      </if>
+      <if test="latest">
+        and RES.VERSION_ = (select max(VERSION_) from ${prefix}FLW_CHANNEL_DEFINITION where KEY_ = RES.KEY_ 
+             <if test="tenantId != null">
+               and TENANT_ID_ = #{tenantId}
+             </if>
+             <if test="tenantIdLike != null">
+               and TENANT_ID_ like #{tenantIdLike}
+             </if>
+             <if test="withoutTenantId">
+               and (TENANT_ID_ = '' or TENANT_ID_ is null)
+             </if>
+             <if test="tenantId == null and tenantIdLike == null and !withoutTenantId">
+               and ( (TENANT_ID_ IS NOT NULL and TENANT_ID_ = RES.TENANT_ID_) or (TENANT_ID_ IS NULL and RES.TENANT_ID_ IS NULL) )
+             </if>
+        )
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+    </where>
+  </sql>
+    
+  <select id="selectChannelDefinitionByDeploymentAndKey" parameterType="map" resultMap="channelDefinitionResultMap">
+    select * 
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{channelDefinitionKey}
+      and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+  
+   <select id="selectChannelDefinitionByDeploymentAndKeyAndTenantId" parameterType="map" resultMap="channelDefinitionResultMap">
+    select * 
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{channelDefinitionKey}
+      and TENANT_ID_ = #{tenantId}
+  </select>
+    
+  <select id="selectChannelDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="channelDefinitionResultMap">
+    select *
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where KEY_ = #{parameter.channelDefinitionKey} and VERSION_ = #{parameter.eventVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
+  </select>
+    
+  
+   <select id="selectChannelDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="channelDefinitionResultMap">
+    select *
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where KEY_ = #{parameter.channelDefinitionKey} and VERSION_ = #{parameter.eventVersion} and TENANT_ID_ = #{parameter.tenantId}
+  </select>
+    
+  <select id="selectLatestChannelDefinitionByKey" parameterType="string" resultMap="channelDefinitionResultMap">
+    select *
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where KEY_ = #{channelDefinitionKey} and
+          (TENANT_ID_ = ''  or TENANT_ID_ is null) and
+          VERSION_ = (select max(VERSION_) from ${prefix}FLW_CHANNEL_DEFINITION where KEY_ = #{channelDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+  </select>
+  
+  <select id="selectLatestChannelDefinitionByKeyAndTenantId" parameterType="map" resultMap="channelDefinitionResultMap">
+    select *
+    from ${prefix}FLW_CHANNEL_DEFINITION 
+    where KEY_ = #{channelDefinitionKey} and
+          TENANT_ID_ = #{tenantId} and
+          VERSION_ = (select max(VERSION_) from ${prefix}FLW_CHANNEL_DEFINITION where KEY_ = #{channelDefinitionKey} and TENANT_ID_ = #{tenantId})
+  </select>
+  
+  <select id="selectChannelDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="channelDefinitionResultMap">
+    <include refid="org.flowable.common.engine.db.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectChannelDefinitionCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+</mapper>

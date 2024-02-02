@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+    <case id="testSendEvent" name="testSendEvent" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+            </extensionElements>
+            <planItem id="planItem1" name="Send event task" definitionRef="sendEventTask1"></planItem>
+            <planItem id="planItem2" name="Human task" definitionRef="humanTask1">
+                <entryCriterion id="entryCriterion1" sentryRef="sentry1"></entryCriterion>
+            </planItem>
+            <sentry id="sentry1">
+                <extensionElements>
+                    <design:stencilid xmlns:design="http://flowable.org/design"><![CDATA[EntryCriterion]]></design:stencilid>
+                </extensionElements>
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="sendEventTask1" name="Send event task" flowable:type="send-event">
+                <extensionElements>
+                    <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                    <flowable:channelKey>out-channel</flowable:channelKey>
+                    <flowable:eventInParameter source="${myVariable}" target="tenantACustomerId"></flowable:eventInParameter>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                </extensionElements>
+            </task>
+            <humanTask id="humanTask1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                <extensionElements>
+                    <flowable:start-form-field-validation><![CDATA[false]]></flowable:start-form-field-validation>
+                </extensionElements>
+            </humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

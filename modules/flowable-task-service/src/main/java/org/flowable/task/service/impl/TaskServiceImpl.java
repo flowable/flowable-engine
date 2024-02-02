@@ -14,20 +14,24 @@ package org.flowable.task.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskServiceImpl extends ServiceImpl implements TaskService {
-
-    public TaskServiceImpl() {
-
-    }
+public class TaskServiceImpl extends CommonServiceImpl<TaskServiceConfiguration> implements TaskService {
 
     public TaskServiceImpl(TaskServiceConfiguration taskServiceConfiguration) {
         super(taskServiceConfiguration);
@@ -56,6 +60,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     @Override
     public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
         return getTaskEntityManager().findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+
+    @Override
+    public TaskQuery createTaskQuery(CommandExecutor commandExecutor, AbstractEngineConfiguration engineConfiguration) {
+        return new TaskQueryImpl(commandExecutor, configuration, getVariableServiceConfiguration(engineConfiguration), configuration.getIdmIdentityService());
     }
 
     @Override
@@ -97,5 +106,22 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     public void deleteTask(TaskEntity task, boolean fireEvents) {
         getTaskEntityManager().delete(task, fireEvents);
     }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        getTaskEntityManager().deleteTasksByExecutionId(executionId);
+    }
 
+    public TaskEntityManager getTaskEntityManager() {
+        return configuration.getTaskEntityManager();
+    }
+
+    @Override
+    public TaskEntity createTask(TaskBuilder taskBuilder) {
+        return getTaskEntityManager().createTask(taskBuilder);
+    }
+    
+    protected VariableServiceConfiguration getVariableServiceConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (VariableServiceConfiguration) engineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
 }

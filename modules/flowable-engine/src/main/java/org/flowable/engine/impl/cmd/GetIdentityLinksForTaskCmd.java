@@ -15,11 +15,13 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -39,7 +41,12 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<IdentityLink> execute(CommandContext commandContext) {
-        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
+        
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("task not found");
+        }
 
         List<IdentityLink> identityLinks = (List) task.getIdentityLinks();
 
@@ -52,14 +59,14 @@ public class GetIdentityLinksForTaskCmd implements Command<List<IdentityLink>>, 
         // since the task.delete cascaded to all associated identityLinks
         // and of course this leads to exception while trying to delete a non-existing identityLink
         if (task.getAssignee() != null) {
-            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkService().createIdentityLink();
+            IdentityLinkEntity identityLink = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService().createIdentityLink();
             identityLink.setUserId(task.getAssignee());
             identityLink.setType(IdentityLinkType.ASSIGNEE);
             identityLink.setTaskId(task.getId());
             identityLinks.add(identityLink);
         }
         if (task.getOwner() != null) {
-            IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkService().createIdentityLink();
+            IdentityLinkEntity identityLink = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService().createIdentityLink();
             identityLink.setUserId(task.getOwner());
             identityLink.setTaskId(task.getId());
             identityLink.setType(IdentityLinkType.OWNER);

@@ -21,11 +21,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.ActivateTaskCmd;
 import org.flowable.engine.impl.cmd.AddCommentCmd;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
+import org.flowable.engine.impl.cmd.BulkSaveTasksCmd;
 import org.flowable.engine.impl.cmd.ClaimTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.engine.impl.cmd.CompleteTaskWithFormCmd;
@@ -66,16 +70,22 @@ import org.flowable.engine.impl.cmd.SaveTaskCmd;
 import org.flowable.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
+import org.flowable.engine.impl.cmd.StartProgressTaskCmd;
+import org.flowable.engine.impl.cmd.SuspendTaskCmd;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.idm.api.IdmEngineConfigurationApi;
+import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.task.api.NativeTaskQuery;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskBuilder;
+import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.NativeTaskQueryImpl;
 import org.flowable.task.service.impl.TaskQueryImpl;
@@ -85,11 +95,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TaskServiceImpl extends ServiceImpl implements TaskService {
-
-    public TaskServiceImpl() {
-
-    }
+public class TaskServiceImpl extends CommonEngineServiceImpl<ProcessEngineConfigurationImpl> implements TaskService {
 
     public TaskServiceImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -108,6 +114,11 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     @Override
     public void saveTask(Task task) {
         commandExecutor.execute(new SaveTaskCmd(task));
+    }
+
+    @Override
+    public void bulkSaveTasks(Collection<Task> taskList) {
+        commandExecutor.execute(new BulkSaveTasksCmd(taskList));
     }
 
     @Override
@@ -206,28 +217,68 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     }
 
     @Override
+    public void startProgress(String taskId, String userId) {
+        commandExecutor.execute(new StartProgressTaskCmd(taskId, userId));
+    }
+
+    @Override
+    public void suspendTask(String taskId, String userId) {
+        commandExecutor.execute(new SuspendTaskCmd(taskId, userId));
+    }
+
+    @Override
+    public void activateTask(String taskId, String userId) {
+        commandExecutor.execute(new ActivateTaskCmd(taskId, userId));
+    }
+
+    @Override
     public void complete(String taskId) {
-        commandExecutor.execute(new CompleteTaskCmd(taskId, null));
+        commandExecutor.execute(new CompleteTaskCmd(taskId, (Map<String, Object>) null));
+    }
+    
+    @Override
+    public void complete(String taskId, String userId) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, (Map<String, Object>) null));
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables));
     }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables));
+    }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, transientVariables));
+    }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, transientVariables));
     }
 
     @Override
     public void complete(String taskId, Map<String, Object> variables, boolean localScope) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, localScope));
     }
+    
+    @Override
+    public void complete(String taskId, String userId, Map<String, Object> variables, boolean localScope) {
+        commandExecutor.execute(new CompleteTaskCmd(taskId, userId, variables, localScope));
+    }
 
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, String userId, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables));
     }
 
     @Override
@@ -236,17 +287,37 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
     }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, Map<String, Object> transientVariables) {
 
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, 
+                userId, variables, transientVariables));
+    }
+    
     @Override
     public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope) {
 
         commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
     }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            String userId, Map<String, Object> variables, boolean localScope) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, userId, variables, localScope));
+    }
 
     @Override
-    public FormModel getTaskFormModel(String taskId) {
-        return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
+    public FormInfo getTaskFormModel(String taskId) {
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, false));
+    }
+    
+    @Override
+    public FormInfo getTaskFormModel(String taskId, boolean ignoreVariables) {
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId, ignoreVariables));
     }
 
     @Override
@@ -281,12 +352,13 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
 
     @Override
     public TaskQuery createTaskQuery() {
-        return new TaskQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
+        return new TaskQueryImpl(commandExecutor, configuration.getDatabaseType(), configuration.getTaskServiceConfiguration(), 
+                configuration.getVariableServiceConfiguration(), getIdmIdentityService());
     }
 
     @Override
     public NativeTaskQuery createNativeTaskQuery() {
-        return new NativeTaskQueryImpl(commandExecutor);
+        return new NativeTaskQueryImpl(commandExecutor, configuration.getTaskServiceConfiguration());
     }
 
     @Override
@@ -568,6 +640,27 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     @Override
     public DataObject getDataObject(String taskId, String dataObjectName, String locale, boolean withLocalizationFallback) {
         return commandExecutor.execute(new GetTaskDataObjectCmd(taskId, dataObjectName, locale, withLocalizationFallback));
+    }
+
+    @Override
+    public TaskBuilder createTaskBuilder() {
+        return new TaskBuilderImpl(commandExecutor);
+    }
+    
+    protected IdmIdentityService getIdmIdentityService() {
+        IdmEngineConfigurationApi idmEngineConfiguration = (IdmEngineConfigurationApi) configuration.getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        IdmIdentityService idmIdentityService = null;
+        if (idmEngineConfiguration != null) {
+            idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
+        }
+        
+        return idmIdentityService;
+    }
+
+    @Override
+    public TaskCompletionBuilder createTaskCompletionBuilder() {
+        return new TaskCompletionBuilderImpl(commandExecutor);
     }
 
 }

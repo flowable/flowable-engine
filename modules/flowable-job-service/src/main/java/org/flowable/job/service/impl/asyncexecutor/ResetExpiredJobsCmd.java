@@ -14,12 +14,11 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.Collection;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.api.Job;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -28,18 +27,23 @@ public class ResetExpiredJobsCmd implements Command<Void> {
 
     protected Collection<String> jobIds;
     protected JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager;
+    protected JobServiceConfiguration jobServiceConfiguration;
     
-    public ResetExpiredJobsCmd(Collection<String> jobsIds, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager) {
+    public ResetExpiredJobsCmd(Collection<String> jobsIds, JobInfoEntityManager<? extends JobInfoEntity> jobEntityManager,
+            JobServiceConfiguration jobServiceConfiguration) {
+        
         this.jobIds = jobsIds;
         this.jobEntityManager = jobEntityManager;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
         for (String jobId : jobIds) {
-            Job job = CommandContextUtil.getJobEntityManager(commandContext).findById(jobId);
-            CommandContextUtil.getJobManager(commandContext).unacquire(job);
-            jobEntityManager.resetExpiredJob(jobId);
+            JobInfoEntity job = jobEntityManager.findById(jobId);
+            if (job !=  null) {
+                jobServiceConfiguration.getJobManager().unacquire(job);
+            }
         }
         return null;
     }

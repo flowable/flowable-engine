@@ -1,0 +1,44 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_3fa3bde4-1645-11e8-b1df-be031b97f836" name="asdasd" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="collection decision">
+    <decisionTable id="decisionTable_3fa3bde4-1645-11e8-b1df-be031b97f836" hitPolicy="RULE ORDER">
+      <input>
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>input1</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[${collection:contains("test1", customerOne.name)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["customerOne.name in ['test1']"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[${collection:contains('"test1", "test2"', customerOne.name)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["customerOne.name in ['test1', 'test2']"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[${collection:contains(10, customerOne.age)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA["customerOne.age in ['test1']"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[${collection:contains('10, 20', customerOne.age)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA["customerOne.age in [10, 20]"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

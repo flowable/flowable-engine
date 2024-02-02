@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,8 +41,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import org.flowable.bpmn.model.Import;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.PrimitiveStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
@@ -82,7 +83,7 @@ public class CxfWSDLImporter implements XMLImporter {
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         try {
-            final URIResolver uriResolver = new URIResolver(sourceSystemId, theImport.getLocation());
+            final URIResolver uriResolver = this.createUriResolver(sourceSystemId, theImport);
             if (uriResolver.isResolved()) {
                 if (uriResolver.getURI() != null) {
                     this.importFrom(uriResolver.getURI().toString());
@@ -98,6 +99,10 @@ public class CxfWSDLImporter implements XMLImporter {
         } catch (final IOException e) {
             throw new UncheckedException(e);
         }
+    }
+
+    protected URIResolver createUriResolver(String sourceSystemId, Import theImport) throws IOException {
+        return new URIResolver(sourceSystemId, theImport.getLocation());
     }
 
     public void importFrom(String url) {
@@ -211,7 +216,6 @@ public class CxfWSDLImporter implements XMLImporter {
             _importFields((JDefinedClass) parentClass, index, structure);
         }
         for (Entry<String, JFieldVar> entry : theClass.fields().entrySet()) {
-            Class<?> fieldClass = ReflectUtil.loadClass(entry.getValue().type().boxify().erasure().fullName());
 
             String fieldName = entry.getKey();
             if (fieldName.startsWith("_")) {
@@ -220,7 +224,45 @@ public class CxfWSDLImporter implements XMLImporter {
                 }
             }
 
-            structure.setFieldName(index.getAndIncrement(), fieldName, fieldClass);
+            final JType fieldType = entry.getValue().type();
+            final Class<?> fieldClass = ReflectUtil.loadClass(fieldType.boxify().erasure().fullName());
+            final Class<?> fieldParameterClass;
+            if (fieldType instanceof JClass) {
+                final JClass fieldClassType = (JClass) fieldType;
+                final List<JClass> fieldTypeParameters = fieldClassType.getTypeParameters();
+                if (fieldTypeParameters.size() > 1) {
+                    throw new FlowableException(
+                            String.format("Field type '%s' with more than one parameter is not supported: %S",
+                                    fieldClassType, fieldTypeParameters));
+                } else if (fieldTypeParameters.isEmpty()) {
+                    fieldParameterClass = null;
+                } else {
+                    final JClass fieldParameterType = fieldTypeParameters.get(0);
+
+                    // Hack because JClass.fullname() doesn't return the right class fullname for a nested class to be
+                    // loaded from classloader. It should be contain "$" instead of "." as separator
+                    boolean isFieldParameterTypeNeestedClass = false;
+                    final Iterator<JDefinedClass> theClassNeestedClassIt = theClass.classes();
+                    while (theClassNeestedClassIt.hasNext() && !isFieldParameterTypeNeestedClass) {
+                        final JDefinedClass neestedType = theClassNeestedClassIt.next();
+                        if (neestedType.name().equals(fieldParameterType.name())) {
+                            isFieldParameterTypeNeestedClass = true;
+                        }
+                    }
+                    if (isFieldParameterTypeNeestedClass) {
+                        // The parameter type is a nested class
+                        fieldParameterClass = ReflectUtil
+                                .loadClass(theClass.erasure().fullName() + "$" + fieldParameterType.name());
+                    } else {
+                        // The parameter type is not a nested class
+                        fieldParameterClass = ReflectUtil.loadClass(fieldParameterType.erasure().fullName());
+                    }
+                }
+            } else {
+                fieldParameterClass = null;
+            }
+
+            structure.setFieldName(index.getAndIncrement(), fieldName, fieldClass, fieldParameterClass);
         }
     }
 

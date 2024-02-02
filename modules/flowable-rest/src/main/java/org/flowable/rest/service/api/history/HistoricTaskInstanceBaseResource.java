@@ -13,16 +13,21 @@
 
 package org.flowable.rest.service.api.history;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +67,11 @@ public class HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired(required=false)
+    protected BpmnRestApiInterceptor restApiInterceptor;
 
-    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
+    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
         // Populate query based on request
@@ -72,6 +80,12 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getProcessInstanceId() != null) {
             query.processInstanceId(queryRequest.getProcessInstanceId());
+        }
+        if (queryRequest.getProcessInstanceIdWithChildren() != null) {
+            query.processInstanceIdWithChildren(queryRequest.getProcessInstanceIdWithChildren());
+        }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutProcessInstanceId())) {
+            query.withoutProcessInstanceId();
         }
         if (queryRequest.getProcessBusinessKey() != null) {
             query.processInstanceBusinessKey(queryRequest.getProcessBusinessKey());
@@ -103,6 +117,9 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskNameLike() != null) {
             query.taskNameLike(queryRequest.getTaskNameLike());
         }
+        if (queryRequest.getTaskNameLikeIgnoreCase() != null) {
+            query.taskNameLikeIgnoreCase(queryRequest.getTaskNameLikeIgnoreCase());
+        }
         if (queryRequest.getTaskDescription() != null) {
             query.taskDescription(queryRequest.getTaskDescription());
         }
@@ -115,8 +132,20 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getTaskDefinitionKeyLike() != null) {
             query.taskDefinitionKeyLike(queryRequest.getTaskDefinitionKeyLike());
         }
+        if (queryRequest.getTaskDefinitionKeys() != null) {
+            query.taskDefinitionKeys(queryRequest.getTaskDefinitionKeys());
+        }
         if (queryRequest.getTaskCategory() != null) {
             query.taskCategory(queryRequest.getTaskCategory());
+        }
+        if (queryRequest.getTaskCategoryIn() != null && !queryRequest.getTaskCategoryIn().isEmpty()) {
+            query.taskCategoryIn(queryRequest.getTaskCategoryIn());
+        }
+        if (queryRequest.getTaskCategoryNotIn() != null && !queryRequest.getTaskCategoryNotIn().isEmpty()) {
+            query.taskCategoryNotIn(queryRequest.getTaskCategoryNotIn());
+        }
+        if (Boolean.TRUE.equals(queryRequest.getTaskWithoutCategory())) {
+            query.taskWithoutCategory();
         }
         if (queryRequest.getTaskDeleteReason() != null) {
             query.taskDeleteReason(queryRequest.getTaskDeleteReason());
@@ -223,24 +252,85 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getProcessVariables() != null) {
             addProcessVariables(query, queryRequest.getProcessVariables());
         }
+        
+        if (queryRequest.getScopeDefinitionId() != null) {
+            query.scopeDefinitionId(queryRequest.getScopeDefinitionId());
+        }
+        if (queryRequest.getScopeId() != null) {
+            query.scopeId(queryRequest.getScopeId());
+        }
+        if (Boolean.TRUE.equals(queryRequest.getWithoutScopeId())) {
+            query.withoutScopeId();
+        }
+        if (queryRequest.getScopeType() != null) {
+            query.scopeType(queryRequest.getScopeType());
+        }
+        if (queryRequest.getPropagatedStageInstanceId() != null) {
+            query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.taskTenantId(queryRequest.getTenantId());
         }
-
         if (queryRequest.getTenantIdLike() != null) {
             query.taskTenantIdLike(queryRequest.getTenantIdLike());
         }
-
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.taskWithoutTenantId();
+        }
+
+        if (Boolean.TRUE.equals(queryRequest.getWithoutDeleteReason())) {
+            query.taskWithoutDeleteReason();
         }
 
         if (queryRequest.getTaskCandidateGroup() != null) {
             query.taskCandidateGroup(queryRequest.getTaskCandidateGroup());
         }
 
-        return new HistoricTaskInstancePaginateList(restResponseFactory, serverRootUrl).paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties);
+        if (queryRequest.isIgnoreTaskAssignee()) {
+            query.ignoreAssigneeValue();
+        }
+
+        if (queryRequest.getRootScopeId() != null) {
+            query.taskRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.taskParentScopeId(queryRequest.getParentScopeId());
+        }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);
+        }
+
+        return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
+            restResponseFactory::createHistoricTaskInstanceResponseList);
+    }
+    
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
+        HistoricTaskInstance taskInstance = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
+        }
+
+        return taskInstance;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskInstanceFromRequestWithoutAccessCheck(String taskId) {
+        HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (taskInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
+        }
+        
+        return taskInstance;
     }
 
     protected void addTaskVariables(HistoricTaskInstanceQuery taskInstanceQuery, List<QueryVariable> variables) {
@@ -306,6 +396,14 @@ public class HistoricTaskInstanceBaseResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     taskInstanceQuery.taskVariableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    taskInstanceQuery.taskVariableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
@@ -379,6 +477,13 @@ public class HistoricTaskInstanceBaseResource {
             case LIKE:
                 if (actualValue instanceof String) {
                     taskInstanceQuery.processVariableValueLike(variable.getName(), (String) actualValue);
+                } else {
+                    throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
+                }
+                break;
+            case LIKE_IGNORE_CASE:
+                if (actualValue instanceof String) {
+                    taskInstanceQuery.processVariableValueLikeIgnoreCase(variable.getName(), (String) actualValue);
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }

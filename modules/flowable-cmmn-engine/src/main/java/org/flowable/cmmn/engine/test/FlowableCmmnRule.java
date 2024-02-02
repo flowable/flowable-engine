@@ -25,7 +25,7 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
@@ -66,8 +66,6 @@ import org.junit.runners.model.Statement;
  * order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>
- * 
- * @author Tom Baeyens
  */
 public class FlowableCmmnRule implements TestRule {
 
@@ -87,6 +85,10 @@ public class FlowableCmmnRule implements TestRule {
 
     public FlowableCmmnRule(String configurationResource) {
         this.configurationResource = configurationResource;
+    }
+
+    public FlowableCmmnRule(CmmnEngine cmmnEngine) {
+        setCmmnEngine(cmmnEngine);
     }
 
     /**
@@ -242,12 +244,25 @@ public class FlowableCmmnRule implements TestRule {
         return cmmnEngine;
     }
 
+    public void setCmmnEngine(CmmnEngine cmmnEngine) {
+        this.cmmnEngine = cmmnEngine;
+        initializeServices();
+    }
+    
+    public CmmnEngineConfiguration getCmmnEngineConfiguration() {
+        return cmmnEngineConfiguration;
+    }
+
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }
 
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
+    }
+
+    public CmmnTaskService getCmmnTaskService() {
+        return cmmnTaskService;
     }
 
     public CmmnHistoryService getCmmnHistoryService() {

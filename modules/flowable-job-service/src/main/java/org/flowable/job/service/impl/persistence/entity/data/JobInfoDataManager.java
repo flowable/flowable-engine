@@ -12,23 +12,26 @@
  */
 package org.flowable.job.service.impl.persistence.entity.data;
 
+import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 
 public interface JobInfoDataManager<T extends JobInfoEntity> extends DataManager<T> {
 
-    List<T> findJobsToExecute(Page page);
+    List<T> findJobsToExecute(List<String> enabledCategories, Page page);
 
     List<T> findJobsByExecutionId(final String executionId);
 
     List<T> findJobsByProcessInstanceId(final String processInstanceId);
 
-    List<T> findExpiredJobs(Page page);
+    List<T> findExpiredJobs(List<String> enabledCategories, Page page);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+
+    void bulkUpdateJobLockWithoutRevisionCheck(List<T> jobEntities, String lockOwner, Date lockExpirationTime);
 
     void resetExpiredJob(String jobId);
 

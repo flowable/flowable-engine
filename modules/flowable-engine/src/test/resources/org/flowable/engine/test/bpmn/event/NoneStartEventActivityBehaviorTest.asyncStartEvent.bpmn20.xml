@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="asyncNoneStartEvent" name="None start event executed in the async way">
+
+        <startEvent id="theStart" flowable:async="true"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

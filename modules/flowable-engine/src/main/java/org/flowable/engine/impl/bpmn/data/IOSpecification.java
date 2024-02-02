@@ -43,11 +43,11 @@ public class IOSpecification {
 
     public void initialize(DelegateExecution execution) {
         for (Data data : this.dataInputs) {
-            execution.setVariable(data.getName(), data.getDefinition().createInstance());
+            execution.setTransientVariable(data.getName(), data.getDefinition().createInstance());
         }
 
         for (Data data : this.dataOutputs) {
-            execution.setVariable(data.getName(), data.getDefinition().createInstance());
+            execution.setTransientVariable(data.getName(), data.getDefinition().createInstance());
         }
     }
 

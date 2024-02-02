@@ -16,16 +16,17 @@ import java.util.concurrent.ExecutorService;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.cfg.multitenant.TenantAwareDataSource;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.cfg.multitenant.TenantAwareDataSource;
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmd.ClearProcessInstanceLockTimesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -33,8 +34,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ProcessEngineConfiguration} that builds a multi tenant {@link ProcessEngine} where each tenant has its own database schema.
@@ -50,8 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  * - Adding tenants (also after boot!) is done using the {@link #registerTenant(String, DataSource)} operations.
  * 
- * - Currently, this config does not work with the 'old' {@link JobExecutor}, but only with the newer {@link AsyncExecutor}. There are two different implementations: - The
- * {@link ExecutorPerTenantAsyncExecutor}: creates one full {@link AsyncExecutor} for each tenant. - The {@link SharedExecutorServiceAsyncExecutor}: created acquisition threads for each tenant, but
+ * - There are two different implementations: - The {@link ExecutorPerTenantAsyncExecutor}: creates one full {@link AsyncExecutor} for each tenant. - The {@link SharedExecutorServiceAsyncExecutor}: created acquisition threads for each tenant, but
  * the job execution is done using a process engine shared {@link ExecutorService}. The {@link AsyncExecutor} needs to be injected using the {@link #setAsyncExecutor(AsyncExecutor)} method on this
  * class.
  * 
@@ -60,8 +58,6 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiSchemaMultiTenantProcessEngineConfiguration.class);
 
     protected TenantInfoHolder tenantInfoHolder;
     protected boolean booted;
@@ -148,7 +144,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     }
 
     protected void createTenantSchema(String tenantId) {
-        LOGGER.info("creating/validating database schema for tenant {}", tenantId);
+        logger.info("creating/validating database schema for tenant {}", tenantId);
         tenantInfoHolder.setCurrentTenantId(tenantId);
         getCommandExecutor().execute(getSchemaCommandConfig(), new ExecuteSchemaOperationCommand(databaseSchemaUpdate));
         tenantInfoHolder.clearCurrentTenantId();
@@ -175,6 +171,11 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
             public void run() {
                 for (String tenantId : tenantInfoHolder.getAllTenants()) {
                     tenantInfoHolder.setCurrentTenantId(tenantId);
+
+                    if (asyncExecutor != null) {
+                        commandExecutor.execute(new ClearProcessInstanceLockTimesCmd(asyncExecutor.getLockOwner()));
+                    }
+
                     commandExecutor.execute(getProcessEngineCloseCommand());
                     tenantInfoHolder.clearCurrentTenantId();
                 }
@@ -183,7 +184,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     }
 
     public Command<Void> getProcessEngineCloseCommand() {
-        return new Command<Void>() {
+        return new Command<>() {
             @Override
             public Void execute(CommandContext commandContext) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor().execute(new SchemaOperationProcessEngineClose());

@@ -35,15 +35,21 @@ public class FlowableHttpRequestHandlerParser extends BaseChildElementParser {
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS))) {
             requestHandler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_CLASS));
             requestHandler.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-            
+
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION))) {
             requestHandler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_DELEGATEEXPRESSION));
             requestHandler.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+        } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_TYPE))) {
+            requestHandler.setImplementationType(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_TYPE));
         }
-        
+
         if (parentElement instanceof HttpServiceTask) {
             ((HttpServiceTask) parentElement).setHttpRequestHandler(requestHandler);
-            parseChildElements(xtr, requestHandler, model, new FieldExtensionParser());
+            if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(requestHandler.getImplementationType())) {
+                parseChildElements(xtr, requestHandler, model, new ScriptInfoParser());
+            } else {
+                parseChildElements(xtr, requestHandler, model, new FieldExtensionParser());
+            }
         }
     }
 

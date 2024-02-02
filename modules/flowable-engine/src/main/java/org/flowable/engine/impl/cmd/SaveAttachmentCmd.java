@@ -15,11 +15,13 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -40,12 +42,13 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
 
     @Override
     public Object execute(CommandContext commandContext) {
-        AttachmentEntity updateAttachment = CommandContextUtil.getAttachmentEntityManager().findById(attachment.getId());
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        AttachmentEntity updateAttachment = processEngineConfiguration.getAttachmentEntityManager().findById(attachment.getId());
 
         String processInstanceId = updateAttachment.getProcessInstanceId();
         String processDefinitionId = null;
         if (updateAttachment.getProcessInstanceId() != null) {
-            ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+            ExecutionEntity process = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
             if (process != null) {
                 processDefinitionId = process.getProcessDefinitionId();
                 if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, process.getProcessDefinitionId())) {
@@ -59,9 +62,11 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
         updateAttachment.setName(attachment.getName());
         updateAttachment.setDescription(attachment.getDescription());
 
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, 
+                    attachment, processInstanceId, processInstanceId, processDefinitionId),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return null;

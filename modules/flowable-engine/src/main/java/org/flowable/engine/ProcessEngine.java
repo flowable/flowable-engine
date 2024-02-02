@@ -12,7 +12,8 @@
  */
 package org.flowable.engine;
 
-import org.flowable.engine.common.impl.FlowableVersions;
+import org.flowable.common.engine.api.Engine;
+import org.flowable.common.engine.impl.FlowableVersions;
 
 /**
  * Provides access to all the services that expose the BPM and workflow operations.
@@ -21,7 +22,7 @@ import org.flowable.engine.common.impl.FlowableVersions;
  * <li><b>{@link org.flowable.engine.RuntimeService}: </b> Allows the creation of {@link org.flowable.engine.repository.Deployment}s and the starting of and searching on
  * {@link org.flowable.engine.runtime.ProcessInstance}s.</li>
  * <li><b>{@link org.flowable.engine.TaskService}: </b> Exposes operations to manage human (standalone) {@link org.flowable.task.api.Task}s, such as claiming, completing and assigning tasks</li>
- * <li><b>{@link org.flowable.engine.IdentityService}: </b> Used for managing {@link org.flowable.idm.api.User}s, {@link org.flowable.idm.api.Group}s and the relations between them<</li>
+ * <li><b>{@link org.flowable.engine.IdentityService}: </b> Used for managing users, groups and the relations between them</li>
  * <li><b>{@link org.flowable.engine.ManagementService}: </b> Exposes engine admin and maintenance operations</li>
  * <li><b>{@link org.flowable.engine.HistoryService}: </b> Service exposing information about ongoing and past process instances.</li>
  * </ul>
@@ -33,17 +34,15 @@ import org.flowable.engine.common.impl.FlowableVersions;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface ProcessEngine {
+public interface ProcessEngine extends Engine {
 
     /** the version of the flowable library */
-    public static String VERSION = FlowableVersions.CURRENT_VERSION;
+    String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default
+     * Starts the executors (async and async history), if they are configured to be auto-activated.
      */
-    String getName();
-
-    void close();
+    void startExecutors();
 
     RepositoryService getRepositoryService();
 
@@ -60,6 +59,8 @@ public interface ProcessEngine {
     ManagementService getManagementService();
 
     DynamicBpmnService getDynamicBpmnService();
+
+    ProcessMigrationService getProcessMigrationService();
 
     ProcessEngineConfiguration getProcessEngineConfiguration();
 }

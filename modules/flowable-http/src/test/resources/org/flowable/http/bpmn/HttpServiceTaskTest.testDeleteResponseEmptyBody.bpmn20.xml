@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="testDeleteResponse" name="testDeleteResponse" isExecutable="true">
+    <startEvent id="startEvent1"></startEvent>
+    <serviceTask id="httpServiceTask" name="Get Data" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[DELETE]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://localhost:9798/delete]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="responseVariableName">
+          <flowable:string><![CDATA[myResponse]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="saveResponseVariableAsJson">
+          <flowable:expression><![CDATA[${true}]]></flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="startEvent1-httpServiceTask" sourceRef="startEvent1" targetRef="httpServiceTask"></sequenceFlow>
+    <receiveTask id="waitTask" name="waitTask" />
+    <sequenceFlow id="httpServiceTask-waitTask" sourceRef="httpServiceTask" targetRef="waitTask"></sequenceFlow>
+    <endEvent id="endEvent"></endEvent>
+    <sequenceFlow id="waitTask-endEvent" sourceRef="waitTask" targetRef="endEvent"></sequenceFlow>
+  </process>
+</definitions>

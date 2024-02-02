@@ -13,6 +13,7 @@
 
 package org.flowable.dmn.spring;
 
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.springframework.beans.BeansException;
@@ -48,19 +49,16 @@ public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableB
 
     @Override
     public DmnEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
+        
+        if (dmnEngineConfiguration.getBeans() == null) {
+            dmnEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.dmnEngine = dmnEngineConfiguration.buildDmnEngine();
         return this.dmnEngine;
     }
     
-    protected void configureExpressionManager() {
-        if (dmnEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(applicationContext, dmnEngineConfiguration.getBeans()));
-        }
-    }
-
     protected void configureExternallyManagedTransactions() {
         if (dmnEngineConfiguration instanceof SpringDmnEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
             SpringDmnEngineConfiguration engineConfiguration = (SpringDmnEngineConfiguration) dmnEngineConfiguration;

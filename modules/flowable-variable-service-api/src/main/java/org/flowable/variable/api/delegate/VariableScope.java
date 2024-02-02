@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
@@ -33,12 +33,19 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 public interface VariableScope extends VariableContainer {
 
     /**
+     * @return an empty (null object) variable scope.
+     */
+    public static VariableScope empty() {
+        return EmptyVariableScope.INSTANCE;
+    }
+
+    /**
      * Returns all variables. This will include all variables of parent scopes too.
      */
     Map<String, Object> getVariables();
 
     /**
-     * Returns all variables, as instances of the {@link VariableInstance} interface, which gives more information than only the the value (type, execution id, etc.)
+     * Returns all variables, as instances of the {@link VariableInstance} interface, which gives more information than only the value (type, execution id, etc.)
      */
     Map<String, VariableInstance> getVariableInstances();
 
@@ -53,15 +60,15 @@ public interface VariableScope extends VariableContainer {
     Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames);
 
     /**
-     * Similar to {@link #getVariables(Collection))}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
+     * Similar to {@link #getVariables(Collection)}, but with a flag that indicates that all variables should be fetched when fetching the specific variables.
      * 
      * If set to false, only the specific variables will be fetched. Depending on the use case, this can be better for performance, as it avoids fetching and processing the other variables. However,
-     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one {@link Command} execution).
+     * if the other variables are needed further on, getting them in one go is probably better (and the variables are cached during one Command execution).
      */
     Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables);
 
     /**
-     * Similar to {@link #getVariables(Collection, boolean)} but returns the variables as instances of the {@link VariableInstance} interface, which gives more information than only the the value
+     * Similar to {@link #getVariables(Collection, boolean)} but returns the variables as instances of the {@link VariableInstance} interface, which gives more information than only the value
      * (type, execution id, etc.)
      */
     Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables);
@@ -164,17 +171,19 @@ public interface VariableScope extends VariableContainer {
     Set<String> getVariableNamesLocal();
 
     /**
-     * Sets the variable with the provided name to the provided value.
+     * Sets the variable with the provided name to the provided value. In the case when variable name is an expression
+     * which is resolved by expression manager, the value is set in the object resolved from the expression.
      * 
      * <p>
      * A variable is set according to the following algorithm:
-     * 
-     * <p>
+     *
+     * <ul>
+     * <li>If variable name is an expression, resolve expression and set the value on the resolved object.</li>
      * <li>If this scope already contains a variable by the provided name as a <strong>local</strong> variable, its value is overwritten to the provided value.</li>
      * <li>If this scope does <strong>not</strong> contain a variable by the provided name as a local variable, the variable is set to this scope's parent scope, if there is one. If there is no parent
      * scope (meaning this scope is the root scope of the hierarchy it belongs to), this scope is used. This applies recursively up the parent scope chain until, if no scope contains a local variable
      * by the provided name, ultimately the root scope is reached and the variable value is set on that scope.</li>
-     * <p>
+     * </ul>
      * In practice for most cases, this algorithm will set variables to the scope of the execution at the process instance’s root level, if there is no execution-local variable by the provided name.
      * 
      * @param variableName
@@ -187,6 +196,7 @@ public interface VariableScope extends VariableContainer {
 
     /**
      * Similar to {@link #setVariable(String, Object)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
+     * Variable name expression is not resolved.
      * 
      * The variable will be put on the highest possible scope. For an execution this is the process instance execution. If this is not wanted, use the {@link #setVariableLocal(String, Object)} method
      * instead.
@@ -197,12 +207,13 @@ public interface VariableScope extends VariableContainer {
     void setVariable(String variableName, Object value, boolean fetchAllVariables);
 
     /**
-     * Similar to {@link #setVariable(String, Object)}, but the variable is set to this scope specifically.
+     * Similar to {@link #setVariable(String, Object)}, but the variable is set to this scope specifically. Variable name
+     is handled as a variable name string without resolving an expression.
      */
     Object setVariableLocal(String variableName, Object value);
 
     /**
-     * Similar to {@link #setVariableLocal(String, Object, value)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
+     * Similar to {@link #setVariableLocal(String, Object)}, but with an extra flag to indicate whether all variables should be fetched while doing this or not.
      */
     Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables);
 
@@ -244,32 +255,32 @@ public interface VariableScope extends VariableContainer {
     boolean hasVariableLocal(String variableName);
 
     /**
-     * Removes the variable and creates a new;@link HistoricVariableUpdateEntity}
+     * Removes the variable and creates a new HistoricVariableUpdate.
      */
     void removeVariable(String variableName);
 
     /**
-     * Removes the local variable and creates a new {@link HistoricVariableUpdate}.
+     * Removes the local variable and creates a new HistoricVariableUpdate.
      */
     void removeVariableLocal(String variableName);
 
     /**
-     * Removes the variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables(Collection<String> variableNames);
 
     /**
-     * Removes the local variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the local variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal(Collection<String> variableNames);
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariables();
 
     /**
-     * Removes the (local) variables and creates a new {@link HistoricVariableUpdate} for each of them.
+     * Removes the (local) variables and creates a new HistoricVariableUpdate for each of them.
      */
     void removeVariablesLocal();
 
@@ -279,6 +290,7 @@ public interface VariableScope extends VariableContainer {
      * - no history is kept for the variable - the variable is only available until a waitstate is reached in the process - transient variables 'shadow' persistent variable (when getVariable('abc')
      * where 'abc' is both persistent and transient, the transient value is returned.
      */
+    @Override
     void setTransientVariable(String variableName, Object variableValue);
 
     /**

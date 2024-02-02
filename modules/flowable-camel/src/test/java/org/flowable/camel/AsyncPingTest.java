@@ -12,6 +12,8 @@
  */
 package org.flowable.camel;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -22,13 +24,17 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Saeid Mirzaei
  */
+@Tag("camel")
 @ContextConfiguration("classpath:generic-camel-flowable-context.xml")
 public class AsyncPingTest extends SpringFlowableTestCase {
 
@@ -38,7 +44,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
     @Autowired
     protected RuntimeService runtimeService;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -50,29 +56,30 @@ public class AsyncPingTest extends SpringFlowableTestCase {
         });
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
-            camelContext.stopRoute(r.getId());
+            camelContext.getRouteController().stopRoute(r.getId());
             camelContext.removeRoute(r.getId());
         }
     }
 
+    @Test
     @Deployment(resources = { "process/asyncPing.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncPingProcess");
 
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
-        Assert.assertEquals(2, executionList.size());
+        assertThat(executionList).hasSize(2);
 
         managementService.executeJob(managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult().getId());
         Thread.sleep(1500);
 
         executionList = runtimeService.createExecutionQuery().list();
-        Assert.assertEquals(0, executionList.size());
+        assertThat(executionList).isEmpty();
 
-        Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
 
 }

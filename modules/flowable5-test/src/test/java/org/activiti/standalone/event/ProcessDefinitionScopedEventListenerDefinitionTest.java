@@ -17,10 +17,11 @@ import java.util.List;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.test.api.event.StaticTestFlowableEventListener;
 import org.activiti.engine.test.api.event.TestFlowableEventListener;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -99,9 +100,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
             fail("Exception expected");
 
         } catch (FlowableException ae) {
-            assertEquals("Exception while executing event-listener", ae.getMessage());
-            assertTrue(ae.getCause() instanceof org.activiti.engine.ActivitiException);
-            assertEquals("couldn't instantiate class org.activiti.engine.test.api.event.UnexistingClass", ae.getCause().getMessage());
+            assertEquals("couldn't instantiate class org.activiti.engine.test.api.event.UnexistingClass", ae.getMessage());
         }
     }
 
@@ -122,7 +121,8 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
             fail("Exception expected");
 
         } catch (FlowableException ae) {
-            assertEquals("Invalid event-type: invalid", ae.getCause().getMessage());
+            assertTrue(ae instanceof FlowableIllegalArgumentException);
+            assertEquals("Invalid event-type: invalid", ae.getMessage());
         } finally {
             if (deployment != null) {
                 repositoryService.deleteDeployment(deployment.getId(), true);

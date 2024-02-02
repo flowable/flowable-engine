@@ -13,11 +13,7 @@
 
 package org.flowable.management.jmx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.management.JMException;
 import javax.management.MBeanAttributeInfo;
@@ -47,52 +43,50 @@ public class MBeanInfoAssemblerTest {
     public void testNullInputs() throws JMException {
 
         // at least one of the first parameters should be not null
-        assertNull(mbeanInfoAssembler.getMBeanInfo(null, null, ""));
+        assertThat(mbeanInfoAssembler.getMBeanInfo(null, null, "")).isNull();
 
         // mbean should be not null
-        assertNull(mbeanInfoAssembler.getMBeanInfo(testMbean, testMbean, null));
+        assertThat(mbeanInfoAssembler.getMBeanInfo(testMbean, testMbean, null)).isNull();
 
         // it should return something if at least one of the first parameters
         // are
         // not null
         NotManagedMBean notManagedMbean = new NotManagedMBean();
-        assertNotNull(mbeanInfoAssembler.getMBeanInfo(null, notManagedMbean, "someName"));
-        assertNotNull(mbeanInfoAssembler.getMBeanInfo(notManagedMbean, null, "someName"));
+        assertThat(mbeanInfoAssembler.getMBeanInfo(null, notManagedMbean, "someName")).isNotNull();
+        assertThat(mbeanInfoAssembler.getMBeanInfo(notManagedMbean, null, "someName")).isNotNull();
 
     }
 
     @Test
     public void testReadAttributeInfoHappyPath() throws JMException {
         ModelMBeanInfo beanInfo = mbeanInfoAssembler.getMBeanInfo(testMbean, null, "someName");
-        assertNotNull(beanInfo);
+        assertThat(beanInfo).isNotNull();
 
-        assertEquals("test description", beanInfo.getDescription());
+        assertThat(beanInfo.getDescription()).isEqualTo("test description");
         MBeanAttributeInfo[] testAttributes = beanInfo.getAttributes();
-        assertNotNull(testAttributes);
-        assertEquals(2, testAttributes.length);
+        assertThat(testAttributes).hasSize(2);
 
         int counter = 0;
         for (MBeanAttributeInfo info : testAttributes) {
-            if (info.getName().equals("TestAttributeBoolean")) {
+            if ("TestAttributeBoolean".equals(info.getName())) {
                 counter++;
-                assertEquals("test attribute Boolean description", info.getDescription());
-                assertEquals("java.lang.Boolean", info.getType());
-                assertTrue(info.isReadable());
-                assertFalse(info.isWritable());
-            } else if (info.getName().equals("TestAttributeString")) {
+                assertThat(info.getDescription()).isEqualTo("test attribute Boolean description");
+                assertThat(info.getType()).isEqualTo("java.lang.Boolean");
+                assertThat(info.isReadable()).isTrue();
+                assertThat(info.isWritable()).isFalse();
+            } else if ("TestAttributeString".equals(info.getName())) {
                 counter++;
-                assertEquals("test attribute String description", info.getDescription());
-                assertEquals("java.lang.String", info.getType());
-                assertTrue(info.isReadable());
-                assertFalse(info.isWritable());
+                assertThat(info.getDescription()).isEqualTo("test attribute String description");
+                assertThat(info.getType()).isEqualTo("java.lang.String");
+                assertThat(info.isReadable()).isTrue();
+                assertThat(info.isWritable()).isFalse();
             }
         }
-        assertEquals(2, counter);
+        assertThat(counter).isEqualTo(2);
 
         // check the single operation
 
-        assertNotNull(beanInfo.getOperations());
-        assertEquals(3, beanInfo.getOperations().length);
+        assertThat(beanInfo.getOperations()).hasSize(3);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -129,11 +123,9 @@ public class MBeanInfoAssemblerTest {
     @Test
     public void testInherited() throws JMException {
         ModelMBeanInfo beanInfo = mbeanInfoAssembler.getMBeanInfo(new BadInherited(), null, "someName");
-        assertNotNull(beanInfo);
-        assertNotNull(beanInfo.getAttributes());
-        assertEquals(2, beanInfo.getAttributes().length);
-        assertNotNull(beanInfo.getOperations());
-        assertEquals(3, beanInfo.getOperations().length);
+        assertThat(beanInfo).isNotNull();
+        assertThat(beanInfo.getAttributes()).hasSize(2);
+        assertThat(beanInfo.getOperations()).hasSize(3);
 
     }
 

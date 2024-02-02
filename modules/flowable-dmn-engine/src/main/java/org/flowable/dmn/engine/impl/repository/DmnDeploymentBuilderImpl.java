@@ -12,11 +12,13 @@
  */
 package org.flowable.dmn.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -27,7 +29,6 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Tijs Rademakers
@@ -35,7 +36,6 @@ import org.flowable.engine.common.api.FlowableException;
 public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient DmnRepositoryServiceImpl repositoryService;
     protected transient DmnResourceEntityManager resourceEntityManager;
@@ -61,7 +61,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         try {
             bytes = IOUtils.toByteArray(inputStream);
         } catch (Exception e) {
-            throw new FlowableException("could not get byte array from resource '" + resourceName + "'");
+            throw new FlowableException("could not get byte array from resource '" + resourceName + "'", e);
         }
 
         if (bytes == null) {
@@ -77,11 +77,15 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
     @Override
     public DmnDeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (inputStream == null) {
+                throw new FlowableException("resource '" + resource + "' not found");
+            }
+            return addInputStream(resource, inputStream);
+            
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
     }
 
     @Override
@@ -92,11 +96,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
         DmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get decision table bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }
@@ -117,12 +117,8 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
     @Override
     public DmnDeploymentBuilder addDmnModel(String resourceName, DmnDefinition dmnDefinition) {
         DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
-        try {
-            String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), "UTF-8");
-            addString(resourceName, dmn20Xml);
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Error while transforming DMN model to xml: not UTF-8 encoded", e);
-        }
+        String dmn20Xml = new String(dmnXMLConverter.convertToXML(dmnDefinition), StandardCharsets.UTF_8);
+        addString(resourceName, dmn20Xml);
         return this;
     }
 

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,23 +13,29 @@
 
 package org.flowable.idm.engine.test.api.identity;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.Arrays;
 import java.util.List;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
         createGroup("muppets", "Muppet show characters", "user");
         createGroup("frogs", "Famous frogs", "user");
@@ -53,7 +59,7 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         idmIdentityService.deleteUser("kermit");
         idmIdentityService.deleteUser("fozzie");
@@ -63,26 +69,33 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         idmIdentityService.deleteGroup("mammals");
         idmIdentityService.deleteGroup("frogs");
         idmIdentityService.deleteGroup("admin");
-
-        super.tearDown();
     }
 
+    @Test
     public void testQueryById() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupId("muppets");
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidId() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupId("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createGroupQuery().groupId(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupId(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupIds(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
+    public void testQueryByIds() {
+        GroupQuery query = idmIdentityService.createGroupQuery().groupIds(Arrays.asList("muppets", "frogs", "dummy"));
+        verifyQueryResults(query, 2);
+    }
+
+    @Test
     public void testQueryByName() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupName("Muppet show characters");
         verifyQueryResults(query, 1);
@@ -91,17 +104,16 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidName() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupName("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createGroupQuery().groupName(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupName(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
     public void testQueryByNameLike() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%Famous%");
         verifyQueryResults(query, 2);
@@ -113,17 +125,16 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 1);
     }
 
+    @Test
     public void testQueryByInvalidNameLike() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLike("%invalid%");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createGroupQuery().groupNameLike(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupNameLike(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
     public void testQueryByNameLikeIgnoreCase() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%FAMOus%");
         verifyQueryResults(query, 2);
@@ -133,8 +144,12 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         query = idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase("%SHoW%");
         verifyQueryResults(query, 1);
+
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupNameLikeIgnoreCase(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
     public void testQueryByType() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupType("user");
         verifyQueryResults(query, 3);
@@ -143,17 +158,16 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
         verifyQueryResults(query, 0);
     }
 
+    @Test
     public void testQueryByInvalidType() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupType("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createGroupQuery().groupType(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupType(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
     public void testQueryByMember() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupMember("fozzie");
         verifyQueryResults(query, 2);
@@ -163,114 +177,123 @@ public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
         query = query.orderByGroupId().asc();
         List<Group> groups = query.list();
-        assertEquals(3, groups.size());
-        assertEquals("admin", groups.get(0).getId());
-        assertEquals("frogs", groups.get(1).getId());
-        assertEquals("muppets", groups.get(2).getId());
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "frogs", "muppets");
 
         query = query.groupType("user");
         groups = query.list();
-        assertEquals(2, groups.size());
-        assertEquals("frogs", groups.get(0).getId());
-        assertEquals("muppets", groups.get(1).getId());
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("frogs", "muppets");
     }
 
+    @Test
     public void testQueryByInvalidMember() {
         GroupQuery query = idmIdentityService.createGroupQuery().groupMember("invalid");
         verifyQueryResults(query, 0);
 
-        try {
-            idmIdentityService.createGroupQuery().groupMember(null).list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupMember(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
+    @Test
+    public void testQueryByGroupMembers() {
+        List<Group> groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().list();
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "frogs", "mammals", "muppets");
+
+        groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("fozzie")).orderByGroupId().asc().list();
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("mammals", "muppets");
+
+        groups = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("kermit", "fozzie")).orderByGroupId().asc().listPage(1, 2);
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("frogs", "mammals");
+    }
+
+    @Test
+    public void testQueryByInvalidGroupMember() {
+        GroupQuery query = idmIdentityService.createGroupQuery().groupMembers(Arrays.asList("invalid"));
+        verifyQueryResults(query, 0);
+
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().groupMembers(null).list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
     public void testQuerySorting() {
         // asc
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupId().asc().count());
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupName().asc().count());
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupType().asc().count());
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupId().asc().count()).isEqualTo(4);
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupName().asc().count()).isEqualTo(4);
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupType().asc().count()).isEqualTo(4);
 
         // desc
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupId().desc().count());
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupName().desc().count());
-        assertEquals(4, idmIdentityService.createGroupQuery().orderByGroupType().desc().count());
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupId().desc().count()).isEqualTo(4);
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupName().desc().count()).isEqualTo(4);
+        assertThat(idmIdentityService.createGroupQuery().orderByGroupType().desc().count()).isEqualTo(4);
 
         // Multiple sortings
         GroupQuery query = idmIdentityService.createGroupQuery().orderByGroupType().asc().orderByGroupName().desc();
         List<Group> groups = query.list();
-        assertEquals(4, query.count());
+        assertThat(groups)
+                .extracting(Group::getType)
+                .containsExactly("security", "user", "user", "user");
 
-        assertEquals("security", groups.get(0).getType());
-        assertEquals("user", groups.get(1).getType());
-        assertEquals("user", groups.get(2).getType());
-        assertEquals("user", groups.get(3).getType());
-
-        assertEquals("admin", groups.get(0).getId());
-        assertEquals("muppets", groups.get(1).getId());
-        assertEquals("mammals", groups.get(2).getId());
-        assertEquals("frogs", groups.get(3).getId());
+        assertThat(groups)
+                .extracting(Group::getId)
+                .containsExactly("admin", "muppets", "mammals", "frogs");
     }
 
+    @Test
     public void testQueryInvalidSortingUsage() {
-        try {
-            idmIdentityService.createGroupQuery().orderByGroupId().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
-
-        try {
-            idmIdentityService.createGroupQuery().orderByGroupId().orderByGroupName().list();
-            fail();
-        } catch (FlowableIllegalArgumentException e) {
-        }
+        assertThatThrownBy(() -> idmIdentityService.createGroupQuery().orderByGroupName().list())
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     private void verifyQueryResults(GroupQuery query, int countExpected) {
-        assertEquals(countExpected, query.list().size());
-        assertEquals(countExpected, query.count());
+        assertThat(query.list()).hasSize(countExpected);
+        assertThat(query.count()).isEqualTo(countExpected);
 
         if (countExpected == 1) {
-            assertNotNull(query.singleResult());
+            assertThat(query.singleResult()).isNotNull();
         } else if (countExpected > 1) {
             verifySingleResultFails(query);
         } else if (countExpected == 0) {
-            assertNull(query.singleResult());
+            assertThat(query.singleResult()).isNull();
         }
     }
 
     private void verifySingleResultFails(GroupQuery query) {
-        try {
-            query.singleResult();
-            fail();
-        } catch (FlowableException e) {
-        }
+        assertThatThrownBy(() -> query.singleResult())
+                .isExactlyInstanceOf(FlowableException.class);
     }
 
+    @Test
     public void testNativeQuery() {
-        assertEquals("ACT_ID_GROUP", idmManagementService.getTableName(Group.class));
-        assertEquals("ACT_ID_GROUP", idmManagementService.getTableName(GroupEntity.class));
+        assertThat(idmManagementService.getTableName(Group.class)).isEqualTo("ACT_ID_GROUP");
+        assertThat(idmManagementService.getTableName(GroupEntity.class)).isEqualTo("ACT_ID_GROUP");
         String tableName = idmManagementService.getTableName(Group.class);
         String baseQuerySql = "SELECT * FROM " + tableName;
 
-        assertEquals(4, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).list().size());
+        assertThat(idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).list()).hasSize(4);
 
-        assertEquals(1, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").list().size());
+        assertThat(idmIdentityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").list()).hasSize(1);
 
-        assertEquals(
-                3,
-                idmIdentityService
-                        .createNativeGroupQuery()
-                        .sql(
-                                "SELECT aig.* from " + tableName + " aig" + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
-                                        + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
-                        .parameter("id", "kermit").list().size());
+        assertThat(idmIdentityService
+                .createNativeGroupQuery()
+                .sql(
+                        "SELECT aig.* from " + tableName + " aig" + " inner join ACT_ID_MEMBERSHIP aim on aig.ID_ = aim.GROUP_ID_ "
+                                + " inner join ACT_ID_USER aiu on aiu.ID_ = aim.USER_ID_ where aiu.ID_ = #{id}")
+                .parameter("id", "kermit").list()).hasSize(3);
 
         // paging
-        assertEquals(2, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).listPage(0, 2).size());
-        assertEquals(3, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).listPage(1, 3).size());
-        assertEquals(1, idmIdentityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").listPage(0, 1).size());
+        assertThat(idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
+        assertThat(idmIdentityService.createNativeGroupQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(3);
+        assertThat(idmIdentityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").listPage(0, 1)).hasSize(1);
     }
 
 }

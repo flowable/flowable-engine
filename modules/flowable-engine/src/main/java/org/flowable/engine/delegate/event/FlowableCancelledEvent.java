@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 /**
  * @author martin.grofcik
  */
@@ -20,5 +20,5 @@ public interface FlowableCancelledEvent extends FlowableEngineEvent {
     /**
      * @return the cause of the cancel event. Returns null, if no specific cause has been specified.
      */
-    public Object getCause();
+    Object getCause();
 }

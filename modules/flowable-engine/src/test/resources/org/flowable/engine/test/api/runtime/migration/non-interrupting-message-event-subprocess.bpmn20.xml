@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <message id="myMessage" name="someMessage"/>
+
+    <process id="nonInterruptingMessageEventSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="processTask"/>
+        <userTask id="processTask"/>
+        <sequenceFlow id="flow2" sourceRef="processTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+        <subProcess id="eventSubProcess" triggeredByEvent="true">
+            <startEvent id="eventSubProcessStart" isInterrupting="false">
+                <messageEventDefinition messageRef="myMessage"/>
+            </startEvent>
+            <sequenceFlow id="subProcessFlow1" sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+            <userTask id="eventSubProcessTask"/>
+            <sequenceFlow id="subProcessFlow2" sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <endEvent id="eventSubProcessEnd" />
+        </subProcess>
+    </process>
+
+</definitions>

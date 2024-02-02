@@ -13,18 +13,22 @@
 
 package org.flowable.engine.test.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class ConnectionPoolTest extends AbstractTestCase {
 
+    @Test
     public void testMyBatisConnectionPoolProperlyConfigured() {
         ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
                 .createProcessEngineConfigurationFromResource("org/flowable/engine/test/db/connection-pool.flowable.cfg.xml");
@@ -37,21 +41,21 @@ public class ConnectionPoolTest extends AbstractTestCase {
         int maxCheckoutTime = 30000;
         int maxWaitTime = 25000;
 
-        assertEquals(maxActive, config.getJdbcMaxActiveConnections());
-        assertEquals(maxIdle, config.getJdbcMaxIdleConnections());
-        assertEquals(maxCheckoutTime, config.getJdbcMaxCheckoutTime());
-        assertEquals(maxWaitTime, config.getJdbcMaxWaitTime());
+        assertThat(config.getJdbcMaxActiveConnections()).isEqualTo(maxActive);
+        assertThat(config.getJdbcMaxIdleConnections()).isEqualTo(maxIdle);
+        assertThat(config.getJdbcMaxCheckoutTime()).isEqualTo(maxCheckoutTime);
+        assertThat(config.getJdbcMaxWaitTime()).isEqualTo(maxWaitTime);
 
         // Verify that these properties are correctly set in the MyBatis
         // datasource
         DataSource datasource = config.getDbSqlSessionFactory().getSqlSessionFactory().getConfiguration().getEnvironment().getDataSource();
-        assertTrue(datasource instanceof PooledDataSource);
+        assertThat(datasource).isInstanceOf(PooledDataSource.class);
 
         PooledDataSource pooledDataSource = (PooledDataSource) datasource;
-        assertEquals(maxActive, pooledDataSource.getPoolMaximumActiveConnections());
-        assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
-        assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
-        assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
+        assertThat(pooledDataSource.getPoolMaximumActiveConnections()).isEqualTo(maxActive);
+        assertThat(pooledDataSource.getPoolMaximumIdleConnections()).isEqualTo(maxIdle);
+        assertThat(pooledDataSource.getPoolMaximumCheckoutTime()).isEqualTo(maxCheckoutTime);
+        assertThat(pooledDataSource.getPoolTimeToWait()).isEqualTo(maxWaitTime);
     }
 
 }

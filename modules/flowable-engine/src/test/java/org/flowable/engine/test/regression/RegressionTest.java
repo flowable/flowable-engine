@@ -13,6 +13,7 @@
 package org.flowable.engine.test.regression;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * All tests that do not belong to any other test case, but test a supposedly working feature go here.
@@ -23,6 +24,7 @@ public class RegressionTest extends PluggableFlowableTestCase {
 
     // https://jira.codehaus.org/browse/ACT-1623
     // NPE when eventbased gateway is after referenced event
+    @Test
     public void testAct1623() throws Exception {
 
         // Deploy processes

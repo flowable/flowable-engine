@@ -12,13 +12,16 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
@@ -44,6 +47,12 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceBySubScopeIdAndScopeTypeMatcher 
         = new HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher();
+    
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    
+    public MybatisHistoricVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
+    }
     
     @Override
     public Class<? extends HistoricVariableInstanceEntity> getManagedEntityClass() {
@@ -112,5 +121,49 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     public long findHistoricVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectHistoricVariableInstanceCountByNativeQuery", parameterMap);
     }
+    
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForProcessInstanceIds", createSafeInValuesList(processInstanceIds), HistoricVariableInstanceEntity.class);
+    }
+    
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForTaskIds", createSafeInValuesList(taskIds), HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForTaskIds", createSafeInValuesList(taskIds), HistoricVariableInstanceEntity.class);
+    }
 
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("scopeIds", createSafeInValuesList(scopeIds));
+        params.put("scopeType", scopeType);
+        
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
+    }
+
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingProcessInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances", null, HistoricVariableInstanceEntity.class);
+    }
+
+    @Override
+    public void deleteHistoricVariableInstancesForNonExistingCaseInstances() {
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForNonExistingCaseInstances", null, HistoricVariableInstanceEntity.class);
+    }
+
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return variableServiceConfiguration.getIdGenerator();
+    }
+    
 }

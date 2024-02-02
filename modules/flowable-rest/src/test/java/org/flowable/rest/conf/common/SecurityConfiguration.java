@@ -12,44 +12,52 @@
  */
 package org.flowable.rest.conf.common;
 
-import org.flowable.rest.security.BasicAuthenticationProvider;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.spring.security.FlowableAuthenticationProvider;
+import org.flowable.spring.security.FlowableUserDetailsService;
+import org.flowable.spring.security.SpringSecurityAuthenticationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, jsr250Enabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
+    public SecurityConfiguration() {
+        Authentication.setAuthenticationContext(new SpringSecurityAuthenticationContext());
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        return new BasicAuthenticationProvider();
+    public FlowableAuthenticationProvider authenticationProvider(IdmIdentityService idmIdentityService, UserDetailsService userDetailsService) {
+        return new FlowableAuthenticationProvider(idmIdentityService, userDetailsService);
     }
     
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.authenticationProvider(authenticationProvider())
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().csrf().disable()
-            .authorizeRequests()
-            .anyRequest()
-            .authenticated().and().httpBasic();
+    @Bean
+    public FlowableUserDetailsService userDetailsService(IdmIdentityService identityService) {
+        return new FlowableUserDetailsService(identityService);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
+        http.authenticationProvider(authenticationProvider)
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
+
+        return http.build();
     }
     
     /* Needed for allowing slashes in urls, needed for getting deployment resources */
@@ -59,11 +67,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }
-    
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.httpFirewall(defaultFireWall());
-        super.configure(web);
-    }
 
+    @Bean
+    public WebSecurityCustomizer fireWallCustomizer(HttpFirewall defaultFireWall) {
+        return web -> web.httpFirewall(defaultFireWall);
+    }
 }

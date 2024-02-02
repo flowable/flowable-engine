@@ -1,0 +1,11 @@
+{
+    "key": "customPartitionRoundRobin",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-custom-partition-round-robin",
+    "serializerType": "json",
+    "partition": {
+        "roundRobin": "1-3"
+    }
+}

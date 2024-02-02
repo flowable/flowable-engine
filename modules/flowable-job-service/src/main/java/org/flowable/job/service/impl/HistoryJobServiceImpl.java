@@ -14,6 +14,7 @@ package org.flowable.job.service.impl;
 
 import java.util.List;
 
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -23,10 +24,6 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
  * @author Tijs Rademakers
  */
 public class HistoryJobServiceImpl extends ServiceImpl implements HistoryJobService {
-
-    public HistoryJobServiceImpl() {
-
-    }
 
     public HistoryJobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);
@@ -44,7 +41,7 @@ public class HistoryJobServiceImpl extends ServiceImpl implements HistoryJobServ
 
     @Override
     public void scheduleHistoryJob(HistoryJobEntity historyJob) {
-        getJobManager().scheduleHistoryJob(historyJob);
+        getJobManager().scheduleHistoryJob(historyJob, Context.getTransactionContext());
     }
 
     @Override

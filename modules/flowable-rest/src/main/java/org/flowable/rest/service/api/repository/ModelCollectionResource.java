@@ -13,6 +13,24 @@
 
 package org.flowable.rest.service.api.repository;
 
+import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.flowable.common.engine.api.query.QueryProperty;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.impl.ModelQueryProperty;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ModelQuery;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,22 +39,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.impl.ModelQueryProperty;
-import org.flowable.engine.repository.Model;
-import org.flowable.engine.repository.ModelQuery;
-import org.flowable.rest.api.DataResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -63,7 +65,7 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return models with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return models with a category like the given name.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return models which don’t have the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return models which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return models with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return models with the given key.", paramType = "query"),
@@ -81,7 +83,7 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
     @GetMapping(value = "/repository/models", produces = "application/json")
-    public DataResponse<ModelResponse> getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ModelResponse> getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -109,7 +111,7 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.modelVersion(Integer.valueOf(allRequestParams.get("version")));
         }
         if (allRequestParams.containsKey("latestVersion")) {
-            boolean isLatestVersion = Boolean.valueOf(allRequestParams.get("latestVersion"));
+            boolean isLatestVersion = Boolean.parseBoolean(allRequestParams.get("latestVersion"));
             if (isLatestVersion) {
                 modelQuery.latestVersion();
             }
@@ -118,7 +120,7 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.deploymentId(allRequestParams.get("deploymentId"));
         }
         if (allRequestParams.containsKey("deployed")) {
-            boolean isDeployed = Boolean.valueOf(allRequestParams.get("deployed"));
+            boolean isDeployed = Boolean.parseBoolean(allRequestParams.get("deployed"));
             if (isDeployed) {
                 modelQuery.deployed();
             } else {
@@ -132,21 +134,28 @@ public class ModelCollectionResource extends BaseModelResource {
             modelQuery.modelTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            boolean withoutTenantId = Boolean.valueOf(allRequestParams.get("withoutTenantId"));
+            boolean withoutTenantId = Boolean.parseBoolean(allRequestParams.get("withoutTenantId"));
             if (withoutTenantId) {
                 modelQuery.modelWithoutTenantId();
             }
         }
-        return new ModelsPaginateList(restResponseFactory).paginateList(allRequestParams, modelQuery, "id", allowedSortProperties);
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessModelInfoWithQuery(modelQuery);
+        }
+        
+        return paginateList(allRequestParams, modelQuery, "id", allowedSortProperties, restResponseFactory::createModelResponseList);
     }
 
     @ApiOperation(value = "Create a model", tags = {
-            "Models" }, notes = "All request values are optional. For example, you can only include the name attribute in the request body JSON-object, only setting the name of the model, leaving all other fields null.")
+            "Models" }, notes = "All request values are optional. For example, you can only include the name attribute in the request body JSON-object, only setting the name of the model, leaving all other fields null.",
+            code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the model was created.")
     })
     @PostMapping(value = "/repository/models", produces = "application/json")
-    public ModelResponse createModel(@RequestBody ModelRequest modelRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ModelResponse createModel(@RequestBody ModelRequest modelRequest) {
         Model model = repositoryService.newModel();
         model.setCategory(modelRequest.getCategory());
         model.setDeploymentId(modelRequest.getDeploymentId());
@@ -155,9 +164,13 @@ public class ModelCollectionResource extends BaseModelResource {
         model.setName(modelRequest.getName());
         model.setVersion(modelRequest.getVersion());
         model.setTenantId(modelRequest.getTenantId());
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createModel(model, modelRequest);
+        }
 
         repositoryService.saveModel(model);
-        response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createModelResponse(model);
     }
+
 }

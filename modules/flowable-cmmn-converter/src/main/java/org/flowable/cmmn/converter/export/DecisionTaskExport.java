@@ -12,33 +12,47 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.model.DecisionTask;
-
 import javax.xml.stream.XMLStreamWriter;
 
-import static org.flowable.cmmn.converter.export.ServiceTaskExport.writeExtensions;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.DecisionTask;
 
-public class DecisionTaskExport extends AbstractPlanItemDefinitionExport {
+public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<DecisionTask> {
 
-    public static void writeDecisionTask(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
-        // start decision task element
-        xtw.writeStartElement(ELEMENT_DECISION_TASK);
-        writeCommonTaskAttributes(xtw, decisionTask);
+    @Override
+    protected Class<DecisionTask> getExportablePlanItemDefinitionClass() {
+        return DecisionTask.class;
+    }
 
-        writeExtensions(decisionTask, xtw);
+    @Override
+    protected String getPlanItemDefinitionXmlElementValue(DecisionTask decisionTask) {
+        return ELEMENT_DECISION_TASK;
+    }
 
+    @Override
+    protected void writePlanItemDefinitionSpecificAttributes(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionSpecificAttributes(decisionTask, xtw);
+        TaskExport.writeCommonTaskAttributes(decisionTask, xtw);
+    }
+    
+    @Override
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, DecisionTask decisionTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, decisionTask, didWriteExtensionElement, xtw);
+        return TaskExport.writeTaskFieldExtensions(decisionTask, extensionElementWritten, xtw);
+    }
+
+    @Override
+    protected void writePlanItemDefinitionBody(CmmnModel model, DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
+        super.writePlanItemDefinitionBody(model, decisionTask, xtw);
         if (StringUtils.isNotEmpty(decisionTask.getDecisionRef()) || StringUtils.isNotEmpty(decisionTask.getDecisionRefExpression())) {
             xtw.writeStartElement(ELEMENT_DECISION_REF_EXPRESSION);
-                xtw.writeCData(
-                        StringUtils.isNotEmpty(decisionTask.getDecisionRef()) ?
-                            decisionTask.getDecisionRef():
+            xtw.writeCData(
+                    StringUtils.isNotEmpty(decisionTask.getDecisionRef()) ?
+                            decisionTask.getDecisionRef() :
                             decisionTask.getDecisionRefExpression()
-                );
+            );
             xtw.writeEndElement();
         }
-
-        // end decision task element
-        xtw.writeEndElement();
     }
 }

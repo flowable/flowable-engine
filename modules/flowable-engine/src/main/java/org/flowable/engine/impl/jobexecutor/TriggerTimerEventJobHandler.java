@@ -12,9 +12,11 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
@@ -37,8 +39,11 @@ public class TriggerTimerEventJobHandler implements JobHandler {
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
         CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job),
+                    processEngineConfiguration.getEngineCfgKey());
         }
     }
     

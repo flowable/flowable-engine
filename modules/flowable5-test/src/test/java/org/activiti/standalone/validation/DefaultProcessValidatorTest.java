@@ -59,7 +59,7 @@ public class DefaultProcessValidatorTest {
         Assert.assertNotNull(bpmnModel);
 
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
-        Assert.assertEquals(65, allErrors.size());
+        Assert.assertEquals(66, allErrors.size());
 
         String setName = ValidatorSetNames.FLOWABLE_EXECUTABLE_PROCESS; // shortening it a bit
 
@@ -172,6 +172,8 @@ public class DefaultProcessValidatorTest {
 
         // Event subprocesses
         problems = findErrors(allErrors, setName, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, 1);
+        assertCommonProblemFieldForActivity(problems.get(0));
+        problems = findErrors(allErrors, setName, Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, 1);
         assertCommonProblemFieldForActivity(problems.get(0));
 
         // Boundary events

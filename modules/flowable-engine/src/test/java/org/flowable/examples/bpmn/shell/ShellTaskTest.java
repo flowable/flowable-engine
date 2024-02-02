@@ -12,9 +12,15 @@
  */
 package org.flowable.examples.bpmn.shell;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 public class ShellTaskTest extends PluggableFlowableTestCase {
 
@@ -38,48 +44,52 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             return OsType.UNKOWN;
     }
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         osType = getSystemOsType();
     }
 
+    @Test
     public void testOsDetection() throws Exception {
-        assertNotSame(OsType.UNKOWN, osType);
+        assertThat(osType).isNotSameAs(OsType.UNKOWN);
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.WINDOWS)
     public void testEchoShellWindows() {
         if (osType == OsType.WINDOWS) {
 
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellWindows");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.LINUX)
     public void testEchoShellLinux() {
         if (osType == OsType.LINUX) {
 
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellLinux");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 
+    @Test
     @Deployment
+    @EnabledOnOs(OS.MAC)
     public void testEchoShellMac() {
         if (osType == OsType.MAC) {
 
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("echoShellMac");
 
             String st = (String) runtimeService.getVariable(pi.getId(), "resultVar");
-            assertNotNull(st);
-            assertTrue(st.startsWith("EchoTest"));
+            assertThat(st).startsWith("EchoTest");
         }
     }
 }

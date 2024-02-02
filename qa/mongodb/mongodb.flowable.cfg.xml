@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.flowable.mongodb.cfg.MongoDbProcessEngineConfiguration">
+  
+    <property name="connectionUrl" value="localhost:27017, localhost:27018, localhost:27019" />
+    <property name="disableIdmEngine" value="true" />
+
+    <property name="databaseSchemaUpdate" value="drop-create" />
+
+    <property name="asyncExecutorActivate" value="false" />
+    <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+    <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
+    
+    <property name="asyncFailedJobWaitTime" value="1" />
+
+    <property name="history" value="audit" />
+    <property name="asyncHistoryEnabled" value="false" />
+    <property name="enableProcessDefinitionHistoryLevel" value="true" />
+    
+    <property name="enableProcessDefinitionInfoCache" value="true" />
+
+    <property name="clock">
+        <bean class="org.flowable.common.engine.impl.util.TestClockImpl" />
+    </property>
+  </bean>
+  
+  <bean id="throwCustomExceptionBean" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean" />
+  <bean id="throwCustomExceptionDelegate" class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate" />
+
+</beans>

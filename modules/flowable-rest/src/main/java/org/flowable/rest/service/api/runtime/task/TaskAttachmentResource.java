@@ -13,13 +13,7 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
@@ -29,10 +23,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -44,37 +43,41 @@ public class TaskAttachmentResource extends TaskBaseResource {
     @ApiOperation(value = "Get an attachment on a task", tags = { "Task Attachments" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and attachment were found and the attachment is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks does not have a attachment with the given ID.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}", produces = "application/json")
-    public AttachmentResponse getAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletRequest request) {
+    public AttachmentResponse getAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId) {
 
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an attachment with id '" + attachmentId + "'.", Comment.class);
         }
 
         return restResponseFactory.createAttachmentResponse(attachment);
     }
 
-    @ApiOperation(value = "Delete an attachment on a task", tags = { "Task Attachments"})
+    @ApiOperation(value = "Delete an attachment on a task", tags = { "Task Attachments"}, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and attachment were found and the attachment is deleted. Response body is left empty intentionally."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")
+            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks does not have a attachment with the given ID.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}/attachments/{attachmentId}")
-    public void deleteAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAttachment(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "attachmentId") @PathVariable("attachmentId") String attachmentId) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         Attachment attachment = taskService.getAttachment(attachmentId);
         if (attachment == null || !task.getId().equals(attachment.getTaskId())) {
-            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' doesn't have an attachment with id '" + attachmentId + "'.", Comment.class);
+            throw new FlowableObjectNotFoundException("Task '" + task.getId() + "' does not have an attachment with id '" + attachmentId + "'.", Comment.class);
+        }
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteTaskAttachment(task, attachment);
         }
 
         taskService.deleteAttachment(attachmentId);
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

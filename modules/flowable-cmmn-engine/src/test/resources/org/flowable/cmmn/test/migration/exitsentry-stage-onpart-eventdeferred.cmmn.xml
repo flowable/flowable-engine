@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="Sentry On Part Test Case" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="Task 1" definitionRef="humanTask1"/>
+            <planItem id="planItem2" name="Stage" definitionRef="expandedStage1">
+                <exitCriterion id="cmmnExitSentry_1" sentryRef="sentrycmmnExitSentry_1" />
+            </planItem>
+            <sentry id="sentrycmmnExitSentry_1">
+                <planItemOnPart id="sentryOnPartcmmnExitSentry_1" sourceRef="stagePlanItem1">
+                  <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="sentryOnPartcmmnExitSentry_2" sourceRef="stagePlanItem2">
+                  <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="humanTask1" name="Task 1" flowable:assignee="${initiator}"/>
+            <stage id="expandedStage1" name="Stage">
+                <planItem id="stagePlanItem1" name="Stage task 1" definitionRef="stageHumanTask1" />
+                <planItem id="stagePlanItem2" name="Stage task 2" definitionRef="stageHumanTask2" />
+                <humanTask id="stageHumanTask1" name="Stage task 1" flowable:assignee="${initiator}" />
+                <humanTask id="stageHumanTask2" name="Stage task 2" flowable:assignee="${initiator}" />
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

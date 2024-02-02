@@ -14,12 +14,12 @@ package org.flowable.job.service.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +34,11 @@ public class UnlockExclusiveJobCmd implements Command<Object>, Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlockExclusiveJobCmd.class);
 
     protected Job job;
+    protected JobServiceConfiguration jobServiceConfiguration;
 
-    public UnlockExclusiveJobCmd(Job job) {
+    public UnlockExclusiveJobCmd(Job job, JobServiceConfiguration jobServiceConfiguration) {
         this.job = job;
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     @Override
@@ -51,8 +53,8 @@ public class UnlockExclusiveJobCmd implements Command<Object>, Serializable {
         }
 
         if (job.isExclusive()) {
-            if (job.getProcessInstanceId() != null) {
-                InternalJobManager jobScopeInterface = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
+            if (job.getProcessInstanceId() != null || job.getScopeId() != null) {
+                InternalJobManager jobScopeInterface = jobServiceConfiguration.getInternalJobManager();
                 if (jobScopeInterface != null) {
                     jobScopeInterface.clearJobScopeLock(job);
                 }

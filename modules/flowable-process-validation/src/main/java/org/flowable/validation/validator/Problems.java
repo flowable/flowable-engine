@@ -38,11 +38,13 @@ public interface Problems {
     String SEQ_FLOW_INVALID_TARGET = "flowable-seq-flow-invalid-target";
 
     String USER_TASK_LISTENER_IMPLEMENTATION_MISSING = "flowable-usertask-listener-implementation-missing";
+    String USER_TASK_LISTENER_MISSING_EVENT = "flowable-usertask-listener-event-missing";
 
     String SERVICE_TASK_INVALID_TYPE = "flowable-servicetask-invalid-type";
     String SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE = "flowable-servicetask-result-var-name-with-delegate";
     String SERVICE_TASK_MISSING_IMPLEMENTATION = "flowable-servicetask-missing-implementation";
     String SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF = "flowable-servicetask-webservice-invalid-operation-ref";
+    String SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME = "flowable-servicetask-use-local-scope-for-result-var-without-result-variable-name";
 
     String SEND_TASK_INVALID_IMPLEMENTATION = "flowable-sendtask-invalid-implementation";
     String SEND_TASK_INVALID_TYPE = "flowable-sendtask-invalid-type";
@@ -60,6 +62,13 @@ public interface Problems {
 
     String HTTP_TASK_NO_REQUEST_URL = "flowable-httptask-no-request-url";
     String HTTP_TASK_NO_REQUEST_METHOD = "flowable-httptask-no-request-method";
+    
+    String CASE_TASK_NO_CASE_DEFINITION_KEY = "flowable-casetask-no-case-definition-key";
+    
+    String SEND_EVENT_TASK_NO_EVENT_TYPE = "flowable-sendeventtask-no-event-type";
+    String SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL = "flowable-sendeventtask-no-outbound-channel";
+
+    String EXTERNAL_WORKER_TASK_NO_TOPIC = "flowable-externalworkertask-no-topic";
 
     String EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW = "flowable-exclusive-gateway-no-outgoing-seq-flow";
     String EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW = "flowable-exclusive-gateway-condition-not-allowed-on-single-seq-flow";
@@ -81,6 +90,7 @@ public interface Problems {
     String SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED = "flowable-subprocess-start-event-event-definition-not-allowed";
 
     String EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION = "flowable-event-subprocess-invalid-start-event-definition";
+    String EVENT_SUBPROCESS_BOUNDARY_EVENT = "flowable-event-subprocess-boundary-event";
 
     String BOUNDARY_EVENT_NO_EVENT_DEFINITION = "flowable-boundary-event-no-event-definition";
     String BOUNDARY_EVENT_INVALID_EVENT_DEFINITION = "flowable-boundary-event-invalid-event-definition";

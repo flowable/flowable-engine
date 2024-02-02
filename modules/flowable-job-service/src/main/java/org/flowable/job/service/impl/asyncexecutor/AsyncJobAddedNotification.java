@@ -12,14 +12,9 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.engine.common.impl.cfg.TransactionPropagation;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,18 +35,11 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
 
     @Override
     public void closed(CommandContext commandContext) {
-        CommandExecutor commandExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor();
-        CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
-        commandExecutor.execute(commandConfig, new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("notifying job executor of new job");
-                }
-                asyncExecutor.executeAsyncJob(job);
-                return null;
-            }
-        });
+        execute(commandContext);
+    }
+
+    public void execute(CommandContext commandContext) {
+        asyncExecutor.executeAsyncJob(job);
     }
 
     @Override
@@ -65,5 +53,14 @@ public class AsyncJobAddedNotification implements CommandContextCloseListener {
     @Override
     public void closeFailure(CommandContext commandContext) {
     }
+    
+    @Override
+    public Integer order() {
+        return 10;
+    }
 
+    @Override
+    public boolean multipleAllowed() {
+        return true;
+    }
 }

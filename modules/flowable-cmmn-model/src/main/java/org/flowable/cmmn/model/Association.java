@@ -15,7 +15,7 @@ package org.flowable.cmmn.model;
 /**
  * @author Tijs Rademakers
  */
-public class Association extends BaseElement {
+public class Association extends CmmnElement {
 
     protected String sourceRef;
     protected BaseElement sourceElement;
@@ -63,6 +63,7 @@ public class Association extends BaseElement {
         this.transitionEvent = transitionEvent;
     }
 
+    @Override
     public Association clone() {
         Association clone = new Association();
         clone.setValues(this);
@@ -73,5 +74,6 @@ public class Association extends BaseElement {
         super.setValues(otherElement);
         setSourceRef(otherElement.getSourceRef());
         setTargetRef(otherElement.getTargetRef());
+        setTransitionEvent(otherElement.getTransitionEvent());
     }
 }

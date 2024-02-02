@@ -5,13 +5,15 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
+
     <bean id="dataSource" class="org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy">
         <property name="targetDataSource">
             <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-                <property name="driverClass" value="org.h2.Driver"/>
-                <property name="url" value="jdbc:h2:mem:flowable-spring-async-executor-test;DB_CLOSE_DELAY=1000;mvcc=true;"/>
-                <property name="username" value="sa"/>
-                <property name="password" value=""/>
+                <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
+                <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+                <property name="username" value="${jdbc.username:sa}" />
+                <property name="password" value="${jdbc.password:}" />
             </bean>
         </property>
     </bean>
@@ -45,9 +47,13 @@
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
 
-    <bean id="springAsyncExecutor" class="org.flowable.spring.SpringAsyncExecutor">
+    <bean id="springAsyncExecutor" class="org.flowable.spring.job.service.SpringAsyncExecutor">
         <property name="taskExecutor">
-            <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+            <bean class="org.flowable.common.spring.async.SpringAsyncTaskExecutor">
+                <constructor-arg>
+                    <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+                </constructor-arg>
+            </bean>
         </property>
         <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
         <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />

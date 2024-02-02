@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -56,6 +56,19 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         params.put("tenantId", tenantId);
         return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestProcessDefinitionByKeyAndTenantId", params);
     }
+    
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKey(String processDefinitionKey) {
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestDerivedProcessDefinitionByKey", processDefinitionKey);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findLatestDerivedProcessDefinitionByKeyAndTenantId(String processDefinitionKey, String tenantId) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("processDefinitionKey", processDefinitionKey);
+        params.put("tenantId", tenantId);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectLatestDerivedProcessDefinitionByKeyAndTenantId", params);
+    }
 
     @Override
     public void deleteProcessDefinitionsByDeploymentId(String deploymentId) {
@@ -65,11 +78,13 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
     @Override
     @SuppressWarnings("unchecked")
     public List<ProcessDefinition> findProcessDefinitionsByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        setSafeInValueLists(processDefinitionQuery);
         return getDbSqlSession().selectList("selectProcessDefinitionsByQueryCriteria", processDefinitionQuery);
     }
 
     @Override
     public long findProcessDefinitionCountByQueryCriteria(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        setSafeInValueLists(processDefinitionQuery);
         return (Long) getDbSqlSession().selectOne("selectProcessDefinitionCountByQueryCriteria", processDefinitionQuery);
     }
 
@@ -88,6 +103,23 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         parameters.put("processDefinitionKey", processDefinitionKey);
         parameters.put("tenantId", tenantId);
         return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByDeploymentAndKeyAndTenantId", parameters);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKey(String parentDeploymentId, String processDefinitionKey) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("processDefinitionKey", processDefinitionKey);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByParentDeploymentAndKey", parameters);
+    }
+
+    @Override
+    public ProcessDefinitionEntity findProcessDefinitionByParentDeploymentAndKeyAndTenantId(String parentDeploymentId, String processDefinitionKey, String tenantId) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("parentDeploymentId", parentDeploymentId);
+        parameters.put("processDefinitionKey", processDefinitionKey);
+        parameters.put("tenantId", tenantId);
+        return (ProcessDefinitionEntity) getDbSqlSession().selectOne("selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", parameters);
     }
 
     @Override
@@ -115,7 +147,7 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "'.");
+            throw new FlowableException("There are " + results.size() + " process definitions with key = '" + processDefinitionKey + "' and version = '" + processDefinitionVersion + "' in tenant='" + tenantId + "'.");
         }
         return null;
     }
@@ -136,7 +168,20 @@ public class MybatisProcessDefinitionDataManager extends AbstractProcessDataMana
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateProcessDefinitionTenantIdForDeploymentId", params);
+        getDbSqlSession().directUpdate("updateProcessDefinitionTenantIdForDeploymentId", params);
     }
 
+    @Override
+    public void updateProcessDefinitionVersionForProcessDefinitionId(String processDefinitionId, int version) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("processDefinitionId", processDefinitionId);
+        params.put("version", version);
+        getDbSqlSession().directUpdate("updateProcessDefinitionVersionForProcessDefinitionId", params);
+    }
+
+    protected void setSafeInValueLists(ProcessDefinitionQueryImpl processDefinitionQuery) {
+        if (processDefinitionQuery.getAuthorizationGroups() != null) {
+            processDefinitionQuery.setSafeAuthorizationGroups(createSafeInValuesList(processDefinitionQuery.getAuthorizationGroups()));
+        }
+    }
 }

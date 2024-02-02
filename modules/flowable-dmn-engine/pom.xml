@@ -10,7 +10,7 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.3.0-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -35,6 +35,10 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-xml-converter</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-dmn-image-generator</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine-common-api</artifactId>
@@ -50,10 +54,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -104,8 +104,39 @@
             <artifactId>junit</artifactId>
             <scope>provided</scope>
         </dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.json-unit</groupId>
+			<artifactId>json-unit-assertj</artifactId>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
     <build>
 		<plugins>
@@ -175,21 +206,54 @@
 	</build>
 
 	<profiles>
+        <profile>
+            <id>errorLogging</id>
+            <build>
+                <plugins>
+                    <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>error-logging</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating log4j configuration to error logging" />
+                                        <copy
+                                            file="${basedir}/../../qa/logging/log4j.properties"
+                                            todir="target/test-classes"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 		<profile>
-			<id>distro</id>
+			<id>cleanDb</id>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.1.1</version>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
+								<id>drop-idm-schema</id>
+								<phase>prepare-package</phase>
 								<goals>
-									<goal>jar-no-fork</goal>
+									<goal>java</goal>
 								</goals>
+								<configuration>
+									<mainClass>org.flowable.dmn.engine.impl.db.DbSchemaDrop</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -207,10 +271,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -248,6 +310,56 @@
 				</plugins>
 			</build>
 		</profile>
+        
+        <profile>
+            <id>databasemssqldmn</id>
+            <activation>
+                <property>
+                    <name>databasemssqldmn</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable dmn configuration to db ${databasemssqldmn}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.dmn.cfg.xml"
+                                            tofile="target/test-classes/flowable.dmn.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqldmn}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqldmn}" />
+                                        <java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 
 		<profile>
 			<id>databasewithschemadmn</id>
@@ -259,10 +371,8 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
-						<!-- only worked with this version, there might be a bug with antrun 
-							see http://jira.codehaus.org/browse/MANTRUN-109 -->
-						<version>1.4</version>
 						<executions>
 							<execution>
 								<id>database-test-create-schema</id>
@@ -311,8 +421,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -328,8 +438,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.oracle.jdbc</groupId>
-					<artifactId>ojdbc7</artifactId>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -345,8 +455,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.ibm.db2.jcc</groupId>
-					<artifactId>db2jcc4</artifactId>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -356,7 +466,7 @@
 			<id>mssql</id>
 			<activation>
 				<property>
-					<name>databasedmn</name>
+					<name>databasemssqldmn</name>
 					<value>mssql</value>
 				</property>
 			</activation>
@@ -379,8 +489,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>mysql</groupId>
-					<artifactId>mysql-connector-java</artifactId>
+					<groupId>com.mysql</groupId>
+					<artifactId>mysql-connector-j</artifactId>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>

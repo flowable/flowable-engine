@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.repository;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Joram Barrez
@@ -39,6 +39,7 @@ public class CmmnDeploymentQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

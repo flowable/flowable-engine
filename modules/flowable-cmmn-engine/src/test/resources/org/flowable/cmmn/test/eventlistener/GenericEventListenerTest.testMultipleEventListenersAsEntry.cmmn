@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testMultipleEventListenersAsEntry" name="testMultipleEventListenersAsEntry" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem2" definitionRef="sid-1102DA46-D3ED-467A-9E03-E5846817AE87">
+        <entryCriterion id="sid-3825FDA2-8417-45F5-BAD6-5C5108D4C383" sentryRef="sentry1"></entryCriterion>
+        <entryCriterion id="sid-33FEB091-E8EA-4AEA-BB20-6BDE999DBFD5" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <planItem id="planItem3" name="A" definitionRef="sid-FD1C3F9C-08D0-45B3-A308-7B4F3C450402"></planItem>
+      <planItem id="planItem4" name="B" definitionRef="sid-1F66E71E-2129-46A2-8658-DEB97F9557AB"></planItem>
+      <planItem id="planItem5" name="C" definitionRef="sid-82312EBB-EC6B-4BAA-9B00-E3256D46A4FA"></planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem3">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem4">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart3" sourceRef="planItem5">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="sid-1102DA46-D3ED-467A-9E03-E5846817AE87">
+        <planItem id="planItem1" name="The task" definitionRef="sid-8EB89F2A-5807-48A7-B9CD-5CF36E5B8500"></planItem>
+        <humanTask id="sid-8EB89F2A-5807-48A7-B9CD-5CF36E5B8500" name="The task"></humanTask>
+      </stage>
+      <eventListener id="sid-FD1C3F9C-08D0-45B3-A308-7B4F3C450402" name="A"></eventListener>
+      <eventListener id="sid-1F66E71E-2129-46A2-8658-DEB97F9557AB" name="B"></eventListener>
+      <eventListener id="sid-82312EBB-EC6B-4BAA-9B00-E3256D46A4FA" name="C"></eventListener>
+    </casePlanModel>
+  </case>
+</definitions>

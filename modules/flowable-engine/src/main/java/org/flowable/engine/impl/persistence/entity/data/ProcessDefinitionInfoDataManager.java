@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.persistence.entity.data;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 
 /**

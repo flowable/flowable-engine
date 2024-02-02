@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testSimpleStageCompletion">
+
+        <casePlanModel id="myCompletionNeutralTestPlanModel" name="My completion neutral test plan model">
+            <documentation>TaskB inside the Stage will be AVILABLE waiting for TaskA outside the stage. Once TaskC completes the stage should complete regardless of whether or not TaskA completed</documentation>
+
+            <planItem id="taskBWaitingForThis" name="Task B is Available waiting for its completion" definitionRef="taskA"/>
+            <planItem id="theStage" name="this stage should complete after taskA is completed" definitionRef="stageOne"/>
+
+            <humanTask id="taskA"/>
+            <stage id="stageOne">
+                <planItem id="manuallyCompletedTask" name="manually completed task" definitionRef="taskC"/>
+                <planItem id="completionNeutralTask" name="Completion Neutral Task" definitionRef="taskB">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                    </itemControl>
+                    <entryCriterion sentryRef="onTaskACompleteSentry"/>
+                </planItem>
+                <sentry id="onTaskACompleteSentry">
+                    <planItemOnPart sourceRef="taskBWaitingForThis">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <humanTask id="taskC"/>
+                <humanTask id="taskB"/>
+            </stage>
+        </casePlanModel>
+    </case>
+
+</definitions>

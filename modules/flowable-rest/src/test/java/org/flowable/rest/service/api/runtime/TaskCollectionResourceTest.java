@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -22,31 +26,37 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import net.javacrumbs.jsonunit.core.Option;
+
 /**
  * Test for all REST-operations related to the Task collection resource.
- * 
+ *
  * @author Frederik Heremans
+ * @author Christopher Welsch
  */
 public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTask() throws Exception {
         try {
             Task parentTask = taskService.newTask();
@@ -78,16 +88,16 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             // Check if task is created with right arguments
             Task task = taskService.createTaskQuery().taskId(createdTaskId).singleResult();
-            assertEquals("New task name", task.getName());
-            assertEquals("New task description", task.getDescription());
-            assertEquals("assignee", task.getAssignee());
-            assertEquals("owner", task.getOwner());
-            assertEquals(20, task.getPriority());
-            assertEquals(DelegationState.RESOLVED, task.getDelegationState());
-            assertEquals(dateFormat.parse(dueDateString), task.getDueDate());
-            assertEquals(parentTask.getId(), task.getParentTaskId());
-            assertEquals("testKey", task.getFormKey());
-            assertEquals("test", task.getTenantId());
+            assertThat(task.getName()).isEqualTo("New task name");
+            assertThat(task.getDescription()).isEqualTo("New task description");
+            assertThat(task.getAssignee()).isEqualTo("assignee");
+            assertThat(task.getOwner()).isEqualTo("owner");
+            assertThat(task.getPriority()).isEqualTo(20);
+            assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
+            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
+            assertThat(task.getFormKey()).isEqualTo("testKey");
+            assertThat(task.getTenantId()).isEqualTo("test");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -101,6 +111,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTaskNoBody() throws Exception {
         try {
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
@@ -119,6 +130,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
+    @Test
     @Deployment
     public void testGetTasks() throws Exception {
         try {
@@ -159,12 +171,20 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
             assertResultsPresentInDataResponse(url, adhocTask.getId(), processTask.getId());
 
+            // ID filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskId=" + encode(adhocTask.getId());
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
             // Name filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?name=" + encode("Name one");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Name like filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?nameLike=" + encode("%one");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            // Name like ignore case filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?nameLikeIgnoreCase=" + encode("%ONE");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Description filtering
@@ -185,7 +205,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?priority=100";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
-            // Mininmum Priority filtering
+            // Minimum Priority filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?minimumPriority=70";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
@@ -231,17 +251,54 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=kermit";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Candidate group filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales";
             assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
+            
+            // Candidate user with group filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=aSalesUser";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateUser=notExisting";
+            assertEmptyResultsPresentInDataResponse(url);
 
             // Involved user filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?involvedUser=misspiggy";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
+            // Claim task
+            taskService.claim(processTask.getId(), "johnDoe");
+
+            // IgnoreAssignee
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=sales&ignoreAssignee=true";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?candidateGroup=notExisting&ignoreAssignee";
+            assertEmptyResultsPresentInDataResponse(url);
+
             // Process instance filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceId=" + processInstance.getId();
             assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            // Process instance with children filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=" + processInstance.getId();
+            assertResultsPresentInDataResponse(url, processTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?processInstanceIdWithChildren=nonexisting";
+            assertResultsPresentInDataResponse(url);
+            
+            // Without process instance id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=true";
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutProcessInstanceId=false";
+            assertResultsPresentInDataResponse(url, processTask.getId(), adhocTask.getId());
 
             // Execution filtering
             Execution taskExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
@@ -274,6 +331,10 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             // Task definition key like filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeyLike=" + encode("process%");
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
+            // Task definition keys filtering
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?taskDefinitionKeys=processTask,invalidTask";
             assertResultsPresentInDataResponse(url, processTask.getId());
 
             // Duedate filtering
@@ -319,6 +380,15 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?category=" + encode("some-category");
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?categoryIn=" + encode("some-other-category,some-category");
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?categoryNotIn=" + encode("some-category");
+            assertResultsPresentInDataResponse(url);
+
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutCategory=true";
+            assertResultsPresentInDataResponse(url, processTask.getId());
+
             // Suspend process-instance to have a suspended task
             runtimeService.suspendProcessInstanceById(processInstance.getId());
 
@@ -329,60 +399,65 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Active filtering
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?active=true";
             assertResultsPresentInDataResponse(url, adhocTask.getId());
-            
+
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true";
             CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            
+            // Without scope id
+            url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?withoutScopeId=true";
+            assertResultsPresentInDataResponse(url, processTask.getId(), adhocTask.getId());
 
             // Check status and size
             JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            Assert.assertEquals(2, dataNode.size());
-            
+            assertThat(dataNode).hasSize(2);
+
             Map<String, JsonNode> taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
                 taskNodeMap.put(taskNode.get("id").asText(), taskNode);
             }
-            
-            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+
+            assertThat(taskNodeMap).containsKey(processTask.getId());
+
             JsonNode processTaskNode = taskNodeMap.get(processTask.getId());
-            JsonNode variablesNode = processTaskNode.get("variables");
-            assertEquals(1, variablesNode.size());
-            JsonNode variableNode = variablesNode.get(0);
-            assertEquals("localVariable", variableNode.get("name").asText());
-            assertEquals("local", variableNode.get("scope").asText());
-            assertEquals("localtest", variableNode.get("value").asText());
-            
+            assertThatJson(processTaskNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "variables: [ {"
+                            + "name: 'localVariable',"
+                            + "value: 'localtest',"
+                            + "scope: 'local'"
+                            + "} ]"
+                            + "}");
+
             url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?includeTaskLocalVariables=true&includeProcessVariables=true";
             response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
             // Check status and size
             dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
             closeResponse(response);
-            Assert.assertEquals(2, dataNode.size());
-            
+            assertThat(dataNode).hasSize(2);
+
             taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
                 taskNodeMap.put(taskNode.get("id").asText(), taskNode);
             }
-            
-            Assert.assertTrue(taskNodeMap.containsKey(processTask.getId()));
+
+            assertThat(taskNodeMap).containsKey(processTask.getId());
             processTaskNode = taskNodeMap.get(processTask.getId());
-            variablesNode = processTaskNode.get("variables");
-            assertEquals(2, variablesNode.size());
-            Map<String, JsonNode> variableMap = new HashMap<>();
-            for (JsonNode variableResponseNode : variablesNode) {
-                variableMap.put(variableResponseNode.get("name").asText(), variableResponseNode);
-            }
-            
-            variableNode = variableMap.get("localVariable");
-            assertEquals("localVariable", variableNode.get("name").asText());
-            assertEquals("local", variableNode.get("scope").asText());
-            assertEquals("localtest", variableNode.get("value").asText());
-            
-            variableNode = variableMap.get("variable");
-            assertEquals("variable", variableNode.get("name").asText());
-            assertEquals("global", variableNode.get("scope").asText());
-            assertEquals("globaltest", variableNode.get("value").asText());
+            assertThatJson(processTaskNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                    .isEqualTo("{"
+                            + "variables: [ {"
+                            + "    name: 'variable',"
+                            + "    value: 'globaltest',"
+                            + "    scope: 'global'"
+                            + "  }, {"
+                            + "    name: 'localVariable',"
+                            + "    value: 'localtest',"
+                            + "    scope: 'local'"
+                            + "  } ]"
+                            + "}");
 
         } finally {
             // Clean adhoc-tasks even if test fails
@@ -394,4 +469,140 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
+    @Test
+    public void testBulkUpdateTaskAssignee() throws IOException {
+
+        taskService.createTaskBuilder().id("taskID1").create();
+        taskService.createTaskBuilder().id("taskID2").create();
+        taskService.createTaskBuilder().id("taskID3").create();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("assignee", "admin");
+        requestNode.putArray("taskIds").add("taskID1").add("taskID3");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(taskService.createTaskQuery().taskId("taskID1").singleResult().getAssignee()).isEqualTo("admin");
+        assertThat(taskService.createTaskQuery().taskId("taskID2").singleResult().getAssignee()).isNull();
+        assertThat(taskService.createTaskQuery().taskId("taskID3").singleResult().getAssignee()).isEqualTo("admin");
+
+        taskService.deleteTask("taskID1", true);
+        taskService.deleteTask("taskID2", true);
+        taskService.deleteTask("taskID3", true);
+
+    }
+    @Test
+    public void testInvalidBulkUpdateTasks() throws IOException {
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        httpPut.setEntity(null);
+        executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+
+        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION));
+        requestNode.put("name", "testName");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "message:'Bad request',"
+                        + "exception:'taskIds can not be null for bulk update tasks requests'"
+                        + "}");
+
+        requestNode.putArray("taskIds").add("invalidId");
+
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
+
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
+
+        Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
+        Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?rootScopeId="
+                + processInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + task1.getId() + "' },"
+                        + "    { id: '" + task2.getId() + "' },"
+                        + "    { id: '" + task3.getId() + "' },"
+                        + "    { id: '" + formTask1.getId() + "' },"
+                        + "    { id: '" + formTask2.getId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION) + "?parentScopeId="
+                + taskForm2Execution.getProcessInstanceId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + formTask1.getId() + "' },"
+                        + "    { id: '" + formTask2.getId() + "' }"
+
+                        + "  ]"
+                        + "}");
+
+    }
+
 }

@@ -49,7 +49,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
-            camelContext.stopRoute(r.getId());
+            camelContext.getRouteController().stopRoute(r.getId());
             camelContext.removeRoute(r.getId());
         }
     }
@@ -77,7 +77,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     public void testObjectAsVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
         ProducerTemplate tpl = ctx.createProducerTemplate();
-        Object expectedObj = new Long(99);
+        Object expectedObj = Long.valueOf(99);
         Exchange exchange = ctx.getEndpoint("direct:startEmpty").createExchange();
         exchange.getIn().setBody(expectedObj);
         tpl.send("direct:startEmpty", exchange);
@@ -92,7 +92,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     public void testObjectAsStringVariable() throws Exception {
         CamelContext ctx = applicationContext.getBean(CamelContext.class);
         ProducerTemplate tpl = ctx.createProducerTemplate();
-        Object expectedObj = new Long(99);
+        Object expectedObj = Long.valueOf(99);
 
         Exchange exchange = ctx.getEndpoint("direct:startEmptyBodyAsString").createExchange();
         exchange.getIn().setBody(expectedObj);

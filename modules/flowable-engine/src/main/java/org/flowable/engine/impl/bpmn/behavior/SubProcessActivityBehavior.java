@@ -21,11 +21,12 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
@@ -52,11 +53,13 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         FlowElement startElement = getStartElement(subProcess);
 
         if (startElement == null) {
-            throw new FlowableException("No initial activity found for subprocess " + subProcess.getId());
+            throw new FlowableException("No initial activity found for subprocess " + subProcess.getId() + " in " + execution);
         }
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         executionEntity.setScope(true);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
         // initialize the template-defined data objects as variables
         Map<String, Object> dataObjectVars = processDataObjects(subProcess.getDataObjects());
@@ -65,11 +68,10 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         
         CommandContext commandContext = Context.getCommandContext();
-        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
         processInstanceHelper.processAvailableEventSubProcesses(executionEntity, subProcess, commandContext);
 
-        ExecutionEntity startSubProcessExecution = CommandContextUtil.getExecutionEntityManager(commandContext)
-                .createChildExecution(executionEntity);
+        ExecutionEntity startSubProcessExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(executionEntity);
         startSubProcessExecution.setCurrentFlowElement(startElement);
         CommandContextUtil.getAgenda().planContinueProcessOperation(startSubProcessExecution);
     }
@@ -99,7 +101,9 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         if (flowElement instanceof SubProcess) {
             subProcess = (SubProcess) flowElement;
         } else {
-            throw new FlowableException("Programmatic error: sub process behaviour can only be applied" + " to a SubProcess instance, but got an instance of " + flowElement);
+            throw new FlowableException(
+                    "Programmatic error: sub process behaviour can only be applied to a SubProcess instance, but got an instance of " + flowElement + " for "
+                            + execution);
         }
         return subProcess;
     }

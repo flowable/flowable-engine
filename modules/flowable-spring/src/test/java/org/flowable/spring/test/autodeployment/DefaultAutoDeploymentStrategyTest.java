@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,12 +13,9 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,18 +25,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private DefaultAutoDeploymentStrategy classUnderTest;
@@ -49,20 +45,20 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     public void before() throws Exception {
         super.before();
         classUnderTest = new DefaultAutoDeploymentStrategy();
-        assertNotNull(classUnderTest);
+        assertThat(classUnderTest).isNotNull();
     }
 
     @Test
     public void testHandlesMode() {
-        assertTrue(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE));
-        assertFalse(classUnderTest.handlesMode("other-mode"));
-        assertFalse(classUnderTest.handlesMode(null));
+        assertThat(classUnderTest.handlesMode(DefaultAutoDeploymentStrategy.DEPLOYMENT_MODE)).isTrue();
+        assertThat(classUnderTest.handlesMode("other-mode")).isFalse();
+        assertThat(classUnderTest.handlesMode(null)).isFalse();
     }
 
     @Test
     public void testDeployResources() {
         final Resource[] resources = new Resource[] { resourceMock1, resourceMock2, resourceMock3, resourceMock4, resourceMock5 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, processEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
@@ -76,7 +72,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     @Test
     public void testDeployResourcesNoResources() {
         final Resource[] resources = new Resource[] {};
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, processEngineMock);
 
         verify(repositoryServiceMock, times(1)).createDeployment();
         verify(deploymentBuilderMock, times(1)).enableDuplicateFiltering();
@@ -87,23 +83,13 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
         verify(deploymentBuilderMock, times(1)).deploy();
     }
 
-    @Test(expected = FlowableException.class)
-    public void testDeployResourcesIOExceptionYieldsActivitiException() throws Exception {
-        when(resourceMock3.getInputStream()).thenThrow(new IOException());
-
-        final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
-
-        fail("Expected exception for IOException");
-    }
-
     @Test
     public void testDetermineResourceNameWithExceptionFailsGracefully() throws Exception {
         when(resourceMock3.getFile()).thenThrow(new IOException());
         when(resourceMock3.getFilename()).thenReturn(resourceName3);
 
         final Resource[] resources = new Resource[] { resourceMock3 };
-        classUnderTest.deployResources(deploymentNameHint, resources, repositoryServiceMock);
+        classUnderTest.deployResources(deploymentNameHint, resources, processEngineMock);
     }
 
 }

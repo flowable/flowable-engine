@@ -12,28 +12,12 @@
  */
 package org.flowable.variable.service.impl.util;
 
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.DbSqlSession;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityManager;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 public class CommandContextUtil {
 
-    public static VariableServiceConfiguration getVariableServiceConfiguration() {
-        return getVariableServiceConfiguration(getCommandContext());
-    }
-    
-    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
-        if (commandContext != null) {
-            return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
-        }
-        return null;
-    }
-    
     public static DbSqlSession getDbSqlSession() {
         return getDbSqlSession(getCommandContext());
     }
@@ -42,32 +26,7 @@ public class CommandContextUtil {
         return commandContext.getSession(DbSqlSession.class);
     }
     
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return getVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-    }
-    
-    public static VariableByteArrayEntityManager getByteArrayEntityManager() {
-        return getByteArrayEntityManager(getCommandContext());
-    }
-    
-    public static VariableByteArrayEntityManager getByteArrayEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getByteArrayEntityManager();
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return getHistoricVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager(CommandContext commandContext) {
-        return getVariableServiceConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
-    }
-    
     public static CommandContext getCommandContext() {
         return Context.getCommandContext();
     }
-
 }

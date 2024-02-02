@@ -17,13 +17,13 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.delegate.ExpressionGetInvocation;
 import org.activiti.engine.impl.delegate.ExpressionSetInvocation;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELException;
-import org.activiti.engine.impl.javax.el.MethodNotFoundException;
-import org.activiti.engine.impl.javax.el.PropertyNotFoundException;
-import org.activiti.engine.impl.javax.el.ValueExpression;
-import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELException;
+import org.flowable.common.engine.impl.javax.el.MethodNotFoundException;
+import org.flowable.common.engine.impl.javax.el.PropertyNotFoundException;
+import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**

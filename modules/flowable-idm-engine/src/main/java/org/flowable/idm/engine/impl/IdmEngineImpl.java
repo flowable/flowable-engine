@@ -12,7 +12,8 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
@@ -41,8 +42,8 @@ public class IdmEngineImpl implements IdmEngine {
         this.managementService = engineConfiguration.getIdmManagementService();
         this.commandExecutor = engineConfiguration.getCommandExecutor();
 
-        if (engineConfiguration.isUsingRelationalDatabase() && engineConfiguration.getDatabaseSchemaUpdate() != null) {
-            commandExecutor.execute(engineConfiguration.getSchemaCommandConfig(), new SchemaOperationsIdmEngineBuild());
+        if (engineConfiguration.getSchemaManagementCmd() != null) {
+            engineConfiguration.getCommandExecutor().execute(engineConfiguration.getSchemaCommandConfig(), engineConfiguration.getSchemaManagementCmd());
         }
 
         if (name == null) {
@@ -52,11 +53,24 @@ public class IdmEngineImpl implements IdmEngine {
         }
 
         IdmEngines.registerIdmEngine(this);
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineBuilt(this);
+            }
+        }
     }
 
     @Override
     public void close() {
         IdmEngines.unregister(this);
+        engineConfiguration.close();
+
+        if (engineConfiguration.getEngineLifecycleListeners() != null) {
+            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
+                engineLifecycleListener.onEngineClosed(this);
+            }
+        }
     }
 
     // getters and setters

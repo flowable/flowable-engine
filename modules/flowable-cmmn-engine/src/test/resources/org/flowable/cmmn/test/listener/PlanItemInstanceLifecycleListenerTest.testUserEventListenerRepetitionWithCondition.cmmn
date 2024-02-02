@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testRepetition" name="testRepetitionRule">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1"/>
+
+            <stage id="stage1" name="Stage One">
+                <planItem id="planItemTaskA" name="Task A" definitionRef="taskA">
+                    <itemControl>
+                        <repetitionRule>
+                            <condition><![CDATA[${continueRepeat}]]></condition>
+                        </repetitionRule>
+                    </itemControl>
+                    <entryCriterion sentryRef="sentryActivateTask"/>
+                </planItem>
+                <planItem id="planItemTaskB" name="Task B" definitionRef="taskB"/>
+                <planItem id="userAction" definitionRef="activateTaskA">
+                	<itemControl>
+                        <repetitionRule>
+                            <condition><![CDATA[${continueRepeat}]]></condition>
+                        </repetitionRule>
+                    </itemControl>
+                </planItem>
+                
+                <sentry id="sentryActivateTask">
+                    <planItemOnPart sourceRef="userAction">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <humanTask id="taskA" name="Task A"/>
+                <humanTask id="taskB" name="Task B"/>
+                <userEventListener id="activateTaskA" name="Activate Task"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>

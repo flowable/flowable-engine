@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="inclusiveGateway">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="taskBefore"/>
+
+        <userTask id="taskBefore" name="Task before gateway"/>
+        <sequenceFlow id="flow2" sourceRef="taskBefore" targetRef="gwFork"/>
+
+        <inclusiveGateway id="gwFork"/>
+
+        <sequenceFlow id="gwFlow1" sourceRef="gwFork" targetRef="taskLess" name="var less or equals than 10">
+            <conditionExpression><![CDATA[${var:lowerThanOrEquals(myConditionVar, 10)}]]></conditionExpression>
+        </sequenceFlow>
+        <userTask id="taskLess" name="Task less than 10"/>
+        <sequenceFlow id="gwFlow2" sourceRef="gwFork" targetRef="taskMore" name="var greater or equals than 9">
+            <conditionExpression><![CDATA[${var:greaterThanOrEquals(myConditionVar, 10)}]]></conditionExpression>
+        </sequenceFlow>
+        <userTask id="taskMore"/>
+
+        <sequenceFlow id="gwFlow3" sourceRef="taskLess" targetRef="gwJoin"/>
+        <sequenceFlow id="gwFlow4" sourceRef="taskMore" targetRef="gwJoin"/>
+
+        <inclusiveGateway id="gwJoin"/>
+
+        <sequenceFlow id="flow3" sourceRef="gwJoin" targetRef="taskAfter"/>
+        <userTask id="taskAfter" name="Task after sub process"/>
+
+        <sequenceFlow id="flow4" sourceRef="taskAfter" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

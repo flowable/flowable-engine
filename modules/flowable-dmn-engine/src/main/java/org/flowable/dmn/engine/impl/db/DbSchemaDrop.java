@@ -54,6 +54,7 @@ public class DbSchemaDrop {
 
             Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
             liquibase.dropAll();
+            liquibase.getDatabase().close();
 
         } catch (Exception e) {
             e.printStackTrace();

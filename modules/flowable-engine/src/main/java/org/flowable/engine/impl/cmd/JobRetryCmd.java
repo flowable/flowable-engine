@@ -18,18 +18,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.impl.calendar.DurationHelper;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.calendar.DurationHelper;
+import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -40,6 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Saeid Mirzaei
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 
 public class JobRetryCmd implements Command<Object> {
@@ -56,25 +62,36 @@ public class JobRetryCmd implements Command<Object> {
 
     @Override
     public Object execute(CommandContext commandContext) {
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
-        TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        JobService jobService = processEngineConfig.getJobServiceConfiguration().getJobService();
+        TimerJobService timerJobService = processEngineConfig.getJobServiceConfiguration().getTimerJobService();
         
         JobEntity job = jobService.findJobById(jobId);
         if (job == null) {
             return null;
         }
 
-        ProcessEngineConfiguration processEngineConfig = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-
         ExecutionEntity executionEntity = fetchExecutionEntity(commandContext, job.getExecutionId());
         FlowElement currentFlowElement = executionEntity != null ? executionEntity.getCurrentFlowElement() : null;
-        if (executionEntity != null) {
-            executionEntity.setActive(false);
-        }
 
         String failedJobRetryTimeCycleValue = null;
         if (currentFlowElement instanceof ServiceTask) {
             failedJobRetryTimeCycleValue = ((ServiceTask) currentFlowElement).getFailedJobRetryTimeCycleValue();
+        }
+
+        if (executionEntity != null) {
+            executionEntity.setActive(false);
+
+            if (StringUtils.isNotEmpty(failedJobRetryTimeCycleValue)) {
+                ExpressionManager expressionManager = processEngineConfig.getExpressionManager();
+                if (expressionManager != null) {
+                    Expression expression = expressionManager.createExpression(failedJobRetryTimeCycleValue);
+                    Object value = expression.getValue(executionEntity);
+                    if (value != null) {
+                        failedJobRetryTimeCycleValue = value.toString();
+                    }
+                }
+            }
         }
 
         AbstractRuntimeJobEntity newJobEntity = null;
@@ -82,7 +99,7 @@ public class JobRetryCmd implements Command<Object> {
 
             LOGGER.debug("activity or FailedJobRetryTimerCycleValue is null in job {}. Only decrementing retries.", jobId);
 
-            if (job.getRetries() <= 1) {
+            if (job.getRetries() <= 1 || isUnrecoverableException()) {
                 newJobEntity = jobService.moveJobToDeadLetterJob(job);
             } else {
                 newJobEntity = timerJobService.moveJobToTimerJob(job);
@@ -106,7 +123,7 @@ public class JobRetryCmd implements Command<Object> {
                     jobRetries = durationHelper.getTimes();
                 }
 
-                if (jobRetries <= 1) {
+                if (jobRetries <= 1 || isUnrecoverableException()) {
                     newJobEntity = jobService.moveJobToDeadLetterJob(job);
                 } else {
                     newJobEntity = timerJobService.moveJobToTimerJob(job);
@@ -124,7 +141,7 @@ public class JobRetryCmd implements Command<Object> {
                 newJobEntity.setRetries(jobRetries - 1);
 
             } catch (Exception e) {
-                throw new FlowableException("failedJobRetryTimeCycle has wrong format:" + failedJobRetryTimeCycleValue, exception);
+                throw new FlowableException("failedJobRetryTimeCycle has wrong format:" + failedJobRetryTimeCycleValue + " for execution " + executionEntity, e);
             }
         }
 
@@ -134,10 +151,13 @@ public class JobRetryCmd implements Command<Object> {
         }
 
         // Dispatch both an update and a retry-decrement event
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity));
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity));
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity),
+                    processEngineConfiguration.getEngineCfgKey());
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity),
+                    processEngineConfiguration.getEngineCfgKey());
         }
 
         return null;
@@ -167,6 +187,10 @@ public class JobRetryCmd implements Command<Object> {
             return null;
         }
         return CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
+    }
+
+    protected boolean isUnrecoverableException() {
+        return ExceptionUtil.containsCause(exception, FlowableUnrecoverableJobException.class);
     }
 
 }

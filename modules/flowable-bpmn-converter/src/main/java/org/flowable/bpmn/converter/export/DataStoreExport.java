@@ -33,7 +33,7 @@ public class DataStoreExport implements BpmnXMLConstants {
 
             if (StringUtils.isNotEmpty(dataStore.getDataState())) {
                 xtw.writeStartElement(ELEMENT_DATA_STATE);
-                xtw.writeCharacters(dataStore.getDataState());
+                xtw.writeAttribute(ATTRIBUTE_NAME, dataStore.getDataState());
                 xtw.writeEndElement();
             }
 

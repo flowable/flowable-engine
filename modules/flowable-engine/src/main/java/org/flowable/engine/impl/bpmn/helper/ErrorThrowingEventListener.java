@@ -12,12 +12,12 @@
  */
 package org.flowable.engine.impl.bpmn.helper;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -56,13 +56,13 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
             }
 
             if (execution == null) {
-                throw new FlowableException("No execution context active and event is not related to an execution. No compensation event can be thrown.");
+                throw new FlowableException("No execution context active and event (" + event + ") is not related to an execution. No compensation event can be thrown.");
             }
 
             try {
                 ErrorPropagation.propagateError(errorCode, execution);
             } catch (Exception e) {
-                throw new FlowableException("Error while propagating error-event", e);
+                throw new FlowableException("Error while propagating error-event for " + execution, e);
             }
         }
     }

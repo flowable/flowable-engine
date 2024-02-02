@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor.multitenant;
 
-import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ResetExpiredJobsRunnable;
 
@@ -25,7 +25,11 @@ public class TenantAwareResetExpiredJobsRunnable extends ResetExpiredJobsRunnabl
     protected String tenantId;
 
     public TenantAwareResetExpiredJobsRunnable(final AsyncExecutor asyncExecutor, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        super("flowable-tenant-" + tenantId + "-reset-expired-jobs", asyncExecutor, asyncExecutor.getJobServiceConfiguration().getJobEntityManager());
+        super("flowable-tenant-" + tenantId + "-" + asyncExecutor.getJobServiceConfiguration().getEngineName() + "-reset-expired-jobs", asyncExecutor,
+                asyncExecutor.getJobServiceConfiguration().getJobEntityManager(),
+                asyncExecutor.getJobServiceConfiguration().getTimerJobEntityManager(),
+                asyncExecutor.getJobServiceConfiguration().getExternalWorkerJobEntityManager()
+        );
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

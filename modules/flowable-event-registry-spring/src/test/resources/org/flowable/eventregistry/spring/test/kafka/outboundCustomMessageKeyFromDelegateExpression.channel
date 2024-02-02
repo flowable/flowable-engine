@@ -1,0 +1,11 @@
+{
+    "key": "messageKeyDelegateExpression",
+    "category": "channel",
+    "channelType": "outbound",
+    "type": "kafka",
+    "topic": "test-delegate-expression-message-key",
+    "serializerType": "json",
+    "recordKey": {
+        "delegateExpression": "#{kafkaMessageKeyProvider}"
+    }
+}

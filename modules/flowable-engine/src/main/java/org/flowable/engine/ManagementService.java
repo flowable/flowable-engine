@@ -13,18 +13,33 @@
 package org.flowable.engine;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.common.api.management.TablePageQuery;
-import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
+import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchPartBuilder;
+import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchQuery;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.common.engine.api.management.TablePage;
+import org.flowable.common.engine.api.management.TablePageQuery;
+import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
+import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.engine.event.EventLogEntry;
+import org.flowable.engine.runtime.ExternalWorkerCompletionBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
+import org.flowable.job.api.ExternalWorkerJobFailureBuilder;
+import org.flowable.job.api.ExternalWorkerJobQuery;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
@@ -56,6 +71,11 @@ public interface ManagementService {
     String getTableName(Class<?> entityClass);
 
     /**
+     * Gets the table name for an entity like Task, Execution or the like.
+     */
+    String getTableName(Class<?> entityClass, boolean includePrefix);
+
+    /**
      * Gets the metadata (column names, column types, etc.) of a certain table. Returns null when no table exists with the given name.
      */
     TableMetaData getTableMetaData(String tableName);
@@ -69,6 +89,11 @@ public interface ManagementService {
      * Returns a new JobQuery implementation, that can be used to dynamically query the jobs.
      */
     JobQuery createJobQuery();
+
+    /**
+     * Returns a new ExternalWorkerJobQuery implementation, that can be used to dynamically query the external worker jobs.
+     */
+    ExternalWorkerJobQuery createExternalWorkerJobQuery();
 
     /**
      * Returns a new TimerJobQuery implementation, that can be used to dynamically query the timer jobs.
@@ -91,7 +116,13 @@ public interface ManagementService {
     HistoryJobQuery createHistoryJobQuery();
 
     /**
-     * Forced synchronous execution of a job (eg. for administration or testing) The job will be executed, even if the process definition and/or the process instance is in suspended state.
+     * Find a job by a correlation id.
+     */
+    Job findJobByCorrelationId(String jobCorrelationId);
+
+    /**
+     * Forced synchronous execution of a job (eg. for administration or testing).
+     * The job will be executed, even if the process definition and/or the process instance is in suspended state.
      * 
      * @param jobId
      *            id of the job to execute, cannot be null.
@@ -99,6 +130,27 @@ public interface ManagementService {
      *             when there is no job with the given id.
      */
     void executeJob(String jobId);
+    
+    /**
+     * Forced synchronous execution of a history job (eg. for administration or testing).
+     * 
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     */
+    void executeHistoryJob(String historyJobId);
+
+    /**
+     * Get the advanced configuration (storing the history json data) of a {@link HistoryJob}.
+     *
+     * @param historyJobId
+     *            id of the history job to execute, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no historyJob with the given id.
+     *
+     */
+    String getHistoryJobHistoryJson(String historyJobId);
 
     /**
      * Moves a timer job to the executable job table (eg. for administration or testing). The timer job will be moved, even if the process definition and/or the process instance is in suspended state.
@@ -121,16 +173,66 @@ public interface ManagementService {
     Job moveJobToDeadLetterJob(String jobId);
 
     /**
-     * Moves a job that is in the dead letter job table back to be an executable job, and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
-     * 
+     * Moves a job that is in the dead letter job table back to be an executable job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
      * @param jobId
      *            id of the job to move, cannot be null.
      * @param retries
      *            the number of retries (value greater than 0) which will be set on the job.
      * @throws FlowableObjectNotFoundException
      *             when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException
+     *              when the job cannot be moved to be an executable job (e.g. because it's a history job)
      */
     Job moveDeadLetterJobToExecutableJob(String jobId, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @param retries
+     *            the number of retries (value greater than 0) which will be set on the job.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException
+     *              when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    HistoryJob moveDeadLetterJobToHistoryJob(String jobId, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when there is no job with the given id.
+     * @throws FlowableIllegalArgumentException when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    void bulkMoveDeadLetterJobs(Collection<String> jobIds, int retries);
+
+    /**
+     * Moves a job that is in the dead letter job table back to be a history job,
+     * and resetting the retries (as the retries was 0 when it was put into the dead letter job table).
+     *
+     * @param jobIds ids of the jobs to move, cannot be null.
+     * @param retries the number of retries (value greater than 0) which will be set on the jobs.
+     * @throws FlowableObjectNotFoundException when one job with of the given ids is not found.
+     * @throws FlowableIllegalArgumentException when the job cannot be moved to be a history job (e.g. because it's not history job)
+     */
+    void bulkMoveDeadLetterJobsToHistoryJobs(Collection<String> jobIds, int retries);
+
+    /**
+     * Moves a suspended job from the suspended letter job table back to be an executable job. The retries are untouched.
+     * 
+     * @param jobId
+     *            id of the job to move, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when there is no job with the given id.
+     */
+    Job moveSuspendedJobToExecutableJob(String jobId);
 
     /**
      * Delete the job with the provided id.
@@ -172,6 +274,14 @@ public interface ManagementService {
      */
     void deleteDeadLetterJob(String jobId);
     
+    /**
+     * Delete the external worker job with the provided id.
+     *
+     * @param jobId id of the external worker job to delete, cannot be null.
+     * @throws FlowableObjectNotFoundException when there is no job with the given id.
+     */
+    void deleteExternalWorkerJob(String jobId);
+
     /**
      * Delete the history job with the provided id.
      * 
@@ -295,6 +405,46 @@ public interface ManagementService {
      *             when no job exists with the given id.
      */
     String getDeadLetterJobExceptionStacktrace(String jobId);
+    
+    /**
+     * Returns the full error details that were passed to the {@link org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity} when the job was last failed. Returns null when the job has no error details.
+     *
+     * @param jobId id of the job, cannot be null.
+     * @throws FlowableObjectNotFoundException when no job exists with the given id.
+     */
+    String getExternalWorkerJobErrorDetails(String jobId);
+
+    void handleHistoryCleanupTimerJob();
+    
+    List<Batch> getAllBatches();
+    
+    List<Batch> findBatchesBySearchKey(String searchKey);
+    
+    String getBatchDocument(String batchId);
+    
+    BatchPart getBatchPart(String batchPartId);
+    
+    List<BatchPart> findBatchPartsByBatchId(String batchId);
+    
+    List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
+    
+    String getBatchPartDocument(String batchPartId);
+    
+    /**
+     * Returns a new BatchQuery implementation, that can be used to dynamically query the batches.
+     */
+    BatchQuery createBatchQuery();
+    
+    BatchBuilder createBatchBuilder();
+    
+    /**
+     * Returns a new BatchPartQuery implementation, that can be used to dynamically query the batch parts.
+     */
+    BatchPartQuery createBatchPartQuery();
+
+    BatchPartBuilder createBatchPartBuilder(Batch batch);
+
+    void deleteBatch(String batchId);
 
     /** get the list of properties. */
     Map<String, String> getProperties();
@@ -325,6 +475,18 @@ public interface ManagementService {
     <T> T executeCommand(CommandConfig config, Command<T> command);
 
     /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
+
+    /**
      * Executes the sql contained in the {@link CustomSqlExecution} parameter.
      */
     <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution);
@@ -347,5 +509,49 @@ public interface ManagementService {
      * Delete a EventLogEntry. Typically only used in testing, as deleting log entries defeats the whole purpose of keeping a log.
      */
     void deleteEventLogEntry(long logNr);
+
+    // External Worker
+
+    /**
+     * Create an {@link ExternalWorkerJobAcquireBuilder} that can be used to acquire jobs for an external worker.
+     */
+    ExternalWorkerJobAcquireBuilder createExternalWorkerJobAcquireBuilder();
+
+    /**
+     * Create an {@link ExternalWorkerJobFailureBuilder} that can be used to fail an external worker job.
+     *
+     * @param externalJobId the id of the external worker job
+     * @param workerId the id of the worker doing the action
+     */
+    ExternalWorkerJobFailureBuilder createExternalWorkerJobFailureBuilder(String externalJobId, String workerId);
+
+    /**
+     * Create an {@link ExternalWorkerCompletionBuilder} that can be used to transition the status of the external worker job.
+     */
+    ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId);
+
+    /**
+     * Unaquire a locked external worker job.
+     */
+    void unacquireExternalWorkerJob(String jobId, String workerId);
+    
+    /**
+     * Unaquire all locked external worker jobs for worker.
+     */
+    void unacquireAllExternalWorkerJobsForWorker(String workerId);
+    
+    /**
+     * Unaquire all locked external worker jobs for worker and tenant.
+     */
+    void unacquireAllExternalWorkerJobsForWorker(String workerId, String tenantId);
+    
+    /**
+     * Create a {@link ChangeTenantIdBuilder} that can be used to change the tenant id of the process instances
+     * and all the related instances. See {@link BpmnChangeTenantIdEntityTypes} for related instances.
+     * <p>
+     * You must provide the source tenant id and the destination tenant id. All instances from the source tenant id in the BPMN scope
+     * will be changed to the target tenant id.
+     */
+    ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
 
 }

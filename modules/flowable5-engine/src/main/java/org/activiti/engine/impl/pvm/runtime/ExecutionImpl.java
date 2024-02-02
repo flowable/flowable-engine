@@ -36,6 +36,8 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
+import org.flowable.engine.impl.delegate.ReadOnlyDelegateExecutionImpl;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
@@ -226,7 +228,7 @@ public class ExecutionImpl implements
         }
 
         // remove event scopes:
-        List<InterpretableExecution> childExecutions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> childExecutions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : childExecutions) {
             if (childExecution.isEventScope()) {
                 LOGGER.debug("removing eventScope {}", childExecution);
@@ -242,7 +244,7 @@ public class ExecutionImpl implements
         LOGGER.debug("performing destroy scope behavior for execution {}", this);
 
         // remove all child executions and sub process instances:
-        List<InterpretableExecution> executions = new ArrayList<InterpretableExecution>(getExecutions());
+        List<InterpretableExecution> executions = new ArrayList<>(getExecutions());
         for (InterpretableExecution childExecution : executions) {
             if (childExecution.getSubProcessInstance() != null) {
                 childExecution.getSubProcessInstance().deleteCascade(reason);
@@ -454,6 +456,11 @@ public class ExecutionImpl implements
     public String getProcessInstanceBusinessKey() {
         return getProcessInstance().getBusinessKey();
     }
+    
+    @Override
+    public String getProcessInstanceBusinessStatus() {
+        return null;
+    }
 
     /**
      * for setting the process instance, this setter must be used as subclasses can override
@@ -467,6 +474,11 @@ public class ExecutionImpl implements
      * must be called before memberfield processInstance is used. can be used by subclasses to provide processInstance member field initialization.
      */
     protected void ensureProcessInstanceInitialized() {
+    }
+
+    @Override
+    public ReadOnlyDelegateExecution snapshotReadOnly() {
+        return new ReadOnlyDelegateExecutionImpl(this);
     }
 
     // The current flow element, will be filled during operation execution
@@ -621,7 +633,7 @@ public class ExecutionImpl implements
     @SuppressWarnings("unchecked")
     public void takeAll(List<PvmTransition> transitions, List<ActivityExecution> recyclableExecutions) {
         transitions = new ArrayList<>(transitions);
-        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<ActivityExecution>());
+        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<>());
 
         if (recyclableExecutions.size() > 1) {
             for (ActivityExecution recyclableExecution : recyclableExecutions) {
@@ -1191,6 +1203,11 @@ public class ExecutionImpl implements
     @Override
     public void setMultiInstanceRoot(boolean isMultiInstanceRoot) {
 
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return null;
     }
 
     // No support for transient variables in v5

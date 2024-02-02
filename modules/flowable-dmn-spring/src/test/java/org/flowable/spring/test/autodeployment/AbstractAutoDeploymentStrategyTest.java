@@ -13,7 +13,7 @@
 
 package org.flowable.spring.test.autodeployment;
 
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngine;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
@@ -32,6 +33,9 @@ import org.springframework.core.io.Resource;
  * @author Tiese Barrell
  */
 public class AbstractAutoDeploymentStrategyTest {
+
+    @Mock
+    protected DmnEngine dmnEngineMock;
 
     @Mock
     protected DmnRepositoryService repositoryServiceMock;
@@ -71,6 +75,8 @@ public class AbstractAutoDeploymentStrategyTest {
 
     @Before
     public void before() throws Exception {
+
+        when(dmnEngineMock.getDmnRepositoryService()).thenReturn(repositoryServiceMock);
 
         when(resourceMock1.getPathWithinContext()).thenReturn(resourceName1);
         when(resourceMock1.getFile()).thenReturn(fileMock1);

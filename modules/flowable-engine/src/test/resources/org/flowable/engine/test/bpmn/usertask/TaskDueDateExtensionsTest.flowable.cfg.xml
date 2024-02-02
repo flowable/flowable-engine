@@ -4,20 +4,40 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="dataSource" class="org.flowable.common.engine.impl.test.ClosingDataSource">
+        <constructor-arg>
+            <bean class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+                <constructor-arg>
+                    <bean class="com.zaxxer.hikari.HikariConfig">
+                        <property name="minimumIdle" value="0" />
+                        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}"/>
+                        <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}"/>
+                        <property name="username" value="${jdbc.username:sa}"/>
+                        <property name="password" value="${jdbc.password:}"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+    </bean>
+
     <bean id="processEngineConfiguration"
           class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
-        <property name="jdbcDriver" value="org.h2.Driver"/>
-        <property name="jdbcUsername" value="sa"/>
-        <property name="jdbcPassword" value=""/>
+        <property name="dataSource" ref="dataSource"/>
+
+        <property name="engineLifecycleListeners">
+            <list>
+                <ref bean="dataSource"/>
+            </list>
+        </property>
 
         <!-- Database configurations -->
         <property name="databaseSchemaUpdate" value="drop-create"/>
 
         <!-- job executor configurations -->
         <property name="asyncExecutorActivate" value="false"/>
-        <property name="asyncExecutor" ref="asyncExecutor"/>
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
 
         <property name="defaultFailedJobWaitTime" value="1"/>
         <property name="asyncFailedJobWaitTime" value="1"/>
@@ -28,7 +48,7 @@
         <property name="mailServers">
             <map>
                 <entry key="myEmailTenant">
-                    <bean class="org.flowable.engine.cfg.MailServerInfo">
+                    <bean class="org.flowable.common.engine.impl.cfg.mail.MailServerInfo">
                         <property name="mailServerHost" value="localhost"/>
                         <property name="mailServerPort" value="5025"/>
                         <property name="mailServerUseSSL" value="false"/>
@@ -44,24 +64,24 @@
         <property name="clock" ref="clock"/>
 
         <property name="businessCalendarManager">
-            <bean class="org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager">
+            <bean class="org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager">
                 <constructor-arg name="businessCalendars">
                     <map>
                         <entry key="custom">
                             <bean class="org.flowable.engine.test.bpmn.usertask.TaskDueDateExtensionsTest.CustomBusinessCalendar"/>
                         </entry>
                         <entry key="cycle">
-                            <bean class="org.flowable.engine.common.impl.calendar.CycleBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.CycleBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="duration">
-                            <bean class="org.flowable.engine.common.impl.calendar.DurationBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DurationBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
                         <entry key="dueDate">
-                            <bean class="org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar">
+                            <bean class="org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar">
                                 <constructor-arg name="clockReader" ref="clock"/>
                             </bean>
                         </entry>
@@ -72,17 +92,9 @@
 
         <property name="history" value="full"/>
         <property name="asyncHistoryEnabled" value="false" />
+        <property name="asyncHistoryExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
     </bean>
 
-    <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
-        <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
-        <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
-    </bean>
-    
-    <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
-    	<property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
-  	</bean>
-
-    <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+    <bean id="clock" class="org.flowable.common.engine.impl.util.DefaultClockImpl"/>
 
 </beans>

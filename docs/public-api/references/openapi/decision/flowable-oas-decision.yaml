@@ -500,7 +500,7 @@ paths:
         An additional parameter (form-field) can be passed in the request body
         with name tenantId. The value of this field will be used as the id of
         the tenant this deployment is done in.
-      operationId: uploadDecistionTableDeployment
+      operationId: uploadDecisionTableDeployment
       parameters:
         - name: tenantId
           in: query

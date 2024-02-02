@@ -17,6 +17,7 @@ package org.flowable.variable.service.impl.types;
  */
 public class LongStringType extends SerializableType {
 
+    public static final String TYPE_NAME = "longString";
     private final int minLength;
 
     public LongStringType(int minLength) {
@@ -25,7 +26,7 @@ public class LongStringType extends SerializableType {
 
     @Override
     public String getTypeName() {
-        return "longString";
+        return TYPE_NAME;
     }
 
     @Override

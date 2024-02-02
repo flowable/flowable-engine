@@ -9,6 +9,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.JobEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
         <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
@@ -16,10 +17,13 @@
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
         <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
+        <result property="elementName" column="ELEMENT_NAME_" jdbcType="VARCHAR" />
         <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
         <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+        <result property="correlationId" column="CORRELATION_ID_" jdbcType="VARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -38,59 +42,94 @@
         select * from ${prefix}ACT_RU_JOB where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectJobsToExecute" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
-        from ${prefix}ACT_RU_JOB RES
-        where LOCK_EXP_TIME_ is null
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    <select id="selectJobByCorrelationId" parameterType="string" resultMap="jobResultMap">
+        select *
+        from ${prefix}ACT_RU_JOB
+        where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectExpiredJobs" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select
-        RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <select id="selectJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_JOB RES
-        where (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
-              or (LOCK_EXP_TIME_ is null and CREATE_TIME_ &lt; #{parameter.maxTimeout, jdbcType=TIMESTAMP})
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <where>
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope, jdbcType=VARCHAR} and LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope == 'all'">
+                LOCK_EXP_TIME_ is null
+            </if>
+            <if test="parameter.enabledCategories != null">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
     </select>
-
-    <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    
+    <select id="selectExpiredJobs" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+        from ${prefix}ACT_RU_JOB RES
+        <where>
+            <if test="parameter.jobExecutionScope == null">
+                SCOPE_TYPE_ is null
+            </if>
+            <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+            </if>
+              and (LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP})
+            <if test="parameter.enabledCategories">
+                and CATEGORY_ in
+                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+    
+    <select id="selectJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and PROC_DEF_ID_ = #{parameter.processDefinitionId}
     </select>
 
-    <select id="selectJobsByConfiguration" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select * from ${prefix}ACT_RU_JOB
         where HANDLER_TYPE_ = #{parameter.handlerType}
         and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
     </select>
 
-    <select id="selectJobsByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
 
-    <select id="selectJobsByProcessInstanceId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB J
         where J.PROCESS_INSTANCE_ID_ = #{parameter}
     </select>
 
     <select id="selectJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
-        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
-        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectJobByQueryCriteriaSql" />
         ${orderBy}
-        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">
-        select count(distinct RES.ID_)
+        select count(RES.ID_)
         <include refid="selectJobByQueryCriteriaSql" />
     </select>
 
@@ -100,8 +139,17 @@
             <if test="id != null">
                 RES.ID_ = #{id}
             </if>
+            <if test="jobIds != null and !jobIds.empty">
+                AND RES.ID_ IN
+                <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
+                    #{jobId}
+                </foreach>
+            </if>
             <if test="processInstanceId != null">
                 and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
+            </if>
+            <if test="withoutProcessInstanceId">
+                and RES.PROCESS_INSTANCE_ID_ IS NULL
             </if>
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId}
@@ -109,11 +157,35 @@
             <if test="handlerType != null">
                 and RES.HANDLER_TYPE_ = #{handlerType}
             </if>
+            <if test="handlerTypes != null">
+                and RES.HANDLER_TYPE_ in
+                <foreach item="item" index="index" collection="handlerTypes" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
             </if>
+            <if test="processDefinitionKey != null">
+                and RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{processDefinitionKey})
+            </if>
+            <if test="category != null">
+                and RES.CATEGORY_ = #{category}
+            </if>
+            <if test="categoryLike != null">
+                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+            </if>
+            <if test="elementId != null">
+                and RES.ELEMENT_ID_ = #{elementId}
+            </if>
+            <if test="elementName != null">
+                and RES.ELEMENT_NAME_ = #{elementName}
+            </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="withoutScopeId">
+                and RES.SCOPE_ID_ IS NULL
             </if>
             <if test="subScopeId != null">
                 and RES.SUB_SCOPE_ID_ = #{subScopeId}
@@ -123,6 +195,12 @@
             </if>
             <if test="scopeDefinitionId != null">
                 and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+            </if>
+            <if test="caseDefinitionKey != null">
+                and RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{caseDefinitionKey})
+            </if>
+            <if test="correlationId != null">
+                and RES.CORRELATION_ID_ = #{correlationId}
             </if>
             <if test="onlyTimers">
                 and RES.TYPE_ = 'timer'
@@ -166,6 +244,9 @@
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
             </if>
+            <if test="withoutScopeType">
+                and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
+            </if>
         </where>
     </sql>
 
@@ -175,11 +256,8 @@
         delete from ${prefix}ACT_RU_JOB where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
-    <delete id="bulkDeleteJob" parameterType="java.util.Collection">
-        delete from ${prefix}ACT_RU_JOB where
-        <foreach item="job" collection="list" index="index" separator=" or ">
-            ID_ = #{job.id, jdbcType=VARCHAR}
-        </foreach>
+    <delete id="deleteJobsByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_JOB where EXECUTION_ID_ = #{id}
     </delete>
 
     <!-- JOB UPDATE STATEMENTS -->
@@ -216,12 +294,21 @@
         )
     </update>
 
+    <update id="updateJobLocks" parameterType="java.util.Map">
+        update ${prefix}ACT_RU_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        where ID_ in
+        <foreach item="job" index="index" collection="jobs" open="(" separator="," close=")">
+            #{job.id}
+        </foreach>
+    </update>
+
     <!-- JOB INSERT -->
 
     <insert id="insertJob" parameterType="org.flowable.job.service.impl.persistence.entity.JobEntityImpl">
         insert into ${prefix}ACT_RU_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         LOCK_OWNER_,
         LOCK_EXP_TIME_,
@@ -229,10 +316,13 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        ELEMENT_ID_,
+        ELEMENT_NAME_,
         SCOPE_ID_, 
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -245,6 +335,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
         #{revision, jdbcType=INTEGER},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=VARCHAR},
         #{lockOwner, jdbcType=VARCHAR},
         #{lockExpirationTime, jdbcType=TIMESTAMP},
@@ -252,10 +343,13 @@
         #{executionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{elementId, jdbcType=VARCHAR},
+        #{elementName, jdbcType=VARCHAR},
         #{scopeId, jdbcType=VARCHAR},
         #{subScopeId, jdbcType=VARCHAR},
         #{scopeType, jdbcType=VARCHAR},
         #{scopeDefinitionId, jdbcType=VARCHAR},
+        #{correlationId, jdbcType=VARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{exceptionMessage, jdbcType=VARCHAR},
@@ -273,6 +367,7 @@
         INSERT INTO ${prefix}ACT_RU_JOB (
         ID_,
         REV_,
+        CATEGORY_,
         TYPE_,
         LOCK_OWNER_,
         LOCK_EXP_TIME_,
@@ -280,10 +375,13 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        ELEMENT_ID_,
+        ELEMENT_NAME_,
         SCOPE_ID_, 
         SUB_SCOPE_ID_, 
         SCOPE_TYPE_, 
         SCOPE_DEFINITION_ID_,
+        CORRELATION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -297,6 +395,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.lockOwner, jdbcType=VARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -304,10 +403,13 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.elementId, jdbcType=VARCHAR},
+            #{job.elementName, jdbcType=VARCHAR},
             #{job.scopeId, jdbcType=VARCHAR},
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -327,6 +429,7 @@
             INTO ${prefix}ACT_RU_JOB (
             ID_,
             REV_,
+            CATEGORY_,
             TYPE_,
             LOCK_OWNER_,
             LOCK_EXP_TIME_,
@@ -334,14 +437,18 @@
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
+            ELEMENT_ID_,
+            ELEMENT_NAME_,
             SCOPE_ID_, 
             SUB_SCOPE_ID_, 
             SCOPE_TYPE_, 
             SCOPE_DEFINITION_ID_,
-            DUEDATE_,
+            CORRELATION_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
+            DUEDATE_,
+            REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
             CUSTOM_VALUES_ID_,
@@ -349,6 +456,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
             #{job.revision, jdbcType=INTEGER},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=VARCHAR},
             #{job.lockOwner, jdbcType=VARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -356,14 +464,18 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.elementId, jdbcType=VARCHAR},
+            #{job.elementName, jdbcType=VARCHAR},
             #{job.scopeId, jdbcType=VARCHAR},
             #{job.subScopeId, jdbcType=VARCHAR},
             #{job.scopeType, jdbcType=VARCHAR},
             #{job.scopeDefinitionId, jdbcType=VARCHAR},
-            #{job.duedate, jdbcType=TIMESTAMP},
+            #{job.correlationId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
+            #{job.duedate, jdbcType=TIMESTAMP},
+            #{job.repeat, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
             #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
@@ -385,33 +497,48 @@
             <if test="originalPersistentState.lockOwner != lockOwner">
                 LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.category != category">
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.jobHandlerType != jobHandlerType">
                 HANDLER_TYPE_ = #{jobHandlerType, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.retries != retries">
                 RETRIES_ = #{retries, jdbcType=INTEGER},
             </if>
+            <if test="originalPersistentState.processDefinitionId != processDefinitionId">
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.elementId != elementId">
+                ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.elementName != elementName">
+                ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
+            </if>
             <if test="originalPersistentState.createTime != createTime">
-                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP}
+                CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.correlationId != correlationId">
+                CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR}
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
             </if>
         </set>
         where ID_= #{id, jdbcType=VARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
-    <update id="resetExpiredJob" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+    <update id="resetExpiredJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
         update ${prefix}ACT_RU_JOB
         set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null, CREATE_TIME_ = #{parameter.now, jdbcType=TIMESTAMP}
         where ID_ = #{parameter.id,jdbcType=VARCHAR}
     </update>
 
-    <select id="selectTimersByExecutionId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
+    <select id="selectTimersByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_JOB
         where (RETRIES_ &gt; 0)

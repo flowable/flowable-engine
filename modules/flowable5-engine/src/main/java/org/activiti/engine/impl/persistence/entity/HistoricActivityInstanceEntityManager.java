@@ -21,7 +21,7 @@ import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 
 /**
  * @author Tom Baeyens
@@ -43,7 +43,7 @@ public class HistoricActivityInstanceEntityManager extends AbstractManager {
         parameters.put("activityId", activityId);
         parameters.put("processInstanceId", processInstanceId);
 
-        return (HistoricActivityInstanceEntity) getDbSqlSession().selectOne("selectHistoricActivityInstance", parameters);
+        return (HistoricActivityInstanceEntity) getDbSqlSession().selectOne("selectHistoricActivityInstanceByActivityIdAndProcessInstanceId", parameters);
     }
 
     public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {

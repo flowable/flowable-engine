@@ -13,6 +13,30 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -21,26 +45,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.api.RequestUtil;
-import org.flowable.task.api.Task;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
+ * @author Christopher Welsch
  */
 @RestController
 @Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
@@ -48,8 +56,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return tasks with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return tasks with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
             @ApiImplicitParam(name = "priority", dataType = "string", value = "Only return tasks with the given priority.", paramType = "query"),
             @ApiImplicitParam(name = "minimumPriority", dataType = "string", value = "Only return tasks with a priority greater than the given value.", paramType = "query"),
@@ -63,10 +73,14 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "candidateUser", dataType = "string", value = "Only return tasks that can be claimed by the given user. This includes both tasks where the user is an explicit candidate for and task that are claimable by a group that the user is a member of.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
             @ApiImplicitParam(name = "candidateGroups", dataType = "string", value = "Only return tasks that can be claimed by a user in the given groups. Values split by comma.", paramType = "query"),
+            @ApiImplicitParam(name = "ignoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with candidateGroups or candidateUser) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup or candidateUser)"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "Only return tasks in which the given user is involved.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "Only return tasks with the given task definition id.", paramType = "query"),
             @ApiImplicitParam(name = "taskDefinitionKeyLike", dataType = "string", value = "Only return tasks with a given task definition id like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "taskDefinitionKeys", dataType = "string", value = "Only return tasks with the given task definition ids.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return tasks which are part of the process instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIdWithChildren", dataType = "string", value = "Only return tasks which are part of the process instance and its children with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns tasks without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKey", dataType = "string", value = "Only return tasks which are part of the process instance with the given business key.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceBusinessKeyLike", dataType = "string", value = "Only return tasks which are part of the process instance which has a business key like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return tasks which are part of a process instance which has a process definition with the given id.", paramType = "query"),
@@ -78,36 +92,53 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "createdOn", dataType = "string",format = "date-time", value = "Only return tasks which are created on the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdBefore", dataType = "string",format = "date-time", value = "Only return tasks which are created before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "createdAfter", dataType = "string",format = "date-time", value = "Only return tasks which are created after the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueOn", dataType = "string",format = "date-time", value = "Only return tasks which are due on the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "dueDate", dataType = "string",format = "date-time", value = "Only return tasks which are due on the given date.", paramType = "query"),
             @ApiImplicitParam(name = "dueBefore", dataType = "string", format = "date-time", value = "Only return tasks which are due before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "dueAfter", dataType = "string", format = "date-time", value = "Only return tasks which are due after the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutDueDate", dataType = "boolean", value = "Only return tasks which don’t have a due date. The property is ignored if the value is false.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutDueDate", dataType = "boolean", value = "Only return tasks which do not have a due date. The property is ignored if the value is false.", paramType = "query"),
             @ApiImplicitParam(name = "excludeSubTasks", dataType = "boolean", value = "Only return tasks that are not a subtask of another task.", paramType = "query"),
             @ApiImplicitParam(name = "active", dataType = "boolean", value = "If true, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.", paramType = "query"),
             @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "Indication to include task local variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
+            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return tasks with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return tasks with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns tasks without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "candidateOrAssigned", dataType = "string", value = "Select tasks that has been claimed or assigned to user or waiting to claim by user (candidate user or groups).", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "categoryIn", dataType = "string", value = "Select tasks for the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "categoryNotIn", dataType = "string", value = "Select tasks which are not assigned to the given categories. Does not return tasks without categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return tasks which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return tasks which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @GetMapping(value = "/runtime/tasks", produces = "application/json")
-    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams) {
         // Create a Task query request
         TaskQueryRequest request = new TaskQueryRequest();
 
         // Populate filter-parameters
+        if (requestParams.containsKey("taskId")) {
+            request.setTaskId(requestParams.get("taskId"));
+        }
         if (requestParams.containsKey("name")) {
             request.setName(requestParams.get("name"));
         }
 
         if (requestParams.containsKey("nameLike")) {
             request.setNameLike(requestParams.get("nameLike"));
+        }
+        
+        if (requestParams.containsKey("nameLikeIgnoreCase")) {
+            request.setNameLikeIgnoreCase(requestParams.get("nameLikeIgnoreCase"));
         }
 
         if (requestParams.containsKey("description")) {
@@ -167,10 +198,12 @@ public class TaskCollectionResource extends TaskBaseResource {
         }
 
         if (requestParams.containsKey("candidateGroups")) {
-            String[] candidateGroups = requestParams.get("candidateGroups").split(",");
-            List<String> groups = new ArrayList<>(candidateGroups.length);
-            Collections.addAll(groups, candidateGroups);
+            List<String> groups = csvToList("candidateGroups", requestParams);
             request.setCandidateGroupIn(groups);
+        }
+
+        if (requestParams.containsKey("ignoreAssignee") && Boolean.valueOf(requestParams.get("ignoreAssignee"))) {
+            request.setIgnoreAssignee(true);
         }
 
         if (requestParams.containsKey("processDefinitionId")) {
@@ -195,6 +228,14 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("processInstanceId")) {
             request.setProcessInstanceId(requestParams.get("processInstanceId"));
+        }
+        
+        if (requestParams.containsKey("processInstanceIdWithChildren")) {
+            request.setProcessInstanceIdWithChildren(requestParams.get("processInstanceIdWithChildren"));
+        }
+        
+        if (requestParams.containsKey("withoutProcessInstanceId") && Boolean.valueOf(requestParams.get("withoutProcessInstanceId"))) {
+            request.setWithoutProcessInstanceId(Boolean.TRUE);
         }
 
         if (requestParams.containsKey("processInstanceBusinessKey")) {
@@ -233,6 +274,10 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setTaskDefinitionKeyLike(requestParams.get("taskDefinitionKeyLike"));
         }
 
+        if (requestParams.containsKey("taskDefinitionKeys")) {
+            request.setTaskDefinitionKeys(Arrays.asList(requestParams.get("taskDefinitionKeys").split(",")));
+        }
+
         if (requestParams.containsKey("dueDate")) {
             request.setDueDate(RequestUtil.getDate(requestParams, "dueDate"));
         }
@@ -256,6 +301,26 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (requestParams.containsKey("includeProcessVariables")) {
             request.setIncludeProcessVariables(Boolean.valueOf(requestParams.get("includeProcessVariables")));
         }
+        
+        if (requestParams.containsKey("scopeDefinitionId")) {
+            request.setScopeDefinitionId(requestParams.get("scopeDefinitionId"));
+        }
+        
+        if (requestParams.containsKey("scopeId")) {
+            request.setScopeId(requestParams.get("scopeId"));
+        }
+        
+        if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {
+            request.setWithoutScopeId(Boolean.TRUE);
+        }
+        
+        if (requestParams.containsKey("scopeType")) {
+            request.setScopeType(requestParams.get("scopeType"));
+        }
+
+        if (requestParams.containsKey("propagatedStageInstanceId")) {
+            request.setPropagatedStageInstanceId(requestParams.get("propagatedStageInstanceId"));
+        }
 
         if (requestParams.containsKey("tenantId")) {
             request.setTenantId(requestParams.get("tenantId"));
@@ -277,16 +342,37 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setCategory(requestParams.get("category"));
         }
 
+        if (requestParams.containsKey("withoutCategory") && Boolean.valueOf(requestParams.get("withoutCategory"))) {
+            request.setWithoutCategory(Boolean.TRUE);
+        }
+
+        if (requestParams.containsKey("categoryIn")) {
+            request.setCategoryIn(csvToList("categoryIn", requestParams));
+        }
+
+        if (requestParams.containsKey("categoryNotIn")) {
+            request.setCategoryNotIn(csvToList("categoryNotIn", requestParams));
+        }
+
+        if (requestParams.containsKey("rootScopeId")) {
+            request.setRootScopeId(requestParams.get("rootScopeId"));
+        }
+
+        if (requestParams.containsKey("parentScopeId")) {
+            request.setParentScopeId(requestParams.get("parentScopeId"));
+        }
+
         return getTasksFromQueryRequest(request, requestParams);
     }
 
-    @ApiOperation(value = "Create Task", tags = { "Tasks" })
+    @ApiOperation(value = "Create Task", tags = { "Tasks" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @PostMapping(value = "/runtime/tasks", produces = "application/json")
-    public TaskResponse createTask(@RequestBody TaskRequest taskRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskResponse createTask(@RequestBody TaskRequest taskRequest) {
 
         Task task = taskService.newTask();
 
@@ -295,9 +381,62 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (taskRequest.isTenantIdSet()) {
             ((TaskEntity) task).setTenantId(taskRequest.getTenantId());
         }
+        
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTask(task, taskRequest);
+        }
+        
         taskService.saveTask(task);
 
-        response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createTaskResponse(task);
+    }
+
+    @ApiOperation(value = "Update Tasks", tags = { "Tasks" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
+    })
+    @PutMapping(value = "/runtime/tasks", produces = "application/json")
+    public DataResponse<TaskResponse> bulkUpdateTasks(@RequestBody BulkTasksRequest bulkTasksRequest) {
+
+        if (bulkTasksRequest == null) {
+            throw new FlowableException("A request body was expected when bulk updating tasks.");
+        }
+        if (bulkTasksRequest.getTaskIds() == null) {
+            throw new FlowableIllegalArgumentException("taskIds can not be null for bulk update tasks requests");
+        }
+
+        Collection<Task> taskList = getTasksFromIdList(bulkTasksRequest.getTaskIds());
+
+        if (taskList.size() != bulkTasksRequest.getTaskIds().size()) {
+            taskList.stream().forEach(task -> bulkTasksRequest.getTaskIds().remove(task.getId()));
+            throw new FlowableObjectNotFoundException(
+                    "Could not find task instance with id:" + bulkTasksRequest.getTaskIds().stream().collect(Collectors.joining(",")));
+        }
+
+        // Populate the task properties based on the request
+        populateTasksFromRequest(taskList, bulkTasksRequest);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.bulkUpdateTasks(taskList, bulkTasksRequest);
+        }
+
+        // Save the task and fetch again, it's possible that an
+        // assignment-listener has updated
+        // fields after it was saved so we can not use the in-memory task
+        taskService.bulkSaveTasks(taskList);
+
+        List<Task> taskResultList = getTasksFromIdList(bulkTasksRequest.getTaskIds());
+
+        DataResponse<TaskResponse> dataResponse = new DataResponse<>();
+        dataResponse.setData(restResponseFactory.createTaskResponseList(taskResultList));
+        return dataResponse;
+    }
+
+    protected List<String> csvToList(String key, Map<String, String> requestParams) {
+        String[] candidateGroupsSplit = requestParams.get(key).split(",");
+        List<String> groups = new ArrayList<>(candidateGroupsSplit.length);
+        Collections.addAll(groups, candidateGroupsSplit);
+        return groups;
     }
 }

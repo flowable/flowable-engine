@@ -13,16 +13,20 @@
 
 package org.flowable.examples.groovy;
 
-import org.flowable.engine.common.impl.util.CollectionUtil;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Grochowski
  */
 public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testGroovyStaticScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
@@ -30,10 +34,11 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        assertEquals("ABC", result);
-        assertEquals(15, sum.intValue());
+        assertThat(result).isEqualTo("ABC");
+        assertThat(sum).isEqualTo(15);
     }
     
+    @Test
     @Deployment
     public void testGroovyScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
@@ -41,7 +46,7 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
-        assertEquals("ABC", result);
-        assertEquals(15, sum.intValue());
+        assertThat(result).isEqualTo("ABC");
+        assertThat(sum).isEqualTo(15);
     }
 }

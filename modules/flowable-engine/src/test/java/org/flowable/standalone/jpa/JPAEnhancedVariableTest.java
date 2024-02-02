@@ -12,59 +12,57 @@
  */
 package org.flowable.standalone.jpa;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.AbstractFlowableTestCase;
+import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Test for JPA enhancement support
- * 
+ *
  * @author <a href="mailto:eugene.khrustalev@gmail.com">Eugene Khrustalev</a>
  */
-public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
+@Tag("jpa")
+public class JPAEnhancedVariableTest extends ResourceFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JPAEnhancedVariableTest.class);
-    private static EntityManagerFactory entityManagerFactory;
-    protected static ProcessEngine cachedProcessEngine;
+    private EntityManagerFactory entityManagerFactory;
 
-    private static FieldAccessJPAEntity fieldEntity;
-    private static FieldAccessJPAEntity fieldEntity2;
-    private static PropertyAccessJPAEntity propertyEntity;
+    private FieldAccessJPAEntity fieldEntity;
+    private FieldAccessJPAEntity fieldEntity2;
+    private PropertyAccessJPAEntity propertyEntity;
 
-    @Override
-    protected void initializeProcessEngine() {
-        if (cachedProcessEngine == null) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
-                    .createProcessEngineConfigurationFromResource("org/flowable/standalone/jpa/flowable.cfg.xml");
-
-            cachedProcessEngine = processEngineConfiguration.buildProcessEngine();
-
-            EntityManagerSessionFactory entityManagerSessionFactory = (EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class);
-
-            entityManagerFactory = entityManagerSessionFactory.getEntityManagerFactory();
-
-            setupJPAVariables();
-        }
-        processEngine = cachedProcessEngine;
+    public JPAEnhancedVariableTest() {
+        super("org/flowable/standalone/jpa/flowable.cfg.xml");
     }
 
-    private static void setupJPAVariables() {
+    @BeforeEach
+    protected void setUp() {
+        entityManagerFactory = ((EntityManagerSessionFactory) processEngineConfiguration.getSessionFactories().get(EntityManagerSession.class))
+                .getEntityManagerFactory();
+        setupJPAVariables();
+    }
+
+    private void setupJPAVariables() {
         EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
 
@@ -104,6 +102,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testEnhancedEntityVariables() throws Exception {
         // test if enhancement is used
@@ -122,16 +121,17 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
-            if (name.equals("fieldEntity")) {
-                assertTrue(value instanceof FieldAccessJPAEntity);
-            } else if (name.equals("propertyEntity")) {
-                assertTrue(value instanceof PropertyAccessJPAEntity);
+            if ("fieldEntity".equals(name)) {
+                assertThat(value).isInstanceOf(FieldAccessJPAEntity.class);
+            } else if ("propertyEntity".equals(name)) {
+                assertThat(value).isInstanceOf(PropertyAccessJPAEntity.class);
             } else {
-                fail();
+                fail("Unknown 'name' field");
             }
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
     public void testEnhancedEntityListVariables() throws Exception {
         // test if enhancement is used
@@ -148,14 +148,14 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
         org.flowable.task.api.Task task = getTask(instance);
         List list = (List) task.getProcessVariables().get("list1");
-        assertEquals(2, list.size());
-        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat(list.get(1)).isInstanceOf(FieldAccessJPAEntity.class);
 
         list = (List) task.getProcessVariables().get("list2");
-        assertEquals(2, list.size());
-        assertTrue(list.get(0) instanceof PropertyAccessJPAEntity);
-        assertTrue(list.get(1) instanceof PropertyAccessJPAEntity);
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0)).isInstanceOf(PropertyAccessJPAEntity.class);
+        assertThat(list.get(1)).isInstanceOf(PropertyAccessJPAEntity.class);
 
         // start process with enhanced and persisted only jpa variables in the
         // same list
@@ -164,11 +164,11 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
         task = getTask(instance);
         list = (List) task.getProcessVariables().get("list");
-        assertEquals(2, list.size());
-        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-        assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
-        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-        assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat((long) ((FieldAccessJPAEntity) list.get(0)).getId()).isEqualTo(1L);
+        assertThat(list.get(1)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat((long) ((FieldAccessJPAEntity) list.get(1)).getId()).isEqualTo(2L);
 
         // shuffle list and start a new process
         params.putAll(Collections.singletonMap("list", Arrays.asList(fieldEntity2, fieldEntity)));
@@ -176,20 +176,18 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
 
         task = getTask(instance);
         list = (List) task.getProcessVariables().get("list");
-        assertEquals(2, list.size());
-        assertTrue(list.get(0) instanceof FieldAccessJPAEntity);
-        assertEquals(2L, (long) ((FieldAccessJPAEntity) list.get(0)).getId());
-        assertTrue(list.get(1) instanceof FieldAccessJPAEntity);
-        assertEquals(1L, (long) ((FieldAccessJPAEntity) list.get(1)).getId());
+        assertThat(list).hasSize(2);
+        assertThat(list.get(0)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat((long) ((FieldAccessJPAEntity) list.get(0)).getId()).isEqualTo(2L);
+        assertThat(list.get(1)).isInstanceOf(FieldAccessJPAEntity.class);
+        assertThat((long) ((FieldAccessJPAEntity) list.get(1)).getId()).isEqualTo(1L);
 
         // start process with mixed jpa entities in list
-        try {
-            params = new HashMap<>();
-            params.put("list", Arrays.asList(fieldEntity, propertyEntity));
-            instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
-            fail();
-        } catch (Exception e) {
-            /* do nothing */
-        }
+        assertThatThrownBy(() -> {
+            Map<String, Object> params2 = new HashMap<>();
+            params2.put("list", Arrays.asList(fieldEntity, propertyEntity));
+            processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params2);
+        })
+                .isExactlyInstanceOf(Exception.class);
     }
 }

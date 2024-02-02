@@ -1,0 +1,364 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" xmlns:dmndi="http://www.omg.org/spec/DMN/20180521/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="definition_decisionServiceTest" name="Decision Service Test" namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <decisionTable id="decisionTable_9ea65ee8-8208-4db7-8ea4-f5a6a9d67981" hitPolicy="FIRST">
+            <input label="Decision Two">
+                <inputExpression id="inputExpression_918ec698-1c2f-4302-ac46-05a0a5909297" typeRef="string">
+                    <text>decisionTwo</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_a0b6ed95-d254-4627-a3d7-09b63c9bd5fd" name="output1" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_918ec698-1c2f-4302-ac46-05a0a5909297_1">
+                    <text><![CDATA[== "WAS 10"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_a0b6ed95-d254-4627-a3d7-09b63c9bd5fd_1">
+                    <text><![CDATA["RESULT 1"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_918ec698-1c2f-4302-ac46-05a0a5909297_2">
+                    <text><![CDATA[== "WAS 10"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_a0b6ed95-d254-4627-a3d7-09b63c9bd5fd_2">
+                    <text><![CDATA["RESULT 2"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_918ec698-1c2f-4302-ac46-05a0a5909297_3">
+                    <text><![CDATA[-]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_a0b6ed95-d254-4627-a3d7-09b63c9bd5fd_3">
+                    <text><![CDATA[""]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <decisionTable id="decisionTable_85d18c88-43eb-4068-9a61-b7803d9b8db7" hitPolicy="FIRST">
+            <input label="Input 1">
+                <inputExpression id="inputExpression_07b59b32-7f0a-46ad-849b-8f89c01e8d79" typeRef="number">
+                    <text>root.input1</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_1efb503b-40a5-4940-94fa-ccbb615116d8" label="Decision Result" name="decisionTwo" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_1">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_1">
+                    <text><![CDATA["WAS 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_2">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_2">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_3">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_3">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_4">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_4">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_5">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_5">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_6">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_6">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_7">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_7">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_8">
+                    <text><![CDATA[== 10]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_8">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_9">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_9">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_10">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_10">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_11">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_11">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_12">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_12">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_13">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_13">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_14">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_14">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_15">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_15">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_16">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_16">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_17">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_17">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_18">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_18">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_19">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_19">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_20">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_20">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_21">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_21">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_22">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_22">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_23">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_23">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_24">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_24">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_25">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_25">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_26">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_26">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_27">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_27">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_28">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_28">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_29">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_29">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_30">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_30">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_31">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_31">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_32">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_32">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_33">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_33">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_34">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_34">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_35">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_35">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_36">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_36">
+                    <text><![CDATA["WAS NOT 10"]]></text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry_07b59b32-7f0a-46ad-849b-8f89c01e8d79_37">
+                    <text><![CDATA[== asdasdasd]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_1efb503b-40a5-4940-94fa-ccbb615116d8_37">
+                    <text><![CDATA[""]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="decisionServiceTest" name="Decision Service Test">
+        <outputDecision href="#decision1"></outputDecision>
+        <encapsulatedDecision href="#decision2"></encapsulatedDecision>
+    </decisionService>
+    <dmndi:DMNDI>
+        <dmndi:DMNDiagram id="DMNDiagram_decisionServiceTest" name="Decision Service Test">
+            <dmndi:Size height="1050.0" width="1485.0"></dmndi:Size>
+            <dmndi:DMNShape id="DMNShape_8e0129d4-4cf9-493b-8c9d-9a16761bb9ac" dmnElementRef="decisionServiceTest">
+                <dc:Bounds height="570.0" width="729.0" x="30.0" y="45.0"></dc:Bounds>
+                <dmndi:DMNDecisionServiceDividerLine>
+                    <di:waypoint x="30.0" y="285.0"></di:waypoint>
+                    <di:waypoint x="759.0" y="285.0"></di:waypoint>
+                </dmndi:DMNDecisionServiceDividerLine>
+            </dmndi:DMNShape>
+            <dmndi:DMNShape id="DMNShape_a9a76276-ebcd-4d24-952b-15d100792b84" dmnElementRef="decision1">
+                <dc:Bounds height="62.0" width="100.0" x="150.0" y="134.0"></dc:Bounds>
+            </dmndi:DMNShape>
+            <dmndi:DMNShape id="DMNShape_dcbb4bd6-96a4-4c6f-a8b2-f96be28b47eb" dmnElementRef="decision2">
+                <dc:Bounds height="62.0" width="100.0" x="525.0" y="450.0"></dc:Bounds>
+            </dmndi:DMNShape>
+        </dmndi:DMNDiagram>
+    </dmndi:DMNDI>
+</definitions>

@@ -23,22 +23,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
-import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.task.service.impl.util.CountingTaskUtil;
+import org.flowable.task.service.impl.util.TaskVariableUtils;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
+import org.flowable.variable.service.impl.util.CommandContextUtil;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -46,7 +57,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
  * @author Falko Menge
  * @author Tijs Rademakers
  */
-public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, CountingTaskEntity, Serializable {
+public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity implements TaskEntity, CountingTaskEntity, Serializable {
 
     public static final String DELETE_REASON_COMPLETED = "completed";
     public static final String DELETE_REASON_DELETED = "deleted";
@@ -66,7 +77,15 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String description;
     protected String localizedDescription;
     protected int priority = DEFAULT_PRIORITY;
+    protected String state;
     protected Date createTime; // The time when the task has been created
+    protected Date inProgressStartTime;
+    protected String inProgressStartedBy;
+    protected Date claimTime;
+    protected String claimedBy;
+    protected Date suspendedTime;
+    protected String suspendedBy;
+    protected Date inProgressStartDueDate;
     protected Date dueDate;
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
     protected String category;
@@ -77,38 +96,33 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String taskDefinitionId;
     
     protected String scopeId;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected String propagatedStageInstanceId;
 
     protected String taskDefinitionKey;
     protected String formKey;
 
-    protected boolean isDeleted;
     protected boolean isCanceled;
 
     private boolean isCountEnabled;
-    private int variableCount;
-    private int identityLinkCount;
-    
-
-    protected Date claimTime;
+    protected int variableCount;
+    protected int identityLinkCount;
+    protected int subTaskCount;
 
     protected String tenantId = TaskServiceConfiguration.NO_TENANT_ID;
 
     // Non-persisted
     protected String eventName;
     protected String eventHandlerId;
+    protected String tempCompletedBy;
     protected List<VariableInstanceEntity> queryVariables;
     protected List<IdentityLinkEntity> queryIdentityLinks;
     protected boolean forcedUpdate;
-
-
-    public TaskEntityImpl() {
-
-    }
 
     @Override
     public Object getPersistentState() {
@@ -128,6 +142,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (processDefinitionId != null) {
             persistentState.put("processDefinitionId", this.processDefinitionId);
         }
+        if (taskDefinitionId != null) {
+            persistentState.put("taskDefinitionId", this.taskDefinitionId);
+        }
+        if (taskDefinitionKey != null) {
+            persistentState.put("taskDefinitionKey", this.taskDefinitionKey);
+        }
         if (scopeId != null) {
             persistentState.put("scopeId", this.scopeId);
         }
@@ -140,11 +160,38 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (scopeDefinitionId != null) {
             persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
         }
+        if (propagatedStageInstanceId != null) {
+            persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
+        }
+        if (state != null) {
+            persistentState.put("state", this.state);
+        }
         if (createTime != null) {
             persistentState.put("createTime", this.createTime);
         }
+        if (inProgressStartTime != null) {
+            persistentState.put("inProgressStartTime", this.inProgressStartTime);
+        }
+        if (inProgressStartedBy != null) {
+            persistentState.put("inProgressStartedBy", this.inProgressStartedBy);
+        }
+        if (claimTime != null) {
+            persistentState.put("claimTime", this.claimTime);
+        }
+        if (claimedBy != null) {
+            persistentState.put("claimedBy", this.claimedBy);
+        }
+        if (suspendedTime != null) {
+            persistentState.put("suspendedTime", this.suspendedTime);
+        }
+        if (suspendedBy != null) {
+            persistentState.put("suspendedBy", this.suspendedBy);
+        }
         if (description != null) {
             persistentState.put("description", this.description);
+        }
+        if (inProgressStartDueDate != null) {
+            persistentState.put("inProgressStartDueDate", this.inProgressStartDueDate);
         }
         if (dueDate != null) {
             persistentState.put("dueDate", this.dueDate);
@@ -163,13 +210,10 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
             persistentState.put("forcedUpdate", Boolean.TRUE);
         }
 
-        if (claimTime != null) {
-            persistentState.put("claimTime", this.claimTime);
-        }
-
         persistentState.put("isCountEnabled", this.isCountEnabled);
         persistentState.put("variableCount", this.variableCount);
         persistentState.put("identityLinkCount", this.identityLinkCount);
+        persistentState.put("subTaskCount", this.subTaskCount);
 
         return persistentState;
     }
@@ -183,27 +227,38 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
-        return CommandContextUtil.getTaskServiceConfiguration().getInternalTaskVariableScopeResolver().resolveParentVariableScope(this);
+        return getTaskServiceConfiguration().getInternalTaskVariableScopeResolver().resolveParentVariableScope(this);
     }
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         variableInstance.setTaskId(id);
-        variableInstance.setExecutionId(executionId);
-        variableInstance.setProcessInstanceId(processInstanceId);
-        variableInstance.setProcessDefinitionId(processDefinitionId);
+        if (ScopeTypes.CMMN.equals(this.scopeType)) {
+            variableInstance.setScopeId(this.scopeId);
+            variableInstance.setScopeType(this.scopeType);
+            variableInstance.setSubScopeId(this.subScopeId);
+        } else {
+            variableInstance.setExecutionId(this.executionId);
+            variableInstance.setProcessInstanceId(this.processInstanceId);
+            variableInstance.setProcessDefinitionId(this.processDefinitionId);
+        }
+    }
+
+    @Override
+    protected void addLoggingSessionInfo(ObjectNode loggingNode) {
+        // TODO
     }
 
     @Override
     protected List<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskId(id);
+        return getVariableServiceConfiguration().getVariableService().createInternalVariableInstanceQuery().taskId(id).list();
     }
     
     @Override
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value) {
         VariableInstanceEntity variableInstance = super.createVariableInstance(variableName, value);
         
-        CountingTaskUtil.handleInsertVariableInstanceEntityCount(variableInstance);
+        CountingTaskUtil.handleInsertVariableInstanceEntityCount(variableInstance, getTaskServiceConfiguration());
 
         return variableInstance;
         
@@ -213,7 +268,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance) {
         super.deleteVariableInstanceForExplicitUserCall(variableInstance);
         
-        CountingTaskUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true);
+        CountingTaskUtil.handleDeleteVariableInstanceEntityCount(variableInstance, true, getTaskServiceConfiguration());
     }
 
     // task assignment ////////////////////////////////////////////////////////////
@@ -233,7 +288,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public List<IdentityLinkEntity> getIdentityLinks() {
         if (!isIdentityLinksInitialized) {
             if (queryIdentityLinks == null) {
-                taskIdentityLinkEntities = CommandContextUtil.getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
+                taskIdentityLinkEntities = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager().findIdentityLinksByTaskId(id);
             } else {
                 taskIdentityLinkEntities = queryIdentityLinks;
             }
@@ -259,10 +314,37 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         this.assignee = assignee;
         assigneeUpdatedCount++;
     }
+    
+    @Override
+    public void setAssigneeValue(String assignee) {
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.changeAssignee(this, assignee);
+        } else {
+            this.originalAssignee = this.assignee;
+            this.assignee = assignee;
+            assigneeUpdatedCount++;
+        }
+    }
 
     @Override
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+    
+    @Override
+    public void setOwnerValue(String owner) {
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.changeOwner(this, owner);
+        } else {
+            this.owner = owner;
+        }
+    }
+    
+    @Override
+    public void setInProgressStartDueDate(Date inProgressStartDueDate) {
+        this.inProgressStartDueDate = inProgressStartDueDate;
     }
 
     @Override
@@ -282,14 +364,22 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public void addUserIdentityLink(String userId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addTaskIdentityLink(this.id, userId, null, identityLinkType);
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        IdentityLinkEntity identityLink = identityLinkEntityManager.addTaskIdentityLink(this.id, userId, null, identityLinkType);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addUserIdentityLink(this, identityLink);
+        }
     }
 
     @Override
     public void addGroupIdentityLink(String groupId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addTaskIdentityLink(this.id, null, groupId, identityLinkType);
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        IdentityLinkEntity identityLink = identityLinkEntityManager.addTaskIdentityLink(this.id, null, groupId, identityLinkType);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addGroupIdentityLink(this, identityLink);
+        }
     }
 
     @Override
@@ -304,13 +394,13 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     
     @Override
     public void deleteUserIdentityLink(String userId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), userId, null, identityLinkType);
     }
     
     @Override
     public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
         identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), null, groupId,identityLinkType);
     }
 
@@ -341,20 +431,27 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
-        VariableInstanceEntity variableInstance = CommandContextUtil.getVariableInstanceEntityManager().findVariableInstanceByTaskAndName(id, variableName);
 
-        return variableInstance;
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .taskId(id)
+                .name(variableName)
+                .singleResult();
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
-        return CommandContextUtil.getVariableInstanceEntityManager().findVariableInstancesByTaskAndNames(id, variableNames);
+        return getVariableServiceConfiguration().getVariableService()
+                .createInternalVariableInstanceQuery()
+                .taskId(id)
+                .names(variableNames)
+                .list();
     }
 
     // regular getters and setters ////////////////////////////////////////////////////////
@@ -394,6 +491,11 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
     }
+    
+    @Override
+    public Date getInProgressStartDueDate() {
+        return inProgressStartDueDate;
+    }
 
     @Override
     public Date getDueDate() {
@@ -404,6 +506,16 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public int getPriority() {
         return priority;
     }
+    
+    @Override
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public void setState(String state) {
+        this.state = state;
+    }
 
     @Override
     public Date getCreateTime() {
@@ -413,6 +525,66 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @Override
+    public Date getInProgressStartTime() {
+        return inProgressStartTime;
+    }
+
+    @Override
+    public void setInProgressStartTime(Date inProgressStartTime) {
+        this.inProgressStartTime = inProgressStartTime;
+    }
+
+    @Override
+    public String getInProgressStartedBy() {
+        return inProgressStartedBy;
+    }
+
+    @Override
+    public void setInProgressStartedBy(String inProgressStartedBy) {
+        this.inProgressStartedBy = inProgressStartedBy;
+    }
+    
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
+    public Date getSuspendedTime() {
+        return suspendedTime;
+    }
+
+    @Override
+    public void setSuspendedTime(Date suspendedTime) {
+        this.suspendedTime = suspendedTime;
+    }
+
+    @Override
+    public String getSuspendedBy() {
+        return suspendedBy;
+    }
+
+    @Override
+    public void setSuspendedBy(String suspendedBy) {
+        this.suspendedBy = suspendedBy;
     }
 
     @Override
@@ -434,7 +606,17 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
-    
+
+    @Override
+    public String getTaskDefinitionId() {
+        return taskDefinitionId;
+    }
+
+    @Override
+    public void setTaskDefinitionId(String taskDefinitionId) {
+        this.taskDefinitionId = taskDefinitionId;
+    }
+
     @Override
     public String getScopeId() {
         return scopeId;
@@ -473,6 +655,16 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    @Override
+    public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
+        this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @Override
+    public String getPropagatedStageInstanceId() {
+        return propagatedStageInstanceId;
     }
 
     @Override
@@ -518,6 +710,16 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public void setEventHandlerId(String eventHandlerId) {
         this.eventHandlerId = eventHandlerId;
     }
+    
+    @Override
+    public String getTempCompletedBy() {
+        return tempCompletedBy;
+    }
+
+    @Override
+    public void setTempCompletedBy(String tempCompletedBy) {
+        this.tempCompletedBy = tempCompletedBy;
+    }
 
     @Override
     public void setExecutionId(String executionId) {
@@ -541,26 +743,84 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     
     @Override
     public void addCandidateUser(String userId) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addCandidateUser(this.id, userId);
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        IdentityLinkEntity identityLink = identityLinkEntityManager.addCandidateUser(this.id, userId);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addCandidateUser(this, identityLink);
+        }
     }
     
     @Override
     public void addCandidateUsers(Collection<String> candidateUsers) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addCandidateUsers(this.id, candidateUsers);        
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        List<IdentityLinkEntity> identityLinks = identityLinkEntityManager.addCandidateUsers(this.id, candidateUsers);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addCandidateUsers(this, convertToIdentityLinks(identityLinks));
+        }
     }
     
     @Override
     public void addCandidateGroup(String groupId) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addCandidateGroup(this.id, groupId);
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        IdentityLinkEntity identityLink = identityLinkEntityManager.addCandidateGroup(this.id, groupId);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addCandidateGroup(this, identityLink);
+        }
     }
     
     @Override
     public void addCandidateGroups(Collection<String> candidateGroups) {
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
-        identityLinkEntityManager.addCandidateGroups(this.id, candidateGroups);
+        IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
+        List<IdentityLinkEntity> identityLinks = identityLinkEntityManager.addCandidateGroups(this.id, candidateGroups);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            taskAssignmentManager.addCandidateGroups(this, convertToIdentityLinks(identityLinks));
+        }
+    }
+    
+    protected List<IdentityLink> convertToIdentityLinks(List<IdentityLinkEntity> identityLinks) {
+        List<IdentityLink> identityLinkObjects = new ArrayList<>(identityLinks);
+        return identityLinkObjects;
+    }
+    
+    protected InternalTaskAssignmentManager getTaskAssignmentManager() {
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        if (taskServiceConfiguration != null) {
+            return taskServiceConfiguration.getInternalTaskAssignmentManager();
+        }
+        
+        return null;
+    }
+
+    protected TaskServiceConfiguration getTaskServiceConfiguration() {
+        return (TaskServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+
+    protected IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return (IdentityLinkServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+
+    @Override
+    protected VariableServiceConfiguration getVariableServiceConfiguration() {
+        return (VariableServiceConfiguration) getTaskEngineConfiguration().getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+
+    protected AbstractEngineConfiguration getTaskEngineConfiguration() {
+        Map<String, AbstractEngineConfiguration> engineConfigurations = CommandContextUtil.getCommandContext().getEngineConfigurations();
+        AbstractEngineConfiguration engineConfiguration = null;
+        if (ScopeTypes.CMMN.equals(scopeType)) {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+        } else {
+            engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            if (engineConfiguration == null) {
+                engineConfiguration = engineConfigurations.get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
+        }
+
+        return engineConfiguration;
     }
 
     @Override
@@ -624,7 +884,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public boolean isSuspended() {
-        return suspensionState == SuspensionState.SUSPENDED.getStateCode();
+        return suspensionState == SuspensionState.SUSPENDED.getStateCode() || Task.SUSPENDED.equals(state);
     }
 
     @Override
@@ -645,7 +905,22 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
-                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                if (this.getProcessInstanceId() != null && this.getProcessInstanceId()
+                        .equals(variableInstance.getProcessInstanceId()) && variableInstance.getTaskId() == null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public Map<String, Object> getCaseVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (VariableInstanceEntity variableInstance : queryVariables) {
+                if (TaskVariableUtils.isCaseRelated(variableInstance) && variableInstance.getScopeId().equals(this.getScopeId())
+                        && variableInstance.getTaskId() == null) {
                     variables.put(variableInstance.getName(), variableInstance.getValue());
                 }
             }
@@ -663,6 +938,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         this.tenantId = tenantId;
     }
 
+    @Override
     public List<VariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new VariableInitializingList();
@@ -686,18 +962,23 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     }
 
     @Override
-    public Date getClaimTime() {
-        return claimTime;
-    }
-
-    @Override
-    public void setClaimTime(Date claimTime) {
-        this.claimTime = claimTime;
-    }
-
-    @Override
     public String toString() {
-        return "Task[id=" + id + ", name=" + name + "]";
+        StringBuilder strb = new StringBuilder();
+        strb.append("Task[");
+        strb.append("id=").append(id);
+        strb.append(", key=").append(taskDefinitionKey);
+        strb.append(", name=").append(name);
+        if (executionId != null) {
+            strb.append(", processInstanceId=").append(processInstanceId)
+                    .append(", executionId=").append(executionId)
+                    .append(", processDefinitionId=").append(processDefinitionId);
+        } else if (scopeId != null) {
+            strb.append(", scopeInstanceId=").append(scopeId)
+                    .append(", subScopeId=").append(subScopeId)
+                    .append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        strb.append("]");
+        return strb.toString();
     }
 
     @Override
@@ -705,8 +986,16 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return isCountEnabled;
     }
 
+    public boolean getIsCountEnabled() {
+        return isCountEnabled;
+    }
+
     @Override
     public void setCountEnabled(boolean isCountEnabled) {
+        this.isCountEnabled = isCountEnabled;
+    }
+
+    public void setIsCountEnabled(boolean isCountEnabled) {
         this.isCountEnabled = isCountEnabled;
     }
 
@@ -730,4 +1019,18 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return identityLinkCount;
     }
 
+    @Override
+    public int getSubTaskCount() {
+        return subTaskCount;
+    }
+
+    @Override
+    public void setSubTaskCount(int subTaskCount) {
+        this.subTaskCount = subTaskCount;
+    }
+
+    @Override
+    public boolean isIdentityLinksInitialized() {
+        return isIdentityLinksInitialized;
+    }
 }

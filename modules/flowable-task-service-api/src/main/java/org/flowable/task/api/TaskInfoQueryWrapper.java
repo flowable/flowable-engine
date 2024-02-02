@@ -16,10 +16,13 @@ package org.flowable.task.api;
  * This is a helper class to help you work with the {@link TaskInfoQuery}, without having to care about the awful generics.
  * 
  * Example usage:
- * 
- * TaskInfoQueryWrapper taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery()); List<? extends TaskInfo> taskInfos = taskInfoQueryWrapper.getTaskInfoQuery().or()
- * .taskNameLike("%task%") .taskDescriptionLike("%blah%"); .endOr() .list();
- * 
+ * <pre>
+ * {@code
+ * TaskInfoQueryWrapper taskInfoQueryWrapper = new TaskInfoQueryWrapper(taskService.createTaskQuery()); 
+ * List<? extends TaskInfo> taskInfos = taskInfoQueryWrapper.getTaskInfoQuery().or()
+ *    .taskNameLike("%task%").taskDescriptionLike("%blah%").endOr().list();
+ * }
+ * </pre>
  * First line can be switched to TaskInfoQueryWrapper taskInfoQueryWrapper = new TaskInfoQueryWrapper(historyService.createTaskQuery()); and the same methods can be used on the result.
  * 
  * @author Joram Barrez

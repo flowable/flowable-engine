@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.test.bpmn;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,19 +25,22 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class StartToEndTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testStartToEnd() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         assertProcessEnded(processInstance.getId());
-        assertTrue(processInstance.isEnded());
+        assertThat(processInstance.isEnded()).isTrue();
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/StartToEndTest.testStartToEnd.bpmn20.xml" })
     public void testStartProcessInstanceWithVariables() {
         Map<String, Object> varMap = new HashMap<>();
@@ -42,9 +48,10 @@ public class StartToEndTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd", varMap);
         assertProcessEnded(processInstance.getId());
         Map<String, Object> returnVarMap = ((ExecutionEntity) processInstance).getVariables();
-        assertEquals("hello", returnVarMap.get("test"));
+        assertThat(returnVarMap).containsEntry("test", "hello");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/StartToEndTest.testStartWithServiceTask.bpmn20.xml" })
     public void testStartProcessInstanceWithServiceTask() {
         Map<String, Object> varMap = new HashMap<>();
@@ -52,27 +59,31 @@ public class StartToEndTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd", varMap);
         assertProcessEnded(processInstance.getId());
         Map<String, Object> returnVarMap = ((ExecutionEntity) processInstance).getVariables();
-        assertEquals("hello", returnVarMap.get("test"));
-        assertEquals("string", returnVarMap.get("string"));
-        assertEquals(true, returnVarMap.get("boolean"));
-        assertEquals(25.5, returnVarMap.get("double"));
-        assertEquals(10L, returnVarMap.get("long"));
+        assertThat(returnVarMap)
+                .contains(
+                        entry("test", "hello"),
+                        entry("string", "string"),
+                        entry("boolean", true),
+                        entry("double", 25.5),
+                        entry("long", 10L)
+                );
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/StartToEndTest.testStartWithSerializableVariables.bpmn20.xml" })
-    public void testStartProcessInstanceWithSerializbleVariables() {
+    public void testStartProcessInstanceWithSerializableVariables() {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("test", "hello");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd", varMap);
         assertProcessEnded(processInstance.getId());
         Map<String, Object> returnVarMap = ((ExecutionEntity) processInstance).getVariables();
-        assertEquals("hello", returnVarMap.get("test"));
+        assertThat(returnVarMap).containsEntry("test", "hello");
         Person person1 = (Person) returnVarMap.get("person1");
-        assertEquals("1", person1.getId());
-        assertEquals("John", person1.getName());
+        assertThat(person1.getId()).isEqualTo("1");
+        assertThat(person1.getName()).isEqualTo("John");
         Person person2 = (Person) returnVarMap.get("person2");
-        assertEquals("2", person2.getId());
-        assertEquals("Paul", person2.getName());
+        assertThat(person2.getId()).isEqualTo("2");
+        assertThat(person2.getName()).isEqualTo("Paul");
     }
 
     public static class PrimitiveServiceTaskDelegate implements JavaDelegate {

@@ -12,7 +12,7 @@
  */
 package org.flowable.experimental;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class ProcessVariablesTest extends CdiFlowableTestCase {
         businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());
 
         InjectProcessVariable injectProcessVariables = getBeanInstance(InjectProcessVariable.class);
-        assertEquals("testValue", injectProcessVariables.testKeyString);
+        assertThat(injectProcessVariables.testKeyString).isEqualTo("testValue");
 
         businessProcess.completeTask();
     }

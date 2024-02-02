@@ -12,19 +12,31 @@
  */
 package org.flowable.cmmn.test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
@@ -46,9 +58,13 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnManagementService cmmnManagementService;
 
+    protected ManagementService processEngineManagementService;
     protected RepositoryService processEngineRepositoryService;
     protected RuntimeService processEngineRuntimeService;
+    protected HistoryService processEngineHistoryService;
     protected TaskService processEngineTaskService;
+    protected ProcessEngineConfiguration processEngineConfiguration;
+    protected DynamicBpmnService processEngineDynamicBpmnService;
 
     @BeforeClass
     public static void bootProcessEngine() {
@@ -68,9 +84,13 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
 
+        this.processEngineManagementService = processEngine.getManagementService();
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();
         this.processEngineTaskService = processEngine.getTaskService();
+        this.processEngineHistoryService = processEngine.getHistoryService();
+        this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        this.processEngineDynamicBpmnService = processEngine.getDynamicBpmnService();
     }
 
     @After
@@ -78,6 +98,34 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
+
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
     }
 
+    protected Date setCmmnClockFixedToCurrentTime() {
+        Date date = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
+    }
+
+    protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
+        long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count();
+        assertThat(count).as(createCaseInstanceEndedErrorMessage(caseInstance, count)).isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).as("Runtime case instance found").isZero();
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
+    }
+
+    protected String createCaseInstanceEndedErrorMessage(CaseInstance caseInstance, long count) {
+        String errorMessage = "Plan item instances found for case instance: ";
+        if (count != 0) {
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            String names = planItemInstances.stream()
+                    .map(planItemInstance -> planItemInstance.getName() + "(" + planItemInstance.getPlanItemDefinitionType() + ")")
+                    .collect(Collectors.joining(", "));
+            errorMessage += names;
+        }
+        return errorMessage;
+    }
 }

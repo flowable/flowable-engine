@@ -20,10 +20,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 
 import junit.framework.TestCase;
 

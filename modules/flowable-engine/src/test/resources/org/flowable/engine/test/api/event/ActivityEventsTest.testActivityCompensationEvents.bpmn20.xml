@@ -9,8 +9,7 @@
 
     <startEvent id="theStart" />
 
-    <sequenceFlow id="flow1" sourceRef="theStart"
-      targetRef="usertask" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="usertask" />
 
     <userTask id="usertask" />
 

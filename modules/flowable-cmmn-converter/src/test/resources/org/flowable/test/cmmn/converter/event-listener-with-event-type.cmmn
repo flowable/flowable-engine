@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="singleCorrelationCase" name="testEventListener">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItemA" name="A" definitionRef="taskA"/>
+            <planItem id="eventListenerPlanItem" definitionRef="eventListener">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter"/>
+                </itemControl>
+            </planItem>
+            <planItem id="planItemB" name="B" definitionRef="taskB">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter"/>
+                </itemControl>
+                <entryCriterion id="entryTaskB" sentryRef="sentryOnEventListener"/>
+            </planItem>
+            <sentry id="sentryOnEventListener">
+                <planItemOnPart id="sentryOnEvent" sourceRef="eventListenerPlanItem">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="taskA" name="A"/>
+            <eventListener id="eventListener" name="myEventListener">
+                <extensionElements>
+                    <flowable:eventType>myEvent</flowable:eventType>
+                    <flowable:eventCorrelationParameter name="customerId" value="${customerIdVar}" />
+                </extensionElements>
+            </eventListener>
+            <humanTask id="taskB" name="B"/>
+        </casePlanModel>
+    </case>
+</definitions>

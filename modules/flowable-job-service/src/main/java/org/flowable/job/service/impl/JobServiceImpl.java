@@ -15,14 +15,23 @@ package org.flowable.job.service.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.job.api.JobInfo;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
+import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.HistoryJobQuery;
+import org.flowable.job.api.JobQuery;
+import org.flowable.job.api.SuspendedJobQuery;
+import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -33,14 +42,35 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
  */
 public class JobServiceImpl extends ServiceImpl implements JobService {
 
-    public JobServiceImpl() {
-
-    }
-
     public JobServiceImpl(JobServiceConfiguration jobServiceConfiguration) {
         super(jobServiceConfiguration);
     }
     
+    @Override
+    public JobQuery createJobQuery() {
+        return new JobQueryImpl(getCommandExecutor(), configuration);
+    }
+
+    @Override
+    public TimerJobQuery createTimerJobQuery() {
+        return new TimerJobQueryImpl(getCommandExecutor(), configuration);
+    }
+
+    @Override
+    public SuspendedJobQuery createSuspendedJobQuery() {
+        return new SuspendedJobQueryImpl(getCommandExecutor(), configuration);
+    }
+
+    @Override
+    public DeadLetterJobQuery createDeadLetterJobQuery() {
+        return new DeadLetterJobQueryImpl(getCommandExecutor(), configuration);
+    }
+
+    @Override
+    public HistoryJobQuery createHistoryJobQuery() {
+        return new HistoryJobQueryImpl(getCommandExecutor(), configuration);
+    }
+
     @Override
     public void scheduleAsyncJob(JobEntity job) {
         getJobManager().scheduleAsyncJob(job);
@@ -55,6 +85,21 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     public List<JobEntity> findJobsByExecutionId(String executionId) {
         return getJobEntityManager().findJobsByExecutionId(executionId);
     }
+    
+    @Override
+    public List<SuspendedJobEntity> findSuspendedJobsByExecutionId(String executionId) {
+        return getSuspendedJobEntityManager().findJobsByExecutionId(executionId);
+    }
+    
+    @Override
+    public List<DeadLetterJobEntity> findDeadLetterJobsByExecutionId(String executionId) {
+        return getDeadLetterJobEntityManager().findJobsByExecutionId(executionId);
+    }
+    
+    @Override
+    public List<ExternalWorkerJobEntity> findExternalWorkerJobsByExecutionId(String executionId) {
+        return getExternalWorkerJobEntityManager().findJobsByExecutionId(executionId);
+    }
 
     @Override
     public List<JobEntity> findJobsByProcessInstanceId(String processInstanceId) {
@@ -67,6 +112,11 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
     
     @Override
+    public List<DeadLetterJobEntity> findDeadLetterJobsByProcessInstanceId(String processInstanceId) {
+        return getDeadLetterJobEntityManager().findJobsByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
     public void updateAllJobTypesTenantIdForDeployment(String deploymentId, String newTenantId) {
         getJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
         getTimerJobEntityManager().updateJobTenantIdForDeployment(deploymentId, newTenantId);
@@ -76,6 +126,9 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     
     @Override
     public AbstractRuntimeJobEntity activateSuspendedJob(SuspendedJobEntity job) {
+        if (configuration.getJobParentStateResolver().isSuspended(job)) {
+            throw new FlowableIllegalArgumentException("Can not activate job "+ job.getId() +". Parent is suspended.");
+        }
         return getJobManager().activateSuspendedJob(job);
     }
 
@@ -90,23 +143,35 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
 
     @Override
-    public void unacquireWithDecrementRetries(JobInfo job) {
-        getJobManager().unacquireWithDecrementRetries(job);
-    }
-    
-    @Override
     public JobEntity createJob() {
         return getJobEntityManager().create();
     }
     
     @Override
-    public void setAsyncJobProperties(JobEntity job, boolean isExclusive) {
-        getJobManager().setAsyncJobProperties(job, isExclusive);
+    public void createAsyncJob(JobEntity job, boolean isExclusive) {
+        getJobManager().createAsyncJob(job, isExclusive);
+    }
+
+    @Override
+    public void createAsyncJobNoTriggerAsyncExecutor(JobEntity job, boolean isExclusive) {
+        getJobManager().createAsyncJob(job, isExclusive);
+        job.setLockExpirationTime(null);
+        job.setLockOwner(null);
     }
 
     @Override
     public void insertJob(JobEntity job) {
         getJobEntityManager().insert(job);
+    }
+
+    @Override
+    public ExternalWorkerJobEntity createExternalWorkerJob() {
+        return getExternalWorkerJobEntityManager().create();
+    }
+
+    @Override
+    public void insertExternalWorkerJob(ExternalWorkerJobEntity job) {
+        getExternalWorkerJobEntityManager().insert(job);
     }
 
     @Override
@@ -138,12 +203,30 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     public void deleteJobsByExecutionId(String executionId) {
         JobEntityManager jobEntityManager = getJobEntityManager();
         Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionId);
+        if (jobsForExecution.isEmpty()) {
+            return;
+        }
+
+        InternalJobManager internalJobManager = configuration.getInternalJobManager();
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        boolean eventDispatcherEnabled = eventDispatcher != null && eventDispatcher.isEnabled();
         for (JobEntity job : jobsForExecution) {
-            getJobEntityManager().delete(job);
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            if (internalJobManager != null) {
+                internalJobManager.handleJobDelete(job);
+            }
+
+            deleteByteArrayRef(job.getExceptionByteArrayRef());
+            deleteByteArrayRef(job.getCustomValuesByteArrayRef());
+
+            if (eventDispatcherEnabled) {
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.ENTITY_DELETED, job), configuration.getEngineName());
+                eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.JOB_CANCELED, job), configuration.getEngineName());
             }
         }
+
+        jobEntityManager.deleteJobsByExecutionId(executionId);
     }
     
     @Override
@@ -152,8 +235,9 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionId);
         for (SuspendedJobEntity job : suspendedJobsForExecution) {
             suspendedJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.JOB_CANCELED, job), configuration.getEngineName());
             }
         }
     }
@@ -164,9 +248,17 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
         Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionId);
         for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
             deadLetterJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.JOB_CANCELED, job), configuration.getEngineName());
             }
         }
     }
+
+    protected void deleteByteArrayRef(ByteArrayRef jobByteArrayRef) {
+        if (jobByteArrayRef != null) {
+            jobByteArrayRef.delete(configuration.getEngineName());
+        }
+    }
+
 }

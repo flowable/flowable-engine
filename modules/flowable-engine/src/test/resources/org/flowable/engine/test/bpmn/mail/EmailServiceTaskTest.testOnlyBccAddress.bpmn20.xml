@@ -1,0 +1,30 @@
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <process id="onlyBccAddress" >
+
+        <startEvent id="theStart" />
+        <sequenceFlow sourceRef="theStart" targetRef="sendMail" />
+
+        <serviceTask id="sendMail" flowable:type="mail">
+            <extensionElements>
+                <flowable:field name="subject">
+                    <flowable:string>Hello world</flowable:string>
+                </flowable:field>
+                <flowable:field name="text">
+                    <flowable:string>This is the content</flowable:string>
+                </flowable:field>
+                <flowable:field name="bcc">
+                    <flowable:string>mispiggy@activiti.org</flowable:string>
+                </flowable:field>
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow sourceRef="sendMail" targetRef="theEnd" />
+
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

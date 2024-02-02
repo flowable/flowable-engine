@@ -32,6 +32,12 @@
         <activiti:testvalue>test</activiti:testvalue>
       </extensionElements>
     </dataObject>
+    <dataObject id="dObjJson" name="JsonTest" itemSubjectRef="xsd:json">
+      <extensionElements>
+        <activiti:value>{ "eltString": "my-string",
+        "eltDate": "2020-02-21T10:25:23+01:00" }</activiti:value>
+      </extensionElements>
+    </dataObject>
     <dataObject id="NoData" name="NoData" itemSubjectRef="xsd:datetime">
       <extensionElements>
         <activiti:value></activiti:value>

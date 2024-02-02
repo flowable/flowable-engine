@@ -23,16 +23,43 @@ public interface PlanItemInstance {
     String getName();
     String getState();
     String getCaseDefinitionId();
+    String getDerivedCaseDefinitionId();
     String getCaseInstanceId();
     String getStageInstanceId();
     boolean isStage();
     String getElementId();
     String getPlanItemDefinitionId();
     String getPlanItemDefinitionType();
-    Date getStartTime();
+    /**
+     * @deprecated use {@link #getCreateTime()} instead
+     */
+    @Deprecated()
+    default Date getStartTime() {
+        return getCreateTime();
+    }
+    Date getCreateTime();
+    Date getLastAvailableTime();
+    Date getLastUnavailableTime();
+    Date getLastEnabledTime();
+    Date getLastDisabledTime();
+    Date getLastStartedTime();
+    Date getLastSuspendedTime();
+    Date getCompletedTime();
+    Date getOccurredTime();
+    Date getTerminatedTime();
+    Date getExitTime();
+    Date getEndedTime();
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
+    boolean isCompletable();
+    String getEntryCriterionId();
+    String getExitCriterionId();
+    String getFormKey();
+    String getExtraValue();
     String getTenantId();
     
+
+    /** Sets an optional localized name for the plan item */
+    void setLocalizedName(String localizedName);
 }

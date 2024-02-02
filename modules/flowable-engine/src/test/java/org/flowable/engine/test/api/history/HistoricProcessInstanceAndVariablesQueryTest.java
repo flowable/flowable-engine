@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,16 +12,26 @@
  */
 package org.flowable.engine.test.api.history;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -39,9 +49,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess2.bpmn20.xml")
@@ -68,199 +77,251 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap).getId());
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         deleteDeployments();
-        
-        super.tearDown();
     }
 
+    @Test
     public void testQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().variableValueEquals("anothertest", 123).singleResult();
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                    .variableValueEquals("anothertest", 123).singleResult();
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
-            assertEquals(6, instanceList.size());
+            assertThat(instanceList).hasSize(6);
 
             instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).list();
-            assertEquals(4, instanceList.size());
+            assertThat(instanceList).hasSize(4);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
-            assertEquals(PROCESS_DEFINITION_KEY, instanceList.get(0).getProcessDefinitionKey());
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
+            assertThat(instanceList.get(0).getProcessDefinitionKey()).isEqualTo(PROCESS_DEFINITION_KEY);
 
-            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY_2).singleResult();
+            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY_2)
+                    .singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().finished().singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
             instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().listPage(0, 50);
-            assertEquals(6, instanceList.size());
-            assertEquals(6, historyService.createHistoricProcessInstanceQuery().includeProcessVariables().count());
+            assertThat(instanceList).hasSize(6);
+            assertThat(historyService.createHistoricProcessInstanceQuery().includeProcessVariables().count()).isEqualTo(6);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueEquals("test", "test")
                     .includeProcessVariables()
                     .listPage(0, 50);
-            assertEquals(4, instanceList.size());
-            assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables().count());
+            assertThat(instanceList).hasSize(4);
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables().count()).isEqualTo(4);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueLike("test", "te%")
                     .includeProcessVariables()
                     .list();
-            assertEquals(4, instanceList.size());
-            assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueLike("test", "te%").includeProcessVariables().count());
+            assertThat(instanceList).hasSize(4);
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLike("test", "te%").includeProcessVariables().count()).isEqualTo(4);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueLike("test2", "te%2")
                     .includeProcessVariables()
                     .list();
-            assertEquals(4, instanceList.size());
-            assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueLike("test2", "te%2").includeProcessVariables().count());
+            assertThat(instanceList).hasSize(4);
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLike("test2", "te%2").includeProcessVariables().count()).isEqualTo(4);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueLikeIgnoreCase("test", "te%")
                     .includeProcessVariables()
                     .list();
-            assertEquals(4, instanceList.size());
-            assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("test", "te%").includeProcessVariables().count());
+            assertThat(instanceList).hasSize(4);
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("test", "te%").includeProcessVariables().count())
+                    .isEqualTo(4);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueLikeIgnoreCase("test", "t3%")
                     .includeProcessVariables()
                     .list();
-            assertEquals(0, instanceList.size());
-            assertEquals(0, historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("test", "t3%").includeProcessVariables().count());
+            assertThat(instanceList).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueLikeIgnoreCase("test", "t3%").includeProcessVariables().count())
+                    .isZero();
 
             instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().listPage(0, 50);
-            assertEquals(6, instanceList.size());
-            assertEquals(6, historyService.createHistoricProcessInstanceQuery().includeProcessVariables().count());
+            assertThat(instanceList).hasSize(6);
+            assertThat(historyService.createHistoricProcessInstanceQuery().includeProcessVariables().count()).isEqualTo(6);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .variableValueEquals("test", "test")
                     .includeProcessVariables()
                     .listPage(0, 1);
-            assertEquals(1, instanceList.size());
+            assertThat(instanceList).hasSize(1);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
-            assertEquals(4, historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables().count());
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables().count()).isEqualTo(4);
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(1, 2);
-            assertEquals(2, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .listPage(1, 2);
+            assertThat(instanceList).hasSize(2);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(3, 4);
-            assertEquals(1, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .listPage(3, 4);
+            assertThat(instanceList).hasSize(1);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY).listPage(4, 2);
-            assertEquals(0, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .listPage(4, 2);
+            assertThat(instanceList).isEmpty();
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables().orderByProcessInstanceId().asc().listPage(0, 50);
-            assertEquals(4, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables()
+                    .orderByProcessInstanceId().asc().listPage(0, 50);
+            assertThat(instanceList).hasSize(4);
+        }
+    }
+    
+    @Test
+    public void testQueryOnTaskVariable() {
+        ProcessInstance taskProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess3").singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(taskProcessInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(), "localVar", "test");
+        
+        assertThat(runtimeService.createProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
+                    .variableValueEquals("anothertest", 123).singleResult();
+            Map<String, Object> variableMap = processInstance.getProcessVariables();
+            assertThat(variableMap).containsExactly(entry("anothertest", 123));
+            
+            assertThat(historyService.createHistoricProcessInstanceQuery().variableValueEquals("localVar", "test").list()).isEmpty();
+            assertThat(historyService.createHistoricProcessInstanceQuery().localVariableValueEquals("localVar", "test").list()).hasSize(1);
         }
     }
 
-    public void testQueryByprocessDefinition() {
+    @Test
+    public void testQueryWithLocalVariables() {
+        String processInstanceId = processInstanceIds.get(processInstanceIds.size() - 1);
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().singleResult();
+        runtimeService.setVariableLocal(execution.getId(), "localVar1", "test");
+        runtimeService.setVariableLocal(execution.getId(), "localVar2", 123);
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processDefinitionKey(PROCESS_DEFINITION_KEY_3)
+                    .includeProcessVariables()
+                    .singleResult();
+            Map<String, Object> variableMap = processInstance.getProcessVariables();
+            assertThat(variableMap);
+        }
+    }
+
+    @Test
+    public void testQueryByProcessDefinition() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId
             String deploymentId = repositoryService.createDeploymentQuery().list().get(0).getId();
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", 123).deploymentId(deploymentId).singleResult();
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
-            assertEquals(deploymentId, processInstance.getDeploymentId());
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
+            assertThat(processInstance.getDeploymentId()).isEqualTo(deploymentId);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", "invalid").deploymentId(deploymentId).singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
 
             // ProcessDefinitionName
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", 123).processDefinitionName(PROCESS_DEFINITION_NAME_2).singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
-            assertEquals(PROCESS_DEFINITION_NAME_2, processInstance.getProcessDefinitionName());
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
+            assertThat(processInstance.getProcessDefinitionName()).isEqualTo(PROCESS_DEFINITION_NAME_2);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("test", "test").processDefinitionName(PROCESS_DEFINITION_NAME_2).singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
 
             // ProcessDefinitionCategory
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("anothertest", 123).processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("test", "test").processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
         }
     }
-    
+
+    @Test
     public void testQueryByVariableExist() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId
             String deploymentId = repositoryService.createDeploymentQuery().list().get(0).getId();
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().variableExists("anothertest")
-                            .deploymentId(deploymentId).singleResult();
-            assertNotNull(processInstance);
+                    .deploymentId(deploymentId).singleResult();
+            assertThat(processInstance).isNotNull();
 
             List<HistoricProcessInstance> processInstanceList = historyService.createHistoricProcessInstanceQuery()
-                            .variableNotExists("anothertest").deploymentId(deploymentId).list();
-            assertEquals(5, processInstanceList.size());
-            
+                    .variableNotExists("anothertest").deploymentId(deploymentId).list();
+            assertThat(processInstanceList).hasSize(5);
+
             processInstance = historyService.createHistoricProcessInstanceQuery().or().variableExists("anothertest")
-                            .processInstanceId("notexisting").endOr().deploymentId(deploymentId).singleResult();
-            assertNotNull(processInstance);
-            
+                    .processInstanceId("notexisting").endOr().deploymentId(deploymentId).singleResult();
+            assertThat(processInstance).isNotNull();
+
             processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
-                            .processInstanceId("nonexisting").endOr().deploymentId(deploymentId).list();
-            assertEquals(5, processInstanceList.size());
-            
+                    .processInstanceId("nonexisting").endOr().deploymentId(deploymentId).list();
+            assertThat(processInstanceList).hasSize(5);
+
             processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
-                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
-            assertEquals(5, processInstanceList.size());
-            
+                    .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertThat(processInstanceList).hasSize(5);
+
             processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest").endOr().or()
-                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
-            assertEquals(4, processInstanceList.size());
+                    .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertThat(processInstanceList).hasSize(4);
         }
     }
 
+    @Test
     public void testOrQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().variableValueEquals("anothertest", 123)
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or()
+                    .variableValueEquals("anothertest", 123)
                     .processDefinitionId("undefined").endOr().singleResult();
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or()
@@ -273,8 +334,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .endOr()
                     .singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or()
@@ -286,7 +347,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .processDefinitionId("undefined")
                     .endOr()
                     .singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or()
@@ -294,68 +355,81 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .processDefinitionId("undefined")
                     .endOr()
                     .singleResult();
-            assertNotNull(processInstance);
+            assertThat(processInstance).isNotNull();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals("MyTest", variableMap.get("casetest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("casetest", "MyTest"));
 
             List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or()
                     .processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionId("undefined").endOr().list();
-            assertEquals(4, instanceList.size());
+            assertThat(instanceList).hasSize(4);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY_2).processDefinitionId("undefined").endOr()
+            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY_2)
+                    .processDefinitionId("undefined").endOr()
                     .singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
-            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().finished().processDefinitionId("undefined").endOr().singleResult();
+            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().finished().processDefinitionId("undefined")
+                    .endOr().singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr().includeProcessVariables().listPage(0, 50);
-            assertEquals(4, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr()
+                    .includeProcessVariables().listPage(0, 50);
+            assertThat(instanceList).hasSize(4);
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr().includeProcessVariables().listPage(0, 1);
-            assertEquals(1, instanceList.size());
+            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr()
+                    .includeProcessVariables().listPage(0, 1);
+            assertThat(instanceList).hasSize(1);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionId("undefined").endOr()
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .processDefinitionId("undefined").endOr()
                     .listPage(1, 2);
-            assertEquals(2, instanceList.size());
+            assertThat(instanceList).hasSize(2);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionId("undefined").endOr()
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .processDefinitionId("undefined").endOr()
                     .listPage(3, 4);
-            assertEquals(1, instanceList.size());
+            assertThat(instanceList).hasSize(1);
             processInstance = instanceList.get(0);
             variableMap = processInstance.getProcessVariables();
-            assertEquals(2, variableMap.size());
-            assertEquals("test", variableMap.get("test"));
-            assertEquals("test2", variableMap.get("test2"));
+            assertThat(variableMap)
+                    .containsOnly(
+                            entry("test", "test"),
+                            entry("test2", "test2"));
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY).processDefinitionId("undefined").endOr()
+            instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                    .processDefinitionId("undefined").endOr()
                     .listPage(4, 2);
-            assertEquals(0, instanceList.size());
+            assertThat(instanceList).isEmpty();
 
-            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr().includeProcessVariables()
+            instanceList = historyService.createHistoricProcessInstanceQuery().or().variableValueEquals("test", "test").processDefinitionId("undefined").endOr()
+                    .includeProcessVariables()
                     .orderByProcessInstanceId().asc().listPage(0, 50);
-            assertEquals(4, instanceList.size());
+            assertThat(instanceList).hasSize(4);
 
             instanceList = historyService.createHistoricProcessInstanceQuery()
                     .or()
@@ -370,10 +444,11 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .orderByProcessInstanceId()
                     .asc()
                     .listPage(0, 50);
-            assertEquals(4, instanceList.size());
+            assertThat(instanceList).hasSize(4);
         }
     }
 
+    @Test
     public void testOrQueryMultipleVariableValues() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricProcessInstanceQuery query0 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or();
@@ -382,9 +457,10 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             }
             query0 = query0.processDefinitionId("undefined").endOr();
 
-            assertNull(query0.singleResult());
+            assertThat(query0.singleResult()).isNull();
 
-            HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or().variableValueEquals("anothertest", 123);
+            HistoricProcessInstanceQuery query1 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().or()
+                    .variableValueEquals("anothertest", 123);
             for (int i = 0; i < 20; i++) {
                 query1 = query1.variableValueEquals("anothertest", i);
             }
@@ -392,8 +468,8 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
 
             HistoricProcessInstance processInstance = query1.singleResult();
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
 
             HistoricProcessInstanceQuery query2 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or();
@@ -406,7 +482,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .processDefinitionKey(PROCESS_DEFINITION_KEY_2)
                     .processDefinitionId("undefined")
                     .endOr();
-            assertNull(query2.singleResult());
+            assertThat(query2.singleResult()).isNull();
 
             HistoricProcessInstanceQuery query3 = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", 123);
@@ -420,52 +496,58 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
                     .processDefinitionId("undefined")
                     .endOr();
             variableMap = query3.singleResult().getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
         }
     }
 
-    public void testOrQueryByprocessDefinition() {
+    @Test
+    public void testOrQueryByProcessDefinition() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // DeploymentId
             String deploymentId = repositoryService.createDeploymentQuery().list().get(0).getId();
             HistoricProcessInstanceQuery historicprocessInstanceQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").deploymentId(deploymentId).endOr();
-            assertEquals(6, historicprocessInstanceQuery.list().size());
-            assertEquals(6, historicprocessInstanceQuery.count());
-            Map<String, Object> variableMap = historicprocessInstanceQuery.list().get(4).getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(historicprocessInstanceQuery.list()).hasSize(6);
+            assertThat(historicprocessInstanceQuery.count()).isEqualTo(6);
+            Map<String, Object> variableMap = historicprocessInstanceQuery.list()
+                    .stream()
+                    .filter(p -> p.getId().equals(processInstanceIds.get(4)))
+                    .map(HistoricProcessInstance::getProcessVariables)
+                    .findAny()
+                    .orElse(Collections.emptyMap());
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
             for (HistoricProcessInstance processInstance : historicprocessInstanceQuery.list()) {
-                assertEquals(deploymentId, processInstance.getDeploymentId());
+                assertThat(processInstance.getDeploymentId()).isEqualTo(deploymentId);
             }
 
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").deploymentId("invalid").endOr().singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
 
             // ProcessDefinitionName
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").processDefinitionName(PROCESS_DEFINITION_NAME_2).endOr().singleResult();
             variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
-            assertEquals(PROCESS_DEFINITION_NAME_2, processInstance.getProcessDefinitionName());
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
+            assertThat(processInstance.getProcessDefinitionName()).isEqualTo(PROCESS_DEFINITION_NAME_2);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").processDefinitionName("invalid").endOr().singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
 
             // ProcessDefinitionCategory
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).endOr().singleResult();
-            variableMap = processInstance.getProcessVariables();
-            assertEquals(1, variableMap.size());
-            assertEquals(123, variableMap.get("anothertest"));
+            assertThat(variableMap)
+                    .containsExactly(entry("anothertest", 123));
+            assertThat(processInstance.getProcessDefinitionCategory()).isEqualTo(PROCESS_DEFINITION_CATEGORY_2);
 
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .or().variableValueEquals("anothertest", "invalid").processDefinitionCategory("invalid").endOr().singleResult();
-            assertNull(processInstance);
+            assertThat(processInstance).isNull();
         }
     }
 }

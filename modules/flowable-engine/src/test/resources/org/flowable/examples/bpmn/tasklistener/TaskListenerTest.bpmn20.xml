@@ -27,19 +27,17 @@
 		
 		<sequenceFlow id="flow2" sourceRef="task1" targetRef="task2" />
 		
-		<userTask id="task2" name="Write meeting notes" >
-      <documentation>
-        Write meeting notes after meeting with management.
-      </documentation>
-      <extensionElements>
-        <activiti:taskListener event="create" expression="${execution.setVariable('greeting2', task.name)}" />
-      </extensionElements>
-    </userTask>
-    
-    <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
-		
+		<userTask id="task2" name="Write meeting notes">
+		  <documentation>
+            Write meeting notes after meeting with management.
+          </documentation>
+          <extensionElements>
+            <activiti:taskListener event="create" expression="${execution.setVariable('greeting2', task.name)}" />
+		  </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow3" sourceRef="task2" targetRef="theEnd" />
 		<endEvent id="theEnd" />
-		
+
 	</process>
 
 </definitions>

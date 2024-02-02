@@ -12,8 +12,7 @@
  */
 package org.flowable.cdi.test.impl.context;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
@@ -35,7 +34,7 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
 
         businessProcess.startProcessByKey("testResolution").getId();
 
-        assertNotNull(getBeanInstance(CreditCard.class));
+        assertThat(getBeanInstance(CreditCard.class)).isNotNull();
     }
 
     @Test
@@ -43,7 +42,7 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
     public void testResolutionBeforeProcessStart() throws Exception {
         // assert that @BusinessProcessScoped beans can be resolved in the
         // absence of an underlying process instance:
-        assertNotNull(getBeanInstance(CreditCard.class));
+        assertThat(getBeanInstance(CreditCard.class)).isNotNull();
     }
 
     @Test
@@ -56,10 +55,10 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
         getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
 
         // assert that the variable assigned on the businessProcess bean is flushed
-        assertEquals("testValue", runtimeService.getVariable(pid, "testVariable"));
+        assertThat(runtimeService.getVariable(pid, "testVariable")).isEqualTo("testValue");
 
         // assert that the value set to the message bean in the first service task is flushed
-        assertEquals("Hello from Flowable", getBeanInstance(ProcessScopedMessageBean.class).getMessage());
+        assertThat(getBeanInstance(ProcessScopedMessageBean.class).getMessage()).isEqualTo("Hello from Flowable");
 
         // complete the task to allow the process instance to terminate
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
@@ -76,7 +75,7 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
         getBeanInstance(BusinessProcess.class).startTask(taskService.createTaskQuery().singleResult().getId());
 
         // assert that the value of creditCardNumber is '123'
-        assertEquals("123", getBeanInstance(CreditCard.class).getCreditcardNumber());
+        assertThat(getBeanInstance(CreditCard.class).getCreditcardNumber()).isEqualTo("123");
         // set a different value:
         getBeanInstance(CreditCard.class).setCreditcardNumber("321");
         // complete the task
@@ -85,7 +84,7 @@ public class BusinessProcessContextTest extends CdiFlowableTestCase {
         getBeanInstance(BusinessProcess.class).associateExecutionById(pid);
 
         // now assert that the value of creditcard is "321":
-        assertEquals("321", getBeanInstance(CreditCard.class).getCreditcardNumber());
+        assertThat(getBeanInstance(CreditCard.class).getCreditcardNumber()).isEqualTo("321");
 
         // complete the task to allow the process instance to terminate
         taskService.complete(taskService.createTaskQuery().singleResult().getId());

@@ -15,8 +15,8 @@ package org.flowable.idm.engine.impl.persistence.entity;
 
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.db.HasRevision;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 
 /**
  * @author Tom Baeyens

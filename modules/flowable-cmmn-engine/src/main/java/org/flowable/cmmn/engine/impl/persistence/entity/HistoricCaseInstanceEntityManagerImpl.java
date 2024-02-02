@@ -13,55 +13,71 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
  * @author Joram Barrez
  */
-public class HistoricCaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<HistoricCaseInstanceEntity> implements HistoricCaseInstanceEntityManager {
-
-    protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
+public class HistoricCaseInstanceEntityManagerImpl
+    extends AbstractEngineEntityManager<CmmnEngineConfiguration, HistoricCaseInstanceEntity, HistoricCaseInstanceDataManager>
+    implements HistoricCaseInstanceEntityManager {
 
     public HistoricCaseInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, HistoricCaseInstanceDataManager historicCaseInstanceDataManager) {
-        super(cmmnEngineConfiguration);
-        this.historicCaseInstanceDataManager = historicCaseInstanceDataManager;
-    }
-
-    @Override
-    protected DataManager<HistoricCaseInstanceEntity> getDataManager() {
-        return historicCaseInstanceDataManager;
+        super(cmmnEngineConfiguration, historicCaseInstanceDataManager);
     }
     
     @Override
+    public HistoricCaseInstanceEntity create(CaseInstance caseInstance) {
+        return dataManager.create(caseInstance);
+    }
+
+    @Override
     public HistoricCaseInstanceQuery createHistoricCaseInstanceQuery() {
-        return new HistoricCaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
+        return new HistoricCaseInstanceQueryImpl(engineConfiguration.getCommandExecutor(), engineConfiguration);
     }
     
     @Override
     public List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
-        return historicCaseInstanceDataManager.findHistoricCaseInstancesByCaseDefinitionId(caseDefinitionId);
+        return dataManager.findHistoricCaseInstancesByCaseDefinitionId(caseDefinitionId);
+    }
+
+    @Override
+    public List<String> findHistoricCaseInstanceIdsByParentIds(Collection<String> caseInstanceIds) {
+        return dataManager.findHistoricCaseInstanceIdsByParentIds(caseInstanceIds);
     }
 
     @Override
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query) {
-        return historicCaseInstanceDataManager.findByCriteria((HistoricCaseInstanceQueryImpl) query);
+        return dataManager.findByCriteria((HistoricCaseInstanceQueryImpl) query);
     }
 
     @Override
-   public long countByCriteria(HistoricCaseInstanceQuery query) {
-        return historicCaseInstanceDataManager.countByCriteria((HistoricCaseInstanceQueryImpl) query);
+    @SuppressWarnings("unchecked")
+    public List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query) {
+        return dataManager.findWithVariablesByQueryCriteria((HistoricCaseInstanceQueryImpl) query);
+    }
+
+    @Override
+    public long countByCriteria(HistoricCaseInstanceQuery query) {
+        return dataManager.countByCriteria((HistoricCaseInstanceQueryImpl) query);
     }
     
     @Override
-    public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        historicCaseInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
+    public void deleteHistoricCaseInstances(HistoricCaseInstanceQueryImpl historicCaseInstanceQuery) {
+        dataManager.deleteHistoricCaseInstances(historicCaseInstanceQuery);
     }
 
+    @Override
+    public void bulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
+        dataManager.bulkDeleteHistoricCaseInstances(caseInstanceIds);
+    }
 }

@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event.error.mapError;
 
+import java.util.Map;
+
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
@@ -20,19 +22,25 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class FlagDelegate implements JavaDelegate {
     static boolean visited;
+    static Map<String, Object> variables;
 
     public static void reset() {
         visited = false;
+        variables = null;
     }
 
     public static boolean isVisited() {
         return visited;
     }
 
+    public static Map<String, Object> getVariables() {
+        return variables;
+    }
+
     @Override
     public void execute(DelegateExecution execution) {
         visited = true;
-
+        variables = execution.getVariables();
     }
 
 }

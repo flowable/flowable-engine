@@ -14,7 +14,7 @@
     <userTask id="task" name="Multi User Task-${loopCounter}">
         <multiInstanceLoopCharacteristics isSequential="false">
             <loopCardinality>2</loopCardinality>
-            <completionCondition>${nrOfCompletedInstances/nrOfInstances >= 0.5 }</completionCondition>
+            <completionCondition>${nrOfCompletedInstances/nrOfInstances >= percentageCompleted }</completionCondition>
         </multiInstanceLoopCharacteristics>
     </userTask>
 

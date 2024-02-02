@@ -16,7 +16,7 @@ package org.flowable.task.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Tom Baeyens
@@ -43,8 +43,10 @@ public class HistoricTaskInstanceQueryProperty implements QueryProperty {
     public static final HistoricTaskInstanceQueryProperty TASK_PRIORITY = new HistoricTaskInstanceQueryProperty("RES.PRIORITY_");
     public static final HistoricTaskInstanceQueryProperty TASK_DUE_DATE = new HistoricTaskInstanceQueryProperty("RES.DUE_DATE_");
     public static final HistoricTaskInstanceQueryProperty TENANT_ID_ = new HistoricTaskInstanceQueryProperty("RES.TENANT_ID_");
-
-    public static final HistoricTaskInstanceQueryProperty INCLUDED_VARIABLE_TIME = new HistoricTaskInstanceQueryProperty("VAR.LAST_UPDATED_TIME_");
+    public static final HistoricTaskInstanceQueryProperty SCOPE_DEFINITION_ID = new HistoricTaskInstanceQueryProperty("RES.SCOPE_DEFINITION_ID_");
+    public static final HistoricTaskInstanceQueryProperty SCOPE_ID = new HistoricTaskInstanceQueryProperty("RES.SCOPE_ID_");
+    public static final HistoricTaskInstanceQueryProperty SCOPE_TYPE = new HistoricTaskInstanceQueryProperty("RES.SCOPE_TYPE_");
+    public static final HistoricTaskInstanceQueryProperty CATEGORY = new HistoricTaskInstanceQueryProperty("RES.CATEGORY_");
 
     private String name;
 

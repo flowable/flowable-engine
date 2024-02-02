@@ -17,17 +17,23 @@ import java.util.List;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class CallActivity extends Activity {
+public class CallActivity extends Activity implements HasOutParameters, HasInParameters {
 
     protected String calledElement;
+    protected String calledElementType;
     protected boolean inheritVariables;
     protected boolean sameDeployment;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
+    protected String processInstanceName;
     protected String businessKey;
     protected boolean inheritBusinessKey;
     protected boolean useLocalScopeForOutParameters;
+    protected boolean completeAsync;
+    protected Boolean fallbackToDefaultTenant;
+    protected String processInstanceIdVariableName;
 
     public String getCalledElement() {
         return calledElement;
@@ -53,20 +59,42 @@ public class CallActivity extends Activity {
         this.sameDeployment = sameDeployment;
     }
 
+    @Override
     public List<IOParameter> getInParameters() {
         return inParameters;
     }
 
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        inParameters.add(inParameter);
+    }
+
+    @Override
     public void setInParameters(List<IOParameter> inParameters) {
         this.inParameters = inParameters;
     }
 
+    @Override
     public List<IOParameter> getOutParameters() {
         return outParameters;
     }
 
+    @Override
+    public void addOutParameter(IOParameter outParameter) {
+        this.outParameters.add(outParameter);
+    }
+
+    @Override
     public void setOutParameters(List<IOParameter> outParameters) {
         this.outParameters = outParameters;
+    }
+    
+    public String getProcessInstanceName() {
+        return processInstanceName;
+    }
+
+    public void setProcessInstanceName(String processInstanceName) {
+        this.processInstanceName = processInstanceName;
     }
 
     public String getBusinessKey() {
@@ -92,6 +120,38 @@ public class CallActivity extends Activity {
     public void setUseLocalScopeForOutParameters(boolean useLocalScopeForOutParameters) {
         this.useLocalScopeForOutParameters = useLocalScopeForOutParameters;
     }
+    
+    public boolean isCompleteAsync() {
+        return completeAsync;
+    }
+
+    public void setCompleteAsync(boolean completeAsync) {
+        this.completeAsync = completeAsync;
+    }
+
+    public Boolean getFallbackToDefaultTenant() {
+        return fallbackToDefaultTenant;
+    }
+
+    public void setFallbackToDefaultTenant(Boolean fallbackToDefaultTenant) {
+        this.fallbackToDefaultTenant = fallbackToDefaultTenant;
+    }
+    
+    public void setCalledElementType(String calledElementType) {
+        this.calledElementType = calledElementType;
+    }
+
+    public String getCalledElementType() {
+        return calledElementType;
+    }
+
+    public String getProcessInstanceIdVariableName() {
+        return processInstanceIdVariableName;
+    }
+
+    public void setProcessInstanceIdVariableName(String processInstanceIdVariableName) {
+        this.processInstanceIdVariableName = processInstanceIdVariableName;
+    }
 
     @Override
     public CallActivity clone() {
@@ -103,10 +163,14 @@ public class CallActivity extends Activity {
     public void setValues(CallActivity otherElement) {
         super.setValues(otherElement);
         setCalledElement(otherElement.getCalledElement());
+        setCalledElementType(otherElement.getCalledElementType());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setInheritVariables(otherElement.isInheritVariables());
         setSameDeployment(otherElement.isSameDeployment());
         setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
+        setCompleteAsync(otherElement.isCompleteAsync());
+        setFallbackToDefaultTenant(otherElement.getFallbackToDefaultTenant());
 
         inParameters = new ArrayList<>();
         if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {
@@ -122,4 +186,5 @@ public class CallActivity extends Activity {
             }
         }
     }
+
 }

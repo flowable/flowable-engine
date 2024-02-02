@@ -13,12 +13,13 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -54,31 +55,31 @@ public class AddCommentCmd implements Command<Comment> {
 
     @Override
     public Comment execute(CommandContext commandContext) {
-
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         TaskEntity task = null;
         // Validate task
         if (taskId != null) {
-            task = CommandContextUtil.getTaskService().getTask(taskId);
+            task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
 
             if (task == null) {
                 throw new FlowableObjectNotFoundException("Cannot find task with id " + taskId, Task.class);
             }
 
             if (task.isSuspended()) {
-                throw new FlowableException(getSuspendedTaskException());
+                throw new FlowableException("Cannot add a comment to a suspended " + task);
             }
         }
 
         ExecutionEntity execution = null;
         if (processInstanceId != null) {
-            execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+            execution = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
 
             if (execution == null) {
                 throw new FlowableObjectNotFoundException("execution " + processInstanceId + " doesn't exist", Execution.class);
             }
 
             if (execution.isSuspended()) {
-                throw new FlowableException(getSuspendedExceptionMessage());
+                throw new FlowableException("Cannot add a comment to a suspended " + execution);
             }
         }
 
@@ -89,16 +90,16 @@ public class AddCommentCmd implements Command<Comment> {
             processDefinitionId = task.getProcessDefinitionId();
         }
 
-        if (processDefinitionId != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
+        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
             return compatibilityHandler.addComment(taskId, processInstanceId, type, message);
         }
 
         String userId = Authentication.getAuthenticatedUserId();
-        CommentEntity comment = CommandContextUtil.getCommentEntityManager(commandContext).create();
+        CommentEntity comment = processEngineConfiguration.getCommentEntityManager().create();
         comment.setUserId(userId);
         comment.setType((type == null) ? CommentEntity.TYPE_COMMENT : type);
-        comment.setTime(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
+        comment.setTime(processEngineConfiguration.getClock().getCurrentTime());
         comment.setTaskId(taskId);
         comment.setProcessInstanceId(processInstanceId);
         comment.setAction(Event.ACTION_ADD_COMMENT);
@@ -111,16 +112,8 @@ public class AddCommentCmd implements Command<Comment> {
 
         comment.setFullMessage(message);
 
-        CommandContextUtil.getCommentEntityManager(commandContext).insert(comment);
+        processEngineConfiguration.getCommentEntityManager().insert(comment);
 
         return comment;
-    }
-
-    protected String getSuspendedTaskException() {
-        return "Cannot add a comment to a suspended task";
-    }
-
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot add a comment to a suspended execution";
     }
 }

@@ -13,53 +13,58 @@
 
 package org.flowable.examples.bpmn.mail;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
 /**
  * @author Joram Barrez
  * @author Falko Menge
+ * @author Simon Amport
  */
+@Tag("email")
 public class EmailSendTaskTest extends PluggableFlowableTestCase {
 
     /* Wiser is a fake email server for unit testing */
     private Wiser wiser;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();
                 serverUpAndRunning = true;
             } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
-                if (e.getMessage().toLowerCase().contains("BindException")) {
+                if (e.getMessage().toLowerCase().contains("bindexception")) {
                     Thread.sleep(250L);
                 }
             }
         }
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         wiser.stop();
-        super.tearDown();
     }
 
+    @Test
     @Deployment
     public void testSendEmail() throws Exception {
 
@@ -81,14 +86,71 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("sendMailExample", vars);
 
         List<WiserMessage> messages = wiser.getMessages();
-        assertEquals(1, messages.size());
+        assertThat(messages).hasSize(1);
 
         WiserMessage message = messages.get(0);
         MimeMessage mimeMessage = message.getMimeMessage();
 
-        assertEquals("Your order " + orderId + " has been shipped", mimeMessage.getHeader("Subject", null));
-        assertEquals(from, mimeMessage.getHeader("From", null));
-        assertTrue(mimeMessage.getHeader("To", null).contains(recipient));
+        assertThat(mimeMessage.getHeader("Subject", null)).isEqualTo("Your order " + orderId + " has been shipped");
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
+    }
+
+    @Test
+    @Deployment
+    public void testSendEmailWithStaticHeader() throws Exception {
+
+        String from = "ordershipping@flowable.org";
+        String recipient = "johndoe@flowable.com";
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("sender", from);
+        vars.put("recipient", recipient);
+
+        runtimeService.startProcessInstanceByKey("sendMailWithStaticHeaderExample", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+
+        WiserMessage message = messages.get(0);
+        MimeMessage mimeMessage = message.getMimeMessage();
+
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
+        assertThat(mimeMessage.getHeader("X-Attribute1", null)).isEqualTo("value1");
+        assertThat(mimeMessage.getHeader("X-Attribute2", null)).isEqualTo("value2");
+        assertThat(mimeMessage.getHeader("X-Attribute3", null)).isEqualTo("value3");
+    }
+
+    @Test
+    @Deployment
+    public void testSendEmailWithVariableHeader() throws Exception {
+
+        String from = "ordershipping@flowable.org";
+        String recipient = "johndoe@flowable.com";
+        String headers = """
+                X-Attribute1: value1
+                X-Attribute2: value2
+                X-Attribute3: value3""";
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("sender", from);
+        vars.put("recipient", recipient);
+        vars.put("headers", headers);
+
+        runtimeService.startProcessInstanceByKey("sendMailWithVariableHeaderExample", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+
+        WiserMessage message = messages.get(0);
+        MimeMessage mimeMessage = message.getMimeMessage();
+
+        assertThat(mimeMessage.getHeader("From", null)).isEqualTo(from);
+        assertThat(mimeMessage.getHeader("To", null)).contains(recipient);
+        assertThat(mimeMessage.getHeader("X-Attribute1", null)).isEqualTo("value1");
+        assertThat(mimeMessage.getHeader("X-Attribute2", null)).isEqualTo("value2");
+        assertThat(mimeMessage.getHeader("X-Attribute3", null)).isEqualTo("value3");
     }
 
 }

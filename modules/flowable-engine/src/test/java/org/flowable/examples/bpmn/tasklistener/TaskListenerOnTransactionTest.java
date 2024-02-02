@@ -12,22 +12,29 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
 public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
+    @Test
     @Deployment
     public void testOnCompleteCommitted() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -47,14 +54,16 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
-        assertEquals(1, currentTasks.size());
-
-        assertEquals("usertask1", currentTasks.get(0).getTaskId());
-        assertEquals("User Task 1", currentTasks.get(0).getTaskName());
-        assertEquals(processInstance.getId(), currentTasks.get(0).getProcessInstanceId());
-        assertNotNull(currentTasks.get(0).getProcessInstanceId());
+        assertThat(currentTasks)
+                .extracting(CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskId,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getProcessInstanceId)
+                .containsExactly(
+                        tuple("usertask1", "User Task 1", processInstance.getId())
+                );
     }
 
+    @Test
     @Deployment
     public void testOnCompleteRolledBack() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -84,19 +93,17 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         }
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
-        assertEquals(2, currentTasks.size());
-
-        assertEquals("usertask1", currentTasks.get(0).getTaskId());
-        assertEquals("User Task 1", currentTasks.get(0).getTaskName());
-        assertEquals(processInstance.getId(), currentTasks.get(0).getProcessInstanceId());
-        assertNotNull(currentTasks.get(0).getProcessInstanceId());
-
-        assertEquals("usertask3", currentTasks.get(1).getTaskId());
-        assertEquals("User Task 3", currentTasks.get(1).getTaskName());
-        assertEquals(processInstance.getId(), currentTasks.get(1).getProcessInstanceId());
-        assertNotNull(currentTasks.get(1).getProcessInstanceId());
+        assertThat(currentTasks)
+                .extracting(CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskId,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getProcessInstanceId)
+                .containsExactly(
+                        tuple("usertask1", "User Task 1", processInstance.getId()),
+                        tuple("usertask3", "User Task 3", processInstance.getId())
+                );
     }
 
+    @Test
     @Deployment
     public void testOnCompleteExecutionVariables() {
 
@@ -105,7 +112,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("taskListenersOnCompleteExecutionVariables");
 
         // task 1 has committed listener
-        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has committed listener
@@ -113,19 +120,24 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
-        assertEquals(2, currentTasks.size());
+        assertThat(currentTasks)
+                .extracting(CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskId,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName)
+                .containsExactly(
+                        tuple("usertask1", "User Task 1"),
+                        tuple("usertask2", "User Task 2")
+                );
 
-        assertEquals("usertask1", currentTasks.get(0).getTaskId());
-        assertEquals("User Task 1", currentTasks.get(0).getTaskName());
-        assertEquals(1, currentTasks.get(1).getExecutionVariables().size());
-        assertEquals("test1", currentTasks.get(0).getExecutionVariables().get("injectedExecutionVariable"));
+        assertThat(currentTasks.get(0).getExecutionVariables())
+                .hasSize(1)
+                .containsEntry("injectedExecutionVariable", "test1");
 
-        assertEquals("usertask2", currentTasks.get(1).getTaskId());
-        assertEquals("User Task 2", currentTasks.get(1).getTaskName());
-        assertEquals(1, currentTasks.get(1).getExecutionVariables().size());
-        assertEquals("test2", currentTasks.get(1).getExecutionVariables().get("injectedExecutionVariable"));
+        assertThat(currentTasks.get(1).getExecutionVariables())
+                .hasSize(1)
+                .containsEntry("injectedExecutionVariable", "test2");
     }
 
+    @Test
     @Deployment
     public void testOnCompleteTransactionalOperation() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -135,8 +147,9 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-            assertEquals(1, historicProcessInstances.size());
-            assertEquals("transactionDependentTaskListenerProcess", historicProcessInstances.get(0).getProcessDefinitionKey());
+            assertThat(historicProcessInstances)
+                    .extracting(HistoricProcessInstance::getProcessDefinitionKey)
+                    .containsExactly("transactionDependentTaskListenerProcess");
         }
 
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("secondTransactionDependentTaskListenerProcess");
@@ -149,17 +162,21 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // first historic process instance was deleted by task listener
             List<HistoricProcessInstance> historicProcessInstances = historyService.createHistoricProcessInstanceQuery().list();
-            assertEquals(1, historicProcessInstances.size());
-            assertEquals("secondTransactionDependentTaskListenerProcess", historicProcessInstances.get(0).getProcessDefinitionKey());
+            assertThat(historicProcessInstances)
+                    .extracting(HistoricProcessInstance::getProcessDefinitionKey)
+                    .containsExactly("secondTransactionDependentTaskListenerProcess");
         }
 
         List<MyTransactionalOperationTransactionDependentTaskListener.CurrentTask> currentTasks = MyTransactionalOperationTransactionDependentTaskListener.getCurrentTasks();
-        assertEquals(1, currentTasks.size());
-
-        assertEquals("usertask1", currentTasks.get(0).getTaskId());
-        assertEquals("User Task 1", currentTasks.get(0).getTaskName());
+        assertThat(currentTasks)
+                .extracting(CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskId,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName)
+                .containsExactly(
+                        tuple("usertask1", "User Task 1")
+                );
     }
 
+    @Test
     @Deployment
     public void testOnCompleteCustomPropertiesResolver() {
         CurrentTaskTransactionDependentTaskListener.clear();
@@ -170,12 +187,14 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();
-        assertEquals(1, currentTasks.size());
-
-        assertEquals("usertask1", currentTasks.get(0).getTaskId());
-        assertEquals("User Task 1", currentTasks.get(0).getTaskName());
-        assertEquals(1, currentTasks.get(0).getCustomPropertiesMap().size());
-        assertEquals("usertask1", currentTasks.get(0).getCustomPropertiesMap().get("customProp1"));
+        assertThat(currentTasks)
+                .extracting(CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskId,
+                        CurrentTaskTransactionDependentTaskListener.CurrentTask::getTaskName)
+                .containsExactly(
+                        tuple("usertask1", "User Task 1")
+                );
+        assertThat(currentTasks.get(0).getCustomPropertiesMap())
+                .containsExactly(entry("customProp1", "usertask1"));
     }
 
 }

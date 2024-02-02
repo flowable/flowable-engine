@@ -1,0 +1,97 @@
+name: Flowable MySQL Build
+
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
+
+env:
+  MAVEN_ARGS: >-
+    -Dmaven.javadoc.skip=true
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+# We explicitly don't use a container for running the job since there is some connectivity issues to MySQL if that is done
+jobs:
+  test_mysql:
+    name: MySQL ${{ matrix.mysql }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: [5.7, 8.0]
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_DATABASE: flowable
+          MYSQL_USER: flowable
+          MYSQL_PASSWORD: flowable
+          MYSQL_ROOT_PASSWORD: flowable
+        ports:
+          - 3306/tcp
+        # needed because the mysql container does not provide a health check
+        options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
+    steps:
+      - name: "Set MySQL collation"
+        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use localhost for the host here because we have specified a vm for the job.
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -PcleanDb,mysql
+          -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
+  test_mysql_dmn:
+    name: MySQL ${{ matrix.mysql }} DMN
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mysql: [5.7, 8.0]
+    services:
+      mysql:
+        image: mysql:${{ matrix.mysql }}
+        env:
+          MYSQL_DATABASE: flowable
+          MYSQL_USER: flowable
+          MYSQL_PASSWORD: flowable
+          MYSQL_ROOT_PASSWORD: flowable
+        ports:
+          - 3306/tcp
+        # needed because the mysql container does not provide a health check
+        options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
+    steps:
+      - name: "Set MySQL collation"
+        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - name: Test
+        # use mysql for the host here because we have specified a container for the job.
+        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
+        # and new lines from the end would be removed
+        run: >-
+          ./mvnw clean install
+          ${MAVEN_ARGS}
+          -Pdmn,mysql
+          -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
+          -Djdbc.username=flowable
+          -Djdbc.password=flowable
+          -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dmaven.test.redirectTestOutputToFile=false
+          -pl org.flowable:flowable-dmn-engine -am

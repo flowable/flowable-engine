@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+    <process id="simpleProcess" name="simpleProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:language><![CDATA[English]]></design:language>
+            <design:creationdate><![CDATA[2022-06-07T09:13:57.075Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2022-06-07T09:20:00.294Z]]></design:modificationdate>
+        </extensionElements>
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <userTask id="formTask1" name="User task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="formTask1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <endEvent id="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <sequenceFlow id="sequenceFlow2" sourceRef="formTask1" targetRef="endNoneEvent1">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <textAnnotation id="textAnnotation1">
+            <extensionElements>
+                <design:stencilid><![CDATA[TextAnnotation]]></design:stencilid>
+                <design:text><![CDATA[this is text]]></design:text>
+            </extensionElements>
+            <text>sdjfhsdfj</text>
+        </textAnnotation>
+        <association id="associationUndirected1" sourceRef="sequenceFlow2" targetRef="textAnnotation1" associationDirection="None">
+            <extensionElements>
+                <design:stencilid><![CDATA[AssociationUndirected]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Association_Undirected]]></design:stencilsuperid>
+            </extensionElements>
+        </association>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_testProcess">
+        <bpmndi:BPMNPlane bpmnElement="testProcess" id="BPMNPlane_testProcess">
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="117.0" y="261.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="formTask1" id="BPMNShape_formTask1">
+                <omgdc:Bounds height="80.0" width="100.0" x="192.0" y="236.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+                <omgdc:Bounds height="28.0" width="28.0" x="495.0" y="262.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="textAnnotation1" id="BPMNShape_textAnnotation1">
+                <omgdc:Bounds height="50.0" width="100.0" x="420.0" y="90.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="associationUndirected1" id="BPMNShape_associationUndirected1">
+                <omgdc:Bounds height="156.0" width="26.0" x="393.0" y="120.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="146.9499984899576" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="191.9999999999917" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="sequenceFlow2" id="BPMNEdge_sequenceFlow2" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+                <omgdi:waypoint x="291.95000000000005" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="495.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

@@ -21,9 +21,11 @@ import org.joda.time.DateTime;
  */
 public class JodaDateTimeType implements VariableType {
 
+    public static final String TYPE_NAME = "jodadatetime";
+
     @Override
     public String getTypeName() {
-        return "jodadatetime";
+        return TYPE_NAME;
     }
 
     @Override

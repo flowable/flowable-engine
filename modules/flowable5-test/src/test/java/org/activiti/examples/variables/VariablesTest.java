@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -333,7 +333,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         } catch (Exception e) {
             runtimeService.deleteProcessInstance(processInstance.getId(), "intentional exception in script task");
 
-            assertEquals("class org.flowable.engine.common.api.FlowableException", e.getClass().toString());
+            assertEquals("class org.flowable.common.engine.api.FlowableException", e.getClass().toString());
         }
 
         // No we put null property, This should be put into the variable. We do not expect exceptions

@@ -12,7 +12,7 @@
  */
 package org.flowable.identitylink.service.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.identitylink.api.IdentityLink;
 
 /**
@@ -37,6 +37,14 @@ public interface IdentityLinkEntity extends IdentityLink, Entity {
     String getProcessDefId();
 
     void setProcessDefId(String processDefId);
+    
+    void setScopeId(String scopeId);
+    
+    void setSubScopeId(String subScopeId);
+    
+    void setScopeType(String scopeType);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     @Override
     String getProcessDefinitionId();

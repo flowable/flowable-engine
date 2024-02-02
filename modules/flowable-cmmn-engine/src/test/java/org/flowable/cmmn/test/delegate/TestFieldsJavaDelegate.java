@@ -14,19 +14,19 @@ package org.flowable.cmmn.test.delegate;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Tijs Rademakers
  */
 public class TestFieldsJavaDelegate implements PlanItemJavaDelegate {
     
-    protected String testValue;
+    protected Expression testValue;
     protected Expression testExpression;
 
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
-        planItemInstance.setVariable("testValue", testValue);
+        planItemInstance.setVariable("testValue", testValue.getValue(planItemInstance));
         planItemInstance.setVariable("testExpression", testExpression.getValue(planItemInstance));
     }
     

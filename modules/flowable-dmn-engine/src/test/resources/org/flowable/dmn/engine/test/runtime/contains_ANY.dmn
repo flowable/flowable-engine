@@ -1,0 +1,87 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_3fa3bde4-1645-11e8-b1df-be031b97f836" name="asdasd" namespace="http://www.flowable.org/dmn">
+  <decision id="decision" name="collection decision">
+    <decisionTable id="decisionTable_3fa3bde4-1645-11e8-b1df-be031b97f836" hitPolicy="RULE ORDER">
+      <input>
+        <inputExpression id="inputExpression_1" typeRef="collection">
+          <text>collection1</text>
+        </inputExpression>
+        <inputValues>
+          <text>"test1","test2"</text>
+        </inputValues>
+      </input>
+      <output id="outputExpression_2" name="output1" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA[${collection:containsAny(collection1, "test2")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA["test2 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA[${collection:containsAny(collection2, 50)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA["50 in collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_3">
+          <text><![CDATA[${collection:containsAny(collection1, "test4")}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_3">
+          <text><![CDATA["test1 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_4">
+          <text><![CDATA[${collection:containsAny(collection2, 51)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_4">
+          <text><![CDATA["51 not collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_5">
+          <text><![CDATA[${collection:containsAny(collection1, '"test2", "test5"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_5">
+          <text><![CDATA["test2 or test5 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_6">
+          <text><![CDATA[${collection:containsAny(collection2, '11, 20')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_6">
+          <text><![CDATA["11 or 20 in collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_7">
+          <text><![CDATA[${collection:containsAny(collection1, '"test5", "test6"')}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_7">
+          <text><![CDATA["test5 or test6 in collection1"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_8">
+          <text><![CDATA[${collection:containsAny(collection1, collection3)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_8">
+          <text><![CDATA["11 or 24 in collection2"]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_9">
+          <text><![CDATA[${collection:containsAny(collection1, collection4)}]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_9">
+          <text><![CDATA["11 or 24 in collection2"]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

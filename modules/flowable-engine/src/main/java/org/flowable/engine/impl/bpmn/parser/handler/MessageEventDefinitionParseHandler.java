@@ -12,9 +12,12 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -38,7 +41,12 @@ public class MessageEventDefinitionParseHandler extends AbstractBpmnParseHandler
         if (bpmnModel.containsMessageId(messageRef)) {
             Message message = bpmnModel.getMessage(messageRef);
             messageDefinition.setMessageRef(message.getName());
-            messageDefinition.setExtensionElements(message.getExtensionElements());
+
+            for(List<ExtensionElement> extensionElementList : message.getExtensionElements().values()) {
+                for(ExtensionElement extensionElement : extensionElementList) {
+                    messageDefinition.addExtensionElement(extensionElement);
+                }
+            }
         }
 
         if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {

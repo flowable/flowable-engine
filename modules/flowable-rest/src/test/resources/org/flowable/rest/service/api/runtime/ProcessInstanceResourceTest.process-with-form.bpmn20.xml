@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+  
+  <process id="processOne" name="The One Task Process">
+    <documentation>One task process description</documentation>
+  
+    <startEvent id="theStart" flowable:formKey="form1" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="processTask" />
+    
+    <userTask id="processTask" name="Process task">
+       <documentation>Process task description</documentation>
+    </userTask>    
+    <sequenceFlow id="flow2" sourceRef="processTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

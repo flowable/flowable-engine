@@ -1,0 +1,31 @@
+{
+  "toProcessDefinitionId": "someProcessId",
+  "toProcessDefinitionKey": "MyProcessKey",
+  "toProcessDefinitionVersion": 9,
+  "toProcessDefinitionTenantId": "admin",
+  "activityMappings": [
+    {
+      "fromActivityId": "originalActivity1",
+      "toActivityId": "newActivity1",
+      "newAssignee": "kermit"
+    },
+    {
+      "fromActivityId": "originalActivity1",
+      "toActivityId": "newActivity2"
+    },
+    {
+      "fromActivityId": "originalActivity2",
+      "toActivityIds": [
+        "newActivity2.1",
+        "newActivity2.2"
+      ]
+    },
+    {
+      "fromActivityIds": [
+        "originalActivity2",
+        "originalActivity3"
+      ],
+      "toActivityId": "newActivity3"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testAutocompleteStageWithoutFiringTheEvent" name="testAutocompleteStageWithoutFiringTheEvent">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1"/>
+
+            <stage id="stage1" name="Stage One" autoComplete="true">
+                <planItem id="planItemTaskA" name="Task A" definitionRef="taskA">
+                    <exitCriterion sentryRef="onUserEventAbortTaskSentry"/>
+                </planItem>
+                <planItem id="planItemUserEventAbortTask" definitionRef="abortTaskUserEvent"/>
+                <sentry id="onUserEventAbortTaskSentry">
+                    <planItemOnPart sourceRef="planItemUserEventAbortTask">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <task id="taskA" name="Task A"/>
+
+                <userEventListener id="abortTaskUserEvent" name="Abort Task"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>

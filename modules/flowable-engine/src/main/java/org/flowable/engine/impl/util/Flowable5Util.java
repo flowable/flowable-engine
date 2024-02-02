@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl.util;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.Flowable5CompatibilityContext;
@@ -42,7 +42,7 @@ public class Flowable5Util {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean isFlowable5ProcessDefinition = Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
         if (isFlowable5ProcessDefinition) {
-            return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+            return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
                 @Override
                 public Boolean execute(CommandContext commandContext) {
                     CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().executeJobWithLockAndRetry(job);
@@ -86,7 +86,7 @@ public class Flowable5Util {
             return isFlowable5ProcessDefinition(processDefinition, processEngineConfiguration);
 
         } else {
-            return processEngineConfiguration.getCommandExecutor().execute(new Command<Boolean>() {
+            return processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public Boolean execute(CommandContext commandContext) {
@@ -143,7 +143,13 @@ public class Flowable5Util {
     }
 
     public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
-        Flowable5CompatibilityHandler flowable5CompatibilityHandler = CommandContextUtil.getProcessEngineConfiguration().getFlowable5CompatibilityHandler(); 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
+        Flowable5CompatibilityHandler flowable5CompatibilityHandler = null;
+        if (processEngineConfiguration != null) {
+            flowable5CompatibilityHandler = processEngineConfiguration.getFlowable5CompatibilityHandler();
+        }
+
         if (flowable5CompatibilityHandler == null) {
             flowable5CompatibilityHandler = Flowable5CompatibilityContext.getFallbackFlowable5CompatibilityHandler();
         }

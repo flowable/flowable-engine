@@ -1,0 +1,687 @@
+---
+swagger: "2.0"
+info:
+  description: "# flowable / flowəb(ə)l /\r\n\r\n- a compact and highly efficient\
+    \ workflow and Business Process Management (BPM) platform for developers, system\
+    \ admins and business users.\r\n- a lightning fast, tried and tested BPMN 2 process\
+    \ engine written in Java. It is Apache 2.0 licensed open source, with a committed\
+    \ community.\r\n- can run embedded in a Java application, or as a service on a\
+    \ server, a cluster, and in the cloud. It integrates perfectly with Spring. With\
+    \ a rich Java and REST API, it is the ideal engine for orchestrating human or\
+    \ system activities."
+  version: "v1"
+  title: "Flowable APP REST API"
+  contact:
+    name: "Flowable"
+    url: "http://www.flowable.org/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/flowable-rest/app-api"
+tags:
+- name: "App Definitions"
+- name: "App Deployment"
+- name: "App Deployments"
+- name: "Case Definitions"
+- name: "Deployment"
+- name: "Engine"
+- name: "Form Deployments"
+schemes:
+- "http"
+- "https"
+paths:
+  /app-management/engine:
+    get:
+      tags:
+      - "Engine"
+      summary: "Get app engine info"
+      description: "Returns a read-only view of the engine that is used in this REST-service."
+      operationId: "getEngineInfo"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Indicates the engine info is returned."
+          schema:
+            $ref: "#/definitions/AppEngineInfoResponse"
+      security:
+      - basicAuth: []
+  /app-repository/app-definitions:
+    get:
+      tags:
+      - "App Definitions"
+      summary: "List of app definitions"
+      description: ""
+      operationId: "listAppDefinitions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category"
+        in: "query"
+        description: "Only return app definitions with the given category."
+        required: false
+        type: "string"
+      - name: "categoryLike"
+        in: "query"
+        description: "Only return app definitions with a category like the given value."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return app definitions not with the given category."
+        required: false
+        type: "string"
+      - name: "key"
+        in: "query"
+        description: "Only return app definitions with the given key."
+        required: false
+        type: "string"
+      - name: "keyLike"
+        in: "query"
+        description: "Only return app definitions with a key like the given value."
+        required: false
+        type: "string"
+      - name: "name"
+        in: "query"
+        description: "Only return app definitions with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return app definitions with a name like the given value."
+        required: false
+        type: "string"
+      - name: "resourceName"
+        in: "query"
+        description: "Only return app definitions with the given resource name."
+        required: false
+        type: "string"
+      - name: "resourceNameLike"
+        in: "query"
+        description: "Only return app definitions a resource name like the given value."
+        required: false
+        type: "string"
+      - name: "version"
+        in: "query"
+        description: "Only return app definitions with the given version."
+        required: false
+        type: "string"
+      - name: "versionGreaterThan"
+        in: "query"
+        description: "Only return app definitions with a version greater than the\
+          \ given value."
+        required: false
+        type: "string"
+      - name: "versionGreaterThanOrEquals"
+        in: "query"
+        description: "Only return app definitions with a version greater than or equal\
+          \ to the given value."
+        required: false
+        type: "string"
+      - name: "versionLowerThan"
+        in: "query"
+        description: "Only return app definitions with a version lower than the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "versionLowerThanOrEquals"
+        in: "query"
+        description: "Only return app definitions with a version lower than or equal\
+          \ to the given value."
+        required: false
+        type: "string"
+      - name: "deploymentId"
+        in: "query"
+        description: "Only return app definitions with the given deployment id."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return app definitions with the given tenant id."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return app definitions with a tenant id like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "Only return app definitions without a tenant id."
+        required: false
+        type: "string"
+      - name: "latest"
+        in: "query"
+        description: "If true; only the latest versions will be returned."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "key"
+        - "category"
+        - "id"
+        - "version"
+        - "name"
+        - "deploymentId"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates request was successful and the app definitions are\
+            \ returned"
+          schema:
+            $ref: "#/definitions/DataResponseAppDefinitionResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /app-repository/app-definitions/{appDefinitionId}:
+    get:
+      tags:
+      - "App Definitions"
+      summary: "Get a app definition"
+      description: ""
+      operationId: "getAppDefinition"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "appDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the app definition was found returned."
+          schema:
+            $ref: "#/definitions/AppDefinitionResponse"
+        404:
+          description: "Indicates the app definition was not found."
+      security:
+      - basicAuth: []
+    put:
+      tags:
+      - "Case Definitions"
+      summary: "Execute actions for an app definition"
+      description: "Execute actions for an app definition (Update category)"
+      operationId: "executeAppDefinitionAction"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "appDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/AppDefinitionActionRequest"
+      responses:
+        200:
+          description: "Indicates action has been executed for the specified app definition.\
+            \ (category altered)"
+          schema:
+            $ref: "#/definitions/AppDefinitionResponse"
+        400:
+          description: "Indicates no category was defined in the request body."
+        404:
+          description: "Indicates the requested app definition was not found."
+      security:
+      - basicAuth: []
+  /app-repository/app-definitions/{appDefinitionId}/model:
+    get:
+      tags:
+      - "App Definitions"
+      summary: "Get an App model"
+      description: ""
+      operationId: "getAppModel"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "appDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the app model was found returned."
+          schema:
+            type: "string"
+        404:
+          description: "Indicates the app model was not found."
+      security:
+      - basicAuth: []
+  /app-repository/app-definitions/{appDefinitionId}/resourcedata:
+    get:
+      tags:
+      - "App Definitions"
+      summary: "Get an app definition resource content"
+      description: ""
+      operationId: "getAppDefinitionContent"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "appDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both app definition and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested app definition was not found or there\
+            \ is no resource with the given id present in the app definition. The\
+            \ status-description contains additional information."
+      security:
+      - basicAuth: []
+  /app-repository/deployments:
+    get:
+      tags:
+      - "Form Deployments"
+      summary: "List of App Deployments"
+      description: ""
+      operationId: "listAppDeployments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "query"
+        description: "Only return app deployments with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return app deployments with a name like the given name."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Only return app deployments with the given category."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return app deployments which do not have the given category."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return app deployments with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return app deployments with a tenantId like the given value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns app deployments without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "id"
+        - "name"
+        - "deployTime"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates the request was successful."
+          schema:
+            $ref: "#/definitions/DataResponseAppDeploymentResponse"
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - "App Deployments"
+      summary: "Create a new app deployment"
+      description: "The request body should contain data of type multipart/form-data.\
+        \ There should be exactly one file in the request, any additional files will\
+        \ be ignored. The deployment name is the name of the file-field passed in.\
+        \ Make sure the file-name ends with .app, .zip or .bar."
+      operationId: "uploadDeployment"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tenantId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/AppDeploymentResponse"
+        201:
+          description: "Indicates the app deployment was created."
+        400:
+          description: "Indicates there was no content present in the request body\
+            \ or the content mime-type is not supported for app deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+  /app-repository/deployments/{deploymentId}:
+    get:
+      tags:
+      - "App Deployments"
+      summary: "Get an app deployment"
+      description: ""
+      operationId: "getAppDeployment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the app deployment was found and returned."
+          schema:
+            $ref: "#/definitions/AppDeploymentResponse"
+        404:
+          description: "Indicates the requested app deployment was not found."
+      security:
+      - basicAuth: []
+    delete:
+      tags:
+      - "App Deployments"
+      summary: "Delete an app deployment"
+      description: ""
+      operationId: "deleteAppDeployment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the App deployment was found and has been deleted.\
+            \ Response-body is intentionally empty."
+        404:
+          description: "Indicates the requested app deployment was not found."
+      security:
+      - basicAuth: []
+  /app-repository/deployments/{deploymentId}/resourcedata/{resourceName}:
+    get:
+      tags:
+      - "App Deployments"
+      summary: "Get an app deployment resource content"
+      description: "The response body will contain the binary resource-content for\
+        \ the requested resource. The response content-type will be the same as the\
+        \ type returned in the resources mimeType property. Also, a content-disposition\
+        \ header is set, allowing browsers to download the file instead of displaying\
+        \ it."
+      operationId: "getAppDeploymentResource"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "resourceName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both app deployment and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested app deployment was not found or there\
+            \ is no resource with the given id present in the app deployment. The\
+            \ status-description contains additional information."
+      security:
+      - basicAuth: []
+  /app-repository/deployments/{deploymentId}/resources:
+    get:
+      tags:
+      - "Deployment"
+      summary: "List resources in a deployment"
+      description: "The dataUrl property in the resulting JSON for a single resource\
+        \ contains the actual URL to use for retrieving the binary resource."
+      operationId: "listDeploymentResources"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the deployment was found and the resource list has\
+            \ been returned."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/AppDeploymentResourceResponse"
+        404:
+          description: "Indicates the requested deployment was not found."
+      security:
+      - basicAuth: []
+  /app-repository/deployments/{deploymentId}/resources/**:
+    get:
+      tags:
+      - "Deployment"
+      summary: "Get a deployment resource"
+      description: "Replace ** by ResourceId"
+      operationId: "getDeploymentResource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both deployment and resource have been found and\
+            \ the resource has been returned."
+          schema:
+            $ref: "#/definitions/AppDeploymentResourceResponse"
+        404:
+          description: "Indicates the requested deployment was not found or there\
+            \ is no resource with the given id present in the deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+definitions:
+  AppDefinitionActionRequest:
+    type: "object"
+    properties:
+      action:
+        type: "string"
+      category:
+        type: "string"
+  AppDefinitionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "10"
+      url:
+        type: "string"
+        example: "http://localhost:8182/app-repository/app-definitions/simpleApp"
+      category:
+        type: "string"
+        example: "Examples"
+      name:
+        type: "string"
+        example: "Simple App"
+      key:
+        type: "string"
+        example: "simpleApp"
+      description:
+        type: "string"
+        example: "This is an app for testing purposes"
+      version:
+        type: "integer"
+        format: "int32"
+        example: 1
+      resourceName:
+        type: "string"
+        example: "SimpleSourceName"
+      deploymentId:
+        type: "string"
+        example: "818e4703-f1d2-11e6-8549-acde48001121"
+      tenantId:
+        type: "string"
+        example: "null"
+  AppDeploymentResourceResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "oneApp.app"
+      url:
+        type: "string"
+        example: "http://localhost:8081/flowable-rest/service/app-repository/deployments/10/resources/oneApp.app"
+        description: "For a single resource contains the actual URL to use for retrieving\
+          \ the binary resource"
+      contentUrl:
+        type: "string"
+        example: "http://localhost:8081/flowable-rest/service/app-repository/deployments/10/resourcedata/oneApp.app"
+      mediaType:
+        type: "string"
+        example: "text/xml"
+        description: "Contains the media-type the resource has. This is resolved using\
+          \ a (pluggable) MediaTypeResolver and contains, by default, a limited number\
+          \ of mime-type mappings."
+      type:
+        type: "string"
+        example: "appDefinition"
+        description: "Type of resource"
+        enum:
+        - "resource"
+        - "appDefinition"
+  AppDeploymentResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "10"
+      name:
+        type: "string"
+        example: "flowable-app-examples"
+      deploymentTime:
+        type: "string"
+        format: "date-time"
+        example: "2010-10-13T14:54:26.750+02:00"
+      category:
+        type: "string"
+        example: "examples"
+      url:
+        type: "string"
+        example: "http://localhost:8081/app-api/app-repository/deployments/10"
+      tenantId:
+        type: "string"
+        example: "null"
+  AppEngineInfoResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "default"
+      resourceUrl:
+        type: "string"
+        example: "file://flowable/flowable.app.cfg.xml"
+      exception:
+        type: "string"
+        example: "null"
+      version:
+        type: "string"
+        example: "6.3.1"
+  DataResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseAppDefinitionResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/AppDefinitionResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseAppDeploymentResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/AppDeploymentResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"

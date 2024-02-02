@@ -12,15 +12,18 @@
  */
 package org.flowable.engine.impl.agenda;
 
+import java.util.Collection;
+
+import org.flowable.common.engine.impl.agenda.AbstractAgenda;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.impl.agenda.AbstractAgenda;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.interceptor.MigrationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * The agenda also gives easy access to methods to plan new operations when writing {@link ActivityBehavior} implementations.
  *
- * During a {@link Command} execution, the agenda can always be fetched using {@link Context#getAgenda()}.
+ * During a {@link Command} execution, the agenda can always be fetched using {@link CommandContextUtil#getAgenda()}.
  *
  * @author Joram Barrez
  */
@@ -55,6 +58,11 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
         }
     }
 
+    @Override
+    protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return CommandContextUtil.getProcessEngineConfiguration(commandContext).getAgendaFutureMaxWaitTimeoutProvider();
+    }
+
     /* SPECIFIC operations */
 
     @Override
@@ -64,27 +72,42 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
 
     @Override
     public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
-        planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
+        planOperation(new ContinueProcessOperation(commandContext, execution, true, false, null), execution);
+    }
+
+    @Override
+    public void planContinueProcessWithMigrationContextOperation(ExecutionEntity execution, MigrationContext migrationContext) {
+        planOperation(new ContinueProcessOperation(commandContext, execution, false, false, migrationContext), execution);
     }
 
     @Override
     public void planContinueProcessInCompensation(ExecutionEntity execution) {
-        planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
+        planOperation(new ContinueProcessOperation(commandContext, execution, false, true, null), execution);
     }
 
     @Override
-    public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
-        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
+    public void planContinueMultiInstanceOperation(ExecutionEntity execution, ExecutionEntity multiInstanceRootExecution, int loopCounter) {
+        planOperation(new ContinueMultiInstanceOperation(commandContext, execution, multiInstanceRootExecution, loopCounter), execution);
     }
 
     @Override
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
-        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
+        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions, false), execution);
+    }
+
+    @Override
+    public void planTakeOutgoingSequenceFlowsSynchronousOperation(ExecutionEntity execution, boolean evaluateConditions) {
+        planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions, true), execution);
     }
 
     @Override
     public void planEndExecutionOperation(ExecutionEntity execution) {
         planOperation(new EndExecutionOperation(commandContext, execution), execution);
+    }
+    
+    @Override
+    public void planEndExecutionOperationSynchronous(ExecutionEntity execution) {
+        planOperation(new EndExecutionOperation(commandContext, execution, true), execution);
     }
 
     @Override
@@ -93,13 +116,28 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     }
 
     @Override
+    public void planAsyncTriggerExecutionOperation(ExecutionEntity execution) {
+        planOperation(new TriggerExecutionOperation(commandContext, execution, true), execution);
+    }
+    
+    @Override
+    public void planEvaluateConditionalEventsOperation(ExecutionEntity execution) {
+        planOperation(new EvaluateConditionalEventsOperation(commandContext, execution), execution);
+    }
+    
+    @Override
+    public void planEvaluateVariableListenerEventsOperation(String processDefinitionId, String processInstanceId) {
+        planOperation(new EvaluateVariableListenerEventDefinitionsOperation(commandContext, processDefinitionId, processInstanceId));
+    }
+
+    @Override
     public void planDestroyScopeOperation(ExecutionEntity execution) {
         planOperation(new DestroyScopeOperation(commandContext, execution), execution);
     }
 
     @Override
-    public void planExecuteInactiveBehaviorsOperation() {
-        planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
+    public void planExecuteInactiveBehaviorsOperation(Collection<ExecutionEntity> executions) {
+        planOperation(new ExecuteInactiveBehaviorsOperation(commandContext, executions));
     }
 
 }

@@ -14,7 +14,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.db.HasRevision;
+import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.engine.history.HistoricActivityInstance;
 
 /**
@@ -23,6 +23,8 @@ import org.flowable.engine.history.HistoricActivityInstance;
  */
 public interface HistoricActivityInstanceEntity extends HistoricActivityInstance, HistoricScopeInstanceEntity, HasRevision {
 
+    void setTransactionOrder(Integer transactionOrder);
+    
     void setActivityId(String activityId);
 
     void setActivityName(String activityName);

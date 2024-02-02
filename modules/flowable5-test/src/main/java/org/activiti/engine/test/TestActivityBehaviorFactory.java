@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.CancelBoundaryEventActivityBehavior;
@@ -28,12 +27,12 @@ import org.activiti.engine.impl.bpmn.behavior.ErrorEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventBasedGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.ExternalWorkerTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateCatchEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.activiti.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
@@ -70,6 +69,7 @@ import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.ManualTask;
@@ -85,8 +85,8 @@ import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -188,33 +188,23 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(serviceTask, bpmnModel);
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask) {
-        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask);
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
+        return wrappedActivityBehaviorFactory.createWebServiceActivityBehavior(sendTask, bpmnModel);
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
+    public ActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
         return wrappedActivityBehaviorFactory.createMailActivityBehavior(serviceTask);
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(SendTask sendTask) {
+    public ActivityBehavior createMailActivityBehavior(SendTask sendTask) {
         return wrappedActivityBehaviorFactory.createMailActivityBehavior(sendTask);
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(serviceTask, bpmnModel);
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(sendTask, bpmnModel);
     }
 
     @Override
@@ -243,6 +233,11 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
+    public ExternalWorkerTaskActivityBehavior createExternalWorkerTaskActivityBehavior(ExternalWorkerServiceTask externalWorkerServiceTask) {
+        return wrappedActivityBehaviorFactory.createExternalWorkerTaskActivityBehavior(externalWorkerServiceTask);
+    }
+
+    @Override
     public ExclusiveGatewayActivityBehavior createExclusiveGatewayActivityBehavior(ExclusiveGateway exclusiveGateway) {
         return wrappedActivityBehaviorFactory.createExclusiveGatewayActivityBehavior(exclusiveGateway);
     }
@@ -264,13 +259,13 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
 
     @Override
     public SequentialMultiInstanceBehavior createSequentialMultiInstanceBehavior(
-            ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+            ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return wrappedActivityBehaviorFactory.createSequentialMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 
     @Override
     public ParallelMultiInstanceBehavior createParallelMultiInstanceBehavior(
-            ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
+            ActivityImpl activity, ActivityBehavior innerActivityBehavior) {
         return wrappedActivityBehaviorFactory.createParallelMultiInstanceBehavior(activity, innerActivityBehavior);
     }
 

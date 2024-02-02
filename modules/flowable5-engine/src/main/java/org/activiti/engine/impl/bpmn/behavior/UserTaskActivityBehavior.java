@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -34,14 +31,18 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.calendar.BusinessCalendar;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Activity implementation for the user task.
@@ -217,7 +218,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             // All properties set, now firing 'create' events
             if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
                 Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+                        ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task),
+                        EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
             }
         }
 

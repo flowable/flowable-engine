@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testTerminateStage" name="testTerminateStageUserEventListener">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" name="Stage One" definitionRef="stage1">
+                <exitCriterion id="onUserEventExit" sentryRef="onUserEventExitSentry"/>
+            </planItem>
+            <planItem id="userEventListenerPlanItem" definitionRef="userEventListener"/>
+
+            <sentry id="onUserEventExitSentry">
+                <planItemOnPart sourceRef="userEventListenerPlanItem">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <userEventListener id="userEventListener" name="myUserEventListener">
+                <documentation>UserEventListener documentation</documentation>
+            </userEventListener>
+
+            <stage id="stage1" name="Stage One">
+                <planItem id="planItemTaskA" name="Task A" definitionRef="taskA"/>
+                <task id="taskA" name="Task A"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>

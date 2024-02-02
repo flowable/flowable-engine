@@ -16,13 +16,13 @@ package org.activiti.engine.test.bpmn.subprocess.transaction;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
-import org.flowable.engine.runtime.EventSubscription;
-import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 
 /**
  * @author Daniel Meyer

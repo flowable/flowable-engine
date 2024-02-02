@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="testEntryAndExitPropagate">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItemStageOne" definitionRef="stageOne">
+                <entryCriterion id="entryStageOneCriterion" sentryRef="entrySentryStageOne"/>
+                <exitCriterion id="exitStageOneCriterion" sentryRef="exitSentryStageOne"/>
+            </planItem>
+            <planItem id="planItemStartStageOneEvent" definitionRef="startStageOneEvent"/>
+            <planItem id="planItemExitStageOneEvent" definitionRef="exitStageOneEvent"/>
+            <sentry id="entrySentryStageOne">
+                <planItemOnPart sourceRef="planItemStartStageOneEvent">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="exitSentryStageOne">
+                <planItemOnPart sourceRef="planItemExitStageOneEvent">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <userEventListener id="startStageOneEvent"/>
+            <userEventListener id="exitStageOneEvent"/>
+            <stage id="stageOne">
+                <planItem id="planItemTaskA" definitionRef="taskA"/>
+                <planItem id="planItemTaskB" definitionRef="taskB"/>
+                <humanTask id="taskA"/>
+                <humanTask id="taskB"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

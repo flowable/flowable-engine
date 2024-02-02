@@ -3,7 +3,7 @@
   <case id="testAsyncServiceTask" name="testAsyncServiceTask" flowable:initiatorVariableName="initiator">
     <casePlanModel id="casePlanModel">
       <planItem id="planItem1" name="Task before service task" definitionRef="sid-001F675B-E86D-4F6C-A70A-B14F866228E3"></planItem>
-      <planItem id="planItem2" name="Async service task" definitionRef="sid-3F947F0B-D6BE-4DF6-A7E6-920E5E2E78DC">
+      <planItem id="planItem2" name="Async service task" definitionRef="asyncServiceTask">
         <entryCriterion id="sid-7CB7354C-BF7C-405B-828B-655C4940EB44" sentryRef="sentry1"></entryCriterion>
       </planItem>
       <planItem id="planItem3" name="Task after service task" definitionRef="sid-A1003ABB-CF0B-4377-BE7C-FABA753FF698">
@@ -23,7 +23,7 @@
         </planItemOnPart>
       </sentry>
       <humanTask id="sid-001F675B-E86D-4F6C-A70A-B14F866228E3" name="Task before service task"></humanTask>
-      <task id="sid-3F947F0B-D6BE-4DF6-A7E6-920E5E2E78DC" name="Async service task" isBlocking="false" flowable:async="true" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate"></task>
+      <task id="asyncServiceTask" name="Async service task" isBlocking="false" flowable:async="true" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate"></task>
       <humanTask id="sid-A1003ABB-CF0B-4377-BE7C-FABA753FF698" name="Task after service task"></humanTask>
     </casePlanModel>
   </case>

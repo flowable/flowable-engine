@@ -13,14 +13,13 @@
 package org.flowable.job.service.impl.persistence.entity;
 
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
@@ -30,7 +29,7 @@ import org.flowable.job.service.JobServiceConfiguration;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEntity, Serializable {
+public class HistoryJobEntityImpl extends AbstractJobServiceEntity implements HistoryJobEntity, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,17 +37,18 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
-    protected JobByteArrayRef customValuesByteArrayRef;
-    protected JobByteArrayRef advancedJobHandlerConfigurationByteArrayRef;
+    protected ByteArrayRef customValuesByteArrayRef;
+    protected ByteArrayRef advancedJobHandlerConfigurationByteArrayRef;
 
-    protected JobByteArrayRef exceptionByteArrayRef;
+    protected ByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
-
-    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
 
     protected String lockOwner;
     protected Date lockExpirationTime;
     protected Date createTime;
+    protected String scopeType;
+    
+    protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
 
     @Override
     public Object getPersistentState() {
@@ -63,12 +63,14 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("lockExpirationTime", lockExpirationTime);
+        
+        persistentState.put("scopeType", scopeType);
 
         return persistentState;
     }
 
-    private void putByteArrayRefIdToMap(String key, JobByteArrayRef jobByteArrayRef, Map<String, Object> map) {
-        if(jobByteArrayRef != null) {
+    private void putByteArrayRefIdToMap(String key, ByteArrayRef jobByteArrayRef, Map<String, Object> map) {
+        if (jobByteArrayRef != null) {
             map.put(key, jobByteArrayRef.getId());
         }
     }
@@ -114,23 +116,23 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     @Override
     public void setCustomValues(String customValues) {
         if (customValuesByteArrayRef == null) {
-            customValuesByteArrayRef = new JobByteArrayRef();
+            customValuesByteArrayRef = new ByteArrayRef();
         }
-        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues, getEngineType());
     }
 
     @Override
-    public JobByteArrayRef getCustomValuesByteArrayRef() {
+    public ByteArrayRef getCustomValuesByteArrayRef() {
         return customValuesByteArrayRef;
     }
 
     @Override
-    public void setCustomValuesByteArrayRef(JobByteArrayRef customValuesByteArrayRef) {
+    public void setCustomValuesByteArrayRef(ByteArrayRef customValuesByteArrayRef) {
         this.customValuesByteArrayRef = customValuesByteArrayRef;
     }
 
     @Override
-    public JobByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef() {
+    public ByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef() {
         return advancedJobHandlerConfigurationByteArrayRef;
     }
 
@@ -140,33 +142,33 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     }
 
     @Override
-    public void setAdvancedJobHandlerConfigurationByteArrayRef(JobByteArrayRef configurationByteArrayRef) {
+    public void setAdvancedJobHandlerConfigurationByteArrayRef(ByteArrayRef configurationByteArrayRef) {
          this.advancedJobHandlerConfigurationByteArrayRef = configurationByteArrayRef;
     }
 
     @Override
     public void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration) {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
-            advancedJobHandlerConfigurationByteArrayRef = new JobByteArrayRef();
+            advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
         }
-        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", jobHandlerConfiguration);
+        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", jobHandlerConfiguration, getEngineType());
     }
 
     @Override
     public void setAdvancedJobHandlerConfigurationBytes(byte[] bytes) {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
-            advancedJobHandlerConfigurationByteArrayRef = new JobByteArrayRef();
+            advancedJobHandlerConfigurationByteArrayRef = new ByteArrayRef();
         }
-        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes);
+        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes, getEngineType());
     }
 
     @Override
-    public void setExceptionByteArrayRef(JobByteArrayRef exceptionByteArrayRef) {
+    public void setExceptionByteArrayRef(ByteArrayRef exceptionByteArrayRef) {
         this.exceptionByteArrayRef = exceptionByteArrayRef;
     }
 
     @Override
-    public JobByteArrayRef getExceptionByteArrayRef() {
+    public ByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }
 
@@ -178,9 +180,9 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
-            exceptionByteArrayRef = new JobByteArrayRef();
+            exceptionByteArrayRef = new ByteArrayRef();
         }
-        exceptionByteArrayRef.setValue("stacktrace", exception);
+        exceptionByteArrayRef.setValue("stacktrace", exception, getEngineType());
     }
 
     @Override
@@ -233,16 +235,46 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         this.lockExpirationTime = claimedUntil;
     }
 
-    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    protected String getJobByteArrayRefAsString(ByteArrayRef jobByteArrayRef) {
         if (jobByteArrayRef == null) {
             return null;
         }
-        return jobByteArrayRef.asString();
+        return jobByteArrayRef.asString(getEngineType());
+    }
+    
+    protected String getEngineType() {
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        } else {
+            return ScopeTypes.BPMN;
+        }
     }
 
     @Override
     public String toString() {
-        return "HistoryJobEntity [id=" + id + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoryJobEntity[").append("id=").append(id)
+                .append(", jobHandlerType=").append(jobHandlerType);
+
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

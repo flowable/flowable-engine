@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- This configuration is to have the same tests with enabled parallel in same transaction by default -->
+
+    <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+        <property name="engineName" value="parallelInSameTransaction"/>
+
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}"/>
+        <property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}"/>
+        <property name="jdbcUsername" value="${jdbc.username:sa}"/>
+        <property name="jdbcPassword" value="${jdbc.password:}"/>
+
+        <!-- Database configurations -->
+        <property name="databaseSchemaUpdate" value="drop-create"/>
+
+        <!-- job executor configurations -->
+        <property name="asyncExecutorActivate" value="false"/>
+        <property name="asyncExecutorDefaultAsyncJobAcquireWaitTime" value="1000" />
+        <property name="asyncExecutorDefaultTimerJobAcquireWaitTime" value="1000" />
+
+        <property name="asyncFailedJobWaitTime" value="1"/>
+
+        <!-- http client configurations -->
+        <property name="httpClientConfig" ref="httpClientConfig"/>
+
+        <property name="history" value="full"/>
+
+        <property name="enableProcessDefinitionInfoCache" value="true"/>
+    </bean>
+
+    <bean id="httpClientConfig" class="org.flowable.engine.cfg.HttpClientConfig">
+        <property name="connectTimeout" value="5000"/>
+        <property name="socketTimeout" value="5000"/>
+        <property name="connectionRequestTimeout" value="5000"/>
+        <property name="requestRetryLimit" value="5"/>
+        <!-- https configuration -->
+        <property name="disableCertVerify" value="true"/>
+        <property name="defaultParallelInSameTransaction" value="true"/>
+        <property name="httpClient" ref="springWebClientFlowableHttpClient" />
+    </bean>
+
+    <bean id="springWebClientFlowableHttpClient" class="org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient">
+        <constructor-arg name="config">
+            <bean class="org.flowable.http.common.impl.HttpClientConfig">
+                <property name="connectTimeout" value="5000"/>
+                <property name="socketTimeout" value="5000"/>
+                <property name="connectionRequestTimeout" value="5000"/>
+                <property name="requestRetryLimit" value="5"/>
+                <!-- https configuration -->
+                <property name="disableCertVerify" value="true"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="throwCustomExceptionBean"
+          class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean"/>
+    <bean id="throwCustomExceptionDelegate"
+          class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate"/>
+
+</beans>

@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
 
 public class TestBaseEntityEventListener extends BaseEntityEventListener {

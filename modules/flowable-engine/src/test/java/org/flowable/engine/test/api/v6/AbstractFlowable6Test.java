@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.v6;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.engine.FormService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -24,7 +25,6 @@ import org.flowable.engine.ProcessEngineLifecycleListener;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.common.EngineConfigurator;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.FlowableRule;
@@ -115,18 +115,15 @@ public class AbstractFlowable6Test {
 
             // Shutdown hook
             final ProcessEngineConfiguration processEngineConfiguration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
-            final ProcessEngineLifecycleListener originalLifecycleListener = processEngineConfiguration.getProcessEngineLifecycleListener();
-            processEngineConfiguration.setProcessEngineLifecycleListener(new ProcessEngineLifecycleListener() {
+            processEngineConfiguration.addEngineLifecycleListener(new ProcessEngineLifecycleListener() {
 
                 @Override
                 public void onProcessEngineClosed(ProcessEngine processEngine) {
                     server.stop();
-                    originalLifecycleListener.onProcessEngineClosed(processEngine);
                 }
 
                 @Override
                 public void onProcessEngineBuilt(ProcessEngine processEngine) {
-                    originalLifecycleListener.onProcessEngineBuilt(processEngine);
                 }
 
             });

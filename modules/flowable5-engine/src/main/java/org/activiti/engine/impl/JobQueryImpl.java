@@ -313,6 +313,50 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return exceptionMessage;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public boolean isRetriesLeft() {
+        return retriesLeft;
+    }
+
+    public boolean isExecutable() {
+        return executable;
+    }
+
+    public boolean isOnlyTimers() {
+        return onlyTimers;
+    }
+
+    public boolean isOnlyMessages() {
+        return onlyMessages;
+    }
+
+    public Date getDuedateHigherThan() {
+        return duedateHigherThan;
+    }
+
+    public Date getDuedateLowerThan() {
+        return duedateLowerThan;
+    }
+
+    public Date getDuedateHigherThanOrEqual() {
+        return duedateHigherThanOrEqual;
+    }
+
+    public Date getDuedateLowerThanOrEqual() {
+        return duedateLowerThanOrEqual;
+    }
+
+    public boolean isNoRetriesLeft() {
+        return noRetriesLeft;
+    }
+
     public String getTenantId() {
         return tenantId;
     }

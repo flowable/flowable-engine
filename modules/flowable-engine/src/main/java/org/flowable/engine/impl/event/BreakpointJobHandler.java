@@ -13,7 +13,7 @@
 
 package org.flowable.engine.impl.event;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.agenda.ContinueProcessOperation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -38,6 +38,7 @@ public class BreakpointJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
-        CommandContextUtil.getAgenda(commandContext).planOperation(new ContinueProcessOperation(commandContext, executionEntity, true, false), executionEntity);
+        CommandContextUtil.getAgenda(commandContext).planOperation(new ContinueProcessOperation(
+                commandContext, executionEntity, true, false, null), executionEntity);
     }
 }

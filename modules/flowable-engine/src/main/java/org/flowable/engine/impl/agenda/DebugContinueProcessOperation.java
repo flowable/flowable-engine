@@ -13,12 +13,11 @@
 package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.job.service.JobService;
-import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
@@ -32,10 +31,10 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     public static final String HANDLER_TYPE_BREAK_POINT = "breakpoint";
     protected ProcessDebugger debugger;
 
-    public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext,
-                                         ExecutionEntity execution, boolean forceSynchronousOperation,
-                                         boolean inCompensation) {
-        super(commandContext, execution, forceSynchronousOperation, inCompensation);
+    public DebugContinueProcessOperation(ProcessDebugger debugger, CommandContext commandContext, 
+            ExecutionEntity execution, boolean forceSynchronousOperation, boolean inCompensation) {
+        
+        super(commandContext, execution, forceSynchronousOperation, inCompensation, null);
         this.debugger = debugger;
     }
 
@@ -54,11 +53,11 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void breakExecution(FlowNode flowNode) {
-        JobService jobService = CommandContextUtil.getJobService();
-        DeadLetterJobEntity brokenJob = jobService.createDeadLetterJob();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobEntity brokenJob = jobService.createJob();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);
-        brokenJob.setRetries(0);
+        brokenJob.setRetries(1);
         brokenJob.setExecutionId(execution.getId());
         brokenJob.setProcessInstanceId(execution.getProcessInstanceId());
         brokenJob.setProcessDefinitionId(execution.getProcessDefinitionId());
@@ -70,6 +69,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
             brokenJob.setTenantId(execution.getTenantId());
         }
 
-        jobService.insertDeadLetterJob(brokenJob);
+        jobService.insertJob(brokenJob);
+        jobService.moveJobToSuspendedJob(brokenJob);
     }
 }

@@ -13,6 +13,10 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -33,6 +37,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,6 +53,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
     /**
      * Test getting all process variables. GET runtime/process-instances/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessVariables() throws Exception {
 
@@ -67,21 +73,22 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);
 
-        // Request all variables (no scope provides) which include global an
-        // local
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId())),
+        // Request all variables (no scope provides) which include global an local
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId())),
                 HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(9, responseNode.size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThat(responseNode).hasSize(9);
     }
 
     /**
      * Test creating a single process variable. POST runtime/process-instance/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateSingleProcessInstanceVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -93,25 +100,29 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         variableNode.put("type", "string");
 
         // Create a new local variable
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent()).get(0);
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("myVariable", responseNode.get("name").asText());
-        assertEquals("simple string value", responseNode.get("value").asText());
-        assertEquals("local", responseNode.get("scope").asText());
-        assertEquals("string", responseNode.get("type").asText());
-        assertNull(responseNode.get("valueUrl"));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "name: 'myVariable',"
+                        + "value: 'simple string value',"
+                        + "scope: 'local',"
+                        + "type: 'string'"
+                        + "}");
 
-        assertTrue(runtimeService.hasVariableLocal(processInstance.getId(), "myVariable"));
-        assertEquals("simple string value", runtimeService.getVariableLocal(processInstance.getId(), "myVariable"));
+        assertThat(runtimeService.hasVariableLocal(processInstance.getId(), "myVariable")).isTrue();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "myVariable")).isEqualTo("simple string value");
     }
 
     /**
      * Test creating a single process variable using a binary stream. POST runtime/process-instances/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateSingleBinaryProcessVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -123,29 +134,33 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         additionalFields.put("name", "binaryVariable");
         additionalFields.put("type", "binary");
 
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
         CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("binaryVariable", responseNode.get("name").asText());
-        assertTrue(responseNode.get("value").isNull());
-        assertEquals("local", responseNode.get("scope").asText());
-        assertEquals("binary", responseNode.get("type").asText());
-        assertFalse(responseNode.get("valueUrl").isNull());
-        assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "binaryVariable")));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "name: 'binaryVariable',"
+                        + "value: null,"
+                        + "scope: 'local',"
+                        + "type: 'binary',"
+                        + "valueUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "binaryVariable") + "'"
+                        + "}");
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "binaryVariable");
-        assertNotNull(variableValue);
-        assertTrue(variableValue instanceof byte[]);
-        assertEquals("This is binary content", new String((byte[]) variableValue));
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }
 
     /**
      * Test creating a single process variable using a binary stream containing a serializable. POST runtime/process-instances/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateSingleSerializableProcessVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -167,29 +182,33 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         additionalFields.put("type", "serializable");
 
         // Upload a valid BPMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
         CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertEquals("serializableVariable", responseNode.get("name").asText());
-        assertTrue(responseNode.get("value").isNull());
-        assertEquals("local", responseNode.get("scope").asText());
-        assertEquals("serializable", responseNode.get("type").asText());
-        assertFalse(responseNode.get("valueUrl").isNull());
-        assertTrue(responseNode.get("valueUrl").asText().endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable")));
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "name: 'serializableVariable',"
+                        + "value: null,"
+                        + "scope: 'local',"
+                        + "type: 'serializable',"
+                        + "valueUrl: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable") + "'"
+                        + "}");
 
         // Check actual value of variable in engine
         Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "serializableVariable");
-        assertNotNull(variableValue);
-        assertTrue(variableValue instanceof TestSerializableVariable);
-        assertEquals("some value", ((TestSerializableVariable) variableValue).getSomeField());
+        assertThat(variableValue).isInstanceOf(TestSerializableVariable.class);
+        assertThat(((TestSerializableVariable) variableValue).getSomeField()).isEqualTo("some value");
     }
 
     /**
      * Test creating a single process variable, testing edge case exceptions. POST runtime/process-instances/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateSingleProcessVariableEdgeCases() throws Exception {
         // Test adding variable to unexisting execution
@@ -234,6 +253,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
     /**
      * Test creating a single process variable, testing default types when omitted. POST runtime/process-instances/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateSingleProcessVariableDefaultTypes() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
@@ -248,7 +268,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CREATED));
 
-        assertEquals("String value", runtimeService.getVariable(processInstance.getId(), "stringVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isEqualTo("String value");
 
         // Integer type detection
         varNode.put("name", "integerVar");
@@ -257,7 +277,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CREATED));
 
-        assertEquals(123, runtimeService.getVariable(processInstance.getId(), "integerVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "integerVar")).isEqualTo(123);
 
         // Double type detection
         varNode.put("name", "doubleVar");
@@ -266,7 +286,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CREATED));
 
-        assertEquals(123.456, runtimeService.getVariable(processInstance.getId(), "doubleVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "doubleVar")).isEqualTo(123.456);
 
         // Boolean type detection
         varNode.put("name", "booleanVar");
@@ -275,12 +295,13 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_CREATED));
 
-        assertEquals(Boolean.TRUE, runtimeService.getVariable(processInstance.getId(), "booleanVar"));
+        assertThat(runtimeService.getVariable(processInstance.getId(), "booleanVar")).isEqualTo(Boolean.TRUE);
     }
 
     /**
      * Test creating multiple process variables in a single call. POST runtime/process-instance/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateMultipleProcessVariables() throws Exception {
 
@@ -334,31 +355,34 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         dateVarNode.put("type", "date");
 
         // Create local variables with a single request
-        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(7, responseNode.size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThat(responseNode).hasSize(7);
 
         // Check if engine has correct variables set
         Map<String, Object> variables = runtimeService.getVariablesLocal(processInstance.getId());
-        assertEquals(7, variables.size());
-
-        assertEquals("simple string value", variables.get("stringVariable"));
-        assertEquals(1234, variables.get("integerVariable"));
-        assertEquals((short) 123, variables.get("shortVariable"));
-        assertEquals(4567890L, variables.get("longVariable"));
-        assertEquals(123.456, variables.get("doubleVariable"));
-        assertEquals(Boolean.TRUE, variables.get("booleanVariable"));
-        assertEquals(dateFormat.parse(isoString), variables.get("dateVariable"));
+        assertThat(variables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", true),
+                        entry("dateVariable", dateFormat.parse(isoString))
+                );
     }
 
     /**
      * Test creating multiple process variables in a single call. POST runtime/process-instance/{processInstanceId}/variables?override=true
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testCreateMultipleProcessVariablesWithOverride() throws Exception {
 
@@ -378,26 +402,29 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         anotherVariable.put("type", "string");
 
         // Create local variables with a single request
-        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertNotNull(responseNode);
-        assertTrue(responseNode.isArray());
-        assertEquals(2, responseNode.size());
+        assertThat(responseNode).isNotNull();
+        assertThat(responseNode.isArray()).isTrue();
+        assertThat(responseNode).hasSize(2);
 
         // Check if engine has correct variables set
         Map<String, Object> variables = runtimeService.getVariablesLocal(processInstance.getId());
-        assertEquals(2, variables.size());
-
-        assertEquals("simple string value", variables.get("stringVariable"));
-        assertEquals("another string value", variables.get("stringVariable2"));
+        assertThat(variables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("stringVariable2", "another string value")
+                );
     }
 
     /**
      * Test deleting all process variables. DELETE runtime/process-instance/{processInstanceId}/variables
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testDeleteAllProcessVariables() throws Exception {
 
@@ -410,6 +437,6 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT));
 
         // Check if local variables are gone and global remain unchanged
-        assertEquals(0, runtimeService.getVariablesLocal(processInstance.getId()).size());
+        assertThat(runtimeService.getVariablesLocal(processInstance.getId())).isEmpty();
     }
 }

@@ -19,20 +19,26 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.zip.ZipInputStream;
 
+import org.flowable.common.spring.CommonAutoDeploymentProperties;
+import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of {@link AutoDeploymentStrategy} that performs a separate deployment for each set of {@link Resource}s that share the same parent folder. The namehint is used to prefix the names of
- * deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
+ * Implementation of {@link org.flowable.common.spring.AutoDeploymentStrategy AutoDeploymentStrategy}
+ * that performs a separate deployment for each set of {@link Resource}s that share the same parent folder.
+ * The namehint is used to prefix the names of deployments. If the parent folder for a {@link Resource} cannot be determined, the resource's name is used.
  * 
  * @author Tiese Barrell
+ * @author Joram Barrez
  */
-public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDeploymentStrategy {
+public class ResourceParentFolderAutoDeploymentStrategy extends AbstractProcessAutoDeploymentStrategy {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParentFolderAutoDeploymentStrategy.class);
 
     /**
      * The deployment mode this strategy handles.
@@ -41,39 +47,44 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
 
     private static final String DEPLOYMENT_NAME_PATTERN = "%s.%s";
 
+    public ResourceParentFolderAutoDeploymentStrategy() {
+    }
+
+    public ResourceParentFolderAutoDeploymentStrategy(CommonAutoDeploymentProperties deploymentProperties) {
+        super(deploymentProperties);
+    }
+
     @Override
     protected String getDeploymentMode() {
         return DEPLOYMENT_MODE;
     }
 
     @Override
-    public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
+    protected void deployResourcesInternal(String deploymentNameHint, Resource[] resources, ProcessEngine engine) {
 
-        // Create a deployment for each distinct parent folder using the name
-        // hint
-        // as a prefix
+        RepositoryService repositoryService = engine.getRepositoryService();
+        // Create a deployment for each distinct parent folder using the namehint as a prefix
         final Map<String, Set<Resource>> resourcesMap = createMap(resources);
-
         for (final Entry<String, Set<Resource>> group : resourcesMap.entrySet()) {
 
             final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
-
             final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
 
             for (final Resource resource : group.getValue()) {
-                final String resourceName = determineResourceName(resource);
+                addResource(resource, deploymentBuilder);
+            }
 
-                try {
-                    if (resourceName.endsWith(".bar") || resourceName.endsWith(".zip") || resourceName.endsWith(".jar")) {
-                        deploymentBuilder.addZipInputStream(new ZipInputStream(resource.getInputStream()));
-                    } else {
-                        deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
-                    }
-                } catch (IOException e) {
-                    throw new FlowableException("couldn't auto deploy resource '" + resource + "': " + e.getMessage(), e);
+            try {
+                deploymentBuilder.deploy();
+            } catch (Exception e) {
+                if (isThrowExceptionOnDeploymentFailure()) {
+                    throw e;
+                } else {
+                    LOGGER.warn("Exception while autodeploying process definitions. "
+                        + "This exception can be ignored if the root cause indicates a unique constraint violation, "
+                        + "which is typically caused by two (or more) servers booting up at the exact same time and deploying the same definitions. ", e);
                 }
             }
-            deploymentBuilder.deploy();
         }
 
     }
@@ -84,7 +95,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
         for (final Resource resource : resources) {
             final String parentFolderName = determineGroupName(resource);
             if (resourcesMap.get(parentFolderName) == null) {
-                resourcesMap.put(parentFolderName, new HashSet<Resource>());
+                resourcesMap.put(parentFolderName, new HashSet<>());
             }
             resourcesMap.get(parentFolderName).add(resource);
         }

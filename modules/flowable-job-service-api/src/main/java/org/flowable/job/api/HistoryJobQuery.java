@@ -13,7 +13,9 @@
 
 package org.flowable.job.api;
 
-import org.flowable.engine.common.api.query.Query;
+import java.util.Collection;
+
+import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link HistoryJob}s.
@@ -29,11 +31,28 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
     /** Select jobs which have given job handler type */
     HistoryJobQuery handlerType(String handlerType);
 
-    /** Only select jobs that failed due to an exception. */
+    /**
+     * Select jobs which have given job handler type
+     */
+    HistoryJobQuery handlerTypes(Collection<String> handlerType);
+
+    /**
+     * Only select jobs that failed due to an exception.
+     */
     HistoryJobQuery withException();
 
     /** Only select jobs that failed due to an exception with the given message. */
     HistoryJobQuery exceptionMessage(String exceptionMessage);
+    
+    /**
+     * Only select jobs with the given scope type.
+     */
+    HistoryJobQuery scopeType(String scopeType);
+
+    /**
+     * Only return jobs that do not have a scope type.
+     */
+    HistoryJobQuery withoutScopeType();
 
     /**
      * Only select jobs that have the given tenant id.
@@ -73,24 +92,9 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
     HistoryJobQuery orderByJobId();
 
     /**
-     * Order by duedate (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByJobDuedate();
-
-    /**
      * Order by retries (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     HistoryJobQuery orderByJobRetries();
-
-    /**
-     * Order by process instance id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByProcessInstanceId();
-
-    /**
-     * Order by execution id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    HistoryJobQuery orderByExecutionId();
 
     /**
      * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).

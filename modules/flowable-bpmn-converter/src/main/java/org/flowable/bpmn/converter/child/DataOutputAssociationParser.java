@@ -33,8 +33,9 @@ public class DataOutputAssociationParser extends BaseChildElementParser {
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-        if (!(parentElement instanceof Activity))
+        if (!(parentElement instanceof Activity)) {
             return;
+        }
 
         DataAssociation dataAssociation = new DataAssociation();
         BpmnXMLUtil.addXMLLocation(dataAssociation, xtr);

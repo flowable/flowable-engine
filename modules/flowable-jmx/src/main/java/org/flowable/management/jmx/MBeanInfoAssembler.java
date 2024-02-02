@@ -30,7 +30,7 @@ import javax.management.modelmbean.ModelMBeanInfoSupport;
 import javax.management.modelmbean.ModelMBeanNotificationInfo;
 import javax.management.modelmbean.ModelMBeanOperationInfo;
 
-import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.management.jmx.annotations.ManagedAttribute;
 import org.flowable.management.jmx.annotations.ManagedNotification;
 import org.flowable.management.jmx.annotations.ManagedNotifications;
@@ -131,8 +131,7 @@ public class MBeanInfoAssembler {
             }
         }
 
-        // and then any additional interfaces (as interfaces can be annotated as
-        // well)
+        // and then any additional interfaces (as interfaces can be annotated as well)
         if (managedClass.getInterfaces() != null) {
             for (Class<?> clazz : managedClass.getInterfaces()) {
                 // recursive as there may be multiple interfaces
@@ -223,8 +222,7 @@ public class MBeanInfoAssembler {
         for (ManagedAttributeInfo info : attributes.values()) {
             ModelMBeanAttributeInfo mbeanAttribute = new ModelMBeanAttributeInfo(info.getKey(), info.getDescription(), info.getGetter(), info.getSetter());
 
-            // add missing attribute descriptors, this is needed to have
-            // attributes accessible
+            // add missing attribute descriptors, this is needed to have attributes accessible
             Descriptor desc = mbeanAttribute.getDescriptor();
 
             if (info.getGetter() != null) {

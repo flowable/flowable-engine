@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <jaxb:bindings
-   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+   xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-   xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd" version="2.1">
+   xsi:schemaLocation="https://jakarta.ee/xml/ns/jaxb https://jakarta.ee/xml/ns/jaxb/bindingschema_3_0.xsd" version="3.0">
    <jaxb:globalBindings>
       <!-- 
-           Use java.util.Date instead of javax.xml.datatype.XMLGregorianCalendar for xsd:date, xsd:dateTime, 
+           Use java.util.Date instead of jakarta.xml.datatype.XMLGregorianCalendar for xsd:date, xsd:dateTime,
            because Flowable engine uses java.util.Date to store dates/times and JAXB generated XMLGregorianCalendar by default.
       -->
       <jaxb:javaType name="java.util.Date" xmlType="xsd:time"

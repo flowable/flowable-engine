@@ -18,29 +18,32 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.util.io.InputStreamSource;
+import org.flowable.common.engine.impl.util.io.StreamSource;
+import org.flowable.common.engine.impl.util.io.StringStreamSource;
+import org.flowable.common.engine.impl.util.io.UrlStreamSource;
+import org.flowable.dmn.api.DecisionTypes;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.io.ResourceStreamSource;
-import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.dmn.model.Decision;
+import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.constants.DmnXMLConstants;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.dmn.xml.exception.DmnXMLException;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.io.InputStreamSource;
-import org.flowable.engine.common.impl.util.io.StreamSource;
-import org.flowable.engine.common.impl.util.io.StringStreamSource;
-import org.flowable.engine.common.impl.util.io.UrlStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Specific parsing of one BPMN 2.0 XML file, created by the {@link DmnParse}.
+ * Specific parsing of one DMN XML file, created by the {@link DmnParse}.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @author Yvo Swillens
  */
 public class DmnParse implements DmnXMLConstants {
 
@@ -57,11 +60,11 @@ public class DmnParse implements DmnXMLConstants {
 
     protected String targetNamespace;
 
-    /** The deployment to which the parsed decision tables will be added. */
+    /** The deployment to which the parsed definition will be added. */
     protected DmnDeploymentEntity deployment;
 
-    /** The end result of the parsing: a list of decision tables. */
-    protected List<DecisionTableEntity> decisionTables = new ArrayList<>();
+    /** The end result of the parsing: a list of decision (services). */
+    protected List<DecisionEntity> decisions = new ArrayList<>();
 
     public DmnParse deployment(DmnDeploymentEntity deployment) {
         this.deployment = deployment;
@@ -83,18 +86,30 @@ public class DmnParse implements DmnXMLConstants {
             }
 
             if (dmnDefinition != null && dmnDefinition.getDecisions() != null) {
-                for (Decision decision : dmnDefinition.getDecisions()) {
-                    DecisionTableEntity decisionTableEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager().create();
-                    decisionTableEntity.setKey(decision.getId());
-                    decisionTableEntity.setName(decision.getName());
-                    decisionTableEntity.setResourceName(name);
-                    decisionTableEntity.setDeploymentId(deployment.getId());
-                    decisionTableEntity.setParentDeploymentId(deployment.getParentDeploymentId());
-                    decisionTableEntity.setDescription(decision.getDescription());
-                    decisionTables.add(decisionTableEntity);
+                // determine decision type based on whether definition contains decision services
+                for (DecisionService decisionService : dmnDefinition.getDecisionServices()) {
+                    DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
+                    decisionEntity.setKey(decisionService.getId());
+                    decisionEntity.setName(decisionService.getName());
+                    decisionEntity.setResourceName(name);
+                    decisionEntity.setDeploymentId(deployment.getId());
+                    decisionEntity.setDescription(decisionService.getDescription());
+                    decisionEntity.setDecisionType(DecisionTypes.DECISION_SERVICE);
+                    decisions.add(decisionEntity);
+                }
+                if (dmnDefinition.getDecisionServices().isEmpty()) {
+                    for (Decision decision : dmnDefinition.getDecisions()) {
+                        DecisionEntity decisionEntity = CommandContextUtil.getDmnEngineConfiguration().getDecisionDataManager().create();
+                        decisionEntity.setKey(decision.getId());
+                        decisionEntity.setName(decision.getName());
+                        decisionEntity.setResourceName(name);
+                        decisionEntity.setDeploymentId(deployment.getId());
+                        decisionEntity.setDescription(decision.getDescription());
+                        decisionEntity.setDecisionType(DecisionTypes.DECISION_TABLE);
+                        decisions.add(decisionEntity);
+                    }
                 }
             }
-
         } catch (Exception e) {
             if (e instanceof FlowableException) {
                 throw (FlowableException) e;
@@ -181,8 +196,8 @@ public class DmnParse implements DmnXMLConstants {
         this.validateSchema = validateSchema;
     }
 
-    public List<DecisionTableEntity> getDecisionTables() {
-        return decisionTables;
+    public List<DecisionEntity> getDecisions() {
+        return decisions;
     }
 
     public String getTargetNamespace() {

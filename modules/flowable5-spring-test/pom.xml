@@ -9,7 +9,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <build>
@@ -119,18 +119,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-jsr223</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -140,8 +135,13 @@
         <dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable5-test</artifactId>
-			<version>6.3.0-SNAPSHOT</version>
+			<version>7.1.0-SNAPSHOT</version>
 		</dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+          <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -153,25 +153,19 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>subethasmtp</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>3.6.9.Final</version>
-            <scope>test</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.subethamail</groupId>
-            <artifactId>subethasmtp-wiser</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.openjpa</groupId>
-            <artifactId>openjpa</artifactId>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -186,6 +180,11 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.h-thurow</groupId>
+            <artifactId>simple-jndi</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -194,6 +193,7 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
@@ -223,6 +223,7 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
@@ -286,29 +287,7 @@
                                 <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
                                 <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485 -->
                             </excludes>
-                            <runOrder>alphabetical</runOrder>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>distro</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

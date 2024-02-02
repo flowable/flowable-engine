@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test"
+             design:palette="flowable-core-process-palette">
+    <process id="transientVariableTest" name="Transient Variable Test" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <serviceTask id="bpmnTask_0" name="A" flowable:class="org.flowable.engine.test.api.variables.TransientVariablesTest$TestServiceDelegate01" />
+        <serviceTask id="bpmnTask_2" name="B" flowable:class="org.flowable.engine.test.api.variables.TransientVariablesTest$TestServiceDelegate02" />
+        <serviceTask id="bpmnTask_3" name="C" flowable:class="org.flowable.engine.test.api.variables.TransientVariablesTest$TestServiceDelegate03" />
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" />
+        <endEvent id="bpmnEndEvent_4" />
+        <sequenceFlow id="bpmnSequenceFlow_3" sourceRef="bpmnTask_0" targetRef="bpmnTask_2" />
+        <sequenceFlow id="bpmnSequenceFlow_5" sourceRef="bpmnTask_2" targetRef="bpmnTask_3" />
+        <sequenceFlow id="bpmnSequenceFlow_1" sourceRef="startnoneevent1" targetRef="bpmnTask_0" />
+        <sequenceFlow id="bpmnSequenceFlow_4" sourceRef="bpmnTask_3" targetRef="bpmnEndEvent_4" />
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_transientVariableTest">
+        <bpmndi:BPMNPlane bpmnElement="transientVariableTest" id="BPMNPlane_transientVariableTest">
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_0" id="BPMNShape_bpmnTask_0">
+                <omgdc:Bounds height="80.0" width="100.0" x="486.0" y="236.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_2" id="BPMNShape_bpmnTask_2">
+                <omgdc:Bounds height="80.0" width="100.0" x="753.0" y="236.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="317.0" y="261.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnEndEvent_4" id="BPMNShape_bpmnEndEvent_4">
+                <omgdc:Bounds height="28.0" width="28.0" x="985.0" y="262.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_3" id="BPMNEdge_bpmnSequenceFlow_3" flowable:sourceDockerX="586.0" flowable:sourceDockerY="276.0"
+                             flowable:targetDockerX="753.0" flowable:targetDockerY="276.0">
+                <omgdi:waypoint x="586.0" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="753.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_1" id="BPMNEdge_bpmnSequenceFlow_1" flowable:sourceDockerX="347.0" flowable:sourceDockerY="276.0"
+                             flowable:targetDockerX="486.0" flowable:targetDockerY="276.0">
+                <omgdi:waypoint x="347.0" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="486.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_5" id="BPMNEdge_bpmnSequenceFlow_5" flowable:sourceDockerX="853.0" flowable:sourceDockerY="276.0"
+                             flowable:targetDockerX="985.0" flowable:targetDockerY="276.0">
+                <omgdi:waypoint x="853.0" y="276.0"></omgdi:waypoint>
+                <omgdi:waypoint x="985.0" y="276.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

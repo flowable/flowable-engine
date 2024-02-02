@@ -8,8 +8,7 @@
         insert into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_)
         values (
             #{id ,jdbcType=VARCHAR},
-            1,
-            #{caseDefinitionId ,jdbcType=VARCHAR},
+            1, #{caseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{planItemInstanceId ,jdbcType=VARCHAR},
             #{onPartId ,jdbcType=VARCHAR},
@@ -25,8 +24,7 @@
         <foreach collection="list" item="sentryPartInstance" index="index" separator=",">
             (
                 #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
@@ -42,8 +40,7 @@
             into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_) VALUES
             (
                 #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1,
-                #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
                 #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
@@ -74,7 +71,7 @@
                 IF_PART_ID_ = #{ifPartId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.timeStamp != timeStamp">
-                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP}
+                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
@@ -83,6 +80,11 @@
     <delete id="deleteSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
         delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id} and REV_ = #{revision}
     </delete>
+    
+     <delete id="deleteSentryPartInstancesByCaseInstanceId" parameterType="String">
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where CASE_INST_ID_ = #{id}
+    </delete>
+    
 
     <resultMap id="sentryPartInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -103,9 +105,14 @@
         select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where PLAN_ITEM_INST_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectSentryPartInstanceByCaseInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+    <select id="selectSentryPartInstanceByCaseInstanceIdAndNullPlanItemInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
         where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and PLAN_ITEM_INST_ID_ is null
+    </select>
+
+    <select id="selectSentryPartInstanceByCaseInstanceId" parameterType="string" resultMap="sentryPartInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST
+        where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
 </mapper>

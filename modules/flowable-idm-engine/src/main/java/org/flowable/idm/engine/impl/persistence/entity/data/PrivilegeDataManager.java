@@ -15,7 +15,7 @@ package org.flowable.idm.engine.impl.persistence.entity.data;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.engine.impl.PrivilegeQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntity;

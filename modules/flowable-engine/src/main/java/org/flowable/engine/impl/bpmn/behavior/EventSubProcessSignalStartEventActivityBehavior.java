@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -24,16 +25,21 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 /**
  * Implementation of the BPMN 2.0 event subprocess signal start event.
@@ -69,34 +75,34 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
     @Override
     public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
-        String eventName = null;
-        if (signal != null) {
-            eventName = signal.getName();
-        } else {
-            eventName = signalEventDefinition.getSignalRef();
-        }
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition,
+            ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId()), execution);
 
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
         if (startEvent.isInterrupting()) {
             List<ExecutionEntity> childExecutions = executionEntityManager.collectChildren(executionEntity.getParent());
+            Collection<String> executionIdsNotToDelete = new ArrayList<>();
             for (int i = childExecutions.size() - 1; i >= 0; i--) {
                 ExecutionEntity childExecutionEntity = childExecutions.get(i);
-                if (!childExecutionEntity.isEnded() && !childExecutionEntity.getId().equals(executionEntity.getId())) {
-                    executionEntityManager.deleteExecutionAndRelatedData(childExecutionEntity,
-                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")");
+                if (childExecutionEntity.isEnded() || childExecutionEntity.getId().equals(executionEntity.getId())) {
+                    executionIdsNotToDelete.add(childExecutionEntity.getId());
                 }
             }
+            executionEntityManager.deleteChildExecutions(executionEntity.getParent(), executionIdsNotToDelete, null,
+                    DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", true, executionEntity.getCurrentFlowElement());
 
-            EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
+            EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
                 if (eventSubscription instanceof SignalEventSubscriptionEntity && eventSubscription.getEventName().equals(eventName)) {
 
-                    eventSubscriptionEntityManager.delete(eventSubscription);
+                    eventSubscriptionService.deleteEventSubscription(eventSubscription);
+                    CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
                 }
             }
         }
@@ -106,10 +112,15 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         newSubProcessExecution.setEventScope(false);
         newSubProcessExecution.setScope(true);
 
+        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(newSubProcessExecution);
+
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(newSubProcessExecution);
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
-        
-        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(outgoingFlowExecution);
+
+        processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                startEvent, outgoingFlowExecution, ExecutionListener.EVENTNAME_START);
 
         leave(outgoingFlowExecution);
     }

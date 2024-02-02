@@ -1,0 +1,92 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_c0e9d8ba-4b7f-11e7-8197-a26608126000" name="Risk Rating Decision Table"
+             namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <informationRequirement id="infoRequirement1_1">
+            <requiredDecision href="#decision2" />
+        </informationRequirement>
+        <decisionTable id="decisionTable1">
+            <input>
+                <inputExpression id="inputExpression1" typeRef="string">
+                    <text>decision2Output</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry1_1_1">
+                    <text><![CDATA[== "was another test 1"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_1">
+                    <text>'result is another test 1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry1_1_2">
+                    <text><![CDATA[!= "was another test 2"]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1_2">
+                    <text>'result is another test 2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <informationRequirement id="infoRequirement2_1">
+            <requiredDecision href="#decision3" />
+        </informationRequirement>
+        <decisionTable id="decisionTable2">
+            <input>
+                <inputExpression id="inputExpression2_1" typeRef="string">
+                    <text>decision3Output</text>
+                </inputExpression>
+            </input>
+            <output id="output2_1" label="Decision 2 Output" name="decision2Output" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry2_1">
+                    <text><![CDATA[== 'another_test1']]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_1">
+                    <text>'was another test 1'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry2_2">
+                    <text><![CDATA[== 'another_test2']]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry2_2">
+                    <text>'was another test 2'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision3" name="Decision 3">
+        <decisionTable id="decisionTable3">
+            <input>
+                <inputExpression id="inputExpression3_1" typeRef="string">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output3_1" label="Decision 3 Output" name="decision3Output" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry3_1">
+                    <text><![CDATA[.endsWith('acme')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_1">
+                    <text>'another_test2'</text>
+                </outputEntry>
+            </rule>
+            <rule>
+                <inputEntry id="inputEntry3_2">
+                    <text><![CDATA[.startsWith('test')]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry3_2">
+                    <text>'another_test1'</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="decisionService1" name="Decision Service 1">
+        <outputDecision href="#decision1"/>
+        <encapsulatedDecision href="#decision2"/>
+        <encapsulatedDecision href="#decision3"/>
+    </decisionService>
+</definitions>

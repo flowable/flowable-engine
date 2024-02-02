@@ -12,10 +12,12 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -25,9 +27,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public interface HistoricDetailEntityManager extends EntityManager<HistoricDetailEntity> {
 
-    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
+    HistoricFormPropertyEntity insertHistoricFormPropertyEntity(ExecutionEntity execution, String propertyId, String propertyValue, String taskId,
+        Date createTime);
 
-    HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance);
+    HistoricDetailVariableInstanceUpdateEntity copyAndInsertHistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance,
+        Date createTime);
 
     long findHistoricDetailCountByQueryCriteria(HistoricDetailQueryImpl historicVariableUpdateQuery);
 
@@ -40,5 +44,10 @@ public interface HistoricDetailEntityManager extends EntityManager<HistoricDetai
     long findHistoricDetailCountByNativeQuery(Map<String, Object> parameterMap);
 
     void deleteHistoricDetailsByProcessInstanceId(String historicProcessInstanceId);
+    
+    void bulkDeleteHistoricDetailsByTaskIds(Collection<String> taskIds);
+    
+    void bulkDeleteHistoricDetailsByProcessInstanceIds(Collection<String> historicProcessInstanceIds);
 
+    void deleteHistoricDetailForNonExistingProcessInstances();
 }

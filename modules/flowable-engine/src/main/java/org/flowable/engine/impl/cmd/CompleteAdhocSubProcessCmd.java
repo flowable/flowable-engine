@@ -17,10 +17,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.bpmn.model.AdhocSubProcess;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -47,18 +47,18 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         }
 
         if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
-            throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
+            throw new FlowableException("The current flow element of the requested " + execution + " is not an ad-hoc sub process");
         }
 
         List<? extends ExecutionEntity> childExecutions = execution.getExecutions();
         if (childExecutions.size() > 0) {
-            throw new FlowableException("Ad-hoc sub process has running child executions that need to be completed first");
+            throw new FlowableException("Ad-hoc sub process has running child executions that need to be completed first. " + execution);
         }
 
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(execution.getParent());
         outgoingFlowExecution.setCurrentFlowElement(execution.getCurrentFlowElement());
 
-        executionEntityManager.deleteExecutionAndRelatedData(execution, null);
+        executionEntityManager.deleteExecutionAndRelatedData(execution, null, false);
 
         CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(outgoingFlowExecution, true);
 

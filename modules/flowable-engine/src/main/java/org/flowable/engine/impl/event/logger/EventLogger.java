@@ -17,14 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
-import org.flowable.engine.common.runtime.Clock;
+import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompletedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityErrorReceivedEventHandler;
@@ -50,7 +50,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author Joram Barrez
  */
-public class EventLogger implements FlowableEventListener {
+public class EventLogger extends AbstractFlowableEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogger.class);
 
@@ -138,6 +138,16 @@ public class EventLogger implements FlowableEventListener {
                             @Override
                             public void closeFailure(CommandContext commandContext) {
                             }
+                            
+                            @Override
+                            public Integer order() {
+                                return 5;
+                            }
+                            
+                            @Override
+                            public boolean multipleAllowed() {
+                                return false;
+                            }
 
                         });
             }
@@ -181,7 +191,7 @@ public class EventLogger implements FlowableEventListener {
     protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
             Class<? extends EventLoggerEventHandler> eventHandlerClass) {
         try {
-            EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
+            EventLoggerEventHandler eventHandler = eventHandlerClass.getConstructor().newInstance();
             eventHandler.setTimeStamp(clock.getCurrentTime());
             eventHandler.setEvent(event);
             eventHandler.setObjectMapper(objectMapper);

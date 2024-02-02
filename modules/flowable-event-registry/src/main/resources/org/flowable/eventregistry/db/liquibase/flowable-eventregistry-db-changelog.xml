@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="flowable">
+
+        <createTable tableName="FLW_EVENT_DEPLOYMENT">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+            <column name="DEPLOY_TIME_" type="datetime(3)">
+                <constraints nullable="true" />
+            </column>
+            <column name="TENANT_ID_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+            <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <createTable tableName="FLW_EVENT_RESOURCE">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="RESOURCE_BYTES_" type="longblob">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <createTable tableName="FLW_EVENT_DEFINITION">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="VERSION_" type="int" />
+            <column name="KEY_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="TENANT_ID_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+            <column name="RESOURCE_NAME_" type="varchar(255)" />
+            <column name="DESCRIPTION_" type="varchar(255)">
+            	<constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <createIndex tableName="FLW_EVENT_DEFINITION" indexName="ACT_IDX_EVENT_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+        
+        <createTable tableName="FLW_CHANNEL_DEFINITION">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="NAME_" type="varchar(255)" />
+            <column name="VERSION_" type="int" />
+            <column name="KEY_" type="varchar(255)" />
+            <column name="CATEGORY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="DEPLOYMENT_ID_" type="varchar(255)" />
+            <column name="CREATE_TIME_" type="datetime(3)">
+                <constraints nullable="true" />
+            </column>
+            <column name="TENANT_ID_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="RESOURCE_NAME_" type="varchar(255)" />
+            <column name="DESCRIPTION_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+        
+        <createIndex tableName="FLW_CHANNEL_DEFINITION" indexName="ACT_IDX_CHANNEL_DEF_UNIQ" unique="true">
+            <column name="KEY_" />
+            <column name="VERSION_" />
+            <column name="TENANT_ID_" />
+        </createIndex>
+
+    </changeSet>
+
+    <changeSet id="2" author="flowable">
+        <addColumn tableName="FLW_CHANNEL_DEFINITION">
+            <column name="TYPE_" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="FLW_CHANNEL_DEFINITION">
+            <column name="IMPLEMENTATION_" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="3" author="flowable">
+        <customChange class="org.flowable.eventregistry.impl.db.SetChannelDefinitionTypeAndImplementationCustomChange" />
+    </changeSet>
+
+</databaseChangeLog>

@@ -14,11 +14,16 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.callback.CallbackData;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
 
 /**
  * @author Joram Barrez
@@ -34,31 +39,52 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
 
     @Override
-    public void run() {
-        super.run();
+    public void internalExecute() {
         deleteCaseInstance();
     }
-    
+
     protected void deleteCaseInstance() {
-        deleteRuntimeData();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
-                caseInstanceEntity, caseInstanceEntity.getState(), getNewState());
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId);
+        updateChildPlanItemInstancesState();
+        
+        String newState = getNewState();
+        CallbackData callBackData = new CallbackData(caseInstanceEntity.getCallbackId(), caseInstanceEntity.getCallbackType(),
+            caseInstanceEntity.getId(), caseInstanceEntity.getState(), newState);
+        addAdditionalCallbackData(callBackData);
+        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(callBackData);
+        
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        CommandContextUtil.getCmmnHistoryManager(commandContext)
+            .recordCaseInstanceEnd(caseInstanceEntity, newState, cmmnEngineConfiguration.getClock().getCurrentTime());
+
+        if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
+            String loggingType = null;
+            if (CaseInstanceState.TERMINATED.equals(getNewState())) {
+                loggingType = CmmnLoggingSessionConstants.TYPE_CASE_TERMINATED;
+            } else {
+                loggingType = CmmnLoggingSessionConstants.TYPE_CASE_COMPLETED;
+            }
+            CmmnLoggingSessionUtil.addLoggingData(loggingType, "Completed case instance with id " + caseInstanceEntity.getId(), 
+                    caseInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
+        }
+
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), false, getDeleteReason());
     }
 
-    protected void deleteRuntimeData() {
+    protected void updateChildPlanItemInstancesState() {
         List<PlanItemInstanceEntity> childPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                if (PlanItemInstanceState.ACTIVE.equals(childPlanItemInstance.getState())
-                        || PlanItemInstanceState.AVAILABLE.equals(childPlanItemInstance.getState())) {
+                // if the child plan item is not yet in a terminal state, terminate it
+                if (!PlanItemInstanceState.isInTerminalState(childPlanItemInstance)) {
                     changeStateForChildPlanItemInstance(childPlanItemInstance);
                 }
             }
         }
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).deleteCaseInstanceAndRelatedData(caseInstanceEntity.getId(), getDeleteReason());
     }
-    
-    protected abstract String getDeleteReason();
-    
+
+    public abstract String getDeleteReason();
+
+    public void addAdditionalCallbackData(CallbackData callbackData) {
+        // meant to be overridden
+    }
 }

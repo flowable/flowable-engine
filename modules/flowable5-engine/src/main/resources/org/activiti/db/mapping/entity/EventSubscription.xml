@@ -96,7 +96,7 @@
     </where>
   </sql>
   
-  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     left outer join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
@@ -177,7 +177,7 @@
     </if>   	
   </select>
   
-  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>

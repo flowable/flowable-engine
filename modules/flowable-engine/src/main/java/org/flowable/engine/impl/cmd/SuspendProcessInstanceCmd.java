@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.db.SuspensionState;
 
 /**
  * 

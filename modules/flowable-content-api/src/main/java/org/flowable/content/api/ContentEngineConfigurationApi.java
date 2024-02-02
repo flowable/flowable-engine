@@ -16,4 +16,5 @@ public interface ContentEngineConfigurationApi {
 
     ContentService getContentService();
     
+    ContentManagementService getContentManagementService();
 }

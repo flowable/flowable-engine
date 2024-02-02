@@ -14,18 +14,15 @@ package org.flowable.variable.service.impl.el;
 
 import java.util.Map;
 
-import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.el.DefaultExpressionManager;
-import org.flowable.engine.common.impl.javax.el.ELContext;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.DefaultExpressionManager;
+import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * @author Joram Barrez
  */
 public class VariableScopeExpressionManager extends DefaultExpressionManager {
-    
-    public VariableScopeExpressionManager() {
-    }
 
     public VariableScopeExpressionManager(Map<Object, Object> beans) {
        super(beans);

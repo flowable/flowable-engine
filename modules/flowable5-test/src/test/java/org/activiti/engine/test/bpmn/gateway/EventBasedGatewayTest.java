@@ -16,12 +16,12 @@ package org.activiti.engine.test.bpmn.gateway;
 import java.util.Date;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.EventSubscriptionQueryImpl;
+import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.repository.DeploymentProperties;
-import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 
 /**
  * @author Daniel Meyer
@@ -151,7 +151,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
     }
 
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor());
+        return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }
 
 }

@@ -17,16 +17,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.MessageEventHandler;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.EventSubscriptionUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author Daniel Meyer
@@ -72,18 +74,23 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
             return null;
         }
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
-        List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsByNameAndExecution(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, executionId);
 
         if (eventSubscriptions.isEmpty()) {
-            throw new FlowableException("Execution with id '" + executionId + "' does not have a subscription to a message event with name '" + messageName + "'");
+            throw new FlowableException(execution + " does not have a subscription to a message event with name '" + messageName + "'");
         }
 
         // there can be only one:
         EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptions.get(0);
-        eventSubscriptionEntityManager.eventReceived(eventSubscriptionEntity, payload, async);
+        EventSubscriptionUtil.eventReceived(eventSubscriptionEntity, payload, async);
 
         return null;
     }
 
+    @Override
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot receive message for";
+    }
 }

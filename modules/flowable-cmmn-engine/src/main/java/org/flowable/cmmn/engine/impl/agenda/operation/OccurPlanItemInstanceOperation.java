@@ -12,33 +12,65 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.Map;
+
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class OccurPlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+public class OccurPlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
     public OccurPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
     @Override
-    protected String getNewState() {
+    public String getNewState() {
         return PlanItemInstanceState.COMPLETED;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
+    public String getLifeCycleTransition() {
         return PlanItemTransition.OCCUR;
     }
     
     @Override
-    protected boolean isEvaluateRepetitionRule() {
-        return false;
+    public boolean isEvaluateRepetitionRule() {
+        // Only event listeners can be repeating on occur
+        return planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener;
+    }
+
+    @Override
+    protected boolean shouldAggregateForSingleInstance() {
+        return true;
+    }
+
+    @Override
+    protected boolean shouldAggregateForMultipleInstances() {
+        return true;
+    }
+
+    @Override
+    protected void internalExecute() {
+        planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setOccurredTime(planItemInstanceEntity.getEndedTime());
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceOccurred(planItemInstanceEntity);
+    }
+
+    @Override
+    protected Map<String, String> getAsyncLeaveTransitionMetadata() {
+        throw new UnsupportedOperationException("Occur does not support async leave");
+    }
+
+    @Override
+    public String getOperationName() {
+        return "[Occur plan item]";
     }
     
 }

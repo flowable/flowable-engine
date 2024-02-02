@@ -12,11 +12,13 @@
  */
 package org.flowable.engine.impl.persistence.entity.data.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
+import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 
@@ -51,4 +53,10 @@ public class MybatisAttachmentDataManager extends AbstractProcessDataManager<Att
         return getDbSqlSession().selectList("selectAttachmentsByTaskId", taskId);
     }
 
+    @Override
+    public void bulkDeleteAttachmentsByTaskId(Collection<String> taskIds) {
+        List<List<String>> safeTaskIds = createSafeInValuesList(taskIds);
+        getDbSqlSession().delete("bulkDeleteBytesForAttachmentsForTaskIds", safeTaskIds, CommentEntity.class);
+        getDbSqlSession().delete("bulkDeleteAttachmentsForTaskIds", safeTaskIds, CommentEntity.class);
+    }
 }

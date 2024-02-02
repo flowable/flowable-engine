@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+	
+	<process id="boundaryConditionalOnEmbeddedSubprocess">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="subprocess" />
+
+        <subProcess id="subprocess">
+            <startEvent id="subprocessStart" />
+            <sequenceFlow id="subFlow1" sourceRef="subprocessStart" targetRef="subprocessTask" />
+            <userTask id="subprocessTask" name="subprocessTask" />
+            <sequenceFlow id="subFlow2" sourceRef="subprocessTask" targetRef="subprocessEnd" />
+            <endEvent id="subprocessEnd" />
+        </subProcess>
+        <sequenceFlow id="flow3" sourceRef="subprocess" targetRef="theEnd" />
+
+		<boundaryEvent id="catchConditional" cancelActivity="true" attachedToRef="subprocess">
+			<conditionalEventDefinition>
+                <condition>${myVar == 'test'}</condition>
+            </conditionalEventDefinition>
+		</boundaryEvent>
+		<sequenceFlow id="flow2" sourceRef="catchConditional" targetRef="taskAfterConditionalCatch" />
+		<userTask id="taskAfterConditionalCatch" />
+        
+        <sequenceFlow id="flow4" sourceRef="taskAfterConditionalCatch" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+
+</definitions>

@@ -14,27 +14,33 @@ package org.flowable.engine.test.jobexecutor;
 
 import java.util.Date;
 
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.junit.jupiter.api.AfterEach;
 
 /**
  * @author Tom Baeyens
  */
-public abstract class JobExecutorTestCase extends PluggableFlowableTestCase {
+public abstract class JobExecutorTestCase extends CustomConfigurationFlowableTestCase {
 
     protected TweetHandler tweetHandler = new TweetHandler();
 
-    @Override
-    public void setUp() throws Exception {
-        processEngineConfiguration.getJobHandlers().put(tweetHandler.getType(), tweetHandler);
+    public JobExecutorTestCase() {
+        super("jobExecutorTest");
     }
 
     @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.addCustomJobHandler(tweetHandler);
+    }
+
+    @AfterEach
     public void tearDown() throws Exception {
-        processEngineConfiguration.getJobHandlers().remove(tweetHandler.getType());
+        processEngineConfiguration.removeJobHandler(tweetHandler.getType());
     }
 
     protected JobEntity createTweetMessage(String msg) {

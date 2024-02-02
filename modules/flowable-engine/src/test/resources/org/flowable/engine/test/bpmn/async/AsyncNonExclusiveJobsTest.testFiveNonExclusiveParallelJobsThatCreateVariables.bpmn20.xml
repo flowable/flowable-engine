@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+    <process id="testNonExclusiveJobs" name="Asynchronous" isExecutable="true">
+        <startEvent id="startevent1" name="Start"/>
+
+        <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="parallelGateway1"/>
+        <parallelGateway id="parallelGateway1" name="Parallel Gateway"/>
+
+        <sequenceFlow id="flowToService1" sourceRef="parallelGateway1" targetRef="serviceTaskSleep1"/>
+        <serviceTask id="serviceTaskSleep1" name="Service Task Sleep 1" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flowToCreateVar1" sourceRef="serviceTaskSleep1" targetRef="serviceCreateVar1"/>
+        <serviceTask id="serviceCreateVar1" name="Create Var 1" flowable:expression="${'value1'}" flowable:resultVariable="var1"/>
+
+        <sequenceFlow id="flowToService2" sourceRef="parallelGateway1" targetRef="serviceTaskSleep2"/>
+        <serviceTask id="serviceTaskSleep2" name="Service Task Sleep 2" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flowToCreateVar2" sourceRef="serviceTaskSleep2" targetRef="serviceCreateVar2"/>
+        <serviceTask id="serviceCreateVar2" name="Create Var 2" flowable:expression="${'value2'}" flowable:resultVariable="var2"/>
+
+        <sequenceFlow id="flowToService3" sourceRef="parallelGateway1" targetRef="serviceTaskSleep3"/>
+        <serviceTask id="serviceTaskSleep3" name="Service Task Sleep 3" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flowToCreateVar3" sourceRef="serviceTaskSleep3" targetRef="serviceCreateVar3"/>
+        <serviceTask id="serviceCreateVar3" name="Create Var 3" flowable:expression="${'value3'}" flowable:resultVariable="var3"/>
+
+        <sequenceFlow id="flowToService4" sourceRef="parallelGateway1" targetRef="serviceTaskSleep4"/>
+        <serviceTask id="serviceTaskSleep4" name="Service Task Sleep 4" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flowToCreateVar4" sourceRef="serviceTaskSleep4" targetRef="serviceCreateVar4"/>
+        <serviceTask id="serviceCreateVar4" name="Create Var 4" flowable:expression="${'value4'}" flowable:resultVariable="var4"/>
+
+        <sequenceFlow id="flowToService5" sourceRef="parallelGateway1" targetRef="serviceTaskSleep5"/>
+        <serviceTask id="serviceTaskSleep5" name="Service Task Sleep 5" flowable:class="org.flowable.engine.test.bpmn.async.SleepServiceTask" flowable:async="true"
+                     flowable:exclusive="false"/>
+        <sequenceFlow id="flowToCreateVar5" sourceRef="serviceTaskSleep5" targetRef="serviceCreateVar5"/>
+        <serviceTask id="serviceCreateVar5" name="Create Var 5" flowable:expression="${'value5'}" flowable:resultVariable="var5"/>
+
+
+        <sequenceFlow id="flow5" sourceRef="serviceCreateVar1" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow6" sourceRef="serviceCreateVar2" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow7" sourceRef="serviceCreateVar3" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow8" sourceRef="serviceCreateVar4" targetRef="parallelGateway2"/>
+        <sequenceFlow id="flow9" sourceRef="serviceCreateVar5" targetRef="parallelGateway2"/>
+        <parallelGateway id="parallelGateway2" name="Parallel Gateway" flowable:async="true" flowable:exclusive="true" />
+
+        <sequenceFlow id="flow25" sourceRef="parallelGateway2" targetRef="endevent1"/>
+        <endEvent id="endevent1" name="End"/>
+
+    </process>
+</definitions>

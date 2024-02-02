@@ -17,20 +17,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.Page;
-import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.ListQueryParameterObject;
+import org.flowable.common.engine.impl.Page;
+import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.job.api.HistoryJob;
+import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  */
 public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJobEntity> implements HistoryJobDataManager {
+
+    protected JobServiceConfiguration jobServiceConfiguration;
+    
+    public MybatisHistoryJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
+    }
 
     @Override
     public Class<? extends HistoryJobEntity> getManagedEntityClass() {
@@ -44,12 +51,14 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findJobsToExecute(Page page) {
-        // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
+    public List<HistoryJobEntity> findJobsToExecute(List<String> enabledCategories, Page page) {
+        
         ListQueryParameterObject params = new ListQueryParameterObject();
+        params.setParameter(jobServiceConfiguration.getHistoryJobExecutionScope());
+        
+        // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
         params.setFirstResult(page.getFirstResult());
         params.setMaxResults(page.getMaxResults());
-        params.setOrderByColumns("CREATE_TIME_ ASC");
         return getDbSqlSession().selectList("selectHistoryJobsToExecute", params);
     }
 
@@ -66,12 +75,12 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoryJobEntity> findExpiredJobs(Page page) {
+    public List<HistoryJobEntity> findExpiredJobs(List<String> enabledCategories, Page page) {
         Map<String, Object> params = new HashMap<>();
-        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
+        params.put("jobExecutionScope", jobServiceConfiguration.getHistoryJobExecutionScope());
+        Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
-        params.put("maxTimeout", maxTimeout);
+
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }
 
@@ -92,14 +101,28 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
-        getDbSqlSession().update("updateHistoryJobTenantIdForDeployment", params);
+        getDbSqlSession().directUpdate("updateHistoryJobTenantIdForDeployment", params);
+    }
+
+    @Override
+    public void bulkUpdateJobLockWithoutRevisionCheck(List<HistoryJobEntity> historyJobs, String lockOwner, Date lockExpirationTime) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("lockOwner", lockOwner);
+        params.put("lockExpirationTime", lockExpirationTime);
+
+        bulkUpdateEntities("updateHistoryJobLocks", params, "historyJobs", historyJobs);
     }
 
     @Override
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
-        getDbSqlSession().update("resetExpiredHistoryJob", params);
+        getDbSqlSession().directUpdate("resetExpiredHistoryJob", params);
     }
 
+    @Override
+    protected IdGenerator getIdGenerator() {
+        return jobServiceConfiguration.getIdGenerator();
+    }
+    
 }

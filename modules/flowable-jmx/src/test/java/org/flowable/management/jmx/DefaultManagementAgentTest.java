@@ -13,9 +13,8 @@
 
 package org.flowable.management.jmx;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -77,11 +76,11 @@ public class DefaultManagementAgentTest {
         verify(mbeanServer).isRegistered(sourceObjectName);
         verify(mbeanServer).registerMBean(any(RequiredModelMBean.class), any(ObjectName.class));
 
-        assertTrue(agent.isRegistered(sourceObjectName));
+        assertThat(agent.isRegistered(sourceObjectName)).isTrue();
 
         agent.unregister(sourceObjectName);
         verify(mbeanServer).unregisterMBean(registeredObjectName);
-        assertFalse(agent.isRegistered(sourceObjectName));
+        assertThat(agent.isRegistered(sourceObjectName)).isFalse();
 
     }
 
@@ -107,7 +106,7 @@ public class DefaultManagementAgentTest {
         verify(mbeanServer).isRegistered(sourceObjectName);
         verify(mbeanServer, never()).unregisterMBean(registeredObjectName);
 
-        assertFalse(agent.isRegistered(sourceObjectName));
+        assertThat(agent.isRegistered(sourceObjectName)).isFalse();
 
     }
 

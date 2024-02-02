@@ -53,6 +53,7 @@ public class CustomProperty extends BaseElement {
     }
 
     public void setValues(CustomProperty otherProperty) {
+        super.setValues(otherProperty);
         setName(otherProperty.getName());
         setSimpleValue(otherProperty.getSimpleValue());
 

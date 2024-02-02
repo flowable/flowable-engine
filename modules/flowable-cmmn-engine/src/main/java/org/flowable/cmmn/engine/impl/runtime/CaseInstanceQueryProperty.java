@@ -16,7 +16,7 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 
 /**
  * @author Joram Barrez
@@ -28,8 +28,8 @@ public class CaseInstanceQueryProperty implements QueryProperty {
     private static final Map<String, CaseInstanceQueryProperty> properties = new HashMap<>();
 
     public static final CaseInstanceQueryProperty CASE_INSTANCE_ID = new CaseInstanceQueryProperty("RES.ID_");
-    public static final CaseInstanceQueryProperty CASE_DEFINITION_KEY = new CaseInstanceQueryProperty("CaseDefinitionKey");
-    public static final CaseInstanceQueryProperty CASE_DEFINITION_ID = new CaseInstanceQueryProperty("CaseDefinitionId");
+    public static final CaseInstanceQueryProperty CASE_DEFINITION_KEY = new CaseInstanceQueryProperty("CASE_DEF.KEY_");
+    public static final CaseInstanceQueryProperty CASE_DEFINITION_ID = new CaseInstanceQueryProperty("RES.CASE_DEF_ID_");
     public static final CaseInstanceQueryProperty CASE_START_TIME = new CaseInstanceQueryProperty("RES.START_TIME_");
     public static final CaseInstanceQueryProperty TENANT_ID = new CaseInstanceQueryProperty("RES.TENANT_ID_");
 
@@ -40,6 +40,7 @@ public class CaseInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

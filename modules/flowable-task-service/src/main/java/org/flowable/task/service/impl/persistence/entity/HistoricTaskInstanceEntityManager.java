@@ -12,10 +12,11 @@
  */
 package org.flowable.task.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 
@@ -28,7 +29,13 @@ public interface HistoricTaskInstanceEntityManager extends EntityManager<Histori
     
     List<HistoricTaskInstanceEntity> findHistoricTasksByParentTaskId(String parentTaskId);
     
+    List<String> findHistoricTaskIdsByParentTaskIds(Collection<String> parentTaskIds);
+    
     List<HistoricTaskInstanceEntity> findHistoricTasksByProcessInstanceId(String processInstanceId);
+    
+    List<String> findHistoricTaskIdsForProcessInstanceIds(Collection<String> processInstanceIds);
+    
+    List<String> findHistoricTaskIdsForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
 
     long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
 
@@ -39,5 +46,12 @@ public interface HistoricTaskInstanceEntityManager extends EntityManager<Histori
     List<HistoricTaskInstance> findHistoricTaskInstancesByNativeQuery(Map<String, Object> parameterMap);
 
     long findHistoricTaskInstanceCountByNativeQuery(Map<String, Object> parameterMap);
+    
+    void deleteHistoricTaskInstances(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery);
+    
+    void bulkDeleteHistoricTaskInstancesForIds(Collection<String> taskIds);
 
+    void deleteHistoricTaskInstancesForNonExistingProcessInstances();
+    
+    void deleteHistoricTaskInstancesForNonExistingCaseInstances();
 }

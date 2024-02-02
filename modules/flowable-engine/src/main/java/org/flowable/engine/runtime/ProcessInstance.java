@@ -48,6 +48,11 @@ public interface ProcessInstance extends Execution {
     Integer getProcessDefinitionVersion();
 
     /**
+     * The category of the process definition of the process instance.
+     */
+    String getProcessDefinitionCategory();
+
+    /**
      * The deployment id of the process definition of the process instance.
      */
     String getDeploymentId();
@@ -56,6 +61,11 @@ public interface ProcessInstance extends Execution {
      * The business key of this process instance.
      */
     String getBusinessKey();
+    
+    /**
+     * The business status of this process instance.
+     */
+    String getBusinessStatus();
 
     /**
      * returns true if the process instance is suspended

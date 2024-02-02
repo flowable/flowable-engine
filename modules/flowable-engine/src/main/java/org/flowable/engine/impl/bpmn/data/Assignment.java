@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.impl.bpmn.data;
 
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * Implementation of the BPMN 2.0 'assignment'

@@ -13,10 +13,7 @@
 
 package org.flowable.management.jmx.mbeans;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +61,7 @@ public class JobExecutorMBeanTest {
 
         boolean result = jobExecutorMbean.isJobExecutorActivated();
         verify(jobExecutor).isActive();
-        assertFalse(result);
+        assertThat(result).isFalse();
 
     }
 
@@ -73,7 +70,7 @@ public class JobExecutorMBeanTest {
         when(jobExecutor.isActive()).thenReturn(true);
         boolean result = jobExecutorMbean.isJobExecutorActivated();
         verify(jobExecutor).isActive();
-        assertTrue(result);
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -92,38 +89,36 @@ public class JobExecutorMBeanTest {
     public void testAnnotations() throws MalformedObjectNameException, JMException {
 
         ModelMBean modelBean = assembler.assemble(jobExecutorMbean, new ObjectName("domain", "key", "value"));
-        assertNotNull(modelBean);
+        assertThat(modelBean).isNotNull();
         MBeanInfo beanInfo = modelBean.getMBeanInfo();
-        assertNotNull(beanInfo);
-        assertNotNull(beanInfo.getOperations());
-        assertEquals(2, beanInfo.getOperations().length);
+        assertThat(beanInfo).isNotNull();
+        assertThat(beanInfo.getOperations()).hasSize(2);
         int counter = 0;
 
         for (MBeanOperationInfo op : beanInfo.getOperations()) {
-            if (op.getName().equals("setJobExecutorActivate")) {
+            if ("setJobExecutorActivate".equals(op.getName())) {
                 counter++;
-                assertEquals("set job executor activate", op.getDescription());
-                assertEquals("void", op.getReturnType());
-                assertEquals(1, op.getSignature().length);
-                assertEquals("java.lang.Boolean", op.getSignature()[0].getType());
+                assertThat(op.getDescription()).isEqualTo("set job executor activate");
+                assertThat(op.getReturnType()).isEqualTo("void");
+                assertThat(op.getSignature()).hasSize(1);
+                assertThat(op.getSignature()[0].getType()).isEqualTo("java.lang.Boolean");
             }
         }
-        assertEquals(1, counter);
+        assertThat(counter).isEqualTo(1);
 
         // check attributes
-        assertNotNull(beanInfo.getAttributes());
-        assertEquals(1, beanInfo.getAttributes().length);
+        assertThat(beanInfo.getAttributes()).hasSize(1);
 
         counter = 0;
 
         for (MBeanAttributeInfo attr : beanInfo.getAttributes()) {
-            if (attr.getName().equals("JobExecutorActivated")) {
+            if ("JobExecutorActivated".equals(attr.getName())) {
                 counter++;
-                assertEquals("check if the job executor is activated", attr.getDescription());
-                assertEquals("boolean", attr.getType());
+                assertThat(attr.getDescription()).isEqualTo("check if the job executor is activated");
+                assertThat(attr.getType()).isEqualTo("boolean");
             }
         }
-        assertEquals(1, counter);
+        assertThat(counter).isEqualTo(1);
 
     }
 

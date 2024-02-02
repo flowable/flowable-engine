@@ -1,0 +1,9 @@
+{
+  "key": "outboundCustomer",
+  "category": "channel",
+  "name": "Test channel",
+  "channelType": "outbound",
+  "type": "jms",
+  "destination": "outbound-customer",
+  "serializerType": "json"
+}

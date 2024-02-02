@@ -14,9 +14,13 @@ package org.flowable.engine.impl.webservice;
 
 import java.util.Date;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Holder;
+import jakarta.xml.ws.RequestWrapper;
+import jakarta.xml.ws.ResponseWrapper;
 
 /**
  * A simple WS for unit test purpose
@@ -30,6 +34,26 @@ public interface WebServiceMock {
      * Increase the counter in 1
      */
     void inc() throws MaxValueReachedFault;
+
+    /**
+     * Add the given value to the counter
+     */
+    void add(@WebParam(name = "value") int value);
+
+    /**
+     * Add the given values to the counter
+     */
+    void addMulti(@WebParam(name = "values") int[] values);
+
+    /**
+     * Add the given values and add result to the counter
+     */
+    void addition(@WebParam(name = "value1") int value1, @WebParam(name = "value2") int value2);
+
+    /**
+     * Add the given values and add result to the counter
+     */
+    void addOperands(@WebParam(name = "args") Operands args);
 
     /**
      * Returns the current count
@@ -53,13 +77,13 @@ public interface WebServiceMock {
     void setTo(@WebParam(name = "value") int value);
 
     /**
-     * Returns a formated string composed of prefix + current count + suffix
+     * Returns a formatted string composed of prefix + current count + suffix
      *
      * @param prefix
      *            the prefix
      * @param suffix
      *            the suffix
-     * @return the formated string
+     * @return the formatted string
      */
     @WebResult(name = "prettyPrint")
     String prettyPrintCount(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
@@ -87,4 +111,14 @@ public interface WebServiceMock {
 
     @WebResult(name = "static")
     String reservedWordAsName(@WebParam(name = "prefix") String prefix, @WebParam(name = "suffix") String suffix);
+
+    @WebMethod(action = "http://flowable.org/test/unit/returnsSeveralParams")
+    @RequestWrapper(localName = "returnsSeveralParams", className = "org.flowable.engine.impl.webservice.wrappers.ReturnsSeveralParams")
+    @ResponseWrapper(localName = "returnsSeveralParamsResponse", className = "org.flowable.engine.impl.webservice.wrappers.ReturnsSeveralParamsResponse")
+    public void returnsSeveralParams(
+
+            @WebParam(name = "in-param-1", targetNamespace = "") final String inParam,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-1", targetNamespace = "") final Holder<String> outParam1,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-2", targetNamespace = "") final Holder<Integer> outParam2,
+            @WebParam(mode = WebParam.Mode.OUT, name = "out-param-3", targetNamespace = "") final Holder<String> outParam3);
 }

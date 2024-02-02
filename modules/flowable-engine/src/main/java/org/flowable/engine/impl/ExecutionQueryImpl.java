@@ -17,18 +17,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.query.CacheAwareQuery;
+import org.flowable.common.engine.impl.db.SuspensionState;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.db.SuspensionState;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
+import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,9 +41,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  * @author Daniel Meyer
  */
-public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery {
+public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery, Execution> implements ExecutionQuery, CacheAwareQuery<ExecutionEntity> {
 
     private static final long serialVersionUID = 1L;
+    
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    
     protected String processDefinitionId;
     protected String processDefinitionKey;
     protected String processDefinitionCategory;
@@ -74,9 +79,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean excludeSubprocesses;
     protected SuspensionState suspensionState;
     protected String businessKey;
+    protected String businessKeyLike;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected boolean isActive;
     protected String involvedUser;
+    protected Set<String> involvedGroups;
+    private List<List<String>> safeInvolvedGroups;
     protected Set<String> processDefinitionKeys;
     protected Set<String> processDefinitionIds;
 
@@ -88,6 +96,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String activeActivityId;
+    protected Set<String> activeActivityIds;
+    protected String callbackId;
+    protected String callbackType;
+    protected String referenceId;
+    protected String referenceType;
     
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
     protected ExecutionQueryImpl currentOrQueryObject;
@@ -96,12 +110,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public ExecutionQueryImpl() {
     }
 
-    public ExecutionQueryImpl(CommandContext commandContext) {
-        super(commandContext);
+    public ExecutionQueryImpl(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandContext, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
-    public ExecutionQueryImpl(CommandExecutor commandExecutor) {
-        super(commandExecutor);
+    public ExecutionQueryImpl(CommandExecutor commandExecutor, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(commandExecutor, processEngineConfiguration.getVariableServiceConfiguration());
+        this.processEngineConfiguration = processEngineConfiguration;
     }
 
     public boolean isProcessInstancesOnly() {
@@ -368,6 +384,26 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.withoutTenantId = true;
         }
         
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceId(String referenceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery executionReferenceType(String referenceType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
         return this;
     }
 
@@ -743,7 +779,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         }
 
         inOrStatement = true;
-        currentOrQueryObject = new ExecutionQueryImpl();
+        if (commandContext != null) {
+            currentOrQueryObject = new ExecutionQueryImpl(commandContext, processEngineConfiguration);
+        } else {
+            currentOrQueryObject = new ExecutionQueryImpl(commandExecutor, processEngineConfiguration);
+        }
         orQueryObjects.add(currentOrQueryObject);
         return this;
     }
@@ -789,24 +829,32 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
-        return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionCountByQueryCriteria(this);
+        
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().beforeExecutionQueryExecute(this);
+        }
+        
+        return processEngineConfiguration.getExecutionEntityManager().findExecutionCountByQueryCriteria(this);
     }
 
     @SuppressWarnings({ "unchecked" })
     @Override
     public List<Execution> executeList(CommandContext commandContext) {
-        checkQueryOk();
         ensureVariablesInitialized();
-        List<?> executions = CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionsByQueryCriteria(this);
+        
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().beforeExecutionQueryExecute(this);
+        }
+        
+        List<?> executions = processEngineConfiguration.getExecutionEntityManager().findExecutionsByQueryCriteria(this);
 
-        if (CommandContextUtil.getProcessEngineConfiguration().getPerformanceSettings().isEnableLocalization()) {
+        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization()) {
             for (ExecutionEntity execution : (List<ExecutionEntity>) executions) {
                 String activityId = null;
                 if (execution.getId().equals(execution.getProcessInstanceId())) {
                     if (execution.getProcessDefinitionId() != null) {
-                        ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext)
+                        ProcessDefinition processDefinition = processEngineConfiguration
                                 .getDeploymentManager()
                                 .findDeployedProcessDefinitionById(execution.getProcessDefinitionId());
                         activityId = processDefinition.getKey();
@@ -820,6 +868,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
                     localize(execution, activityId);
                 }
             }
+        }
+        
+        if (processEngineConfiguration.getExecutionQueryInterceptor() != null) {
+            processEngineConfiguration.getExecutionQueryInterceptor().afterExecutionQueryExecute(this, (List<Execution>) executions);
         }
 
         return (List<Execution>) executions;
@@ -905,8 +957,25 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public String getBusinessKey() {
         return businessKey;
     }
+    
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
+    }
+    
+    public String getBusinessStatus() {
+        return null;
+    }
+    
+    public String getBusinessStatusLike() {
+        return null;
+    }
 
     public String getExecutionId() {
+        return executionId;
+    }
+    
+    @Override
+    public String getId() {
         return executionId;
     }
 
@@ -953,6 +1022,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setInvolvedUser(String involvedUser) {
         this.involvedUser = involvedUser;
     }
+    
+    public IdentityLinkQueryObject getInvolvedUserIdentityLink() {
+        return null;
+    }
+
+    public IdentityLinkQueryObject getInvolvedGroupIdentityLink() {
+        return null;
+    }
+
+    public Set<String> getInvolvedGroups() {
+        return involvedGroups;
+    }
+
+    public void setInvolvedGroups(Set<String> involvedGroups) {
+        this.involvedGroups = involvedGroups;
+    }
 
     public Set<String> getProcessDefinitionIds() {
         return processDefinitionIds;
@@ -988,6 +1073,14 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getName() {
@@ -1030,6 +1123,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         this.deploymentIds = deploymentIds;
     }
 
+    public String getActiveActivityId() {
+        return activeActivityId;
+    }
+
+    public void setActiveActivityId(String activeActivityId) {
+        this.activeActivityId = activeActivityId;
+    }
+
+    public Set<String> getActiveActivityIds() {
+        return activeActivityIds;
+    }
+
+    public void setActiveActivityIds(Set<String> activeActivityIds) {
+        this.activeActivityIds = activeActivityIds;
+    }
+
     public Date getStartedBefore() {
         return startedBefore;
     }
@@ -1053,4 +1162,41 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
     }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public boolean isWithLocalizationFallback() {
+        return withLocalizationFallback;
+    }
+
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
+    
+    public List<ExecutionQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeInvolvedGroups() {
+        return safeInvolvedGroups;
+    }
+
+    public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
+        this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public String getRootScopeId() {
+        return null;
+    }
+
+    public String getParentScopeId() {
+        return null;
+    }
+
 }

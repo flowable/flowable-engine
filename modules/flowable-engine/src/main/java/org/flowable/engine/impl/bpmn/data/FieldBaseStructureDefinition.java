@@ -43,4 +43,13 @@ public interface FieldBaseStructureDefinition extends StructureDefinition {
      * @return the type of the field
      */
     Class<?> getFieldTypeAt(int index);
+
+    /**
+     * Obtains the parameter type of the field in the index position
+     * 
+     * @param index
+     *            the position of the field
+     * @return the parameter type of the field, or {@code null} if the type is not a parameterized type
+     */
+    Class<?> getFieldParameterTypeAt(int index);
 }

@@ -12,14 +12,20 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tom Baeyens
@@ -30,56 +36,53 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     private CommandExecutor commandExecutor;
 
-    @Override
+    @BeforeEach
     public void setUp() throws Exception {
-        processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
+        processEngineConfiguration.addJobHandler(tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
-    @Override
+    @AfterEach
     public void tearDown() throws Exception {
-        processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
+        processEngineConfiguration.removeJobHandler(tweetExceptionHandler.getType());
     }
 
+    @Test
     public void testJobCommandsWith2Exceptions() {
         commandExecutor.execute(new Command<String>() {
 
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
 
         Job job = managementService.createJobQuery().singleResult();
-        assertEquals(3, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(3);
 
-        try {
-            managementService.executeJob(job.getId());
-            fail("exception expected");
-        } catch (Exception e) {
-            // exception expected;
-        }
+        String jobId = job.getId();
+        assertThatThrownBy(() -> managementService.executeJob(jobId))
+                .isInstanceOf(Exception.class);
 
         job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(2, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(2);
 
-        try {
-            managementService.moveTimerToExecutableJob(job.getId());
-            managementService.executeJob(job.getId());
-            fail("exception expected");
-        } catch (Exception e) {
-            // exception expected;
-        }
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+        })
+                .isInstanceOf(Exception.class);
 
         job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(1, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(1);
 
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
     }
 
+    @Test
     public void testJobCommandsWith3Exceptions() {
         tweetExceptionHandler.setExceptionsRemaining(3);
 
@@ -88,45 +91,37 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
             @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration().getJobService().scheduleAsyncJob(message);
                 return message.getId();
             }
         });
 
         Job job = managementService.createJobQuery().singleResult();
-        assertEquals(3, job.getRetries());
-
-        try {
-            managementService.executeJob(job.getId());
-            fail("exception expected");
-        } catch (Exception e) {
-            // exception expected;
-        }
+        assertThat(job.getRetries()).isEqualTo(3);
+        String jobId = job.getId();
+        assertThatThrownBy(() -> managementService.executeJob(jobId))
+                .isInstanceOf(Exception.class);
 
         job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(2, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(2);
 
-        try {
-            managementService.moveTimerToExecutableJob(job.getId());
-            managementService.executeJob(job.getId());
-            fail("exception expected");
-        } catch (Exception e) {
-            // exception expected;
-        }
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+        })
+                .isInstanceOf(Exception.class);
 
         job = managementService.createTimerJobQuery().singleResult();
-        assertEquals(1, job.getRetries());
+        assertThat(job.getRetries()).isEqualTo(1);
 
-        try {
-            managementService.moveTimerToExecutableJob(job.getId());
-            managementService.executeJob(job.getId());
-            fail("exception expected");
-        } catch (Exception e) {
-            // exception expected;
-        }
+        assertThatThrownBy(() -> {
+            managementService.moveTimerToExecutableJob(jobId);
+            managementService.executeJob(jobId);
+        })
+                .isInstanceOf(Exception.class);
 
         job = managementService.createDeadLetterJobQuery().singleResult();
-        assertNotNull(job);
+        assertThat(job).isNotNull();
 
         managementService.deleteDeadLetterJob(job.getId());
     }

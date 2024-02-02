@@ -18,9 +18,9 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**

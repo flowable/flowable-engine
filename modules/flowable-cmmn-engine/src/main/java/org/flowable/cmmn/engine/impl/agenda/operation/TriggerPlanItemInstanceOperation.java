@@ -18,8 +18,9 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
@@ -33,11 +34,19 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
     @Override
     public void run() {
         if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())
-                ||  (planItemInstanceEntity.getPlanItem() != null 
+                || (planItemInstanceEntity.getPlanItem() != null 
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener
-                && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))
-            ){
+                && PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState()))){
+            
             executeTrigger();
+
+        } else {
+            if (planItemInstanceEntity.getPlanItem() != null && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof EventListener){
+                throw new FlowableIllegalStateException("Can only trigger an event listener plan item that is in the AVAILABLE state");
+            } else {
+                throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
+            }
+
         }
     }
 
@@ -45,7 +54,7 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
         Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
         if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
             throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
-                    + CmmnTriggerableActivityBehavior.class + " interface");
+                    + CmmnTriggerableActivityBehavior.class + " interface in " + planItemInstanceEntity);
         }
         CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
         if (behavior instanceof CoreCmmnTriggerableActivityBehavior) {
@@ -60,14 +69,7 @@ public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOp
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("[Trigger PlanItem] ");
-        if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append(" (");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
-        } else {
-            stringBuilder.append(planItem.getId());
-        }
+        stringBuilder.append(planItem);
         return stringBuilder.toString();
     }
 

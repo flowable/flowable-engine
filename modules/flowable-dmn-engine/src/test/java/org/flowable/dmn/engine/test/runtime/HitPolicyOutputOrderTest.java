@@ -12,21 +12,17 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.joda.time.DateTime;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -43,17 +39,84 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .execute();
-        
-        assertEquals(3, result.size());
-        assertEquals("OUTPUT2", result.get(0).get("outputVariable1"));
-        assertEquals("OUTPUT3", result.get(1).get("outputVariable1"));
-        assertEquals("OUTPUT1", result.get(2).get("outputVariable1"));
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly("OUTPUT2", "OUTPUT3", "OUTPUT1");
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyNumberAsString() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(20D, 30D, 10D);
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyNumber() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(20D, 30D, 10D);
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyDate() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(new DateTime("2000-01-01").toDate(), new DateTime("2020-01-01").toDate(), new DateTime("2010-01-01").toDate());
+    }
+
+    @Test
+    @DmnDeployment
+    public void outputOrderHitPolicyBoolean() {
+        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 5)
+                .execute();
+
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly(Boolean.TRUE, Boolean.FALSE, Boolean.FALSE);
     }
 
     @Test
@@ -62,23 +125,20 @@ public class HitPolicyOutputOrderTest {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithAuditTrail();
-        
-        assertEquals(3, result.getDecisionResult().size());
-        assertEquals("OUTPUT1", result.getDecisionResult().get(0).get("outputVariable1"));
-        assertEquals("OUTPUT2", result.getDecisionResult().get(1).get("outputVariable1"));
-        assertEquals("OUTPUT3", result.getDecisionResult().get(2).get("outputVariable1"));
 
-        assertFalse(result.isFailed());
-        assertNull(result.getExceptionMessage());
+        assertThat(result.getDecisionResult())
+                .extracting("outputVariable1")
+                .containsExactly("OUTPUT1", "OUTPUT2", "OUTPUT3");
+
+        assertThat(result.isFailed()).isFalse();
+        assertThat(result.getExceptionMessage()).isNull();
+        assertThat(result.getValidationMessage()).isNotNull();
 
         dmnEngine.getDmnEngineConfiguration().setStrictMode(true);
     }
@@ -88,20 +148,18 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicyNoOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> inputVariables = new HashMap<>();
-        inputVariables.put("inputVariable1", 5);
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .executeWithAuditTrail();
 
-        assertEquals(0, result.getDecisionResult().size());
+        assertThat(result.getDecisionResult()).isEmpty();
 
-        assertTrue(result.isFailed());
-        assertNotNull(result.getExceptionMessage());
+        assertThat(result.isFailed()).isTrue();
+        assertThat(result.getExceptionMessage()).isNotNull();
+        assertThat(result.getValidationMessage()).isNull();
     }
 
     @Test
@@ -109,23 +167,20 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicyCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .execute();
 
-        assertEquals(4, result.size());
-        assertEquals("DECLINE", result.get(0).get("outputVariable1"));
-        assertEquals("REFER", result.get(1).get("outputVariable1"));
-        assertEquals("REFER", result.get(2).get("outputVariable1"));
-        assertEquals("ACCEPT", result.get(3).get("outputVariable1"));
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly("DECLINE", "REFER", "REFER", "ACCEPT");
 
-        assertEquals("NONE", result.get(0).get("outputVariable2"));
-        assertEquals("LEVEL 2", result.get(1).get("outputVariable2"));
-        assertEquals("LEVEL 1", result.get(2).get("outputVariable2"));
-        assertEquals("NONE", result.get(3).get("outputVariable2"));
+        assertThat(result)
+                .extracting("outputVariable2")
+                .containsExactly("NONE", "LEVEL 2", "LEVEL 1", "NONE");
     }
 
     @Test
@@ -133,23 +188,20 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicyCompoundOtherTypes() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .execute();
 
-        assertEquals(4, result.size());
-        assertEquals("DECLINE", result.get(0).get("outputVariable1"));
-        assertEquals("REFER", result.get(1).get("outputVariable1"));
-        assertEquals("REFER", result.get(2).get("outputVariable1"));
-        assertEquals("ACCEPT", result.get(3).get("outputVariable1"));
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly("DECLINE", "REFER", "REFER", "ACCEPT");
 
-        assertEquals(10D, result.get(0).get("outputVariable2"));
-        assertEquals(30D, result.get(1).get("outputVariable2"));
-        assertEquals(20D, result.get(2).get("outputVariable2"));
-        assertEquals(10D, result.get(3).get("outputVariable2"));
+        assertThat(result)
+                .extracting("outputVariable2")
+                .containsExactly(10D, 30D, 20D, 10D);
     }
 
     @Test
@@ -157,23 +209,20 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicyCompoundFirstOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .execute();
 
-        assertEquals(4, result.size());
-        assertEquals("DECLINE", result.get(0).get("outputVariable1"));
-        assertEquals("REFER", result.get(1).get("outputVariable1"));
-        assertEquals("REFER", result.get(2).get("outputVariable1"));
-        assertEquals("ACCEPT", result.get(3).get("outputVariable1"));
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly("DECLINE", "REFER", "REFER", "ACCEPT");
 
-        assertEquals("NONE", result.get(0).get("outputVariable2"));
-        assertEquals("LEVEL 1", result.get(1).get("outputVariable2"));
-        assertEquals("LEVEL 2", result.get(2).get("outputVariable2"));
-        assertEquals("NONE", result.get(3).get("outputVariable2"));
+        assertThat(result)
+                .extracting("outputVariable2")
+                .containsExactly("NONE", "LEVEL 1", "LEVEL 2", "NONE");
     }
 
     @Test
@@ -181,22 +230,19 @@ public class HitPolicyOutputOrderTest {
     public void outputOrderHitPolicyCompoundSecondOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .variable("inputVariable1", 5)
                 .execute();
 
-        assertEquals(4, result.size());
-        assertEquals("REFER", result.get(0).get("outputVariable1"));
-        assertEquals("REFER", result.get(1).get("outputVariable1"));
-        assertEquals("ACCEPT", result.get(2).get("outputVariable1"));
-        assertEquals("DECLINE", result.get(3).get("outputVariable1"));
+        assertThat(result)
+                .extracting("outputVariable1")
+                .containsExactly("REFER", "REFER", "ACCEPT", "DECLINE");
 
-        assertEquals("LEVEL 2", result.get(0).get("outputVariable2"));
-        assertEquals("LEVEL 1", result.get(1).get("outputVariable2"));
-        assertEquals("NONE", result.get(2).get("outputVariable2"));
-        assertEquals("NONE", result.get(3).get("outputVariable2"));
+        assertThat(result)
+                .extracting("outputVariable2")
+                .containsExactly("LEVEL 2", "LEVEL 1", "NONE", "NONE");
     }
 }

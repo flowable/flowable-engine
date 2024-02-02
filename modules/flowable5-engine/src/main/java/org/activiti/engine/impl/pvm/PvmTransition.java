@@ -13,7 +13,7 @@
 
 package org.activiti.engine.impl.pvm;
 
-import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.Expression;
 
 /**
  * @author Tom Baeyens

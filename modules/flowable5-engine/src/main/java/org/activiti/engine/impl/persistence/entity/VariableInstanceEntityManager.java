@@ -77,6 +77,14 @@ public class VariableInstanceEntityManager extends AbstractManager {
         params.put("names", names);
         return getDbSqlSession().selectList("selectVariableInstancesByTaskAndNames", params);
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeType", scopeType);
+        return getDbSqlSession().selectList("selectVariableInstancesBySubScopeIdAndScopeType", params);
+    }
 
     public void deleteVariableInstanceByTask(TaskEntity task) {
         Map<String, VariableInstanceEntity> variableInstances = task.getVariableInstanceEntities();

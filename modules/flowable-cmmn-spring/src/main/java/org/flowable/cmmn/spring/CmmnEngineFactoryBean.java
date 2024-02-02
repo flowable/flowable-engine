@@ -15,6 +15,7 @@ package org.flowable.cmmn.spring;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.impl.cfg.SpringBeanFactoryProxyMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
@@ -48,19 +49,16 @@ public class CmmnEngineFactoryBean implements FactoryBean<CmmnEngine>, Disposabl
 
     @Override
     public CmmnEngine getObject() throws Exception {
-        configureExpressionManager();
         configureExternallyManagedTransactions();
+        
+        if (cmmnEngineConfiguration.getBeans() == null) {
+            cmmnEngineConfiguration.setBeans(new SpringBeanFactoryProxyMap(applicationContext));
+        }
 
         this.cmmnEngine = cmmnEngineConfiguration.buildCmmnEngine();
         return this.cmmnEngine;
     }
     
-    protected void configureExpressionManager() {
-        if (cmmnEngineConfiguration.getExpressionManager() == null && applicationContext != null) {
-            cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(applicationContext, cmmnEngineConfiguration.getBeans()));
-        }
-    }
-
     protected void configureExternallyManagedTransactions() {
         if (cmmnEngineConfiguration instanceof SpringCmmnEngineConfiguration) { // remark: any config can be injected, so we cannot have SpringConfiguration as member
             SpringCmmnEngineConfiguration engineConfiguration = (SpringCmmnEngineConfiguration) cmmnEngineConfiguration;

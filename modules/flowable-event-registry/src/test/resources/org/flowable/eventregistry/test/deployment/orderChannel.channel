@@ -1,0 +1,13 @@
+{
+    "key": "orderChannel",
+    "category": "channel",
+    "name": "Order channel",
+    "description": "My order channel description",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "orderQueue",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "jsonField": "type"
+    }
+}

@@ -23,6 +23,8 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public interface InternalJobManager {
 
+    void registerScopedInternalJobManager(String scopeType, InternalJobManager internalJobManager);
+
     VariableScope resolveVariableScope(Job job);
     
     boolean handleJobInsert(Job job);

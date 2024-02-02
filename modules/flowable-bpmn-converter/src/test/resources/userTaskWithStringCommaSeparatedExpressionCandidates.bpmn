@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/test">
+
+    <process id="process" name="process1" isExecutable="true">
+        <endEvent id="endEvent"></endEvent>
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="usertask"></sequenceFlow>
+        <startEvent id="startEvent"></startEvent>
+        <sequenceFlow id="flow2" sourceRef="usertask" targetRef="endEvent"></sequenceFlow>
+        <userTask id="usertask" name="User task" flowable:candidateUsers="${'kermit, fozzie'}" flowable:candidateGroups="${'management, sales'}"/>
+        <boundaryEvent id="escalationTimer" cancelActivity="true" attachedToRef="usertask">
+            <timerEventDefinition>
+                <timeCycle>${cronExpression}</timeCycle>
+            </timerEventDefinition>
+        </boundaryEvent>
+        <sequenceFlow id="flow5" sourceRef="escalationTimer" targetRef="endEvent"></sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_process">
+        <bpmndi:BPMNPlane bpmnElement="process" id="BPMNPlane_process">
+            <bpmndi:BPMNShape bpmnElement="sid-7C003C2A-266E-4C30-9309-06BA6F9DD527" id="BPMNShape_sid-7C003C2A-266E-4C30-9309-06BA6F9DD527">
+                <omgdc:Bounds height="28.0" width="28.0" x="310.5" y="93.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+                <omgdc:Bounds height="30.0" width="30.0" x="90.5" y="92.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="usertask" id="BPMNShape_usertask">
+                <omgdc:Bounds height="80.0" width="100.0" x="165.5" y="67.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="120.5" y="107.0"></omgdi:waypoint>
+                <omgdi:waypoint x="165.5" y="107.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2" flowable:sourceDockerX="50.0" flowable:sourceDockerY="10.0" flowable:targetDockerX="40.0"
+                             flowable:targetDockerY="30.0">
+                <omgdi:waypoint x="265.5" y="107.0"></omgdi:waypoint>
+                <omgdi:waypoint x="310.5" y="107.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

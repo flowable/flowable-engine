@@ -36,8 +36,9 @@ public class IOSpecificationParser extends BaseChildElementParser {
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
-        if (!(parentElement instanceof Activity) && !(parentElement instanceof Process))
+        if (!(parentElement instanceof Activity) && !(parentElement instanceof Process)) {
             return;
+        }
 
         IOSpecification ioSpecification = new IOSpecification();
         BpmnXMLUtil.addXMLLocation(ioSpecification, xtr);

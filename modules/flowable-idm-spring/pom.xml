@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.3.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -95,6 +95,10 @@
             <artifactId>flowable-idm-engine</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
@@ -109,7 +113,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring.security.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -127,23 +130,24 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <scope>provided</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -158,24 +162,38 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>
         <profile>
-            <id>distro</id>
+            <id>errorLogging</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1.1</version>
+                        <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>attach-sources</id>
-                                <phase>package</phase>
+                                <id>error-logging</id>
+                                <phase>process-test-classes</phase>
                                 <goals>
-                                    <goal>jar-no-fork</goal>
+                                    <goal>run</goal>
                                 </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo
+                                            message="updating log4j configuration to error logging" />
+                                        <copy
+                                            file="${basedir}/../../qa/logging/log4j.properties"
+                                            todir="target/test-classes"
+                                            overwrite="true" />
+                                    </tasks>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

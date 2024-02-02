@@ -16,7 +16,7 @@ package org.flowable.job.service.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.api.query.QueryProperty;
+import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.job.api.JobQuery;
 
 /**
@@ -34,6 +34,7 @@ public class JobQueryProperty implements QueryProperty {
     public static final JobQueryProperty PROCESS_INSTANCE_ID = new JobQueryProperty("RES.PROCESS_INSTANCE_ID_");
     public static final JobQueryProperty EXECUTION_ID = new JobQueryProperty("RES.EXECUTION_ID_");
     public static final JobQueryProperty DUEDATE = new JobQueryProperty("RES.DUEDATE_");
+    public static final JobQueryProperty CREATE_TIME = new JobQueryProperty("RES.CREATE_TIME_");
     public static final JobQueryProperty RETRIES = new JobQueryProperty("RES.RETRIES_");
     public static final JobQueryProperty TENANT_ID = new JobQueryProperty("RES.TENANT_ID_");
 

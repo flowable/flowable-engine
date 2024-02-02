@@ -13,9 +13,9 @@
 package org.activiti.engine.delegate.event.impl;
 
 import org.activiti.engine.ActivitiIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 
 /**
  * Base class for all {@link FlowableEvent} implementations, related to entities.

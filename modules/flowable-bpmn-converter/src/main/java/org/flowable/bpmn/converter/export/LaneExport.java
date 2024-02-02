@@ -17,12 +17,13 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Lane;
 import org.flowable.bpmn.model.Process;
 
 public class LaneExport implements BpmnXMLConstants {
 
-    public static void writeLanes(Process process, XMLStreamWriter xtw) throws Exception {
+    public static void writeLanes(Process process, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         if (!process.getLanes().isEmpty()) {
             xtw.writeStartElement(ELEMENT_LANESET);
             xtw.writeAttribute(ATTRIBUTE_ID, "laneSet_" + process.getId());
@@ -34,7 +35,7 @@ public class LaneExport implements BpmnXMLConstants {
                     xtw.writeAttribute(ATTRIBUTE_NAME, lane.getName());
                 }
 
-                boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(lane, false, xtw);
+                boolean didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(lane, false, model.getNamespaces(), xtw);
                 if (didWriteExtensionStartElement) {
                     xtw.writeEndElement();
                 }
