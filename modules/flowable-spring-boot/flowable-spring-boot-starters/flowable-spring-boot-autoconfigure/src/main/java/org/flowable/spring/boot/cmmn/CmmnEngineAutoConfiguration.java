@@ -49,6 +49,7 @@ import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
+import org.flowable.spring.boot.dmn.DmnEngineAutoConfiguration;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
@@ -88,7 +89,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
-    TaskExecutionAutoConfiguration.class
+    TaskExecutionAutoConfiguration.class,
+    DmnEngineAutoConfiguration.class,
 }, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class
