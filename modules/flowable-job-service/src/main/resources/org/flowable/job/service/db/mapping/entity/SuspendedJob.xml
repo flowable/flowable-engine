@@ -234,7 +234,7 @@
         SELECT * FROM dual
     </insert>
 
-    <select id="selectSuspendedJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
+    <select id="selectSuspendedJobByQueryCriteria" parameterType="org.flowable.job.service.impl.SuspendedJobQueryImpl" resultMap="jobResultMap">
         <if test="needsPaging">${limitBefore}</if>
         SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectSuspendedJobByQueryCriteriaSql" />
@@ -242,7 +242,7 @@
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
-    <select id="selectSuspendedJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultType="long">
+    <select id="selectSuspendedJobCountByQueryCriteria" parameterType="org.flowable.job.service.impl.SuspendedJobQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectSuspendedJobByQueryCriteriaSql" />
     </select>

@@ -1,0 +1,3 @@
+org.springframework.aot.hint.RuntimeHintsRegistrar=\
+org.flowable.common.engine.impl.aot.FlowableCommonRuntimeHints,\
+org.flowable.common.engine.impl.aot.FlowableMyBatisRuntimeHints
