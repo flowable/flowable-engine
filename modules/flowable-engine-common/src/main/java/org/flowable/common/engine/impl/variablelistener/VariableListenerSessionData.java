@@ -12,6 +12,9 @@
  */
 package org.flowable.common.engine.impl.variablelistener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VariableListenerSessionData {
     
     public static final String VARIABLE_CREATE = "create";
@@ -22,6 +25,7 @@ public class VariableListenerSessionData {
     protected String scopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
+    protected List<String> processedElementIds = new ArrayList<>();
     
     public VariableListenerSessionData(String changeType, String scopeId, String scopeType, String scopeDefinitionId) {
         this.changeType = changeType;
@@ -57,5 +61,11 @@ public class VariableListenerSessionData {
     }
     public void setScopeDefinitionId(String scopeDefinitionId) {
         this.scopeDefinitionId = scopeDefinitionId;
-    }     
+    }
+    public boolean containsProcessedElementId(String elementId) {
+        return this.processedElementIds.contains(elementId);
+    }
+    public void addProcessedElementId(String elementId) {
+        this.processedElementIds.add(elementId);
+    }
 }
