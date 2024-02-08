@@ -93,10 +93,12 @@ public class EvaluateVariableEventListenersOperation extends AbstractEvaluationC
                 if (changeTypeValue.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_ALL.equals(changeTypeValue) ||
                             (VariableListenerEventDefinition.CHANGE_TYPE_UPDATE_CREATE.equals(changeTypeValue) &&
                                     (VariableListenerEventDefinition.CHANGE_TYPE_CREATE.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_UPDATE.equals(variableListenerData.getChangeType())))) {
-                        
-                    itVariableListener.remove();
-                    CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstance);
-                    triggeredPlanItemInstance = true;
+                    
+                    if (!variableListenerData.containsProcessedElementId(planItemInstance.getPlanItemDefinitionId())) {
+                        CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstance);
+                        triggeredPlanItemInstance = true;
+                        variableListenerData.addProcessedElementId(planItemInstance.getPlanItemDefinitionId());
+                    }
                 }         
             }
         }
