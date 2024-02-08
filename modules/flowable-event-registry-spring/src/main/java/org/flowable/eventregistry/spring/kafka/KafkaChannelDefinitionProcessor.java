@@ -84,11 +84,11 @@ import org.springframework.kafka.retrytopic.DefaultDestinationTopicProcessor;
 import org.springframework.kafka.retrytopic.DefaultDestinationTopicResolver;
 import org.springframework.kafka.retrytopic.DestinationTopic;
 import org.springframework.kafka.retrytopic.DestinationTopicProcessor;
-import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.kafka.retrytopic.ListenerContainerFactoryConfigurer;
 import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.retrytopic.RetryTopicSchedulerWrapper;
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
 import org.springframework.kafka.support.Suffixer;
 import org.springframework.kafka.support.TopicPartitionOffset;
@@ -1024,13 +1024,14 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         RetryTopicConfigurationBuilder retryTopicConfigurationBuilder = RetryTopicConfigurationBuilder.newInstance()
                 .autoStartDltHandler(false)
                 .autoCreateTopics(retryConfiguration.autoCreateTopics, retryConfiguration.numPartitions, retryConfiguration.replicationFactor)
-                .dltSuffix(dltTopicSuffix)
                 .retryTopicSuffix(retryTopicSuffix)
-                .useSingleTopicForFixedDelays(retryConfiguration.fixedDelayTopicStrategy)
+                .sameIntervalTopicReuseStrategy(retryConfiguration.sameIntervalTopicReuseStrategy)
                 .setTopicSuffixingStrategy(retryConfiguration.topicSuffixingStrategy);
 
         if (dltTopicSuffix == null) {
             retryTopicConfigurationBuilder.doNotConfigureDlt();
+        } else {
+            retryTopicConfigurationBuilder.dltSuffix(dltTopicSuffix);
         }
 
         if (retryConfiguration.hasRetryTopic()) {
@@ -1061,10 +1062,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         resolvedRetryConfiguration.dltTopicSuffix = resolveExpressionAsString(retry.getDltTopicSuffix(), "retry.dltTopicSuffix");
         resolvedRetryConfiguration.retryTopicSuffix = resolveExpressionAsString(retry.getRetryTopicSuffix(), "retry.retryTopicSuffix");
 
-        String fixedDelayTopicStrategy = resolveExpressionAsString(retry.getFixedDelayTopicStrategy(), "retry.fixedDelayTopicStrategy");
+        String sameIntervalTopicReuseStrategy = resolveExpressionAsString(retry.getFixedDelayTopicStrategy(), "retry.fixedDelayTopicStrategy");
         // Different default from Spring Kafka
-        resolvedRetryConfiguration.fixedDelayTopicStrategy =
-                fixedDelayTopicStrategy == null ? FixedDelayStrategy.SINGLE_TOPIC : FixedDelayStrategy.valueOf(fixedDelayTopicStrategy);
+        resolvedRetryConfiguration.sameIntervalTopicReuseStrategy =
+                sameIntervalTopicReuseStrategy == null ? SameIntervalTopicReuseStrategy.SINGLE_TOPIC : SameIntervalTopicReuseStrategy.valueOf(sameIntervalTopicReuseStrategy);
 
         String topicSuffixingStrategy = resolveExpressionAsString(retry.getTopicSuffixingStrategy(), "retry.topicSuffixingStrategy");
         // Different default from Spring Kafka
@@ -1133,7 +1134,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         protected Integer attempts;
         protected String dltTopicSuffix;
         protected String retryTopicSuffix;
-        protected FixedDelayStrategy fixedDelayTopicStrategy;
+        protected SameIntervalTopicReuseStrategy sameIntervalTopicReuseStrategy;
         protected TopicSuffixingStrategy topicSuffixingStrategy;
         protected SleepingBackOffPolicy<?> nonBlockingBackOff;
         protected boolean autoCreateTopics;
