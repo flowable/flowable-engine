@@ -104,9 +104,10 @@
 		<flowable.osgi.export.additional>
 			org.flowable.job.service.db.mapping.entity
 		</flowable.osgi.export.additional>
-        <flowable.osgi.import.additional>
-            jakarta.enterprise.concurrent;resolution:=optional,
-        </flowable.osgi.import.additional>
+		<flowable.osgi.import.additional>
+			jakarta.enterprise.concurrent;resolution:=optional,
+			org.springframework*;resolution:=optional
+		</flowable.osgi.import.additional>
 	</properties>
 
 	<build>
