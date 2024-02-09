@@ -28,6 +28,7 @@
 		<slf4j.version>2.0.9</slf4j.version>
 		<groovy.version>4.0.15</groovy.version>
 		<jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
+		<native-build-tools-plugin.version>0.9.27</native-build-tools-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.9.3</junit.jupiter.version>
@@ -292,12 +293,12 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.11</version>
+				<version>3.5.15</version>
 			</dependency>
 			<dependency>
               <groupId>org.mybatis</groupId>
               <artifactId>mybatis-spring</artifactId>
-              <version>3.0.0</version>
+              <version>3.0.3</version>
             </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
@@ -709,6 +710,12 @@
 							</configuration>
 						</execution>
 					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.graalvm.buildtools</groupId>
+					<artifactId>native-maven-plugin</artifactId>
+					<version>${native-build-tools-plugin.version}</version>
+					<extensions>true</extensions>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>

@@ -186,7 +186,7 @@
         select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
     </select>
 
-    <select id="selectVariablesByQuery" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="variableInstanceResultMap">
+    <select id="selectVariablesByQuery" parameterType="org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
         select *
         from ${prefix}ACT_RU_VARIABLE
         <where>

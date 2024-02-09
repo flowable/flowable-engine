@@ -96,6 +96,7 @@
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             jakarta.persistence*;resolution:=optional,
+            org.springframework*;resolution:=optional
         </flowable.osgi.import.additional>
     </properties>
 
