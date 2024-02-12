@@ -51,18 +51,13 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
  * @author Christopher Welsch
  */
 public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @CmmnDeployment
@@ -167,12 +162,12 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Error while evaluating expression: ${caseInstance.name}");
-        cmmnTaskService.complete(task.getId(), Collections.singletonMap(
+        assertThatThrownBy(() -> cmmnTaskService.complete(task.getId(), Collections.singletonMap(
                 "${caseInstance.name}", "newCaseName"
                 )
-        );
+        ))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Error while evaluating expression: ${caseInstance.name}");
     }
 
     @Test
@@ -181,12 +176,12 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Error while evaluating expression: ${name}");
-        cmmnTaskService.complete(task.getId(), Collections.singletonMap(
+        assertThatThrownBy(() -> cmmnTaskService.complete(task.getId(), Collections.singletonMap(
                 "${name}", "newCaseName"
                 )
-        );
+        ))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Error while evaluating expression: ${name}");
     }
 
     @Test
