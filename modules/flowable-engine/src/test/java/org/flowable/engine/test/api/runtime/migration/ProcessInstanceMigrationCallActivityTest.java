@@ -1796,7 +1796,9 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                 .containsOnly(procDefWithCallActivityV2.getId());
         ProcessInstance subProcessInstanceAfterMigration = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId())
                 .singleResult();
-        assertThat(subProcessInstanceAfterMigration).isEqualToComparingFieldByField(subProcessInstance);
+        assertThat(subProcessInstanceAfterMigration)
+                .usingRecursiveComparison()
+                .isEqualTo(subProcessInstance);
         List<Execution> subProcessExecutionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(subProcessInstanceAfterMigration.getId())
                 .onlyChildExecutions().list();
         assertThat(subProcessExecutionsAfterMigration)
@@ -1807,7 +1809,9 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                 .containsOnly(procDefSubProcess.getId());
         subProcessExecutions.sort(Comparator.comparing(Execution::getId));
         subProcessExecutionsAfterMigration.sort(Comparator.comparing(Execution::getId));
-        assertThat(subProcessExecutionsAfterMigration).usingFieldByFieldElementComparator().isEqualTo(subProcessExecutions);
+        assertThat(subProcessExecutionsAfterMigration)
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(subProcessExecutions);
 
         List<Task> subProcessTasksAfterMigration = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).list();
         assertThat(subProcessTasksAfterMigration)
@@ -1816,7 +1820,9 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
 
         subProcessTasks.sort(Comparator.comparing(Task::getId));
         subProcessTasksAfterMigration.sort(Comparator.comparing(Task::getId));
-        assertThat(subProcessTasksAfterMigration).usingFieldByFieldElementComparator().isEqualTo(subProcessTasks);
+        assertThat(subProcessTasksAfterMigration)
+                .usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(subProcessTasks);
 
         subProcessTasksAfterMigration.forEach(this::completeTask);
 

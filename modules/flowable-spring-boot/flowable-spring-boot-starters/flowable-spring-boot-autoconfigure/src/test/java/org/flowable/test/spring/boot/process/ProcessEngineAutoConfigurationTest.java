@@ -446,7 +446,8 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(dbIdGenerator.getIdBlockSize()).isEqualTo(engineConfiguration.getIdBlockSize());
                         assertThat(dbIdGenerator.getCommandExecutor()).isEqualTo(engineConfiguration.getCommandExecutor());
                         assertThat(dbIdGenerator.getCommandConfig())
-                            .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
+                            .usingRecursiveComparison()
+                            .isEqualTo(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
                     });
             });
     }
@@ -467,7 +468,8 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(dbIdGenerator.getIdBlockSize()).isEqualTo(engineConfiguration.getIdBlockSize());
                         assertThat(dbIdGenerator.getCommandExecutor()).isEqualTo(engineConfiguration.getCommandExecutor());
                         assertThat(dbIdGenerator.getCommandConfig())
-                            .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
+                            .usingRecursiveComparison()
+                            .isEqualTo(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
                     })
                     .isEqualTo(context.getBean(IdGenerator.class));
             });
