@@ -53,7 +53,7 @@ public class CmmnHistoryCleanupJobHandler implements JobHandler {
 
         BatchQuery batchCleaningQuery = cmmnEngineConfiguration.getCmmnHistoryCleaningManager().createBatchCleaningQuery();
         if (batchCleaningQuery != null) {
-            batchCleaningQuery.deleteWithRelatedData();
+            batchCleaningQuery.delete();
         }
     }
     
