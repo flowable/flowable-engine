@@ -53,7 +53,7 @@ public class BpmnHistoryCleanupJobHandler implements JobHandler {
 
         BatchQuery batchCleaningQuery = processEngineConfiguration.getHistoryCleaningManager().createBatchCleaningQuery();
         if (batchCleaningQuery != null) {
-            batchCleaningQuery.deleteWithRelatedData();
+            batchCleaningQuery.delete();
         }
     }
     
