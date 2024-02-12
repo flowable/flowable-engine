@@ -69,7 +69,8 @@ public class FlowableLdapPropertiesTest {
 
         assertThat(ldapConfiguration)
             .as("Base Ldap Configuration")
-            .isEqualToIgnoringGivenFields(properties,
+            .usingRecursiveComparison()
+            .ignoringFields(
                 "queryUserByUserId",
                 "queryUserByFullNameLike",
                 "queryAllUsers",
@@ -87,7 +88,8 @@ public class FlowableLdapPropertiesTest {
                 "groupCacheExpirationTime",
                 "ldapQueryBuilder",
                 "groupCacheListener"
-            );
+            )
+            .isEqualTo(properties);
 
         assertThat(ldapConfiguration)
             .as("Query properties")

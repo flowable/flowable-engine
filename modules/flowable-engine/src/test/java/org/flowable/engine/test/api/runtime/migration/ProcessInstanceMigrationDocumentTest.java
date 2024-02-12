@@ -105,8 +105,12 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
-        assertThat(migrationDocument.getPreUpgradeScript()).isEqualToComparingFieldByField(new Script("groovy", "1+1"));
-        assertThat(migrationDocument.getPostUpgradeScript()).isEqualToComparingFieldByField(new Script("groovy", "2+2"));
+        assertThat(migrationDocument.getPreUpgradeScript())
+                .usingRecursiveComparison()
+                .isEqualTo(new Script("groovy", "1+1"));
+        assertThat(migrationDocument.getPostUpgradeScript())
+                .usingRecursiveComparison()
+                .isEqualTo(new Script("groovy", "2+2"));
     }
 
     @Test

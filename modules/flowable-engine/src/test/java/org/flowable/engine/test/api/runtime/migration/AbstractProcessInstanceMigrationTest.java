@@ -52,7 +52,9 @@ public class AbstractProcessInstanceMigrationTest extends PluggableFlowableTestC
                     activityInstance -> {
                         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
                                 .activityInstanceId(activityInstance.getId()).singleResult();
-                        assertThat(activityInstance).isEqualToComparingFieldByField(historicActivityInstance);
+                        assertThat(activityInstance)
+                                .usingRecursiveComparison()
+                                .isEqualTo(historicActivityInstance);
                     }
             );
         } else {

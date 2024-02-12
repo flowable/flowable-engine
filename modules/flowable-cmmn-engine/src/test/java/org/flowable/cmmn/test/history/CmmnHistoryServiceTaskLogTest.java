@@ -727,7 +727,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
             List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries).hasSize(1);
-            assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+            assertThat(pagedLogEntries.get(0))
+                    .usingRecursiveComparison()
+                    .isEqualTo(logEntries.get(1));
 
         } finally {
             deleteTaskWithLogEntries(anotherTask.getId());
@@ -753,7 +755,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
             List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
             assertThat(pagedLogEntries).hasSize(1);
-            assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+            assertThat(pagedLogEntries.get(0))
+                    .usingRecursiveComparison()
+                    .isEqualTo(logEntries.get(1));
 
         } finally {
             deleteTaskWithLogEntries(anotherTask.getId());
@@ -855,7 +859,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0))
+                        .usingRecursiveComparison()
+                        .isEqualTo(logEntries.get(1));
 
             } finally {
                 deleteTaskWithLogEntries(anotherTask.getId());
@@ -934,7 +940,9 @@ public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowab
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0))
+                        .usingRecursiveComparison()
+                        .isEqualTo(logEntries.get(1));
 
             } finally {
                 deleteTaskWithLogEntries(anotherTask.getId());
