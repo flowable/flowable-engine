@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.runtime;
 
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
@@ -54,17 +55,12 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
  */
 public class VariablesTest extends FlowableCmmnTestCase {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @CmmnDeployment
@@ -437,19 +433,17 @@ public class VariablesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testSetVariableOnNonExistingCase() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
-        this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
-
-        cmmnRuntimeService.setVariable("NON-EXISTING-CASE", "varToUpdate", "newValue");
+        assertThatThrownBy(() -> cmmnRuntimeService.setVariable("NON-EXISTING-CASE", "varToUpdate", "newValue"))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No case instance found for id NON-EXISTING-CASE");
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testSetVariableWithoutName() {
-        this.expectedException.expect(FlowableIllegalArgumentException.class);
-        this.expectedException.expectMessage("variable name is null");
-
-        cmmnRuntimeService.setVariable("NON-EXISTING-CASE", null, "newValue");
+        assertThatThrownBy(() -> cmmnRuntimeService.setVariable("NON-EXISTING-CASE", null, "newValue"))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("variable name is null");
     }
 
     @Test
@@ -513,13 +507,13 @@ public class VariablesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testSetVariablesOnNonExistingCase() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
-        this.expectedException.expectMessage("No case instance found for id NON-EXISTING-CASE");
         Map<String, Object> variables = Stream.of(new ImmutablePair<String, Object>("varToUpdate", "newValue")).collect(
                 toMap(Pair::getKey, Pair::getValue)
         );
 
-        cmmnRuntimeService.setVariables("NON-EXISTING-CASE", variables);
+        assertThatThrownBy(() -> cmmnRuntimeService.setVariables("NON-EXISTING-CASE", variables))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No case instance found for id NON-EXISTING-CASE");
     }
 
     @SuppressWarnings("unchecked")
@@ -531,10 +525,9 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneHumanTaskCase")
                 .start();
 
-        this.expectedException.expect(FlowableIllegalArgumentException.class);
-        this.expectedException.expectMessage("variables is empty");
-
-        cmmnRuntimeService.setVariables(caseInstance.getId(), Collections.EMPTY_MAP);
+        assertThatThrownBy(() -> cmmnRuntimeService.setVariables(caseInstance.getId(), Collections.EMPTY_MAP))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("variables is empty");
     }
 
     @Test

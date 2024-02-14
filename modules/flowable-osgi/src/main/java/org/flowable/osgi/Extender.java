@@ -21,11 +21,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
@@ -367,9 +369,13 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         @Override
         public ScriptEngine resolveScriptEngine(String name) {
             try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(configFile.openStream()));
-                String className = in.readLine();
-                in.close();
+                String className;
+                try (InputStream input = configFile.openStream()) {
+                    className = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines()
+                            .map(line -> line.split("#", 2)[0].trim())
+                            .filter(Predicate.not(String::isBlank))
+                            .findFirst().orElse(null);
+                }
                 Class<?> cls = bundle.loadClass(className);
                 if (!ScriptEngineFactory.class.isAssignableFrom(cls)) {
                     throw new IllegalStateException("Invalid ScriptEngineFactory: " + cls.getName());

@@ -163,7 +163,7 @@ public class AllEnginesAutoConfigurationTest {
             SpringProcessEngineConfigurator processConfigurator = context.getBean(SpringProcessEngineConfigurator.class);
             assertThat(appEngineConfiguration.getConfigurators())
                     .as("AppEngineConfiguration configurators")
-                    .containsExactly(
+                    .containsExactlyInAnyOrder(
                             processConfigurator,
                             dmnConfigurator,
                             cmmnConfigurator

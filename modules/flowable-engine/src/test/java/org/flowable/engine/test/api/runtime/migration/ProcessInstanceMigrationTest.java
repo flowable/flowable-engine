@@ -1925,7 +1925,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
         assertThat(job)
-                .isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+                .usingRecursiveComparison()
+                .ignoringFields("originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef")
+                .isEqualTo(timerJob);
 
         // Verify events
         assertThat(changeStateEventListener.hasEvents()).isTrue();
@@ -1992,7 +1994,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
         assertThat(job)
-                .isEqualToIgnoringGivenFields(timerJob, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+                .usingRecursiveComparison()
+                .ignoringFields("originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef")
+                .isEqualTo(timerJob);
 
         changeStateEventListener.clear();
 
@@ -2096,7 +2100,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
         assertThat(job)
-                .isEqualToIgnoringGivenFields(timerJob2, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+                .usingRecursiveComparison()
+                .ignoringFields("originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef")
+                .isEqualTo(timerJob2);
         assertThat(timerJob1)
                 .extracting(Job::getExecutionId)
                 .isNotEqualTo(timerJob2);
@@ -2530,7 +2536,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();
         assertThat(timerJob)
-                .isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+                .usingRecursiveComparison()
+                .ignoringFields("originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef")
+                .isEqualTo(timerFromTask);
 
         // Verify events
         assertThat(changeStateEventListener.hasEvents()).isTrue();
@@ -2619,7 +2627,9 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         Execution timerExecution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job timerFromTask = managementService.createTimerJobQuery().executionId(timerExecution.getId()).singleResult();
         assertThat(timerJob)
-                .isEqualToIgnoringGivenFields(timerFromTask, "originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef");
+                .usingRecursiveComparison()
+                .ignoringFields("originalPersistentState", "customValuesByteArrayRef", "exceptionByteArrayRef")
+                .isEqualTo(timerFromTask);
 
         // Verify events
         assertThat(changeStateEventListener.hasEvents()).isTrue();

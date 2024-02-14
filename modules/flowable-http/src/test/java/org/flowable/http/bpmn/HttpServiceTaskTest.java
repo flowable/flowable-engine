@@ -285,7 +285,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testRequestTimeout() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .getCause().isInstanceOfAny(SocketTimeoutException.class, SocketException.class);
+                .cause().isInstanceOfAny(SocketTimeoutException.class, SocketException.class);
     }
 
     @Test

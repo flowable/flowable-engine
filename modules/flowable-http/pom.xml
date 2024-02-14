@@ -224,6 +224,16 @@
             <artifactId>spring-webflux</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--
+            The SpringWebClientFlowableHttpClient is using ReactorClientHttpConnector,
+            which since Spring Framework 6.1 is implementing SmartLifecycle and thus needs spring-context.
+            See https://github.com/spring-projects/spring-framework/issues/31180#issuecomment-1934453468 for more information.
+         -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
