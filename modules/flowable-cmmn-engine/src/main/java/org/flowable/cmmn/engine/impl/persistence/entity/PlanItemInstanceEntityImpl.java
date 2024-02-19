@@ -92,6 +92,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
+    protected boolean plannedForActivationInMigration;
 
     public PlanItemInstanceEntityImpl() {
     }
@@ -644,6 +645,16 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
+    }
+
+    @Override
+    public boolean isPlannedForActivationInMigration() {
+        return plannedForActivationInMigration;
+    }
+
+    @Override
+    public void setPlannedForActivationInMigration(boolean plannedForActivationInMigration) {
+        this.plannedForActivationInMigration = plannedForActivationInMigration;
     }
 
     @Override
