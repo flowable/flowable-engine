@@ -14,7 +14,16 @@ package org.flowable.cmmn.engine.interceptor;
 
 public class MigrationContext {
 
+    protected boolean fetchPlanItemInstances;
     protected String assignee;
+    
+    public boolean isFetchPlanItemInstances() {
+        return fetchPlanItemInstances;
+    }
+
+    public void setFetchPlanItemInstances(boolean fetchPlanItemInstances) {
+        this.fetchPlanItemInstances = fetchPlanItemInstances;
+    }
 
     public String getAssignee() {
         return assignee;

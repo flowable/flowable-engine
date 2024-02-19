@@ -147,7 +147,9 @@ public abstract class AbstractCmmnDynamicStateManager {
         executeRemoveWaitingForRepetitionPlanItemInstances(caseInstanceChangeState, caseInstance, commandContext);
         
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        agenda.planEvaluateCriteriaOperation(caseInstance.getId());
+        MigrationContext migrationContext = new MigrationContext();
+        migrationContext.setFetchPlanItemInstances(true);
+        agenda.planEvaluateCriteriaOperation(caseInstance.getId(), migrationContext);
     }
     
     protected void executeChangePlanItemIds(CaseInstanceChangeState caseInstanceChangeState, String originalCaseDefinitionId, CommandContext commandContext) {
@@ -228,6 +230,10 @@ public abstract class AbstractCmmnDynamicStateManager {
 
             PlanItemInstanceEntity newPlanItemInstance = createStagesAndPlanItemInstances(planItem, 
                             caseInstance, caseInstanceChangeState, commandContext);
+            
+            if (planItemDefinitionMapping.getWithLocalVariables() != null && !planItemDefinitionMapping.getWithLocalVariables().isEmpty()) {
+                newPlanItemInstance.setVariablesLocal(planItemDefinitionMapping.getWithLocalVariables());
+            }
 
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
             if (planItemDefinitionMapping.getNewAssignee() != null && planItem.getPlanItemDefinition() instanceof HumanTask) {
@@ -321,6 +327,10 @@ public abstract class AbstractCmmnDynamicStateManager {
                 
                 if (hasRepetitionRule(availablePlanItemInstance)) {
                     setRepetitionCounter(availablePlanItemInstance, 1);
+                }
+
+                if (planItemDefinitionMapping.getWithLocalVariables() != null && !planItemDefinitionMapping.getWithLocalVariables().isEmpty()) {
+                    availablePlanItemInstance.setVariablesLocal(planItemDefinitionMapping.getWithLocalVariables());
                 }
                 
                 CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
