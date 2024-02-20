@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.assertions.process;
+package org.flowable.assertj.process;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;

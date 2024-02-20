@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.assertions.process;
+package org.flowable.assertj.process;
 
 import org.assertj.core.groups.Tuple;
 import org.flowable.engine.HistoryService;
@@ -26,7 +26,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.flowable.assertions.process.TestUtils.createOneTaskProcess;
 
 /**
  * @author martin.grofcik
@@ -37,7 +36,7 @@ class HistoricProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void isFinishedForFinishedProcessInstance(RuntimeService runtimeService, TaskService taskService, HistoryService historyService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.inHistory().activities().extracting(HistoricActivityInstance::getActivityId).contains(
@@ -61,7 +60,7 @@ class HistoricProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void variables(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.as("No variable exists in the process scope.")
@@ -92,7 +91,7 @@ class HistoricProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void hasVariable(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.as("No variable exists in the process scope.")
@@ -108,7 +107,7 @@ class HistoricProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void doesNotHaveVariable(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.as("No variable exists in the process scope.")

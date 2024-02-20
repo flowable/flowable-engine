@@ -11,22 +11,16 @@
  * limitations under the License.
  */
 
-package org.flowable.assertions.process;
+package org.flowable.assertj.process;
 
-import org.assertj.core.api.Assertions;
-import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
  * @author martin.grofcik
  */
-public class FlowableProcessAssertions extends Assertions {
-
-    public static ProcessInstanceAssert assertThat(ProcessInstance processInstance) {
-        return new ProcessInstanceAssert(processInstance);
+abstract class TestUtils {
+    static ProcessInstance createOneTaskProcess(RuntimeService runtimeService) {
+        return runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").start();
     }
-    public static HistoricProcessInstanceAssert assertThat(HistoricProcessInstance historicProcessInstance) {
-        return new HistoricProcessInstanceAssert(historicProcessInstance);
-    }
-
 }

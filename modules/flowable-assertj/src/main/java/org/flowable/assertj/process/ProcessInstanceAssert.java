@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.assertions.process;
+package org.flowable.assertj.process;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Assertions;
@@ -25,8 +25,7 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-import static org.flowable.assertions.process.FlowableProcessAssertions.assertThat;
-import static org.flowable.assertions.process.Utils.*;
+import static org.flowable.assertj.process.FlowableProcessAssertions.assertThat;
 
 /**
  * @author martin.grofcik
@@ -40,7 +39,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
     }
 
     protected ProcessInstanceAssert(ProcessInstance processInstance) {
-        this(getProcessEngine(), processInstance);
+        this(Utils.getProcessEngine(), processInstance);
     }
 
     /**
@@ -52,7 +51,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
         isNotNull();
 
         if (processServicesProvider.getRuntimeService().createProcessInstanceQuery().processInstanceId(actual.getId()).count() < 1) {
-            failWithMessage(getProcessDescription(actual)+" to be running but is not.", actual.getId());
+            failWithMessage(Utils.getProcessDescription(actual)+" to be running but is not.", actual.getId());
         }
         return this;
     }
@@ -67,7 +66,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
         isNotNull();
 
         if (processServicesProvider.getRuntimeService().createProcessInstanceQuery().processInstanceId(actual.getId()).variableExists(variableName).count() != 1) {
-            failWithMessage(getProcessDescription(actual)+" has variable <%s> but variable does not exist.", variableName);
+            failWithMessage(Utils.getProcessDescription(actual)+" has variable <%s> but variable does not exist.", variableName);
         }
 
         return this;
@@ -98,7 +97,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
         isNotNull();
 
         if (processServicesProvider.getRuntimeService().createProcessInstanceQuery().processInstanceId(actual.getId()).variableExists(variableName).count() != 0) {
-            failWithMessage(getProcessDescription(actual)+" does not have variable <%s> but variable exists.", variableName);
+            failWithMessage(Utils.getProcessDescription(actual)+" does not have variable <%s> but variable exists.", variableName);
         }
 
         return this;
@@ -113,7 +112,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
         isNotNull();
 
         if (processServicesProvider.getRuntimeService().createProcessInstanceQuery().processInstanceId(actual.getId()).count() != 0) {
-            failWithMessage(getProcessDescription(actual)+" is finished but instance exists in runtime.");
+            failWithMessage(Utils.getProcessDescription(actual)+" is finished but instance exists in runtime.");
         }
 
         return this;
@@ -178,7 +177,7 @@ public class ProcessInstanceAssert extends AbstractAssert<ProcessInstanceAssert,
     public ListAssert<Task> userTasks() {
         isNotNull();
 
-        return assertThat(getTaskService().createTaskQuery().processInstanceId(actual.getId()).orderByTaskName().asc()
+        return assertThat(Utils.getTaskService().createTaskQuery().processInstanceId(actual.getId()).orderByTaskName().asc()
                 .includeProcessVariables().includeIdentityLinks().includeTaskLocalVariables().list());
     }
 

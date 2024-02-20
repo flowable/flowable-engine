@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.assertions.process;
+package org.flowable.assertj.process;
 
 import org.assertj.core.groups.Tuple;
 import org.flowable.engine.ManagementService;
@@ -33,7 +33,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.flowable.assertions.process.TestUtils.createOneTaskProcess;
 
 /**
  * @author martin.grofcik
@@ -44,7 +43,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void isRunning(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         FlowableProcessAssertions.assertThat(oneTaskProcess).isRunning();
     }
@@ -52,7 +51,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void isRunningForNonRunningProcess(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
         assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).isRunning())
@@ -70,7 +69,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void hasVariable(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
@@ -85,7 +84,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void hasVariableForNonRunningProcess(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
@@ -107,7 +106,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void doesNotHaveVariable(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
@@ -121,7 +120,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void doesNotHaveVariableForNonRunningProcess(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         runtimeService.setVariable(oneTaskProcess.getId(), "variableName", "variableValue");
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
@@ -140,7 +139,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void doesNotExistForRunningInstance(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         assertThatThrownBy(() -> FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotExist())
                 .isInstanceOf(AssertionError.class)
@@ -150,7 +149,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void doesNotExistForNonRunningProcess(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
         FlowableProcessAssertions.assertThat(oneTaskProcess).doesNotExist();
@@ -166,7 +165,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void activitiesForRunningInstance(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         FlowableProcessAssertions.assertThat(oneTaskProcess).activities().extracting(ActivityInstance::getActivityId)
                 .contains("theStart", "theStart-theTask", "theTask");
@@ -175,7 +174,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void activitiesForNonRunningProcess(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
         taskService.complete(taskService.createTaskQuery().processInstanceId(oneTaskProcess.getId()).singleResult().getId());
 
         FlowableProcessAssertions.assertThat(oneTaskProcess).activities().isEmpty();
@@ -184,7 +183,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void executions(RuntimeService runtimeService, TaskService taskService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.as("Running process has at least 2 active executions." +
@@ -201,7 +200,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void variables(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.variables().isEmpty();
@@ -229,7 +228,7 @@ class ProcessInstanceAssertTest {
     @Test
     @Deployment(resources = "oneTask.bpmn20.xml")
     void identityLinks(RuntimeService runtimeService) {
-        ProcessInstance oneTaskProcess = createOneTaskProcess(runtimeService);
+        ProcessInstance oneTaskProcess = TestUtils.createOneTaskProcess(runtimeService);
 
         ProcessInstanceAssert assertThatOneTaskProcess = FlowableProcessAssertions.assertThat(oneTaskProcess);
         assertThatOneTaskProcess.identityLinks().isEmpty();
