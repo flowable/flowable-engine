@@ -12,13 +12,13 @@
  */
 package org.flowable.engine.impl.util;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
@@ -64,8 +64,6 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -436,9 +434,8 @@ public class ProcessInstanceHelper {
         
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-        Signal signal = null;
-        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        if (signal != null) {
             signalEventDefinition.setSignalRef(signal.getName());
         }
 
@@ -544,5 +541,5 @@ public class ProcessInstanceHelper {
             }
         }
     }
-    
+
 }
