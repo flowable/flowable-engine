@@ -60,9 +60,9 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
         } else {
             orderBy = "RES.ID_ asc";
         }
-        parameterMap.put("orderBy", "order by " + columns);
-        parameterMap.put("orderByForWindow", "order by " + columns);
-        parameterMap.put("orderByColumns", columns);
+        parameterMap.put("orderBy", "order by " + orderBy);
+        parameterMap.put("orderByForWindow", "order by " + orderBy);
+        parameterMap.put("orderByColumns", orderBy);
 
         int firstRow = firstResult + 1;
         parameterMap.put("firstRow", firstRow);
