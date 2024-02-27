@@ -58,8 +58,8 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
         if (orderBy != null && !"".equals(orderBy)) {
             String columns = "RES." + orderBy;
             parameterMap.put("orderBy", "order by " + columns);
-            parameterMap.put("orderByColumns", "order by " + columns);
-            parameterMap.put("orderByForWindow", columns);
+            parameterMap.put("orderByForWindow", "order by " + columns);
+            parameterMap.put("orderByColumns", columns);
         } else {
             parameterMap.put("orderBy", "order by RES.ID_ asc");
             parameterMap.put("orderByForWindow", "order by RES.ID_ asc");
