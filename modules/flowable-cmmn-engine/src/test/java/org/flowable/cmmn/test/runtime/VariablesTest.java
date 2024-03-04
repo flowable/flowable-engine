@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
@@ -888,6 +889,22 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     }
 
+    @Test
+    @CmmnDeployment
+    public void testSettingGettingMultipleTimesInSameTransaction() {
+        TestSetGetVariablesDelegate.REMOVE_VARS_IN_LAST_ROUND = true;
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSettingGettingMultipleTimesInSameTransaction").start();
+        assertThat(cmmnRuntimeService.getVariables(caseInstance1.getId())).isEmpty();
+
+        TestSetGetVariablesDelegate.REMOVE_VARS_IN_LAST_ROUND = false;
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSettingGettingMultipleTimesInSameTransaction").start();
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance2.getId());
+        assertThat(variables).hasSize(100);
+        for (String variableName : variables.keySet()) {
+            assertThat(variables.get(variableName)).isNotNull();
+        }
+    }
+
     protected void addVariableTypeIfNotExists(VariableType variableType) {
         // We can't remove the VariableType after every test since it would cause the test
         // to fail due to not being able to get the variable value during deleting
@@ -1066,6 +1083,41 @@ public class VariablesTest extends FlowableCmmnTestCase {
         public CustomTestVariable(String someValue, int someInt) {
             this.someValue = someValue;
             this.someInt = someInt;
+        }
+    }
+
+    public static class TestSetGetVariablesDelegate implements PlanItemJavaDelegate {
+
+        public static boolean REMOVE_VARS_IN_LAST_ROUND = true;
+
+        @Override
+        public void execute(DelegatePlanItemInstance planItemInstance) {
+            String caseInstanceId = planItemInstance.getCaseInstanceId();
+            CmmnRuntimeService cmmnRuntimeService = CommandContextUtil.getCmmnRuntimeService();
+
+            int nrOfLoops = 100;
+            for (int nrOfRounds = 0; nrOfRounds < 4; nrOfRounds++) {
+
+                // Set
+                for (int i = 0; i < nrOfLoops; i++) {
+                    cmmnRuntimeService.setVariable(caseInstanceId, "test_" + i, i);
+                }
+
+                // Get
+                for (int i = 0; i < nrOfLoops; i++) {
+                    if (cmmnRuntimeService.getVariable(caseInstanceId, "test_" + i) == null) {
+                        throw new RuntimeException("This exception shouldn't happen");
+                    }
+                }
+
+                // Remove
+                if (REMOVE_VARS_IN_LAST_ROUND && nrOfRounds == 3) {
+                    for (int i = 0; i < nrOfLoops; i++) {
+                        cmmnRuntimeService.removeVariable(caseInstanceId, "test_" + i);
+                    }
+                }
+
+            }
         }
     }
 
