@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -733,6 +734,28 @@ public class VariablesTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Test
+    @Deployment
+    public void testSettingGettingMultipleTimesInSameTransaction() {
+
+        TestSetGetVariablesDelegate.REMOVE_VARS_IN_LAST_ROUND = true;
+
+        ProcessInstance processInstance1 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSettingGettingMultipleTimesInSameTransaction")
+                .start();
+        assertThat(runtimeService.getVariables(processInstance1.getId())).isEmpty();
+
+        TestSetGetVariablesDelegate.REMOVE_VARS_IN_LAST_ROUND = false;
+        ProcessInstance processInstance2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSettingGettingMultipleTimesInSameTransaction")
+                .start();
+        Map<String, Object> variables = runtimeService.getVariables(processInstance2.getId());
+        assertThat(variables).hasSize(100);
+        for (String variableName : variables.keySet()) {
+            assertThat(variables.get(variableName)).isNotNull();
+        }
+    }
+
     // Class to test variable serialization
     public static class TestSerializableVariable implements Serializable {
 
@@ -903,6 +926,41 @@ public class VariablesTest extends PluggableFlowableTestCase {
         @Override
         public void execute(DelegateExecution execution) {
             execution.removeVariable("testVar3");
+        }
+    }
+
+    public static class TestSetGetVariablesDelegate implements JavaDelegate {
+
+        public static boolean REMOVE_VARS_IN_LAST_ROUND = true;
+
+        @Override
+        public void execute(DelegateExecution execution) {
+            String processInstanceId = execution.getProcessInstanceId();
+            RuntimeService runtimeService = CommandContextUtil.getProcessEngineConfiguration().getRuntimeService();
+
+            int nrOfLoops = 100;
+            for (int nrOfRounds = 0; nrOfRounds < 4; nrOfRounds++) {
+
+                // Set
+                for (int i = 0; i < nrOfLoops; i++) {
+                    runtimeService.setVariable(processInstanceId, "test_" + i, i);
+                }
+
+                // Get
+                for (int i = 0; i < nrOfLoops; i++) {
+                    if (runtimeService.getVariable(processInstanceId, "test_" + i) == null) {
+                        throw new RuntimeException("This exception shouldn't happen");
+                    }
+                }
+
+                // Remove
+                if (REMOVE_VARS_IN_LAST_ROUND && nrOfRounds == 3) {
+                    for (int i = 0; i < nrOfLoops; i++) {
+                        runtimeService.removeVariable(processInstanceId, "test_" + i);
+                    }
+                }
+
+            }
         }
     }
 

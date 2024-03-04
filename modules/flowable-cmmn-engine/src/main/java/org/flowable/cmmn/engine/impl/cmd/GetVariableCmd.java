@@ -38,8 +38,12 @@ public class GetVariableCmd implements Command<Object> {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
-        
+
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+
+        // In the BPMN engine, this is done by getting the variable on the execution.
+        // However, doing the same in CMMN will fetch the case instance and non-completed plan item instances in one query.
+        // Hence, why here a direct query is done here (which is cached).
         VariableInstanceEntity variableInstanceEntity = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
                 .createInternalVariableInstanceQuery()
                 .scopeId(caseInstanceId)
@@ -49,7 +53,7 @@ public class GetVariableCmd implements Command<Object> {
                 .singleResult();
         if (variableInstanceEntity != null) {
             return variableInstanceEntity.getValue();
-        } 
+        }
         return null;
     }
 

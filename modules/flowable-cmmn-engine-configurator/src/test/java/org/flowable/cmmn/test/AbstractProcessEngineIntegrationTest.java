@@ -15,7 +15,9 @@ package org.flowable.cmmn.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -52,6 +54,8 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected static CmmnEngineConfiguration cmmnEngineConfiguration;
     protected static ProcessEngine processEngine;
 
+    protected static Map<Object, Object> beans = new HashMap<>();
+
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnTaskService cmmnTaskService;
@@ -69,7 +73,9 @@ public abstract class AbstractProcessEngineIntegrationTest {
     @BeforeClass
     public static void bootProcessEngine() {
         if (processEngine == null) {
-            processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml").buildProcessEngine();
+            ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
+            processEngineConfiguration.setBeans(beans);
+            processEngine = processEngineConfiguration.buildProcessEngine();
             cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
                     .getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
             CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
@@ -91,6 +97,12 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.processEngineHistoryService = processEngine.getHistoryService();
         this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         this.processEngineDynamicBpmnService = processEngine.getDynamicBpmnService();
+
+        beans.put("cmmnRepositoryService", cmmnEngineConfiguration.getCmmnRepositoryService());
+        beans.put("cmmnRuntimeService", cmmnEngineConfiguration.getCmmnRuntimeService());
+        beans.put("cmmnTaskService", cmmnEngineConfiguration.getCmmnTaskService());
+        beans.put("cmmnHistoryService", cmmnEngineConfiguration.getCmmnHistoryService());
+        beans.put("cmmnManagementService", cmmnEngineConfiguration.getCmmnManagementService());
     }
 
     @After
@@ -102,6 +114,8 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
+
+        beans.clear();
     }
 
     protected Date setCmmnClockFixedToCurrentTime() {
