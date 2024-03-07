@@ -717,7 +717,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment
+    @org.flowable.engine.test.Deployment
     public void testSettingGettingMultipleTimesInSameTransaction() {
 
         TestSetGetVariablesDelegate.REMOVE_VARS_IN_LAST_ROUND = true;
