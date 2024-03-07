@@ -32,18 +32,13 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Joram Barrez
  */
 public class CmmnPrefixTest {
     
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void testPrefixCase() {
         CmmnEngine cmmnEngine = null;

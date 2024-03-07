@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +24,7 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * This class tests fallbacks in {@link org.flowable.dmn.engine.impl.cmd.AbstractExecuteDecisionCmd}
@@ -35,9 +34,6 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     public static final String TEST_TENANT_ID = "testTenantId";
     public static final String TEST_PARENT_DEPLOYMENT_ID = "testParentDeploymentId";
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     protected DmnDeployment deployment;
 
@@ -72,19 +68,16 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     @Test
     public void decisionKeyDeploymentIdTenantIdWrongTenantIdThrowsException() {
-        expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("No decision found for key: decision1, parent deployment id testParentDeploymentId and tenant id: WRONG_TENANT_ID.");
-
-        executeDecision("WRONG_TENANT_ID", TEST_PARENT_DEPLOYMENT_ID);
+        assertThatThrownBy(() -> executeDecision("WRONG_TENANT_ID", TEST_PARENT_DEPLOYMENT_ID))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No decision found for key: decision1, parent deployment id testParentDeploymentId and tenant id: WRONG_TENANT_ID.");
     }
 
     @Test
     public void decisionKeyTenantIdWrongTenantIdThrowsException() {
-        expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("No decision found for key: decision1");
-        expectedException.expectMessage("and tenantId: WRONG_TENANT_ID");
-
-        executeDecision("WRONG_TENANT_ID", null);
+        assertThatThrownBy(() -> executeDecision("WRONG_TENANT_ID", null))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No decision found for key: decision1 and tenantId: WRONG_TENANT_ID.");
     }
 
     @Test

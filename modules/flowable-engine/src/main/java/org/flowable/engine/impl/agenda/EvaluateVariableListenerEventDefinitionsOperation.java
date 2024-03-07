@@ -106,8 +106,10 @@ public class EvaluateVariableListenerEventDefinitionsOperation extends AbstractO
                         VariableListenerEventDefinition.CHANGE_TYPE_ALL.equals(changeTypeValue) || (VariableListenerEventDefinition.CHANGE_TYPE_UPDATE_CREATE.equals(changeTypeValue) &&
                                 (VariableListenerEventDefinition.CHANGE_TYPE_CREATE.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_UPDATE.equals(variableListenerData.getChangeType())))) {
                     
-                    itVariableListener.remove();
-                    CommandContextUtil.getAgenda().planTriggerExecutionOperation(execution);
+                    if (!variableListenerData.containsProcessedElementId(execution.getActivityId())) {
+                        CommandContextUtil.getAgenda().planTriggerExecutionOperation(execution);
+                        variableListenerData.addProcessedElementId(execution.getActivityId());
+                    }
                 }
             }               
         }

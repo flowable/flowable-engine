@@ -836,7 +836,9 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0))
+                        .usingRecursiveComparison()
+                        .isEqualTo(logEntries.get(1));
             }
 
         } finally {
@@ -865,7 +867,9 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0))
+                        .usingRecursiveComparison()
+                        .isEqualTo(logEntries.get(1));
             }
 
         } finally {
@@ -940,7 +944,9 @@ public class HistoryServiceTaskLogTest extends CustomConfigurationFlowableTestCa
 
                 List<HistoricTaskLogEntry> pagedLogEntries = historicTaskLogEntryQuery.listPage(1, 1);
                 assertThat(pagedLogEntries).hasSize(1);
-                assertThat(pagedLogEntries.get(0)).isEqualToComparingFieldByField(logEntries.get(1));
+                assertThat(pagedLogEntries.get(0))
+                        .usingRecursiveComparison()
+                        .isEqualTo(logEntries.get(1));
             }
 
         } finally {

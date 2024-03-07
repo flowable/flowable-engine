@@ -32,18 +32,13 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Yvo Swillens
  * @author Filip Hrisafov
  */
 public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
@@ -155,10 +150,9 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml" }
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantDefaultBehavior() {
-        this.expectedException.expect(FlowableObjectNotFoundException.class);
-        this.expectedException.expectMessage("Process definition with key 'oneDecisionTaskProcess' and tenantId 'flowable' was not found");
-
-        deployDecisionAndAssertProcessExecuted();
+        assertThatThrownBy(this::deployDecisionAndAssertProcessExecuted)
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("Process definition with key 'oneDecisionTaskProcess' and tenantId 'flowable' was not found");
     }
 
     @Test
@@ -166,11 +160,9 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         tenantId = "flowable"
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFalse() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("No decision found for key: decision1");
-        this.expectedException.expectMessage("and tenant id: flowable");
-
-        deployDecisionAndAssertProcessExecuted();
+        assertThatThrownBy(this::deployDecisionAndAssertProcessExecuted)
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContainingAll("No decision found for key: decision1", "and tenant id: flowable");
     }
 
     @Test
@@ -178,17 +170,15 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         tenantId = "flowable"
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackFalseWithoutDeployment() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("No decision found for key: decision1");
-        this.expectedException.expectMessage("and tenant id: flowable");
-
         deleteAllDmnDeployments();
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
             tenantId("anotherTenant").
             deploy();
         try {
-            assertDmnProcessExecuted();
+            assertThatThrownBy(this::assertDmnProcessExecuted)
+                    .isInstanceOf(FlowableObjectNotFoundException.class)
+                    .hasMessageContainingAll("No decision found for key: decision1", "and tenant id: flowable");
         } finally {
             this.repositoryService.deleteDeployment(deployment.getId(), true);
             deleteAllDmnDeployments();
@@ -200,15 +190,14 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         tenantId = "flowable"
     )
     public void testDecisionTaskExecutionInAnotherDeploymentAndTenantFallbackTrueWithoutDeployment() {
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
-
         org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().
             addClasspathResource("org/flowable/dmn/engine/test/deployment/simple.dmn").
             tenantId("anotherTenant").
             deploy();
         try {
-            assertDmnProcessExecuted();
+            assertThatThrownBy(this::assertDmnProcessExecuted)
+                    .isInstanceOf(FlowableObjectNotFoundException.class)
+                    .hasMessageContaining("No decision found for key: decision1. There was also no fall back decision table found without tenant.");
         } finally {
             this.repositoryService.deleteDeployment(deployment.getId(), true);
             deleteAllDmnDeployments();

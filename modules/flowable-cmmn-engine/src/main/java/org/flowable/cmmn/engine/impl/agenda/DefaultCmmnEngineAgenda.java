@@ -144,6 +144,14 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         internalPlanEvaluateCriteria(caseInstanceEntityId, lifeCycleEvent, false);
     }
     
+    @Override
+    public void planEvaluateCriteriaOperation(String caseInstanceEntityId, MigrationContext migrationContext) {
+        EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, null);
+        evaluateCriteriaOperation.setEvaluateStagesAndCaseInstanceCompletion(false);
+        evaluateCriteriaOperation.setMigrationContext(migrationContext);
+        addOperation(evaluateCriteriaOperation);
+    }
+    
     protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
         EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent);
         evaluateCriteriaOperation.setEvaluateStagesAndCaseInstanceCompletion(evaluateCaseInstanceCompleted);

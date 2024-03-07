@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
@@ -62,6 +63,11 @@ public interface ChangePlanItemStateBuilder {
      * Set multiple plan items to available state by definition id.
      */
     ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinitionIds(List<String> planItemDefinitionIds);
+    
+    /**
+     * Set a plan item to available state by definition mapping.
+     */
+    ChangePlanItemStateBuilder changeToAvailableStateByPlanItemDefinition(MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping);
     
     /**
      * Terminate a plan item by definition id without terminating another plan item instance.

@@ -371,7 +371,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
         
         for (MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping : document.getMoveToAvailablePlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinition(planItemDefinitionMapping);
         }
         
         for (WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getWaitingForRepetitionPlanItemDefinitionMappings()) {
