@@ -277,9 +277,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setCaseInstanceId(caseInstance.getId())
                 .setCaseDefinitionToMigrateTo(caseDefinitionToMigrateTo)
                 .setActivatePlanItemDefinitions(filterByCondition(changePlanItemStateBuilder.getActivatePlanItemDefinitions(), caseInstance))
-                .setTerminatePlanItemDefinitions(filterByCondition(changePlanItemStateBuilder.getTerminatePlanItemDefinitions(), caseInstance))
+                .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
                 .setChangePlanItemDefinitionsToAvailable(filterByCondition(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions(), caseInstance))
-                .setWaitingForRepetitionPlanItemDefinitions(filterByCondition(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions(), caseInstance))
+                .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())
                 .setRemoveWaitingForRepetitionPlanItemDefinitions(filterByCondition(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions(), caseInstance))
                 .setChangePlanItemIds(changePlanItemStateBuilder.getChangePlanItemIds())
                 .setChangePlanItemIdsWithDefinitionId(changePlanItemStateBuilder.getChangePlanItemIdsWithDefinitionId())
@@ -303,23 +303,6 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         if (document.getPostUpgradeExpression() != null && !document.getPostUpgradeExpression().isEmpty()) {
             cmmnEngineConfiguration.getExpressionManager().createExpression(document.getPostUpgradeExpression()).getValue(caseInstance);
         }
-    }
-
-    protected <T extends PlanItemDefinitionMapping> Set<T> filterByCondition(Set<T> planItemDefinitions, CaseInstanceEntity caseInstance) {
-        Set<T> result = new HashSet<>();
-        for (T planItemDefinition : planItemDefinitions) {
-            if (planItemDefinition.getCondition() == null) {
-                result.add(planItemDefinition);
-            } else {
-                Object conditionResult = cmmnEngineConfiguration.getExpressionManager().createExpression(planItemDefinition.getCondition())
-                        .getValue(caseInstance);
-                if (conditionResult instanceof Boolean condition && condition) {
-                    result.add(planItemDefinition);
-                }
-            }
-
-        }
-        return result;
     }
 
     protected void doMigrateHistoricCaseInstance(HistoricCaseInstanceEntity historicCaseInstance, CaseDefinition caseDefinitionToMigrateTo, HistoricCaseInstanceMigrationDocument document, CommandContext commandContext) {
