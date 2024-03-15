@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,28 +42,22 @@ public class HistoricProcessInstanceEntityManagerImpl
 
     @Override
     public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        if (getHistoryManager().isHistoryEnabled()) {
+        //removed the check of history level, because history level could be defined by definition
             return dataManager.findHistoricProcessInstanceCountByQueryCriteria(historicProcessInstanceQuery);
-        }
-        return 0;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        if (getHistoryManager().isHistoryEnabled()) {
+        //removed the check of history level, because history level could be defined by definition
             return dataManager.findHistoricProcessInstancesByQueryCriteria(historicProcessInstanceQuery);
-        }
-        return Collections.EMPTY_LIST;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        if (getHistoryManager().isHistoryEnabled()) {
+        //removed the check of history level, because history level could be defined by definition
             return dataManager.findHistoricProcessInstancesAndVariablesByQueryCriteria(historicProcessInstanceQuery);
-        }
-        return Collections.EMPTY_LIST;
     }
 
     @Override

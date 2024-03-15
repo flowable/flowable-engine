@@ -285,7 +285,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
 
     @Override
     public boolean isHistoryEnabledForVariables(HistoricProcessInstance historicProcessInstance) {
-        return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
+        return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, historicProcessInstance.getProcessDefinitionId());
     }
 
     @Override
