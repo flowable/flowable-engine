@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -28,8 +27,7 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * @author Christopher Welsch
@@ -37,17 +35,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
     protected HistoryLevel engineHistoryLevel;
-
-    static Stream<Arguments> historyLevels() {
-        return Stream.of(
-                Arguments.of(HistoryLevel.NONE),
-                Arguments.of(HistoryLevel.INSTANCE),
-                Arguments.of(HistoryLevel.TASK),
-                Arguments.of(HistoryLevel.ACTIVITY),
-                Arguments.of(HistoryLevel.AUDIT),
-                Arguments.of(HistoryLevel.FULL)
-        );
-    }
 
     @BeforeEach
     public void prepare() {
@@ -60,7 +47,7 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
+    @EnumSource
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelNoneProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelNone(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
@@ -82,8 +69,8 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
-    @org.flowable.engine.test.Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelTaskProcess.bpmn20.xml" })
+    @EnumSource
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelTaskProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelTask(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
@@ -108,8 +95,8 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
-    @org.flowable.engine.test.Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceProcess.bpmn20.xml" })
+    @EnumSource
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelInstance(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
 
@@ -134,8 +121,8 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
-    @org.flowable.engine.test.Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
+    @EnumSource
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelActivity(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
@@ -156,8 +143,8 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
-    @org.flowable.engine.test.Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
+    @EnumSource
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelAudit(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")
@@ -178,8 +165,8 @@ public class DeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase
     }
 
     @ParameterizedTest
-    @MethodSource("historyLevels")
-    @org.flowable.engine.test.Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
+    @EnumSource
+    @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
     public void testDeleteVariableInstancesWithHistoryLevelFull(HistoryLevel historyLevel) {
         processEngineConfiguration.setHistoryLevel(historyLevel);
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess")

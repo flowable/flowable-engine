@@ -42,22 +42,19 @@ public class HistoricProcessInstanceEntityManagerImpl
 
     @Override
     public long findHistoricProcessInstanceCountByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        //removed the check of history level, because history level could be defined by definition
-            return dataManager.findHistoricProcessInstanceCountByQueryCriteria(historicProcessInstanceQuery);
+        return dataManager.findHistoricProcessInstanceCountByQueryCriteria(historicProcessInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        //removed the check of history level, because history level could be defined by definition
-            return dataManager.findHistoricProcessInstancesByQueryCriteria(historicProcessInstanceQuery);
+        return dataManager.findHistoricProcessInstancesByQueryCriteria(historicProcessInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
-        //removed the check of history level, because history level could be defined by definition
-            return dataManager.findHistoricProcessInstancesAndVariablesByQueryCriteria(historicProcessInstanceQuery);
+        return dataManager.findHistoricProcessInstancesAndVariablesByQueryCriteria(historicProcessInstanceQuery);
     }
 
     @Override
