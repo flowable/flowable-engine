@@ -129,8 +129,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-            if (getHistoryConfigurationSettings().isHistoryEnabledForVariables(historicProcessInstance)) {
-                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+
+            if (getHistoryConfigurationSettings().isHistoryEnabledForVariables(processDefinitionId)) {
+                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
+                        .deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
             }
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);

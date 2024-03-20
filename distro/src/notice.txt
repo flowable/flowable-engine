@@ -104,9 +104,9 @@ org.liquibase                   liquibase-core              4.5.0           Apac
 org.mybatis                     mybatis                     3.5.13          The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              3.0.3           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
-org.slf4j                       jcl-over-slf4j              2.0.11           MIT License
-org.slf4j                       slf4j-api                   2.0.11           MIT License
-org.slf4j                       slf4j-log4j12               2.0.11           MIT License
+org.slf4j                       jcl-over-slf4j              2.0.11          MIT License
+org.slf4j                       slf4j-api                   2.0.11          MIT License
+org.slf4j                       slf4j-log4j12               2.0.11          MIT License
 org.springframework             spring-beans                6.1.3           The Apache Software License, Version 2.0
 org.springframework             spring-core                 6.1.3           The Apache Software License, Version 2.0
 org.springframework             spring-context              6.1.3           The Apache Software License, Version 2.0
@@ -127,3 +127,11 @@ org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGra
 org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
 xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0
 xml-apis                        xml-apis                    1.4.01          The Apache Software License, Version 2.0-The SAX License-The W3C License
+
+When using the Flowable Rest app, there are a number of additional libraries included, which are otherwise not a dependency of Flowable:
+
+org.eclipse.angus               angus-mail                  2.0.2            EPL 2.0, GPL with classpath exception
+jakarta.annotation              jakarta.annotation-api      2.1.1            EPL 2.0, GPL with classpath exception
+jakarta.jms                     jakarta.jms-api             3.1.0            EPL 2.0, GPL with classpath exception
+jakarta.mail                    jakarta.mail-api            2.1.2            EPL 2.0, GPL with classpath exception
+org.openjdk.nashorn             nashorn-core                15.4             GPL with classpath exception

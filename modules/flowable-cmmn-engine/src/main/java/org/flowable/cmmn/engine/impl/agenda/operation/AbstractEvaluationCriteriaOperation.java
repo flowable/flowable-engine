@@ -44,6 +44,7 @@ import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
@@ -107,6 +108,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // if we need to activate the plan item, mark the result as some criteria changed and plan the activation of the plan item by adding
             // this as an operation to the agenda
             if (activatePlanItemInstance) {
+                planItemInstanceEntity.setPlannedForActivationInMigration(true);
                 evaluationResult.markCriteriaChanged();
                 CommandContextUtil.getAgenda(commandContext)
                     .planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null);
@@ -144,7 +146,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 
             if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity);
+                boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity, null);
                 if (criteriaChangeOrActiveChildrenForStage) {
                     evaluationResult.markCriteriaChanged();
                     planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
@@ -189,15 +191,21 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      * Returns false if no sentry changes happened and none of the passed plan item instances are active.
      * This means that the parent of these plan item instances also now can change its state.
      */
-    protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer) {
+    protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer, MigrationContext migrationContext) {
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
         
         // needed because when doing case instance migration the child plan item instances can be null
-        if (planItemInstances == null && planItemInstanceContainer instanceof CaseInstanceEntity) {
+        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) && 
+                planItemInstanceContainer instanceof CaseInstanceEntity) {
+            
             PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
             CaseInstanceEntity caseInstance = (CaseInstanceEntity) planItemInstanceContainer;
             planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
             planItemInstanceContainer.setChildPlanItemInstances(planItemInstances);
+            
+            if (migrationContext != null && migrationContext.isFetchPlanItemInstances()) {
+                migrationContext.setFetchPlanItemInstances(false);
+            }
         }
 
         // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
@@ -212,7 +220,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             String state = planItemInstanceEntity.getState();
 
             // check, if the plan item is in an evaluation state (e.g. available or waiting for repetition) to check for its activation
-            if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
+            if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state) && !planItemInstanceEntity.isPlannedForActivationInMigration()) {
                 evaluateForActivation(planItemInstanceEntity, planItemInstanceContainer, evaluationResult);
             }
 

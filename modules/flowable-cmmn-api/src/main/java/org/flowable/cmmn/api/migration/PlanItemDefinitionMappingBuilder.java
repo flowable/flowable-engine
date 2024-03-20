@@ -38,6 +38,12 @@ public class PlanItemDefinitionMappingBuilder {
         return new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId);
     }
     
+    public static MoveToAvailablePlanItemDefinitionMapping createMoveToAvailablePlanItemDefinitionMappingFor(
+            String planItemDefinitionId, Map<String, Object> withLocalVariables) {
+        
+        return new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId, withLocalVariables);
+    }
+    
     public static WaitingForRepetitionPlanItemDefinitionMapping createWaitingForRepetitionPlanItemDefinitionMappingFor(String planItemDefinitionId) {
         return new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
     }

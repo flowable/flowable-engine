@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class EvaluateCriteriaOperation extends AbstractEvaluationCriteriaOperation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EvaluateCriteriaOperation.class);
+    
+    protected MigrationContext migrationContext;
 
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null, null);
@@ -53,7 +56,7 @@ public class EvaluateCriteriaOperation extends AbstractEvaluationCriteriaOperati
                             satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
         } else {
-            boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
+            boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity, migrationContext);
             if (evaluateStagesAndCaseInstanceCompletion
                     && evaluatePlanModelComplete()
                     && !criteriaChangeOrActiveChildren
@@ -91,5 +94,12 @@ public class EvaluateCriteriaOperation extends AbstractEvaluationCriteriaOperati
 
         return stringBuilder.toString();
     }
-    
+
+    public MigrationContext getMigrationContext() {
+        return migrationContext;
+    }
+
+    public void setMigrationContext(MigrationContext migrationContext) {
+        this.migrationContext = migrationContext;
+    }
 }
