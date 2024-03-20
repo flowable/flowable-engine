@@ -28,7 +28,7 @@
 		<slf4j.version>2.0.11</slf4j.version>
 		<groovy.version>4.0.17</groovy.version>
 		<jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
-		<native-build-tools-plugin.version>0.9.27</native-build-tools-plugin.version>
+		<native-build-tools-plugin.version>0.10.1</native-build-tools-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
 		<junit.jupiter.version>5.10.1</junit.jupiter.version>
