@@ -26,8 +26,6 @@ public class FlowableCommonRuntimeHints implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
-        resourceHints.registerPattern("META-INF/services/liquibase.hub.HubService");
-        resourceHints.registerPattern("META-INF/services/liquibase.license.LicenseService");
         resourceHints.registerResourceBundle("org.flowable.common.engine.impl.de.odysseus.el.misc.LocalStrings");
         // If we can detect which DB is being used we can perhaps register only the appropriate DB file
         resourceHints.registerPattern("org/flowable/common/db/properties/*.properties");
