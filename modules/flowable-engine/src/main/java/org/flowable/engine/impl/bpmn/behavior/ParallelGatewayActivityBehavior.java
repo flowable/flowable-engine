@@ -90,7 +90,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         // Is needed to set the endTime for all historic activity joins
         CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
 
-        if (nbrOfExecutionsCurrentlyJoined == nbrOfExecutionsToJoin) {
+        if (nbrOfExecutionsCurrentlyJoined == nbrOfExecutionsToJoin || isLatestTaskOfParallelGateway(execution.getProcessInstanceId())) {
 
             // Fork
             if (LOGGER.isDebugEnabled()) {
@@ -120,6 +120,22 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
                     execution.getId(), nbrOfExecutionsCurrentlyJoined, nbrOfExecutionsToJoin);
         }
 
+    }
+
+    /**
+     * Determine if it is the last active task of the parallel gateway
+     *
+     * @param processInstanceId The process instance ID
+     * @return The result is true for the last parallel activity task, otherwise it is not the last parallel activity task.
+     */
+    private boolean isLatestTaskOfParallelGateway(String processInstanceId) {
+        long unfinishedTaskCount = CommandContextUtil.getProcessEngineConfiguration()
+                .getRuntimeService()
+                .createActivityInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .unfinished()
+                .count();
+        return unfinishedTaskCount == 1;
     }
 
     protected Collection<ExecutionEntity> cleanJoinedExecutions(Collection<ExecutionEntity> joinedExecutions, DelegateExecution multiInstanceExecution) {
