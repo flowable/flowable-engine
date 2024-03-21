@@ -465,15 +465,17 @@ public abstract class AbstractCmmnDynamicStateManager {
                 for (PlanItemInstance planItemInstance : planItemInstances) {
                     if (planItemInstance.getState().equalsIgnoreCase(PlanItemInstanceState.WAITING_FOR_REPETITION)) {
                         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-                        
-                        Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-                        CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                        planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
-                        planItemInstanceEntity.setEndedTime(currentTime);
-                        planItemInstanceEntity.setTerminatedTime(currentTime);
-                        cmmnHistoryManager.recordPlanItemInstanceTerminated(planItemInstanceEntity);
-                        
-                        planItemInstanceEntityManager.delete(planItemInstanceEntity);
+
+                        if (evaluateCondition(planItemInstanceEntity, planItemDefinitionMapping)) {
+                            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
+                            CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+                            planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                            planItemInstanceEntity.setEndedTime(currentTime);
+                            planItemInstanceEntity.setTerminatedTime(currentTime);
+                            cmmnHistoryManager.recordPlanItemInstanceTerminated(planItemInstanceEntity);
+
+                            planItemInstanceEntityManager.delete(planItemInstanceEntity);
+                        }
                     }
                 }
             }
