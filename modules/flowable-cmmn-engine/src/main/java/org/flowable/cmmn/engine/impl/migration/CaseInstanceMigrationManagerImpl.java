@@ -276,7 +276,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         CaseInstanceChangeState caseInstanceChangeState = new CaseInstanceChangeState()
                 .setCaseInstanceId(caseInstance.getId())
                 .setCaseDefinitionToMigrateTo(caseDefinitionToMigrateTo)
-                .setActivatePlanItemDefinitions(filterByCondition(changePlanItemStateBuilder.getActivatePlanItemDefinitions(), caseInstance))
+                .setActivatePlanItemDefinitions(changePlanItemStateBuilder.getActivatePlanItemDefinitions())
                 .setTerminatePlanItemDefinitions(changePlanItemStateBuilder.getTerminatePlanItemDefinitions())
                 .setChangePlanItemDefinitionsToAvailable(filterByCondition(changePlanItemStateBuilder.getChangeToAvailableStatePlanItemDefinitions(), caseInstance))
                 .setWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getWaitingForRepetitionPlanItemDefinitions())

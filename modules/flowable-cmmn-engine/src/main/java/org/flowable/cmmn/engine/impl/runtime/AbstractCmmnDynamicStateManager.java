@@ -231,7 +231,11 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
 
             PlanItemInstanceEntity newPlanItemInstance = createStagesAndPlanItemInstances(planItem, 
-                            caseInstance, caseInstanceChangeState, commandContext);
+                            caseInstance, caseInstanceChangeState, planItemDefinitionMapping, commandContext);
+
+            if (newPlanItemInstance == null) {
+                continue; // condition evaluated to false, this plan item should not be activated
+            }
             
             if (planItemDefinitionMapping.getWithLocalVariables() != null && !planItemDefinitionMapping.getWithLocalVariables().isEmpty()) {
                 newPlanItemInstance.setVariablesLocal(planItemDefinitionMapping.getWithLocalVariables());
@@ -829,7 +833,7 @@ public abstract class AbstractCmmnDynamicStateManager {
     }
     
     protected PlanItemInstanceEntity createStagesAndPlanItemInstances(PlanItem planItem, CaseInstanceEntity caseInstance, 
-            CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
+            CaseInstanceChangeState caseInstanceChangeState, ActivatePlanItemDefinitionMapping planItemDefinitionMapping, CommandContext commandContext) {
         
         PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
         
@@ -838,13 +842,27 @@ public abstract class AbstractCmmnDynamicStateManager {
         Stage stage = planItemDefinition.getParentStage();
             
         Map<String, List<PlanItemInstanceEntity>> runtimePlanItemInstanceMap = caseInstanceChangeState.getRuntimePlanItemInstances();
+        PlanItemInstanceEntity closestAncestorPlanItemInstance = null;
         while (stage != null) {
-            if (!stage.isPlanModel() && !caseInstanceChangeState.getCreatedStageInstances().containsKey(stage.getId()) && 
-                    !isStageAncestorOfAnyPlanItemInstance(stage.getId(), runtimePlanItemInstanceMap)) {
-                
-                stagesToCreate.put(stage.getId(), stage);
+            if (!stage.isPlanModel() && !caseInstanceChangeState.getCreatedStageInstances().containsKey(stage.getId())) {
+                PlanItemInstanceEntity stageAncestorInstance = getStageAncestorOfAnyPlanItemInstance(stage.getId(), runtimePlanItemInstanceMap);
+                if (stageAncestorInstance == null) {
+                    stagesToCreate.put(stage.getId(), stage);
+                } else if (closestAncestorPlanItemInstance == null) {
+                    closestAncestorPlanItemInstance = stageAncestorInstance;
+                }
             }
             stage = stage.getParentStage();
+        }
+
+        if (closestAncestorPlanItemInstance == null) {
+            if (!evaluateCondition(caseInstance, planItemDefinitionMapping)) {
+                return null;
+            }
+        } else {
+            if (!evaluateCondition(closestAncestorPlanItemInstance, planItemDefinitionMapping)) {
+                return null;
+            }
         }
 
         // Build the stage hierarchy
@@ -952,23 +970,23 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
     }
 
-    protected boolean isStageAncestorOfAnyPlanItemInstance(String stageId, Map<String, List<PlanItemInstanceEntity>> planItemInstanceMap) {
+    protected PlanItemInstanceEntity getStageAncestorOfAnyPlanItemInstance(String stageId, Map<String, List<PlanItemInstanceEntity>> planItemInstanceMap) {
         for (List<PlanItemInstanceEntity> planItemInstanceList : planItemInstanceMap.values()) {
             for (PlanItemInstanceEntity planItemInstance : planItemInstanceList) {
                 if (planItemInstance.getPlanItem() != null) {
                     PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
-                    
+
                     if (planItemDefinition.getId().equals(stageId)) {
-                        return true;
+                        return planItemInstance;
                     }
-        
+
                     if (isStageAncestor(stageId, planItemDefinition)) {
-                        return true;
+                        return planItemInstance;
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
     protected boolean isStageAncestor(String stageId, PlanItemDefinition planItemDefinition) {
