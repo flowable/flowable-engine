@@ -314,6 +314,12 @@ public abstract class AbstractCmmnDynamicStateManager {
                         }
                     }
                 }
+
+                boolean conditionResult = (parentPlanItemInstance != null && evaluateCondition(parentPlanItemInstance, planItemDefinitionMapping))
+                        || (parentPlanItemInstance == null && evaluateCondition(caseInstance, planItemDefinitionMapping));
+                if (!conditionResult) {
+                    continue;
+                }
                 
                 PlanItemInstanceEntity availablePlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
                         .planItem(planItem)
@@ -1244,17 +1250,6 @@ public abstract class AbstractCmmnDynamicStateManager {
             caseDefinitionIdToMigrateTo = caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId();
         }
         return caseDefinitionIdToMigrateTo;
-    }
-
-    protected <T extends PlanItemDefinitionMapping> Set<T> filterByCondition(Set<T> planItemDefinitions, VariableContainer variableContainer) {
-        Set<T> result = new HashSet<>();
-        for (T planItemDefinition : planItemDefinitions) {
-            if (evaluateCondition(variableContainer, planItemDefinition)) {
-                result.add(planItemDefinition);
-            }
-
-        }
-        return result;
     }
 
     protected <T extends PlanItemDefinitionMapping> boolean evaluateCondition(VariableContainer variableContainer, T planItemDefinitionMapping) {
