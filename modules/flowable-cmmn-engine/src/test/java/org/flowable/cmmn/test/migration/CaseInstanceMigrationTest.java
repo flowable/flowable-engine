@@ -2970,6 +2970,150 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
     }
     
     @Test
+    void withAdditionalReptitionTask() {
+        // Arrange
+        CaseDefinition originalDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/repetition-task.cmmn.xml");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(originalDefinition.getId())
+                .start();
+
+        // Assert
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("repeatableTask");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("repeatableTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        Map<String, Object> localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("repetitionCounter")).isEqualTo(1);
+
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/repetition-task-new-repetition-task.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("repeatableTask2"))
+                .migrate(caseInstance.getId());
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("repeatableTask2").singleResult();
+        assertThat(task.getName()).isEqualTo("repeatableTask2");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("repeatableTask2").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("repetitionCounter2")).isEqualTo(1);
+        
+        // Assert
+        cmmnTaskService.complete(task.getId());
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("repeatableTask2").singleResult();
+        assertThat(task.getName()).isEqualTo("repeatableTask2");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("repeatableTask2").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("repetitionCounter2")).isEqualTo(2);
+    }
+    
+    @Test
+    void withAdditionalRepetitionWithTwoTasks() {
+        // Arrange
+        CaseDefinition originalDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/repetition-2tasks.cmmn.xml");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionId(originalDefinition.getId())
+                .start();
+
+        // Assert
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("initialTask");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("initialTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        Map<String, Object> localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("initialCounter")).isEqualTo(1);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dependingTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        assertThat(planItemInstances.get(0).getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        localVarMap  = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("dependingCounter")).isEqualTo(1);
+        
+        cmmnTaskService.complete(task.getId());
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("dependingTask").singleResult();
+        assertThat(task.getName()).isEqualTo("dependingTask");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dependingTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(2);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dependingTask").planItemInstanceStateActive().list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("dependingCounter")).isEqualTo(1);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("dependingTask").planItemInstanceStateWaitingForRepetition().list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("dependingCounter")).isEqualTo(2);
+
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/repetition-2tasks-new-repetition-2tasks.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("extraInitialTask"))
+                .addMoveToAvailablePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("extraDependingTask"))
+                .migrate(caseInstance.getId());
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("extraInitialTask").singleResult();
+        assertThat(task.getName()).isEqualTo("extraInitialTask");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("extraInitialTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("extraInitialCounter")).isEqualTo(1);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("extraDependingTask").count()).isEqualTo(0);
+        
+        // Assert
+        cmmnTaskService.complete(task.getId());
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("extraDependingTask").singleResult();
+        assertThat(task.getName()).isEqualTo("extraDependingTask");
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("extraDependingTask").list();
+        assertThat(planItemInstances.size()).isEqualTo(2);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("extraDependingTask").planItemInstanceStateActive().list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("extraDependingCounter")).isEqualTo(1);
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("extraDependingTask").planItemInstanceStateWaitingForRepetition().list();
+        assertThat(planItemInstances.size()).isEqualTo(1);
+        
+        localVarMap = cmmnRuntimeService.getLocalVariables(planItemInstances.get(0).getId());
+        assertThat(localVarMap.size()).isEqualTo(1);
+        assertThat(localVarMap.get("extraDependingCounter")).isEqualTo(2);
+    }
+    
+    @Test
     void migrateCaseInstancesWithSimpleOneTaskCaseWithMappingToSecondNewTask() {
         // Arrange
         deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");

@@ -256,6 +256,9 @@ public abstract class AbstractCmmnDynamicStateManager {
                 if (evaluateRepetitionRule(newPlanItemInstance, commandContext)) {
                     createPlanItemInstanceDuplicateForRepetition(newPlanItemInstance, commandContext);
                 }
+            
+            } else if (hasRepetitionRule(newPlanItemInstance)) {
+                setRepetitionCounter(newPlanItemInstance, 1);
             }
         }
     }
@@ -320,6 +323,10 @@ public abstract class AbstractCmmnDynamicStateManager {
                 
                 if (planItem.getPlanItemDefinition() instanceof Stage) {
                     caseInstanceChangeState.addCreatedStageInstance(planItemDefinitionMapping.getPlanItemDefinitionId(), availablePlanItemInstance);
+                }
+                
+                if (hasRepetitionRule(availablePlanItemInstance)) {
+                    setRepetitionCounter(availablePlanItemInstance, 1);
                 }
                 
                 if (planItemDefinitionMapping.getWithLocalVariables() != null && !planItemDefinitionMapping.getWithLocalVariables().isEmpty()) {
