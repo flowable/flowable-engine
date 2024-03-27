@@ -265,6 +265,34 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
+     * Test getting a list of case instance, using all tenant filters.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testSortByBusinessKey() throws Exception {
+        String businessKey3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey3").start().getId();
+        String businessKey1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey1").start().getId();
+        String businessKey2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey2").start().getId();
+
+        List<String> sortedIds = new ArrayList<>();
+        sortedIds.add(businessKey1);
+        sortedIds.add(businessKey2);
+        sortedIds.add(businessKey1);
+        Collections.sort(sortedIds);
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey1, businessKey2);
+
+        // Sort by businessKey time
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=businessKey";
+        assertResultsExactlyPresentInDataResponse(url, businessKey1, businessKey2, businessKey3);
+
+        // Sort by businessKey time desc
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=businessKey&order=desc";
+        assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey2, businessKey1);
+    }
+
+    /**
      * Test getting a list of case instance, using the variable selector
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
