@@ -273,12 +273,6 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         String businessKey1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey1").start().getId();
         String businessKey2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey2").start().getId();
 
-        List<String> sortedIds = new ArrayList<>();
-        sortedIds.add(businessKey1);
-        sortedIds.add(businessKey2);
-        sortedIds.add(businessKey1);
-        Collections.sort(sortedIds);
-
         // Test without any parameters
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
         assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey1, businessKey2);
