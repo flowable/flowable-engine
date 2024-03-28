@@ -133,6 +133,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
             mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getNewAssignee());
+            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
             mappingsArray.add(mappingNode);
         }
 
@@ -145,6 +146,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (TerminatePlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
             mappingsArray.add(mappingNode);
         }
 
@@ -157,6 +159,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (MoveToAvailablePlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
             mappingsArray.add(mappingNode);
         }
 
@@ -169,6 +172,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (WaitingForRepetitionPlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
             mappingsArray.add(mappingNode);
         }
 
@@ -181,6 +185,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (RemoveWaitingForRepetitionPlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
+            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
             mappingsArray.add(mappingNode);
         }
 
@@ -234,6 +239,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     ActivatePlanItemDefinitionMapping activateDefinitionMapping = new ActivatePlanItemDefinitionMapping(planItemDefinitionId);
                     String newAssginee = getJsonProperty(NEW_ASSIGNEE_JSON_PROPERTY, mappingNode);
                     activateDefinitionMapping.setNewAssignee(newAssginee);
+                    String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
+                    activateDefinitionMapping.setCondition(condition);
                     
                     documentBuilder.addActivatePlanItemDefinitionMapping(activateDefinitionMapping);
                 }
@@ -244,6 +251,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                 for (JsonNode mappingNode : terminateMappingNodes) {
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     TerminatePlanItemDefinitionMapping terminateDefinitionMapping = new TerminatePlanItemDefinitionMapping(planItemDefinitionId);
+                    String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
+                    terminateDefinitionMapping.setCondition(condition);
                     documentBuilder.addTerminatePlanItemDefinitionMapping(terminateDefinitionMapping);
                 }
             }
@@ -253,6 +262,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                 for (JsonNode mappingNode : moveToAvailableMappingNodes) {
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     MoveToAvailablePlanItemDefinitionMapping moveToAvailableDefinitionMapping = new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId);
+                    String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
+                    moveToAvailableDefinitionMapping.setCondition(condition);
                     documentBuilder.addMoveToAvailablePlanItemDefinitionMapping(moveToAvailableDefinitionMapping);
                 }
             }
@@ -262,6 +273,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                 for (JsonNode mappingNode : waitingForRepetitionMappingNodes) {
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     WaitingForRepetitionPlanItemDefinitionMapping waitingForRepetitionDefinitionMapping = new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
+                    String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
+                    waitingForRepetitionDefinitionMapping.setCondition(condition);
                     documentBuilder.addWaitingForRepetitionPlanItemDefinitionMapping(waitingForRepetitionDefinitionMapping);
                 }
             }
@@ -271,6 +284,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                 for (JsonNode mappingNode : removeWaitingForRepetitionMappingNodes) {
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     RemoveWaitingForRepetitionPlanItemDefinitionMapping removeWaitingForRepetitionDefinitionMapping = new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
+                    String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
+                    removeWaitingForRepetitionDefinitionMapping.setCondition(condition);
                     documentBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionMapping(removeWaitingForRepetitionDefinitionMapping);
                 }
             }

@@ -28,6 +28,10 @@ public class MoveToAvailablePlanItemDefinitionMapping extends PlanItemDefinition
         this.withLocalVariables = withLocalVariables;
     }
 
+    public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
+        super(planItemDefinitionId, condition);
+    }
+
     public Map<String, Object> getWithLocalVariables() {
         return withLocalVariables;
     }

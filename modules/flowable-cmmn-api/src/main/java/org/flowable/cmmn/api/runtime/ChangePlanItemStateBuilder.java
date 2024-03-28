@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 
@@ -73,7 +76,12 @@ public interface ChangePlanItemStateBuilder {
      * Terminate a plan item by definition id without terminating another plan item instance.
      */
     ChangePlanItemStateBuilder terminatePlanItemDefinitionId(String planItemDefinitionId);
-    
+
+    /**
+     * Terminate a plan item by definition mapping without terminating another plan item instance.
+     */
+    ChangePlanItemStateBuilder terminatePlanItemDefinition(TerminatePlanItemDefinitionMapping planItemDefinition);
+
     /**
      * Terminate multiple plan items by definition id without terminating another plan item instance.
      */
@@ -85,6 +93,11 @@ public interface ChangePlanItemStateBuilder {
     ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId);
 
     /**
+     * Add waiting for repetition to a plan item by definition mapping.
+     */
+    ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinition(WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping);
+
+    /**
      * Add multiple waiting for repetitions to a plan item by definition id.
      */
     ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds);
@@ -93,6 +106,11 @@ public interface ChangePlanItemStateBuilder {
      * Remove waiting for repetition from a plan item by definition id.
      */
     ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId);
+
+    /**
+     * Remove waiting for repetition from a plan item by definition.
+     */
+    ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinition(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionId);
 
     /**
      * Remove multiple waiting for repetitions from a plan item by definition id.

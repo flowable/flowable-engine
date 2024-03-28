@@ -30,6 +30,16 @@ public class ActivatePlanItemDefinitionMapping extends PlanItemDefinitionMapping
         super(planItemDefinitionId);
     }
 
+    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
+        super(planItemDefinitionId, condition);
+    }
+
+    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String newAssignee, String condition, Map<String, Object> withLocalVariables) {
+        super(planItemDefinitionId, condition);
+        this.newAssignee = newAssignee;
+        this.withLocalVariables = withLocalVariables;
+    }
+
     public String getNewAssignee() {
         return newAssignee;
     }

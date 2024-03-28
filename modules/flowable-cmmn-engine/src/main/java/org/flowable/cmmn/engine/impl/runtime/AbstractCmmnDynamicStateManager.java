@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +30,7 @@ import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.PlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
@@ -229,7 +231,11 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
 
             PlanItemInstanceEntity newPlanItemInstance = createStagesAndPlanItemInstances(planItem, 
-                            caseInstance, caseInstanceChangeState, commandContext);
+                            caseInstance, caseInstanceChangeState, planItemDefinitionMapping, commandContext);
+
+            if (newPlanItemInstance == null) {
+                continue; // condition evaluated to false, this plan item should not be activated
+            }
             
             if (planItemDefinitionMapping.getWithLocalVariables() != null && !planItemDefinitionMapping.getWithLocalVariables().isEmpty()) {
                 newPlanItemInstance.setVariablesLocal(planItemDefinitionMapping.getWithLocalVariables());
@@ -310,6 +316,12 @@ public abstract class AbstractCmmnDynamicStateManager {
                             break;
                         }
                     }
+                }
+
+                boolean conditionResult = (parentPlanItemInstance != null && evaluateCondition(parentPlanItemInstance, planItemDefinitionMapping))
+                        || (parentPlanItemInstance == null && evaluateCondition(caseInstance, planItemDefinitionMapping));
+                if (!conditionResult) {
+                    continue;
                 }
                 
                 PlanItemInstanceEntity availablePlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
@@ -397,10 +409,13 @@ public abstract class AbstractCmmnDynamicStateManager {
                     .list();
             
             List<PlanItemInstance> waitingForRepetitionPlanItemInstances = new ArrayList<>();
+            PlanItemInstance activePlanItemInstance = null;
             if (planItemInstances != null && !planItemInstances.isEmpty()) {
                 for (PlanItemInstance planItemInstance : planItemInstances) {
                     if (planItemInstance.getState().equalsIgnoreCase(PlanItemInstanceState.WAITING_FOR_REPETITION)) {
                         waitingForRepetitionPlanItemInstances.add(planItemInstance);
+                    } else if (planItemInstance.getState().equalsIgnoreCase(PlanItemInstanceState.ACTIVE)) {
+                        activePlanItemInstance = planItemInstance;
                     }
                 }
             }
@@ -419,27 +434,31 @@ public abstract class AbstractCmmnDynamicStateManager {
                         }
                     }
                 }
-                
-                PlanItemInstanceEntity waitingForRepetitionPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
-                        .planItem(planItem)
-                        .caseDefinitionId(caseInstance.getCaseDefinitionId())
-                        .caseInstanceId(caseInstance.getId())
-                        .stagePlanItemInstance(parentPlanItemInstance)
-                        .tenantId(caseInstance.getTenantId())
-                        .addToParent(true)
-                        .create();
-                
-                if (planItem.getPlanItemDefinition() instanceof Stage) {
-                    caseInstanceChangeState.addCreatedStageInstance(planItemDefinitionMapping.getPlanItemDefinitionId(), waitingForRepetitionPlanItemInstance);
+
+                if ((activePlanItemInstance == null && parentPlanItemInstance == null && evaluateCondition(caseInstance, planItemDefinitionMapping))
+                        || (activePlanItemInstance instanceof PlanItemInstanceEntity
+                        && evaluateCondition((PlanItemInstanceEntity) activePlanItemInstance, planItemDefinitionMapping))
+                        || (parentPlanItemInstance != null && evaluateCondition(parentPlanItemInstance, planItemDefinitionMapping))) {
+
+                    PlanItemInstanceEntity waitingForRepetitionPlanItemInstance = planItemInstanceEntityManager.createPlanItemInstanceEntityBuilder()
+                            .planItem(planItem)
+                            .caseDefinitionId(caseInstance.getCaseDefinitionId())
+                            .caseInstanceId(caseInstance.getId())
+                            .stagePlanItemInstance(parentPlanItemInstance)
+                            .tenantId(caseInstance.getTenantId())
+                            .addToParent(true)
+                            .create();
+
+                    if (planItem.getPlanItemDefinition() instanceof Stage) {
+                        caseInstanceChangeState.addCreatedStageInstance(planItemDefinitionMapping.getPlanItemDefinitionId(), waitingForRepetitionPlanItemInstance);
+                    }
+
+                    CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+                    cmmnHistoryManager.recordPlanItemInstanceCreated(waitingForRepetitionPlanItemInstance);
+
+                    waitingForRepetitionPlanItemInstance.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+                    cmmnHistoryManager.recordPlanItemInstanceAvailable(waitingForRepetitionPlanItemInstance);
                 }
-                
-                CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                cmmnHistoryManager.recordPlanItemInstanceCreated(waitingForRepetitionPlanItemInstance);
-                
-                waitingForRepetitionPlanItemInstance.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
-                cmmnHistoryManager.recordPlanItemInstanceAvailable(waitingForRepetitionPlanItemInstance);
-                
-                continue;
             }
         }
     }
@@ -463,15 +482,17 @@ public abstract class AbstractCmmnDynamicStateManager {
                 for (PlanItemInstance planItemInstance : planItemInstances) {
                     if (planItemInstance.getState().equalsIgnoreCase(PlanItemInstanceState.WAITING_FOR_REPETITION)) {
                         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-                        
-                        Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
-                        CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                        planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
-                        planItemInstanceEntity.setEndedTime(currentTime);
-                        planItemInstanceEntity.setTerminatedTime(currentTime);
-                        cmmnHistoryManager.recordPlanItemInstanceTerminated(planItemInstanceEntity);
-                        
-                        planItemInstanceEntityManager.delete(planItemInstanceEntity);
+
+                        if (evaluateCondition(planItemInstanceEntity, planItemDefinitionMapping)) {
+                            Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
+                            CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+                            planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                            planItemInstanceEntity.setEndedTime(currentTime);
+                            planItemInstanceEntity.setTerminatedTime(currentTime);
+                            cmmnHistoryManager.recordPlanItemInstanceTerminated(planItemInstanceEntity);
+
+                            planItemInstanceEntityManager.delete(planItemInstanceEntity);
+                        }
                     }
                 }
             }
@@ -741,7 +762,8 @@ public abstract class AbstractCmmnDynamicStateManager {
                 List<PlanItemInstanceEntity> currentPlanItemInstanceList = currentPlanItemInstanceMap.get(planItemDefinitionMapping.getPlanItemDefinitionId());
                 for (PlanItemInstanceEntity planItemInstance : currentPlanItemInstanceList) {
                     if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState()) && 
-                            !PlanItemInstanceState.WAITING_FOR_REPETITION.equals(planItemInstance.getState())) {
+                            !PlanItemInstanceState.WAITING_FOR_REPETITION.equals(planItemInstance.getState()) &&
+                            evaluateCondition(planItemInstance, planItemDefinitionMapping)) {
                         
                         terminatePlanItemInstance(planItemInstance, commandContext);
                         caseInstanceChangeState.addTerminatedPlanItemInstance(planItemInstance.getPlanItemDefinitionId(), planItemInstance);
@@ -824,7 +846,7 @@ public abstract class AbstractCmmnDynamicStateManager {
     }
     
     protected PlanItemInstanceEntity createStagesAndPlanItemInstances(PlanItem planItem, CaseInstanceEntity caseInstance, 
-            CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
+            CaseInstanceChangeState caseInstanceChangeState, ActivatePlanItemDefinitionMapping planItemDefinitionMapping, CommandContext commandContext) {
         
         PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
         
@@ -833,13 +855,27 @@ public abstract class AbstractCmmnDynamicStateManager {
         Stage stage = planItemDefinition.getParentStage();
             
         Map<String, List<PlanItemInstanceEntity>> runtimePlanItemInstanceMap = caseInstanceChangeState.getRuntimePlanItemInstances();
+        PlanItemInstanceEntity closestAncestorPlanItemInstance = null;
         while (stage != null) {
-            if (!stage.isPlanModel() && !caseInstanceChangeState.getCreatedStageInstances().containsKey(stage.getId()) && 
-                    !isStageAncestorOfAnyPlanItemInstance(stage.getId(), runtimePlanItemInstanceMap)) {
-                
-                stagesToCreate.put(stage.getId(), stage);
+            if (!stage.isPlanModel() && !caseInstanceChangeState.getCreatedStageInstances().containsKey(stage.getId())) {
+                PlanItemInstanceEntity stageAncestorInstance = getStageAncestorOfAnyPlanItemInstance(stage.getId(), runtimePlanItemInstanceMap);
+                if (stageAncestorInstance == null) {
+                    stagesToCreate.put(stage.getId(), stage);
+                } else if (closestAncestorPlanItemInstance == null) {
+                    closestAncestorPlanItemInstance = stageAncestorInstance;
+                }
             }
             stage = stage.getParentStage();
+        }
+
+        if (closestAncestorPlanItemInstance == null) {
+            if (!evaluateCondition(caseInstance, planItemDefinitionMapping)) {
+                return null;
+            }
+        } else {
+            if (!evaluateCondition(closestAncestorPlanItemInstance, planItemDefinitionMapping)) {
+                return null;
+            }
         }
 
         // Build the stage hierarchy
@@ -947,23 +983,23 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
     }
 
-    protected boolean isStageAncestorOfAnyPlanItemInstance(String stageId, Map<String, List<PlanItemInstanceEntity>> planItemInstanceMap) {
+    protected PlanItemInstanceEntity getStageAncestorOfAnyPlanItemInstance(String stageId, Map<String, List<PlanItemInstanceEntity>> planItemInstanceMap) {
         for (List<PlanItemInstanceEntity> planItemInstanceList : planItemInstanceMap.values()) {
             for (PlanItemInstanceEntity planItemInstance : planItemInstanceList) {
                 if (planItemInstance.getPlanItem() != null) {
                     PlanItemDefinition planItemDefinition = planItemInstance.getPlanItem().getPlanItemDefinition();
-                    
+
                     if (planItemDefinition.getId().equals(stageId)) {
-                        return true;
+                        return planItemInstance;
                     }
-        
+
                     if (isStageAncestor(stageId, planItemDefinition)) {
-                        return true;
+                        return planItemInstance;
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
     protected boolean isStageAncestor(String stageId, PlanItemDefinition planItemDefinition) {
@@ -1221,6 +1257,15 @@ public abstract class AbstractCmmnDynamicStateManager {
             caseDefinitionIdToMigrateTo = caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId();
         }
         return caseDefinitionIdToMigrateTo;
+    }
+
+    protected <T extends PlanItemDefinitionMapping> boolean evaluateCondition(VariableContainer variableContainer, T planItemDefinitionMapping) {
+        if (planItemDefinitionMapping.getCondition() != null) {
+            Object conditionResult = cmmnEngineConfiguration.getExpressionManager().createExpression(planItemDefinitionMapping.getCondition())
+                    .getValue(variableContainer);
+            return conditionResult instanceof Boolean condition && condition;
+        }
+        return true;
     }
 
 }
