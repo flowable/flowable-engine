@@ -50,6 +50,7 @@ public class BaseCaseInstanceResource {
         allowedSortProperties.put("id", CaseInstanceQueryProperty.CASE_INSTANCE_ID);
         allowedSortProperties.put("startTime", CaseInstanceQueryProperty.CASE_START_TIME);
         allowedSortProperties.put("tenantId", CaseInstanceQueryProperty.TENANT_ID);
+        allowedSortProperties.put("businessKey", CaseInstanceQueryProperty.BUSINESS_KEY);
     }
 
     @Autowired

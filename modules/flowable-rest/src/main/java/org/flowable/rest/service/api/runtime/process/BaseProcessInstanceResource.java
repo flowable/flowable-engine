@@ -50,6 +50,7 @@ public class BaseProcessInstanceResource {
         allowedSortProperties.put("id", ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
         allowedSortProperties.put("startTime", ProcessInstanceQueryProperty.PROCESS_START_TIME);
         allowedSortProperties.put("tenantId", ProcessInstanceQueryProperty.TENANT_ID);
+        allowedSortProperties.put("businessKey", ProcessInstanceQueryProperty.BUSINESS_KEY);
     }
 
     @Autowired

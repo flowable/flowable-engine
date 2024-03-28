@@ -294,6 +294,41 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     }
 
     /**
+     * Test getting a list of sorted process instance
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testGetProcessInstancesSortedByBusinessKey() throws Exception {
+        Instant initialTime = Instant.now();
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime));
+        String businessKey3 = runtimeService.startProcessInstanceByKey("processOne", "businessKey3").getId();
+
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime.plus(1, ChronoUnit.HOURS)));
+        String businessKey1 = runtimeService.startProcessInstanceByKey("processOne", "businessKey1").getId();
+
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(initialTime.minus(1, ChronoUnit.HOURS)));
+        String businessKey2 = runtimeService.startProcessInstanceByKey("processOne", "businessKey2").getId();
+
+        List<String> sortedIds = new ArrayList<>();
+        sortedIds.add(businessKey3);
+        sortedIds.add(businessKey1);
+        sortedIds.add(businessKey2);
+        Collections.sort(sortedIds);
+
+        // Test without any parameters
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION);
+        assertResultsExactlyPresentInDataResponse(url, sortedIds.toArray(new String[0]));
+
+        // Sort by businessKey
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?sort=businessKey";
+        assertResultsExactlyPresentInDataResponse(url, businessKey1, businessKey2, businessKey3);
+
+        // Sort by businessKey desc
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?sort=businessKey&order=desc";
+        assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey2, businessKey1);
+    }
+
+    /**
      * Test getting a list of process instance, using all tenant filters.
      */
     @Test
