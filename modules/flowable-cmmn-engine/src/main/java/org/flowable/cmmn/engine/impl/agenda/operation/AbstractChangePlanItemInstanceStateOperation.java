@@ -118,7 +118,9 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             stringBuilder.append(planItem);
         }
 
-        stringBuilder.append(" (PlanItemInstance id: ");
+        stringBuilder.append(" (CaseInstance id: ");
+        stringBuilder.append(planItemInstanceEntity.getCaseInstanceId());
+        stringBuilder.append(", PlanItemInstance id: ");
         stringBuilder.append(planItemInstanceEntity.getId());
         stringBuilder.append("), ");
 
