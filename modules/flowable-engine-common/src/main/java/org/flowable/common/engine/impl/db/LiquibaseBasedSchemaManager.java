@@ -42,16 +42,12 @@ import liquibase.ui.LoggerUIService;
  */
 public abstract class LiquibaseBasedSchemaManager implements SchemaManager {
 
-    private static final String LIQUIBASE_HUB_SERVICE_CLASS_NAME = "liquibase.hub.HubService";
     protected static final Map<String, Object> LIQUIBASE_SCOPE_VALUES = new HashMap<>();
 
     static {
-        if (ClassUtils.isPresent(LIQUIBASE_HUB_SERVICE_CLASS_NAME, null)) {
-            LIQUIBASE_SCOPE_VALUES.put("liquibase.plugin." + LIQUIBASE_HUB_SERVICE_CLASS_NAME, FlowableLiquibaseHubService.class);
-            LoggerUIService uiService = new LoggerUIService();
-            uiService.setStandardLogLevel(Level.FINE);
-            LIQUIBASE_SCOPE_VALUES.put(Scope.Attr.ui.name(), uiService);
-        }
+        LoggerUIService uiService = new LoggerUIService();
+        uiService.setStandardLogLevel(Level.FINE);
+        LIQUIBASE_SCOPE_VALUES.put(Scope.Attr.ui.name(), uiService);
     }
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
