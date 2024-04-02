@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.Deployment;
 
 /**
@@ -32,7 +33,11 @@ public interface DeploymentEntity extends Deployment, Entity {
     void addDeployedArtifact(Object deployedArtifact);
 
     <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    
+    void addProcessDefinitionCacheEntry(String processDefinitionId, ProcessDefinitionCacheEntry processDefinitionCacheEntry);
 
+    ProcessDefinitionCacheEntry getProcessDefinitionCacheEntry(String processDefinitionId);
+    
     void setName(String name);
 
     void setCategory(String category);

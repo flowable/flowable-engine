@@ -106,7 +106,7 @@ public class CmmnDeploymentManager {
             CmmnDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+            cachedCaseDefinition = deployment.getCaseDefinitionCacheEntry(caseDefinitionId);
 
             if (cachedCaseDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put case definition '" + caseDefinitionId + "' in the cache");

@@ -120,5 +120,6 @@ public class AppDeployer implements EngineDeployer {
         appDefinitionCache.add(appDefinition.getId(), cacheEntry);
 
         deployment.addDeployedArtifact(appDefinition);
+        deployment.addAppDefinitionCacheEntry(appDefinition.getId(), cacheEntry);
     }
 }
