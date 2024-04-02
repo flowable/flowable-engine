@@ -128,7 +128,7 @@ public class DeploymentManager {
             DeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
+            cachedProcessDefinition = deployment.getProcessDefinitionCacheEntry(processDefinitionId);
 
             if (cachedProcessDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put process definition '" + processDefinitionId + "' in the cache");
