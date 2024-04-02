@@ -505,12 +505,33 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 }
                 
             } else {
-                throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
-                
+                throw new FlowableIllegalArgumentException(buildUnresolvedCollectionExceptionMessage());
             }
         }
     }
-    
+
+    protected String buildUnresolvedCollectionExceptionMessage() {
+        StringBuilder exceptionStringBuilder = new StringBuilder("Couldn't resolve collection expression");
+        if (collectionExpression != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionExpression.getExpressionText());
+            exceptionStringBuilder.append(")");
+        }
+        exceptionStringBuilder.append(", variable reference");
+        if (collectionVariable != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionVariable);
+            exceptionStringBuilder.append(")");
+        }
+        exceptionStringBuilder.append(" or string");
+        if (collectionString != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionString);
+            exceptionStringBuilder.append(")");
+        }
+        return exceptionStringBuilder.toString();
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Collection iterableToCollection(Iterable iterable) {
         List result = new ArrayList();
