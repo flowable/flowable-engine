@@ -333,6 +333,7 @@ public class CmmnDeployer implements EngineDeployer {
             caseDefinitionCache.add(caseDefinitionEntity.getId(), cacheEntry);
 
             deployment.addDeployedArtifact(caseDefinitionEntity);
+            deployment.addCaseDefinitionCacheEntry(caseDefinitionEntity.getId(), cacheEntry);
         }
     }
     

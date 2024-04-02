@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 
@@ -45,6 +46,7 @@ public class AppDeploymentEntityImpl extends AbstractAppEngineNoRevisionEntity i
      * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
+    protected Map<String, AppDefinitionCacheEntry> appDefinitionCache = new HashMap<>();
 
     public AppDeploymentEntityImpl() {
 
@@ -105,6 +107,16 @@ public class AppDeploymentEntityImpl extends AbstractAppEngineNoRevisionEntity i
             }
         }
         return null;
+    }
+    
+    @Override
+    public void addAppDefinitionCacheEntry(String appDefinitionId, AppDefinitionCacheEntry appDefinitionCacheEntry) {
+        appDefinitionCache.put(appDefinitionId, appDefinitionCacheEntry);
+    }
+
+    @Override
+    public AppDefinitionCacheEntry getAppDefinitionCacheEntry(String appDefinitionId) {
+        return appDefinitionCache.get(appDefinitionId);
     }
 
     // getters and setters ////////////////////////////////////////////////////////

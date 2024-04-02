@@ -106,7 +106,7 @@ public class AppDeploymentManager {
             AppDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedAppDefinition = appDefinitionCache.get(appDefinitionId);
+            cachedAppDefinition = deployment.getAppDefinitionCacheEntry(appDefinitionId);
 
             if (cachedAppDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put app definition '" + appDefinitionId + "' in the cache");
