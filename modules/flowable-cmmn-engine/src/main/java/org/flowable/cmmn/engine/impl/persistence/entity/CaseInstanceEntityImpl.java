@@ -489,7 +489,10 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("CaseInstance[id=").append(id)
-                .append(", caseDefinitionId=").append(caseDefinitionId);
+                .append(", caseDefinitionId=").append(caseDefinitionId)
+                .append(", caseDefinitionKey=").append(caseDefinitionKey)
+                .append(", parentId=").append(parentId)
+                .append(", name=").append(name);
 
         if (StringUtils.isNotEmpty(tenantId)) {
             sb.append(", tenantId=").append(tenantId);
