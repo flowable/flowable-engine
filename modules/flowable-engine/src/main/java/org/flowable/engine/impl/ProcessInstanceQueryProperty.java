@@ -35,6 +35,7 @@ public class ProcessInstanceQueryProperty implements QueryProperty {
     public static final ProcessInstanceQueryProperty PROCESS_DEFINITION_ID = new ProcessInstanceQueryProperty("RES.PROC_DEF_ID_");
     public static final ProcessInstanceQueryProperty PROCESS_START_TIME = new ProcessInstanceQueryProperty("RES.START_TIME_");
     public static final ProcessInstanceQueryProperty TENANT_ID = new ProcessInstanceQueryProperty("RES.TENANT_ID_");
+    public static final ProcessInstanceQueryProperty BUSINESS_KEY = new ProcessInstanceQueryProperty("RES.BUSINESS_KEY_");
 
     private String name;
 
