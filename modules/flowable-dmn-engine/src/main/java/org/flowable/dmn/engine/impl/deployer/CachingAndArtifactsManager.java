@@ -51,6 +51,7 @@ public class CachingAndArtifactsManager {
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(decisionEntity);
+            deployment.addDecisionCacheEntry(decisionEntity.getId(), cacheEntry);
         }
     }
 }
