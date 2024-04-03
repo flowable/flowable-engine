@@ -147,7 +147,7 @@ public class DeploymentManager {
 
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedDecision = decisionCache.get(decisionId);
+            cachedDecision = deployment.getDecisionCacheEntry(decisionId);
 
             if (cachedDecision == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put decision '" + decisionId + "' in the cache");
