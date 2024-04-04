@@ -29,15 +29,27 @@ public class PlanItemDefinitionMappingBuilder {
         
         return new ActivatePlanItemDefinitionMapping(planItemDefinitionId, newAssignee, withLocalVariables);
     }
-    
+
+    public static ActivatePlanItemDefinitionMapping createActivatePlanItemDefinitionMappingFor(String planItemDefinitionId, String condition) {
+        return new ActivatePlanItemDefinitionMapping(planItemDefinitionId, condition);
+    }
+
     public static TerminatePlanItemDefinitionMapping createTerminatePlanItemDefinitionMappingFor(String planItemDefinitionId) {
         return new TerminatePlanItemDefinitionMapping(planItemDefinitionId);
     }
-    
+
+    public static TerminatePlanItemDefinitionMapping createTerminatePlanItemDefinitionMappingFor(String planItemDefinitionId, String condition) {
+        return new TerminatePlanItemDefinitionMapping(planItemDefinitionId, condition);
+    }
+
     public static MoveToAvailablePlanItemDefinitionMapping createMoveToAvailablePlanItemDefinitionMappingFor(String planItemDefinitionId) {
         return new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId);
     }
-    
+
+    public static MoveToAvailablePlanItemDefinitionMapping createMoveToAvailablePlanItemDefinitionMappingFor(String planItemDefinitionId, String condition) {
+        return new MoveToAvailablePlanItemDefinitionMapping(planItemDefinitionId, condition);
+    }
+
     public static MoveToAvailablePlanItemDefinitionMapping createMoveToAvailablePlanItemDefinitionMappingFor(
             String planItemDefinitionId, Map<String, Object> withLocalVariables) {
         
@@ -47,8 +59,16 @@ public class PlanItemDefinitionMappingBuilder {
     public static WaitingForRepetitionPlanItemDefinitionMapping createWaitingForRepetitionPlanItemDefinitionMappingFor(String planItemDefinitionId) {
         return new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
     }
-    
+
+    public static WaitingForRepetitionPlanItemDefinitionMapping createWaitingForRepetitionPlanItemDefinitionMappingFor(String planItemDefinitionId, String condition) {
+        return new WaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId, condition);
+    }
+
     public static RemoveWaitingForRepetitionPlanItemDefinitionMapping createRemoveWaitingForRepetitionPlanItemDefinitionMappingFor(String planItemDefinitionId) {
         return new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId);
+    }
+
+    public static RemoveWaitingForRepetitionPlanItemDefinitionMapping createRemoveWaitingForRepetitionPlanItemDefinitionMappingFor(String planItemDefinitionId, String condition) {
+        return new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId, condition);
     }
 }
