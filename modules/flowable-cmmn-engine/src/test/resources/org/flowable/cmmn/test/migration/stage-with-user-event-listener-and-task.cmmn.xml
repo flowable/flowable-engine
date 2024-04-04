@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="repetitionCase" name="Repetition case" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <planItem id="planItemstage" name="Stage" definitionRef="stage"/>
+            <stage id="stage" name="Stage">
+                <planItem id="planItemhumanTask" name="Human Task" definitionRef="humanTask">
+                    <entryCriterion id="cmmnEntrySentry_3" sentryRef="sentrycmmnEntrySentry_3"/>
+                </planItem>
+                <planItem id="planItemuserEventListener" name="User Event Listener" definitionRef="userEventListener"/>
+                <sentry id="sentrycmmnEntrySentry_3" name="Entry criterion">
+                    <planItemOnPart id="sentryOnPartcmmnEntrySentry_3" sourceRef="planItemuserEventListener">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <humanTask id="humanTask" name="Human Task" flowable:assignee="${initiator}" flowable:formFieldValidation="false"/>
+                <userEventListener id="userEventListener" name="User Event Listener"/>
+            </stage>
+        </casePlanModel>
+    </case>
+</definitions>

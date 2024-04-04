@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="Test Case" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItemcmmnStage_6" definitionRef="cmmnStage_6">
+                <entryCriterion id="cmmnEntrySentry_1" sentryRef="sentrycmmnEntrySentry_1"/>
+            </planItem>
+            <planItem id="planItemhumanTask1" name="Task 1" definitionRef="humanTask1"/>
+            <sentry id="sentrycmmnEntrySentry_1">
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_1" sourceRef="planItemhumanTask1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="cmmnStage_6">
+                <planItem id="planItemhumanTask3" name="Task 3" definitionRef="humanTask3">
+                    <entryCriterion id="cmmnEntrySentry_9" sentryRef="sentrycmmnEntrySentry_9"/>
+                </planItem>
+                <planItem id="planItemeventListener" name="Event Listener" definitionRef="eventListener"/>
+                <planItem id="planItemhumanTask2" name="Task 2" definitionRef="humanTask2"/>
+                <sentry id="sentrycmmnEntrySentry_9" name="Entry criterion">
+                    <planItemOnPart id="sentryOnPartcmmnEntrySentry_9" sourceRef="planItemeventListener">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <humanTask id="humanTask3" name="Task 3" flowable:assignee="${initiator}" flowable:formFieldValidation="false"/>
+                <eventListener id="eventListener" name="Event Listener"/>
+                <humanTask id="humanTask2" name="Task 2" flowable:assignee="${initiator}" flowable:formFieldValidation="false"/>
+            </stage>
+            <humanTask id="humanTask1" name="Task 1" flowable:assignee="${initiator}" flowable:formFieldValidation="false"/>
+        </casePlanModel>
+    </case>
+</definitions>

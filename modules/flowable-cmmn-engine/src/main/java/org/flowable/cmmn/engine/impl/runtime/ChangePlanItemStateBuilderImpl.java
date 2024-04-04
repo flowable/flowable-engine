@@ -110,6 +110,12 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     }
 
     @Override
+    public ChangePlanItemStateBuilder terminatePlanItemDefinition(TerminatePlanItemDefinitionMapping planItemDefinition) {
+        terminatePlanItemDefinitions.add(planItemDefinition);
+        return this;
+    }
+
+    @Override
     public ChangePlanItemStateBuilder terminatePlanItemDefinitionIds(List<String> planItemDefinitionIds) {
         if (planItemDefinitionIds != null) {
             for (String planItemDefinitionId : planItemDefinitionIds) {
@@ -126,6 +132,12 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     }
 
     @Override
+    public ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinition(WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping) {
+        waitingForRepetitionPlanItemDefinitions.add(planItemDefinitionMapping);
+        return this;
+    }
+
+    @Override
     public ChangePlanItemStateBuilder addWaitingForRepetitionPlanItemDefinitionIds(List<String> planItemDefinitionIds) {
         if (planItemDefinitionIds != null) {
             for (String planItemDefinitionId : planItemDefinitionIds) {
@@ -138,6 +150,12 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     @Override
     public ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinitionId(String planItemDefinitionId) {
         removeWaitingForRepetitionPlanItemDefinitions.add(new RemoveWaitingForRepetitionPlanItemDefinitionMapping(planItemDefinitionId));
+        return this;
+    }
+
+    @Override
+    public ChangePlanItemStateBuilder removeWaitingForRepetitionPlanItemDefinition(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinition) {
+        removeWaitingForRepetitionPlanItemDefinitions.add(planItemDefinition);
         return this;
     }
 
