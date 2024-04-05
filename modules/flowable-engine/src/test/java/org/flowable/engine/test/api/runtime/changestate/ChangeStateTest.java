@@ -3397,5 +3397,36 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance2.getId());
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/multipleEventSubProcessEvents.bpmn20.xml" })
+    public void testEnableEventSubProcessStartEvent() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("changeStateForEventSubProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("processTask");
+        
+        runtimeService.signalEventReceived("mySignal");
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("eventSubProcessTask");
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .enableEventSubProcessStartEvent("messageEventSubProcessStart")
+                .changeState();
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
+        
+        runtimeService.messageEventReceived("myMessage", messageEventSubscription.getExecutionId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("messageEventSubProcessTask");
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 }
 

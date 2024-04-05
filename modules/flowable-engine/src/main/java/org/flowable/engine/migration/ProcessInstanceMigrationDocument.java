@@ -43,6 +43,8 @@ public interface ProcessInstanceMigrationDocument {
     String getPostUpgradeJavaDelegateExpression();
 
     List<ActivityMigrationMapping> getActivityMigrationMappings();
+    
+    List<EnableActivityMapping> getEnableActivityMappings();
 
     Map<String, Map<String, Object>> getActivitiesLocalVariables();
 
