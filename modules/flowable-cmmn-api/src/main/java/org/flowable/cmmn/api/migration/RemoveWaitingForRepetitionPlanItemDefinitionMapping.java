@@ -17,8 +17,4 @@ public class RemoveWaitingForRepetitionPlanItemDefinitionMapping extends PlanIte
     public RemoveWaitingForRepetitionPlanItemDefinitionMapping(String planItemDefinitionId) {
         super(planItemDefinitionId);
     }
-
-    public RemoveWaitingForRepetitionPlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
-        super(planItemDefinitionId, condition);
-    }
 }

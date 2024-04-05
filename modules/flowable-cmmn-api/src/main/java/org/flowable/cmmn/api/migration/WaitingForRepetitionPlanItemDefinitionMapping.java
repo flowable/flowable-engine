@@ -17,8 +17,4 @@ public class WaitingForRepetitionPlanItemDefinitionMapping extends PlanItemDefin
     public WaitingForRepetitionPlanItemDefinitionMapping(String planItemDefinitionId) {
         super(planItemDefinitionId);
     }
-
-    public WaitingForRepetitionPlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
-        super(planItemDefinitionId, condition);
-    }
 }

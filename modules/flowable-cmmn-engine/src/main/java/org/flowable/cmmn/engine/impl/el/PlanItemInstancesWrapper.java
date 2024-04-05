@@ -64,10 +64,6 @@ public class PlanItemInstancesWrapper {
         return planItemInstances.size();
     }
 
-    public boolean exists() {
-        return count() > 0;
-    }
-
     protected void ensurePlanItemInstanceInitialized() {
         if (planItemInstances == null) {
             planItemInstances = collectAllChildPlanItemInstances(caseInstanceEntity);

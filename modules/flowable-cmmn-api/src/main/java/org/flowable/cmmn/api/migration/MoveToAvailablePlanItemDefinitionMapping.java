@@ -17,8 +17,4 @@ public class MoveToAvailablePlanItemDefinitionMapping extends PlanItemDefinition
     public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId) {
         super(planItemDefinitionId);
     }
-    
-    public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
-        super(planItemDefinitionId, condition);
-    }
 }

@@ -17,8 +17,4 @@ public class TerminatePlanItemDefinitionMapping extends PlanItemDefinitionMappin
     public TerminatePlanItemDefinitionMapping(String planItemDefinitionId) {
         super(planItemDefinitionId);
     }
-
-    public TerminatePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
-        super(planItemDefinitionId, condition);
-    }
 }
