@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.EnableActivityMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentBuilder;
 import org.flowable.engine.migration.Script;
@@ -35,6 +36,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
     protected List<ActivityMigrationMapping> activityMigrationMappings = new ArrayList<>();
+    protected List<EnableActivityMapping> enableActivityMappings = new ArrayList<>();
     protected Map<String, Object> processInstanceVariables = new HashMap<>();
     protected Script preUpgradeScript;
     protected String preUpgradeJavaDelegate;
@@ -109,6 +111,18 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         this.activityMigrationMappings.add(activityMigrationMapping);
         return this;
     }
+    
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder addEnableActivityMappings(List<EnableActivityMapping> enableActivityMappings) {
+        this.enableActivityMappings.addAll(enableActivityMappings);
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder addEnableActivityMapping(EnableActivityMapping enableActivityMapping) {
+        this.enableActivityMappings.add(enableActivityMapping);
+        return this;
+    }
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariable(String variableName, Object variableValue) {
@@ -156,6 +170,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
             document.setPostUpgradeJavaDelegateExpression(postUpgradeJavaDelegateExpression);
         }
         document.setActivityMigrationMappings(activityMigrationMappings);
+        document.setEnableActivityMappings(enableActivityMappings);
         document.setProcessInstanceVariables(processInstanceVariables);
 
         return document;

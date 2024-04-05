@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+    <signal id="mySignal" name="mySignal" flowable:scope="global"/>
+    <message id="myMessage" name="someMessage"/>
+    <process id="MP" name="MyProcess" isExecutable="true">
+        <documentation>My process documentation</documentation>
+        <startEvent id="startEvent1"></startEvent>
+        <userTask id="userTask1Id" name="My User Task"/>
+        <sequenceFlow id="seqFlow1Id" sourceRef="startEvent1" targetRef="userTask1Id"></sequenceFlow>
+        <userTask id="userTask2Id" name="Last User Task"/>
+        <sequenceFlow id="seqFlow2Id" sourceRef="userTask1Id" targetRef="userTask2Id"></sequenceFlow>
+        <endEvent id="endEvent1"></endEvent>
+        <sequenceFlow id="seqFlow3Id" sourceRef="userTask2Id" targetRef="endEvent1"></sequenceFlow>
+        
+        <subProcess id="eventSubProcess" triggeredByEvent="true">
+            <startEvent id="eventSubProcessStart" isInterrupting="false">
+                <signalEventDefinition signalRef="mySignal" />
+            </startEvent>
+            <sequenceFlow id="subProcessFlow1" sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+            <userTask id="eventSubProcessTask"/>
+            <sequenceFlow id="subProcessFlow2" sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <endEvent id="eventSubProcessEnd" />
+            
+            <startEvent id="messageEventSubProcessStart" isInterrupting="false">
+                <messageEventDefinition messageRef="myMessage"/>
+            </startEvent>
+            <sequenceFlow id="subProcessFlow3" sourceRef="messageEventSubProcessStart" targetRef="messageEventSubProcessTask" />
+            <userTask id="messageEventSubProcessTask"/>
+            <sequenceFlow id="subProcessFlow4" sourceRef="messageEventSubProcessTask" targetRef="messageEventSubProcessEnd" />
+            <endEvent id="messageEventSubProcessEnd" />
+        </subProcess>
+    </process>
+</definitions>

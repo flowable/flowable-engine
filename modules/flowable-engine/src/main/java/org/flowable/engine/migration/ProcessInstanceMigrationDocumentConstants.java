@@ -28,6 +28,7 @@ public interface ProcessInstanceMigrationDocumentConstants {
     String TO_ACTIVITY_ID_JSON_PROPERTY = "toActivityId";
     String TO_ACTIVITY_IDS_JSON_PROPERTY = "toActivityIds";
     String NEW_ASSIGNEE_JSON_PROPERTY = "newAssignee";
+    String ACTIVITY_ID_JSON_PROPERTY = "activityId";
 
     String IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY = "inSubProcessOfCallActivityId";
     String CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY = "callActivityProcessDefinitionVersion";
@@ -43,6 +44,7 @@ public interface ProcessInstanceMigrationDocumentConstants {
     String SCRIPT = "script";
 
     String ACTIVITY_MAPPINGS_JSON_SECTION = "activityMappings";
+    String ENABLE_ACTIVITY_MAPPINGS_JSON_SECTION = "enableActivityMappings";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";
     String PROCESS_INSTANCE_VARIABLES_JSON_SECTION = "processInstanceVariables";
 
