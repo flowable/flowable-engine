@@ -33,6 +33,7 @@ public class ProcessInstanceChangeState {
     protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
+    protected List<EnableActivityContainer> enableActivityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
     protected HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution = new HashMap<>();
     protected HashMap<StartEvent, ExecutionEntity> pendingEventSubProcessesStartEvents = new HashMap<>();
@@ -80,6 +81,15 @@ public class ProcessInstanceChangeState {
         return this;
     }
 
+    public List<EnableActivityContainer> getEnableActivityContainers() {
+        return enableActivityContainers;
+    }
+
+    public ProcessInstanceChangeState setEnableActivityContainers(List<EnableActivityContainer> enableActivityContainers) {
+        this.enableActivityContainers = enableActivityContainers;
+        return this;
+    }
+    
     public List<MoveExecutionEntityContainer> getMoveExecutionEntityContainers() {
         return moveExecutionEntityContainers;
     }

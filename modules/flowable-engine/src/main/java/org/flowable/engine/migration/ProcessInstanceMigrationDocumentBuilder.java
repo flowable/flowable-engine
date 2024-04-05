@@ -43,6 +43,10 @@ public interface ProcessInstanceMigrationDocumentBuilder {
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMappings(List<ActivityMigrationMapping> activityMigrationMappings);
 
     ProcessInstanceMigrationDocumentBuilder addActivityMigrationMapping(ActivityMigrationMapping activityMigrationMapping);
+    
+    ProcessInstanceMigrationDocumentBuilder addEnableActivityMappings(List<EnableActivityMapping> enableActivityMappings);
+    
+    ProcessInstanceMigrationDocumentBuilder addEnableActivityMapping(EnableActivityMapping enableActivityMapping);
 
     ProcessInstanceMigrationDocumentBuilder addProcessInstanceVariable(String variableName, Object variableValue);
 
