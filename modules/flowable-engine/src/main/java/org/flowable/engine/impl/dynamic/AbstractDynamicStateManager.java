@@ -77,6 +77,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.runtime.EnableActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -242,6 +243,18 @@ public abstract class AbstractDynamicStateManager {
         }
 
         return moveExecutionEntityContainerList;
+    }
+    
+    public List<EnableActivityContainer> resolveEnableActivityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
+        List<EnableActivityContainer> enableActivityContainerList = new ArrayList<>();
+        if (!changeActivityStateBuilder.getEnableActivityIdList().isEmpty()) {
+            for (EnableActivityIdContainer enableActivityIdContainer : changeActivityStateBuilder.getEnableActivityIdList()) {
+                EnableActivityContainer enableActivityContainer = new EnableActivityContainer(enableActivityIdContainer.getActivityIds());
+                enableActivityContainerList.add(enableActivityContainer);
+            }
+        }
+        
+        return enableActivityContainerList;
     }
 
     protected ExecutionEntity resolveActiveExecution(String executionId, CommandContext commandContext) {
@@ -409,7 +422,6 @@ public abstract class AbstractDynamicStateManager {
     //-- Move container preparation section end
 
     protected void doMoveExecutionState(ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
-
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         Map<String, List<ExecutionEntity>> activeEmbeddedSubProcesses = resolveActiveEmbeddedSubProcesses(processInstanceChangeState.getProcessInstanceId(), commandContext);
         processInstanceChangeState.setProcessInstanceActiveEmbeddedExecutions(activeEmbeddedSubProcesses);
@@ -554,6 +566,31 @@ public abstract class AbstractDynamicStateManager {
         }
 
         processPendingEventSubProcessesStartEvents(processInstanceChangeState, commandContext);
+        
+        for (EnableActivityContainer enableActivityContainer : processInstanceChangeState.getEnableActivityContainers()) {
+            if (enableActivityContainer.getActivityIds() != null && !enableActivityContainer.getActivityIds().isEmpty()) {
+                BpmnModel bpmnModel = null;
+                ExecutionEntity parentExecution = executionEntityManager.findById(processInstanceChangeState.getProcessInstanceId());
+                if (processInstanceChangeState.getProcessDefinitionToMigrateTo() != null) {
+                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(processInstanceChangeState.getProcessDefinitionToMigrateTo().getId());
+                    
+                } else {
+                    bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+                }
+                
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
+                
+                for (String enableActivityId : enableActivityContainer.getActivityIds()) {
+                    FlowElement enableFlowElement = bpmnModel.getFlowElement(enableActivityId);
+                    if (enableFlowElement == null) {
+                        throw new FlowableException("could not find element for activity id " + enableActivityId);
+                    }
+                    
+                    processInstanceHelper.processEventSubProcessStartEvent(enableFlowElement, parentExecution, processEngineConfiguration, commandContext);
+                }
+            }
+        }
     }
 
     protected void processPendingEventSubProcessesStartEvents(ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {

@@ -81,6 +81,11 @@ public interface ChangeActivityStateBuilder {
      * Moves the execution with the current activity id to an activity id in a new sub process instance of the specific definition version for the provided call activity id.
      */
     ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId, Integer subProcessDefinitionVersion);
+    
+    /**
+     * Enables a new start event in an event sub process.
+     */
+    ChangeActivityStateBuilder enableEventSubProcessStartEvent(String eventSubProcessStartEventId);
 
     /**
      * Sets a process scope variable
