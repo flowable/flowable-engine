@@ -19,6 +19,7 @@ import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.EnableActivityMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
@@ -112,6 +113,12 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder addActivityMigrationMapping(ActivityMigrationMapping mapping) {
         this.migrationDocumentBuilder.addActivityMigrationMapping(mapping);
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceMigrationBuilder addEnableEventSubProcessStartEvent(EnableActivityMapping mapping) {
+        this.migrationDocumentBuilder.addEnableActivityMapping(mapping);
         return this;
     }
 

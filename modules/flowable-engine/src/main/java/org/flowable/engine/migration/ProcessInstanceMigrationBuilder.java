@@ -122,6 +122,15 @@ public interface ProcessInstanceMigrationBuilder {
      * @see ActivityMigrationMapping
      */
     ProcessInstanceMigrationBuilder addActivityMigrationMapping(ActivityMigrationMapping mapping);
+    
+    /**
+     * Adds an event sub process start event to enable for the migration.
+     *
+     * @param mapping
+     * @return
+     * @see EnableActivityMapping
+     */
+    ProcessInstanceMigrationBuilder addEnableEventSubProcessStartEvent(EnableActivityMapping mapping);
 
     /**
      * Specifies a process instance variable that will also be available during the process migration (ie. to resolve callActivity calledElement expressions of the new process definition - if any)
