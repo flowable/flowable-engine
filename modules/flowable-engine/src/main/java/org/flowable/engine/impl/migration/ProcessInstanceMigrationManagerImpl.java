@@ -60,6 +60,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.dynamic.AbstractDynamicStateManager;
+import org.flowable.engine.impl.dynamic.EnableActivityContainer;
 import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.dynamic.ProcessInstanceChangeState;
 import org.flowable.engine.impl.history.HistoryManager;
@@ -74,6 +75,7 @@ import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.EnableActivityMapping;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
 import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
@@ -435,11 +437,20 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         			builder, document.getProcessInstanceVariables(), commandContext);
             moveExecutionEntityContainerList.addAll(moveExecutionEntityContainers);
         }
+        
+        List<EnableActivityContainer> enableActivityContainerList = new ArrayList<>();
+        if (!document.getEnableActivityMappings().isEmpty()) {
+            for (EnableActivityMapping enableActivityMapping : document.getEnableActivityMappings()) {
+                EnableActivityContainer enableActivityContainer = new EnableActivityContainer(Collections.singletonList(enableActivityMapping.getActivityId()));
+                enableActivityContainerList.add(enableActivityContainer);
+            }
+        }
 
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
             .setProcessInstanceId(processInstance.getId())
             .setProcessDefinitionToMigrateTo(procDefToMigrateTo)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
+            .setEnableActivityContainers(enableActivityContainerList)
             .setProcessInstanceVariables(document.getProcessInstanceVariables())
             .setLocalVariables(document.getActivitiesLocalVariables());
 

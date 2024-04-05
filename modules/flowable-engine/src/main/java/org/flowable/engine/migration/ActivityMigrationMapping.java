@@ -18,9 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis
- */
 public abstract class ActivityMigrationMapping {
 
     protected String toCallActivityId;

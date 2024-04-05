@@ -10,15 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.api.migration;
+package org.flowable.engine.impl.dynamic;
 
-public class TerminatePlanItemDefinitionMapping extends PlanItemDefinitionMapping {
+import java.util.List;
 
-    public TerminatePlanItemDefinitionMapping(String planItemDefinitionId) {
-        super(planItemDefinitionId);
+public class EnableActivityContainer {
+
+    protected List<String> activityIds;
+
+    public EnableActivityContainer(List<String> activityIds) {
+        this.activityIds = activityIds;
     }
 
-    public TerminatePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
-        super(planItemDefinitionId, condition);
+    public List<String> getActivityIds() {
+        return activityIds;
     }
 }
