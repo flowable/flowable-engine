@@ -13,17 +13,24 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.reactivation.CaseReactivationBuilderImpl;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ReactivateEventListener;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -85,7 +92,8 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
         }
 
         // if there is an available condition on the reactivation event listener, evaluate it to make sure the listener is available for reactivation
-        ReactivateEventListener reactivateEventListener = CaseDefinitionUtil.getCase(instance.getCaseDefinitionId()).getReactivateEventListener();
+        Case caze = CaseDefinitionUtil.getCase(instance.getCaseDefinitionId());
+        ReactivateEventListener reactivateEventListener = caze.getReactivateEventListener();
         String availableConditionExpression = reactivateEventListener.getReactivationAvailableConditionExpression();
         if (StringUtils.isNotEmpty(availableConditionExpression)) {
             Object listenerAvailable = CommandContextUtil.getCmmnEngineConfiguration()
@@ -102,6 +110,32 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
         // invoke the identity link interceptor to record the reactivation user
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleReactivateCaseInstance(caseInstanceEntity);
+        }
+        
+        if (!reactivationBuilder.getTerminatedPlanItemDefinitionIds().isEmpty()) {
+            for (String planItemDefinitionId : reactivationBuilder.getTerminatedPlanItemDefinitionIds()) {
+                PlanItem planItem = caze.getPlanModel().findPlanItemForPlanItemDefinitionInPlanFragmentOrDownwards(planItemDefinitionId);
+                if (planItem == null) {
+                    throw new FlowableException("incorrect plan item definition id passed " + planItemDefinitionId);
+                }
+                
+                PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
+                PlanItemInstanceEntity reactivatedPlanItemInstance = planItemInstanceEntityManager
+                        .createPlanItemInstanceEntityBuilder()
+                        .planItem(planItem)
+                        .caseDefinitionId(caseInstanceEntity.getCaseDefinitionId())
+                        .caseInstanceId(caseInstanceEntity.getId())
+                        .tenantId(caseInstanceEntity.getTenantId())
+                        .create();
+                
+                Date currentTime = cmmnEngineConfiguration.getClock().getCurrentTime();
+                reactivatedPlanItemInstance.setState(PlanItemInstanceState.TERMINATED);
+                reactivatedPlanItemInstance.setEndedTime(currentTime);
+                reactivatedPlanItemInstance.setTerminatedTime(currentTime);
+                caseInstanceEntity.getChildPlanItemInstances().add(reactivatedPlanItemInstance);
+                
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceReactivated(reactivatedPlanItemInstance);
+            }
         }
 
         // record the reactivation of the case in the history manager to also synchronize the new state and last reactivation data to the history
