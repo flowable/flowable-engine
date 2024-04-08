@@ -111,6 +111,85 @@ public class SimpleHistoricCaseReactivationTest extends FlowableCmmnTestCase {
             Authentication.setAuthenticatedUserId(previousUserId);
         }
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case_No_Reactivation.cmmn.xml")
+    public void simpleMigrateCaseWithNoReactivationTest() {
+        String previousUserId = Authentication.getAuthenticatedUserId();
+        org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
+        try {
+            Authentication.setAuthenticatedUserId("simpleCaseReactivationTest_user");
+            final HistoricCaseInstance historicCase = createAndFinishSimpleCase("simpleReactivationTestCase");
+            
+            deployment = cmmnRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/reactivation/Simple_Reactivation_Test_Case_Added_Reactivation.cmmn.xml")
+                    .deploy();
+
+            CaseDefinition newCaseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                    .deploymentId(deployment.getId())
+                    .singleResult();
+            
+            cmmnMigrationService.createHistoricCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(newCaseDefinition.getId())
+                .migrate(historicCase.getId());
+            
+            HistoricCaseInstance historicCaseInstanceAfterMigration = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(historicCase.getId())
+                    .singleResult();
+            assertThat(historicCaseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(newCaseDefinition.getId());
+            assertThat(historicCaseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("simpleReactivationTestCase");
+            assertThat(historicCaseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("Simple Reactivation Test Case Added Reactivaton");
+            assertThat(historicCaseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+            assertThat(historicCaseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(newCaseDefinition.getDeploymentId());
+
+            CaseInstance reactivatedCase = cmmnHistoryService.createCaseReactivationBuilder(historicCase.getId())
+                    .addTerminatedPlanItemInstanceForPlanItemDefinition("reactivateEventListener1")
+                    .addTerminatedPlanItemInstanceForPlanItemDefinition("humanTask3")
+                    .reactivate();
+            assertThat(reactivatedCase).isNotNull();
+
+            List<PlanItemInstance> planItemInstances = getAllPlanItemInstances(reactivatedCase.getId());
+            assertThat(planItemInstances).isNotNull().hasSize(8);
+
+            // we need to have two reactivation listeners by now, one in terminated state (from the first case completion) and the second one needs to be
+            // in completion state as we just triggered it for case reactivation
+            assertPlanItemInstanceState(planItemInstances, "Reactivate case", TERMINATED, COMPLETED);
+
+            assertPlanItemInstanceState(planItemInstances, "Task C", TERMINATED, ACTIVE);
+            
+            assertCaseInstanceNotEnded(reactivatedCase);
+
+            // the plan items must be equal for both the runtime as well as the history as of now
+            assertSamePlanItemState(reactivatedCase);
+
+            // make sure we have exactly the same variables as the historic case
+            assertSameVariables(historicCase, reactivatedCase);
+            
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery().list();
+            assertThat(historicPlanItemInstances).isNotNull().hasSize(8);
+            
+            Map<String, HistoricPlanItemInstance> historicPlanItemInstanceMap = new HashMap<>();
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                historicPlanItemInstanceMap.put(historicPlanItemInstance.getId(), historicPlanItemInstance);
+            }
+            
+            for (PlanItemInstance planItemInstance : planItemInstances) {
+                assertThat(historicPlanItemInstanceMap.containsKey(planItemInstance.getId())).isTrue();
+                HistoricPlanItemInstance historicPlanItemInstance = historicPlanItemInstanceMap.get(planItemInstance.getId());
+                assertThat(historicPlanItemInstance.getState()).isEqualTo(planItemInstance.getState());
+                assertThat(historicPlanItemInstance.getElementId()).isEqualTo(planItemInstance.getElementId());
+            }
+            
+            cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(reactivatedCase.getId()).singleResult().getId());
+            assertCaseInstanceEnded(reactivatedCase);
+            
+        } finally {
+            if (deployment != null) {
+                CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deployment.getId());
+            }
+            Authentication.setAuthenticatedUserId(previousUserId);
+        }
+    }
 
     protected HistoricCaseInstance createAndFinishSimpleCase(String caseDefinitionKey) {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
