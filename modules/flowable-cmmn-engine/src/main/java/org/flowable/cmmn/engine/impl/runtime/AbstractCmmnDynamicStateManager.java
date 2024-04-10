@@ -1094,7 +1094,7 @@ public abstract class AbstractCmmnDynamicStateManager {
                 if (planItemInstance.getReferenceId() != null) {
                     cmmnEngineConfiguration.getProcessInstanceService().deleteProcessInstance(planItemInstance.getReferenceId());
                 }
-            
+
             } else if (planItemDefinition instanceof EventListener) {
                 
                 if (planItemDefinition instanceof TimerEventListener) {
@@ -1120,6 +1120,10 @@ public abstract class AbstractCmmnDynamicStateManager {
                             eventSubscriptionService.deleteEventSubscription(eventSubscription);
                         }
                     }
+                }
+            } else if (planItemDefinition instanceof CaseTask) {
+                if (planItemInstance.getReferenceId() != null) {
+                    cmmnEngineConfiguration.getCmmnRuntimeService().deleteCaseInstance(planItemInstance.getReferenceId());
                 }
             }
         }
