@@ -37,6 +37,7 @@ import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.ReceiveTask;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
@@ -506,6 +507,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         return (isDirectCallActivityExecutionMigration(currentFlowElement, newFlowElement) ||
                 isDirectUserTaskExecutionMigration(currentFlowElement, newFlowElement) ||
+                isDirectAsyncServiceTaskExecutionMigration(currentFlowElement, newFlowElement) ||
                 isDirectReceiveTaskExecutionMigration(currentFlowElement, newFlowElement) ||
                 isDirectExternalWorkerServiceTaskExecutionMigration(currentFlowElement, newFlowElement)) &&
                 (getFlowElementMultiInstanceParentId(currentFlowElement) == null && getFlowElementMultiInstanceParentId(newFlowElement) == null);
@@ -523,6 +525,17 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 newFlowElement instanceof UserTask &&
                 ((Task) currentFlowElement).getLoopCharacteristics() == null &&
                 ((Task) newFlowElement).getLoopCharacteristics() == null;
+    }
+    
+    protected boolean isDirectAsyncServiceTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
+        return currentFlowElement instanceof ServiceTask &&
+                newFlowElement instanceof ServiceTask &&
+                ((Task) currentFlowElement).getLoopCharacteristics() == null &&
+                ((Task) newFlowElement).getLoopCharacteristics() == null &&
+                ((((ServiceTask) currentFlowElement).isAsynchronous() &&
+                ((ServiceTask) newFlowElement).isAsynchronous()) ||
+                (((ServiceTask) currentFlowElement).isAsynchronousLeave() &&
+                ((ServiceTask) newFlowElement).isAsynchronousLeave()));
     }
 
     protected boolean isDirectReceiveTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
