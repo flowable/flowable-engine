@@ -63,6 +63,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1339,6 +1340,140 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         //This new process version only have one activity
         taskService.complete(tasks.get(0).getId());
         assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testOneSimpleUserTaskDirectMigration() {
+        //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
+        //Deploy first version of the process
+        deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+
+        Execution executionBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionBefore).isNotNull();
+        String executionBeforeId = executionBefore.getId();
+
+        Task taskBefore = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        String taskBeforeId = taskBefore.getId();
+
+        //Migrate process
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        ExecutionEntity executionAfter = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(executionBeforeId).isEqualTo(executionAfter.getId());
+
+        Task taskAfter = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(taskAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(taskBeforeId).isEqualTo(taskAfter.getId());
+    }
+    
+    @Test
+    public void testOneAsyncServiceTaskDirectMigration() {
+        //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/async-service-task.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/updated-async-service-task.bpmn20.xml");
+
+        Execution executionBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionBefore).isNotNull();
+        String executionBeforeId = executionBefore.getId();
+
+        Job jobBefore = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        String jobBeforeId = jobBefore.getId();
+
+        //Migrate process
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        ExecutionEntity executionAfter = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(executionBeforeId).isEqualTo(executionAfter.getId());
+
+        Job jobAfter = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(jobAfter.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        assertThat(jobBeforeId).isEqualTo(jobAfter.getId());
+        
+        managementService.executeJob(jobAfter.getId());
+        assertProcessEnded(processInstance.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("migrationVar").singleResult();
+            assertThat(historicVariableInstance).isNotNull();
+            assertThat(historicVariableInstance.getValue()).isEqualTo("test");
+        }
+    }
+    
+    @Test
+    public void testOneAsyncLeaveServiceTaskDirectMigration() {
+        //Almost all tests use UserTask, thus are direct migrations, but this one checks explicitly for changes in History
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/async-leave-service-task.bpmn20.xml");
+
+        //Start and instance of the recent first version of the process for migration and one for reference
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/updated-async-leave-service-task.bpmn20.xml");
+
+        Execution executionBefore = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionBefore).isNotNull();
+        String executionBeforeId = executionBefore.getId();
+
+        Job jobBefore = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        String jobBeforeId = jobBefore.getId();
+
+        //Migrate process
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        ExecutionEntity executionAfter = (ExecutionEntity) runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        assertThat(executionAfter.getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        assertThat(executionBeforeId).isEqualTo(executionAfter.getId());
+
+        Job jobAfter = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(jobAfter.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        assertThat(jobBeforeId).isEqualTo(jobAfter.getId());
+        
+        managementService.executeJob(jobAfter.getId());
+        assertProcessEnded(processInstance.getId());
+        
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("migrationVar").singleResult();
+            assertThat(historicVariableInstance).isNull();
+        }
     }
 
     @Test
