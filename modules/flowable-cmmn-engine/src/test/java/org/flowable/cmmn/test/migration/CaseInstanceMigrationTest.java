@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.test.migration;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ELEMENT_STAGE;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMappingBuilder;
@@ -37,6 +39,7 @@ import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
+import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableException;
@@ -5816,6 +5819,32 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .caseDefinitionId(subcaseDefinition.getId())
                 .count();
         assertThat(subcaseInstances).isEqualTo(0);
+    }
+
+    @Test
+    void testCaseInstanceMigrationDocument() {
+        String documentAsJson = this.cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .addTerminatePlanItemDefinitionMapping(
+                        PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("terminateId", "${terminateCondition}"))
+                .addMoveToAvailablePlanItemDefinitionMapping(
+                        PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("availableId", "${availableCondition}"))
+                .addWaitingForRepetitionPlanItemDefinitionMapping(
+                        PlanItemDefinitionMappingBuilder.createWaitingForRepetitionPlanItemDefinitionMappingFor("repetitionId", "${repetitionCondition}"))
+                .removeWaitingForRepetitionPlanItemDefinitionMapping(
+                        PlanItemDefinitionMappingBuilder.createRemoveWaitingForRepetitionPlanItemDefinitionMappingFor("removeRepetitionId",
+                                "${removeRepetitionCondition}"))
+                .addActivatePlanItemDefinitionMapping(
+                        PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("activateId", "${activateCondition}"))
+                .withPreUpgradeExpression("${preExpression}")
+                .withPostUpgradeExpression("${postExpression}")
+                .getCaseInstanceMigrationDocument()
+                .asJsonString();
+        CaseInstanceMigrationDocument caseInstanceMigrationDocumentFromString = CaseInstanceMigrationDocumentConverter.convertFromJson(documentAsJson);
+        String documentAsJsonConverted = this.cmmnMigrationService.createCaseInstanceMigrationBuilderFromCaseInstanceMigrationDocument(
+                        caseInstanceMigrationDocumentFromString)
+                .getCaseInstanceMigrationDocument()
+                .asJsonString();
+        assertThatJson(documentAsJsonConverted).isEqualTo(documentAsJson);
     }
 
     protected class CustomTenantProvider implements DefaultTenantProvider {
