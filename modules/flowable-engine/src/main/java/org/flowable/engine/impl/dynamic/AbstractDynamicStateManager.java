@@ -43,6 +43,7 @@ import org.flowable.bpmn.model.Gateway;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
@@ -102,6 +103,7 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityI
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.slf4j.Logger;
@@ -1118,8 +1120,9 @@ public abstract class AbstractDynamicStateManager {
             processEngineConfiguration.getActivityInstanceEntityManager().syncUserTaskExecution(childExecution, newFlowElement, oldActivityId, task);
         }
 
-        // If we are moving an ExternalWorkerServiceTask we need to update its job
-        if (newFlowElement instanceof ExternalWorkerServiceTask) {
+        if (newFlowElement instanceof ServiceTask && (((ServiceTask) newFlowElement).isAsynchronous() || ((ServiceTask) newFlowElement).isAsynchronousLeave())) {
+            handleServiceTaskJobUpdate(childExecution, commandContext);
+        } else if (newFlowElement instanceof ExternalWorkerServiceTask) {
             handleExternalWorkerServiceTaskJobUpdate(childExecution, commandContext);
         }
 
@@ -1135,20 +1138,22 @@ public abstract class AbstractDynamicStateManager {
         }
         return childExecution;
     }
-
-    protected void handleExternalWorkerServiceTaskJobUpdate(ExecutionEntity childExecution, CommandContext commandContext) {
+    
+    protected void handleServiceTaskJobUpdate(ExecutionEntity childExecution, CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ManagementService managementService = processEngineConfiguration.getManagementService();
 
-        //Update an existing external worker job
-        ExternalWorkerJobEntityImpl externalWorkerJob = (ExternalWorkerJobEntityImpl) managementService.createExternalWorkerJobQuery()
+        // An existing executable job is not updated, because it's not needed and could lead to optimistic lock exceptions
+        
+        // Update an existing timer job
+        TimerJobEntityImpl timerJob = (TimerJobEntityImpl) managementService.createTimerJobQuery()
                 .executionId(childExecution.getId()).singleResult();
-        if (externalWorkerJob != null) {
-            externalWorkerJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+        if (timerJob != null) {
+            timerJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
             return;
         }
 
-        //Update an existing dead letter job
+        // Update an existing dead letter job
         DeadLetterJobEntityImpl deadLetterJob = (DeadLetterJobEntityImpl) managementService.createDeadLetterJobQuery()
                 .executionId(childExecution.getId()).singleResult();
         if (deadLetterJob != null) {
@@ -1156,7 +1161,36 @@ public abstract class AbstractDynamicStateManager {
             return;
         }
 
-        //Update an existing suspended job
+        // Update an existing suspended job
+        SuspendedJobEntityImpl suspendedJob = (SuspendedJobEntityImpl) managementService.createSuspendedJobQuery()
+                .executionId(childExecution.getId()).singleResult();
+        if (suspendedJob != null) {
+            suspendedJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            return;
+        }
+    }
+
+    protected void handleExternalWorkerServiceTaskJobUpdate(ExecutionEntity childExecution, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ManagementService managementService = processEngineConfiguration.getManagementService();
+
+        // Update an existing external worker job
+        ExternalWorkerJobEntityImpl externalWorkerJob = (ExternalWorkerJobEntityImpl) managementService.createExternalWorkerJobQuery()
+                .executionId(childExecution.getId()).singleResult();
+        if (externalWorkerJob != null) {
+            externalWorkerJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            return;
+        }
+
+        // Update an existing dead letter job
+        DeadLetterJobEntityImpl deadLetterJob = (DeadLetterJobEntityImpl) managementService.createDeadLetterJobQuery()
+                .executionId(childExecution.getId()).singleResult();
+        if (deadLetterJob != null) {
+            deadLetterJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            return;
+        }
+
+        // Update an existing suspended job
         SuspendedJobEntityImpl suspendedJob = (SuspendedJobEntityImpl) managementService.createSuspendedJobQuery()
                 .executionId(childExecution.getId()).singleResult();
         if (suspendedJob != null) {
