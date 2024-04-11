@@ -5791,6 +5791,33 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .doesNotContain("Event Listener");
     }
 
+
+    @Test
+    void withCaseTaskWhichWillBeTerminated() {
+        // Arrange
+        CaseDefinition subcaseDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        deployCaseDefinition("test2", "org/flowable/cmmn/test/migration/case-with-subcase.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testParentCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test2", "org/flowable/cmmn/test/migration/case-without-subcase.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addTerminatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("cmmnTask_1"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        HistoricPlanItemInstance cmmnTask1 = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId())
+                .planItemInstanceDefinitionId("cmmnTask_1")
+                .singleResult();
+        assertThat(cmmnTask1.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+        long subcaseInstances = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionId(subcaseDefinition.getId())
+                .count();
+        assertThat(subcaseInstances).isEqualTo(0);
+    }
+
     protected class CustomTenantProvider implements DefaultTenantProvider {
 
         @Override
