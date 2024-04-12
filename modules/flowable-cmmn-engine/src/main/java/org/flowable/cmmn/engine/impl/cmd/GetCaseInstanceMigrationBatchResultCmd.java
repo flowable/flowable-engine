@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class GetCaseInstanceMigrationBatchResultCmd implements Command<CaseInstanceBatchMigrationResult> {
 
     protected static final String BATCH_RESULT_MESSAGE_LABEL = "resultMessage";
+    protected static final String BATCH_RESULT_STACKTRACE_LABEL = "resultStacktrace";
     protected String migrationBatchId;
 
     public GetCaseInstanceMigrationBatchResultCmd(String migrationBatchId) {
@@ -97,6 +98,11 @@ public class GetCaseInstanceMigrationBatchResultCmd implements Command<CaseInsta
                 if (resultNode.has(BATCH_RESULT_MESSAGE_LABEL)) {
                     String resultMessage = resultNode.get(BATCH_RESULT_MESSAGE_LABEL).asText();
                     partResult.setMigrationMessage(resultMessage);
+                }
+                
+                if (resultNode.has(BATCH_RESULT_STACKTRACE_LABEL)) {
+                    String resultStacktrace = resultNode.get(BATCH_RESULT_STACKTRACE_LABEL).asText();
+                    partResult.setMigrationStacktrace(resultStacktrace);
                 }
 
             } catch (IOException e) {

@@ -14,11 +14,9 @@
 package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
@@ -480,6 +478,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
+            job.setRetries(0);
             jobService.scheduleAsyncJob(job);
         }
 
@@ -488,6 +487,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
             timerJob.setRevision(1);
+            timerJob.setRetries(0);
             timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             timerJob.setScopeType(ScopeTypes.CMMN);

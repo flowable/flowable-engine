@@ -12,10 +12,15 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
-import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
@@ -48,31 +53,53 @@ public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceM
         Batch batch = batchService.getBatch(batchPart.getBatchId());
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentImpl.fromJson(batch.getBatchDocumentJson(processEngineConfiguration.getEngineCfgKey()));
 
-        String exceptionMessage = null;
         try {
             processInstanceMigrationManager.migrateProcessInstance(batchPart.getScopeId(), migrationDocument, commandContext);
-        } catch (FlowableException e) {
-            exceptionMessage = e.getMessage();
-        }
+        } catch (Exception e) {
+            String exceptionMessage = e.getMessage();
+            
+            processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    CommandConfig commandConfig = processEngineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
+                    return processEngineConfiguration.getCommandExecutor().execute(commandConfig, new Command<>() {
+                        @Override
+                        public Void execute(CommandContext commandContext2) {
+                            String resultAsJsonString = prepareResultAsJsonString(exceptionMessage, e);
+                            batchService.completeBatchPart(batchPartId, ProcessInstanceBatchMigrationResult.RESULT_FAIL, resultAsJsonString);
 
-        String resultAsJsonString = prepareResultAsJsonString(exceptionMessage);
-        
-        if (exceptionMessage != null) {
-            batchService.completeBatchPart(batchPartId, ProcessInstanceBatchMigrationResult.RESULT_FAIL, resultAsJsonString);
-        } else {
-            batchService.completeBatchPart(batchPartId, ProcessInstanceBatchMigrationResult.RESULT_SUCCESS, resultAsJsonString);
+                            return null;
+                        }
+                    });
+                }
+            });
+            
+            FlowableBatchPartMigrationException wrappedException = new FlowableBatchPartMigrationException(e.getMessage(), e);
+            wrappedException.setIgnoreFailedJob(true);
+            throw wrappedException;
         }
+        
+        String resultAsJsonString = prepareResultAsJsonString();
+        batchService.completeBatchPart(batchPartId, ProcessInstanceBatchMigrationResult.RESULT_SUCCESS, resultAsJsonString);
     }
 
-    protected static String prepareResultAsJsonString(String exceptionMessage) {
+    protected String prepareResultAsJsonString(String exceptionMessage, Exception e) {
         ObjectNode objectNode = getObjectMapper().createObjectNode();
-        if (exceptionMessage == null) {
-            objectNode.put(BATCH_RESULT_STATUS_LABEL, ProcessInstanceBatchMigrationResult.RESULT_SUCCESS);
-        } else {
-            objectNode.put(BATCH_RESULT_STATUS_LABEL, ProcessInstanceBatchMigrationResult.RESULT_FAIL);
-            objectNode.put(BATCH_RESULT_MESSAGE_LABEL, exceptionMessage);
-        }
+        objectNode.put(BATCH_RESULT_STATUS_LABEL, ProcessInstanceBatchMigrationResult.RESULT_FAIL);
+        objectNode.put(BATCH_RESULT_MESSAGE_LABEL, exceptionMessage);
+        objectNode.put(BATCH_RESULT_STACKTRACE_LABEL, getExceptionStacktrace(e));
+        return objectNode.toString();
+    }
+    
+    protected String prepareResultAsJsonString() {
+        ObjectNode objectNode = getObjectMapper().createObjectNode();
+        objectNode.put(BATCH_RESULT_STATUS_LABEL, ProcessInstanceBatchMigrationResult.RESULT_SUCCESS);
         return objectNode.toString();
     }
 
+    protected String getExceptionStacktrace(Throwable exception) {
+        StringWriter stringWriter = new StringWriter();
+        exception.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString();
+    }
 }

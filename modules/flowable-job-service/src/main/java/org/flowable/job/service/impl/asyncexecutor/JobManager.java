@@ -127,6 +127,8 @@ public interface JobManager {
      */
     HistoryJobEntity moveDeadLetterJobToHistoryJob(DeadLetterJobEntity deadLetterJobEntity, int retries);
     
+    void deleteExecutableJob(JobInfo job);
+    
     /**
      * schedules a {@link HistoryJobEntity}, meaning it will be scheduled (inserted in the database/put on a queue/...) to be executed at a later point in time.
      */

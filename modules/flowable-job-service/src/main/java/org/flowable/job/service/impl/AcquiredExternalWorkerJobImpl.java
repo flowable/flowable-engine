@@ -155,4 +155,5 @@ public class AcquiredExternalWorkerJobImpl implements AcquiredExternalWorkerJob 
     public Date getLockExpirationTime() {
         return job.getLockExpirationTime();
     }
+    
 }

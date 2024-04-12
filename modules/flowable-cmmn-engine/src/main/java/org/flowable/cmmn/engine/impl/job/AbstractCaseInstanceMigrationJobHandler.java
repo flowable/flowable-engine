@@ -25,6 +25,7 @@ public abstract class AbstractCaseInstanceMigrationJobHandler implements JobHand
 
     public static final String BATCH_RESULT_STATUS_LABEL = "resultStatus";
     public static final String BATCH_RESULT_MESSAGE_LABEL = "resultMessage";
+    public static final String BATCH_RESULT_STACKTRACE_LABEL = "resultStacktrace";
 
     protected static final String CFG_LABEL_BATCH_ID = "batchId";
     protected static final String CFG_LABEL_BATCH_PART_ID = "batchPartId";
