@@ -22,6 +22,7 @@ public class CaseInstanceBatchMigrationPartResult {
     protected String sourceCaseDefinitionId;
     protected String targetCaseDefinitionId;
     protected String migrationMessage;
+    protected String migrationStacktrace;
 
     public String getBatchId() {
         return batchId;
@@ -77,5 +78,13 @@ public class CaseInstanceBatchMigrationPartResult {
 
     public void setMigrationMessage(String migrationMessage) {
         this.migrationMessage = migrationMessage;
+    }
+    
+    public String getMigrationStacktrace() {
+        return migrationStacktrace;
+    }
+
+    public void setMigrationStacktrace(String migrationStacktrace) {
+        this.migrationStacktrace = migrationStacktrace;
     }
 }

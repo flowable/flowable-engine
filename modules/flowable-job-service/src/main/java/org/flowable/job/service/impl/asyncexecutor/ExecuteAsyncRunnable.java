@@ -15,11 +15,13 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
 import org.flowable.common.engine.api.tenant.TenantContext;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.tenant.CurrentTenant;
 import org.flowable.job.api.HistoryJob;
@@ -197,6 +199,24 @@ public class ExecuteAsyncRunnable implements Runnable {
     }
 
     protected void handleFailedJob(final Throwable exception) {
+        if (exception instanceof FlowableBatchPartMigrationException && ((FlowableBatchPartMigrationException) exception).isIgnoreFailedJob()) {
+            jobServiceConfiguration.getCommandExecutor().execute(new Command<>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    CommandConfig commandConfig = jobServiceConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
+                    return jobServiceConfiguration.getCommandExecutor().execute(commandConfig, new Command<>() {
+                        @Override
+                        public Void execute(CommandContext commandContext2) {
+                            jobServiceConfiguration.getJobManager().deleteExecutableJob(job);
+                            return null;
+                        }
+                    });
+                }
+            });
+            
+            return;
+        }
+        
         for (AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler : asyncRunnableExecutionExceptionHandlers) {
             if (asyncRunnableExecutionExceptionHandler.handleException(this.jobServiceConfiguration, this.job, exception)) {
                 

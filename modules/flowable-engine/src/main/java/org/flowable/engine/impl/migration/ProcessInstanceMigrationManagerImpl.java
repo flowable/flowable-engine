@@ -349,6 +349,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             job.setProcessInstanceId(processInstance.getId());
             job.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
+            job.setRetries(0);
             jobService.scheduleAsyncJob(job);
         }
         
@@ -357,6 +358,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
             timerJob.setRevision(1);
+            timerJob.setRetries(0);
             timerJob.setJobHandlerType(ProcessInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             

@@ -99,8 +99,6 @@ public class HistoricCaseInstanceMigrationBatchTest extends AbstractCaseMigratio
 
         for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
             assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
         }
 
@@ -198,10 +196,18 @@ public class HistoricCaseInstanceMigrationBatchTest extends AbstractCaseMigratio
 
         for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
             assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_FAIL);
-            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_FAIL);
+            assertThat(part.getMigrationMessage()).contains("Tenant mismatch between");
+            assertThat(part.getMigrationStacktrace()).contains("Tenant mismatch between");
         }
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
 
         assertAfterMigrationState(2, caseInstance1, caseDefinitionVersion1, caseInstance1AfterMigration, 1);
         assertAfterMigrationState(2, caseInstance2, caseDefinitionVersion1, caseInstance2AfterMigration, 1);
