@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
@@ -5250,6 +5251,34 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .filteredOn("name", "Stage 2")
                 .extracting(PlanItemInstance::getState)
                 .containsOnly(PlanItemInstanceState.AVAILABLE);
+    }
+
+    @Test
+    void migrateCaseInstancesWithMoveStageToAvailableAndAlreadyAvailableStage() {
+        // Arrange
+        CaseDefinition definition1 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/task-followed-by-stage.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition definition2 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/task-followed-by-stage.cmmn.xml");
+
+        assertThat(definition2.getId()).isNotEqualTo(definition1.getId());
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(definition2.getId())
+                .addMoveToAvailablePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("cmmnStage_2"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances)
+                .hasSize(2)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("Task 1", PlanItemInstanceState.ACTIVE),
+                        Tuple.tuple("Stage", PlanItemInstanceState.AVAILABLE)
+                );
     }
 
     @Test

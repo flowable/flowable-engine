@@ -355,6 +355,7 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
             
             PlanItemInstance existingPlanItemInstance = null;
+            boolean allExistingPlanItemsAreAvailable = true;
             for (PlanItemInstance planItemInstance : planItemInstances) {
                 if (PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState()) || PlanItemInstanceState.ENABLED.equals(planItemInstance.getState())) {
                     if (existingPlanItemInstance != null) {
@@ -363,6 +364,14 @@ public abstract class AbstractCmmnDynamicStateManager {
                         existingPlanItemInstance = planItemInstance;
                     }
                 }
+                if (!PlanItemInstanceState.AVAILABLE.equals(planItemInstance.getState())) {
+                    allExistingPlanItemsAreAvailable = false;
+                }
+            }
+
+            if (allExistingPlanItemsAreAvailable) {
+                // all existing plan items are available, we can continue without any changes
+                continue;
             }
             
             if (existingPlanItemInstance == null) {
