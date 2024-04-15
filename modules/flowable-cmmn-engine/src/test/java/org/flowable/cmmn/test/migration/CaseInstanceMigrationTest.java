@@ -523,6 +523,41 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
     }
 
     @Test
+    void withConditionalMoveToAvailableOnTwoTaskProcessWithSentryAndTaskIsActive() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/second-task-linked-with-sentry.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        cmmnTaskService.complete(task.getId());
+
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/second-task-linked-with-sentry.cmmn.xml");
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addMoveToAvailablePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("humanTask2", "${false}"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .list();
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("Task 2", PlanItemInstanceState.ACTIVE)
+                );
+    }
+
+    @Test
     void withSimpleOneTaskCaseIntroducingNewTaskWithConditionalSentryActivated() {
         // Arrange
         deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
