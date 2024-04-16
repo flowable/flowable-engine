@@ -21,7 +21,10 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentImpl;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -49,30 +52,46 @@ public class CaseInstanceMigrationJobHandler extends AbstractCaseInstanceMigrati
         CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentImpl.fromJson(
                 batch.getBatchDocumentJson(engineConfiguration.getEngineCfgKey()));
 
-        String exceptionMessage = null;
         try {
             migrationManager.migrateCaseInstance(batchPart.getScopeId(), migrationDocument, commandContext);
         } catch (FlowableException e) {
-            exceptionMessage = e.getMessage();
+            String exceptionMessage = e.getMessage();
+            
+            engineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    CommandConfig commandConfig = engineConfiguration.getCommandExecutor().getDefaultConfig().transactionRequiresNew();
+                    return engineConfiguration.getCommandExecutor().execute(commandConfig, new Command<Void>() {
+                        @Override
+                        public Void execute(CommandContext commandContext2) {
+                            String resultAsJsonString = prepareResultAsJsonString(exceptionMessage);
+                            batchService.completeBatchPart(batchPartId, CaseInstanceBatchMigrationResult.RESULT_FAIL, resultAsJsonString);
+                            
+                            return null;
+                        }
+                    });
+                }
+            });
+            
+            FlowableBatchPartMigrationException wrappedException = new FlowableBatchPartMigrationException(e.getMessage(), e);
+            wrappedException.setIgnoreFailedJob(true);
+            throw wrappedException;
         }
 
-        String resultAsJsonString = prepareResultAsJsonString(exceptionMessage);
-
-        if (exceptionMessage != null) {
-            batchService.completeBatchPart(batchPartId, CaseInstanceBatchMigrationResult.RESULT_FAIL, resultAsJsonString);
-        } else {
-            batchService.completeBatchPart(batchPartId, CaseInstanceBatchMigrationResult.RESULT_SUCCESS, resultAsJsonString);
-        }
+        String resultAsJsonString = prepareResultAsJsonString();
+        batchService.completeBatchPart(batchPartId, CaseInstanceBatchMigrationResult.RESULT_SUCCESS, resultAsJsonString);
+    }
+    
+    protected String prepareResultAsJsonString() {
+        ObjectNode objectNode = getObjectMapper().createObjectNode();
+        objectNode.put(BATCH_RESULT_STATUS_LABEL, CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
+        return objectNode.toString();
     }
 
-    protected static String prepareResultAsJsonString(String exceptionMessage) {
+    protected String prepareResultAsJsonString(String exceptionMessage) {
         ObjectNode objectNode = getObjectMapper().createObjectNode();
-        if (exceptionMessage == null) {
-            objectNode.put(BATCH_RESULT_STATUS_LABEL, CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
-        } else {
-            objectNode.put(BATCH_RESULT_STATUS_LABEL, CaseInstanceBatchMigrationResult.RESULT_FAIL);
-            objectNode.put(BATCH_RESULT_MESSAGE_LABEL, exceptionMessage);
-        }
+        objectNode.put(BATCH_RESULT_STATUS_LABEL, CaseInstanceBatchMigrationResult.RESULT_FAIL);
+        objectNode.put(BATCH_RESULT_MESSAGE_LABEL, exceptionMessage);
         return objectNode.toString();
     }
 

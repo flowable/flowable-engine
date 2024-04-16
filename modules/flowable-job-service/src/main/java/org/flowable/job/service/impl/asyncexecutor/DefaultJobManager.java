@@ -464,6 +464,13 @@ public class DefaultJobManager implements JobManager {
 
         }
     }
+    
+    @Override
+    public void deleteExecutableJob(JobInfo job) {
+        if (job instanceof JobEntity) {
+            jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+        } 
+    }
 
     protected String getExceptionStacktrace(Throwable exception) {
         StringWriter stringWriter = new StringWriter();
