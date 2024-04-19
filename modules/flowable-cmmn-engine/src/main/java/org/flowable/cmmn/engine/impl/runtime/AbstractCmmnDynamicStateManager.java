@@ -379,7 +379,11 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
             
             PlanItemInstanceEntity existingPlanItemInstanceEntity = (PlanItemInstanceEntity) existingPlanItemInstance;
-            
+
+            if (!evaluateCondition(existingPlanItemInstanceEntity, planItemDefinitionMapping)) {
+                continue;
+            }
+
             if (existingPlanItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof HumanTask) {
                 TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
                 List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(existingPlanItemInstanceEntity.getId(), ScopeTypes.CMMN);
