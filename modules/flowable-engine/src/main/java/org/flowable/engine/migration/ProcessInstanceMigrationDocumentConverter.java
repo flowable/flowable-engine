@@ -419,7 +419,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         @Override
         public ActivityMigrationMapping.ManyToOneMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
             JsonNode fromActivityIdsNode = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_IDS_JSON_PROPERTY);
-            List<String> fromActivityIds = objectMapper.convertValue(fromActivityIdsNode, new TypeReference<>() {
+            List<String> fromActivityIds = objectMapper.convertValue(fromActivityIdsNode, new TypeReference<List<String>>() {
 
             });
             String toActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
@@ -469,7 +469,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         public ActivityMigrationMapping.OneToManyMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
             String fromActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY).textValue();
             JsonNode toActivityIdsNode = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_IDS_JSON_PROPERTY);
-            List<String> toActivityIds = objectMapper.convertValue(toActivityIdsNode, new TypeReference<>() {
+            List<String> toActivityIds = objectMapper.convertValue(toActivityIdsNode, new TypeReference<List<String>>() {
 
             });
 
