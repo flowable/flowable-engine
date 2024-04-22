@@ -5899,6 +5899,8 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                                 "${removeRepetitionCondition}"))
                 .addActivatePlanItemDefinitionMapping(
                         PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("activateId", "${activateCondition}"))
+                .addChangePlanItemIdMapping(new ChangePlanItemIdMapping("oldPlanItemId", "newPlanItemId"))
+                .addChangePlanItemIdWithDefinitionIdMapping(new ChangePlanItemIdWithDefinitionIdMapping("oldPlanItemDefinitionId", "newPlanItemDefinitionId"))
                 .withPreUpgradeExpression("${preExpression}")
                 .withPostUpgradeExpression("${postExpression}")
                 .getCaseInstanceMigrationDocument()
