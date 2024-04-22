@@ -54,6 +54,10 @@ public interface CaseInstanceMigrationDocumentBuilder {
     CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
 
     CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> mappings);
+    
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMapping(ChangePlanItemDefinitionWithNewTargetIdsMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> mappings);
 
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariable(String variableName, Object variableValue);
 

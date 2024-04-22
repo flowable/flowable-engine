@@ -30,6 +30,7 @@ public class ChangePlanItemStateRequest {
     protected List<String> removeWaitingForRepetitionPlanItemDefinitionIds;
     protected Map<String, String> changePlanItemIds;
     protected Map<String, String> changePlanItemIdsWithDefinitionId;
+    protected List<PlanItemDefinitionWithTargetIdsRequest> changePlanItemDefinitionsWithNewTargetIds;
 
     public List<String> getActivatePlanItemDefinitionIds() {
         return activatePlanItemDefinitionIds;
@@ -93,5 +94,13 @@ public class ChangePlanItemStateRequest {
     public void setChangePlanItemIdsWithDefinitionId(Map<String, String> changePlanItemIdsWithDefinitionId) {
         this.changePlanItemIdsWithDefinitionId = changePlanItemIdsWithDefinitionId;
     }
-	
+
+    public List<PlanItemDefinitionWithTargetIdsRequest> getChangePlanItemDefinitionsWithNewTargetIds() {
+        return changePlanItemDefinitionsWithNewTargetIds;
+    }
+
+    @ApiModelProperty(value = "map an existing plan item id to a new plan item id and plan item definition id, this should not be necessary in general, but could be needed when plan item ids change between case definition versions.")
+    public void setChangePlanItemDefinitionsWithNewTargetIds(List<PlanItemDefinitionWithTargetIdsRequest> changePlanItemDefinitionsWithNewTargetIds) {
+        this.changePlanItemDefinitionsWithNewTargetIds = changePlanItemDefinitionsWithNewTargetIds;
+    }
 }
