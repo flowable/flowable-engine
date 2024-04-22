@@ -132,10 +132,22 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         this.changePlanItemIdMappings.add(mapping);
         return this;
     }
-    
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMappings(List<ChangePlanItemIdMapping> mappings) {
+        this.changePlanItemIdMappings.addAll(mappings);
+        return this;
+    }
+
     @Override
     public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping) {
         this.changePlanItemIdWithDefinitionIdMappings.add(mapping);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> mappings) {
+        this.changePlanItemIdWithDefinitionIdMappings.addAll(mappings);
         return this;
     }
 

@@ -52,6 +52,8 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
         this.caseInstanceMigrationDocumentDocumentBuilder.addWaitingForRepetitionPlanItemDefinitionMappings(caseInstanceMigrationDocument.getWaitingForRepetitionPlanItemDefinitionMappings());
         this.caseInstanceMigrationDocumentDocumentBuilder.addRemoveWaitingForRepetitionPlanItemDefinitionMappings(caseInstanceMigrationDocument.getRemoveWaitingForRepetitionPlanItemDefinitionMappings());
         this.caseInstanceMigrationDocumentDocumentBuilder.addCaseInstanceVariables(caseInstanceMigrationDocument.getCaseInstanceVariables());
+        this.caseInstanceMigrationDocumentDocumentBuilder.addChangePlanItemIdMappings(caseInstanceMigrationDocument.getChangePlanItemIdMappings());
+        this.caseInstanceMigrationDocumentDocumentBuilder.addChangePlanItemIdWithDefinitionIdMappings(caseInstanceMigrationDocument.getChangePlanItemIdWithDefinitionIdMappings());
         this.caseInstanceMigrationDocumentDocumentBuilder.preUpgradeExpression(caseInstanceMigrationDocument.getPreUpgradeExpression());
         this.caseInstanceMigrationDocumentDocumentBuilder.postUpgradeExpression(caseInstanceMigrationDocument.getPostUpgradeExpression());
         return this;
