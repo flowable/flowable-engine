@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.migration.CaseInstanceBatchMigrationResult;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
@@ -281,6 +282,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
                 .setChangePlanItemIds(changePlanItemStateBuilder.getChangePlanItemIds())
                 .setChangePlanItemIdsWithDefinitionId(changePlanItemStateBuilder.getChangePlanItemIdsWithDefinitionId())
+                .setChangePlanItemDefinitionWithNewTargetIds(changePlanItemStateBuilder.getChangePlanItemDefinitionWithNewTargetIds())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
@@ -388,6 +390,11 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         for (ChangePlanItemIdWithDefinitionIdMapping changePlanItemIdWithDefinitionMapping : document.getChangePlanItemIdWithDefinitionIdMappings()) {
             changePlanItemStateBuilder.changePlanItemIdWithDefinitionId(changePlanItemIdWithDefinitionMapping.getExistingPlanItemDefinitionId(), changePlanItemIdWithDefinitionMapping.getNewPlanItemDefinitionId());
+        }
+        
+        for (ChangePlanItemDefinitionWithNewTargetIdsMapping changePlanItemDefinitionWithNewTargetIdsMapping : document.getChangePlanItemDefinitionWithNewTargetIdsMappings()) {
+            changePlanItemStateBuilder.changePlanItemDefinitionWithNewTargetIds(changePlanItemDefinitionWithNewTargetIdsMapping.getExistingPlanItemDefinitionId(), 
+                    changePlanItemDefinitionWithNewTargetIdsMapping.getNewPlanItemId(), changePlanItemDefinitionWithNewTargetIdsMapping.getNewPlanItemDefinitionId());
         }
 
         return changePlanItemStateBuilder;

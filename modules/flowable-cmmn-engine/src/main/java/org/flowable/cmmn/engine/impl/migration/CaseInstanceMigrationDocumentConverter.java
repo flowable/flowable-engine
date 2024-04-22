@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -98,6 +99,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         ArrayNode changePlanItemIdWithDefinitionIdMappingNodes = convertToJsonChangePlanItemIdWithDefinitionIdMappings(caseInstanceMigrationDocument.getChangePlanItemIdWithDefinitionIdMappings());
         if (changePlanItemIdWithDefinitionIdMappingNodes != null && !changePlanItemIdWithDefinitionIdMappingNodes.isNull()) {
             documentNode.set(CHANGE_PLAN_ITEM_IDS_WITH_DEFINITION_ID_JSON_SECTION, changePlanItemIdWithDefinitionIdMappingNodes);
+        }
+        
+        ArrayNode changePlanItemDefinitionWithNewTargetIdsMappingNodes = convertToJsonChangePlanItemDefinitionWithNewTargetIdsMappings(caseInstanceMigrationDocument.getChangePlanItemDefinitionWithNewTargetIdsMappings());
+        if (changePlanItemDefinitionWithNewTargetIdsMappingNodes != null && !changePlanItemDefinitionWithNewTargetIdsMappingNodes.isNull()) {
+            documentNode.set(CHANGE_PLAN_ITEM_DEFINITION_WITH_NEW_TARGET_IDS_JSON_SECTION, changePlanItemDefinitionWithNewTargetIdsMappingNodes);
         }
 
         if (caseInstanceMigrationDocument.getPreUpgradeExpression() != null) {
@@ -217,6 +223,20 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
         return mappingsArray;
     }
+    
+    protected static ArrayNode convertToJsonChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> definitionIdMappings) {
+        ArrayNode mappingsArray = objectMapper.createArrayNode();
+
+        for (ChangePlanItemDefinitionWithNewTargetIdsMapping mapping : definitionIdMappings) {
+            ObjectNode mappingNode = objectMapper.createObjectNode();
+            mappingNode.put(EXISTING_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getExistingPlanItemDefinitionId());
+            mappingNode.put(NEW_PLAN_ITEM_ID_JSON_PROPERTY, mapping.getNewPlanItemId());
+            mappingNode.put(NEW_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getNewPlanItemDefinitionId());
+            mappingsArray.add(mappingNode);
+        }
+
+        return mappingsArray;
+    }
 
     public static CaseInstanceMigrationDocument convertFromJson(String jsonCaseInstanceMigrationDocument) {
 
@@ -307,6 +327,17 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     String newPlanItemDefinitionId = getJsonProperty(NEW_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     ChangePlanItemIdWithDefinitionIdMapping changePlanItemIdWithDefinitionIdMapping = new ChangePlanItemIdWithDefinitionIdMapping(existingPlanItemDefinitionId, newPlanItemDefinitionId);
                     documentBuilder.addChangePlanItemIdWithDefinitionIdMapping(changePlanItemIdWithDefinitionIdMapping);
+                }
+            }
+            
+            JsonNode changePlanItemDefinitionWithNewTargetIdsMappingNodes = rootNode.get(CHANGE_PLAN_ITEM_DEFINITION_WITH_NEW_TARGET_IDS_JSON_SECTION);
+            if (changePlanItemDefinitionWithNewTargetIdsMappingNodes != null) {
+                for (JsonNode mappingNode : changePlanItemDefinitionWithNewTargetIdsMappingNodes) {
+                    String existingPlanItemDefinitionId = getJsonProperty(EXISTING_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
+                    String newPlanItemId = getJsonProperty(NEW_PLAN_ITEM_ID_JSON_PROPERTY, mappingNode);
+                    String newPlanItemDefinitionId = getJsonProperty(NEW_PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
+                    ChangePlanItemDefinitionWithNewTargetIdsMapping changePlanItemDefinitionWithNewTargetIdsMapping = new ChangePlanItemDefinitionWithNewTargetIdsMapping(existingPlanItemDefinitionId, newPlanItemId, newPlanItemDefinitionId);
+                    documentBuilder.addChangePlanItemDefinitionWithNewTargetIdsMapping(changePlanItemDefinitionWithNewTargetIdsMapping);
                 }
             }
 

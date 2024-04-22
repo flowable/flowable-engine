@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -43,6 +44,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<ChangePlanItemIdMapping> changePlanItemIdMappings = new ArrayList<>();
     protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
+    protected List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings = new ArrayList<>();
     protected String preUpgradeExpression;
     protected String postUpgradeExpression;
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
@@ -93,6 +95,10 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     
     public void setChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings) {
         this.changePlanItemIdWithDefinitionIdMappings = changePlanItemIdWithDefinitionIdMappings;
+    }
+    
+    public void setChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings) {
+        this.changePlanItemDefinitionWithNewTargetIdsMappings = changePlanItemDefinitionWithNewTargetIdsMappings;
     }
 
     public void setCaseInstanceVariables(Map<String, Object> caseInstanceVariables) {
@@ -160,6 +166,11 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     @Override
     public List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings() {
         return changePlanItemIdWithDefinitionIdMappings;
+    }
+
+    @Override
+    public List<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIdsMappings() {
+        return changePlanItemDefinitionWithNewTargetIdsMappings;
     }
 
     @Override

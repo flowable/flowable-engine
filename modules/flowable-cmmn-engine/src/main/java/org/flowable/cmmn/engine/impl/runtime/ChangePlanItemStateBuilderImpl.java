@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -43,6 +44,7 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     protected Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions = new HashSet<>();
     protected Set<ChangePlanItemIdMapping> changePlanItemIds = new HashSet<>();
     protected Set<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdsWithDefinitionId = new HashSet<>();
+    protected Set<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIds = new HashSet<>();
     protected Map<String, Object> caseVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
 
@@ -206,6 +208,12 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
         }
         return this;
     }
+    
+    @Override
+    public ChangePlanItemStateBuilder changePlanItemDefinitionWithNewTargetIds(String existingPlanItemDefinitionId, String newPlanItemId, String newPlanItemDefinitionId) {
+        changePlanItemDefinitionWithNewTargetIds.add(new ChangePlanItemDefinitionWithNewTargetIdsMapping(existingPlanItemDefinitionId, newPlanItemId, newPlanItemDefinitionId));
+        return this;
+    }
 
     @Override
     public ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue) {
@@ -275,6 +283,10 @@ public class ChangePlanItemStateBuilderImpl implements ChangePlanItemStateBuilde
     
     public Set<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdsWithDefinitionId() {
         return changePlanItemIdsWithDefinitionId;
+    }
+    
+    public Set<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIds() {
+        return changePlanItemDefinitionWithNewTargetIds;
     }
 
     public Map<String, Object> getCaseVariables() {
