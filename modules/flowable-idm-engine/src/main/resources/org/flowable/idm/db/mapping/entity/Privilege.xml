@@ -62,6 +62,13 @@
       <if test="id != null">
         RES.ID_ = #{id}
       </if>
+      <if test="ids != null &amp;&amp; !ids.empty">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>

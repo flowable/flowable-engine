@@ -37,6 +37,7 @@ public interface CaseInstanceMigrationDocumentConstants {
     String REMOVE_WAITING_FOR_REPETITION_PLAN_ITEM_DEFINITIONS_JSON_SECTION = "removeWaitingForRepetitionPlanItemDefinitions";
     String CHANGE_PLAN_ITEM_IDS_JSON_SECTION = "changePlanItemIds";
     String CHANGE_PLAN_ITEM_IDS_WITH_DEFINITION_ID_JSON_SECTION = "changePlanItemIdsWithDefinitionId";
+    String CHANGE_PLAN_ITEM_DEFINITION_WITH_NEW_TARGET_IDS_JSON_SECTION = "changePlanItemDefinitionWithNewTargetIds";
     String PRE_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY = "preUpgradeExpression";
     String POST_UPGRADE_EXPRESSION_KEY_JSON_PROPERTY = "postUpgradeExpression";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";

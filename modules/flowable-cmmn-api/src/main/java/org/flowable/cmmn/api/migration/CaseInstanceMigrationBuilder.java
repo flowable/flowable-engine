@@ -133,6 +133,16 @@ public interface CaseInstanceMigrationBuilder {
      * @see ChangePlanItemIdWithDefinitionIdMapping
      */
     CaseInstanceMigrationBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
+    
+    /**
+     * Adds a mapping for a plan item definition id to a new plan item id and definition id to change the plan item id. This should not be needed in general, 
+     * but there are cases where the plan item can have a new plan item id between different versions, and that's why this option is added.
+     *
+     * @param mapping Mapping from an existing plan item definition id to a new plan item id and definition id to change the plan item id
+     * @return Returns the builder
+     * @see ChangePlanItemDefinitionWithNewTargetIdsMapping
+     */
+    CaseInstanceMigrationBuilder addChangePlanItemDefinitionWithNewTargetIdsMapping(ChangePlanItemDefinitionWithNewTargetIdsMapping mapping);
 
     /**
      * Specifies an expression which is executed before the migration starts.

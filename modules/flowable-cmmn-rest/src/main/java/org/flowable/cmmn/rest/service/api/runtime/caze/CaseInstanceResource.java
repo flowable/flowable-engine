@@ -218,6 +218,13 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
         } else if (planItemStateRequest.getChangePlanItemIdsWithDefinitionId() != null && !planItemStateRequest.getChangePlanItemIdsWithDefinitionId().isEmpty()) {
             changePlanItemStateBuilder.changePlanItemIdsWithDefinitionId(planItemStateRequest.getChangePlanItemIdsWithDefinitionId())
                 .changeState();
+        
+        } else if (planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds() != null && !planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds().isEmpty()) {
+            for (PlanItemDefinitionWithTargetIdsRequest definition : planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds()) {
+                changePlanItemStateBuilder.changePlanItemDefinitionWithNewTargetIds(definition.getExistingPlanItemDefinitionId(), definition.getNewPlanItemId(), definition.getNewPlanItemDefinitionId());
+            }
+            
+            changePlanItemStateBuilder.changeState();
         }
         
     }

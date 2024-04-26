@@ -142,6 +142,12 @@ public interface ChangePlanItemStateBuilder {
     ChangePlanItemStateBuilder changePlanItemIdsWithDefinitionId(Map<String, String> changePlanItemIdWithDefinitionIdMap);
     
     /**
+     * Add plan item id mapping with definition id. This should not be needed in general, but there are cases where the existing plan item id 
+     * is different from the new plan item id, and for this reason this option is provided.
+     */
+    ChangePlanItemStateBuilder changePlanItemDefinitionWithNewTargetIds(String existingPlanItemDefinitionId, String newPlanItemId, String newPlanItemDefinitionId);
+    
+    /**
      * Set the case variable that should be set as part of the change plan item state action.
      */
     ChangePlanItemStateBuilder caseVariable(String caseVariableName, Object caseVariableValue);

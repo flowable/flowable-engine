@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -87,6 +87,7 @@ import org.flowable.job.service.JobService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,6 +136,8 @@ public abstract class AbstractCmmnDynamicStateManager {
         setCaseDefinitionIdForPlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo());
         
         executeChangePlanItemIds(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
+        
+        executeChangePlanItemDefinitionWithNewTargetIds(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
         
         navigatePlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo());
         
@@ -208,6 +211,52 @@ public abstract class AbstractCmmnDynamicStateManager {
                 historicMilestoneInstanceEntity.setElementId(milestoneInstanceEntity.getElementId());
                 historicMilestoneInstanceEntity.setCaseDefinitionId(caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId());
                 historicMilestoneInstanceEntityManager.update(historicMilestoneInstanceEntity);
+            }
+        }
+    }
+    
+    protected void executeChangePlanItemDefinitionWithNewTargetIds(CaseInstanceChangeState caseInstanceChangeState, String originalCaseDefinitionId, CommandContext commandContext) {
+        if ((caseInstanceChangeState.getChangePlanItemDefinitionWithNewTargetIds() == null || caseInstanceChangeState.getChangePlanItemDefinitionWithNewTargetIds().isEmpty())) {
+            return;
+        }
+        
+        Map<String, ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemIdMap = new HashMap<>();
+        Map<String, ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionIdMap = new HashMap<>();
+        
+        CmmnModel originalCmmnModel = CaseDefinitionUtil.getCmmnModel(originalCaseDefinitionId);
+        CmmnModel targetCmmnModel = CaseDefinitionUtil.getCmmnModel(caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId());
+        for (ChangePlanItemDefinitionWithNewTargetIdsMapping definitionIdMapping : caseInstanceChangeState.getChangePlanItemDefinitionWithNewTargetIds()) {
+            PlanItem existingPlanItem = originalCmmnModel.findPlanItemByPlanItemDefinitionId(definitionIdMapping.getExistingPlanItemDefinitionId());
+            PlanItem newPlanItem = targetCmmnModel.findPlanItemByPlanItemDefinitionId(definitionIdMapping.getNewPlanItemDefinitionId());
+            
+            if (existingPlanItem != null && newPlanItem != null) {
+                changePlanItemIdMap.put(existingPlanItem.getId(), definitionIdMapping);
+                changePlanItemDefinitionIdMap.put(definitionIdMapping.getExistingPlanItemDefinitionId(), definitionIdMapping);
+            }
+        }
+        
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
+        CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+        for (String planItemDefinitionId : caseInstanceChangeState.getCurrentPlanItemInstances().keySet()) {
+            for (PlanItemInstanceEntity currentPlanItemInstance : caseInstanceChangeState.getCurrentPlanItemInstances().get(planItemDefinitionId)) {
+                if (changePlanItemIdMap.containsKey(currentPlanItemInstance.getElementId())) {
+                    ChangePlanItemDefinitionWithNewTargetIdsMapping definitionIdMapping = changePlanItemIdMap.get(currentPlanItemInstance.getElementId());
+                    currentPlanItemInstance.setElementId(definitionIdMapping.getNewPlanItemId());
+                    currentPlanItemInstance.setPlanItemDefinitionId(definitionIdMapping.getNewPlanItemDefinitionId());
+                    planItemInstanceEntityManager.update(currentPlanItemInstance);
+                    cmmnHistoryManager.recordPlanItemInstanceUpdated(currentPlanItemInstance);
+                }
+            }
+        }
+        
+        TaskEntityManager taskEntityManager = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskEntityManager();
+        List<TaskEntity> tasks = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceChangeState.getCaseInstanceId(), ScopeTypes.CMMN);
+        for (TaskEntity task : tasks) {
+            if (changePlanItemDefinitionIdMap.containsKey(task.getTaskDefinitionKey())) {
+                ChangePlanItemDefinitionWithNewTargetIdsMapping definitionIdMapping = changePlanItemDefinitionIdMap.get(task.getTaskDefinitionKey());
+                task.setTaskDefinitionKey(definitionIdMapping.getNewPlanItemDefinitionId());
+                taskEntityManager.update(task);
+                cmmnHistoryManager.recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
             }
         }
     }
@@ -379,7 +428,11 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
             
             PlanItemInstanceEntity existingPlanItemInstanceEntity = (PlanItemInstanceEntity) existingPlanItemInstance;
-            
+
+            if (!evaluateCondition(existingPlanItemInstanceEntity, planItemDefinitionMapping)) {
+                continue;
+            }
+
             if (existingPlanItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof HumanTask) {
                 TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
                 List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(existingPlanItemInstanceEntity.getId(), ScopeTypes.CMMN);
