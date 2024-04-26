@@ -15,6 +15,7 @@ package org.flowable.idm.engine.test.api.identity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -223,6 +224,33 @@ public class PrivilegesTest extends PluggableFlowableIdmTestCase {
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
         idmIdentityService.deletePrivilege(privilege.getId());
+    }
+    
+    @Test
+    public void testGetPrivilegesByIds() {
+        Privilege adminPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName(adminPrivilegename).singleResult();
+        Privilege modelerPrivilege = idmIdentityService.createPrivilegeQuery().privilegeName(modelerPrivilegeName).singleResult();
+        List<String> privilegeIds = new ArrayList<>();
+        privilegeIds.add(adminPrivilege.getId());
+        privilegeIds.add(modelerPrivilege.getId());
+        List<Privilege> privileges = idmIdentityService.createPrivilegeQuery().privilegeIds(privilegeIds).list();
+        assertThat(privileges).hasSize(2);
+        assertThat(privileges)
+                .extracting(Privilege::getId)
+                .contains(adminPrivilege.getId(), modelerPrivilege.getId());
+        assertThat(privileges)
+                .extracting(Privilege::getName)
+                .contains(adminPrivilegename, modelerPrivilegeName);
+        
+        privilegeIds.add("unexisting");
+        privileges = idmIdentityService.createPrivilegeQuery().privilegeIds(privilegeIds).list();
+        assertThat(privileges).hasSize(2);
+        
+        privilegeIds = new ArrayList<>();
+        privilegeIds.add("unknown");
+        privilegeIds.add("unexisting");
+        privileges = idmIdentityService.createPrivilegeQuery().privilegeIds(privilegeIds).list();
+        assertThat(privileges).hasSize(0);
     }
 
 }
