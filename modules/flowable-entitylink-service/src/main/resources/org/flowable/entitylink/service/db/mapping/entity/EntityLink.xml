@@ -117,18 +117,6 @@
     select * from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
   </select>
 
-  <select id="selectEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
-  </select>
-
-  <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
-  </select>
-
-  <select id="selectEntityLinksByRootScopeIdAndRootScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{parameter.rootScopeId} and ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType}
-  </select>
-
   <select id="selectEntityLinks" resultMap="entityLinkResultMap">
     select * from ${prefix}ACT_RU_ENTITYLINK
   </select>
@@ -171,5 +159,42 @@
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
     where LINK_TYPE_ = #{parameter.linkType}
   </select>
+
+    <select id="selectEntityLinksByQuery" parameterType="org.flowable.entitylink.service.impl.InternalEntityLinkQueryImpl" resultMap="entityLinkResultMap">
+        select RES.*
+        from ${prefix}ACT_RU_ENTITYLINK RES
+        <where>
+            <if test="parameter.scopeId != null">
+                AND RES.SCOPE_ID_ = #{parameter.scopeId}
+            </if>
+            <if test="parameter.scopeDefinitionId != null">
+                AND RES.SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId}
+            </if>
+            <if test="parameter.scopeType != null">
+                AND RES.SCOPE_TYPE_ = #{parameter.scopeType}
+            </if>
+            <if test="parameter.referenceScopeId != null">
+                AND RES.REF_SCOPE_ID_ = #{parameter.referenceScopeId}
+            </if>
+            <if test="parameter.referenceScopeDefinitionId != null">
+                AND RES.REF_SCOPE_DEFINITION_ID_ = #{parameter.referenceScopeDefinitionId}
+            </if>
+            <if test="parameter.referenceScopeType != null">
+                AND RES.REF_SCOPE_TYPE_ = #{parameter.referenceScopeType}
+            </if>
+            <if test="parameter.rootScopeId != null">
+                AND RES.ROOT_SCOPE_ID_ = #{parameter.rootScopeId}
+            </if>
+            <if test="parameter.rootScopeType != null">
+                AND RES.ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType}
+            </if>
+            <if test="parameter.linkType != null">
+                AND RES.LINK_TYPE_ = #{parameter.linkType}
+            </if>
+            <if test="parameter.hierarchyType != null">
+                AND RES.HIERARCHY_TYPE_ = #{parameter.hierarchyType}
+            </if>
+        </where>
+    </select>
   
 </mapper>
