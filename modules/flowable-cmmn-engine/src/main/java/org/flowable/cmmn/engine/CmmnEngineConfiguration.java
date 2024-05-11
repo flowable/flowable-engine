@@ -1508,7 +1508,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
 
-        this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1541,7 +1540,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initTaskServiceConfiguration() {
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
-        this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1590,7 +1588,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
-        this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1610,7 +1607,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initEntityLinkServiceConfiguration() {
         if (this.enableEntityLinks) {
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
-            this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
             this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1707,7 +1703,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
-            this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
             this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
