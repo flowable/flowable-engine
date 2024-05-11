@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.api;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -23,6 +24,11 @@ public interface InternalEntityLinkQuery<E extends EntityLinkInfo> {
      * Query entity links with the given scope id.
      */
     InternalEntityLinkQuery<E> scopeId(String scopeId);
+
+    /**
+     * Query entity links with the given scope ids.
+     */
+    InternalEntityLinkQuery<E> scopeIds(Collection<String> scopeIds);
 
     /**
      * Query entity links with the given scope definition id.

@@ -35,6 +35,7 @@ public class InternalEntityLinkQueryImpl<E extends Entity & EntityLinkInfo>
     protected final Function<InternalEntityLinkQueryImpl<E>, E> singleResultProvider;
 
     protected String scopeId;
+    protected Collection<String> scopeIds;
     protected String scopeDefinitionId;
     protected String scopeType;
     protected String referenceScopeId;
@@ -57,6 +58,15 @@ public class InternalEntityLinkQueryImpl<E extends Entity & EntityLinkInfo>
             throw new FlowableIllegalArgumentException("scopeId is empty");
         }
         this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public InternalEntityLinkQuery<E> scopeIds(Collection<String> scopeIds) {
+        if (scopeIds == null || scopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("scopeIds is empty");
+        }
+        this.scopeIds = scopeIds;
         return this;
     }
 
@@ -151,6 +161,10 @@ public class InternalEntityLinkQueryImpl<E extends Entity & EntityLinkInfo>
         return singleResultProvider.apply(this);
     }
 
+    public Collection<String> getScopeIds() {
+        return scopeIds;
+    }
+
     public String getScopeId() {
         return scopeId;
     }
@@ -209,6 +223,10 @@ public class InternalEntityLinkQueryImpl<E extends Entity & EntityLinkInfo>
 
     public boolean isRetained(E entity, InternalEntityLinkQueryImpl<?> param) {
         if (param.scopeId != null && !param.scopeId.equals(entity.getScopeId())) {
+            return false;
+        }
+
+        if (param.scopeIds != null && !param.scopeIds.contains(entity.getScopeId())) {
             return false;
         }
 

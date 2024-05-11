@@ -165,34 +165,40 @@
         from ${prefix}ACT_RU_ENTITYLINK RES
         <where>
             <if test="parameter.scopeId != null">
-                AND RES.SCOPE_ID_ = #{parameter.scopeId}
+                AND RES.SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
+            </if>
+            <if test="parameter.scopeIds != null">
+                AND RES.SCOPE_ID_ in
+                <foreach collection="parameter.scopeIds" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=VARCHAR}
+                </foreach>
             </if>
             <if test="parameter.scopeDefinitionId != null">
-                AND RES.SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId}
+                AND RES.SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId, jdbcType=VARCHAR}
             </if>
             <if test="parameter.scopeType != null">
-                AND RES.SCOPE_TYPE_ = #{parameter.scopeType}
+                AND RES.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
             </if>
             <if test="parameter.referenceScopeId != null">
-                AND RES.REF_SCOPE_ID_ = #{parameter.referenceScopeId}
+                AND RES.REF_SCOPE_ID_ = #{parameter.referenceScopeId, jdbcType=VARCHAR}
             </if>
             <if test="parameter.referenceScopeDefinitionId != null">
-                AND RES.REF_SCOPE_DEFINITION_ID_ = #{parameter.referenceScopeDefinitionId}
+                AND RES.REF_SCOPE_DEFINITION_ID_ = #{parameter.referenceScopeDefinitionId, jdbcType=VARCHAR}
             </if>
             <if test="parameter.referenceScopeType != null">
-                AND RES.REF_SCOPE_TYPE_ = #{parameter.referenceScopeType}
+                AND RES.REF_SCOPE_TYPE_ = #{parameter.referenceScopeType, jdbcType=VARCHAR}
             </if>
             <if test="parameter.rootScopeId != null">
-                AND RES.ROOT_SCOPE_ID_ = #{parameter.rootScopeId}
+                AND RES.ROOT_SCOPE_ID_ = #{parameter.rootScopeId, jdbcType=VARCHAR}
             </if>
             <if test="parameter.rootScopeType != null">
-                AND RES.ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType}
+                AND RES.ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType, jdbcType=VARCHAR}
             </if>
             <if test="parameter.linkType != null">
-                AND RES.LINK_TYPE_ = #{parameter.linkType}
+                AND RES.LINK_TYPE_ = #{parameter.linkType, jdbcType=VARCHAR}
             </if>
             <if test="parameter.hierarchyType != null">
-                AND RES.HIERARCHY_TYPE_ = #{parameter.hierarchyType}
+                AND RES.HIERARCHY_TYPE_ = #{parameter.hierarchyType, jdbcType=VARCHAR}
             </if>
         </where>
     </select>
