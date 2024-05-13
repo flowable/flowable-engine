@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.data.DataManager;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 
 /**
@@ -23,14 +24,12 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
  */
 public interface EntityLinkDataManager extends DataManager<EntityLinkEntity> {
 
-    List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType);
-
-    List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType);
-
     List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
-    
-    List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
-    
+
+    List<EntityLinkEntity> findEntityLinksByQuery(InternalEntityLinkQuery<EntityLinkEntity> query);
+
+    EntityLinkEntity findEntityLinkByQuery(InternalEntityLinkQuery<EntityLinkEntity> query);
+
     void deleteEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
 
     void deleteEntityLinksByRootScopeIdAndType(String scopeId, String scopeType);

@@ -143,7 +143,9 @@ public class CmmnParserImpl implements CmmnParser {
                     continue;
                 }
 
-                if (cmmnModel.findPlanItem(cmmnReference) == null && cmmnModel.getCriterion(cmmnReference) == null) {
+                if (cmmnModel.findPlanItem(cmmnReference) == null && cmmnModel.getCriterion(cmmnReference) == null && 
+                        cmmnModel.findTextAnnotation(cmmnReference) == null) {
+                    
                     logger.warn("Invalid reference in diagram interchange definition: could not find {}", cmmnReference);
                 }
             }

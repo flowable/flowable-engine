@@ -18,13 +18,14 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.EntityLinkDataManager;
-import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByReferenceScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByRootScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksByScopeIdAndTypeMatcher;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
@@ -37,7 +38,6 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByScopeIdAndTypeMatcher = new EntityLinksByScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksByRootScopeIdAndScopeTypeMatcher = new EntityLinksByRootScopeIdAndTypeMatcher();
     protected CachedEntityMatcher<EntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
-    protected CachedEntityMatcher<EntityLinkEntity> entityLinksByReferenceScopeIdAndTypeMatcher = new EntityLinksByReferenceScopeIdAndTypeMatcher();
 
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     
@@ -57,25 +57,6 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
 
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeId", scopeId);
-        parameters.put("scopeType", scopeType);
-        parameters.put("linkType", linkType);
-        return (List) getList("selectEntityLinksByScopeIdAndType", parameters, entityLinksByScopeIdAndTypeMatcher, true);
-    }
-
-    @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("rootScopeId", scopeId);
-        parameters.put("rootScopeType", scopeType);
-        return (List) getList("selectEntityLinksByRootScopeIdAndRootScopeType", parameters, entityLinksByRootScopeIdAndScopeTypeMatcher, true);
-    }
-
-    @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scopeId", scopeId);
@@ -85,13 +66,15 @@ public class MybatisEntityLinkDataManager extends AbstractDataManager<EntityLink
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("referenceScopeId", referenceScopeId);
-        parameters.put("referenceScopeType", referenceScopeType);
-        parameters.put("linkType", linkType);
-        return (List) getList("selectEntityLinksByReferenceScopeIdAndType", parameters, entityLinksByReferenceScopeIdAndTypeMatcher, true);
+    @SuppressWarnings("unchecked")
+    public List<EntityLinkEntity> findEntityLinksByQuery(InternalEntityLinkQuery<EntityLinkEntity> query) {
+        return getList("selectEntityLinksByQuery", query, (CachedEntityMatcher<EntityLinkEntity>) query, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public EntityLinkEntity findEntityLinkByQuery(InternalEntityLinkQuery<EntityLinkEntity> query) {
+        return getEntity("selectEntityLinksByQuery", query, (SingleCachedEntityMatcher<EntityLinkEntity>) query, true);
     }
 
     @Override

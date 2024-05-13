@@ -17,7 +17,9 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.entitylink.api.EntityLink;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.entitylink.service.impl.InternalEntityLinkQueryImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.EntityLinkDataManager;
 
 /**
@@ -39,27 +41,13 @@ public class EntityLinkEntityManagerImpl
     }
 
     @Override
-    public List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
-        return dataManager.findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
-    }
-
-    @Override
-    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
-        return dataManager.findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
-    }
-
-    @Override
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
 
     @Override
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
-        return dataManager.findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
-    }
-
-    public void deleteEntityLink(EntityLinkEntity identityLink) {
-        delete(identityLink);
+    public InternalEntityLinkQuery<EntityLinkEntity> createInternalEntityLinkQuery() {
+        return new InternalEntityLinkQueryImpl<>(dataManager::findEntityLinksByQuery, dataManager::findEntityLinkByQuery);
     }
 
     @Override
