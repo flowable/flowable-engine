@@ -21,13 +21,32 @@ import java.util.List;
  */
 public interface EntityLinkService {
     
-    List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType);
+    default List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
+        return createInternalEntityLinkQuery()
+                .scopeId(scopeId)
+                .scopeType(scopeType)
+                .linkType(linkType)
+                .list();
+    }
 
-    List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType);
+    default List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
+        return createInternalEntityLinkQuery()
+                .rootScopeId(scopeId)
+                .rootScopeType(scopeType)
+                .list();
+    }
 
     List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
     
-    List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
+    default List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+        return createInternalEntityLinkQuery()
+                .referenceScopeId(referenceScopeId)
+                .referenceScopeType(scopeType)
+                .linkType(linkType)
+                .list();
+    }
+
+    InternalEntityLinkQuery<EntityLink> createInternalEntityLinkQuery();
     
     EntityLink createEntityLink();
     

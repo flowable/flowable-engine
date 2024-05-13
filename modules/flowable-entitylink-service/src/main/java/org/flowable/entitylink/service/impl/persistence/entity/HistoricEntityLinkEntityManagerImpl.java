@@ -17,8 +17,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
+import org.flowable.entitylink.service.impl.InternalEntityLinkQueryImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
 
 /**
@@ -40,11 +42,6 @@ public class HistoricEntityLinkEntityManagerImpl
     }
 
     @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
-        return dataManager.findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
-    }
-
-    @Override
     public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return dataManager.findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
@@ -55,13 +52,8 @@ public class HistoricEntityLinkEntityManagerImpl
     }
 
     @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        return dataManager.findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
-    }
-    
-    @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
-        return dataManager.findHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType, linkType);
+    public InternalEntityLinkQuery<HistoricEntityLinkEntity> createInternalHistoricEntityLinkQuery() {
+        return new InternalEntityLinkQueryImpl<>(dataManager::findHistoricEntityLinksByQuery, dataManager::findHistoricEntityLinkByQuery);
     }
 
     @Override
