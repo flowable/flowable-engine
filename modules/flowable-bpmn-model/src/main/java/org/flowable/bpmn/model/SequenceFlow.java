@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class SequenceFlow extends FlowElement {
 
     protected String conditionExpression;
+    protected String conditionLanguage;
     protected String sourceRef;
     protected String targetRef;
     protected String skipExpression;
@@ -58,6 +59,14 @@ public class SequenceFlow extends FlowElement {
 
     public void setConditionExpression(String conditionExpression) {
         this.conditionExpression = conditionExpression;
+    }
+
+    public String getConditionLanguage() {
+        return conditionLanguage;
+    }
+
+    public void setConditionLanguage(String conditionLanguage) {
+        this.conditionLanguage = conditionLanguage;
     }
 
     public String getSourceRef() {
@@ -123,6 +132,7 @@ public class SequenceFlow extends FlowElement {
     public void setValues(SequenceFlow otherFlow) {
         super.setValues(otherFlow);
         setConditionExpression(otherFlow.getConditionExpression());
+        setConditionLanguage(otherFlow.getConditionLanguage());
         setSourceRef(otherFlow.getSourceRef());
         setTargetRef(otherFlow.getTargetRef());
         setSkipExpression(otherFlow.getSkipExpression());

@@ -33,11 +33,13 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
 
     protected ConditionalEventDefinition conditionalEventDefinition;
     protected String conditionExpression;
+    protected String conditionLanguage;
 
-    public BoundaryConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+    public BoundaryConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage, boolean interrupting) {
         super(interrupting);
         this.conditionalEventDefinition = conditionalEventDefinition;
         this.conditionExpression = conditionExpression;
+        this.conditionLanguage = conditionLanguage;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_WAITING, executionEntity.getActivityId(), 
-                    conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    conditionExpression, conditionLanguage, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                     processEngineConfiguration.getEngineCfgKey());
         }
     }
@@ -59,7 +61,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression);
+        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression, conditionLanguage);
         Object result = expression.getValue(execution);
         if (result instanceof Boolean && (Boolean) result) {
             processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(executionEntity);
@@ -67,7 +69,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_RECEIVED, executionEntity.getActivityId(), 
-                        conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                        conditionExpression, conditionLanguage, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                         processEngineConfiguration.getEngineCfgKey());
             }
             
