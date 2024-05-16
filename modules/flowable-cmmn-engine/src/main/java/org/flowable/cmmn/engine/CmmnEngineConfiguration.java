@@ -1544,7 +1544,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging && historyLevel != HistoryLevel.NONE);
+        this.taskServiceConfiguration.setEnableHistoricTaskLogging(this.enableHistoricTaskLogging);
 
         if (this.taskPostProcessor != null) {
             this.taskServiceConfiguration.setTaskPostProcessor(this.taskPostProcessor);
