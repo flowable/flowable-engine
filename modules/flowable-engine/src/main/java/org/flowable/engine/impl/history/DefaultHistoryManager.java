@@ -513,7 +513,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
-        if (isHistoryLevelAtLeast(HistoryLevel.INSTANCE, taskLogEntryBuilder.getProcessDefinitionId())) {
+        if (isHistoryEnabled(taskLogEntryBuilder.getProcessDefinitionId())) {
             processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
         }
     }
