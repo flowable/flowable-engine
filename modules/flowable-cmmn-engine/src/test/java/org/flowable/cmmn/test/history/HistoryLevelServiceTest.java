@@ -15,7 +15,6 @@ package org.flowable.cmmn.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
