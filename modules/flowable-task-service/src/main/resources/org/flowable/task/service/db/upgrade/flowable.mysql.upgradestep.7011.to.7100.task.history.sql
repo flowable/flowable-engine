@@ -1,1 +1,1 @@
-create index ACT_IDX_ACT_HI_TSK_LOG on ACT_HI_TSK_LOG(TASK_ID_);
+create index ACT_IDX_ACT_HI_TSK_LOG_TASK on ACT_HI_TSK_LOG(TASK_ID_);
