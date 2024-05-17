@@ -235,7 +235,30 @@ public class HistoryLevelServiceTest extends FlowableCmmnTestCase {
         assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().count()).isZero();
     }
-    
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/history/testOneSimpleHumanTaskWithHistoryLevelNone.cmmn")
+    public void testNoneHistoryLevel() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("var1", "test")
+                .variable("var2", 10)
+                .start();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        CmmnHistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(cmmnEngineConfiguration, cmmnManagementService, 10000, 200);
+
+        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().count()).isZero();
+        assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().count()).isZero();
+
+    }
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/history/testTwoTaskCaseTaskLevelPlanItems.cmmn")
     public void testTaskLevelTwoTasksWithCustomPlanItems() {
