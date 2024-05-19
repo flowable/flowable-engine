@@ -1168,6 +1168,14 @@ public abstract class AbstractDynamicStateManager {
             suspendedJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
             return;
         }
+
+        // Update an existing external worker job
+        ExternalWorkerJobEntityImpl externalWorkerJob = (ExternalWorkerJobEntityImpl) managementService.createExternalWorkerJobQuery()
+                .executionId(childExecution.getId()).singleResult();
+        if (externalWorkerJob != null) {
+            externalWorkerJob.setProcessDefinitionId(childExecution.getProcessDefinitionId());
+            return;
+        }
     }
 
     protected void handleExternalWorkerServiceTaskJobUpdate(ExecutionEntity childExecution, CommandContext commandContext) {
