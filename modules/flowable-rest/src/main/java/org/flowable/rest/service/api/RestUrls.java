@@ -606,7 +606,7 @@ public final class RestUrls {
     /**
      * URL template for the collection of batches: <i>management/batches/{0:batchId}/batch-parts</i>
      */
-    public static final String[] URL_BATCH_PART_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCH_PARTS, "{0}", SEGMENT_BATCH_PARTS };
+    public static final String[] URL_BATCH_PART_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCHES, "{0}", SEGMENT_BATCH_PARTS };
 
     /**
      * URL template for a single event subscription: <i>runtime/event-subscriptions/{0:eventSubscriptionId}</i>

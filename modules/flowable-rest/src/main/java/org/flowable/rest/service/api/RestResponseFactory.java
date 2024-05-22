@@ -1267,8 +1267,8 @@ public class RestResponseFactory {
         response.setId(batchPart.getId());
         response.setBatchId(batchPart.getBatchId());
         response.setBatchType(batchPart.getBatchType());
-        response.setSearchKey(batchPart.getBatchSearchKey());
-        response.setSearchKey2(batchPart.getBatchSearchKey2());
+        response.setSearchKey(batchPart.getSearchKey());
+        response.setSearchKey2(batchPart.getSearchKey2());
         response.setScopeId(batchPart.getScopeId());
         response.setSubScopeId(batchPart.getSubScopeId());
         response.setScopeType(batchPart.getScopeType());
