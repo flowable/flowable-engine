@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Test for all REST-operations related to the Batch collection and a single batch resource.
+ * Test getting a BatchPart with the BatchPartCollectionResource.
  */
 public class BatchPartCollectionResourceTest extends BaseSpringRestTestCase {
 
