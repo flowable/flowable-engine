@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
@@ -37,11 +38,6 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
     }
     
     @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
-        return getHistoricEntityLinkEntityManager().findHistoricEntityLinksByScopeIdAndScopeType(scopeId, scopeType, linkType);
-    }
-
-    @Override
     public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return getHistoricEntityLinkEntityManager().findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
@@ -52,13 +48,9 @@ public class HistoricEntityLinkServiceImpl extends CommonServiceImpl<EntityLinkS
     }
 
     @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        return getHistoricEntityLinkEntityManager().findHistoricEntityLinksByReferenceScopeIdAndType(referenceScopeId, scopeType, linkType);
-    }
-    
-    @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
-        return getHistoricEntityLinkEntityManager().findHistoricEntityLinksByScopeDefinitionIdAndScopeType(scopeDefinitionId, scopeType, linkType);
+    @SuppressWarnings("unchecked")
+    public InternalEntityLinkQuery<HistoricEntityLink> createInternalHistoricEntityLinkQuery() {
+        return (InternalEntityLinkQuery) getHistoricEntityLinkEntityManager().createInternalHistoricEntityLinkQuery();
     }
     
     @Override

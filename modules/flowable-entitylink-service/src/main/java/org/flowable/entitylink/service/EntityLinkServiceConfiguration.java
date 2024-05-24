@@ -13,7 +13,6 @@
 package org.flowable.entitylink.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.EntityLinkServiceImpl;
@@ -50,8 +49,6 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     protected EntityLinkEntityManager entityLinkEntityManager;
     protected HistoricEntityLinkEntityManager historicEntityLinkEntityManager;
 
-    protected HistoryLevel historyLevel;
-
     protected ObjectMapper objectMapper;
 
     public EntityLinkServiceConfiguration(String engineName) {
@@ -73,23 +70,6 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         initEntityManagers();
 
         configuratorsAfterInit();
-    }
-
-    @Override
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
-
-    @Override
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
     }
 
     // Data managers
@@ -171,17 +151,6 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
 
     public EntityLinkServiceConfiguration setHistoricEntityLinkEntityManager(HistoricEntityLinkEntityManager historicEntityLinkEntityManager) {
         this.historicEntityLinkEntityManager = historicEntityLinkEntityManager;
-        return this;
-    }
-
-    @Override
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-
-    @Override
-    public EntityLinkServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
         return this;
     }
 

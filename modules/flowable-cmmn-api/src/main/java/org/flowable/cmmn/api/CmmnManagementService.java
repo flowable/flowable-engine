@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.batch.api.Batch;
@@ -232,6 +233,46 @@ public interface CmmnManagementService {
      *            number of retries.
      */
     void setTimerJobRetries(String jobId, int retries);
+    
+    /**
+     * Reschedule a timer job with a new date value.
+     * 
+     * @param jobId
+     *            id of the timer job to reschedule, cannot be null.
+     * @param timeDate
+     *            A fixed date
+     */
+    Job rescheduleTimeDateJob(String jobId, Date timeDate);
+    
+    /**
+     * Reschedule a timer job with a time date value.
+     * 
+     * @param jobId
+     *            id of the timer job to reschedule, cannot be null.
+     * @param timeDateValue
+     *            A fixed date in ISO 8601 format, when job will be fired
+     */
+    Job rescheduleTimeDateValueJob(String jobId, String timeDateValue);
+
+    /**
+     * Reschedule a timer event listener instance with a new date value.
+     * 
+     * @param eventListenerInstanceId
+     *            id of the timer event listener instance to reschedule, cannot be null.
+     * @param timeDate
+     *            A fixed date
+     */
+    Job rescheduleTimerEventListenerInstanceWithDate(String eventListenerInstanceId, Date timeDate);
+    
+    /**
+     * Reschedule a timer event listener instance with a time date value.
+     * 
+     * @param eventListenerInstanceId
+     *            id of the timer event listener instance to reschedule, cannot be null.
+     * @param timeDateValue
+     *            A fixed date in ISO 8601 format, when job will be fired
+     */
+    Job rescheduleTimerEventListenerInstanceWithDateValue(String eventListenerInstanceId, String timeDateValue);
 
     /**
      * Returns the full stacktrace of the exception that occurs when the job with the given id was last executed. 

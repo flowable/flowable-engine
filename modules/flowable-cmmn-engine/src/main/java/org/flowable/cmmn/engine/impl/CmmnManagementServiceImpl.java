@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.batch.api.Batch;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.DeleteBatchCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 import org.flowable.cmmn.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
+import org.flowable.cmmn.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -194,6 +196,26 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
     @Override
     public void setTimerJobRetries(String jobId, int retries) {
         commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries, configuration.getJobServiceConfiguration()));
+    }
+
+    @Override
+    public Job rescheduleTimeDateJob(String jobId, Date timeDate) {
+        return commandExecutor.execute(new RescheduleTimerJobCmd(null, jobId, timeDate, null));
+    }
+
+    @Override
+    public Job rescheduleTimeDateValueJob(String jobId, String timeDateValue) {
+        return commandExecutor.execute(new RescheduleTimerJobCmd(null, jobId, null, timeDateValue));
+    }
+
+    @Override
+    public Job rescheduleTimerEventListenerInstanceWithDate(String eventListenerInstanceId, Date timeDate) {
+        return commandExecutor.execute(new RescheduleTimerJobCmd(eventListenerInstanceId, null, timeDate, null));
+    }
+
+    @Override
+    public Job rescheduleTimerEventListenerInstanceWithDateValue(String eventListenerInstanceId, String timeDateValue) {
+        return commandExecutor.execute(new RescheduleTimerJobCmd(eventListenerInstanceId, null, null, timeDateValue));
     }
 
     @Override

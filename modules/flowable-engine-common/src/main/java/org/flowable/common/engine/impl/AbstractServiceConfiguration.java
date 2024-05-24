@@ -22,7 +22,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,6 @@ public abstract class AbstractServiceConfiguration<S> {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
-    protected HistoryLevel historyLevel;
-
     protected ObjectMapper objectMapper;
 
     protected Clock clock;
@@ -61,21 +58,6 @@ public abstract class AbstractServiceConfiguration<S> {
     }
 
     protected abstract S getService();
-
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
-
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
-    }
 
     public String getEngineName() {
         return engineName;
@@ -177,15 +159,6 @@ public abstract class AbstractServiceConfiguration<S> {
 
     public AbstractServiceConfiguration<S> setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
-        return this;
-    }
-
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-
-    public AbstractServiceConfiguration<S> setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
         return this;
     }
 
