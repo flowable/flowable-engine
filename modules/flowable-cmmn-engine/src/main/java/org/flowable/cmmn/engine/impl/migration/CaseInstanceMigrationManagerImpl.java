@@ -289,6 +289,12 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
         LOGGER.debug("Updating case definition reference in plan item instances");
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).updatePlanItemInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        
+        LOGGER.debug("Updating case definition reference in milestone instances");
+        CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).updateMilestoneInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        
+        LOGGER.debug("Updating case definition reference in sentry part instances");
+        CommandContextUtil.getSentryPartInstanceEntityManager(commandContext).updateSentryPartInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
 
         LOGGER.debug("Updating case definition reference in history");
         changeCaseDefinitionReferenceOfHistory(caseInstance, caseDefinitionToMigrateTo, commandContext);
