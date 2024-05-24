@@ -45,6 +45,8 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
 
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+    
+    void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 
     void deleteSentryRelatedData(String planItemId);
 
@@ -53,6 +55,4 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     void deleteByStageInstanceId(String stageInstanceId);
 
     void deleteByCaseInstanceId(String caseInstanceId);
-
-    void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 }

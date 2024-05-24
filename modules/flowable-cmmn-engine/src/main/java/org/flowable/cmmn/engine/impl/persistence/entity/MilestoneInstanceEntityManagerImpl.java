@@ -49,6 +49,20 @@ public class MilestoneInstanceEntityManagerImpl
     }
     
     @Override
+    public void updateMilestoneInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        MilestoneInstanceQuery milestoneQuery = new MilestoneInstanceQueryImpl()
+                .milestoneInstanceCaseInstanceId(caseInstanceId);
+        List<MilestoneInstance> milestoneInstances = findMilestoneInstancesByQueryCriteria(milestoneQuery);
+        if (milestoneInstances != null && !milestoneInstances.isEmpty()) {
+            for (MilestoneInstance milestoneInstance : milestoneInstances) {
+                MilestoneInstanceEntity milestoneInstanceEntity = (MilestoneInstanceEntity) milestoneInstance;
+                milestoneInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(milestoneInstanceEntity);
+            }
+        }
+    }
+    
+    @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         dataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }
