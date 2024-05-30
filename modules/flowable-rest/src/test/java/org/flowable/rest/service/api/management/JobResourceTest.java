@@ -15,6 +15,9 @@ package org.flowable.rest.service.api.management;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -24,6 +27,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -470,5 +474,33 @@ public class JobResourceTest extends BaseSpringRestTestCase {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, "unexistingjob"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
+    }
+
+    /**
+     * Test rescheduling a single timer job
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/management/JobResourceTest.testTimerProcess.bpmn20.xml" })
+    public void testRescheduleTimerJob() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerProcess");
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "reschedule");
+
+        LocalDateTime newDueDate = LocalDateTime.now().plusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String dueDateString = newDueDate.format(formatter);
+        requestNode.put("dueDate", dueDateString);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        Date expectedDueDate = Date.from(newDueDate.atZone(ZoneId.systemDefault()).toInstant());
+        assertThat(timerJob.getDuedate()).isCloseTo(expectedDueDate, 1000);
     }
 }
