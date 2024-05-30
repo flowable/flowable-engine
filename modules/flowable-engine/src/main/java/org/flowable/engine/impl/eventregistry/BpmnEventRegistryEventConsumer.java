@@ -24,6 +24,7 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.StartEvent;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.lock.LockManager;
@@ -201,6 +202,10 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     protected long countProcessInstances(RuntimeService runtimeService, EventInstance eventInstance,
             CorrelationKey correlationKey, ProcessDefinition processDefinition) {
+
+        if (correlationKey == null) {
+            throw new FlowableIllegalStateException(String.format("Event definition %s does not contain correlation parameters. Cannot verify if process instance already exists.", eventInstance.getEventKey()));
+        }
 
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey(processDefinition.getKey())

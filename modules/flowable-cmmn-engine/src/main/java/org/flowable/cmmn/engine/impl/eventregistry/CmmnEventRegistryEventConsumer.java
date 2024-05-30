@@ -30,6 +30,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.lock.LockManager;
@@ -214,6 +215,10 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
     protected long countCaseInstances(CmmnRuntimeService cmmnRuntimeService, EventInstance eventInstance,
             CorrelationKey correlationKey, CaseDefinition caseDefinition) {
+
+        if (correlationKey == null) {
+            throw new FlowableIllegalStateException(String.format("Event definition %s does not contain correlation parameters. Cannot verify if case instance already exists.", eventInstance.getEventKey()));
+        }
 
         CaseInstanceQuery caseInstanceQuery = cmmnRuntimeService.createCaseInstanceQuery()
                 .caseDefinitionKey(caseDefinition.getKey())
