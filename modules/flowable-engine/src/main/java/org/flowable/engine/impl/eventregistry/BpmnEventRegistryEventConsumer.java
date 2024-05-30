@@ -113,7 +113,7 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
                 if (Objects.equals(startCorrelationConfiguration, BpmnXMLConstants.START_EVENT_CORRELATION_STORE_AS_UNIQUE_REFERENCE_ID)) {
 
-                    CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys);
+                    CorrelationKey correlationKeyWithAllParameters = getCorrelationKeyWithAllParameters(correlationKeys, eventInstance);
 
                     ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
                             .getProcessDefinition(eventSubscription.getProcessDefinitionId());
