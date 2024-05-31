@@ -449,6 +449,12 @@ public class DbSqlSession implements Session {
             LOGGER.debug("update {}", updatedObject);
             nrOfUpdates++;
         }
+
+        for (BulkUpdateOperation bulkUpdateOperation : bulkUpdateOperations) {
+            LOGGER.debug("{}", bulkUpdateOperation);
+            nrOfUpdates++;
+        }
+
         for (Map<String, Entity> deletedObjectMap : deletedObjects.values()) {
             for (Entity deletedObject : deletedObjectMap.values()) {
                 LOGGER.debug("delete {} with id {}", deletedObject, deletedObject.getId());

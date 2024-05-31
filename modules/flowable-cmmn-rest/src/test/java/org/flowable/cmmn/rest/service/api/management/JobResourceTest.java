@@ -15,6 +15,10 @@ package org.flowable.cmmn.rest.service.api.management;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import org.apache.http.HttpStatus;
@@ -202,5 +206,33 @@ public class JobResourceTest extends BaseSpringRestTestCase {
 
         // Job should be executed
         assertThat(managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult()).isNull();
+    }
+
+    /**
+     * Test rescheduling a single timer job
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/management/timerEventListenerCase.cmmn" })
+    public void testRescheduleTimerJob() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
+        Job timerJob = managementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("action", "reschedule");
+
+        LocalDateTime newDueDate = LocalDateTime.now().plusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String dueDateString = newDueDate.format(formatter);
+        requestNode.put("dueDate", dueDateString);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TIMER_JOB, timerJob.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        timerJob = managementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        Date expectedDueDate = Date.from(newDueDate.atZone(ZoneId.systemDefault()).toInstant());
+        assertThat(timerJob.getDuedate()).isCloseTo(expectedDueDate, 1000);
     }
 }
