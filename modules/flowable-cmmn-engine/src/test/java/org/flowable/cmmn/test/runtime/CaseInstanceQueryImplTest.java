@@ -20,14 +20,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1414,6 +1407,73 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 );
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(twoYearsLater).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+    }
+
+    @Test
+    public void testQueryUUIDVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        UUID someUUID = UUID.randomUUID();
+        vars.put("uuidVar", someUUID);
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        UUID someUUID2 = UUID.randomUUID();
+        vars = new HashMap<>();
+        vars.put("uuidVar", someUUID);
+        vars.put("uuidVar2", someUUID2);
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        UUID someUUID3 = UUID.randomUUID();
+        vars = new HashMap<>();
+        vars.put("uuidVar", someUUID3);
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        // Query on single uuid variable, should result in 2 matches
+        CaseInstanceQuery query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", someUUID);
+        List<CaseInstance> caseInstances = query.list();
+        Assertions.assertThat(caseInstances).hasSize(2);
+
+        // Query on two uuid variables, should result in single value
+        query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", someUUID)
+                .variableValueEquals("uuidVar2", someUUID2);
+        CaseInstance caseInstance = query.singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+
+        UUID unexistingUUID = UUID.randomUUID();
+        // Query with unexisting variable value
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", unexistingUUID).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+
+        // Test NOT_EQUALS
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("uuidVar", someUUID).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        // Test value-only matching
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(someUUID3).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(someUUID).list();
+        Assertions.assertThat(caseInstances)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        caseInstance1.getId(),
+                        caseInstance2.getId()
+                );
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(unexistingUUID).singleResult();
         Assertions.assertThat(caseInstance).isNull();
     }
 

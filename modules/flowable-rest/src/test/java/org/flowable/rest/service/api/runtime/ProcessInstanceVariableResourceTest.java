@@ -27,6 +27,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -175,6 +176,31 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                         + "  name: 'variable',"
                         + "  type: 'localDateTime',"
                         + "  value: '" + nowWithoutNanos + "'"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceUUIDVariable() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        UUID someUUID = UUID.fromString("239969dd-3310-4068-b558-e4cbce5650ea");
+        runtimeService.setVariable(processInstance.getId(), "variable", someUUID);
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+                HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'variable',"
+                        + "  type: 'uuid',"
+                        + "  value: '" + someUUID + "'"
                         + "}");
     }
 
@@ -412,6 +438,40 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                 .isEqualTo("{"
                         + "  scope: null,"
                         + "  value: '2020-01-28T12:32:45'"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateUUIDProcessVariable() throws Exception {
+        UUID someUUID = UUID.fromString("239969dd-3310-4068-b558-e4cbce5650ea");
+        UUID someUUID2 = UUID.fromString("c5b16e77-0c15-4d7b-ac12-15352af76355");
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "uuidVariable", someUUID);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "uuidVariable");
+        requestNode.put("value", someUUID2.toString());
+        requestNode.put("type", "uuid");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "uuidVariable"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "uuidVariable"))
+                .isEqualTo(someUUID2);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  scope: null,"
+                        + "  value: 'c5b16e77-0c15-4d7b-ac12-15352af76355'"
                         + "}");
     }
 
