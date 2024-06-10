@@ -308,40 +308,44 @@ public class EngineMappingsValidationTest {
                         while ((index = line.indexOf("#{", index + 1)) > 0) {
                             int endIndex = line.indexOf("}", index);
                             String content = line.substring(index + 2, endIndex);
-                            assertThat(content)
-                                    .withFailMessage("Missing 'jdbcType' in " + mappedResource
-                                            + " on line " + lineCounter + ": #{" + content + "}" + " for resource " + mappedResource)
-                                    .contains(", jdbcType=");
 
-                            int commaIndex = line.indexOf(",", index);
-                            String parameterName = line.substring(index + 2, commaIndex).trim();
+                            if (!content.contains("typeHandler")) { // only checking jdbcTypes, not the typeHandler
+                                assertThat(content)
+                                        .withFailMessage("Missing 'jdbcType' in " + mappedResource
+                                                + " on line " + lineCounter + ": #{" + content + "}" + " for resource " + mappedResource)
+                                        .contains(", jdbcType=");
 
-                            int equalsSignIndex = line.indexOf("=", commaIndex);
-                            String jdbcType = line.substring(equalsSignIndex + 1, endIndex).trim();
+                                int commaIndex = line.indexOf(",", index);
+                                String parameterName = line.substring(index + 2, commaIndex).trim();
 
-                            if (jdbcType.contains("blobType")) { // quick-fix for reading ${blobType}
-                                jdbcType = line.substring(equalsSignIndex + 1, endIndex + 1).trim();
+                                int equalsSignIndex = line.indexOf("=", commaIndex);
+                                String jdbcType = line.substring(equalsSignIndex + 1, endIndex).trim();
+
+                                if (jdbcType.contains("blobType")) { // quick-fix for reading ${blobType}
+                                    jdbcType = line.substring(equalsSignIndex + 1, endIndex + 1).trim();
+                                }
+
+                                // Special handling when it's just passing parameter
+                                if ("parameter".equals(parameterName)) {
+
+                                    assertThat(jdbcType)
+                                            .withFailMessage("No jdbcType in " + mappedResource + " on line " + lineCounter + " for resource ")
+                                            .isNotNull();
+
+                                } else {
+
+                                    String expectedParameterType = getParameterType(mappedResource, parameterName);
+                                    assertThat(expectedParameterType)
+                                            .withFailMessage("No jdbcType configured in " + EntityParameterTypesOverview.class + " for parameter '" + parameterName
+                                                    + "' on line " + lineCounter + " for resource " + mappedResource)
+                                            .isNotNull();
+                                    assertThat(jdbcType)
+                                            .withFailMessage("Wrong jdbcType in " + mappedResource + " on line " + lineCounter + " for resource " + mappedResource
+                                                    + ", should be " + expectedParameterType + ", but was " + jdbcType)
+                                            .isEqualTo(expectedParameterType);
+                                }
                             }
 
-                            // Special handling when it's just passing parameter
-                            if ("parameter".equals(parameterName)) {
-
-                                assertThat(jdbcType)
-                                        .withFailMessage("No jdbcType in " + mappedResource + " on line " + lineCounter + " for resource ")
-                                        .isNotNull();
-
-                            } else {
-
-                                String expectedParameterType = getParameterType(mappedResource, parameterName);
-                                assertThat(expectedParameterType)
-                                        .withFailMessage("No jdbcType configured in " + EntityParameterTypesOverview.class + " for parameter '" + parameterName
-                                                + "' on line " + lineCounter + " for resource " + mappedResource)
-                                        .isNotNull();
-                                assertThat(jdbcType)
-                                        .withFailMessage("Wrong jdbcType in " + mappedResource + " on line " + lineCounter + " for resource " + mappedResource
-                                                + ", should be " + expectedParameterType + ", but was " + jdbcType)
-                                        .isEqualTo(expectedParameterType);
-                            }
                         }
 
                     }
