@@ -2701,6 +2701,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("secondTask");
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob2).isNotNull();
+        
         Execution execution = runtimeService.createExecutionQuery().parentId(task.getExecutionId()).singleResult();
         Job job = managementService.createTimerJobQuery().executionId(execution.getId()).singleResult();
         assertThat(job)
@@ -2741,6 +2742,65 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
             checkActivityInstances(procDefTwoTimers, processInstance, "userTask", "secondTask", "thirdTask");
 
             checkTaskInstance(procDefTwoTimers, processInstance, "secondTask", "thirdTask");
+        }
+
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    public void testMigrateProcessDefinitionWithBoundaryTimerEvent() {
+        ProcessDefinition procDefOneTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml");
+        ProcessDefinition procDefTwoTimers = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml");
+
+        // Start the processInstance without timer
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTimer.getId());
+
+        // Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefOneTimer.getId());
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
+        Job timerJob1 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob1).isNotNull();
+
+        // Migrate to the other processDefinition
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(procDefTwoTimers.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefTwoTimers.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
+        Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob2).isNotNull();
+        assertThat(timerJob1.getDuedate()).isEqualTo(timerJob2.getDuedate());
+
+        // Complete the process
+        Job job = managementService.moveTimerToExecutableJob(timerJob2.getId());
+        managementService.executeJob(job.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            checkActivityInstances(procDefTwoTimers, processInstance, "userTask", "firstTask");
+
+            checkTaskInstance(procDefTwoTimers, processInstance, "firstTask");
         }
 
         assertProcessEnded(processInstance.getId());
@@ -3377,7 +3437,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         
         EventSubscription eventSubscription2 = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(eventSubscription2).isNotNull();
-        assertThat(eventSubscription.getId()).isNotEqualTo(eventSubscription2.getId());
+        assertThat(eventSubscription.getId()).isEqualTo(eventSubscription2.getId());
 
         // Complete the process
         completeProcessInstanceTasks(processInstance.getId());
@@ -3392,7 +3452,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
                 "org/flowable/engine/test/api/twoTasksProcessWithEventRegistry.bpmn20.xml");
         ProcessDefinition procDefOWithEventRegistry2 = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithEventRegistry.bpmn20.xml");
 
-        //Start the processInstance without event registry event
+        // Start the processInstance without event registry event
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOWithEventRegistry.getId());
 
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
@@ -3410,7 +3470,7 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
 
-        //Migrate to the other processDefinition
+        // Migrate to the other processDefinition
         ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
                 .migrateToProcessDefinition(procDefOWithEventRegistry2.getId());
 
