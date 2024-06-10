@@ -43,6 +43,7 @@ public class MoveExecutionEntityContainer {
     protected String newOwnerId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new LinkedHashMap<>();
+    protected Map<String, FlowElementMoveEntry> currentActivityToNewElementMap = new LinkedHashMap<>();
     protected Map<String, Map<String, Object>> flowElementLocalVariableMap = new HashMap<>();
     protected List<String> newExecutionIds = new ArrayList<>();
 
@@ -189,6 +190,14 @@ public class MoveExecutionEntityContainer {
 
     public List<FlowElementMoveEntry> getMoveToFlowElements() {
         return new ArrayList<>(moveToFlowElementMap.values());
+    }
+    
+    public void addCurrentActivityToNewElement(String curentActivityId, FlowElement originalFlowElement, FlowElement newFlowElement) {
+        currentActivityToNewElementMap.put(curentActivityId, new FlowElementMoveEntry(originalFlowElement, newFlowElement));
+    }
+    
+    public FlowElementMoveEntry getCurrentActivityToNewElement(String curentActivityId) {
+        return currentActivityToNewElementMap.get(curentActivityId);
     }
 
     public List<String> getNewExecutionIds() {

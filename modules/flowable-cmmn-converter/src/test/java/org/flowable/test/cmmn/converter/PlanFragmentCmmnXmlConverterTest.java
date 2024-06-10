@@ -20,7 +20,10 @@ import java.util.Optional;
 
 import org.assertj.core.api.Fail;
 import org.flowable.cmmn.converter.util.PlanItemUtil;
+import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -36,6 +39,27 @@ public class PlanFragmentCmmnXmlConverterTest {
     @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/plan-fragment.cmmn")
     public void validateModel(CmmnModel cmmnModel) {
         Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
+        
+        assertThat(cmmnModel.getAssociations()).hasSize(2);
+        String entryAssociationId = null;
+        String exitAssociationId = null;
+        for (Association association : cmmnModel.getAssociations()) {
+            if ("planItem2".equals(association.getSourceRef()) && "entryCriterion1".equals(association.getTargetRef())) {
+                entryAssociationId = association.getId();
+                
+            } else if ("planItem3".equals(association.getSourceRef()) && "exitCriterion1".equals(association.getTargetRef())) {
+                exitAssociationId = association.getId();
+            }
+        }
+        
+        assertThat(entryAssociationId).isNotNull();
+        assertThat(cmmnModel.getFlowLocationGraphicInfo(entryAssociationId)).isNotNull();
+        List<GraphicInfo> entryInfoList = cmmnModel.getFlowLocationGraphicInfo(entryAssociationId);
+        assertThat(entryInfoList).hasSize(4);
+        assertThat(exitAssociationId).isNotNull();
+        assertThat(cmmnModel.getFlowLocationGraphicInfo(exitAssociationId)).isNotNull();
+        List<GraphicInfo> exitInfoList = cmmnModel.getFlowLocationGraphicInfo(exitAssociationId);
+        assertThat(exitInfoList).hasSize(4);
 
         // Assert parent-child relations
 
@@ -48,6 +72,15 @@ public class PlanFragmentCmmnXmlConverterTest {
         assertThat(planFragment1ChildPlanItems).extracting(PlanItem::getName).containsOnly("B", "C");
         assertNoChildPlanItems(planFragment1ChildPlanItems, "B");
         assertNoChildPlanItems(planFragment1ChildPlanItems, "C");
+        PlanItem planItemFragment = planModel.getPlanItem("planItem4");
+        assertThat(planItemFragment.getDefinitionRef()).isEqualTo("expandedPlanFragment1");
+        PlanFragment planFragment = (PlanFragment) planItemFragment.getPlanItemDefinition();
+        assertThat(planFragment.getPlanItems()).hasSize(2);
+        PlanItem taskPlanItem = planFragment.getPlanItem("planItem3");
+        assertThat(taskPlanItem.getEntryCriteria()).hasSize(1);
+        Criterion criterion = taskPlanItem.getEntryCriteria().iterator().next();
+        assertThat(criterion.getId()).isEqualTo("entryCriterion1");
+        assertThat(criterion.getIncomingAssociations()).hasSize(1);
 
         List<PlanItem> stageOneChildPlanItems = getChildPlanItems(rootLevelPlanItems, "Stage one");
         assertThat(stageOneChildPlanItems).extracting(PlanItem::getName).containsOnly("PF2", "F");
