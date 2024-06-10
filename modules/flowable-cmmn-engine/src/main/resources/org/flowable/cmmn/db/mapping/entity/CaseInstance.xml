@@ -10,10 +10,10 @@
             1, #{parentId ,jdbcType=VARCHAR},
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{businessKey ,jdbcType=VARCHAR},
-            #{name ,jdbcType=VARCHAR},
+            #{name ,jdbcType=NVARCHAR},
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
-            #{startUserId ,jdbcType=VARCHAR},
+            #{startUserId ,jdbcType=NVARCHAR},
             #{lastReactivationTime ,jdbcType=TIMESTAMP},
             #{lastReactivationUserId ,jdbcType=VARCHAR},
             #{callbackId ,jdbcType=VARCHAR},
@@ -21,8 +21,8 @@
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
             #{completeable ,jdbcType=BOOLEAN},
-            #{tenantId ,jdbcType=VARCHAR},
-            #{businessStatus ,jdbcType=VARCHAR}
+            #{tenantId ,jdbcType=NVARCHAR},
+            #{businessStatus ,jdbcType=NVARCHAR}
         )
     </insert>
 
@@ -35,10 +35,10 @@
                 1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
-                #{caseInstance.name ,jdbcType=VARCHAR},
+                #{caseInstance.name ,jdbcType=NVARCHAR},
                 #{caseInstance.state ,jdbcType=VARCHAR},
                 #{caseInstance.startTime ,jdbcType=TIMESTAMP},
-                #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.startUserId ,jdbcType=NVARCHAR},
                 #{caseInstance.lastReactivationTime ,jdbcType=TIMESTAMP},
                 #{caseInstance.lastReactivationUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
@@ -46,8 +46,8 @@
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
                 #{caseInstance.referenceType ,jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
-                #{caseInstance.tenantId ,jdbcType=VARCHAR},
-                #{caseInstance.businessStatus ,jdbcType=VARCHAR}
+                #{caseInstance.tenantId ,jdbcType=NVARCHAR},
+                #{caseInstance.businessStatus ,jdbcType=NVARCHAR}
             )
         </foreach>
     </insert>
@@ -61,10 +61,10 @@
                 1, #{caseInstance.parentId ,jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{caseInstance.businessKey ,jdbcType=VARCHAR},
-                #{caseInstance.name ,jdbcType=VARCHAR},
+                #{caseInstance.name ,jdbcType=NVARCHAR},
                 #{caseInstance.state ,jdbcType=VARCHAR},
                 #{caseInstance.startTime ,jdbcType=TIMESTAMP},
-                #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.startUserId ,jdbcType=NVARCHAR},
                 #{caseInstance.lastReactivationTime ,jdbcType=TIMESTAMP},
                 #{caseInstance.lastReactivationUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
@@ -72,8 +72,8 @@
                 #{caseInstance.referenceId ,jdbcType=VARCHAR},
                 #{caseInstance.referenceType ,jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
-                #{caseInstance.tenantId ,jdbcType=VARCHAR},
-                #{caseInstance.businessStatus ,jdbcType=VARCHAR}
+                #{caseInstance.tenantId ,jdbcType=NVARCHAR},
+                #{caseInstance.businessStatus ,jdbcType=NVARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -93,7 +93,7 @@
                 BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.state != state">
                 STATE_ = #{state, jdbcType=VARCHAR},
@@ -102,7 +102,7 @@
                 START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.startUserId != startUserId">
-                START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+                START_USER_ID_ = #{startUserId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.lastReactivationTime != lastReactivationTime">
                 LAST_REACTIVATION_TIME_ = #{lastReactivationTime, jdbcType=TIMESTAMP},
@@ -126,10 +126,10 @@
                 IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+                TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.businessStatus != businessStatus">
-                BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR},
+                BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
@@ -170,11 +170,11 @@
         <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
         <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-        <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
-        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
+        <result property="name" column="NAME_" jdbcType="NVARCHAR" />
         <result property="state" column="STATE_" jdbcType="VARCHAR" />
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-        <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+        <result property="startUserId" column="START_USER_ID_" jdbcType="NVARCHAR" />
         <result property="lastReactivationTime" column="LAST_REACTIVATION_TIME_" jdbcType="TIMESTAMP" />
         <result property="lastReactivationUserId" column="LAST_REACTIVATION_USER_ID_" jdbcType="VARCHAR" />
         <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
@@ -184,7 +184,7 @@
         <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
         <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
 
         <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
         <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="VARCHAR" />
@@ -387,13 +387,13 @@
                 and RES.PARENT_ID_ = #{caseInstanceParentId}
             </if>
             <if test="name != null">
-                and RES.NAME_ = #{name}
+                and RES.NAME_ = #{name, jdbcType=NVARCHAR}
             </if>
             <if test="nameLike != null">
-                and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+                and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
             <if test="nameLikeIgnoreCase != null">
-                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
             </if>
             <if test="parentScopeId != null">
                 and EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
@@ -412,7 +412,7 @@
                 and RES.BUSINESS_KEY_ = #{businessKey}
             </if>
             <if test="businessStatus != null">
-                and RES.BUSINESS_STATUS_ = #{businessStatus}
+                and RES.BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR}
             </if>
             <if test="startedBefore != null">
                 and RES.START_TIME_ &lt;= #{startedBefore}
@@ -421,7 +421,7 @@
                 and RES.START_TIME_ &gt;= #{startedAfter}
             </if>
             <if test="startedBy != null">
-                and RES.START_USER_ID_ = #{startedBy}
+                and RES.START_USER_ID_ = #{startedBy, jdbcType=NVARCHAR}
             </if>
             <if test="state != null">
                 and RES.STATE_ = #{state}

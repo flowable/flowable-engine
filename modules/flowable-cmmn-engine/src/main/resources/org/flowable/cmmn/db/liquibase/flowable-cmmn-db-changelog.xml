@@ -591,4 +591,15 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="19" author="flowable">
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="START_USER_ID_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="BUSINESS_STATUS_" newDataType="nvarchar(255)" />
+
+        <!-- TENANT_ID_ has a default value set -->
+        <dropDefaultValue tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" newDataType="nvarchar(255)" />
+        <addDefaultValue tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" defaultValue="" />
+    </changeSet>
+
 </databaseChangeLog>
