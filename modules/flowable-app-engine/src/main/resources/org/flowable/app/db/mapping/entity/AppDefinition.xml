@@ -62,18 +62,18 @@
   </update>
   
   <delete id="deleteAppDefinition" parameterType="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
-    delete from ${prefix}ACT_APP_APPDEF where ID_ = #{id}
+    delete from ${prefix}ACT_APP_APPDEF where ID_ = #{id, jdbcType=VARCHAR}
   </delete>  
 
   <delete id="deleteAppDefinitionsByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_APP_APPDEF where DEPLOYMENT_ID_ = #{deploymenId} 
+    delete from ${prefix}ACT_APP_APPDEF where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
   </delete>
   
   <resultMap id="appDefinitionResultMap" type="org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="revision" column="REV_" />
-    <result property="category" column="CATEGORY_" />
-    <result property="name" column="NAME_" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="category" column="CATEGORY_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -89,51 +89,51 @@
   </select>
 
   <select id="selectAppDefinitionById" parameterType="string" resultMap="appDefinitionResultMap">
-    select * from ${prefix}ACT_APP_APPDEF where ID_ = #{appDefinitionId}
+    select * from ${prefix}ACT_APP_APPDEF where ID_ = #{appDefinitionId, jdbcType=VARCHAR}
   </select>
 
   <select id="selectAppDefinitionByDeploymentAndKey" parameterType="map" resultMap="appDefinitionResultMap">
     select * 
     from ${prefix}ACT_APP_APPDEF 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-      and KEY_ = #{appDefinitionKey}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+      and KEY_ = #{appDefinitionKey, jdbcType=VARCHAR}
       and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
    <select id="selectAppDefinitionByDeploymentAndKeyAndTenantId" parameterType="map" resultMap="appDefinitionResultMap">
     select * 
     from ${prefix}ACT_APP_APPDEF 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-      and KEY_ = #{appDefinitionKey}
-      and TENANT_ID_ = #{tenantId}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+      and KEY_ = #{appDefinitionKey, jdbcType=VARCHAR}
+      and TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
   </select>
   
   <select id="selectAppDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
-    where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
+    where KEY_ = #{parameter.appDefinitionKey, jdbcType=VARCHAR} and VERSION_ = #{parameter.appDefinitionVersion, jdbcType=INTEGER} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
   <select id="selectAppDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
-    where KEY_ = #{parameter.appDefinitionKey} and VERSION_ = #{parameter.appDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}
+    where KEY_ = #{parameter.appDefinitionKey, jdbcType=VARCHAR} and VERSION_ = #{parameter.appDefinitionVersion, jdbcType=INTEGER} and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
   </select>
     
   <select id="selectLatestAppDefinitionByKey" parameterType="string" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
-    where KEY_ = #{key} and
+    where KEY_ = #{key, jdbcType=VARCHAR} and
           (TENANT_ID_ = ''  or TENANT_ID_ is null) and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey, jdbcType=VARCHAR} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
   
   <select id="selectLatestAppDefinitionByKeyAndTenantId" parameterType="map" resultMap="appDefinitionResultMap">
     select *
     from ${prefix}ACT_APP_APPDEF 
-    where KEY_ = #{appDefinitionKey} and
-          TENANT_ID_ = #{tenantId} and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey} and TENANT_ID_ = #{tenantId})
+    where KEY_ = #{appDefinitionKey, jdbcType=VARCHAR} and
+          TENANT_ID_ = #{tenantId, jdbcType=VARCHAR} and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = #{appDefinitionKey, jdbcType=VARCHAR} and TENANT_ID_ = #{tenantId, jdbcType=VARCHAR})
   </select>
   
   <select id="selectAppDefinitionsByQueryCriteria" parameterType="org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl" resultMap="appDefinitionResultMap">
@@ -153,72 +153,72 @@
     from ${prefix}ACT_APP_APPDEF RES
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=VARCHAR}
       </if>
       <if test="ids != null and ids">
         and RES.ID_ in
-        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
-          #{item}
+        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+          #{id, jdbcType=VARCHAR}
         </foreach>
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=VARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="key != null">
-        and RES.KEY_ = #{key}
+        and RES.KEY_ = #{key, jdbcType=VARCHAR}
       </if>
       <if test="keyLike != null">
-        and RES.KEY_ like #{keyLike}${wildcardEscapeClause}
+        and RES.KEY_ like #{keyLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=VARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike}${wildcardEscapeClause}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="version != null">
-        and RES.VERSION_ = #{version}
+        and RES.VERSION_ = #{version, jdbcType=INTEGER}
       </if>
       <if test="versionGt != null">
-        and RES.VERSION_ &gt; #{versionGt}
+        and RES.VERSION_ &gt; #{versionGt, jdbcType=INTEGER}
       </if>
       <if test="versionGte != null">
-        and RES.VERSION_ &gt;= #{versionGte}
+        and RES.VERSION_ &gt;= #{versionGte, jdbcType=INTEGER}
       </if>
       <if test="versionLt != null">
-        and RES.VERSION_ &lt; #{versionLt}
+        and RES.VERSION_ &lt; #{versionLt, jdbcType=INTEGER}
       </if>
       <if test="versionLte != null">
-        and RES.VERSION_ &lt;= #{versionLte}
+        and RES.VERSION_ &lt;= #{versionLte, jdbcType=INTEGER}
       </if>
       <if test="deploymentId != null">
-        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+        and RES.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
       </if>
       <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
-        <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
-          #{item}
+        <foreach item="deploymentId" index="index" collection="deploymentIds" open="(" separator="," close=")">
+          #{deploymentId, jdbcType=VARCHAR}
         </foreach>
       </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_APP_APPDEF where KEY_ = RES.KEY_ 
              <if test="tenantId != null">
-               and TENANT_ID_ = #{tenantId}
+               and TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
              </if>
              <if test="tenantIdLike != null">
-               and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+               and TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}${wildcardEscapeClause}
              </if>
              <if test="withoutTenantId">
                and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -229,10 +229,10 @@
         )
       </if>
        <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
