@@ -74,6 +74,7 @@ public abstract class EntityParameterTypesOverview {
         
         // SERVICES
         addBatchPartParams();
+        addDeadLetterJobParams();
         addEntityLinkParams();
         addEventSubscriptionParams();
         addHistoricIdentityLinkParams();
@@ -1023,6 +1024,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_UPDATED_TIME_", "lastUpdatedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
@@ -1030,9 +1032,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ENTRY_CRITERION_ID_", "entryCriterionId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("EXIT_CRITERION_ID_", "exitCriterionId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("EXTRA_VALUE_", "extraValue", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("IS_COUNT_ENABLED_", "countEnabled", PARAMETER_TYPE_BOOLEAN);
-        info.addColumn("VAR_COUNT_", "variableCount", PARAMETER_TYPE_INTEGER);
-        info.addColumn("SENTRY_PART_INST_COUNT_", "sentryPartInstanceCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("SHOW_IN_OVERVIEW_", "showInOverview", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         
         // Variables are returned together with case instances
@@ -1055,6 +1055,7 @@ public abstract class EntityParameterTypesOverview {
         
         info.addQueryParameter("caseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("planItemInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("planItemInstanceName", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("caseDefinitionCategory", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
@@ -1330,6 +1331,47 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("BATCH_SEARCH_KEY2_", "batchSearchKey2", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+    }
+    
+    protected static void addDeadLetterJobParams() {
+        ParameterInfo info = addParameterInfo("deadLetterJob");
+        info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("EXCLUSIVE_", "exclusive", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROCESS_INSTANCE_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ELEMENT_NAME_", "elementName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CORRELATION_ID_", "correlationId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("RETRIES_", "retries", PARAMETER_TYPE_INTEGER);
+        info.addColumn("EXCEPTION_STACK_ID_", "exceptionByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXCEPTION_MSG_", "exceptionMessage", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_TYPE_", "jobHandlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_CFG_", "jobHandlerConfiguration", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CUSTOM_VALUES_ID_", "customValuesByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUEDATE_", "duedate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("REPEAT_", "repeat", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("handlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // careful: cmmn engine --> varchar
+        info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addEntityLinkParams() {
