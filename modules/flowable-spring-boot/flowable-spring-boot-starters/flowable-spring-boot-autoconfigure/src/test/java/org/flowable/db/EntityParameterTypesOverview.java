@@ -58,11 +58,15 @@ public abstract class EntityParameterTypesOverview {
         addCmmnDeploymentParams();
         addCmmnResourceParams();
         addHistoricCaseInstanceParams();
+        addHistoricMilestoneInstanceParams();
         addHistoricPlanItemInstanceParams();
         addMilestoneInstanceParams();
+        addPlanItemInstanceParams();
+        addSentryPartInstanceParams();
         
         // SERVICES
         addEventSubscriptionParams();
+        addHistoricIdentityLinkParams();
     }
 
     protected static void addActivityInstanceParams() {
@@ -777,30 +781,59 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
     }
     
+    protected static void addHistoricMilestoneInstanceParams() {
+        ParameterInfo info = addParameterInfo("historicMilestoneInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TIME_STAMP_", "timeStamp", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CASE_INST_ID_", "caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR); 
+    }
+    
     protected static void addHistoricPlanItemInstanceParams() {
         ParameterInfo info = addParameterInfo("historicPlanItemInstance");
         info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("REV_", "rev", PARAMETER_TYPE_INTEGER);
-        info.addColumn("PARENT_ID_", "parentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
         info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("BUSINESS_KEY_", "businessKey", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DERIVED_CASE_DEF_ID_", "derivedCaseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CASE_INST_ID_", "caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("STAGE_INST_ID_", "stageInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_STAGE_", "isStage", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ITEM_DEFINITION_ID_", "planItemDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ITEM_DEFINITION_TYPE_", "planItemDefinitionType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
         info.addColumn("STATE_", "state", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_AVAILABLE_TIME_", "lastAvailableTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_UNAVAILABLE_TIME_", "lastUnavailableTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_ENABLED_TIME_", "lastEnabledTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_DISABLED_TIME_", "lastDisabledTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_STARTED_TIME_", "lastStartedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_SUSPENDED_TIME_", "lastSuspendedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
-        info.addColumn("LAST_REACTIVATION_TIME_", "lastReactivationTime", PARAMETER_TYPE_TIMESTAMP);
-        info.addColumn("LAST_REACTIVATION_USER_ID_", "lastReactivationUserId", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("CALLBACK_ID_", "callbackId", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("CALLBACK_TYPE_", "callbackType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("ENTRY_CRITERION_ID_", "entryCriterionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXIT_CRITERION_ID_", "exitCriterionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXTRA_VALUE_", "extraValue", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_COUNT_ENABLED_", "countEnabled", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("VAR_COUNT_", "variableCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("SENTRY_PART_INST_COUNT_", "sentryPartInstanceCount", PARAMETER_TYPE_INTEGER);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("CaseDefinitionName", "caseDefinitionName", PARAMETER_TYPE_VARCHAR);
-        info.addColumn("CaseDefinitionVersion", "caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
-        info.addColumn("CaseDefinitionDeploymentId", "caseDefinitionDeploymentId", PARAMETER_TYPE_VARCHAR);
         
         // Variables are returned together with case instances
         info.addColumn("VAR_ID_", "var.id", PARAMETER_TYPE_NVARCHAR);
@@ -823,40 +856,53 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("planItemInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionCategory", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("caseInstanceNameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("caseInstanceNameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("finishedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createdBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createdAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastAvailableBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastAvailableAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastUnavailableBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastUnavailableAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastEnabledBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastEnabledAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastDisabledBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastDisabledAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastStartedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastStartedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastSuspendedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastSuspendedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("occurredBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("endedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("lastReactivatedBefore", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("lastReactivatedAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("lastReactivatedBy", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("onlyStages", PARAMETER_TYPE_BOOLEAN);
+        info.addQueryParameter("formKey", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("activePlanItemDefinitionId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("involvedUserIdentityLink.userId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("involvedUserIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroup", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("parameter.caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addMilestoneInstanceParams() {
@@ -868,6 +914,131 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR); 
+    }
+    
+    protected static void addPlanItemInstanceParams() {
+        ParameterInfo info = addParameterInfo("planItemInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DERIVED_CASE_DEF_ID_", "derivedCaseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CASE_INST_ID_", "caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("STAGE_INST_ID_", "stageInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_STAGE_", "isStage", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ITEM_DEFINITION_ID_", "planItemDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ITEM_DEFINITION_TYPE_", "planItemDefinitionType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("STATE_", "state", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_AVAILABLE_TIME_", "lastAvailableTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_UNAVAILABLE_TIME_", "lastUnavailableTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_ENABLED_TIME_", "lastEnabledTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_DISABLED_TIME_", "lastDisabledTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_STARTED_TIME_", "lastStartedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_SUSPENDED_TIME_", "lastSuspendedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("ENTRY_CRITERION_ID_", "entryCriterionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXIT_CRITERION_ID_", "exitCriterionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXTRA_VALUE_", "extraValue", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IS_COUNT_ENABLED_", "countEnabled", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("VAR_COUNT_", "variableCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("SENTRY_PART_INST_COUNT_", "sentryPartInstanceCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        // Variables are returned together with case instances
+        info.addColumn("VAR_ID_", "var.id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_NAME_", "var.name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TYPE_", "var.type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_REV_", "var.revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("VAR_PROC_INST_ID_", "var.processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_EXECUTION_ID_", "var.executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TASK_ID_", "var.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_META_INFO_", "var.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_BYTEARRAY_ID_", "var.byteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_DOUBLE_", "var.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addColumn("VAR_TEXT_", "var.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TEXT2_", "var.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_LONG_", "var.longValue", PARAMETER_TYPE_BIGINT);
+        info.addColumn("VAR_SCOPE_ID_", "var.scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_SUB_SCOPE_ID_", "var.subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_SCOPE_TYPE_", "var.scopeType", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("planItemInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("caseDefinitionCategory", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("createdBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createdAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastAvailableBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastAvailableAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastUnavailableBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastUnavailableAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastEnabledBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastEnabledAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastDisabledBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastDisabledAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastStartedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastStartedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastSuspendedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastSuspendedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("occurredBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("endedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("onlyStages", PARAMETER_TYPE_BOOLEAN);
+        info.addQueryParameter("formKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroup", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("parameter.caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
+    }
+    
+    protected static void addSentryPartInstanceParams() {
+        ParameterInfo info = addParameterInfo("sentryPartInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CASE_INST_ID_", "caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("PLAN_ITEM_INST_ID_", "planItemInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ON_PART_ID_", "onPartId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IF_PART_ID_", "ifPartId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TIME_STAMP_", "timeStamp", PARAMETER_TYPE_TIMESTAMP);
         
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -961,6 +1132,30 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("newScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("oldScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("currentTime", PARAMETER_TYPE_TIMESTAMP);
+    }
+    
+    protected static void addHistoricIdentityLinkParams() {
+        ParameterInfo info = addParameterInfo("historicIdentityLink");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        
+        info.addQueryParameter("parameter.scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addEventSubscriptionAlias(String alias, ParameterInfo info) {
