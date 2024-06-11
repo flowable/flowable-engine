@@ -91,10 +91,21 @@ public abstract class EntityParameterTypesOverview {
         addIdentityLinkParams();
         addSuspendedJobParams();
 
-        // App Engine
+        // App
         addAppDefinitionParams();
         addAppDeploymentParams();
         addAppResourceParams();
+
+        // IDM
+        addGroupParams();
+        addIdmByteArrayParams();
+        addPrivilegeParams();
+        addPrivilegeMappingParams();
+        addIdentityInfoParams();
+        addIdmPropertyParams();
+        addMembershipParams();
+        addTokenParams();
+        addUserParams();
     }
 
     protected static void addActivityInstanceParams() {
@@ -1782,6 +1793,102 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
 
         info.addQueryParameter("resourceName", PARAMETER_TYPE_VARCHAR);
+    }
+
+    protected static void addGroupParams() {
+        ParameterInfo info = addParameterInfo("group");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("groupType", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addIdmByteArrayParams() {
+        ParameterInfo info = addParameterInfo("idmByteArray", "byteArray");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
+    }
+
+    protected static void addPrivilegeMappingParams() {
+        ParameterInfo info = addParameterInfo("privilege");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("userId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addPrivilegeParams() {
+        ParameterInfo info = addParameterInfo("privilegeMapping");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PRIV_ID_", "privilegeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("userId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addIdentityInfoParams() {
+        ParameterInfo info = addParameterInfo("identityInfo");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VALUE_", "value", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PASSWORD_", "passwordBytes", PARAMETER_TYPE_BLOBTYPE);
+        info.addColumn("PARENT_ID_", "parentId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addIdmPropertyParams() {
+        ParameterInfo info = addParameterInfo("idmProperty", "property");
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VALUE_", "value", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+    }
+
+    protected static void addMembershipParams() {
+        ParameterInfo info = addParameterInfo("membership");
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addTokenParams() {
+        ParameterInfo info = addParameterInfo("token");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TOKEN_VALUE_", "tokenValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TOKEN_DATE_", "tokenDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("IP_ADDRESS_", "ipAddress", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_AGENT_", "userAgent", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TOKEN_DATA_", "tokenData", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("tokenDateBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tokenDateAfter", PARAMETER_TYPE_TIMESTAMP);
+    }
+
+    protected static void addUserParams() {
+        ParameterInfo info = addParameterInfo("user");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("FIRST_", "firstName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LAST_", "lastName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DISPLAY_NAME_", "displayName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EMAIL_", "email", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PWD_", "password", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PICTURE_ID_", "pictureByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("idIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("fullName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
     }
 
     public static String getParameterType(String entity, String parameterName) {
