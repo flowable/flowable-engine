@@ -100,8 +100,6 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("activityInstanceId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("deleteReasonLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addBatchParams() {
@@ -126,7 +124,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("createTimeLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("completeTimeLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("completeTimeHigherThan", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addByteArrayParams() {
@@ -179,15 +176,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ENGINE_VERSION_", "engineVersion", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_NVARCHAR);
-
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addEventLogEntryParams() {
@@ -266,13 +255,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("parentExecutionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("businessKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("businessStatusLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("superProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("subProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("activeActivityId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
@@ -343,12 +327,10 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("handlerConfiguration", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addHistoricDetailParams() {
@@ -408,13 +390,8 @@ public abstract class EntityParameterTypesOverview {
         addVariableColumnsWhenUsedInQueries(info);
 
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("businessKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("businessStatusLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("superProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("subProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("activeActivityId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -492,35 +469,18 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("historicTaskInstanceId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processCategory", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionName", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionNameLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processInstanceBusinessKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processInstanceBusinessKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processInstanceBusinessKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("caseDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("caseDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processInstanceIdWithChildren", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskName", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskNameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskNameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskParentTaskId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskDescription", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskCategory", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskDescriptionLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskDescriptionLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskDeleteReason", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskDeleteReasonLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskOwner", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskOwnerLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskOwnerLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskAssignee", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskAssigneeLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("taskAssigneeLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("assigneeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskPriority", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("taskMinPriority", PARAMETER_TYPE_INTEGER);
@@ -540,7 +500,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("inProgressStartDueAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("dueBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("dueAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("queryVar.name", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVar.scopeType", PARAMETER_TYPE_NVARCHAR);
@@ -598,12 +557,10 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("handlerConfiguration", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addModelParams() {
@@ -623,10 +580,6 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addProcessDefinitionParams() {
@@ -650,17 +603,10 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ENGINE_VERSION_", "engineVersion", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("processDefinitionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("resourceNameLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("suspensionState.stateCode", PARAMETER_TYPE_INTEGER);
 
         info.addQueryParameter("parentDeploymentId", PARAMETER_TYPE_NVARCHAR);
@@ -743,18 +689,12 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("orQueryObject.deploymentId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("assigneeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("assigneeLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("assigneeLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("candidateUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // CMMN = liquibase
-        info.addQueryParameter("caseDefinitionKeyLike", PARAMETER_TYPE_VARCHAR); // CMMN = liquibase
-        info.addQueryParameter("caseDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);  // CMMN = liquibase
         info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_VARCHAR);  // CMMN = liquibase
         info.addQueryParameter("cmmnDeploymentId", PARAMETER_TYPE_VARCHAR);  // CMMN = liquibase
         info.addQueryParameter("createTimeAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("createTimeBefore", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("descriptionLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("descriptionLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("dueAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("dueBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
@@ -762,27 +702,16 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("inProgressStartTimeBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("key", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("maxPriority", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("minPriority", PARAMETER_TYPE_INTEGER);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("ownerLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("ownerLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR); // From entity link
         info.addQueryParameter("processCategory", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionName", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processDefinitionNameLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processInstanceBusinessKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processInstanceBusinessKeyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("processInstanceBusinessKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processInstanceIdWithChildren", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("taskId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("userIdForCandidateAndAssignee", PARAMETER_TYPE_NVARCHAR);
 
         // Variables are returned together with tasks
@@ -843,17 +772,10 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("parameter.tenantId", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("resourceNameLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("authorizationUserId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("authorizationGroup", PARAMETER_TYPE_NVARCHAR);
     }
@@ -910,8 +832,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -920,7 +840,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("lastReactivatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("lastReactivatedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("lastReactivatedBy", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("activePlanItemDefinitionId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedUserIdentityLink.userId", PARAMETER_TYPE_NVARCHAR);
@@ -947,12 +866,6 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("PARENT_DEPLOYMENT_ID_", "parentDeploymentId", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addCmmnResourceParams() {
@@ -1016,10 +929,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("caseInstanceNameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("caseInstanceNameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1030,7 +939,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("lastReactivatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("lastReactivatedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("lastReactivatedBy", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("activePlanItemDefinitionId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedUserIdentityLink.userId", PARAMETER_TYPE_NVARCHAR);
@@ -1059,7 +967,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR); 
     }
     
     protected static void addHistoricPlanItemInstanceParams() {
@@ -1125,8 +1032,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("createdBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1156,7 +1061,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("onlyStages", PARAMETER_TYPE_BOOLEAN);
         info.addQueryParameter("formKey", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroup", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
@@ -1183,7 +1087,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR); 
     }
     
     protected static void addPlanItemInstanceParams() {
@@ -1249,8 +1152,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("createdBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1280,7 +1181,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("onlyStages", PARAMETER_TYPE_BOOLEAN);
         info.addQueryParameter("formKey", PARAMETER_TYPE_VARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroup", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
@@ -1308,7 +1208,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR); 
     }
 
     protected static void addTimerJobParams() {
@@ -1342,14 +1241,12 @@ public abstract class EntityParameterTypesOverview {
 
         info.addQueryParameter("handlerType", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // careful: cmmn engine --> varchar
         info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
@@ -1464,7 +1361,6 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("handlerConfiguration", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoricTaskLogEntryParams() {
@@ -1548,14 +1444,12 @@ public abstract class EntityParameterTypesOverview {
 
         info.addQueryParameter("handlerType", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // careful: cmmn engine --> varchar
         info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
@@ -1642,6 +1536,16 @@ public abstract class EntityParameterTypesOverview {
         }
 
         protected void addParameter(String parameter, String jdbcType) {
+            internalAddParameter(parameter, jdbcType);
+
+            if (jdbcType.equals(PARAMETER_TYPE_NVARCHAR) || jdbcType.equals(PARAMETER_TYPE_VARCHAR)) {
+                internalAddParameter(parameter + "Like", jdbcType);
+                internalAddParameter(parameter + "LikeIgnoreCase", jdbcType);
+                internalAddParameter(parameter + "NotEquals", jdbcType);
+            }
+        }
+
+        protected void internalAddParameter(String parameter, String jdbcType) {
             parameterToJdbcTypeMap.put(parameter, jdbcType);
             parameterToJdbcTypeMap.put(alias + "." + parameter, jdbcType);
             parameterToJdbcTypeMap.put("parameter." + parameter, jdbcType);
