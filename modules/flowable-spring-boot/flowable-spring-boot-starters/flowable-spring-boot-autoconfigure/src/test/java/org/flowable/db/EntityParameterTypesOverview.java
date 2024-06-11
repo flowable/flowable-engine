@@ -67,8 +67,10 @@ public abstract class EntityParameterTypesOverview {
         addSentryPartInstanceParams();
         
         // SERVICES
+        addEntityLinkParams();
         addEventSubscriptionParams();
         addHistoricIdentityLinkParams();
+        addHistoryJobParams();
         addHistoricTaskLogEntryParams();
         addIdentityLinkParams();
         addSuspendedJobParams();
@@ -1240,6 +1242,25 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
     
+    protected static void addEntityLinkParams() {
+        ParameterInfo info = addParameterInfo("entityLink");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LINK_TYPE_", "linkType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PARENT_ELEMENT_ID_", "parentElementId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_ID_", "referenceScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_DEFINITION_ID_", "referenceScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_TYPE_", "referenceScopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ROOT_SCOPE_ID_", "rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ROOT_SCOPE_TYPE_", "rootScopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HIERARCHY_TYPE_", "hierarchyType", PARAMETER_TYPE_NVARCHAR);
+    }
+    
     protected static void addEventSubscriptionParams() {
         ParameterInfo info = addParameterInfo("eventSubscription");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
@@ -1267,15 +1288,15 @@ public abstract class EntityParameterTypesOverview {
         
         info.addQueryParameter("createdBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("createdAfter", PARAMETER_TYPE_TIMESTAMP);
-        info.addQueryParameter("parameter.eventName", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.eventType", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.executionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.activityId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.processInstanceId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.processDefinitionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.tenantId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("eventName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("eventType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("activityId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeType", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("newTenantId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("oldTenantId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("newProcessDefinitionId", PARAMETER_TYPE_NVARCHAR);
@@ -1299,14 +1320,39 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
         
-        info.addQueryParameter("parameter.scopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeType", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.subScopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.taskId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.userId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.groupId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
+    }
+    
+    protected static void addHistoryJobParams() {
+        ParameterInfo info = addParameterInfo("historyJob");
+        info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_","revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("RETRIES_", "retries", PARAMETER_TYPE_INTEGER);
+        info.addColumn("EXCEPTION_STACK_ID_", "exceptionByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXCEPTION_MSG_", "exceptionMessage", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ADV_HANDLER_CFG_ID_", "advancedJobHandlerConfigurationByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_TYPE_", "jobHandlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_CFG_", "jobHandlerConfiguration", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CUSTOM_VALUES_ID_", "customValuesByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("job.id", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("handlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("handlerConfiguration", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoricTaskLogEntryParams() {
@@ -1348,14 +1394,14 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
         
         info.addQueryParameter("processDefinitionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeType", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.subScopeId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.taskId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.userId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.groupId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parameter.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
     }
     
