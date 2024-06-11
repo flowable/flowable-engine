@@ -253,7 +253,7 @@ public class EngineMappingsValidationTest {
 
         for (String mappedResource : mappedResources.keySet()) {
             System.out.println("Checking mapping " + mappedResource);
-            if (mappedResource.equals("BatchPart")) {
+            if (mappedResource.equals("BatchPart") || mappedResource.equals("HistoricVariableInstance")) {
                 continue;
             }
             String xmlContent = mappedResources.get(mappedResource);

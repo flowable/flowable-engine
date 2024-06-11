@@ -43,6 +43,7 @@ public abstract class EntityParameterTypesOverview {
         addByteArrayParams();
         addCommentParams();
         addDeploymentParams();
+        addHistoricEntityLinkParams();
         addEventLogEntryParams();
         addExecutionParams();
         addExternalWorkerJobParams();
@@ -177,6 +178,24 @@ public abstract class EntityParameterTypesOverview {
 
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addHistoricEntityLinkParams() {
+        ParameterInfo info = addParameterInfo("historicEntityLink");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LINK_TYPE_", "linkType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PARENT_ELEMENT_ID_", "parentElementId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_ID_", "referenceScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_TYPE_", "referenceScopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REF_SCOPE_DEFINITION_ID_", "referenceScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ROOT_SCOPE_ID_", "rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ROOT_SCOPE_TYPE_", "rootScopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("HIERARCHY_TYPE_", "hierarchyType", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addEventLogEntryParams() {
