@@ -72,7 +72,13 @@ public abstract class EntityParameterTypesOverview {
         addMilestoneInstanceParams();
         addPlanItemInstanceParams();
         addSentryPartInstanceParams();
-        
+
+        // DMN
+        addDecisionParams();
+        addDmnDeploymentParams();
+        addHistoricDecisionExecutionParams();
+        addDmnResourceParams();
+
         // SERVICES
         addBatchPartParams();
         addDeadLetterJobParams();
@@ -1337,7 +1343,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
     }
-    
+
     protected static void addBatchPartParams() {
         ParameterInfo info = addParameterInfo("batchPart");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
@@ -1656,6 +1662,77 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("LOCK_TIME_", alias + ".lockTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LOCK_OWNER_", alias + ".lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TENANT_ID_", alias + ".tenantId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addDecisionParams() {
+        ParameterInfo info = addParameterInfo("decision");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DECISION_TYPE_", "decisionType", PARAMETER_TYPE_VARCHAR);
+
+        info.addQueryParameter("decisionId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentDeploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("decisionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("decisionVersion", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
+    }
+
+    protected static void addDmnDeploymentParams() {
+        ParameterInfo info = addParameterInfo("dmnDeployment", "deployment");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("PARENT_DEPLOYMENT_ID_", "parentDeploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEPLOY_TIME_", "deploymentTime", PARAMETER_TYPE_TIMESTAMP);
+
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("decisionKey", PARAMETER_TYPE_VARCHAR);
+    }
+
+    protected static void addHistoricDecisionExecutionParams() {
+        ParameterInfo info = addParameterInfo("historicDecisionExecution");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DECISION_DEFINITION_ID_", "decisionDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("INSTANCE_ID_", "instanceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ACTIVITY_ID_", "activityId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("FAILED_", "failed", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("EXECUTION_JSON_", "executionJson", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEC_DEF_KEY_", "decisionKey", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEC_DEF_NAME_", "decisionName", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEC_DEF_VERSION_", "decisionVersion", PARAMETER_TYPE_VARCHAR);
+
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("decisionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("processInstanceIdWithChildren", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_VARCHAR);
+    }
+
+    protected static void addDmnResourceParams() {
+        ParameterInfo info = addParameterInfo("dmnResource", "resource");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("RESOURCE_BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
+
+        info.addQueryParameter("resourceName", PARAMETER_TYPE_VARCHAR);
     }
 
     public static String getParameterType(String entity, String parameterName) {
