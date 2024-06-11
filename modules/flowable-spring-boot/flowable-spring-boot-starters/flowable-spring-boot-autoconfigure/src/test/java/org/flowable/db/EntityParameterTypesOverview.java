@@ -51,6 +51,7 @@ public abstract class EntityParameterTypesOverview {
         addCaseDefinitionParams();
         addCaseInstanceParams();
         addCmmnResourceParams();
+        addHistoricCaseInstanceParams();
         addMilestoneInstanceParams();
         
         // SERVICES
@@ -423,6 +424,8 @@ public abstract class EntityParameterTypesOverview {
     public static void addCaseDefinitionParams() {
         ParameterInfo info = addParameterInfo("caseDefinition");
         info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
         info.addColumn("KEY_", "key", PARAMETER_TYPE_VARCHAR);
         info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
@@ -433,6 +436,25 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("HAS_START_FORM_KEY_", "hasStartFormKey", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("HAS_GRAPHICAL_NOTATION_", "isGraphicalNotationDefined", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentDeploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter.caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("parameter.tenantId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("resourceNameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("authorizationUserId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("authorizationGroup", PARAMETER_TYPE_NVARCHAR);
     }
     
     public static void addCaseInstanceParams() {
@@ -520,6 +542,88 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("RESOURCE_BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("GENERATED_", "generated", PARAMETER_TYPE_BOOLEAN);
+    }
+    
+    public static void addHistoricCaseInstanceParams() {
+        ParameterInfo info = addParameterInfo("historicCaseInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "rev", PARAMETER_TYPE_INTEGER);
+        info.addColumn("PARENT_ID_", "parentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CASE_DEF_ID_", "caseDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("BUSINESS_KEY_", "businessKey", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("STATE_", "state", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_REACTIVATION_TIME_", "lastReactivationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_REACTIVATION_USER_ID_", "lastReactivationUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CALLBACK_ID_", "callbackId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CALLBACK_TYPE_", "callbackType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CaseDefinitionName", "caseDefinitionName", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CaseDefinitionVersion", "caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CaseDefinitionDeploymentId", "caseDefinitionDeploymentId", PARAMETER_TYPE_VARCHAR);
+        
+        // Variables are returned together with case instances
+        info.addColumn("VAR_ID_", "var.id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_NAME_", "var.name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TYPE_", "var.type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_REV_", "var.revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("VAR_PROC_INST_ID_", "var.processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_EXECUTION_ID_", "var.executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TASK_ID_", "var.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_META_INFO_", "var.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_BYTEARRAY_ID_", "var.byteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_DOUBLE_", "var.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addColumn("VAR_TEXT_", "var.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TEXT2_", "var.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_LONG_", "var.longValue", PARAMETER_TYPE_BIGINT);
+        info.addColumn("VAR_SCOPE_ID_", "var.scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_SUB_SCOPE_ID_", "var.subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_SCOPE_TYPE_", "var.scopeType", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("caseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("planItemInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseDefinitionCategory", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseDefinitionName", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseInstanceNameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseInstanceNameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("finishedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("lastReactivatedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastReactivatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("lastReactivatedBy", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("activePlanItemDefinitionId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedUserIdentityLink.userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedUserIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroup", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
     }
     
     public static void addMilestoneInstanceParams() {
