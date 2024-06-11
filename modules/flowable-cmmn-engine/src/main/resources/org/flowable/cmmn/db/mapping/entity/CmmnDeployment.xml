@@ -22,31 +22,31 @@
   <insert id="bulkInsertCmmnDeployment" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
         values
-        <foreach collection="list" item="deployment" index="index" separator=",">
+        <foreach collection="list" item="cmmnDeployment" index="index" separator=",">
             (
-                #{deployment.id, jdbcType=VARCHAR},
-                #{deployment.name, jdbcType=VARCHAR},
-                #{deployment.category, jdbcType=VARCHAR},
-                #{deployment.key, jdbcType=VARCHAR},
-                #{deployment.tenantId, jdbcType=VARCHAR},
-                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+                #{cmmnDeployment.id, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=VARCHAR},
+                #{cmmnDeployment.category, jdbcType=VARCHAR},
+                #{cmmnDeployment.key, jdbcType=VARCHAR},
+                #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
+                #{cmmnDeployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{cmmnDeployment.parentDeploymentId, jdbcType=VARCHAR}
             )
         </foreach>
   </insert>
   
   <insert id="bulkInsertCmmnDeployment" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="deployment" index="index">
+        <foreach collection="list" item="cmmnDeployment" index="index">
             into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
             (
-                #{deployment.id, jdbcType=VARCHAR},
-                #{deployment.name, jdbcType=VARCHAR},
-                #{deployment.category, jdbcType=VARCHAR},
-                #{deployment.key, jdbcType=VARCHAR},
-                #{deployment.tenantId, jdbcType=VARCHAR},
-                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+                #{cmmnDeployment.id, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=VARCHAR},
+                #{cmmnDeployment.category, jdbcType=VARCHAR},
+                #{cmmnDeployment.key, jdbcType=VARCHAR},
+                #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
+                #{cmmnDeployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{cmmnDeployment.parentDeploymentId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual

@@ -67,11 +67,13 @@ public abstract class EntityParameterTypesOverview {
         addSentryPartInstanceParams();
         
         // SERVICES
+        addBatchPartParams();
         addEntityLinkParams();
         addEventSubscriptionParams();
         addHistoricIdentityLinkParams();
         addHistoryJobParams();
         addHistoricTaskLogEntryParams();
+        addHistoricVariableInstanceParams();
         addIdentityLinkParams();
         addSuspendedJobParams();
     }
@@ -826,21 +828,21 @@ public abstract class EntityParameterTypesOverview {
     
     protected static void addCmmnDeploymentParams() {
         ParameterInfo info = addParameterInfo("cmmnDeployment");
-        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("KEY_", "key", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("DEPLOY_TIME_", "deploymentTime", PARAMETER_TYPE_TIMESTAMP);
-        info.addColumn("PARENT_DEPLOYMENT_ID_", "parentDeploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PARENT_DEPLOYMENT_ID_", "parentDeploymentId", PARAMETER_TYPE_VARCHAR);
 
-        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addCmmnResourceParams() {
@@ -1242,6 +1244,29 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
     
+    protected static void addBatchPartParams() {
+        ParameterInfo info = addParameterInfo("batchPart");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("BATCH_ID_", "batchId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SEARCH_KEY_", "searchKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SEARCH_KEY2_", "searchKey2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("COMPLETE_TIME_", "completeTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("STATUS_", "status", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("RESULT_DOC_ID_", "resultDocRefId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BATCH_TYPE_", "batchType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BATCH_SEARCH_KEY_", "batchSearchKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BATCH_SEARCH_KEY2_", "batchSearchKey2", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+    }
+    
     protected static void addEntityLinkParams() {
         ParameterInfo info = addParameterInfo("entityLink");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
@@ -1376,6 +1401,38 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("toDate", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("fromLogNumber", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("toLogNumber", PARAMETER_TYPE_BIGINT);
+    }
+    
+    protected static void addHistoricVariableInstanceParams() {
+        ParameterInfo info = addParameterInfo("historicVariableInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "variableName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VAR_TYPE_", "variableType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("META_INFO_", "metaInfo", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BYTEARRAY_ID_", "byteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DOUBLE_", "doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addColumn("TEXT_", "textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TEXT2_", "textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LONG_", "longValue", PARAMETER_TYPE_BIGINT);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_UPDATED_TIME_", "lastUpdatedTime", PARAMETER_TYPE_TIMESTAMP);
+        
+        info.addQueryParameter("name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variable.id", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableNameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
     }
     
     protected static void addIdentityLinkParams() {
