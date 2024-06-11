@@ -69,7 +69,7 @@
             </if>
             <if test="jobIds != null and !jobIds.empty">
                 AND RES.ID_ IN
-                <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
+                <foreach item="id" index="index" collection="jobIds" open="(" separator="," close=")">
                     #{id, jdbcType=NVARCHAR}
                 </foreach>
             </if>

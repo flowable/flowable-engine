@@ -94,7 +94,7 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
-    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_= #{name, jdbcType=VARCHAR} order by D.DEPLOY_TIME_ desc
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_= #{parameter, jdbcType=VARCHAR} order by D.DEPLOY_TIME_ desc
   </select>
   
   <select id="selectCmmnDeployment" parameterType="string" resultMap="cmmnDeploymentResultMap">

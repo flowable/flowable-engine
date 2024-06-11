@@ -283,7 +283,7 @@
   <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR})
+    where (EXECUTION_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
       
   <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
@@ -319,7 +319,7 @@
   <select id="selectEventSubscriptionsBySubScopeId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR})
+    where (SUB_SCOPE_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">

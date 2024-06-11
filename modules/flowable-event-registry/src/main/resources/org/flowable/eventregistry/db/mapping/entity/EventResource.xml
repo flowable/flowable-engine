@@ -50,7 +50,7 @@
   </delete>
 
   <delete id="deleteEventResourcesByDeploymentId" parameterType="string">
-    delete from ${prefix}FLW_EVENT_RESOURCE where DEPLOYMENT_ID_ = #{id, jdbcType=VARCHAR}
+    delete from ${prefix}FLW_EVENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR}
   </delete>
   
   <!-- RESOURCE RESULTMAP -->
@@ -74,7 +74,7 @@
   </select>
 
   <select id="selectEventResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventResourceResultMap">
-    select * from ${prefix}FLW_EVENT_RESOURCE where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR} order by NAME_ asc
+    select * from ${prefix}FLW_EVENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <select id="selectEventResource" parameterType="string" resultMap="eventResourceResultMap">

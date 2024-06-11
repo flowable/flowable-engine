@@ -279,7 +279,7 @@
                         IDN.GROUP_ID_ IN
                         <foreach item="groupId" index="index" collection="authorizationGroupListItem"
                               open="(" separator="," close=")">
-                          #{groupId, , jdbcType=NVARCHAR}
+                          #{groupId, jdbcType=NVARCHAR}
                         </foreach>
                     </foreach>
                     )

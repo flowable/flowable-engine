@@ -168,11 +168,11 @@
   </select>
   
   <select id="selectIdentityLinksByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
-    select * from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
+    select * from ${prefix}ACT_RU_IDENTITYLINK where TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectIdentityLinksByProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
-    select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
+    select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
@@ -184,7 +184,7 @@
   </select>
   
   <select id="selectIdentityLinksByProcessDefinition" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">
-    select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
+    select * from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectIdentityLinksByScopeDefinitionAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="identityLinkResultMap">

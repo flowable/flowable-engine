@@ -857,6 +857,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("authorizationUserId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("authorizationGroup", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addCaseInstanceParams() {
@@ -932,6 +933,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addCmmnDeploymentParams() {
@@ -951,6 +953,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addCmmnResourceParams() {
@@ -960,6 +963,8 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("RESOURCE_BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("GENERATED_", "generated", PARAMETER_TYPE_BOOLEAN);
+        
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addHistoricCaseInstanceParams() {
@@ -1157,6 +1162,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.caseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addMilestoneInstanceParams() {
@@ -1277,6 +1283,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.caseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addSentryPartInstanceParams() {
@@ -1293,6 +1300,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addChannelDefinitionParams() {
@@ -1388,6 +1396,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         
         info.addQueryParameter("resourceName", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
     }
 
     protected static void addTimerJobParams() {
@@ -1429,6 +1438,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addVariableInstanceParams() {
@@ -1523,6 +1533,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addEntityLinkParams() {
@@ -1587,6 +1598,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("newScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("oldScopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("currentTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoricIdentityLinkParams() {
@@ -1611,6 +1623,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoryJobParams() {
@@ -1635,6 +1648,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("handlerConfiguration", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoricTaskLogEntryParams() {
@@ -1690,6 +1704,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addIdentityLinkParams() {
@@ -1717,6 +1732,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addSuspendedJobParams() {
@@ -1758,6 +1774,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addEventSubscriptionAlias(String alias, ParameterInfo info) {

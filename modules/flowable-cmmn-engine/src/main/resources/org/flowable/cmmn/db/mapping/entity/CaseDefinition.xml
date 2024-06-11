@@ -75,7 +75,7 @@
   </delete>  
 
   <delete id="deleteCaseDefinitionsByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_CMMN_CASEDEF where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR} 
+    delete from ${prefix}ACT_CMMN_CASEDEF where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} 
   </delete>
   
   <resultMap id="caseDefinitionResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityImpl">

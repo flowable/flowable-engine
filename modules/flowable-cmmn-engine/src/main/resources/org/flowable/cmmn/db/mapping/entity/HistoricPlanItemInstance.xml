@@ -327,7 +327,7 @@
     </select>
 
     <select id="selectHistoricPlanItemInstancesByCaseDefinitionId" resultMap="historicPlanItemInstanceResultMap">
-        select * from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
+        select * from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST where CASE_DEF_ID_ = #{parameter, jdbcType=VARCHAR}
     </select>
 
     <sql id="selectHistoricPlanItemInstancesByQueryCriteriaSql">

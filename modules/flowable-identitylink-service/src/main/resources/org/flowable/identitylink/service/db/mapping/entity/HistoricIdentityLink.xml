@@ -215,11 +215,11 @@
   </select>
   
   <select id="selectHistoricIdentityLinksByTask" parameterType="string" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksByProcessInstance" parameterType="string" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">

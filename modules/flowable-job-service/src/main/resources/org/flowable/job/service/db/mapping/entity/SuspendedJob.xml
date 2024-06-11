@@ -54,13 +54,13 @@
         select *
         from
         ${prefix}ACT_RU_SUSPENDED_JOB J
-        where J.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
+        where J.EXECUTION_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectSuspendedJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_SUSPENDED_JOB J
-        where J.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
+        where J.PROCESS_INSTANCE_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
 
     <!-- TIMER INSERT -->

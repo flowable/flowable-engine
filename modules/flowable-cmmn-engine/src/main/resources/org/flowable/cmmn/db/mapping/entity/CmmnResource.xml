@@ -53,7 +53,7 @@
   <!-- RESOURCE SELECT -->
 
   <select id="selectCmmnResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select NAME_ from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR} order by NAME_ asc
+    select NAME_ from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <select id="selectCmmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="cmmnResourceResultMap">
@@ -63,7 +63,7 @@
   </select>
 
   <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">
-    select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR} order by NAME_ asc
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <update id="updateCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
