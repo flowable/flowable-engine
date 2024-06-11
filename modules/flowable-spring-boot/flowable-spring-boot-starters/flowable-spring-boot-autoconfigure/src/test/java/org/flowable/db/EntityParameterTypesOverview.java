@@ -69,6 +69,9 @@ public abstract class EntityParameterTypesOverview {
         // SERVICES
         addEventSubscriptionParams();
         addHistoricIdentityLinkParams();
+        addHistoricTaskLogEntryParams();
+        addIdentityLinkParams();
+        addSuspendedJobParams();
     }
 
     protected static void addActivityInstanceParams() {
@@ -1304,6 +1307,99 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parameter.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
+    }
+    
+    protected static void addHistoricTaskLogEntryParams() {
+        ParameterInfo info = addParameterInfo("historicTaskLogEntry");
+        info.addColumn("ID_", "logNumber", PARAMETER_TYPE_BIGINT);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TIME_STAMP_", "timeStamp", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DATA_", "data", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("fromDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("toDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("fromLogNumber", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("toLogNumber", PARAMETER_TYPE_BIGINT);
+    }
+    
+    protected static void addIdentityLinkParams() {
+        ParameterInfo info = addParameterInfo("identityLink");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        
+        info.addQueryParameter("processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("identityLink.id", PARAMETER_TYPE_NVARCHAR);
+    }
+    
+    protected static void addSuspendedJobParams() {
+        ParameterInfo info = addParameterInfo("suspendedJob");
+        info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("EXCLUSIVE_", "exclusive", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROCESS_INSTANCE_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ELEMENT_ID_", "elementId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ELEMENT_NAME_", "elementName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CORRELATION_ID_", "correlationId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("RETRIES_", "retries", PARAMETER_TYPE_INTEGER);
+        info.addColumn("EXCEPTION_STACK_ID_", "exceptionByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXCEPTION_MSG_", "exceptionMessage", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_TYPE_", "jobHandlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("HANDLER_CFG_", "jobHandlerConfiguration", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CUSTOM_VALUES_ID_", "customValuesByteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUEDATE_", "duedate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("REPEAT_", "repeat", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("handlerType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // careful: cmmn engine --> varchar
+        info.addQueryParameter("now", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateHigherThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addEventSubscriptionAlias(String alias, ParameterInfo info) {
