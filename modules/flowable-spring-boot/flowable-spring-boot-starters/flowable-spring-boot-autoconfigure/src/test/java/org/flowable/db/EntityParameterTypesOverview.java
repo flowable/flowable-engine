@@ -46,6 +46,8 @@ public abstract class EntityParameterTypesOverview {
         addEventLogEntryParams();
         addExecutionParams();
         addExternalWorkerJobParams();
+        addHistoricDetailParams();
+        addHistoricTaskInstanceParams();
         addJobParams();
         addProcessDefinitionParams();
         addPropertyParams();
@@ -340,6 +342,148 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
+    protected static void addHistoricDetailParams() {
+        ParameterInfo info = addParameterInfo("historicDetail", "historicFormProperty", "historicDetailVariableInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACT_INST_ID_", "activityInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TIME_", "time", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("VAR_TYPE_", "variableType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACTIVITY_ID_", "activityId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BYTEARRAY_ID_", "byteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DOUBLE_", "doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addColumn("TEXT_", "textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TEXT2_", "textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LONG_", "longValue", PARAMETER_TYPE_BIGINT);
+
+        info.addQueryParameter("detailType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("propertyId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("propertyValue", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addHistoricTaskInstanceParams() {
+        ParameterInfo info = addParameterInfo("historicTaskInstance", "historicTask", "task");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TASK_DEF_ID_", "taskDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_DEFINITION_ID_", "scopeDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROPAGATED_STAGE_INST_ID_", "propagatedStageInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("STATE_", "state", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PARENT_TASK_ID_", "parentTaskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("OWNER_", "owner", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("START_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("IN_PROGRESS_TIME_", "inProgressStartTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("IN_PROGRESS_STARTED_BY_", "inProgressStartedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUSPENDED_TIME_", "suspendedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("SUSPENDED_BY_", "suspendedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DURATION_", "durationInMillis", PARAMETER_TYPE_BIGINT);
+        info.addColumn("DELETE_REASON_", "deleteReason", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_DEF_KEY_", "taskDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("FORM_KEY_", "formKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PRIORITY_", "priority", PARAMETER_TYPE_INTEGER);
+        info.addColumn("IN_PROGRESS_DUE_DATE_", "inProgressStartDueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LAST_UPDATED_TIME_", "lastUpdateTime", PARAMETER_TYPE_TIMESTAMP);
+
+        addVariableColumnsWhenUsedInQueries(info);
+        addIdentityLinkColumsWhenUsedInQueries(info);
+
+        info.addColumn("ILINK_CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("cmmnDeploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("historicTaskInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processCategory", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionNameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processInstanceBusinessKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processInstanceBusinessKeyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processInstanceBusinessKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseDefinitionKeyLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processInstanceIdWithChildren", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskNameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskNameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskParentTaskId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDescription", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskCategory", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDescriptionLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDescriptionLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDeleteReason", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskDeleteReasonLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskOwner", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskOwnerLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskOwnerLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskAssignee", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskAssigneeLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskAssigneeLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("assigneeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("taskPriority", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("taskMinPriority", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("taskMaxPriority", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("createTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("inProgressStartTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("inProgressStartTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("claimTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("claimTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("suspendedTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("suspendedTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completedTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("inProgressStartDueBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("inProgressStartDueAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("dueBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("dueAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("queryVar.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVar.scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVar.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVar.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVar.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVar.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVar.doubleValue", PARAMETER_TYPE_DOUBLE);
+
+        // EntityLink
+        info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+
+        // Identitylink
+        info.addQueryParameter("candidateUser", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("group", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
+    }
+
     protected static void addJobParams() {
         ParameterInfo info = addParameterInfo("job");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
@@ -528,6 +672,11 @@ public abstract class EntityParameterTypesOverview {
         addVariableColumnsWhenUsedInQueries(info);
 
         // Identitylinks
+        addIdentityLinkColumsWhenUsedInQueries(info);
+
+    }
+
+    private static void addIdentityLinkColumsWhenUsedInQueries(ParameterInfo info) {
         info.addColumn("ILINK_ID_", "id", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ILINK_TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ILINK_USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
@@ -535,7 +684,6 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ILINK_TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ILINK_PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ILINK_PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
-
     }
 
     protected static void addVariableColumnsWhenUsedInQueries(ParameterInfo info) {
@@ -1201,10 +1349,17 @@ public abstract class EntityParameterTypesOverview {
         ALL_PARAMS.put(alias.toLowerCase(Locale.ROOT), parameterInfo);
         return parameterInfo;
     }
+
+    protected static ParameterInfo addParameterInfo(String alias, String...additionalAliases) {
+        ParameterInfo parameterInfo = new ParameterInfo(alias, additionalAliases);
+        ALL_PARAMS.put(alias.toLowerCase(Locale.ROOT), parameterInfo);
+        return parameterInfo;
+    }
     
     protected static class ParameterInfo {
 
         protected String alias;
+        protected String[] additionalAliases;
         protected Map<String, String> columnToParameterMap = new HashMap<>();
         protected Map<String, String> parameterToJdbcTypeMap = new HashMap<>();
 
@@ -1214,6 +1369,11 @@ public abstract class EntityParameterTypesOverview {
             // Common for all
             addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
             addQueryParameter("revisionNext", PARAMETER_TYPE_INTEGER);
+        }
+
+        public ParameterInfo(String alias, String ... additionalAliases) {
+            this(alias);
+            this.additionalAliases = additionalAliases;
         }
 
         public ParameterInfo addColumn(String columnName, String parameter, String jdbcType) {
@@ -1232,6 +1392,12 @@ public abstract class EntityParameterTypesOverview {
             parameterToJdbcTypeMap.put(alias + "." + parameter, jdbcType);
             parameterToJdbcTypeMap.put("parameter." + parameter, jdbcType);
             parameterToJdbcTypeMap.put("orQueryObject." + parameter, jdbcType);
+
+            if (additionalAliases != null) {
+                for (String additionalAlias : additionalAliases) {
+                    parameterToJdbcTypeMap.put(additionalAlias + "." + parameter, jdbcType);
+                }
+            }
         }
 
         public String getColumnType(String columnName) {
