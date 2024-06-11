@@ -38,15 +38,17 @@ public abstract class EntityParameterTypesOverview {
 
         // BPMN
         addActivityInstanceParams();
+        addAttachmentParams();
         addBatchParams();
         addByteArrayParams();
-        addAttachmentParams();
+        addCommentParams();
         addDeploymentParams();
         addEventLogEntryParams();
         addExecutionParams();
         addExternalWorkerJobParams();
         addJobParams();
         addProcessDefinitionParams();
+        addPropertyParams();
         addTaskParams();
         addTimerJobParams();
 
@@ -133,6 +135,19 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("CONTENT_ID_", "contentId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TIME_", "time", PARAMETER_TYPE_TIMESTAMP);
+    }
+
+    protected static void addCommentParams() {
+        ParameterInfo info = addParameterInfo("comment");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TIME_", "time", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACTION_", "action", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("MESSAGE_", "message", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("FULL_MSG_", "fullMessageBytes", PARAMETER_TYPE_BLOBTYPE);
     }
 
     protected static void addDeploymentParams() {
@@ -411,6 +426,13 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("authorizationUserId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
 
+    }
+
+    protected static void addPropertyParams() {
+        ParameterInfo info = addParameterInfo("property");
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("VALUE_", "value", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
     }
 
     protected static void addTaskParams() {
