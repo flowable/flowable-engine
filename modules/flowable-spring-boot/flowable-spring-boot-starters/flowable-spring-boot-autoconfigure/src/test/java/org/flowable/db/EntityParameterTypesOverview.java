@@ -58,6 +58,7 @@ public abstract class EntityParameterTypesOverview {
         addResourceParams();
         addTaskParams();
         addTimerJobParams();
+        addVariableInstanceParams();
 
         // CMMN
         addCaseDefinitionParams();
@@ -1276,6 +1277,36 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("jobExecutionScope", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addVariableInstanceParams() {
+        ParameterInfo info = addParameterInfo("variableInstance", "variable");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_ID_", "scopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUB_SCOPE_ID_", "subScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SCOPE_TYPE_", "scopeType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BYTEARRAY_ID_", "byteArrayRef", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DOUBLE_", "doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addColumn("TEXT_", "textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TEXT2_", "textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LONG_", "longValue", PARAMETER_TYPE_BIGINT);
+        info.addColumn("META_INFO_", "metaInfo", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("typeName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
     }
     
     protected static void addBatchPartParams() {
