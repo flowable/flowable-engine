@@ -72,6 +72,10 @@ public abstract class EntityParameterTypesOverview {
         addPlanItemInstanceParams();
         addSentryPartInstanceParams();
         
+        // EVENT REGISTRY
+        addChannelDefinitionParams();
+        addEventDefinitionParams();
+        
         // SERVICES
         addBatchPartParams();
         addDeadLetterJobParams();
@@ -1237,6 +1241,70 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("milestoneInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("reachedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("reachedAfter", PARAMETER_TYPE_TIMESTAMP);
+    }
+    
+    protected static void addChannelDefinitionParams() {
+        ParameterInfo info = addParameterInfo("channelDefinition");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TYPE_", "type", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("IMPLEMENTATION_", "implementation", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        info.addQueryParameter("channelDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentDeploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("createTimeAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createTimeBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("resourceNameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("eventVersion", PARAMETER_TYPE_INTEGER);
+    }
+    
+    protected static void addEventDefinitionParams() {
+        ParameterInfo info = addParameterInfo("eventDefinition");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
+        
+        info.addQueryParameter("eventDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentDeploymentId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("keyLikeIgnoreCase", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("versionGt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionGte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLt", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("versionLte", PARAMETER_TYPE_INTEGER);
+        info.addQueryParameter("resourceNameLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("eventVersion", PARAMETER_TYPE_INTEGER);
     }
 
     protected static void addTimerJobParams() {
