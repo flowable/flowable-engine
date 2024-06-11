@@ -8,18 +8,18 @@
   
   <insert id="insertProcessDefinitionInfo" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl">
     insert into ${prefix}ACT_PROCDEF_INFO(ID_, PROC_DEF_ID_, REV_, INFO_JSON_ID_)
-    values(#{id, jdbcType=VARCHAR}, 
-           #{processDefinitionId, jdbcType=VARCHAR},
-           1, #{infoJsonId, jdbcType=VARCHAR})
+    values(#{id, jdbcType=NVARCHAR}, 
+           #{processDefinitionId, jdbcType=NVARCHAR},
+           1, #{infoJsonId, jdbcType=NVARCHAR})
   </insert>
 
   <insert id="bulkInsertProcessDefinitionInfo" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_PROCDEF_INFO(ID_, PROC_DEF_ID_, REV_, INFO_JSON_ID_)
     VALUES 
       <foreach collection="list" item="processDefinitionInfo" index="index" separator=","> 
-        (#{processDefinitionInfo.id, jdbcType=VARCHAR}, 
-         #{processDefinitionInfo.processDefinitionId, jdbcType=VARCHAR},
-         1, #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
+        (#{processDefinitionInfo.id, jdbcType=NVARCHAR}, 
+         #{processDefinitionInfo.processDefinitionId, jdbcType=NVARCHAR},
+         1, #{processDefinitionInfo.infoJsonId, jdbcType=NVARCHAR})
      </foreach>
   </insert>
 
@@ -27,9 +27,9 @@
     INSERT ALL 
       <foreach collection="list" item="processDefinitionInfo" index="index"> 
         INTO ${prefix}ACT_PROCDEF_INFO(ID_, PROC_DEF_ID_, REV_, INFO_JSON_ID_) VALUES 
-          (#{processDefinitionInfo.id, jdbcType=VARCHAR}, 
-           #{processDefinitionInfo.processDefinitionId, jdbcType=VARCHAR},
-           1, #{processDefinitionInfo.infoJsonId, jdbcType=VARCHAR})
+          (#{processDefinitionInfo.id, jdbcType=NVARCHAR}, 
+           #{processDefinitionInfo.processDefinitionId, jdbcType=NVARCHAR},
+           1, #{processDefinitionInfo.infoJsonId, jdbcType=NVARCHAR})
      </foreach>
     SELECT * FROM dual
   </insert>
@@ -39,35 +39,35 @@
     update ${prefix}ACT_PROCDEF_INFO
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      INFO_JSON_ID_ = #{infoJsonId, jdbcType=VARCHAR},
+      INFO_JSON_ID_ = #{infoJsonId, jdbcType=NVARCHAR},
     </set>
-    where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   
   <!-- ProcessDefinitionInfo DELETE -->
   
   <delete id="deleteProcessDefinitionInfo" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl">
-    delete from ${prefix}ACT_PROCDEF_INFO where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_PROCDEF_INFO where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <!-- MODEL RESULTMAP -->
   
   <resultMap id="processDefinitionInfoResultMap" type="org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
-    <result property="infoJsonId" column="INFO_JSON_ID_" jdbcType="VARCHAR" />
+    <result property="infoJsonId" column="INFO_JSON_ID_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- ProcessDefinitionInfo SELECT -->
 
   <select id="selectProcessDefinitionInfo" parameterType="string" resultMap="processDefinitionInfoResultMap">
-    select * from ${prefix}ACT_PROCDEF_INFO where ID_ = #{id}
+    select * from ${prefix}ACT_PROCDEF_INFO where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectProcessDefinitionInfoByProcessDefinitionId" parameterType="string" resultMap="processDefinitionInfoResultMap">
-    select * from ${prefix}ACT_PROCDEF_INFO where PROC_DEF_ID_ = #{processDefinitionId}
+    select * from ${prefix}ACT_PROCDEF_INFO where PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
   </select>
 
 </mapper>

@@ -50,7 +50,9 @@ public abstract class EntityParameterTypesOverview {
         addHistoricProcessInstanceParams();
         addHistoricTaskInstanceParams();
         addJobParams();
+        addModelParams();
         addProcessDefinitionParams();
+        addProcessDefinitionInfoParams();
         addPropertyParams();
         addResourceParams();
         addTaskParams();
@@ -604,6 +606,29 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
+    protected static void addModelParams() {
+        ParameterInfo info = addParameterInfo("model");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LAST_UPDATE_TIME_", "lastUpdateTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
+        info.addColumn("META_INFO_", "metaInfo", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EDITOR_SOURCE_VALUE_ID_", "editorSourceValueId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EDITOR_SOURCE_EXTRA_VALUE_ID_", "editorSourceExtraValueId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+    }
+
     protected static void addProcessDefinitionParams() {
         ParameterInfo info = addParameterInfo("processDefinition");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
@@ -648,6 +673,13 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("authorizationUserId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
 
+    }
+
+    protected static void addProcessDefinitionInfoParams() {
+        ParameterInfo info = addParameterInfo("processDefinitionInfo");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("INFO_JSON_ID_", "infoJsonId", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addPropertyParams() {
