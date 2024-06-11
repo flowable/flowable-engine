@@ -9,11 +9,11 @@
   <insert id="insertByteArray" parameterType="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">
     insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
     values (
-      #{id, jdbcType=VARCHAR},
+      #{id, jdbcType=NVARCHAR},
       1, 
-      #{name, jdbcType=VARCHAR}, 
+      #{name, jdbcType=NVARCHAR}, 
       #{bytes, jdbcType=${blobType}}, 
-      #{deploymentId, jdbcType=VARCHAR}
+      #{deploymentId, jdbcType=NVARCHAR}
     )  
   </insert>
 
@@ -21,11 +21,11 @@
     insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
     values
       <foreach collection="list" item="byteArray" index="index" separator=","> 
-         (#{byteArray.id, jdbcType=VARCHAR},
+         (#{byteArray.id, jdbcType=NVARCHAR},
           1, 
-          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.name, jdbcType=NVARCHAR}, 
           #{byteArray.bytes, jdbcType=${blobType}}, 
-          #{byteArray.deploymentId, jdbcType=VARCHAR})
+          #{byteArray.deploymentId, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -33,11 +33,11 @@
     INSERT ALL 
       <foreach collection="list" item="byteArray" index="index">
         into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_) VALUES 
-         (#{byteArray.id, jdbcType=VARCHAR},
+         (#{byteArray.id, jdbcType=NVARCHAR},
           1, 
-          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.name, jdbcType=NVARCHAR}, 
           #{byteArray.bytes, jdbcType=${blobType}}, 
-          #{byteArray.deploymentId, jdbcType=VARCHAR})
+          #{byteArray.deploymentId, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -50,26 +50,26 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       BYTES_ = #{bytes, jdbcType=${blobType}},
     </set>
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">
-    select BYTES_ from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+    select BYTES_ from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByteArraysForDeployment" parameterType="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">
-    delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <delete id="deleteByteArray" parameterType="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <delete id="deleteByteArrayNoRevisionCheck" parameterType="string">
-    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id}
+    delete from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteByteArraysNoRevisionCheck" parameterType="java.util.List">
@@ -79,8 +79,8 @@
           or
         </if>
         ID_ in
-        <foreach item="byteArrayId" index="index" collection="byteArrayItem" open="(" separator="," close=")">
-          #{byteArrayId}
+        <foreach item="id" index="index" collection="byteArrayItem" open="(" separator="," close=")">
+          #{id, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>
@@ -88,11 +88,11 @@
   <!-- BYTE ARRAY RESULTMAP -->
   
   <resultMap id="byteArrayResultMap" type="org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="${blobType}"/>  
-    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- BYTE ARRAY SELECT -->
@@ -102,7 +102,7 @@
   </select>
   
   <select id="selectByteArray" parameterType="string" resultMap="byteArrayResultMap">
-   select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=VARCHAR}
+   select * from ${prefix}ACT_GE_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
 

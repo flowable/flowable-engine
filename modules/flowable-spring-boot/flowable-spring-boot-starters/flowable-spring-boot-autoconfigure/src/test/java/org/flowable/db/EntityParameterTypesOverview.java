@@ -38,7 +38,8 @@ public abstract class EntityParameterTypesOverview {
 
         // BPMN
         addActivityInstanceParams();
-        addBatch();
+        addBatchParams();
+        addByteArrayParams();
         addAttachmentParams();
         addDeploymentParams();
         addEventLogEntryParams();
@@ -82,7 +83,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("deleteReasonLike", PARAMETER_TYPE_NVARCHAR);
     }
 
-    protected static void addBatch() {
+    protected static void addBatchParams() {
         ParameterInfo info = addParameterInfo("batch");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
@@ -105,6 +106,15 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("completeTimeLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("completeTimeHigherThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addByteArrayParams() {
+        ParameterInfo info = addParameterInfo("byteArray");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
+        info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addAttachmentParams() {
