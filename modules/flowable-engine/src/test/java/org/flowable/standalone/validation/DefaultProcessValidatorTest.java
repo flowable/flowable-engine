@@ -437,7 +437,7 @@ public class DefaultProcessValidatorTest {
         List<ValidationError> allErrors = processValidator.validate(bpmnModel);
         assertThat(allErrors).hasSize(1);
         ValidationError error = allErrors.get(0);
-        assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION);
+        assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME);
         assertThat(error.getDefaultDescription()).isEqualTo("variable name is required for variable listener with activity id variableListenerStartEvent");
 
     }

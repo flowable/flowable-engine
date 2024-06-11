@@ -60,7 +60,7 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
 
                     if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition
                             && StringUtils.isEmpty(variableListenerEventDefinition.getVariableName())) {
-                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION,
+                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME,
                                 process, startEvent, "variable name is required for variable listener with activity id " + startEvent.getId());
                     }
                 }
