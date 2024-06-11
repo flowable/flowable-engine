@@ -38,6 +38,7 @@ public abstract class EntityParameterTypesOverview {
 
         // BPMN
         addActivityInstanceParams();
+        addBatch();
         addAttachmentParams();
         addDeploymentParams();
         addEventLogEntryParams();
@@ -78,6 +79,31 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("activityInstanceId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("deleteReasonLike", PARAMETER_TYPE_NVARCHAR);
+    }
+
+    protected static void addBatch() {
+        ParameterInfo info = addParameterInfo("batch");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TYPE_", "batchType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SEARCH_KEY_", "batchSearchKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SEARCH_KEY2_", "batchSearchKey2", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("COMPLETE_TIME_", "completeTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("STATUS_", "status", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BATCH_DOC_ID_", "batchDocRefId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("searchKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("searchKey2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.searchKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parameter.searchKey2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("batchTypeItem", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("createTimeHigherThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("createTimeLowerThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completeTimeLowerThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("completeTimeHigherThan", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addAttachmentParams() {
