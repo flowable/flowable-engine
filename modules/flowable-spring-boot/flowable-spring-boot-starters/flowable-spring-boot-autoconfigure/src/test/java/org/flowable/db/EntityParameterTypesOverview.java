@@ -52,6 +52,7 @@ public abstract class EntityParameterTypesOverview {
         // CMMN
         addCaseDefinitionParams();
         addCaseInstanceParams();
+        addCmmnDeploymentParams();
         addCmmnResourceParams();
         addHistoricCaseInstanceParams();
         addMilestoneInstanceParams();
@@ -594,6 +595,31 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+    }
+    
+    protected static void addCmmnDeploymentParams() {
+        ParameterInfo info = addParameterInfo("cmmnDeployment");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("KEY_", "key", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DEPLOY_TIME_", "deploymentTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("DERIVED_FROM_", "derivedFrom", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DERIVED_FROM_ROOT_", "derivedFromRoot", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PARENT_DEPLOYMENT_ID_", "parentDeploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ENGINE_VERSION_", "engineVersion", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("categoryLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("categoryNotEquals", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("keyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentDeploymentIdLike", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("processDefinitionKeyLike", PARAMETER_TYPE_NVARCHAR);
     }
     
     public static void addCmmnResourceParams() {
