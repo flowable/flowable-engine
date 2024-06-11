@@ -473,6 +473,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     Association association = new Association();
                     association.setTargetElement(criterion);
                     association.setTargetRef(criterion.getId());
+                    criterion.addIncomingAssociation(association);
 
                     association.setSourceElement(source);
                     association.setSourceRef(source.getId());
