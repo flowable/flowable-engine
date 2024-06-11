@@ -41,6 +41,7 @@ public abstract class EntityParameterTypesOverview {
         addAttachmentParams();
         addDeploymentParams();
         addEventLogEntryParams();
+        addExecutionParams();
         addProcessDefinitionParams();
         addTaskParams();
         addTimerJobParams();
@@ -136,6 +137,97 @@ public abstract class EntityParameterTypesOverview {
         // Query
         info.addQueryParameter("startLogNr", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("endLogNr", PARAMETER_TYPE_BIGINT);
+    }
+    
+    protected static void addExecutionParams() {
+        ParameterInfo info = addParameterInfo("execution");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BUSINESS_KEY_", "businessKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACT_ID_", "activityId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("IS_ACTIVE_", "isActive", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("IS_CONCURRENT_", "isConcurrent", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("IS_SCOPE_", "isScope", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("IS_EVENT_SCOPE_", "isEventScope", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("IS_MI_ROOT_", "isMultiInstanceRoot", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("PARENT_ID_", "parentId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUPER_EXEC_", "superExecutionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ROOT_PROC_INST_ID_", "rootProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("SUSPENSION_STATE_", "suspensionState", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("START_ACT_ID_", "startActivityId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("IS_COUNT_ENABLED_", "isCountEnabled", PARAMETER_TYPE_BOOLEAN);
+        info.addColumn("EVT_SUBSCR_COUNT_", "eventSubscriptionCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TASK_COUNT_", "taskCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("JOB_COUNT_", "jobCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("TIMER_JOB_COUNT_", "timerJobCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("SUSP_JOB_COUNT_", "suspendedJobCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("DEADLETTER_JOB_COUNT_", "deadLetterJobCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("EXTERNAL_WORKER_JOB_COUNT_", "externalWorkerJobCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("VAR_COUNT_", "variableCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("ID_LINK_COUNT_", "identityLinkCount", PARAMETER_TYPE_INTEGER);
+        info.addColumn("CALLBACK_ID_", "callbackId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CALLBACK_TYPE_", "callbackType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROPAGATED_STAGE_INST_ID_", "propagatedStageInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("LOCK_TIME_", "lockTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
+
+        // Process instance
+        info.addColumn("ProcessDefinitionName", "processDefinitionName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ProcessDefinitionKey", "processDefinitionKey", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ProcessDefinitionVersion", "processDefinitionVersion", PARAMETER_TYPE_INTEGER);
+        info.addColumn("ProcessDefinitionCategory", "processDefinitionCategory", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ProcessDefinitionEngineVersion", "processDefinitionEngineVersion", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DeploymentId", "deploymentId", PARAMETER_TYPE_NVARCHAR);
+
+        // Variables
+        addVariableColumnsWhenUsedInQueries(info);
+
+        info.addQueryParameter("executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("expirationTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("parentExecutionId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("businessKeyLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("businessStatusLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("superProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("subProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("nameLike", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("nameLikeIgnoreCase", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("activeActivityId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedUser", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.name", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
+        info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedBy", PARAMETER_TYPE_NVARCHAR);
+
+        // Event
+        info.addQueryParameter("eventSubscriptionValue.eventType", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("eventSubscriptionValue.eventName", PARAMETER_TYPE_NVARCHAR);
+
+        // Identity link
+        info.addQueryParameter("involvedUserIdentityLink.userId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedUserIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
+
+        // EntityLink
+        info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
     }
 
     protected static void addProcessDefinitionParams() {
@@ -270,6 +362,20 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("userIdForCandidateAndAssignee", PARAMETER_TYPE_NVARCHAR);
 
         // Variables are returned together with tasks
+        addVariableColumnsWhenUsedInQueries(info);
+
+        // Identitylinks
+        info.addColumn("ILINK_ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ILINK_PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+
+    }
+
+    protected static void addVariableColumnsWhenUsedInQueries(ParameterInfo info) {
         info.addColumn("VAR_ID_", "var.id", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("VAR_NAME_", "var.name", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("VAR_TYPE_", "var.type", PARAMETER_TYPE_NVARCHAR);
@@ -286,16 +392,6 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("VAR_SCOPE_ID_", "var.scopeId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("VAR_SUB_SCOPE_ID_", "var.subScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("VAR_SCOPE_TYPE_", "var.scopeType", PARAMETER_TYPE_NVARCHAR);
-
-        // Identitylinks
-        info.addColumn("ILINK_ID_", "id", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_TYPE_", "type", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_USER_ID_", "userId", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_GROUP_ID_", "groupId", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("ILINK_PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
-
     }
     
     public static void addCaseDefinitionParams() {
