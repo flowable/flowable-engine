@@ -59,7 +59,7 @@
   <!-- DEPLOYMENT DELETE -->
   
   <delete id="deleteEventDeployment" parameterType="string">
-    delete from ${prefix}FLW_EVENT_DEPLOYMENT where ID_ = #{id}
+    delete from ${prefix}FLW_EVENT_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </delete>
 
   <!-- DEPLOYMENT RESULTMAP -->
@@ -92,25 +92,25 @@
     from ${prefix}FLW_EVENT_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
-        RES.ID_ = #{deploymentId}
+        RES.ID_ = #{deploymentId, jdbcType=VARCHAR}
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=VARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )  
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
@@ -118,28 +118,28 @@
       <if test="eventDefinitionKey != null || eventDefinitionKeyLike != null">
           and exists(select 1 from ${prefix}FLW_EVENT_DEFINITION EVENT where RES.ID_ = EVENT.DEPLOYMENT_ID_ 
         <if test="eventDefinitionKey != null">
-          and EVENT.KEY_ = #{eventDefinitionKey}
+          and EVENT.KEY_ = #{eventDefinitionKey, jdbcType=VARCHAR}
         </if>
         <if test="eventDefinitionKeyLike != null">
-          and EVENT.KEY_ like #{eventDefinitionKeyLike}
+          and EVENT.KEY_ like #{eventDefinitionKeyLike, jdbcType=VARCHAR}
         </if>
         )
       </if>
       <if test="channelDefinitionKey != null || channelDefinitionKeyLike != null">
           and exists(select 1 from ${prefix}FLW_CHANNEL_DEFINITION CHANNEL where RES.ID_ = CHANNEL.DEPLOYMENT_ID_ 
         <if test="channelDefinitionKey != null">
-          and CHANNEL.KEY_ = #{channelDefinitionKey}
+          and CHANNEL.KEY_ = #{channelDefinitionKey, jdbcType=VARCHAR}
         </if>
         <if test="channelDefinitionKeyLike != null">
-          and CHANNEL.KEY_ like #{channelDefinitionKeyLike}
+          and CHANNEL.KEY_ like #{channelDefinitionKeyLike, jdbcType=VARCHAR}
         </if>
         )
       </if>
       <if test="parentDeploymentId != null">
-        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
       </if>
       <if test="parentDeploymentIdLike != null">
-        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike, jdbcType=VARCHAR}
       </if>
     </where>
   </sql>
