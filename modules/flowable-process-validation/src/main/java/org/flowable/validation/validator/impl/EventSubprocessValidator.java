@@ -14,6 +14,7 @@ package org.flowable.validation.validator.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
@@ -55,6 +56,12 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
 
                         addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, eventDefinition,
                                 "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
+                    }
+
+                    if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition
+                            && StringUtils.isEmpty(variableListenerEventDefinition.getVariableName())) {
+                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME,
+                                process, startEvent, "variable name is required for variable listener with activity id " + startEvent.getId());
                     }
                 }
             }

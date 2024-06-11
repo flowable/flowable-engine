@@ -43,7 +43,7 @@ public class VariableListenerEventDefinitionParser extends BaseChildElementParse
         
         String variableName = xtr.getAttributeValue(null, ATTRIBUTE_VARIABLE_NAME);
         if (StringUtils.isEmpty(variableName)) {
-            throw new FlowableException("variable name is required for variable listener with activity id " + parentElement.getId());
+            LOGGER.warn("variable name is required for variable listener with activity id {}", parentElement.getId());
         }
         eventDefinition.setVariableName(variableName);
         
