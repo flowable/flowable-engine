@@ -47,6 +47,7 @@ public abstract class EntityParameterTypesOverview {
         addEventLogEntryParams();
         addExecutionParams();
         addExternalWorkerJobParams();
+        addHistoricActivityInstanceParams();
         addHistoricDetailParams();
         addHistoricProcessInstanceParams();
         addHistoricTaskInstanceParams();
@@ -354,6 +355,33 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("duedateLowerThan", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateHigherThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("duedateLowerThanOrEqual", PARAMETER_TYPE_TIMESTAMP);
+    }
+
+    protected static void addHistoricActivityInstanceParams() {
+        ParameterInfo info = addParameterInfo("historicActivityInstance");
+        info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+        info.addColumn("PROC_DEF_ID_", "processDefinitionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("PROC_INST_ID_", "processInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("EXECUTION_ID_", "executionId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACT_ID_", "activityId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TASK_ID_", "taskId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CALL_PROC_INST_ID_", "calledProcessInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("TRANSACTION_ORDER_", "transactionOrder", PARAMETER_TYPE_INTEGER);
+        info.addColumn("DURATION_", "durationInMillis", PARAMETER_TYPE_BIGINT);
+        info.addColumn("DELETE_REASON_", "deleteReason", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_NVARCHAR);
+
+        info.addQueryParameter("activityInstanceId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("finishedAfter", PARAMETER_TYPE_TIMESTAMP);
     }
 
     protected static void addHistoricDetailParams() {
