@@ -13,14 +13,19 @@
 package org.flowable.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.db.EntityParameterTypesOverview.getColumnType;
+import static org.flowable.db.EntityParameterTypesOverview.getParameterType;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +44,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -239,6 +245,119 @@ public class EngineMappingsValidationTest {
         }
     }
 
+    @ParameterizedTest(name = "Package {0}")
+    @ArgumentsSource(PackageArgumentsProvider.class)
+    public void verifyAllParametersAreTyped(EntityMappingPackageInformation packageInformation) throws IOException {
+        Map<String, String> mappedResources = readMappingFileAsString(packageInformation);
+        assertFalse(mappedResources.isEmpty());
+
+        for (String mappedResource : mappedResources.keySet()) {
+            System.out.println("Checking mapping " + mappedResource);
+            String xmlContent = mappedResources.get(mappedResource);
+
+            int lineCounter = 0;
+            try (BufferedReader reader = new BufferedReader(new StringReader(xmlContent))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+
+                    lineCounter++;
+
+                    // Checking the string replacements (they are passed by ${} )
+                    if (line.contains("${")) {
+
+                        int index = -1;
+                        while ((index = line.indexOf("${", index + 1)) > 0) {
+                            int endIndex = line.indexOf("}", index);
+                            assertThat(endIndex).isGreaterThan(0);
+                            String content = line.substring(index + 2, endIndex);
+
+                            assertThat(content).isIn("prefix", "queryTablePrefix", "queryTablePrefixSelect",
+                                    "limitBefore", "limitBetween", "limitAfter",
+                                    "blobType", "orderBy", "outerJoinOrderBy", "wildcardEscapeClause", "sql");
+                        }
+
+                    }
+
+                    // ResultMap validation
+                    if (line.contains("<result ") || line.contains("<id ")) {
+                        int columnBeginIndex = line.indexOf("column=\"");
+                        String columnName = line.substring(columnBeginIndex + 8, line.indexOf("\"", columnBeginIndex + 8));
+                        assertThat(columnName).withFailMessage("No column set on line " + lineCounter).isNotNull();
+
+                        String expectedColumnType = getColumnType(mappedResource, columnName);
+                        assertThat(expectedColumnType)
+                                .withFailMessage("No jdbcType configured in " + EntityParameterTypesOverview.class + " for column " + columnName
+                                        + " on line " + lineCounter + " for resource " + mappedResource)
+                                .isNotNull();
+
+                        if (!line.contains("typeHandler")) {
+                            int jdbcTypeBeginIndex = line.indexOf("jdbcType=\"");
+                            String columnType = line.substring(jdbcTypeBeginIndex + 10, line.indexOf("\"", jdbcTypeBeginIndex + 10));
+                            assertThat(columnType)
+                                    .withFailMessage("Wrong jdbcType in " + mappedResource + " on line " + lineCounter + " for resource " + mappedResource
+                                            + ", should be " + expectedColumnType + ", but was " + columnType)
+                                    .isEqualTo(expectedColumnType);
+                        }
+
+                    }
+
+                    // The #{...} are the parameters
+                    if (line.contains("#{")) {
+
+                        int index = -1;
+                        while ((index = line.indexOf("#{", index + 1)) > 0) {
+                            int endIndex = line.indexOf("}", index);
+                            String content = line.substring(index + 2, endIndex);
+
+                            if (!content.contains("typeHandler")) { // only checking jdbcTypes, not the typeHandler
+                                assertThat(content)
+                                        .withFailMessage("Missing 'jdbcType' in " + mappedResource
+                                                + " on line " + lineCounter + ": #{" + content + "}" + " for resource " + mappedResource)
+                                        .contains(", jdbcType=");
+
+                                int commaIndex = line.indexOf(",", index);
+                                String parameterName = line.substring(index + 2, commaIndex).trim();
+
+                                int equalsSignIndex = line.indexOf("=", commaIndex);
+                                String jdbcType = line.substring(equalsSignIndex + 1, endIndex).trim();
+
+                                if (jdbcType.contains("blobType")) { // quick-fix for reading ${blobType}
+                                    jdbcType = line.substring(equalsSignIndex + 1, endIndex + 1).trim();
+                                }
+
+                                // Special handling when it's just passing parameter
+                                if ("parameter".equals(parameterName)) {
+
+                                    assertThat(jdbcType)
+                                            .withFailMessage("No jdbcType in " + mappedResource + " on line " + lineCounter + " for resource ")
+                                            .isNotNull();
+
+                                } else {
+
+                                    String expectedParameterType = getParameterType(mappedResource, parameterName);
+                                    assertThat(expectedParameterType)
+                                            .withFailMessage("No jdbcType configured in " + EntityParameterTypesOverview.class + " for parameter '" + parameterName
+                                                    + "' on line " + lineCounter + " for resource " + mappedResource)
+                                            .isNotNull();
+                                    assertThat(jdbcType)
+                                            .withFailMessage("Wrong jdbcType in " + mappedResource + " on line " + lineCounter + " for resource " + mappedResource
+                                                    + ", should be " + expectedParameterType + ", but was " + jdbcType)
+                                            .isEqualTo(expectedParameterType);
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Helper Methods
+     */
+
     protected Class<?> getAndAssertEntityInterfaceClass(Document mappingFileContent, String mappedEntity) {
         String entityPackage = getEntityPackageFromMapperElement(mappingFileContent);
         String expectedClass = entityPackage + "." + mappedEntity + "Entity";
@@ -266,7 +385,7 @@ public class EngineMappingsValidationTest {
     }
 
     /**
-     * Returns a map {entityName, xmlMappingFileContent}
+     * Returns a map {entityName, xmlMappingFileContent as Document}
      */
     private Map<String, Document> readMappingFile(EntityMappingPackageInformation packageInformation) {
         try {
@@ -303,6 +422,35 @@ public class EngineMappingsValidationTest {
         docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         return docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(resourceLocation));
+    }
+
+    /**
+     * Returns a map {entityName, xmlMappingFileContent as Document}
+     */
+    private Map<String, String> readMappingFileAsString(EntityMappingPackageInformation packageInformation) {
+        try {
+            Document mappingsFile = readXmlDocument(packageInformation.getBasePackageFolder() + "/db/mapping/mappings.xml");
+            Map<String, String> resources = new HashMap<>();
+            NodeList nodeList = mappingsFile.getElementsByTagName("mapper");
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Node node = nodeList.item(i);
+                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
+                Matcher resourceMatcher = ENTITY_RESOURCE_PATTERN.matcher(resource);
+                if (resourceMatcher.matches()) {
+                    String entity = resourceMatcher.group(1);
+                    String entityMappingXmlContent = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream(resource), StandardCharsets.UTF_8);
+                    resources.put(entity, entityMappingXmlContent);
+                }
+            }
+
+            resources.remove("TableData"); // not an entity
+
+            assertFalse(resources.isEmpty());
+
+            return resources;
+        } catch (Exception e) {
+            throw new FlowableException("Error getting mapped resources", e);
+        }
     }
 
     private String getEntityPackageFromMapperElement(Document mappingFileContent) {

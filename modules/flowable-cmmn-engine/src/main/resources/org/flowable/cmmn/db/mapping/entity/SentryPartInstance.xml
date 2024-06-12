@@ -7,13 +7,13 @@
     <insert id="insertSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_)
         values (
-            #{id ,jdbcType=VARCHAR},
-            1, #{caseDefinitionId ,jdbcType=VARCHAR},
-            #{caseInstanceId ,jdbcType=VARCHAR},
-            #{planItemInstanceId ,jdbcType=VARCHAR},
-            #{onPartId ,jdbcType=VARCHAR},
-            #{ifPartId ,jdbcType=VARCHAR},
-            #{timeStamp ,jdbcType=TIMESTAMP}
+            #{id, jdbcType=VARCHAR},
+            1, #{caseDefinitionId, jdbcType=VARCHAR},
+            #{caseInstanceId, jdbcType=VARCHAR},
+            #{planItemInstanceId, jdbcType=VARCHAR},
+            #{onPartId, jdbcType=VARCHAR},
+            #{ifPartId, jdbcType=VARCHAR},
+            #{timeStamp, jdbcType=TIMESTAMP}
         )
     </insert>
 
@@ -23,13 +23,13 @@
         values
         <foreach collection="list" item="sentryPartInstance" index="index" separator=",">
             (
-                #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.ifPartId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.timeStamp,jdbcType=TIMESTAMP}
+                #{sentryPartInstance.id, jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId, jdbcType=VARCHAR},
+                #{sentryPartInstance.caseInstanceId, jdbcType=VARCHAR},
+                #{sentryPartInstance.planItemInstanceId, jdbcType=VARCHAR},
+                #{sentryPartInstance.onPartId, jdbcType=VARCHAR},
+                #{sentryPartInstance.ifPartId, jdbcType=VARCHAR},
+                #{sentryPartInstance.timeStamp, jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
@@ -39,13 +39,13 @@
         <foreach collection="list" item="sentryPartInstance" index="index">
             into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_) VALUES
             (
-                #{sentryPartInstance.id ,jdbcType=VARCHAR},
-                1, #{sentryPartInstance.caseDefinitionId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.caseInstanceId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.planItemInstanceId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.onPartId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.ifPartId ,jdbcType=VARCHAR},
-                #{sentryPartInstance.timeStamp ,jdbcType=TIMESTAMP}
+                #{sentryPartInstance.id, jdbcType=VARCHAR},
+                1, #{sentryPartInstance.caseDefinitionId, jdbcType=VARCHAR},
+                #{sentryPartInstance.caseInstanceId, jdbcType=VARCHAR},
+                #{sentryPartInstance.planItemInstanceId, jdbcType=VARCHAR},
+                #{sentryPartInstance.onPartId, jdbcType=VARCHAR},
+                #{sentryPartInstance.ifPartId, jdbcType=VARCHAR},
+                #{sentryPartInstance.timeStamp, jdbcType=TIMESTAMP}
             )
         </foreach>
         SELECT * FROM dual
@@ -78,11 +78,11 @@
     </update>
 
     <delete id="deleteSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
-        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id} and REV_ = #{revision}
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </delete>
     
      <delete id="deleteSentryPartInstancesByCaseInstanceId" parameterType="String">
-        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where CASE_INST_ID_ = #{id}
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
     </delete>
     
 

@@ -8,17 +8,17 @@
 
   <insert id="insertResource" parameterType="org.flowable.engine.impl.persistence.entity.ResourceEntityImpl">
     insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_)
-    values (#{id, jdbcType=VARCHAR}, 1, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
+    values (#{id, jdbcType=NVARCHAR}, 1, #{name, jdbcType=NVARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=NVARCHAR}, #{generated, jdbcType=BOOLEAN})  
   </insert>
 
   <insert id="bulkInsertResource" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
-      <foreach collection="list" item="byteArr" index="index" separator=","> 
-        (#{byteArr.id, jdbcType=VARCHAR},
-         1, #{byteArr.name, jdbcType=VARCHAR},
-         #{byteArr.bytes, jdbcType=${blobType}},
-         #{byteArr.deploymentId, jdbcType=VARCHAR},
-         #{byteArr.generated, jdbcType=BOOLEAN})
+      <foreach collection="list" item="resource" index="index" separator=",">
+        (#{resource.id, jdbcType=NVARCHAR},
+         1, #{resource.name, jdbcType=NVARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=NVARCHAR},
+         #{resource.generated, jdbcType=BOOLEAN})
       </foreach>
   </insert>
 
@@ -26,10 +26,10 @@
     INSERT ALL
       <foreach collection="list" item="resource" index="index"> 
         INTO ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
-        (#{resource.id, jdbcType=VARCHAR},
-         1, #{resource.name, jdbcType=VARCHAR},
+        (#{resource.id, jdbcType=NVARCHAR},
+         1, #{resource.name, jdbcType=NVARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR},
+         #{resource.deploymentId, jdbcType=NVARCHAR},
          #{resource.generated, jdbcType=BOOLEAN})
       </foreach>
     SELECT * FROM dual
@@ -38,14 +38,14 @@
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteResourcesByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id}
+    delete from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
   
   <!-- RESOURCE RESULTMAP -->
 
   <resultMap id="resourceResultMap" type="org.flowable.engine.impl.persistence.entity.ResourceEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="${blobType}"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
@@ -53,17 +53,17 @@
   <!-- RESOURCE SELECT -->
 
   <select id="selectResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select NAME_ from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select NAME_ from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter, jdbcType=NVARCHAR} order by NAME_ asc
   </select>
   
   <select id="selectResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="resourceResultMap">
     select * from ${prefix}ACT_GE_BYTEARRAY 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND NAME_ = #{resourceName}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
+          AND NAME_ = #{resourceName, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
-    select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select * from ${prefix}ACT_GE_BYTEARRAY where DEPLOYMENT_ID_ = #{parameter, jdbcType=NVARCHAR} order by NAME_ asc
   </select>
   
   <update id="updateResource" parameterType="org.flowable.engine.impl.persistence.entity.ResourceEntityImpl">
@@ -71,7 +71,7 @@
     <set>
         BYTES_ = #{bytes, jdbcType=${blobType}},
     </set>
-    where ID_ = #{id, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
   </update>
 
 </mapper>

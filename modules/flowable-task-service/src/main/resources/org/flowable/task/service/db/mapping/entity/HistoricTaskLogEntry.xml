@@ -11,19 +11,19 @@
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
-      #{type, jdbcType=VARCHAR}, 
-      #{taskId, jdbcType=VARCHAR},
-      #{executionId, jdbcType=VARCHAR},
-      #{processInstanceId, jdbcType=VARCHAR},
-      #{processDefinitionId, jdbcType=VARCHAR},
-      #{scopeId, jdbcType=VARCHAR},
-      #{scopeDefinitionId, jdbcType=VARCHAR},
-      #{subScopeId, jdbcType=VARCHAR},
-      #{scopeType, jdbcType=VARCHAR},
-      #{tenantId, jdbcType=VARCHAR},
+      #{type, jdbcType=NVARCHAR}, 
+      #{taskId, jdbcType=NVARCHAR},
+      #{executionId, jdbcType=NVARCHAR},
+      #{processInstanceId, jdbcType=NVARCHAR},
+      #{processDefinitionId, jdbcType=NVARCHAR},
+      #{scopeId, jdbcType=NVARCHAR},
+      #{scopeDefinitionId, jdbcType=NVARCHAR},
+      #{subScopeId, jdbcType=NVARCHAR},
+      #{scopeType, jdbcType=NVARCHAR},
+      #{tenantId, jdbcType=NVARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP}, 
-      #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=VARCHAR}
+      #{userId, jdbcType=NVARCHAR},
+      #{data, jdbcType=NVARCHAR}
     )
   </insert>
   
@@ -32,20 +32,20 @@
                                         SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, TENANT_ID_,
                                         TIME_STAMP_, USER_ID_, DATA_)
     values 
-      <foreach collection="list" item="taskLog" index="index" separator=",">
-        (#{taskLog.type, jdbcType=VARCHAR},
-        #{taskLog.taskId, jdbcType=VARCHAR},
-        #{taskLog.executionId, jdbcType=VARCHAR},
-        #{taskLog.processInstanceId, jdbcType=VARCHAR},
-        #{taskLog.processDefinitionId, jdbcType=VARCHAR},
-        #{taskLog.scopeId, jdbcType=VARCHAR},
-        #{taskLog.scopeDefinitionId, jdbcType=VARCHAR},
-        #{taskLog.subScopeId, jdbcType=VARCHAR},
-        #{taskLog.scopeType, jdbcType=VARCHAR},
-        #{taskLog.tenantId, jdbcType=VARCHAR},
-        #{taskLog.timeStamp, jdbcType=TIMESTAMP},
-        #{taskLog.userId, jdbcType=VARCHAR},
-        #{taskLog.data, jdbcType=VARCHAR})
+      <foreach collection="list" item="historicTaskLogEntry" index="index" separator=",">
+        (#{historicTaskLogEntry.type, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.taskId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.executionId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.processInstanceId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.processDefinitionId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.scopeId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.scopeDefinitionId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.subScopeId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.scopeType, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.tenantId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.timeStamp, jdbcType=TIMESTAMP},
+        #{historicTaskLogEntry.userId, jdbcType=NVARCHAR},
+        #{historicTaskLogEntry.data, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -55,42 +55,42 @@
                                         TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_)
     values (
       ${prefix}ACT_HI_TASK_EVT_LOG_SEQ.nextVal,
-      #{type, jdbcType=VARCHAR}, 
-      #{taskId, jdbcType=VARCHAR},
-      #{executionId, jdbcType=VARCHAR},
-      #{processInstanceId, jdbcType=VARCHAR},
-      #{processDefinitionId, jdbcType=VARCHAR},
-      #{scopeId, jdbcType=VARCHAR},
-      #{scopeDefinitionId, jdbcType=VARCHAR},
-      #{subScopeId, jdbcType=VARCHAR},
-      #{scopeType, jdbcType=VARCHAR},
-      #{tenantId, jdbcType=VARCHAR},
+      #{type, jdbcType=NVARCHAR}, 
+      #{taskId, jdbcType=NVARCHAR},
+      #{executionId, jdbcType=NVARCHAR},
+      #{processInstanceId, jdbcType=NVARCHAR},
+      #{processDefinitionId, jdbcType=NVARCHAR},
+      #{scopeId, jdbcType=NVARCHAR},
+      #{scopeDefinitionId, jdbcType=NVARCHAR},
+      #{subScopeId, jdbcType=NVARCHAR},
+      #{scopeType, jdbcType=NVARCHAR},
+      #{tenantId, jdbcType=NVARCHAR},
       #{timeStamp, jdbcType=TIMESTAMP},
-      #{userId, jdbcType=VARCHAR},
-      #{data, jdbcType=VARCHAR}
+      #{userId, jdbcType=NVARCHAR},
+      #{data, jdbcType=NVARCHAR}
     )  
   </insert>
 
   <insert id="bulkInsertHistoricTaskLogEntry" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
-      <foreach collection="list" item="taskLog" index="index">
+      <foreach collection="list" item="historicTaskLogEntry" index="index">
         into ${prefix}ACT_HI_TSK_LOG(ID_, TYPE_, TASK_ID_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_,
                                      SCOPE_ID_, SCOPE_DEFINITION_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
                                      TENANT_ID_, TIME_STAMP_, USER_ID_, DATA_) VALUES
             (${prefix}ACT_HI_TASK_EVT_LOG_SEQ.nextVal,
-             #{taskLog.type, jdbcType=VARCHAR},
-             #{taskLog.taskId, jdbcType=VARCHAR},
-             #{taskLog.executionId, jdbcType=VARCHAR},
-             #{taskLog.processInstanceId, jdbcType=VARCHAR},
-             #{taskLog.processDefinitionId, jdbcType=VARCHAR},
-             #{taskLog.scopeId, jdbcType=VARCHAR},
-             #{taskLog.scopeDefinitionId, jdbcType=VARCHAR},
-             #{taskLog.subScopeId, jdbcType=VARCHAR},
-             #{taskLog.scopeType, jdbcType=VARCHAR},
-             #{taskLog.tenantId, jdbcType=VARCHAR},
-             #{taskLog.timeStamp, jdbcType=TIMESTAMP},
-             #{taskLog.userId, jdbcType=VARCHAR},
-             #{taskLog.data, jdbcType=VARCHAR})
+             #{historicTaskLogEntry.type, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.taskId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.executionId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.processInstanceId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.processDefinitionId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.scopeId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.scopeDefinitionId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.subScopeId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.scopeType, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.tenantId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.timeStamp, jdbcType=TIMESTAMP},
+             #{historicTaskLogEntry.userId, jdbcType=NVARCHAR},
+             #{historicTaskLogEntry.data, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -100,19 +100,19 @@
   <resultMap id="HistoricTaskLogEntryResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl">
     <id property="logNumber" column="ID_" jdbcType="BIGINT" />
     <result property="id" column="ID_" jdbcType="BIGINT" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR"/>
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR"/>
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+    <result property="type" column="TYPE_" jdbcType="NVARCHAR"/>
+    <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR"/>
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR"/>
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR"/>
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR"/>
     <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP"/>
-    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
-    <result property="data" column="DATA_" jdbcType="VARCHAR"/>
+    <result property="userId" column="USER_ID_" jdbcType="NVARCHAR" />
+    <result property="data" column="DATA_" jdbcType="NVARCHAR"/>
   </resultMap>
   
   <!-- SELECTS -->
@@ -145,65 +145,65 @@
   <sql id="commonSelectHistoricTaskLogEntriesByQueryCriteriaSql">
     <where>
       <if test="taskId != null">
-        RES.TASK_ID_ = #{taskId}
+        RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
       </if>
       <if test="type != null">
-        and RES.TYPE_ = #{type}
+        and RES.TYPE_ = #{type, jdbcType=NVARCHAR}
       </if>
       <if test="userId != null">
-        and RES.USER_ID_ = #{userId}
+        and RES.USER_ID_ = #{userId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
+        and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and RES.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeId != null">
-        and RES.SCOPE_ID_ = #{scopeId}
+        and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeDefinitionId != null">
-        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="subScopeId != null">
-        and RES.SUB_SCOPE_ID_ = #{subScopeId}
+        and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeType != null">
-        and RES.SCOPE_TYPE_ = #{scopeType}
+        and RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
       </if>
       <if test="fromDate != null">
-        and RES.TIME_STAMP_ &gt;= #{fromDate}
+        and RES.TIME_STAMP_ &gt;= #{fromDate, jdbcType=TIMESTAMP}
       </if>
       <if test="toDate != null">
-        and RES.TIME_STAMP_ &lt;= #{toDate}
+        and RES.TIME_STAMP_ &lt;= #{toDate, jdbcType=TIMESTAMP}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="fromLogNumber != -1">
-        and RES.ID_ &gt;= #{fromLogNumber}
+        and RES.ID_ &gt;= #{fromLogNumber, jdbcType=BIGINT}
       </if>
       <if test="toLogNumber != -1">
-        and RES.ID_ &lt;= #{toLogNumber}
+        and RES.ID_ &lt;= #{toLogNumber, jdbcType=BIGINT}
       </if>
     </where>
   </sql>
 
   <!-- DELETE -->
   <delete id="deleteHistoricTaskLogEntryByLogNumber" parameterType="long">
-    delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{logNr}
+    delete from ${prefix}ACT_HI_TSK_LOG where ID_ = #{logNumber, jdbcType=BIGINT}
   </delete>
 
   <delete id="deleteHistoricTaskLogEntriesByProcessDefinitionId" parameterType="string">
-    delete from ${prefix}ACT_HI_TSK_LOG where PROC_DEF_ID_ = #{processDefinitionId}
+    delete from ${prefix}ACT_HI_TSK_LOG where PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteHistoricTaskLogEntriesByScopeDefinitionId" parameterType="map">
-    delete from ${prefix}ACT_HI_TSK_LOG where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+    delete from ${prefix}ACT_HI_TSK_LOG where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteHistoricTaskLogEntriesByTaskId" parameterType="string">
-    delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId}
+    delete from ${prefix}ACT_HI_TSK_LOG where TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="bulkDeleteHistoricTaskLogEntriesForTaskIds" parameterType="string">
@@ -213,8 +213,8 @@
         or
         </if>
         TASK_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{taskId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>
