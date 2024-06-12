@@ -60,7 +60,9 @@ public class FlowableJobConfiguration {
     public AsyncTaskExecutor flowableAsyncTaskInvokerTaskExecutor(
             @Qualifier("flowableAsyncTaskInvokerTaskExecutorConfiguration") AsyncTaskExecutorConfiguration executorConfiguration
     ) {
-        return new DefaultAsyncTaskExecutor(executorConfiguration);
+        DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor(executorConfiguration);
+        defaultAsyncTaskExecutor.start();
+        return defaultAsyncTaskExecutor;
     }
 
 }

@@ -22,16 +22,16 @@
   
   <insert id="insertHistoricIdentityLink" parameterType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
     insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
-    values (#{id, jdbcType=VARCHAR},
-            #{type, jdbcType=VARCHAR},
-            #{userId, jdbcType=VARCHAR},
-            #{groupId, jdbcType=VARCHAR},
-            #{taskId, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
+            #{type, jdbcType=NVARCHAR},
+            #{userId, jdbcType=NVARCHAR},
+            #{groupId, jdbcType=NVARCHAR},
+            #{taskId, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
             #{createTime, jdbcType=TIMESTAMP})
   </insert>
   
@@ -39,16 +39,16 @@
     insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_)
     values 
       <foreach collection="list" item="historicIdentityLink" index="index" separator=",">
-        (#{historicIdentityLink.id, jdbcType=VARCHAR},
-         #{historicIdentityLink.type, jdbcType=VARCHAR},
-         #{historicIdentityLink.userId, jdbcType=VARCHAR},
-         #{historicIdentityLink.groupId, jdbcType=VARCHAR},
-         #{historicIdentityLink.taskId, jdbcType=VARCHAR},
-         #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
-         #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
-         #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
-         #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
-         #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
+        (#{historicIdentityLink.id, jdbcType=NVARCHAR},
+         #{historicIdentityLink.type, jdbcType=NVARCHAR},
+         #{historicIdentityLink.userId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.groupId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.taskId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.processInstanceId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.scopeId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.subScopeId, jdbcType=NVARCHAR},
+         #{historicIdentityLink.scopeType, jdbcType=NVARCHAR},
+         #{historicIdentityLink.scopeDefinitionId, jdbcType=NVARCHAR},
          #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
       </foreach>
   </insert>
@@ -57,16 +57,16 @@
     INSERT ALL 
       <foreach collection="list" item="historicIdentityLink" index="index">
         INTO ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, CREATE_TIME_) VALUES 
-          (#{historicIdentityLink.id, jdbcType=VARCHAR},
-           #{historicIdentityLink.type, jdbcType=VARCHAR},
-           #{historicIdentityLink.userId, jdbcType=VARCHAR},
-           #{historicIdentityLink.groupId, jdbcType=VARCHAR},
-           #{historicIdentityLink.taskId, jdbcType=VARCHAR},
-           #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
-           #{historicIdentityLink.scopeId, jdbcType=VARCHAR},
-           #{historicIdentityLink.subScopeId, jdbcType=VARCHAR},
-           #{historicIdentityLink.scopeType, jdbcType=VARCHAR},
-           #{historicIdentityLink.scopeDefinitionId, jdbcType=VARCHAR},
+          (#{historicIdentityLink.id, jdbcType=NVARCHAR},
+           #{historicIdentityLink.type, jdbcType=NVARCHAR},
+           #{historicIdentityLink.userId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.groupId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.taskId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.processInstanceId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.scopeId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.subScopeId, jdbcType=NVARCHAR},
+           #{historicIdentityLink.scopeType, jdbcType=NVARCHAR},
+           #{historicIdentityLink.scopeDefinitionId, jdbcType=NVARCHAR},
            #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
       </foreach>
     SELECT * FROM dual
@@ -75,22 +75,22 @@
   <!-- HISTORIC IDENTITY LINK DELETE -->
   
   <delete id="deleteHistoricIdentityLink" parameterType="string">
-    delete from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id}
+    delete from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="bulkDeleteHistoricIdentityLink" parameterType="java.util.Collection">
     delete from ${prefix}ACT_HI_IDENTITYLINK where  
     <foreach item="identityLink" collection="list" index="index" separator=" or ">
-        ID_ = #{identityLink.id, jdbcType=VARCHAR}
+        ID_ = #{identityLink.id, jdbcType=NVARCHAR}
     </foreach>
   </delete>
   
   <delete id="deleteHistoricIdentityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
-    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="deleteHistoricIdentityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
-    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
+    delete from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="bulkDeleteHistoricIdentityLinksForProcessInstanceIds" parameterType="java.util.Collection">
@@ -100,8 +100,8 @@
         or
         </if>
         PROC_INST_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="processInstanceId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>
@@ -113,8 +113,8 @@
         or
         </if>
         TASK_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{taskId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>
@@ -126,11 +126,11 @@
         or
         </if>
         SCOPE_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{scopeId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>)
-    and SCOPE_TYPE_ = #{scopeType}
+    and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="bulkDeleteHistoricProcessIdentityLinks" parameterType="java.util.Map">
@@ -195,39 +195,39 @@
 
   <!-- HISTORIC IDENTITY LINK RESULTMAP -->
   <resultMap id="historicIdentityLinkResultMap" type="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
-    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
-    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="NVARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="NVARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="NVARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />       
   </resultMap>
 
   <!-- HISTORIC IDENTITY LINK SELECT -->
 
   <select id="selectHistoricIdentityLink" parameterType="string" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksByTask" parameterType="string" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{parameter}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksByProcessInstance" parameterType="string" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{parameter}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricIdentityLinksBySubScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
-    select * from ${prefix}ACT_HI_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+    select * from ${prefix}ACT_HI_IDENTITYLINK where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
   </select>
   
  <select id="selectIdentityLinks" resultMap="historicIdentityLinkResultMap">
@@ -237,15 +237,15 @@
   <select id="selectHistoricIdentityLinkByTaskUserGroupAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicIdentityLinkResultMap">
     select * 
     from ${prefix}ACT_HI_IDENTITYLINK 
-    where TASK_ID_ = #{parameter.taskId}
+    where TASK_ID_ = #{parameter.taskId, jdbcType=NVARCHAR}
       <if test="parameter.userId != null">
-        and USER_ID_ = #{parameter.userId}
+        and USER_ID_ = #{parameter.userId, jdbcType=NVARCHAR}
       </if>
       <if test="parameter.groupId != null">
-        and GROUP_ID_ = #{parameter.groupId}
+        and GROUP_ID_ = #{parameter.groupId, jdbcType=NVARCHAR}
       </if>
       <if test="parameter.type != null">
-        and TYPE_ = #{parameter.type}
+        and TYPE_ = #{parameter.type, jdbcType=NVARCHAR}
       </if>
   </select>
 </mapper>
