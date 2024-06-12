@@ -932,9 +932,23 @@ public abstract class AbstractEngineConfiguration {
 
         handlerRegistry.register(Object.class, JdbcType.CHAR, new StringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.CLOB, new ClobTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+
+        // For SQL server, the performance difference between using varchar or nvarchar is big.
+        // Using the correct jdbcType is thus very important for SQL server, but in many mappings the type was not set,
+        // which led to defaulting to the regular 'varchar' jdbcType.
+        // Up to the point where the following if was added, none of the MyBatis mappings would use 'nvarchar' as jdbcType.
+        // Together with this check, all mappings were reviewed and the correct type was added.
+        if (databaseType.equals(DATABASE_TYPE_MSSQL)) {
+            handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler()); // Notice the 'N' prefix here
+        } else {
+            // However, for other databases, we want to keep the old behavior of always using 'varchar',
+            // thus the same handler is used for both types.
+            handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new StringTypeHandler()); // Notice: no 'N' prefix here
+        }
+
         handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.NCHAR, new NStringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.NCLOB, new NClobTypeHandler());
 

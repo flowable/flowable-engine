@@ -59,40 +59,40 @@
         TENANT_ID_,
         LAST_UPDATED_TIME_
       ) values (
-        #{id ,jdbcType=VARCHAR},
-        1, #{taskDefinitionId, jdbcType=VARCHAR},
-        #{processDefinitionId, jdbcType=VARCHAR},
-        #{processInstanceId, jdbcType=VARCHAR},
-        #{executionId, jdbcType=VARCHAR},
-        #{scopeId, jdbcType=VARCHAR},
-        #{subScopeId, jdbcType=VARCHAR},
-        #{scopeType, jdbcType=VARCHAR},
-        #{scopeDefinitionId, jdbcType=VARCHAR},
-        #{propagatedStageInstanceId, jdbcType=VARCHAR},
-        #{state ,jdbcType=VARCHAR},
-        #{name ,jdbcType=VARCHAR},
-        #{parentTaskId ,jdbcType=VARCHAR},
-        #{description ,jdbcType=VARCHAR},
-        #{owner ,jdbcType=VARCHAR},
-        #{assignee ,jdbcType=VARCHAR},
+        #{id, jdbcType=NVARCHAR},
+        1, #{taskDefinitionId, jdbcType=NVARCHAR},
+        #{processDefinitionId, jdbcType=NVARCHAR},
+        #{processInstanceId, jdbcType=NVARCHAR},
+        #{executionId, jdbcType=NVARCHAR},
+        #{scopeId, jdbcType=NVARCHAR},
+        #{subScopeId, jdbcType=NVARCHAR},
+        #{scopeType, jdbcType=NVARCHAR},
+        #{scopeDefinitionId, jdbcType=NVARCHAR},
+        #{propagatedStageInstanceId, jdbcType=NVARCHAR},
+        #{state, jdbcType=NVARCHAR},
+        #{name, jdbcType=NVARCHAR},
+        #{parentTaskId, jdbcType=NVARCHAR},
+        #{description, jdbcType=NVARCHAR},
+        #{owner, jdbcType=NVARCHAR},
+        #{assignee, jdbcType=NVARCHAR},
         #{createTime, jdbcType=TIMESTAMP},
         #{inProgressStartTime, jdbcType=TIMESTAMP},
-        #{inProgressStartedBy, jdbcType=VARCHAR},
+        #{inProgressStartedBy, jdbcType=NVARCHAR},
         #{claimTime, jdbcType=TIMESTAMP},
-        #{claimedBy, jdbcType=VARCHAR},
+        #{claimedBy, jdbcType=NVARCHAR},
         #{suspendedTime, jdbcType=TIMESTAMP},
-        #{suspendedBy, jdbcType=VARCHAR},
+        #{suspendedBy, jdbcType=NVARCHAR},
         #{endTime, jdbcType=TIMESTAMP},
-        #{completedBy, jdbcType=VARCHAR},
-        #{durationInMillis ,jdbcType=BIGINT},
-        #{deleteReason ,jdbcType=VARCHAR},
-        #{taskDefinitionKey ,jdbcType=VARCHAR},
-        #{formKey ,jdbcType=VARCHAR},
+        #{completedBy, jdbcType=NVARCHAR},
+        #{durationInMillis, jdbcType=BIGINT},
+        #{deleteReason, jdbcType=NVARCHAR},
+        #{taskDefinitionKey, jdbcType=NVARCHAR},
+        #{formKey, jdbcType=NVARCHAR},
         #{priority, jdbcType=INTEGER},
         #{inProgressStartDueDate, jdbcType=TIMESTAMP},
         #{dueDate, jdbcType=TIMESTAMP},
-        #{category, jdbcType=VARCHAR},
-        #{tenantId, jdbcType=VARCHAR},
+        #{category, jdbcType=NVARCHAR},
+        #{tenantId, jdbcType=NVARCHAR},
         #{lastUpdateTime, jdbcType=TIMESTAMP}
       )
   </insert>
@@ -137,40 +137,40 @@
         LAST_UPDATED_TIME_
       ) values
         <foreach collection="list" item="historicTask" index="index" separator=",">
-          (#{historicTask.id ,jdbcType=VARCHAR},
-           1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
-           #{historicTask.processDefinitionId, jdbcType=VARCHAR},
-           #{historicTask.processInstanceId, jdbcType=VARCHAR},
-           #{historicTask.executionId, jdbcType=VARCHAR},
-           #{historicTask.scopeId, jdbcType=VARCHAR},
-           #{historicTask.subScopeId, jdbcType=VARCHAR},
-           #{historicTask.scopeType, jdbcType=VARCHAR},
-           #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
-           #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
-           #{historicTask.state ,jdbcType=VARCHAR},
-           #{historicTask.name ,jdbcType=VARCHAR},
-           #{historicTask.parentTaskId ,jdbcType=VARCHAR},
-           #{historicTask.description ,jdbcType=VARCHAR},
-           #{historicTask.owner ,jdbcType=VARCHAR},
-           #{historicTask.assignee ,jdbcType=VARCHAR},
+          (#{historicTask.id, jdbcType=NVARCHAR},
+           1, #{historicTask.taskDefinitionId, jdbcType=NVARCHAR},
+           #{historicTask.processDefinitionId, jdbcType=NVARCHAR},
+           #{historicTask.processInstanceId, jdbcType=NVARCHAR},
+           #{historicTask.executionId, jdbcType=NVARCHAR},
+           #{historicTask.scopeId, jdbcType=NVARCHAR},
+           #{historicTask.subScopeId, jdbcType=NVARCHAR},
+           #{historicTask.scopeType, jdbcType=NVARCHAR},
+           #{historicTask.scopeDefinitionId, jdbcType=NVARCHAR},
+           #{historicTask.propagatedStageInstanceId, jdbcType=NVARCHAR},
+           #{historicTask.state, jdbcType=NVARCHAR},
+           #{historicTask.name, jdbcType=NVARCHAR},
+           #{historicTask.parentTaskId, jdbcType=NVARCHAR},
+           #{historicTask.description, jdbcType=NVARCHAR},
+           #{historicTask.owner, jdbcType=NVARCHAR},
+           #{historicTask.assignee, jdbcType=NVARCHAR},
            #{historicTask.createTime, jdbcType=TIMESTAMP},
            #{historicTask.inProgressStartTime, jdbcType=TIMESTAMP},
-           #{historicTask.inProgressStartedBy, jdbcType=VARCHAR},
+           #{historicTask.inProgressStartedBy, jdbcType=NVARCHAR},
            #{historicTask.claimTime, jdbcType=TIMESTAMP},
-           #{historicTask.claimedBy, jdbcType=VARCHAR},
+           #{historicTask.claimedBy, jdbcType=NVARCHAR},
            #{historicTask.suspendedTime, jdbcType=TIMESTAMP},
-           #{historicTask.suspendedBy, jdbcType=VARCHAR},
+           #{historicTask.suspendedBy, jdbcType=NVARCHAR},
            #{historicTask.endTime, jdbcType=TIMESTAMP},
-           #{historicTask.completedBy, jdbcType=VARCHAR},
-           #{historicTask.durationInMillis ,jdbcType=BIGINT},
-           #{historicTask.deleteReason ,jdbcType=VARCHAR},
-           #{historicTask.taskDefinitionKey ,jdbcType=VARCHAR},
-           #{historicTask.formKey ,jdbcType=VARCHAR},
+           #{historicTask.completedBy, jdbcType=NVARCHAR},
+           #{historicTask.durationInMillis, jdbcType=BIGINT},
+           #{historicTask.deleteReason, jdbcType=NVARCHAR},
+           #{historicTask.taskDefinitionKey, jdbcType=NVARCHAR},
+           #{historicTask.formKey, jdbcType=NVARCHAR},
            #{historicTask.priority, jdbcType=INTEGER},
            #{historicTask.inProgressStartDueDate, jdbcType=TIMESTAMP},
            #{historicTask.dueDate, jdbcType=TIMESTAMP},
-           #{historicTask.category, jdbcType=VARCHAR},
-           #{historicTask.tenantId, jdbcType=VARCHAR},
+           #{historicTask.category, jdbcType=NVARCHAR},
+           #{historicTask.tenantId, jdbcType=NVARCHAR},
            #{historicTask.lastUpdateTime, jdbcType=TIMESTAMP})
         </foreach>
   </insert>
@@ -216,40 +216,40 @@
             TENANT_ID_,
             LAST_UPDATED_TIME_
           ) VALUES
-            (#{historicTask.id ,jdbcType=VARCHAR},
-             1, #{historicTask.taskDefinitionId, jdbcType=VARCHAR},
-             #{historicTask.processDefinitionId, jdbcType=VARCHAR},
-             #{historicTask.processInstanceId, jdbcType=VARCHAR},
-             #{historicTask.executionId, jdbcType=VARCHAR},
-             #{historicTask.scopeId, jdbcType=VARCHAR},
-             #{historicTask.subScopeId, jdbcType=VARCHAR},
-             #{historicTask.scopeType, jdbcType=VARCHAR},
-             #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
-             #{historicTask.propagatedStageInstanceId, jdbcType=VARCHAR},
-             #{historicTask.state ,jdbcType=VARCHAR},
-             #{historicTask.name ,jdbcType=VARCHAR},
-             #{historicTask.parentTaskId ,jdbcType=VARCHAR},
-             #{historicTask.description ,jdbcType=VARCHAR},
-             #{historicTask.owner ,jdbcType=VARCHAR},
-             #{historicTask.assignee ,jdbcType=VARCHAR},
+            (#{historicTask.id, jdbcType=NVARCHAR},
+             1, #{historicTask.taskDefinitionId, jdbcType=NVARCHAR},
+             #{historicTask.processDefinitionId, jdbcType=NVARCHAR},
+             #{historicTask.processInstanceId, jdbcType=NVARCHAR},
+             #{historicTask.executionId, jdbcType=NVARCHAR},
+             #{historicTask.scopeId, jdbcType=NVARCHAR},
+             #{historicTask.subScopeId, jdbcType=NVARCHAR},
+             #{historicTask.scopeType, jdbcType=NVARCHAR},
+             #{historicTask.scopeDefinitionId, jdbcType=NVARCHAR},
+             #{historicTask.propagatedStageInstanceId, jdbcType=NVARCHAR},
+             #{historicTask.state, jdbcType=NVARCHAR},
+             #{historicTask.name, jdbcType=NVARCHAR},
+             #{historicTask.parentTaskId, jdbcType=NVARCHAR},
+             #{historicTask.description, jdbcType=NVARCHAR},
+             #{historicTask.owner, jdbcType=NVARCHAR},
+             #{historicTask.assignee, jdbcType=NVARCHAR},
              #{historicTask.createTime, jdbcType=TIMESTAMP},
              #{historicTask.inProgressStartTime, jdbcType=TIMESTAMP},
-             #{historicTask.inProgressStartedBy, jdbcType=VARCHAR},
+             #{historicTask.inProgressStartedBy, jdbcType=NVARCHAR},
              #{historicTask.claimTime, jdbcType=TIMESTAMP},
-             #{historicTask.claimedBy, jdbcType=VARCHAR},
+             #{historicTask.claimedBy, jdbcType=NVARCHAR},
              #{historicTask.suspendedTime, jdbcType=TIMESTAMP},
-             #{historicTask.suspendedBy, jdbcType=VARCHAR},
+             #{historicTask.suspendedBy, jdbcType=NVARCHAR},
              #{historicTask.endTime, jdbcType=TIMESTAMP},
-             #{historicTask.completedBy, jdbcType=VARCHAR},
-             #{historicTask.durationInMillis ,jdbcType=BIGINT},
-             #{historicTask.deleteReason ,jdbcType=VARCHAR},
-             #{historicTask.taskDefinitionKey ,jdbcType=VARCHAR},
-             #{historicTask.formKey ,jdbcType=VARCHAR},
+             #{historicTask.completedBy, jdbcType=NVARCHAR},
+             #{historicTask.durationInMillis, jdbcType=BIGINT},
+             #{historicTask.deleteReason, jdbcType=NVARCHAR},
+             #{historicTask.taskDefinitionKey, jdbcType=NVARCHAR},
+             #{historicTask.formKey, jdbcType=NVARCHAR},
              #{historicTask.priority, jdbcType=INTEGER},
              #{historicTask.inProgressStartDueDate, jdbcType=TIMESTAMP},
              #{historicTask.dueDate, jdbcType=TIMESTAMP},
-             #{historicTask.category, jdbcType=VARCHAR},
-             #{historicTask.tenantId, jdbcType=VARCHAR},
+             #{historicTask.category, jdbcType=NVARCHAR},
+             #{historicTask.tenantId, jdbcType=NVARCHAR},
              #{historicTask.lastUpdateTime, jdbcType=TIMESTAMP})
         </foreach>
     SELECT * FROM dual
@@ -262,82 +262,82 @@
       <set>
       	  REV_ = #{revisionNext, jdbcType=INTEGER},
 	      <if test="originalPersistentState.taskDefinitionId != taskDefinitionId">
-	      	TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=VARCHAR},
+	      	TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.processDefinitionId != processDefinitionId">
-	      	PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+	      	PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.executionId != executionId">
-	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+	      	EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
 	      </if>
           <if test="originalPersistentState.scopeId != scopeId">
-            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+            SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.subScopeId != subScopeId">
-            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.scopeType != scopeType">
-            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+            SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
-            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
+            PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.state != state">
-            STATE_ = #{state, jdbcType=VARCHAR},
+            STATE_ = #{state, jdbcType=NVARCHAR},
           </if>
 	      <if test="originalPersistentState.name != name">
-	      	NAME_ = #{name, jdbcType=VARCHAR},
+	      	NAME_ = #{name, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.parentTaskId != parentTaskId">
-	      	PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
+	      	PARENT_TASK_ID_ = #{parentTaskId, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.description != description">
-	      	DESCRIPTION_ = #{description, jdbcType=VARCHAR},
+	      	DESCRIPTION_ = #{description, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.owner != owner">
-	        OWNER_ = #{owner, jdbcType=VARCHAR},
+	        OWNER_ = #{owner, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.assignee != assignee">
-	      	ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+	      	ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.inProgressStartTime != inProgressStartTime">
             IN_PROGRESS_TIME_ = #{inProgressStartTime, jdbcType=TIMESTAMP},
           </if>
           <if test="originalPersistentState.inProgressStartedBy != inProgressStartedBy">
-            IN_PROGRESS_STARTED_BY_ = #{inProgressStartedBy, jdbcType=VARCHAR},
+            IN_PROGRESS_STARTED_BY_ = #{inProgressStartedBy, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.claimTime != claimTime">
             CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
           </if>
           <if test="originalPersistentState.claimedBy != claimedBy">
-            CLAIMED_BY_ = #{claimedBy, jdbcType=VARCHAR},
+            CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.suspendedTime != suspendedTime">
             SUSPENDED_TIME_ = #{suspendedTime, jdbcType=TIMESTAMP},
           </if>
           <if test="originalPersistentState.suspendedBy != suspendedBy">
-            SUSPENDED_BY_ = #{suspendedBy, jdbcType=VARCHAR},
+            SUSPENDED_BY_ = #{suspendedBy, jdbcType=NVARCHAR},
           </if>
 	      <if test="originalPersistentState.endTime != endTime">
 	      	END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
 	      </if>
 	      <if test="originalPersistentState.completedBy != completedBy">
-            COMPLETED_BY_ = #{completedBy, jdbcType=VARCHAR},
+            COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
           </if>
 	      <if test="originalPersistentState.durationInMillis != durationInMillis">
-	      	DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
+	      	DURATION_ = #{durationInMillis, jdbcType=BIGINT},
 	      </if>
 	      <if test="originalPersistentState.deleteReason != deleteReason">
-	      	DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
+	      	DELETE_REASON_ = #{deleteReason, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.taskDefinitionKey != taskDefinitionKey">
-	      	TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
+	      	TASK_DEF_KEY_ = #{taskDefinitionKey, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.formKey != formKey">
-	      	FORM_KEY_ = #{formKey ,jdbcType=VARCHAR},
+	      	FORM_KEY_ = #{formKey, jdbcType=NVARCHAR},
 	      </if>
 	      <if test="originalPersistentState.priority != priority">
 	      	PRIORITY_ = #{priority, jdbcType=INTEGER},
@@ -349,26 +349,26 @@
 	      	DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
 	      </if>
 	      <if test="originalPersistentState.category != category">
-	      	CATEGORY_ = #{category, jdbcType=VARCHAR},
+	      	CATEGORY_ = #{category, jdbcType=NVARCHAR},
 	  	  </if>
 	  	  <if test="originalPersistentState.lastUpdateTime != lastUpdateTime">
 	      	LAST_UPDATED_TIME_ = #{lastUpdateTime, jdbcType=TIMESTAMP},
 	      </if>
   	  </set>
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
     and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- HISTORIC TASK INSTANCE DELETE -->
 
   <delete id="deleteHistoricTaskInstance" parameterType="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
-    delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
+    delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="bulkDeleteHistoricTaskInstance" parameterType="java.util.Collection">
     delete from ${prefix}ACT_HI_TASKINST where
     <foreach item="task" collection="list" index="index" separator=" or ">
-        ID_ = #{task.id, jdbcType=VARCHAR}
+        ID_ = #{task.id, jdbcType=NVARCHAR}
     </foreach>
   </delete>
   
@@ -379,8 +379,8 @@
         or
         </if>
         ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="id" index="index" collection="listItem" open="(" separator="," close=")">
+          #{id, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>
@@ -427,106 +427,106 @@
 
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
   <resultMap id="historicTaskInstanceResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
-    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
-    <result property="state" column="STATE_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
-    <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
-    <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR"/>
+    <result property="state" column="STATE_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="NVARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
+    <result property="owner" column="OWNER_" jdbcType="NVARCHAR" />
+    <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR" />
     <result property="createTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="inProgressStartTime" column="IN_PROGRESS_TIME_" jdbcType="TIMESTAMP" />
-    <result property="inProgressStartedBy" column="IN_PROGRESS_STARTED_BY_" jdbcType="VARCHAR"/>
+    <result property="inProgressStartedBy" column="IN_PROGRESS_STARTED_BY_" jdbcType="NVARCHAR"/>
     <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
-    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="VARCHAR"/>
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR"/>
     <result property="suspendedTime" column="SUSPENDED_TIME_" jdbcType="TIMESTAMP" />
-    <result property="suspendedBy" column="SUSPENDED_BY_" jdbcType="VARCHAR"/>
+    <result property="suspendedBy" column="SUSPENDED_BY_" jdbcType="NVARCHAR"/>
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
-    <result property="completedBy" column="COMPLETED_BY_" jdbcType="VARCHAR"/>
+    <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR"/>
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
-    <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
-    <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
-    <result property="formKey" column="FORM_KEY_" jdbcType="VARCHAR" />
+    <result property="deleteReason" column="DELETE_REASON_" jdbcType="NVARCHAR" />
+    <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="NVARCHAR" />
+    <result property="formKey" column="FORM_KEY_" jdbcType="NVARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="inProgressStartDueDate" column="IN_PROGRESS_DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
     <result property="lastUpdateTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <resultMap id="historicTaskAndRelatedEntitiesResultMap" type="org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
-    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR"/>
-    <result property="state" column="STATE_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
-    <result property="owner" column="OWNER_" jdbcType="VARCHAR" />
-    <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
+    <result property="taskDefinitionId" column="TASK_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR"/>
+    <result property="state" column="STATE_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="NVARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
+    <result property="owner" column="OWNER_" jdbcType="NVARCHAR" />
+    <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR" />
     <result property="createTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="inProgressStartTime" column="IN_PROGRESS_TIME_" jdbcType="TIMESTAMP" />
-    <result property="inProgressStartedBy" column="IN_PROGRESS_STARTED_BY_" jdbcType="VARCHAR"/>
+    <result property="inProgressStartedBy" column="IN_PROGRESS_STARTED_BY_" jdbcType="NVARCHAR"/>
     <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
-    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="VARCHAR"/>
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR"/>
     <result property="suspendedTime" column="SUSPENDED_TIME_" jdbcType="TIMESTAMP" />
-    <result property="suspendedBy" column="SUSPENDED_BY_" jdbcType="VARCHAR"/>
+    <result property="suspendedBy" column="SUSPENDED_BY_" jdbcType="NVARCHAR"/>
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
-    <result property="completedBy" column="COMPLETED_BY_" jdbcType="VARCHAR"/>
+    <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR"/>
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
-    <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
-    <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
-    <result property="formKey" column="FORM_KEY_" jdbcType="VARCHAR" />
+    <result property="deleteReason" column="DELETE_REASON_" jdbcType="NVARCHAR" />
+    <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="NVARCHAR" />
+    <result property="formKey" column="FORM_KEY_" jdbcType="NVARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="inProgressStartDueDate" column="IN_PROGRESS_DUE_DATE_" jdbcType="TIMESTAMP" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
     <result property="lastUpdateTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
     <collection property="queryVariables" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
-      <id property="id" column="VAR_ID_"/>
-      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
+      <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
+      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
+      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
-      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
-      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
-      <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR" />
+      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR" />
+      <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR" />
+      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
       <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
-      <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
-      <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
+      <result property="textValue" column="VAR_TEXT_" jdbcType="NVARCHAR" />
+      <result property="textValue2" column="VAR_TEXT2_" jdbcType="NVARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
-      <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="VARCHAR"/>
-      <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-      <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="VARCHAR"/>
+      <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
+      <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+      <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
     </collection>
     <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl">
-      <id property="id" column="ILINK_ID_"/>
-      <result property="type" column="ILINK_TYPE_" jdbcType="VARCHAR" />
-      <result property="userId" column="ILINK_USER_ID_" jdbcType="VARCHAR" />
-      <result property="groupId" column="ILINK_GROUP_ID_" jdbcType="VARCHAR" />
-      <result property="taskId" column="ILINK_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="processInstanceId" column="ILINK_PROC_INST_ID_" jdbcType="VARCHAR" />
+      <id property="id" column="ILINK_ID_" jdbcType="NVARCHAR"/>
+      <result property="type" column="ILINK_TYPE_" jdbcType="NVARCHAR" />
+      <result property="userId" column="ILINK_USER_ID_" jdbcType="NVARCHAR" />
+      <result property="groupId" column="ILINK_GROUP_ID_" jdbcType="NVARCHAR" />
+      <result property="taskId" column="ILINK_TASK_ID_" jdbcType="NVARCHAR" />
+      <result property="processInstanceId" column="ILINK_PROC_INST_ID_" jdbcType="NVARCHAR" />
       <result property="createTime" column="ILINK_CREATE_TIME_" jdbcType="TIMESTAMP" />
     </collection>
   </resultMap>
@@ -534,11 +534,11 @@
   <!-- HISTORIC TASK INSTANCE SELECT -->
 
   <select id="selectHistoricTaskInstance" resultMap="historicTaskInstanceResultMap">
-    select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectHistoricTasksByParentTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap">
-    select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter}
+    select * from ${prefix}ACT_HI_TASKINST where PARENT_TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricTaskIdsByParentTaskIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
@@ -548,8 +548,8 @@
         or
         </if>
         PARENT_TASK_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="parentTaskId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{parentTaskId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </select>
@@ -557,7 +557,7 @@
   <select id="selectHistoricTaskInstancesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="historicTaskInstanceResultMap" >
     select *
     from ${prefix}ACT_HI_TASKINST
-    where PROC_INST_ID_ = #{parameter}
+    where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectHistoricTaskInstanceIdsForProcessInstanceIds" parameterType="java.util.Collection" resultType="string">
@@ -567,8 +567,8 @@
         or
         </if>
         PROC_INST_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="processInstanceId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </select>
@@ -580,11 +580,11 @@
         or
         </if>
         SCOPE_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{scopeId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>)
-    and SCOPE_TYPE_ = #{parameter.scopeType}
+    and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
@@ -676,48 +676,48 @@
             <where>
               RES.PROC_DEF_ID_ = D.ID_
               <if test="processDefinitionKey != null">
-                and D.KEY_ = #{processDefinitionKey}
+                and D.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
               </if>
               <if test="processDefinitionKeyLike != null">
-                and D.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+                and D.KEY_ like #{processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="processDefinitionKeyLikeIgnoreCase != null">
-                and lower(D.KEY_) like #{processDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+                and lower(D.KEY_) like #{processDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="processDefinitionKeys != null &amp;&amp; !processDefinitionKeys.empty">
                 and D.KEY_ in
-                <foreach item="item" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
-                  #{item}
+                <foreach item="processDefinitionKey" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
+                  #{processDefinitionKey, jdbcType=NVARCHAR}
                 </foreach>
               </if>
               <if test="processDefinitionName != null">
-                and D.NAME_ = #{processDefinitionName}
+                and D.NAME_ = #{processDefinitionName, jdbcType=NVARCHAR}
               </if>
               <if test="processDefinitionNameLike != null">
-                and D.NAME_ like #{processDefinitionNameLike}${wildcardEscapeClause}
+                and D.NAME_ like #{processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="processCategoryInList != null &amp;&amp; !processCategoryInList.empty">
                 and D.CATEGORY_ IN
                 <foreach item="processCategory" index="index" collection="processCategoryInList"
                          open="(" separator="," close=")">
-                  #{processCategory}
+                  #{processCategory, jdbcType=NVARCHAR}
                 </foreach>
               </if>
               <if test="processCategoryNotInList != null &amp;&amp; !processCategoryNotInList.empty">
                 and D.CATEGORY_ NOT IN
                 <foreach item="processCategory" index="index" collection="processCategoryNotInList"
                          open="(" separator="," close=")">
-                  #{processCategory}
+                  #{processCategory, jdbcType=NVARCHAR}
                 </foreach>
               </if>
               <if test="deploymentId != null">
-                and D.DEPLOYMENT_ID_ = #{deploymentId}
+                and D.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
               </if>
               <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
                 and D.DEPLOYMENT_ID_ IN
-                <foreach item="deployment" index="index" collection="deploymentIds"
+                <foreach item="deploymentId" index="index" collection="deploymentIds"
                          open="(" separator="," close=")">
-                  #{deployment}
+                  #{deploymentId, jdbcType=NVARCHAR}
                 </foreach>
               </if>
             </where>
@@ -730,28 +730,28 @@
             <where>
                 RES.SCOPE_DEFINITION_ID_ = CD.ID_
               <if test="cmmnDeploymentId != null">
-                and CD.DEPLOYMENT_ID_ = #{cmmnDeploymentId}
+                and CD.DEPLOYMENT_ID_ = #{cmmnDeploymentId, jdbcType=NVARCHAR}
               </if>
               <if test="cmmnDeploymentIds != null &amp;&amp; !cmmnDeploymentIds.empty">
                 and CD.DEPLOYMENT_ID_ IN
-                <foreach item="deployment" index="index" collection="cmmnDeploymentIds"
+                <foreach item="deploymentId" index="index" collection="cmmnDeploymentIds"
                          open="(" separator="," close=")">
-                  #{deployment}
+                  #{deploymentId, jdbcType=NVARCHAR}
                 </foreach>
               </if>
               <if test="caseDefinitionKey != null">
-                and CD.KEY_ = #{caseDefinitionKey}
+                and CD.KEY_ = #{caseDefinitionKey, jdbcType=NVARCHAR}
               </if>
               <if test="caseDefinitionKeyLike != null">
-                and CD.KEY_ like #{caseDefinitionKeyLike}${wildcardEscapeClause}
+                and CD.KEY_ like #{caseDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="caseDefinitionKeyLikeIgnoreCase != null">
-                and lower(CD.KEY_) like #{caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+                and lower(CD.KEY_) like #{caseDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="caseDefinitionKeys != null &amp;&amp; !caseDefinitionKeys.empty">
                 and CD.KEY_ in
-                <foreach item="item" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
-                  #{item}
+                <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+                  #{caseDefinitionKey, jdbcType=NVARCHAR}
                 </foreach>
               </if>
             </where>
@@ -770,13 +770,13 @@
                 and HPI.END_TIME_ is null
               </if>
               <if test="processInstanceBusinessKey != null">
-                and HPI.BUSINESS_KEY_ = #{processInstanceBusinessKey}
+                and HPI.BUSINESS_KEY_ = #{processInstanceBusinessKey, jdbcType=NVARCHAR}
               </if>
               <if test="processInstanceBusinessKeyLike != null">
-                and HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike}${wildcardEscapeClause}
+                and HPI.BUSINESS_KEY_ like #{processInstanceBusinessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
               <if test="processInstanceBusinessKeyLikeIgnoreCase != null">
-                and lower(HPI.BUSINESS_KEY_) like #{processInstanceBusinessKeyLikeIgnoreCase}${wildcardEscapeClause}
+                and lower(HPI.BUSINESS_KEY_) like #{processInstanceBusinessKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
               </if>
             </where>
         )
@@ -785,14 +785,14 @@
         <choose>
             <when test="queryVar.operator.equals('EXISTS')">
               and EXISTS (
-                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
+                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name, jdbcType=NVARCHAR}
                 <if test="!queryVar.local">
                   <choose>
                     <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                       and RES.PROC_INST_ID_ = PROC_INST_ID_
                     </when>
                     <otherwise>
-                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                     </otherwise>
                   </choose>
                   AND TASK_ID_ is null
@@ -804,14 +804,14 @@
             </when>
             <when test="queryVar.operator.equals('NOT_EXISTS')">
               and NOT EXISTS (
-                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
+                select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name, jdbcType=NVARCHAR}
                 <if test="!queryVar.local">
                   <choose>
                     <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                       and RES.PROC_INST_ID_ = PROC_INST_ID_
                     </when>
                     <otherwise>
-                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
+                      and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                     </otherwise>
                   </choose>
                   AND TASK_ID_ is null
@@ -832,7 +832,7 @@
                         and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                       </when>
                       <otherwise>
-                        and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
+                        and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                       </otherwise>
                     </choose>
                     AND V.TASK_ID_ is null
@@ -842,10 +842,10 @@
                   </if>
                   <if test="queryVar.name != null">
                     <!-- Match-all variable-names when name is null -->
-                    and V.NAME_= #{queryVar.name}
+                    and V.NAME_= #{queryVar.name, jdbcType=NVARCHAR}
                   </if>
                   <if test="queryVar.needsTypeCheck()">
-                    and V.VAR_TYPE_ = #{queryVar.type}
+                    and V.VAR_TYPE_ = #{queryVar.type, jdbcType=NVARCHAR}
                   </if>
                   <!-- Variable value -->
                   <if test="queryVar.textValue != null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
@@ -861,7 +861,7 @@
                       <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                       <otherwise><include refid="executionVariableOperator" /></otherwise>
                     </choose>
-                    #{queryVar.textValue}
+                    #{queryVar.textValue, jdbcType=NVARCHAR}
                     <choose>
                       <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -876,7 +876,7 @@
                       <when test="queryVar.operator.equals('LIKE')">LIKE</when>
                       <otherwise><include refid="executionVariableOperator" /></otherwise>
                     </choose>
-                    #{queryVar.textValue2}
+                    #{queryVar.textValue2, jdbcType=NVARCHAR}
                     <choose>
                       <when test="queryVar.operator.equals('LIKE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -884,7 +884,7 @@
                   <if test="queryVar.longValue != null">
                     and (V.LONG_
                     <include refid="executionVariableOperator" />
-                    #{queryVar.longValue}
+                    #{queryVar.longValue, jdbcType=BIGINT}
                     <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                       or V.LONG_ is null
                     </if>
@@ -893,7 +893,7 @@
                   <if test="queryVar.doubleValue != null">
                     and (V.DOUBLE_
                     <include refid="executionVariableOperator" />
-                    #{queryVar.doubleValue}
+                    #{queryVar.doubleValue, jdbcType=DOUBLE}
                     <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                       or V.DOUBLE_ is null
                     </if>
@@ -928,48 +928,48 @@
                 where RES.PROC_DEF_ID_ = D.ID_ and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
                   <if test="orQueryObject.processDefinitionKey != null">
-                    or D.KEY_ = #{orQueryObject.processDefinitionKey}
+                    or D.KEY_ = #{orQueryObject.processDefinitionKey, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.processDefinitionKeyLike != null">
-                    or D.KEY_ like #{orQueryObject.processDefinitionKeyLike}${wildcardEscapeClause}
+                    or D.KEY_ like #{orQueryObject.processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.processDefinitionKeyLikeIgnoreCase != null">
-                    or lower(D.KEY_) like #{orQueryObject.processDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+                    or lower(D.KEY_) like #{orQueryObject.processDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.processDefinitionKeys != null &amp;&amp; !orQueryObject.processDefinitionKeys.empty">
                     or D.KEY_ in
-                    <foreach item="item" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
-                      #{item}
+                    <foreach item="processDefinitionKey" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
+                      #{processDefinitionKey, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                   <if test="orQueryObject.processDefinitionName != null">
-                    or D.NAME_ = #{orQueryObject.processDefinitionName}
+                    or D.NAME_ = #{orQueryObject.processDefinitionName, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.processDefinitionNameLike != null">
-                    or D.NAME_ like #{orQueryObject.processDefinitionNameLike}${wildcardEscapeClause}
+                    or D.NAME_ like #{orQueryObject.processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.processCategoryInList != null &amp;&amp; !orQueryObject.processCategoryInList.empty">
                     or D.CATEGORY_ IN
                     <foreach item="processCategory" index="index" collection="orQueryObject.processCategoryInList"
                              open="(" separator="," close=")">
-                      #{processCategory}
+                      #{processCategory, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                   <if test="orQueryObject.processCategoryNotInList != null &amp;&amp; !orQueryObject.processCategoryNotInList.empty">
                     or D.CATEGORY_ NOT IN
                     <foreach item="processCategory" index="index" collection="orQueryObject.processCategoryNotInList"
                              open="(" separator="," close=")">
-                      #{processCategory}
+                      #{processCategory, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                   <if test="orQueryObject.deploymentId != null">
-                    or D.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
+                    or D.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
                     or D.DEPLOYMENT_ID_ IN
-                    <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
+                    <foreach item="deploymentId" index="index" collection="orQueryObject.deploymentIds"
                              open="(" separator="," close=")">
-                      #{deployment}
+                      #{deploymentId, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                 </trim>
@@ -982,28 +982,28 @@
                 where RES.SCOPE_DEFINITION_ID_ = CD.ID_ and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
                   <if test="orQueryObject.cmmnDeploymentId != null">
-                    or CD.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId}
+                    or CD.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; !orQueryObject.cmmnDeploymentIds.empty">
                     or CD.DEPLOYMENT_ID_ IN
-                    <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds"
+                    <foreach item="deploymentId" index="index" collection="orQueryObject.cmmnDeploymentIds"
                              open="(" separator="," close=")">
-                      #{deployment}
+                      #{deploymentId, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                   <if test="orQueryObject.caseDefinitionKey != null">
-                    or CD.KEY_ = #{orQueryObject.caseDefinitionKey}
+                    or CD.KEY_ = #{orQueryObject.caseDefinitionKey, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.caseDefinitionKeyLike != null">
-                    or CD.KEY_ like #{orQueryObject.caseDefinitionKeyLike}${wildcardEscapeClause}
+                    or CD.KEY_ like #{orQueryObject.caseDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.caseDefinitionKeyLikeIgnoreCase != null">
-                    or lower(CD.KEY_) like #{orQueryObject.caseDefinitionKeyLikeIgnoreCase}${wildcardEscapeClause}
+                    or lower(CD.KEY_) like #{orQueryObject.caseDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty">
                     or CD.KEY_ in
-                    <foreach item="item" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
-                      #{item}
+                    <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
+                      #{caseDefinitionKey, jdbcType=NVARCHAR}
                     </foreach>
                   </if>
                 </trim>
@@ -1016,13 +1016,13 @@
                 where RES.PROC_INST_ID_ = HPI.ID_ and
                 <trim prefix="(" prefixOverrides="OR" suffix=")">
                   <if test="orQueryObject.processInstanceBusinessKey != null">
-                    or HPI.BUSINESS_KEY_ = #{orQueryObject.processInstanceBusinessKey}
+                    or HPI.BUSINESS_KEY_ = #{orQueryObject.processInstanceBusinessKey, jdbcType=NVARCHAR}
                   </if>
                   <if test="orQueryObject.processInstanceBusinessKeyLike != null">
-                    or HPI.BUSINESS_KEY_ like #{orQueryObject.processInstanceBusinessKeyLike}${wildcardEscapeClause}
+                    or HPI.BUSINESS_KEY_ like #{orQueryObject.processInstanceBusinessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.processInstanceBusinessKeyLikeIgnoreCase != null">
-                    or lower(HPI.BUSINESS_KEY_) like #{orQueryObject.processInstanceBusinessKeyLikeIgnoreCase}${wildcardEscapeClause}
+                    or lower(HPI.BUSINESS_KEY_) like #{orQueryObject.processInstanceBusinessKeyLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
                   <if test="orQueryObject.processFinished">
                     or HPI.END_TIME_ is not null
@@ -1039,14 +1039,14 @@
               <choose>
                 <when test="queryVar.operator.equals('EXISTS')">
                     and EXISTS (
-                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
+                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name, jdbcType=NVARCHAR}
                     <if test="!queryVar.local">
                       <choose>
                         <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                           and RES.PROC_INST_ID_ = PROC_INST_ID_
                         </when>
                         <otherwise>
-                          and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
+                          and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                         </otherwise>
                       </choose>
                       AND TASK_ID_ is null
@@ -1058,14 +1058,14 @@
                 </when>
                 <when test="queryVar.operator.equals('NOT_EXISTS')">
                     and NOT EXISTS (
-                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name}
+                        select ID_ from ${prefix}ACT_HI_VARINST where NAME_ = #{queryVar.name, jdbcType=NVARCHAR}
                     <if test="!queryVar.local">
                         <choose>
                           <when test="queryVar.scopeType == null or queryVar.scopeType == 'bpmn'">
                             and RES.PROC_INST_ID_ = PROC_INST_ID_
                           </when>
                           <otherwise>
-                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType}
+                            and RES.SCOPE_ID_ = SCOPE_ID_ AND SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                           </otherwise>
                         </choose>
                         AND TASK_ID_ is null
@@ -1086,7 +1086,7 @@
                               and RES.PROC_INST_ID_ = V.PROC_INST_ID_
                             </when>
                             <otherwise>
-                              and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType}
+                              and RES.SCOPE_ID_ = V.SCOPE_ID_ AND V.SCOPE_TYPE_ = #{queryVar.scopeType, jdbcType=NVARCHAR}
                             </otherwise>
                           </choose>
                           AND V.TASK_ID_ is null
@@ -1096,10 +1096,10 @@
                       </if>
                       <if test="queryVar.name != null">
                         <!-- Match-all variable-names when name is null -->
-                        and V.NAME_= #{queryVar.name}
+                        and V.NAME_= #{queryVar.name, jdbcType=NVARCHAR}
                       </if>
                       <if test="queryVar.needsTypeCheck()">
-                        and V.VAR_TYPE_ = #{queryVar.type}
+                        and V.VAR_TYPE_ = #{queryVar.type, jdbcType=NVARCHAR}
                       </if>
                       <!-- Variable value -->
                       <if test="queryVar.textValue != null &amp;&amp; queryVar.longValue == null &amp;&amp; queryVar.doubleValue == null">
@@ -1115,7 +1115,7 @@
                           <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                           <otherwise><include refid="executionVariableOperator" /></otherwise>
                         </choose>
-                        #{queryVar.textValue}
+                        #{queryVar.textValue, jdbcType=NVARCHAR}
                         <choose>
                           <when test="queryVar.operator.equals('LIKE') || queryVar.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                         </choose>
@@ -1130,7 +1130,7 @@
                           <when test="queryVar.operator.equals('LIKE')">LIKE</when>
                           <otherwise><include refid="executionVariableOperator" /></otherwise>
                         </choose>
-                        #{queryVar.textValue2}
+                        #{queryVar.textValue2, jdbcType=NVARCHAR}
                         <choose>
                           <when test="queryVar.operator.equals('LIKE')">${wildcardEscapeClause}</when>
                         </choose>
@@ -1138,7 +1138,7 @@
                       <if test="queryVar.longValue != null">
                         and (V.LONG_
                         <include refid="executionVariableOperator" />
-                        #{queryVar.longValue}
+                        #{queryVar.longValue, jdbcType=BIGINT}
                         <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                           or V.LONG_ is null
                         </if>
@@ -1147,7 +1147,7 @@
                       <if test="queryVar.doubleValue != null">
                         and (V.DOUBLE_
                         <include refid="executionVariableOperator" />
-                        #{queryVar.doubleValue}
+                        #{queryVar.doubleValue, jdbcType=DOUBLE}
                         <if test="queryVar.operator.equals('NOT_EQUALS') || queryVar.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                           or V.DOUBLE_ is null
                         </if>
@@ -1177,141 +1177,141 @@
   
   <sql id="commonTaskInstanceQuerySql">
       <if test="taskId != null">
-        ${queryTablePrefix}ID_ = #{taskId}
+        ${queryTablePrefix}ID_ = #{taskId, jdbcType=NVARCHAR}
       </if>
       <if test="taskIds != null &amp;&amp; !taskIds.empty">
         and ${queryTablePrefix}ID_ IN
         <foreach item="taskId" index="index" collection="taskIds"
                  open="(" separator="," close=")">
-          #{taskId}
+          #{taskId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="taskDefinitionId != null">
-        and ${queryTablePrefix}TASK_DEF_ID_ = #{taskDefinitionId}
+        and ${queryTablePrefix}TASK_DEF_ID_ = #{taskDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="processDefinitionId != null">
-        and ${queryTablePrefix}PROC_DEF_ID_ = #{processDefinitionId}
+        and ${queryTablePrefix}PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceId != null">
-        and ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId}
+        and ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceIds != null &amp;&amp; !processInstanceIds.empty">
         and ${queryTablePrefix}PROC_INST_ID_ IN
-        <foreach item="processInstance" index="index" collection="processInstanceIds"
+        <foreach item="processInstanceId" index="index" collection="processInstanceIds"
                  open="(" separator="," close=")">
-          #{processInstance}
+          #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="withoutProcessInstanceId">
         and ${queryTablePrefix}PROC_INST_ID_ IS NULL
       </if>
       <if test="taskDefinitionKey != null">
-        and ${queryTablePrefix}TASK_DEF_KEY_ = #{taskDefinitionKey}
+        and ${queryTablePrefix}TASK_DEF_KEY_ = #{taskDefinitionKey, jdbcType=NVARCHAR}
       </if>
       <if test="taskDefinitionKeyLike != null">
-        and ${queryTablePrefix}TASK_DEF_KEY_ like #{taskDefinitionKeyLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}TASK_DEF_KEY_ like #{taskDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskDefinitionKeys != null and !taskDefinitionKeys.empty">
         and ${queryTablePrefix}TASK_DEF_KEY_ in
-        <foreach item="item" index="index" collection="taskDefinitionKeys" open="(" separator="," close=")">
-          #{item}
+        <foreach item="taskDefinitionKey" index="index" collection="taskDefinitionKeys" open="(" separator="," close=")">
+          #{taskDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="executionId != null">
-        and ${queryTablePrefix}EXECUTION_ID_ = #{executionId}
+        and ${queryTablePrefix}EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeId != null">
-        and ${queryTablePrefix}SCOPE_ID_ = #{scopeId}
+        and ${queryTablePrefix}SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
       </if>
       <if test="subScopeId != null">
-        and ${queryTablePrefix}SUB_SCOPE_ID_ = #{subScopeId}
+        and ${queryTablePrefix}SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeType != null">
-        and ${queryTablePrefix}SCOPE_TYPE_ = #{scopeType}
+        and ${queryTablePrefix}SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
       </if>
       <if test="scopeDefinitionId != null">
-        and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+        and ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="withoutScopeId">
         and ${queryTablePrefix}SCOPE_ID_ IS NULL
       </if>
       <if test="propagatedStageInstanceId != null">
-        and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId}
+        and ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
-            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
+            ELINK.SCOPE_ID_ = #{processInstanceIdWithChildren, jdbcType=NVARCHAR} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
             ELINK.REF_SCOPE_ID_ = ${queryTablePrefix}ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="caseInstanceIdWithChildren != null">
         and exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
-            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
+            ELINK.SCOPE_ID_ = #{caseInstanceIdWithChildren, jdbcType=NVARCHAR} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
             ELINK.REF_SCOPE_ID_ = ${queryTablePrefix}ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="taskName != null">
-        and ${queryTablePrefix}NAME_ = #{taskName}
+        and ${queryTablePrefix}NAME_ = #{taskName, jdbcType=NVARCHAR}
       </if>
       <if test="taskNameLike != null">
-        and ${queryTablePrefix}NAME_ like #{taskNameLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}NAME_ like #{taskNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskNameLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase})${wildcardEscapeClause}
+        and lower(${queryTablePrefix}NAME_) like lower(#{taskNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="taskNameList != null &amp;&amp; !taskNameList.empty">
         and ${queryTablePrefix}NAME_ IN
         <foreach item="taskName" index="index" collection="taskNameList"
                  open="(" separator="," close=")">
-          #{taskName}
+          #{taskName, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="taskNameListIgnoreCase != null &amp;&amp; !taskNameListIgnoreCase.empty">
         and lower(${queryTablePrefix}NAME_) IN
         <foreach item="taskName" index="index" collection="taskNameListIgnoreCase"
                  open="(" separator="," close=")">
-          #{taskName}
+          #{taskName, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="taskParentTaskId != null">
-        and ${queryTablePrefix}PARENT_TASK_ID_ = #{taskParentTaskId}
+        and ${queryTablePrefix}PARENT_TASK_ID_ = #{taskParentTaskId, jdbcType=NVARCHAR}
       </if>
       <if test="taskDescription != null">
-        and ${queryTablePrefix}DESCRIPTION_ = #{taskDescription}
+        and ${queryTablePrefix}DESCRIPTION_ = #{taskDescription, jdbcType=NVARCHAR}
       </if>
       <if test="taskDescriptionLike != null">
-        and ${queryTablePrefix}DESCRIPTION_ like #{taskDescriptionLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}DESCRIPTION_ like #{taskDescriptionLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskDescriptionLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}DESCRIPTION_) like #{taskDescriptionLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}DESCRIPTION_) like #{taskDescriptionLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskDeleteReason != null">
-        and ${queryTablePrefix}DELETE_REASON_ = #{taskDeleteReason}
+        and ${queryTablePrefix}DELETE_REASON_ = #{taskDeleteReason, jdbcType=NVARCHAR}
       </if>
       <if test="taskDeleteReasonLike != null">
-        and ${queryTablePrefix}DELETE_REASON_ like #{taskDeleteReasonLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}DELETE_REASON_ like #{taskDeleteReasonLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskOwner != null">
-        and ${queryTablePrefix}OWNER_ = #{taskOwner}
+        and ${queryTablePrefix}OWNER_ = #{taskOwner, jdbcType=NVARCHAR}
       </if>
       <if test="taskOwnerLike != null">
-        and ${queryTablePrefix}OWNER_ like #{taskOwnerLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}OWNER_ like #{taskOwnerLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskOwnerLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}OWNER_) like #{taskOwnerLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}OWNER_) like #{taskOwnerLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskAssignee != null">
-        and ${queryTablePrefix}ASSIGNEE_ = #{taskAssignee}
+        and ${queryTablePrefix}ASSIGNEE_ = #{taskAssignee, jdbcType=NVARCHAR}
       </if>
       <if test="taskAssigneeLike != null">
-        and ${queryTablePrefix}ASSIGNEE_ like #{taskAssigneeLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}ASSIGNEE_ like #{taskAssigneeLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskAssigneeLikeIgnoreCase != null">
-        and lower(${queryTablePrefix}ASSIGNEE_) like #{taskAssigneeLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(${queryTablePrefix}ASSIGNEE_) like #{taskAssigneeLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="taskAssigneeIds != null &amp;&amp; !taskAssigneeIds.empty">
         and ${queryTablePrefix}ASSIGNEE_ IN
         <foreach item="assigneeId" index="index" collection="taskAssigneeIds"
                  open="(" separator="," close=")">
-          #{assigneeId}
+          #{assigneeId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="withAssignee">
@@ -1321,13 +1321,13 @@
         and ${queryTablePrefix}ASSIGNEE_ IS NULL
       </if>
       <if test="taskPriority != null">
-        and ${queryTablePrefix}PRIORITY_ = #{taskPriority}
+        and ${queryTablePrefix}PRIORITY_ = #{taskPriority, jdbcType=INTEGER}
       </if>
       <if test="taskMinPriority != null">
-        and ${queryTablePrefix}PRIORITY_ &gt;= #{taskMinPriority}
+        and ${queryTablePrefix}PRIORITY_ &gt;= #{taskMinPriority, jdbcType=INTEGER}
       </if>
       <if test="taskMaxPriority != null">
-        and ${queryTablePrefix}PRIORITY_ &lt;= #{taskMaxPriority}
+        and ${queryTablePrefix}PRIORITY_ &lt;= #{taskMaxPriority, jdbcType=INTEGER}
       </if>
       <if test="unfinished">
         and ${queryTablePrefix}END_TIME_ is null
@@ -1336,101 +1336,101 @@
         and ${queryTablePrefix}END_TIME_ is not null
       </if>
       <if test="state != null">
-        and ${queryTablePrefix}STATE_ = #{state}
+        and ${queryTablePrefix}STATE_ = #{state, jdbcType=NVARCHAR}
       </if>
       <if test="createTime != null">
-        and ${queryTablePrefix}START_TIME_ = #{createTime}
+        and ${queryTablePrefix}START_TIME_ = #{createTime, jdbcType=TIMESTAMP}
       </if>
       <if test="createTimeBefore != null">
-        and ${queryTablePrefix}START_TIME_ &lt; #{createTimeBefore}
+        and ${queryTablePrefix}START_TIME_ &lt; #{createTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="createTimeAfter != null">
-        and ${queryTablePrefix}START_TIME_ &gt; #{createTimeAfter}
+        and ${queryTablePrefix}START_TIME_ &gt; #{createTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartTime != null">
-        and ${queryTablePrefix}IN_PROGRESS_TIME_ = #{inProgressStartTime}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ = #{inProgressStartTime, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartTimeBefore != null">
-        and ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{inProgressStartTimeBefore}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{inProgressStartTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartTimeAfter != null">
-        and ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{inProgressStartTimeAfter}
+        and ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{inProgressStartTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartedBy != null">
-        and ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{inProgressStartedBy}
+        and ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{inProgressStartedBy, jdbcType=NVARCHAR}
       </if>
       <if test="claimTime != null">
-        and ${queryTablePrefix}CLAIM_TIME_ = #{claimTime}
+        and ${queryTablePrefix}CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP}
       </if>
       <if test="claimTimeBefore != null">
-        and ${queryTablePrefix}CLAIM_TIME_ &lt; #{claimTimeBefore}
+        and ${queryTablePrefix}CLAIM_TIME_ &lt; #{claimTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="claimTimeAfter != null">
-        and ${queryTablePrefix}CLAIM_TIME_ &gt; #{claimTimeAfter}
+        and ${queryTablePrefix}CLAIM_TIME_ &gt; #{claimTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="claimedBy != null">
-        and ${queryTablePrefix}CLAIMED_BY_ = #{claimedBy}
+        and ${queryTablePrefix}CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR}
       </if>
       <if test="suspendedTime != null">
-        and ${queryTablePrefix}SUSPENDED_TIME_ = #{suspendedTime}
+        and ${queryTablePrefix}SUSPENDED_TIME_ = #{suspendedTime, jdbcType=TIMESTAMP}
       </if>
       <if test="suspendedTimeBefore != null">
-        and ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{suspendedTimeBefore}
+        and ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{suspendedTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="suspendedTimeAfter != null">
-        and ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{suspendedTimeAfter}
+        and ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{suspendedTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="suspendedBy != null">
-        and ${queryTablePrefix}SUSPENDED_BY_ = #{suspendedBy}
+        and ${queryTablePrefix}SUSPENDED_BY_ = #{suspendedBy, jdbcType=NVARCHAR}
       </if>
       <if test="completedTime != null">
-        and ${queryTablePrefix}END_TIME_ = #{completedTime}
+        and ${queryTablePrefix}END_TIME_ = #{completedTime, jdbcType=TIMESTAMP}
       </if>
       <if test="completedTimeBefore != null">
-        and ${queryTablePrefix}END_TIME_ &lt; #{completedTimeBefore}
+        and ${queryTablePrefix}END_TIME_ &lt; #{completedTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="completedTimeAfter != null">
-        and ${queryTablePrefix}END_TIME_ &gt; #{completedTimeAfter}
+        and ${queryTablePrefix}END_TIME_ &gt; #{completedTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="completedBy != null">
-        and ${queryTablePrefix}COMPLETED_BY_ = #{completedBy}
+        and ${queryTablePrefix}COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
       </if>
       <if test="inProgressStartDueDate != null">
-        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{inProgressStartDueDate}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{inProgressStartDueDate, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartDueBefore != null">
-        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{inProgressStartDueBefore}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{inProgressStartDueBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="inProgressStartDueAfter != null">
-        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{inProgressStartDueAfter}
+        and ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{inProgressStartDueAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="dueDate != null">
-        and ${queryTablePrefix}DUE_DATE_ = #{dueDate}
+        and ${queryTablePrefix}DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
       </if>
       <if test="dueBefore != null">
-        and ${queryTablePrefix}DUE_DATE_ &lt; #{dueBefore}
+        and ${queryTablePrefix}DUE_DATE_ &lt; #{dueBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="dueAfter != null">
-        and ${queryTablePrefix}DUE_DATE_ &gt; #{dueAfter}
+        and ${queryTablePrefix}DUE_DATE_ &gt; #{dueAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="withoutDueDate">
         and ${queryTablePrefix}DUE_DATE_ is null
       </if>
       <if test="category != null">
-        and ${queryTablePrefix}CATEGORY_ = #{category}
+        and ${queryTablePrefix}CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryInList != null &amp;&amp; !categoryInList.empty">
           and ${queryTablePrefix}CATEGORY_ IN
           <foreach item="taskCategory" index="index" collection="categoryInList"
                    open="(" separator="," close=")">
-              #{taskCategory}
+              #{taskCategory, jdbcType=NVARCHAR}
           </foreach>
       </if>
       <if test="categoryNotInList != null &amp;&amp; !categoryNotInList.empty">
           and ${queryTablePrefix}CATEGORY_ NOT IN
           <foreach item="taskCategory" index="index" collection="categoryNotInList"
                    open="(" separator="," close=")">
-              #{taskCategory}
+              #{taskCategory, jdbcType=NVARCHAR}
           </foreach>
       </if>
       <if test="withoutCategory">
@@ -1440,13 +1440,13 @@
         and ${queryTablePrefix}FORM_KEY_ IS NOT NULL
       </if>
       <if test="formKey != null">
-        and ${queryTablePrefix}FORM_KEY_ = #{formKey}
+        and ${queryTablePrefix}FORM_KEY_ = #{formKey, jdbcType=NVARCHAR}
       </if>
       <if test="tenantId != null">
-        and ${queryTablePrefix}TENANT_ID_ = #{tenantId}
+        and ${queryTablePrefix}TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
@@ -1456,7 +1456,7 @@
       </if>
       <if test="parentScopeId != null">
           and EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
-            LINK.SCOPE_ID_ = #{parentScopeId}
+            LINK.SCOPE_ID_ = #{parentScopeId, jdbcType=NVARCHAR}
             and LINK.REF_SCOPE_ID_ = RES.ID_
             and LINK.HIERARCHY_TYPE_ = 'parent'
           )
@@ -1465,7 +1465,7 @@
           and exists(
             select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
                 LINK.REF_SCOPE_ID_ = RES.ID_
-                and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+                and LINK.ROOT_SCOPE_ID_ = #{rootScopeId, jdbcType=NVARCHAR}
           )
       </if>
       <if test="candidateUser != null || candidateGroups != null">
@@ -1476,7 +1476,7 @@
             and
             (
               <if test="candidateUser != null">
-                LINK.USER_ID_ = #{candidateUser}
+                LINK.USER_ID_ = #{candidateUser, jdbcType=NVARCHAR}
               </if>
               <if test="candidateUser != null &amp;&amp; candidateGroups != null &amp;&amp; !candidateGroups.empty">
                 or
@@ -1490,7 +1490,7 @@
                 	LINK.GROUP_ID_ IN
                 	<foreach item="group" index="index" collection="candidateGroupListItem"
                          open="(" separator="," close=")">
-                  	  #{group}
+                  	  #{group, jdbcType=NVARCHAR}
                 	</foreach>
                 </foreach>
                 )
@@ -1500,9 +1500,9 @@
       </if>
       <if test="involvedUser != null">
         and (
-          EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{involvedUser} and LINK.TASK_ID_ = ${queryTablePrefix}ID_)
-          or ${queryTablePrefix}ASSIGNEE_ = #{involvedUser}
-          or ${queryTablePrefix}OWNER_ = #{involvedUser}
+          EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{involvedUser, jdbcType=NVARCHAR} and LINK.TASK_ID_ = ${queryTablePrefix}ID_)
+          or ${queryTablePrefix}ASSIGNEE_ = #{involvedUser, jdbcType=NVARCHAR}
+          or ${queryTablePrefix}OWNER_ = #{involvedUser, jdbcType=NVARCHAR}
           )
       </if>
       <if test="involvedGroups != null">
@@ -1515,7 +1515,7 @@
                 LINK.GROUP_ID_ IN
                 <foreach item="group" index="index" collection="involvedGroupListItem"
                       open="(" separator="," close=")">
-                  #{group}
+                  #{group, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>
             )
@@ -1525,135 +1525,135 @@
   
   <sql id="commonTaskInstanceOrQuerySql">
       <if test="orQueryObject.taskId != null">
-        ${queryTablePrefix}ID_ = #{orQueryObject.taskId}
+        ${queryTablePrefix}ID_ = #{orQueryObject.taskId, jdbcType=NVARCHAR}
       </if>
        <if test="orQueryObject.taskIds != null &amp;&amp; !orQueryObject.taskIds.empty">
          or ${queryTablePrefix}ID_ IN
          <foreach item="taskId" index="index" collection="orQueryObject.taskIds"
                   open="(" separator="," close=")">
-           #{taskId}
+           #{taskId, jdbcType=NVARCHAR}
          </foreach>
        </if>
       <if test="orQueryObject.taskDefinitionId != null">
-        or ${queryTablePrefix}TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId}
+        or ${queryTablePrefix}TASK_DEF_ID_ = #{orQueryObject.taskDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.processDefinitionId != null">
-        or ${queryTablePrefix}PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
+        or ${queryTablePrefix}PROC_DEF_ID_ = #{orQueryObject.processDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.processInstanceId != null">
-        or ${queryTablePrefix}PROC_INST_ID_ = #{orQueryObject.processInstanceId}
+        or ${queryTablePrefix}PROC_INST_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.processInstanceIds != null &amp;&amp; !orQueryObject.processInstanceIds.empty">
         or ${queryTablePrefix}PROC_INST_ID_ IN
-        <foreach item="processInstance" index="index" collection="orQueryObject.processInstanceIds"
+        <foreach item="processInstanceId" index="index" collection="orQueryObject.processInstanceIds"
                  open="(" separator="," close=")">
-          #{processInstance}
+          #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="orQueryObject.withoutProcessInstanceId">
         or ${queryTablePrefix}PROC_INST_ID_ IS NULL
       </if>
       <if test="orQueryObject.taskDefinitionKey != null">
-        or ${queryTablePrefix}TASK_DEF_KEY_ = #{orQueryObject.taskDefinitionKey}
+        or ${queryTablePrefix}TASK_DEF_KEY_ = #{orQueryObject.taskDefinitionKey, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskDefinitionKeyLike != null">
-        or ${queryTablePrefix}TASK_DEF_KEY_ like #{orQueryObject.taskDefinitionKeyLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}TASK_DEF_KEY_ like #{orQueryObject.taskDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskDefinitionKeys != null and !orQueryObject.taskDefinitionKeys.empty">
         or ${queryTablePrefix}TASK_DEF_KEY_ in
-        <foreach item="item" index="index" collection="orQueryObject.taskDefinitionKeys" open="(" separator="," close=")">
-          #{item}
+        <foreach item="taskDefinitionKey" index="index" collection="orQueryObject.taskDefinitionKeys" open="(" separator="," close=")">
+          #{taskDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="orQueryObject.executionId != null">
-        or ${queryTablePrefix}EXECUTION_ID_ = #{orQueryObject.executionId}
+        or ${queryTablePrefix}EXECUTION_ID_ = #{orQueryObject.executionId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.scopeId != null">
-        or ${queryTablePrefix}SCOPE_ID_ = #{orQueryObject.scopeId}
+        or ${queryTablePrefix}SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.subScopeId != null">
-        or ${queryTablePrefix}SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+        or ${queryTablePrefix}SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.scopeType != null">
-        or ${queryTablePrefix}SCOPE_TYPE_ = #{orQueryObject.scopeType}
+        or ${queryTablePrefix}SCOPE_TYPE_ = #{orQueryObject.scopeType, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.scopeDefinitionId != null">
-        or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+        or ${queryTablePrefix}SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.withoutScopeId">
         or ${queryTablePrefix}SCOPE_ID_ IS NULL
       </if>
       <if test="orQueryObject.propagatedStageInstanceId != null">
-        or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId}
+        or ${queryTablePrefix}PROPAGATED_STAGE_INST_ID_ = #{orQueryObject.propagatedStageInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.processInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
-            ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
+            ELINK.SCOPE_ID_ = #{orQueryObject.processInstanceIdWithChildren, jdbcType=NVARCHAR} AND ELINK.SCOPE_TYPE_ = 'bpmn' and
             ELINK.REF_SCOPE_ID_ = ${queryTablePrefix}ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="orQueryObject.caseInstanceIdWithChildren != null">
         or exists(select ELINK.ID_ from ${prefix}ACT_HI_ENTITYLINK ELINK where ELINK.LINK_TYPE_ = 'child' and
-            ELINK.SCOPE_ID_ = #{orQueryObject.caseInstanceIdWithChildren} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
+            ELINK.SCOPE_ID_ = #{orQueryObject.caseInstanceIdWithChildren, jdbcType=NVARCHAR} AND ELINK.SCOPE_TYPE_ = 'cmmn' and
             ELINK.REF_SCOPE_ID_ = ${queryTablePrefix}ID_ and ELINK.REF_SCOPE_TYPE_ = 'task')
       </if>
       <if test="orQueryObject.taskName != null">
-        or ${queryTablePrefix}NAME_ = #{orQueryObject.taskName}
+        or ${queryTablePrefix}NAME_ = #{orQueryObject.taskName, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskNameLike != null">
-        or ${queryTablePrefix}NAME_ like #{orQueryObject.taskNameLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}NAME_ like #{orQueryObject.taskNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
        <if test="orQueryObject.taskNameLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.taskNameLikeIgnoreCase}${wildcardEscapeClause}
+        or lower(${queryTablePrefix}NAME_) like #{orQueryObject.taskNameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskNameList != null &amp;&amp; !orQueryObject.taskNameList.empty">
         or ${queryTablePrefix}NAME_ IN
         <foreach item="taskName" index="index" collection="orQueryObject.taskNameList"
                  open="(" separator="," close=")">
-          #{taskName}
+          #{taskName, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="orQueryObject.taskNameListIgnoreCase != null &amp;&amp; !orQueryObject.taskNameListIgnoreCase.empty">
         or lower(${queryTablePrefix}NAME_) IN
         <foreach item="taskName" index="index" collection="orQueryObject.taskNameListIgnoreCase"
                  open="(" separator="," close=")">
-          #{taskName}
+          #{taskName, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="orQueryObject.taskParentTaskId != null">
-        or ${queryTablePrefix}PARENT_TASK_ID_ = #{orQueryObject.taskParentTaskId}
+        or ${queryTablePrefix}PARENT_TASK_ID_ = #{orQueryObject.taskParentTaskId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskDescription != null">
-        or ${queryTablePrefix}DESCRIPTION_ = #{orQueryObject.taskDescription}
+        or ${queryTablePrefix}DESCRIPTION_ = #{orQueryObject.taskDescription, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskDescriptionLike != null">
-        or ${queryTablePrefix}DESCRIPTION_ like #{orQueryObject.taskDescriptionLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}DESCRIPTION_ like #{orQueryObject.taskDescriptionLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
        <if test="orQueryObject.taskDescriptionLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}DESCRIPTION_) like #{orQueryObject.taskDescriptionLikeIgnoreCase}${wildcardEscapeClause}
+        or lower(${queryTablePrefix}DESCRIPTION_) like #{orQueryObject.taskDescriptionLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskDeleteReason != null">
-        or ${queryTablePrefix}DELETE_REASON_ = #{orQueryObject.taskDeleteReason}
+        or ${queryTablePrefix}DELETE_REASON_ = #{orQueryObject.taskDeleteReason, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskDeleteReasonLike != null">
-        or ${queryTablePrefix}DELETE_REASON_ like #{orQueryObject.taskDeleteReasonLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}DELETE_REASON_ like #{orQueryObject.taskDeleteReasonLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskOwner != null">
-        or ${queryTablePrefix}OWNER_ = #{orQueryObject.taskOwner}
+        or ${queryTablePrefix}OWNER_ = #{orQueryObject.taskOwner, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskOwnerLike != null">
-        or ${queryTablePrefix}OWNER_ like #{orQueryObject.taskOwnerLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}OWNER_ like #{orQueryObject.taskOwnerLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskOwnerLikeIgnoreCase != null">
-        or lower(${queryTablePrefix}OWNER_) like #{orQueryObject.taskOwnerLikeIgnoreCase}${wildcardEscapeClause}
+        or lower(${queryTablePrefix}OWNER_) like #{orQueryObject.taskOwnerLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.taskAssignee != null">
-        or ${queryTablePrefix}ASSIGNEE_ = #{orQueryObject.taskAssignee}
+        or ${queryTablePrefix}ASSIGNEE_ = #{orQueryObject.taskAssignee, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.taskAssigneeLike != null">
-        or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
        <if test="orQueryObject.taskAssigneeLikeIgnoreCase != null">
-        or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLikeIgnoreCase}${wildcardEscapeClause}
+        or ${queryTablePrefix}ASSIGNEE_ like #{orQueryObject.taskAssigneeLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.withAssignee">
         or ${queryTablePrefix}ASSIGNEE_ IS NOT NULL
@@ -1665,17 +1665,17 @@
         or ${queryTablePrefix}ASSIGNEE_ IN
         <foreach item="assigneeId" index="index" collection="orQueryObject.taskAssigneeIds"
                  open="(" separator="," close=")">
-          #{assigneeId}
+          #{assigneeId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="orQueryObject.taskPriority != null">
-        or ${queryTablePrefix}PRIORITY_ = #{orQueryObject.taskPriority}
+        or ${queryTablePrefix}PRIORITY_ = #{orQueryObject.taskPriority, jdbcType=INTEGER}
       </if>
       <if test="orQueryObject.taskMinPriority != null">
-        or ${queryTablePrefix}PRIORITY_ &gt;= #{orQueryObject.taskMinPriority}
+        or ${queryTablePrefix}PRIORITY_ &gt;= #{orQueryObject.taskMinPriority, jdbcType=INTEGER}
       </if>
       <if test="orQueryObject.taskMaxPriority != null">
-        or ${queryTablePrefix}PRIORITY_ &lt;= #{orQueryObject.taskMaxPriority}
+        or ${queryTablePrefix}PRIORITY_ &lt;= #{orQueryObject.taskMaxPriority, jdbcType=INTEGER}
       </if>
       <if test="orQueryObject.unfinished">
         or ${queryTablePrefix}END_TIME_ is null
@@ -1684,104 +1684,104 @@
         or ${queryTablePrefix}END_TIME_ is not null
       </if>
       <if test="orQueryObject.state != null">
-        or ${queryTablePrefix}STATE_ = #{orQueryObject.state}
+        or ${queryTablePrefix}STATE_ = #{orQueryObject.state, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.createTime != null">
-        or ${queryTablePrefix}START_TIME_ = #{orQueryObject.createTime}
+        or ${queryTablePrefix}START_TIME_ = #{orQueryObject.createTime, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.createTimeBefore != null">
-        or ${queryTablePrefix}START_TIME_ &lt; #{orQueryObject.createTimeBefore}
+        or ${queryTablePrefix}START_TIME_ &lt; #{orQueryObject.createTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.createTimeAfter != null">
-        or ${queryTablePrefix}START_TIME_ &gt; #{orQueryObject.createTimeAfter}
+        or ${queryTablePrefix}START_TIME_ &gt; #{orQueryObject.createTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartTime != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ = #{orQueryObject.inProgressStartTime}
+        or ${queryTablePrefix}IN_PROGRESS_TIME_ = #{orQueryObject.inProgressStartTime, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartTimeBefore != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{orQueryObject.inProgressStartTimeBefore}
+        or ${queryTablePrefix}IN_PROGRESS_TIME_ &lt; #{orQueryObject.inProgressStartTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartTimeAfter != null">
-        or ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{orQueryObject.inProgressStartTimeAfter}
+        or ${queryTablePrefix}IN_PROGRESS_TIME_ &gt; #{orQueryObject.inProgressStartTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartedBy != null">
-        or ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{orQueryObject.inProgressStartedBy}
+        or ${queryTablePrefix}IN_PROGRESS_STARTED_BY_ = #{orQueryObject.inProgressStartedBy, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.claimTime != null">
-        or ${queryTablePrefix}CLAIM_TIME_ = #{orQueryObject.claimTime}
+        or ${queryTablePrefix}CLAIM_TIME_ = #{orQueryObject.claimTime, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.claimTimeBefore != null">
-        or ${queryTablePrefix}CLAIM_TIME_ &lt; #{orQueryObject.claimTimeBefore}
+        or ${queryTablePrefix}CLAIM_TIME_ &lt; #{orQueryObject.claimTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.claimTimeAfter != null">
-        or ${queryTablePrefix}CLAIM_TIME_ &gt; #{orQueryObject.claimTimeAfter}
+        or ${queryTablePrefix}CLAIM_TIME_ &gt; #{orQueryObject.claimTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.claimedBy != null">
-        or ${queryTablePrefix}CLAIMED_BY_ = #{orQueryObject.claimedBy}
+        or ${queryTablePrefix}CLAIMED_BY_ = #{orQueryObject.claimedBy, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.suspendedTime != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ = #{orQueryObject.suspendedTime}
+        or ${queryTablePrefix}SUSPENDED_TIME_ = #{orQueryObject.suspendedTime, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.suspendedTimeBefore != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{orQueryObject.suspendedTimeBefore}
+        or ${queryTablePrefix}SUSPENDED_TIME_ &lt; #{orQueryObject.suspendedTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.suspendedTimeAfter != null">
-        or ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{orQueryObject.suspendedTimeAfter}
+        or ${queryTablePrefix}SUSPENDED_TIME_ &gt; #{orQueryObject.suspendedTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.suspendedBy != null">
-        or ${queryTablePrefix}SUSPENDED_BY_ = #{orQueryObject.suspendedBy}
+        or ${queryTablePrefix}SUSPENDED_BY_ = #{orQueryObject.suspendedBy, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.completedTime != null">
-        or ${queryTablePrefix}END_TIME_ = #{orQueryObject.completedTime}
+        or ${queryTablePrefix}END_TIME_ = #{orQueryObject.completedTime, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.completedTimeBefore != null">
-        or ${queryTablePrefix}END_TIME_ &lt; #{orQueryObject.completedTimeBefore}
+        or ${queryTablePrefix}END_TIME_ &lt; #{orQueryObject.completedTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.completedTimeAfter != null">
-        or ${queryTablePrefix}END_TIME_ &gt; #{orQueryObject.completedTimeAfter}
+        or ${queryTablePrefix}END_TIME_ &gt; #{orQueryObject.completedTimeAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.completedBy != null">
-        or ${queryTablePrefix}COMPLETED_BY_ = #{orQueryObject.completedBy}
+        or ${queryTablePrefix}COMPLETED_BY_ = #{orQueryObject.completedBy, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.inProgressStartDueDate != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{orQueryObject.inProgressStartDueDate}
+        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ = #{orQueryObject.inProgressStartDueDate, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartDueBefore != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{orQueryObject.inProgressStartDueBefore}
+        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &lt; #{orQueryObject.inProgressStartDueBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.inProgressStartDueAfter != null">
-        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{orQueryObject.inProgressStartDueAfter}
+        or ${queryTablePrefix}IN_PROGRESS_DUE_DATE_ &gt; #{orQueryObject.inProgressStartDueAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.withoutDueDate">
         or ${queryTablePrefix}DUE_DATE_ is null
       </if>
       <if test="orQueryObject.dueDate != null">
-        or ${queryTablePrefix}DUE_DATE_ = #{orQueryObject.dueDate}
+        or ${queryTablePrefix}DUE_DATE_ = #{orQueryObject.dueDate, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.dueBefore != null">
-        or ${queryTablePrefix}DUE_DATE_ &lt; #{orQueryObject.dueBefore}
+        or ${queryTablePrefix}DUE_DATE_ &lt; #{orQueryObject.dueBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.dueAfter != null">
-        or ${queryTablePrefix}DUE_DATE_ &gt; #{orQueryObject.dueAfter}
+        or ${queryTablePrefix}DUE_DATE_ &gt; #{orQueryObject.dueAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="orQueryObject.withoutDueDate">
         or ${queryTablePrefix}DUE_DATE_ is null
       </if>
       <if test="orQueryObject.category != null">
-        or ${queryTablePrefix}CATEGORY_ = #{orQueryObject.category}
+        or ${queryTablePrefix}CATEGORY_ = #{orQueryObject.category, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.categoryInList != null &amp;&amp; !orQueryObject.categoryInList.empty">
           or ${queryTablePrefix}CATEGORY_ IN
           <foreach item="taskCategory" index="index" collection="orQueryObject.categoryInList"
                    open="(" separator="," close=")">
-              #{taskCategory}
+              #{taskCategory, jdbcType=NVARCHAR}
           </foreach>
       </if>
       <if test="orQueryObject.categoryNotInList != null &amp;&amp; !orQueryObject.categoryNotInList.empty">
           or ${queryTablePrefix}CATEGORY_ NOT IN
           <foreach item="taskCategory" index="index" collection="orQueryObject.categoryNotInList"
                    open="(" separator="," close=")">
-              #{taskCategory}
+              #{taskCategory, jdbcType=NVARCHAR}
           </foreach>
       </if>
       <if test="orQueryObject.withoutCategory">
@@ -1791,13 +1791,13 @@
         or ${queryTablePrefix}FORM_KEY_ IS NOT NULL
       </if>
       <if test="orQueryObject.formKey != null">
-        or ${queryTablePrefix}FORM_KEY_ = #{orQueryObject.formKey}
+        or ${queryTablePrefix}FORM_KEY_ = #{orQueryObject.formKey, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.tenantId != null">
-        or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId}
+        or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.tenantIdLike != null">
-        or ${queryTablePrefix}TENANT_ID_ like #{orQueryObject.tenantIdLike}${wildcardEscapeClause}
+        or ${queryTablePrefix}TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="orQueryObject.withoutTenantId">
         or (${queryTablePrefix}TENANT_ID_ = '' or ${queryTablePrefix}TENANT_ID_ is null)
@@ -1810,7 +1810,7 @@
             and
             (
               <if test="orQueryObject.candidateUser != null">
-                LINK.USER_ID_ = #{orQueryObject.candidateUser}
+                LINK.USER_ID_ = #{orQueryObject.candidateUser, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.candidateUser != null &amp;&amp; orQueryObject.candidateGroups != null &amp;&amp; !orQueryObject.candidateGroups.empty">
                 or
@@ -1824,7 +1824,7 @@
                     LINK.GROUP_ID_ IN
                     <foreach item="group" index="index" collection="candidateGroupListItem"
                          open="(" separator="," close=")">
-                      #{group}
+                      #{group, jdbcType=NVARCHAR}
                     </foreach>
                 </foreach>
                 )
@@ -1838,9 +1838,9 @@
       </if>
       <if test="orQueryObject.involvedUser != null">
         or (
-          EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{orQueryObject.involvedUser} and LINK.TASK_ID_ = ${queryTablePrefix}ID_)
-          or ${queryTablePrefix}ASSIGNEE_ = #{orQueryObject.involvedUser}
-          or ${queryTablePrefix}OWNER_ = #{orQueryObject.involvedUser}
+          EXISTS(select LINK.ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR} and LINK.TASK_ID_ = ${queryTablePrefix}ID_)
+          or ${queryTablePrefix}ASSIGNEE_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+          or ${queryTablePrefix}OWNER_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
           )
       </if>
       <if test="orQueryObject.involvedGroups != null">
@@ -1854,7 +1854,7 @@
                 LINK.GROUP_ID_ IN
                 <foreach item="group" index="index" collection="involvedGroupListItem"
                       open="(" separator="," close=")">
-                  #{group}
+                  #{group, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>
             )
@@ -1862,7 +1862,7 @@
       </if>
       <if test="orQueryObject.parentScopeId != null">
           or EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
-          LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+          LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId, jdbcType=NVARCHAR}
           and LINK.REF_SCOPE_ID_ = RES.ID_
           and LINK.HIERARCHY_TYPE_ = 'parent'
           )
@@ -1871,7 +1871,7 @@
           or exists(
           select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where
           LINK.REF_SCOPE_ID_ = RES.ID_
-          and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+          and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId, jdbcType=NVARCHAR}
           )
       </if>
   </sql>

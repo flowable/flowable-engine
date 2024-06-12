@@ -13,11 +13,11 @@
 
   <insert id="bulkInsertDmnResource" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
-      <foreach collection="list" item="byteArr" index="index" separator=","> 
-        (#{byteArr.id, jdbcType=VARCHAR},
-         #{byteArr.name, jdbcType=VARCHAR},
-         #{byteArr.bytes, jdbcType=${blobType}},
-         #{byteArr.deploymentId, jdbcType=VARCHAR})
+      <foreach collection="list" item="resource" index="index" separator=",">
+        (#{resource.id, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=VARCHAR},
+         #{resource.bytes, jdbcType=${blobType}},
+         #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
@@ -46,7 +46,7 @@
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteDmnResourcesByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
+    delete from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id, jdbcType=VARCHAR}
   </delete>
   
   <!-- RESOURCE RESULTMAP -->
@@ -60,17 +60,17 @@
   <!-- RESOURCE SELECT -->
 
   <select id="selectDmnResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select NAME_ from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select NAME_ from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <select id="selectDmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="dmnResourceResultMap">
     select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND NAME_ = #{resourceName}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+          AND NAME_ = #{resourceName, jdbcType=VARCHAR}
   </select>
 
   <select id="selectDmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="dmnResourceResultMap">
-    select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>  
   
 </mapper>

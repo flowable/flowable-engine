@@ -5,47 +5,47 @@
 <mapper namespace="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
 
     <resultMap id="batchResultMap" type="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
-        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <id property="id" column="ID_" jdbcType="NVARCHAR"/>
         <result property="revision" column="REV_" jdbcType="INTEGER"/>
-        <result property="batchType" column="TYPE_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
+        <result property="batchType" column="TYPE_" jdbcType="NVARCHAR"/>
+        <result property="batchSearchKey" column="SEARCH_KEY_" jdbcType="NVARCHAR"/>
+        <result property="batchSearchKey2" column="SEARCH_KEY2_" jdbcType="NVARCHAR"/>
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
-        <result property="status" column="STATUS_" jdbcType="VARCHAR"/>
+        <result property="status" column="STATUS_" jdbcType="NVARCHAR"/>
         <result property="batchDocRefId" column="BATCH_DOC_ID_" typeHandler="BatchByteArrayRefTypeHandler"/>
-        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+        <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR"/>
     </resultMap>
 
     <!-- Batch INSERTS -->
     <insert id="insertBatch" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
         INSERT INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_)
-        VALUES (#{id, jdbcType=VARCHAR},
+        VALUES (#{id, jdbcType=NVARCHAR},
                 #{revision, jdbcType=INTEGER},
-                #{batchType, jdbcType=VARCHAR},
-                #{batchSearchKey, jdbcType=VARCHAR},
-                #{batchSearchKey2, jdbcType=VARCHAR},
+                #{batchType, jdbcType=NVARCHAR},
+                #{batchSearchKey, jdbcType=NVARCHAR},
+                #{batchSearchKey2, jdbcType=NVARCHAR},
                 #{createTime, jdbcType=TIMESTAMP},
                 #{completeTime, jdbcType=TIMESTAMP},
-                #{status, jdbcType=VARCHAR},
+                #{status, jdbcType=NVARCHAR},
                 #{batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-                #{tenantId, jdbcType=VARCHAR})
+                #{tenantId, jdbcType=NVARCHAR})
     </insert>
 
     <insert id="bulkInsertBatch" parameterType="java.util.List">
         INSERT INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_)
         VALUES
         <foreach collection="list" item="batch" index="index" separator=",">
-            (#{batch.id, jdbcType=VARCHAR},
+            (#{batch.id, jdbcType=NVARCHAR},
             #{batch.revision, jdbcType=INTEGER},
-            #{batch.batchType, jdbcType=VARCHAR},
-            #{batch.batchSearchKey, jdbcType=VARCHAR},
-            #{batch.batchSearchKey2, jdbcType=VARCHAR},
+            #{batch.batchType, jdbcType=NVARCHAR},
+            #{batch.batchSearchKey, jdbcType=NVARCHAR},
+            #{batch.batchSearchKey2, jdbcType=NVARCHAR},
             #{batch.createTime, jdbcType=TIMESTAMP},
             #{batch.completeTime, jdbcType=TIMESTAMP},
-            #{batch.status, jdbcType=VARCHAR},
+            #{batch.status, jdbcType=NVARCHAR},
             #{batch.batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-            #{batch.tenantId, jdbcType=VARCHAR})
+            #{batch.tenantId, jdbcType=NVARCHAR})
         </foreach>
     </insert>
 
@@ -53,16 +53,16 @@
         INSERT ALL
         <foreach collection="list" item="batch" index="index">
             INTO ${prefix}FLW_RU_BATCH(ID_, REV_, TYPE_, SEARCH_KEY_, SEARCH_KEY2_, CREATE_TIME_, COMPLETE_TIME_, STATUS_, BATCH_DOC_ID_, TENANT_ID_) VALUES
-            (#{batch.id, jdbcType=VARCHAR},
+            (#{batch.id, jdbcType=NVARCHAR},
             #{batch.revision, jdbcType=INTEGER},
-            #{batch.batchType, jdbcType=VARCHAR},
-            #{batch.batchSearchKey, jdbcType=VARCHAR},
-            #{batch.batchSearchKey2, jdbcType=VARCHAR},
+            #{batch.batchType, jdbcType=NVARCHAR},
+            #{batch.batchSearchKey, jdbcType=NVARCHAR},
+            #{batch.batchSearchKey2, jdbcType=NVARCHAR},
             #{batch.createTime, jdbcType=TIMESTAMP},
             #{batch.completeTime, jdbcType=TIMESTAMP},
-            #{batch.status, jdbcType=VARCHAR},
+            #{batch.status, jdbcType=NVARCHAR},
             #{batch.batchDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-            #{batch.tenantId, jdbcType=VARCHAR})
+            #{batch.tenantId, jdbcType=NVARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -73,16 +73,16 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.status != null">
-                STATUS_ = #{status, jdbcType=VARCHAR},
+                STATUS_ = #{status, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.completeTime != completeTime">
                 COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+                TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
             </if>
         </set>
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
@@ -90,7 +90,7 @@
     <delete id="deleteBatch" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchEntityImpl">
         delete
         from ${prefix}FLW_RU_BATCH
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
     </delete>
 
     <delete id="bulkDeleteBatches" parameterType="org.flowable.batch.service.impl.BatchQueryImpl">
@@ -133,13 +133,13 @@
     <select id="selectBatch" parameterType="string" resultMap="batchResultMap">
         select *
         from ${prefix}FLW_RU_BATCH
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectBatchesBySearchKey" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchResultMap">
         select *
         from ${prefix}FLW_RU_BATCH
-        where SEARCH_KEY_ = #{parameter.searchKey, jdbcType=VARCHAR} or SEARCH_KEY2_ = #{parameter.searchKey2, jdbcType=VARCHAR}
+        where SEARCH_KEY_ = #{parameter.searchKey, jdbcType=NVARCHAR} or SEARCH_KEY2_ = #{parameter.searchKey2, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectAllBatches" parameterType="string" resultMap="batchResultMap">
@@ -163,44 +163,44 @@
         from ${prefix}FLW_RU_BATCH RES
         <where>
             <if test="id != null">
-                RES.ID_ = #{id}
+                RES.ID_ = #{id, jdbcType=NVARCHAR}
             </if>
             <if test="batchType != null">
-                and RES.TYPE_ = #{batchType}
+                and RES.TYPE_ = #{batchType, jdbcType=NVARCHAR}
             </if>
             <if test="batchTypes != null and !batchTypes.empty">
                 and RES.TYPE_ IN
                 <foreach item="batchTypeItem" index="index" collection="batchTypes"
                          open="(" separator="," close=")">
-                    #{batchTypeItem}
+                    #{batchTypeItem, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="searchKey != null">
-                and RES.SEARCH_KEY_ = #{searchKey}
+                and RES.SEARCH_KEY_ = #{searchKey, jdbcType=NVARCHAR}
             </if>
             <if test="searchKey2 != null">
-                and RES.SEARCH_KEY2_ = #{searchKey2}
+                and RES.SEARCH_KEY2_ = #{searchKey2, jdbcType=NVARCHAR}
             </if>
             <if test="createTimeHigherThan != null">
-                and RES.CREATE_TIME_ &gt; #{createTimeHigherThan}
+                and RES.CREATE_TIME_ &gt; #{createTimeHigherThan, jdbcType=TIMESTAMP}
             </if>
             <if test="createTimeLowerThan != null">
-                and RES.CREATE_TIME_ &lt; #{createTimeLowerThan}
+                and RES.CREATE_TIME_ &lt; #{createTimeLowerThan, jdbcType=TIMESTAMP}
             </if>
             <if test="completeTimeHigherThan != null">
-                and RES.COMPLETE_TIME_ &gt; #{completeTimeHigherThan}
+                and RES.COMPLETE_TIME_ &gt; #{completeTimeHigherThan, jdbcType=TIMESTAMP}
             </if>
             <if test="completeTimeLowerThan != null">
-                and RES.COMPLETE_TIME_ &lt; #{completeTimeLowerThan}
+                and RES.COMPLETE_TIME_ &lt; #{completeTimeLowerThan, jdbcType=TIMESTAMP}
             </if>
             <if test="status != null">
-                and RES.STATUS_ = #{status}
+                and RES.STATUS_ = #{status, jdbcType=NVARCHAR}
             </if>
             <if test="tenantId != null">
-                and RES.TENANT_ID_ = #{tenantId}
+                and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
             </if>
             <if test="tenantIdLike != null">
-                and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+                and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)

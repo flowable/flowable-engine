@@ -9,8 +9,8 @@
   <insert id="insertIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values (
-      #{id, jdbcType=VARCHAR},
-      1, #{name, jdbcType=VARCHAR},
+      #{id, jdbcType=NVARCHAR},
+      1, #{name, jdbcType=NVARCHAR},
       #{bytes, jdbcType=${blobType}}
     )  
   </insert>
@@ -19,8 +19,8 @@
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values
       <foreach collection="list" item="byteArray" index="index" separator=","> 
-         (#{byteArray.id, jdbcType=VARCHAR},
-          1, #{byteArray.name, jdbcType=VARCHAR},
+         (#{byteArray.id, jdbcType=NVARCHAR},
+          1, #{byteArray.name, jdbcType=NVARCHAR},
           #{byteArray.bytes, jdbcType=${blobType}})
       </foreach>
   </insert>
@@ -29,8 +29,8 @@
     INSERT ALL 
       <foreach collection="list" item="byteArray" index="index">
         into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_) VALUES 
-         (#{byteArray.id, jdbcType=VARCHAR},
-          1, #{byteArray.name, jdbcType=VARCHAR},
+         (#{byteArray.id, jdbcType=NVARCHAR},
+          1, #{byteArray.name, jdbcType=NVARCHAR},
           #{byteArray.bytes, jdbcType=${blobType}})
       </foreach>
     SELECT * FROM dual
@@ -44,30 +44,30 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       BYTES_ = #{bytes, jdbcType=${blobType}},
     </set>
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
   <!-- BYTE ARRAY DELETE -->
 
   <select id="selectBytesOfIdmByteArray" parameterType="string" resultType="hashmap">
-    select BYTES_ from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+    select BYTES_ from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </select>
   
   <delete id="deleteIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
-    delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <delete id="deleteIdmByteArrayNoRevisionCheck" parameterType="string">
-    delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id}
+    delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
 
   <!-- BYTE ARRAY RESULTMAP -->
   
   <resultMap id="idmByteArrayResultMap" type="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="BYTES_" jdbcType="${blobType}"/>
   </resultMap>
 
@@ -78,7 +78,7 @@
   </select>
   
   <select id="selectIdmByteArray" parameterType="string" resultMap="idmByteArrayResultMap">
-   select * from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=VARCHAR}
+   select * from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
 
