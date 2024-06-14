@@ -341,7 +341,7 @@ public abstract class EntityParameterTypesOverview {
         ParameterInfo info = addParameterInfo("externalWorkerJob");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
@@ -602,7 +602,7 @@ public abstract class EntityParameterTypesOverview {
         ParameterInfo info = addParameterInfo("job");
         info.addColumn("ID_", "id", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
@@ -1402,7 +1402,7 @@ public abstract class EntityParameterTypesOverview {
     protected static void addTimerJobParams() {
         ParameterInfo info = addParameterInfo("timerJob");
         info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
@@ -1497,7 +1497,7 @@ public abstract class EntityParameterTypesOverview {
     protected static void addDeadLetterJobParams() {
         ParameterInfo info = addParameterInfo("deadLetterJob");
         info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
@@ -1738,7 +1738,7 @@ public abstract class EntityParameterTypesOverview {
     protected static void addSuspendedJobParams() {
         ParameterInfo info = addParameterInfo("suspendedJob");
         info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("CATEGORY_", "category", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TYPE_", "jobType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_EXP_TIME_", "lockExpirationTime", PARAMETER_TYPE_TIMESTAMP);
