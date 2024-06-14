@@ -9,7 +9,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.JobEntityImpl">
         <id property="id" column="ID_" jdbcType="NVARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
-        <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="NVARCHAR" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
         <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
@@ -65,7 +65,7 @@
             <if test="parameter.enabledCategories != null">
                 and CATEGORY_ in
                 <foreach item="category" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-                    #{category, jdbcType=NVARCHAR}
+                    #{category, jdbcType=VARCHAR}
                 </foreach>
             </if>
         </where>
@@ -88,7 +88,7 @@
             <if test="parameter.enabledCategories">
                 and CATEGORY_ in
                 <foreach item="category" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-                    #{category, jdbcType=NVARCHAR}
+                    #{category, jdbcType=VARCHAR}
                 </foreach>
             </if>
         </where>
@@ -170,10 +170,10 @@
                 and RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR})
             </if>
             <if test="category != null">
-                and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
+                and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
             </if>
             <if test="categoryLike != null">
-                and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
             </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR}
@@ -335,7 +335,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=NVARCHAR},
         #{revision, jdbcType=INTEGER},
-        #{category, jdbcType=NVARCHAR},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=NVARCHAR},
         #{lockOwner, jdbcType=NVARCHAR},
         #{lockExpirationTime, jdbcType=TIMESTAMP},
@@ -395,7 +395,7 @@
         <foreach collection="list" item="job" index="index" separator=",">
             (#{job.id, jdbcType=NVARCHAR},
             #{job.revision, jdbcType=INTEGER},
-            #{job.category, jdbcType=NVARCHAR},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=NVARCHAR},
             #{job.lockOwner, jdbcType=NVARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -456,7 +456,7 @@
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=NVARCHAR},
             #{job.revision, jdbcType=INTEGER},
-            #{job.category, jdbcType=NVARCHAR},
+            #{job.category, jdbcType=VARCHAR},
             #{job.jobType, jdbcType=NVARCHAR},
             #{job.lockOwner, jdbcType=NVARCHAR},
             #{job.lockExpirationTime, jdbcType=TIMESTAMP},
@@ -498,7 +498,7 @@
                 LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.category != category">
-                CATEGORY_ = #{category, jdbcType=NVARCHAR},
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.jobHandlerType != jobHandlerType">
                 HANDLER_TYPE_ = #{jobHandlerType, jdbcType=NVARCHAR},
