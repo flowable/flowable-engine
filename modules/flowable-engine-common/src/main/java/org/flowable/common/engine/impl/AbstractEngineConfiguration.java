@@ -81,6 +81,7 @@ import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
 import org.flowable.common.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.common.engine.impl.db.CommonDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.FlowableStringTypeHandler;
 import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
@@ -948,8 +949,8 @@ public abstract class AbstractEngineConfiguration {
             // thus the same handler is used for both types.
             handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
             handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
-            handlerRegistry.register(String.class, JdbcType.NVARCHAR, new StringTypeHandler()); // Notice: no 'N' prefix here
-            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new StringTypeHandler()); // Notice: no 'N' prefix here
+            handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler()); // Notice: no 'N' prefix here
+            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler()); // Notice: no 'N' prefix here
         }
 
         handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());
