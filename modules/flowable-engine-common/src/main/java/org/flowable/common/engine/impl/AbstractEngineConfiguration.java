@@ -949,8 +949,13 @@ public abstract class AbstractEngineConfiguration {
             // thus the same handler is used for both types.
             handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
             handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
-            handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler()); // Notice: no 'N' prefix here
-            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler()); // Notice: no 'N' prefix here
+            if (databaseType.equals(DATABASE_TYPE_DB2)) {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+            } else {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+            }
         }
 
         handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());
