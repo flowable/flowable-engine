@@ -11,7 +11,7 @@
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values (
             #{id, jdbcType=VARCHAR},
-            1, #{name, jdbcType=VARCHAR},
+            1, #{name, jdbcType=NVARCHAR},
             #{state, jdbcType=VARCHAR},
             #{caseDefinitionId, jdbcType=VARCHAR},
             #{derivedCaseDefinitionId, jdbcType=VARCHAR},
@@ -54,7 +54,7 @@
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
             (
             #{historicPlanItemInstance.id, jdbcType=VARCHAR},
-            1, #{historicPlanItemInstance.name, jdbcType=VARCHAR},
+            1, #{historicPlanItemInstance.name, jdbcType=NVARCHAR},
             #{historicPlanItemInstance.state, jdbcType=VARCHAR},
             #{historicPlanItemInstance.caseDefinitionId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.derivedCaseDefinitionId, jdbcType=VARCHAR},
@@ -98,7 +98,7 @@
             START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id, jdbcType=VARCHAR},
-                1, #{historicPlanItemInstance.name, jdbcType=VARCHAR},
+                1, #{historicPlanItemInstance.name, jdbcType=NVARCHAR},
                 #{historicPlanItemInstance.state, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.caseDefinitionId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.derivedCaseDefinitionId, jdbcType=VARCHAR},
@@ -140,7 +140,7 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.state != state">
                 STATE_ = #{state, jdbcType=VARCHAR},
@@ -276,7 +276,7 @@
     <resultMap id="historicPlanItemInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR"/>
         <result property="revision" column="REV_" jdbcType="INTEGER"/>
-        <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
         <result property="state" column="STATE_" jdbcType="VARCHAR"/>
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
         <result property="derivedCaseDefinitionId" column="DERIVED_CASE_DEF_ID_" jdbcType="VARCHAR"/>
@@ -337,7 +337,7 @@
                 RES.ID_ = #{planItemInstanceId, jdbcType=VARCHAR}
             </if>
             <if test="planItemInstanceName != null">
-                RES.NAME_ = #{planItemInstanceName, jdbcType=VARCHAR}
+                RES.NAME_ = #{planItemInstanceName, jdbcType=NVARCHAR}
             </if>
             <if test="state != null">
                 and RES.STATE_ = #{state, jdbcType=VARCHAR}

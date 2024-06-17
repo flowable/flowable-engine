@@ -9,8 +9,8 @@
             #{id, jdbcType=VARCHAR},
             1, #{parentId, jdbcType=VARCHAR},
             #{caseDefinitionId, jdbcType=VARCHAR},
-            #{businessKey, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{businessKey, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{state, jdbcType=VARCHAR},
             #{startTime, jdbcType=TIMESTAMP},
             #{startUserId, jdbcType=VARCHAR},
@@ -22,7 +22,7 @@
             #{referenceType, jdbcType=VARCHAR},
             #{completeable, jdbcType=BOOLEAN},
             #{tenantId, jdbcType=VARCHAR},
-            #{businessStatus, jdbcType=VARCHAR}
+            #{businessStatus, jdbcType=NVARCHAR}
         )
     </insert>
 
@@ -34,8 +34,8 @@
                 #{caseInstance.id, jdbcType=VARCHAR},
                 1, #{caseInstance.parentId, jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId, jdbcType=VARCHAR},
-                #{caseInstance.businessKey, jdbcType=VARCHAR},
-                #{caseInstance.name, jdbcType=VARCHAR},
+                #{caseInstance.businessKey, jdbcType=NVARCHAR},
+                #{caseInstance.name, jdbcType=NVARCHAR},
                 #{caseInstance.state, jdbcType=VARCHAR},
                 #{caseInstance.startTime, jdbcType=TIMESTAMP},
                 #{caseInstance.startUserId, jdbcType=VARCHAR},
@@ -47,7 +47,7 @@
                 #{caseInstance.referenceType, jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId, jdbcType=VARCHAR},
-                #{caseInstance.businessStatus, jdbcType=VARCHAR}
+                #{caseInstance.businessStatus, jdbcType=NVARCHAR}
             )
         </foreach>
     </insert>
@@ -60,8 +60,8 @@
                 #{caseInstance.id, jdbcType=VARCHAR},
                 1, #{caseInstance.parentId, jdbcType=VARCHAR},
                 #{caseInstance.caseDefinitionId, jdbcType=VARCHAR},
-                #{caseInstance.businessKey, jdbcType=VARCHAR},
-                #{caseInstance.name, jdbcType=VARCHAR},
+                #{caseInstance.businessKey, jdbcType=NVARCHAR},
+                #{caseInstance.name, jdbcType=NVARCHAR},
                 #{caseInstance.state, jdbcType=VARCHAR},
                 #{caseInstance.startTime, jdbcType=TIMESTAMP},
                 #{caseInstance.startUserId, jdbcType=VARCHAR},
@@ -73,7 +73,7 @@
                 #{caseInstance.referenceType, jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId, jdbcType=VARCHAR},
-                #{caseInstance.businessStatus, jdbcType=VARCHAR}
+                #{caseInstance.businessStatus, jdbcType=NVARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -90,10 +90,10 @@
                 CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.businessKey != businessKey">
-                BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+                BUSINESS_KEY_ = #{businessKey, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.state != state">
                 STATE_ = #{state, jdbcType=VARCHAR},
@@ -129,7 +129,7 @@
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.businessStatus != businessStatus">
-                BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR},
+                BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
@@ -169,9 +169,9 @@
         <result property="revision" column="REV_" jdbcType="INTEGER" />
         <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
-        <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-        <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
-        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="businessKey" column="BUSINESS_KEY_" jdbcType="NVARCHAR" />
+        <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
+        <result property="name" column="NAME_" jdbcType="NVARCHAR" />
         <result property="state" column="STATE_" jdbcType="VARCHAR" />
         <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
@@ -187,7 +187,7 @@
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
 
         <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
-        <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="VARCHAR" />
+        <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="NVARCHAR" />
         <result property="caseDefinitionVersion" column="CaseDefinitionVersion" jdbcType="INTEGER" />
         <result property="caseDefinitionDeploymentId" column="CaseDefinitionDeploymentId" jdbcType="VARCHAR" />
     </resultMap>
@@ -378,7 +378,7 @@
                 and CASE_DEF.CATEGORY_ = #{caseDefinitionCategory, jdbcType=VARCHAR}
             </if>
             <if test="caseDefinitionName != null">
-                and CASE_DEF.NAME_ = #{caseDefinitionName, jdbcType=VARCHAR}
+                and CASE_DEF.NAME_ = #{caseDefinitionName, jdbcType=NVARCHAR}
             </if>
             <if test="caseDefinitionVersion != null">
                 and CASE_DEF.VERSION_ = #{caseDefinitionVersion, jdbcType=INTEGER}
@@ -387,13 +387,13 @@
                 and RES.PARENT_ID_ = #{caseInstanceParentId, jdbcType=VARCHAR}
             </if>
             <if test="name != null">
-                and RES.NAME_ = #{name, jdbcType=VARCHAR}
+                and RES.NAME_ = #{name, jdbcType=NVARCHAR}
             </if>
             <if test="nameLike != null">
-                and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+                and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
             <if test="nameLikeIgnoreCase != null">
-                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+                and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
             </if>
             <if test="parentScopeId != null">
                 and EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
@@ -409,10 +409,10 @@
                 )
             </if>
             <if test="businessKey != null">
-                and RES.BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR}
+                and RES.BUSINESS_KEY_ = #{businessKey, jdbcType=NVARCHAR}
             </if>
             <if test="businessStatus != null">
-                and RES.BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR}
+                and RES.BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR}
             </if>
             <if test="startedBefore != null">
                 and RES.START_TIME_ &lt;= #{startedBefore, jdbcType=TIMESTAMP}
@@ -624,7 +624,7 @@
                         or CASE_DEF.CATEGORY_ = #{orQueryObject.caseDefinitionCategory, jdbcType=VARCHAR}
                     </if>
                     <if test="orQueryObject.caseDefinitionName != null">
-                        or CASE_DEF.NAME_ = #{orQueryObject.caseDefinitionName, jdbcType=VARCHAR}
+                        or CASE_DEF.NAME_ = #{orQueryObject.caseDefinitionName, jdbcType=NVARCHAR}
                     </if>
                     <if test="orQueryObject.caseDefinitionVersion != null">
                         or CASE_DEF.VERSION_ = #{orQueryObject.caseDefinitionVersion, jdbcType=INTEGER}
@@ -633,19 +633,19 @@
                         or RES.PARENT_ID_ = #{orQueryObject.caseInstanceParentId, jdbcType=VARCHAR}
                     </if>
                     <if test="orQueryObject.name != null">
-                        or RES.NAME_ = #{orQueryObject.name, jdbcType=VARCHAR}
+                        or RES.NAME_ = #{orQueryObject.name, jdbcType=NVARCHAR}
                     </if>
                     <if test="orQueryObject.nameLike != null">
-                        or RES.NAME_ like #{orQueryObject.nameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+                        or RES.NAME_ like #{orQueryObject.nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                     </if>
                     <if test="orQueryObject.nameLikeIgnoreCase != null">
-                        or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+                        or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
                     </if>
                     <if test="orQueryObject.businessKey != null">
-                        or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=VARCHAR}
+                        or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=NVARCHAR}
                     </if>
                     <if test="orQueryObject.businessStatus != null">
-                        or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus, jdbcType=VARCHAR}
+                        or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus, jdbcType=NVARCHAR}
                     </if>
                     <if test="orQueryObject.startedBefore != null">
                         or RES.START_TIME_ &lt;= #{orQueryObject.startedBefore, jdbcType=TIMESTAMP}

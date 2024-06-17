@@ -8,14 +8,14 @@
 
   <insert id="insertEventResource" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityImpl">
     insert into ${prefix}FLW_EVENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
-    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=NVARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
   </insert>
 
   <insert id="bulkInsertEventResource" parameterType="java.util.List">
     INSERT INTO ${prefix}FLW_EVENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
       <foreach collection="list" item="eventResource" index="index" separator=","> 
         (#{eventResource.id, jdbcType=VARCHAR},
-         #{eventResource.name, jdbcType=VARCHAR},
+         #{eventResource.name, jdbcType=NVARCHAR},
          #{eventResource.bytes, jdbcType=${blobType}},
          #{eventResource.deploymentId, jdbcType=VARCHAR})
       </foreach>
@@ -26,7 +26,7 @@
       <foreach collection="list" item="eventResource" index="index"> 
         INTO ${prefix}FLW_EVENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
         (#{eventResource.id, jdbcType=VARCHAR},
-         #{eventResource.name, jdbcType=VARCHAR},
+         #{eventResource.name, jdbcType=NVARCHAR},
          #{eventResource.bytes, jdbcType=${blobType}},
          #{eventResource.deploymentId, jdbcType=VARCHAR})
       </foreach>
@@ -57,7 +57,7 @@
 
   <resultMap id="eventResourceResultMap" type="org.flowable.eventregistry.impl.persistence.entity.EventResourceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
   </resultMap>
   
@@ -70,7 +70,7 @@
   <select id="selectEventResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="eventResourceResultMap">
     select * from ${prefix}FLW_EVENT_RESOURCE 
     where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
-          AND NAME_ = #{resourceName, jdbcType=VARCHAR}
+          AND NAME_ = #{resourceName, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectEventResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventResourceResultMap">

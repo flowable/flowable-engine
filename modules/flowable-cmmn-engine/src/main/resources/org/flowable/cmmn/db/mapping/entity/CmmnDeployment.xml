@@ -10,7 +10,7 @@
     insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
         #{id, jdbcType=VARCHAR},
-        #{name, jdbcType=VARCHAR},
+        #{name, jdbcType=NVARCHAR},
         #{category, jdbcType=VARCHAR},
         #{key, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
@@ -25,7 +25,7 @@
         <foreach collection="list" item="cmmnDeployment" index="index" separator=",">
             (
                 #{cmmnDeployment.id, jdbcType=VARCHAR},
-                #{cmmnDeployment.name, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=NVARCHAR},
                 #{cmmnDeployment.category, jdbcType=VARCHAR},
                 #{cmmnDeployment.key, jdbcType=VARCHAR},
                 #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
@@ -41,7 +41,7 @@
             into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
             (
                 #{cmmnDeployment.id, jdbcType=VARCHAR},
-                #{cmmnDeployment.name, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=NVARCHAR},
                 #{cmmnDeployment.category, jdbcType=VARCHAR},
                 #{cmmnDeployment.key, jdbcType=VARCHAR},
                 #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
@@ -83,7 +83,7 @@
   
   <resultMap id="cmmnDeploymentResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -128,10 +128,10 @@
         </foreach>
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}

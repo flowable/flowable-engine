@@ -81,6 +81,7 @@ import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
 import org.flowable.common.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.common.engine.impl.db.CommonDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.FlowableStringTypeHandler;
 import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
@@ -940,12 +941,21 @@ public abstract class AbstractEngineConfiguration {
         // Together with this check, all mappings were reviewed and the correct type was added.
         if (databaseType.equals(DATABASE_TYPE_MSSQL)) {
             handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
             handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler()); // Notice the 'N' prefix here
+            handlerRegistry.register(String.class, JdbcType.NVARCHAR, new NStringTypeHandler()); // Notice the 'N' prefix here
         } else {
             // However, for other databases, we want to keep the old behavior of always using 'varchar',
             // thus the same handler is used for both types.
+            handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
             handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
-            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new StringTypeHandler()); // Notice: no 'N' prefix here
+            if (databaseType.equals(DATABASE_TYPE_DB2)) {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+            } else {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+            }
         }
 
         handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());

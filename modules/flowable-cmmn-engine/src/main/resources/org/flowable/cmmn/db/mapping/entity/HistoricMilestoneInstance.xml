@@ -8,7 +8,7 @@
         insert into ${prefix}ACT_CMMN_HI_MIL_INST (ID_, REV_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) 
         values (
             #{id, jdbcType=VARCHAR},
-            1, #{name, jdbcType=VARCHAR},
+            1, #{name, jdbcType=NVARCHAR},
             #{timeStamp, jdbcType=TIMESTAMP},
             #{caseInstanceId, jdbcType=VARCHAR},
             #{caseDefinitionId, jdbcType=VARCHAR},
@@ -24,7 +24,7 @@
       <foreach collection="list" item="historicMilestoneInstance" index="index" separator=",">
         (
             #{historicMilestoneInstance.id, jdbcType=VARCHAR},
-            1, #{historicMilestoneInstance.name, jdbcType=VARCHAR},
+            1, #{historicMilestoneInstance.name, jdbcType=NVARCHAR},
             #{historicMilestoneInstance.timeStamp, jdbcType=TIMESTAMP},
             #{historicMilestoneInstance.caseInstanceId, jdbcType=VARCHAR},
             #{historicMilestoneInstance.caseDefinitionId, jdbcType=VARCHAR},
@@ -40,7 +40,7 @@
         into ${prefix}ACT_CMMN_HI_MIL_INST (ID_, REV_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) VALUES
             (
                 #{historicMilestoneInstance.id, jdbcType=VARCHAR},
-                1, #{historicMilestoneInstance.name, jdbcType=VARCHAR},
+                1, #{historicMilestoneInstance.name, jdbcType=NVARCHAR},
                 #{historicMilestoneInstance.timeStamp, jdbcType=TIMESTAMP},
                 #{historicMilestoneInstance.caseInstanceId, jdbcType=VARCHAR},
                 #{historicMilestoneInstance.caseDefinitionId, jdbcType=VARCHAR},
@@ -59,7 +59,7 @@
             CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.name != name">
-            NAME_ = #{name, jdbcType=VARCHAR},
+            NAME_ = #{name, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.elementId != elementId">
             ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
@@ -107,7 +107,7 @@
   <resultMap id="historicMileStoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
@@ -139,7 +139,7 @@
             RES.ID_ = #{id, jdbcType=VARCHAR}
         </if>
         <if test="name != null">
-            RES.NAME_ = #{name, jdbcType=VARCHAR}
+            RES.NAME_ = #{name, jdbcType=NVARCHAR}
         </if>
         <if test="caseInstanceId != null">
             and RES.CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}

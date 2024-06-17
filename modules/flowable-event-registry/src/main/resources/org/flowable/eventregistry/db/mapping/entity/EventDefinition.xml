@@ -10,12 +10,12 @@
     insert into ${prefix}FLW_EVENT_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
     	RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-            #{category, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{category, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER}, 
             #{deploymentId, jdbcType=VARCHAR},
-            #{resourceName, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=NVARCHAR},
             #{description, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
@@ -25,12 +25,12 @@
     values 
     <foreach collection="list" item="eventDefinition" index="index" separator=",">
         (#{eventDefinition.id, jdbcType=VARCHAR},
-         #{eventDefinition.category, jdbcType=VARCHAR},
-         #{eventDefinition.name, jdbcType=VARCHAR},
+         #{eventDefinition.category, jdbcType=NVARCHAR},
+         #{eventDefinition.name, jdbcType=NVARCHAR},
          #{eventDefinition.key, jdbcType=VARCHAR}, 
          #{eventDefinition.version, jdbcType=INTEGER},
          #{eventDefinition.deploymentId, jdbcType=VARCHAR},
-         #{eventDefinition.resourceName, jdbcType=VARCHAR},
+         #{eventDefinition.resourceName, jdbcType=NVARCHAR},
          #{eventDefinition.description, jdbcType=VARCHAR},
          #{eventDefinition.tenantId, jdbcType=VARCHAR})
     </foreach>
@@ -41,12 +41,12 @@
     <foreach collection="list" item="eventDefinition" index="index">
         INTO ${prefix}FLW_EVENT_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
         (#{eventDefinition.id, jdbcType=VARCHAR},
-         #{eventDefinition.category, jdbcType=VARCHAR},
-         #{eventDefinition.name, jdbcType=VARCHAR},
+         #{eventDefinition.category, jdbcType=NVARCHAR},
+         #{eventDefinition.name, jdbcType=NVARCHAR},
          #{eventDefinition.key, jdbcType=VARCHAR}, 
          #{eventDefinition.version, jdbcType=INTEGER},
          #{eventDefinition.deploymentId, jdbcType=VARCHAR},
-         #{eventDefinition.resourceName, jdbcType=VARCHAR},
+         #{eventDefinition.resourceName, jdbcType=NVARCHAR},
          #{eventDefinition.description, jdbcType=VARCHAR},
          #{eventDefinition.tenantId, jdbcType=VARCHAR})                        
     </foreach>
@@ -58,7 +58,7 @@
   <update id="updateEventDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityImpl">
     update ${prefix}FLW_EVENT_DEFINITION
     <set>
-        CATEGORY_ = #{category, jdbcType=VARCHAR},
+        CATEGORY_ = #{category, jdbcType=NVARCHAR},
     </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
@@ -80,12 +80,12 @@
 
   <resultMap id="eventDefinitionResultMap" type="org.flowable.eventregistry.impl.persistence.entity.EventDefinitionEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
-    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
   </resultMap>
@@ -126,22 +126,22 @@
         </foreach>
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
+        and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=NVARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=VARCHAR}${wildcardEscapeClause})
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key, jdbcType=VARCHAR}
@@ -168,10 +168,10 @@
         and RES.VERSION_ &lt;= #{versionLte, jdbcType=INTEGER}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=NVARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=NVARCHAR}
       </if>
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}

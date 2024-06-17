@@ -7,7 +7,7 @@
     <resultMap id="jobResultMap" type="org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl">
         <id property="id" column="ID_" jdbcType="NVARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
-        <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+        <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
         <result property="jobType" column="TYPE_" jdbcType="NVARCHAR" />
         <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
         <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
@@ -94,7 +94,7 @@
         TENANT_ID_)
         values (#{id, jdbcType=NVARCHAR},
         #{revision, jdbcType=INTEGER},
-        #{category, jdbcType=NVARCHAR},
+        #{category, jdbcType=VARCHAR},
         #{jobType, jdbcType=NVARCHAR},
         #{exclusive, jdbcType=BOOLEAN},
         #{executionId, jdbcType=NVARCHAR},
@@ -150,7 +150,7 @@
         <foreach collection="list" item="suspendedJob" index="index" separator=",">
             (#{suspendedJob.id, jdbcType=NVARCHAR},
             #{suspendedJob.revision, jdbcType=INTEGER},
-            #{suspendedJob.category, jdbcType=NVARCHAR},
+            #{suspendedJob.category, jdbcType=VARCHAR},
             #{suspendedJob.jobType, jdbcType=NVARCHAR},
             #{suspendedJob.exclusive, jdbcType=BOOLEAN},
             #{suspendedJob.executionId, jdbcType=NVARCHAR},
@@ -207,7 +207,7 @@
             TENANT_ID_) VALUES
             (#{suspendedJob.id, jdbcType=NVARCHAR},
             #{suspendedJob.revision, jdbcType=INTEGER},
-            #{suspendedJob.category, jdbcType=NVARCHAR},
+            #{suspendedJob.category, jdbcType=VARCHAR},
             #{suspendedJob.jobType, jdbcType=NVARCHAR},
             #{suspendedJob.exclusive, jdbcType=BOOLEAN},
             #{suspendedJob.executionId, jdbcType=NVARCHAR},
@@ -284,10 +284,10 @@
                 and RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR})
             </if>
             <if test="category != null">
-                and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
+                and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
             </if>
             <if test="categoryLike != null">
-                and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
             </if>
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR}
@@ -407,7 +407,7 @@
                 PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.category != category">
-                CATEGORY_ = #{category, jdbcType=NVARCHAR},
+                CATEGORY_ = #{category, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.elementId != elementId">
                 ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR},
