@@ -8,12 +8,12 @@
     insert into ${prefix}ACT_CMMN_CASEDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
     		1, #{category, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
-            #{resourceName, jdbcType=VARCHAR},
-            #{diagramResourceName, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=NVARCHAR},
+            #{diagramResourceName, jdbcType=NVARCHAR},
             #{description, jdbcType=VARCHAR},
             #{hasStartFormKey, jdbcType=BOOLEAN},
             #{isGraphicalNotationDefined, jdbcType=BOOLEAN},
@@ -26,12 +26,12 @@
       <foreach collection="list" item="caseDefinition" index="index" separator=","> 
         (#{caseDefinition.id, jdbcType=VARCHAR},
          1, #{caseDefinition.category, jdbcType=VARCHAR},
-         #{caseDefinition.name, jdbcType=VARCHAR},
+         #{caseDefinition.name, jdbcType=NVARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
          #{caseDefinition.deploymentId, jdbcType=VARCHAR},
-         #{caseDefinition.resourceName, jdbcType=VARCHAR},
-         #{caseDefinition.diagramResourceName, jdbcType=VARCHAR},
+         #{caseDefinition.resourceName, jdbcType=NVARCHAR},
+         #{caseDefinition.diagramResourceName, jdbcType=NVARCHAR},
          #{caseDefinition.description, jdbcType=VARCHAR},
          #{caseDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{caseDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
@@ -46,12 +46,12 @@
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , TENANT_ID_) VALUES 
         (#{caseDefinition.id, jdbcType=VARCHAR},
          1, #{caseDefinition.category, jdbcType=VARCHAR},
-         #{caseDefinition.name, jdbcType=VARCHAR},
+         #{caseDefinition.name, jdbcType=NVARCHAR},
          #{caseDefinition.key, jdbcType=VARCHAR}, 
          #{caseDefinition.version, jdbcType=INTEGER},
          #{caseDefinition.deploymentId, jdbcType=VARCHAR},
-         #{caseDefinition.resourceName, jdbcType=VARCHAR},
-         #{caseDefinition.diagramResourceName, jdbcType=VARCHAR},
+         #{caseDefinition.resourceName, jdbcType=NVARCHAR},
+         #{caseDefinition.diagramResourceName, jdbcType=NVARCHAR},
          #{caseDefinition.description, jdbcType=VARCHAR},
          #{caseDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{caseDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
@@ -82,12 +82,12 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR"/>
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
-    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
-    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="isGraphicalNotationDefined" column="HAS_GRAPHICAL_NOTATION_" jdbcType="BOOLEAN" />
@@ -199,13 +199,13 @@
         and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=VARCHAR}${wildcardEscapeClause})
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key, jdbcType=VARCHAR}
@@ -214,10 +214,10 @@
         and RES.KEY_ like #{keyLike, jdbcType=VARCHAR}${wildcardEscapeClause}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=NVARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version, jdbcType=INTEGER}

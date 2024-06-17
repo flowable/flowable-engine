@@ -8,14 +8,14 @@
 
   <insert id="insertCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
     insert into ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_)
-    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=NVARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
   </insert>
 
   <insert id="bulkInsertCmmnResource" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
       <foreach collection="list" item="cmmnResource" index="index" separator=","> 
         (#{cmmnResource.id, jdbcType=VARCHAR},
-         #{cmmnResource.name, jdbcType=VARCHAR},
+         #{cmmnResource.name, jdbcType=NVARCHAR},
          #{cmmnResource.bytes, jdbcType=${blobType}},
          #{cmmnResource.deploymentId, jdbcType=VARCHAR},
          #{cmmnResource.generated, jdbcType=BOOLEAN})
@@ -27,7 +27,7 @@
       <foreach collection="list" item="cmmnResource" index="index"> 
         INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
         (#{cmmnResource.id, jdbcType=VARCHAR},
-         #{cmmnResource.name, jdbcType=VARCHAR},
+         #{cmmnResource.name, jdbcType=NVARCHAR},
          #{cmmnResource.bytes, jdbcType=${blobType}},
          #{cmmnResource.deploymentId, jdbcType=VARCHAR},
          #{cmmnResource.generated, jdbcType=BOOLEAN})
@@ -45,7 +45,7 @@
 
   <resultMap id="cmmnResourceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
     <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
@@ -59,7 +59,7 @@
   <select id="selectCmmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="cmmnResourceResultMap">
     select * from ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE 
     where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
-          AND NAME_ = #{name, jdbcType=VARCHAR}
+          AND NAME_ = #{name, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectCmmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnResourceResultMap">

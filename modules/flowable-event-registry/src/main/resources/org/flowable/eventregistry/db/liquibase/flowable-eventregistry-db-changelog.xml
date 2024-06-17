@@ -105,5 +105,16 @@
     <changeSet id="3" author="flowable">
         <customChange class="org.flowable.eventregistry.impl.db.SetChannelDefinitionTypeAndImplementationCustomChange" />
     </changeSet>
+    
+    <changeSet id="4" author="flowable" dbms="mssql">
+        <modifyDataType tableName="FLW_EVENT_DEPLOYMENT" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_EVENT_RESOURCE" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_CHANNEL_DEFINITION" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_CHANNEL_DEFINITION" columnName="CATEGORY_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_CHANNEL_DEFINITION" columnName="RESOURCE_NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="CATEGORY_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="RESOURCE_NAME_" newDataType="nvarchar(255)" />
+    </changeSet>
 
 </databaseChangeLog>

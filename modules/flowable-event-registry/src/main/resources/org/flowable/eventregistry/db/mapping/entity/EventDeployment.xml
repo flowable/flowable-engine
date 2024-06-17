@@ -10,7 +10,7 @@
     insert into ${prefix}FLW_EVENT_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values
     (#{id, jdbcType=VARCHAR}, 
-     #{name, jdbcType=VARCHAR}, 
+     #{name, jdbcType=NVARCHAR}, 
      #{category, jdbcType=VARCHAR}, 
      #{tenantId, jdbcType=VARCHAR}, 
      #{deploymentTime, jdbcType=TIMESTAMP}, 
@@ -22,7 +22,7 @@
     values
     <foreach collection="list" item="eventDeployment" index="index" separator=",">
         (#{eventDeployment.id, jdbcType=VARCHAR}, 
-         #{eventDeployment.name, jdbcType=VARCHAR}, 
+         #{eventDeployment.name, jdbcType=NVARCHAR}, 
          #{eventDeployment.category, jdbcType=VARCHAR}, 
          #{eventDeployment.tenantId, jdbcType=VARCHAR}, 
          #{eventDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
@@ -35,7 +35,7 @@
     <foreach collection="list" item="eventDeployment" index="index">
          INTO ${prefix}FLW_EVENT_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
          (#{eventDeployment.id, jdbcType=VARCHAR}, 
-          #{eventDeployment.name, jdbcType=VARCHAR}, 
+          #{eventDeployment.name, jdbcType=NVARCHAR}, 
           #{eventDeployment.category, jdbcType=VARCHAR}, 
           #{eventDeployment.tenantId, jdbcType=VARCHAR}, 
           #{eventDeployment.deploymentTime, jdbcType=TIMESTAMP}, 
@@ -66,7 +66,7 @@
   
   <resultMap id="eventDeploymentResultMap" type="org.flowable.eventregistry.impl.persistence.entity.EventDeploymentEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
@@ -95,10 +95,10 @@
         RES.ID_ = #{deploymentId, jdbcType=VARCHAR}
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}

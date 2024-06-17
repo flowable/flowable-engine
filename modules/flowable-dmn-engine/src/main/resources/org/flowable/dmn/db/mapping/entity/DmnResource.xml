@@ -8,14 +8,14 @@
 
   <insert id="insertDmnResource" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
     insert into ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
-    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=NVARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
   </insert>
 
   <insert id="bulkInsertDmnResource" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
       <foreach collection="list" item="resource" index="index" separator=",">
         (#{resource.id, jdbcType=VARCHAR},
-         #{resource.name, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=NVARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
          #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
@@ -26,7 +26,7 @@
       <foreach collection="list" item="resource" index="index"> 
         INTO ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
         (#{resource.id, jdbcType=VARCHAR},
-         #{resource.name, jdbcType=VARCHAR},
+         #{resource.name, jdbcType=NVARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
          #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
@@ -53,7 +53,7 @@
 
   <resultMap id="dmnResourceResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
     <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
   </resultMap>
   
@@ -66,7 +66,7 @@
   <select id="selectDmnResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="dmnResourceResultMap">
     select * from ${prefix}ACT_DMN_DEPLOYMENT_RESOURCE 
     where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
-          AND NAME_ = #{resourceName, jdbcType=VARCHAR}
+          AND NAME_ = #{resourceName, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectDmnResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="dmnResourceResultMap">

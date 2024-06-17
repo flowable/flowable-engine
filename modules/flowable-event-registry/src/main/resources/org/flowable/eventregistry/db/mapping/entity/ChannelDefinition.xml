@@ -10,15 +10,15 @@
     insert into ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_,
     	CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
-            #{category, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{category, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER}, 
             #{type, jdbcType=VARCHAR},
             #{implementation, jdbcType=VARCHAR},
             #{deploymentId, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
-            #{resourceName, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=NVARCHAR},
             #{description, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
@@ -28,15 +28,15 @@
     values 
     <foreach collection="list" item="channelDefinition" index="index" separator=",">
         (#{channelDefinition.id, jdbcType=VARCHAR},
-         #{channelDefinition.category, jdbcType=VARCHAR},
-         #{channelDefinition.name, jdbcType=VARCHAR},
+         #{channelDefinition.category, jdbcType=NVARCHAR},
+         #{channelDefinition.name, jdbcType=NVARCHAR},
          #{channelDefinition.key, jdbcType=VARCHAR}, 
          #{channelDefinition.version, jdbcType=INTEGER},
          #{channelDefinition.type, jdbcType=VARCHAR},
          #{channelDefinition.implementation, jdbcType=VARCHAR},
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
-         #{channelDefinition.resourceName, jdbcType=VARCHAR},
+         #{channelDefinition.resourceName, jdbcType=NVARCHAR},
          #{channelDefinition.description, jdbcType=VARCHAR},
          #{channelDefinition.tenantId, jdbcType=VARCHAR})
     </foreach>
@@ -47,15 +47,15 @@
     <foreach collection="list" item="channelDefinition" index="index">
         INTO ${prefix}FLW_CHANNEL_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, TYPE_, IMPLEMENTATION_, DEPLOYMENT_ID_, CREATE_TIME_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES
         (#{channelDefinition.id, jdbcType=VARCHAR},
-         #{channelDefinition.category, jdbcType=VARCHAR},
-         #{channelDefinition.name, jdbcType=VARCHAR},
+         #{channelDefinition.category, jdbcType=NVARCHAR},
+         #{channelDefinition.name, jdbcType=NVARCHAR},
          #{channelDefinition.key, jdbcType=VARCHAR}, 
          #{channelDefinition.version, jdbcType=INTEGER},
          #{channelDefinition.type, jdbcType=VARCHAR},
          #{channelDefinition.implementation, jdbcType=VARCHAR},
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
-         #{channelDefinition.resourceName, jdbcType=VARCHAR},
+         #{channelDefinition.resourceName, jdbcType=NVARCHAR},
          #{channelDefinition.description, jdbcType=VARCHAR},
          #{channelDefinition.tenantId, jdbcType=VARCHAR})                        
     </foreach>
@@ -67,7 +67,7 @@
   <update id="updateChannelDefinition" parameterType="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
     update ${prefix}FLW_CHANNEL_DEFINITION
     <set>
-       CATEGORY_ = #{category, jdbcType=VARCHAR},
+       CATEGORY_ = #{category, jdbcType=NVARCHAR},
     </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
@@ -99,15 +99,15 @@
 
   <resultMap id="channelDefinitionResultMap" type="org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
     <result property="implementation" column="IMPLEMENTATION_" jdbcType="VARCHAR"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
-    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
   </resultMap>
@@ -148,22 +148,22 @@
         </foreach>
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
+        and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=NVARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=VARCHAR}${wildcardEscapeClause})
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key, jdbcType=VARCHAR}
@@ -208,10 +208,10 @@
         and RES.CREATE_TIME &lt; #{createTimeBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=NVARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=NVARCHAR}
       </if>
       <if test="deploymentId != null">
         and RES.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}

@@ -156,5 +156,14 @@
         </createIndex>
 
     </changeSet>
+    
+    <changeSet id="10" author="flowable" dbms="mssql">
+        <modifyDataType tableName="ACT_DMN_DEPLOYMENT" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_DMN_DEPLOYMENT_RESOURCE" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_DMN_DECISION" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_DMN_DECISION" columnName="CATEGORY_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_DMN_DECISION" columnName="RESOURCE_NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_DMN_DECISION" columnName="DESCRIPTION_" newDataType="nvarchar(255)" />
+    </changeSet>
 
 </databaseChangeLog>

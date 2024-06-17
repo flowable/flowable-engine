@@ -10,13 +10,13 @@
     insert into ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_,
     	RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_, DECISION_TYPE_)
     values (#{id, jdbcType=VARCHAR},
-            #{category, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{category, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{key, jdbcType=VARCHAR}, 
             #{version, jdbcType=INTEGER},
             #{deploymentId, jdbcType=VARCHAR},
-            #{resourceName, jdbcType=VARCHAR},
-            #{description, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=NVARCHAR},
+            #{description, jdbcType=NVARCHAR},
             #{tenantId, jdbcType=VARCHAR},
             #{decisionType, jdbcType=VARCHAR})
   </insert>
@@ -27,13 +27,13 @@
     values 
     <foreach collection="list" item="decision" index="index" separator=",">
         (#{decision.id, jdbcType=VARCHAR},
-         #{decision.category, jdbcType=VARCHAR},
-         #{decision.name, jdbcType=VARCHAR},
+         #{decision.category, jdbcType=NVARCHAR},
+         #{decision.name, jdbcType=NVARCHAR},
          #{decision.key, jdbcType=VARCHAR}, 
          #{decision.version, jdbcType=INTEGER},
          #{decision.deploymentId, jdbcType=VARCHAR},
-         #{decision.resourceName, jdbcType=VARCHAR},
-         #{decision.description, jdbcType=VARCHAR},
+         #{decision.resourceName, jdbcType=NVARCHAR},
+         #{decision.description, jdbcType=NVARCHAR},
          #{decision.tenantId, jdbcType=VARCHAR},
          #{decision.decisionType, jdbcType=VARCHAR})
     </foreach>
@@ -45,13 +45,13 @@
         INTO ${prefix}ACT_DMN_DECISION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
             RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_, DECISION_TYPE_) VALUES
             (#{decision.id, jdbcType=VARCHAR},
-             #{decision.category, jdbcType=VARCHAR},
-             #{decision.name, jdbcType=VARCHAR},
+             #{decision.category, jdbcType=NVARCHAR},
+             #{decision.name, jdbcType=NVARCHAR},
              #{decision.key, jdbcType=VARCHAR}, 
              #{decision.version, jdbcType=INTEGER},
              #{decision.deploymentId, jdbcType=VARCHAR},
-             #{decision.resourceName, jdbcType=VARCHAR},
-             #{decision.description, jdbcType=VARCHAR},
+             #{decision.resourceName, jdbcType=NVARCHAR},
+             #{decision.description, jdbcType=NVARCHAR},
              #{decision.tenantId, jdbcType=VARCHAR},
              #{decision.decisionType, jdbcType=VARCHAR})
     </foreach>
@@ -63,7 +63,7 @@
   <update id="updateDecision" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityImpl">
     update ${prefix}ACT_DMN_DECISION
     <set>
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
+      CATEGORY_ = #{category, jdbcType=NVARCHAR},
     </set>
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
@@ -85,14 +85,14 @@
 
   <resultMap id="decisionResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
-    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
     <result property="decisionType" column="DECISION_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
 
@@ -132,19 +132,19 @@
         </foreach>
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
+        and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=NVARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name, jdbcType=VARCHAR}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike, jdbcType=VARCHAR}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="key != null">
         and RES.KEY_ = #{key, jdbcType=VARCHAR}
@@ -153,10 +153,10 @@
         and RES.KEY_ like #{keyLike, jdbcType=VARCHAR}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=NVARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=VARCHAR}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=NVARCHAR}
       </if>
       <if test="version != null">
         and RES.VERSION_ = #{version, jdbcType=INTEGER}

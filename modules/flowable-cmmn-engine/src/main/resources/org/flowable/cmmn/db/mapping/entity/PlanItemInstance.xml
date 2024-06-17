@@ -20,7 +20,7 @@
             #{elementId, jdbcType=VARCHAR},
             #{planItemDefinitionId, jdbcType=VARCHAR},
             #{planItemDefinitionType, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
+            #{name, jdbcType=NVARCHAR},
             #{state, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{lastAvailableTime, jdbcType=TIMESTAMP},
@@ -66,7 +66,7 @@
             #{planItemInstance.elementId, jdbcType=VARCHAR},
             #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
             #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
-            #{planItemInstance.name, jdbcType=VARCHAR},
+            #{planItemInstance.name, jdbcType=NVARCHAR},
             #{planItemInstance.state, jdbcType=VARCHAR},
             #{planItemInstance.createTime, jdbcType=TIMESTAMP},
             #{planItemInstance.lastAvailableTime, jdbcType=TIMESTAMP},
@@ -113,7 +113,7 @@
                 #{planItemInstance.elementId, jdbcType=VARCHAR},
                 #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
                 #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
-                #{planItemInstance.name, jdbcType=VARCHAR},
+                #{planItemInstance.name, jdbcType=NVARCHAR},
                 #{planItemInstance.state, jdbcType=VARCHAR},
                 #{planItemInstance.createTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.lastAvailableTime, jdbcType=TIMESTAMP},
@@ -172,7 +172,7 @@
             ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.name != name">
-            NAME_ = #{name, jdbcType=VARCHAR},
+            NAME_ = #{name, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.state != state">
             STATE_ = #{state, jdbcType=VARCHAR},
@@ -280,7 +280,7 @@
     <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
     <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR" />
     <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="lastAvailableTime" column="LAST_AVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
@@ -376,7 +376,7 @@
              and RES.ITEM_DEFINITION_TYPE_ in <foreach item="planItemDefinitionType" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{planItemDefinitionType, jdbcType=VARCHAR}</foreach>
         </if>
         <if test="name != null">
-            and RES.NAME_ = #{name, jdbcType=VARCHAR}
+            and RES.NAME_ = #{name, jdbcType=NVARCHAR}
         </if>
         <if test="state != null">
             and RES.STATE_ = #{state, jdbcType=VARCHAR}

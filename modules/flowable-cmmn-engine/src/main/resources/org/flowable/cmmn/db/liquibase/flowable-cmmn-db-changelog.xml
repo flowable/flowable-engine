@@ -591,15 +591,22 @@
         </createIndex>
     </changeSet>
 
-<!--    <changeSet id="19" author="flowable" dbms="mssql">-->
-<!--        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="NAME_" newDataType="nvarchar(255)" />-->
-<!--        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="START_USER_ID_" newDataType="nvarchar(255)" />-->
-<!--        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="BUSINESS_STATUS_" newDataType="nvarchar(255)" />-->
-
-<!--        &lt;!&ndash; TENANT_ID_ has a default value set &ndash;&gt;-->
-<!--        <dropDefaultValue tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" />-->
-<!--        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" newDataType="nvarchar(255)" />-->
-<!--        <addDefaultValue tableName="ACT_CMMN_RU_CASE_INST" columnName="TENANT_ID_" defaultValue="" />-->
-<!--    </changeSet>-->
+    <changeSet id="19" author="flowable" dbms="mssql">
+        <modifyDataType tableName="ACT_CMMN_DEPLOYMENT" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_DEPLOYMENT_RESOURCE" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="RESOURCE_NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="DGRM_RESOURCE_NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="BUSINESS_KEY_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_CASE_INST" columnName="BUSINESS_STATUS_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_MIL_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_RU_PLAN_ITEM_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_HI_MIL_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_HI_PLAN_ITEM_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="NAME_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="BUSINESS_KEY_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="BUSINESS_STATUS_" newDataType="nvarchar(255)" />
+    </changeSet>
 
 </databaseChangeLog>
