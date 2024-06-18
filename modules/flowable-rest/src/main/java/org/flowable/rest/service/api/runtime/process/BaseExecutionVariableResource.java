@@ -187,7 +187,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
             throw new FlowableIllegalArgumentException("Variable name is required");
         }
 
-        // Figure out scope, revert to local is omitted
+        // Figure out scope, revert to local if omitted
         RestVariableScope scope = restVariable.getVariableScope();
         if (scope == null) {
             scope = RestVariableScope.LOCAL;
