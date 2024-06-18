@@ -26,7 +26,14 @@ public class FlowableStringTypeHandler extends BaseTypeHandler<String> {
             }
             try {
                 if (useDefaultJdbcType) {
-                    ps.setNull(i,  jdbcType.TYPE_CODE);
+                    JdbcType finalJdbcType = null;
+                    if (jdbcType.equals(JdbcType.NVARCHAR)) {
+                        finalJdbcType = JdbcType.VARCHAR;
+                    } else {
+                        finalJdbcType = jdbcType;
+                    }
+                    ps.setNull(i,  finalJdbcType.TYPE_CODE);
+                    
                 } else {
                     ps.setNull(i, Types.NULL);
                 }
