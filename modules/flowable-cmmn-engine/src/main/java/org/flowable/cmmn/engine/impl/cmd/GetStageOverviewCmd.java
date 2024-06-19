@@ -83,10 +83,20 @@ public class GetStageOverviewCmd implements Command<List<StageResponse>>, Serial
         
         List<OverviewElement> overviewElements = new ArrayList<>();
         for (Stage stage : stages) {
-            overviewElements.add(new OverviewElement(stage.getId(), stage.getName(), stage.getDisplayOrder(), stage.getIncludeInStageOverview(), stage));
+            OverviewElement overviewElement = new OverviewElement(stage.getId(), stage.getName(), stage.getDisplayOrder(), stage.getIncludeInStageOverview(), stage);
+            Optional<PlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, stage);
+            if (planItemInstance.isPresent() && StringUtils.isNotEmpty(planItemInstance.get().getName())) {
+                overviewElement.setName(planItemInstance.get().getName());
+            }
+            overviewElements.add(overviewElement);
         }
         for (Milestone milestone : milestones) {
-            overviewElements.add(new OverviewElement(milestone.getId(), milestone.getName(), milestone.getDisplayOrder(), milestone.getIncludeInStageOverview(), milestone));
+            OverviewElement overviewElement = new OverviewElement(milestone.getId(), milestone.getName(), milestone.getDisplayOrder(), milestone.getIncludeInStageOverview(), milestone);
+            Optional<PlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, milestone);
+            if (planItemInstance.isPresent() && StringUtils.isNotEmpty(planItemInstance.get().getName())) {
+                overviewElement.setName(planItemInstance.get().getName());
+            }
+            overviewElements.add(overviewElement);
         }
 
         // If one stage has a display order, they are ordered by that.
