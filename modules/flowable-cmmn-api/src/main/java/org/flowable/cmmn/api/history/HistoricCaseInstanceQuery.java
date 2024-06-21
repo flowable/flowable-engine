@@ -60,6 +60,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the given business key.
      */
     HistoricCaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
+    
+    /**
+     * Only select historic case instances with a business key like the given value.
+     */
+    HistoricCaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
+    
+    /**
+     * Only select historic case instances with a business key like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseInstanceBusinessKeyLikeIgnoreCase(String caseInstanceBusinessKeyLikeIgnoreCase);
 
     /**
      * Only select historic case instances with the given case instance root scope id.
@@ -77,6 +87,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseInstanceBusinessStatus(String caseInstanceBusinessStatus);
     
     /**
+     * Only select historic case instances with a business status like the given value.
+     */
+    HistoricCaseInstanceQuery caseInstanceBusinessStatusLike(String caseInstanceBusinessStatusLike);
+    
+    /**
+     * Only select historic case instances with a business status like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseInstanceBusinessStatusLikeIgnoreCase(String caseInstanceBusinessStatusLikeIgnoreCase);
+    
+    /**
      * Only select historic case instances with the parent identifier.
      */
     HistoricCaseInstanceQuery caseInstanceParentId(String parentId);
@@ -90,6 +110,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances with the given key.
      */
     HistoricCaseInstanceQuery caseDefinitionKey(String caseDefinitionKey);
+    
+    /**
+     * Only select historic case instances with a definition key like the given value.
+     */
+    HistoricCaseInstanceQuery caseDefinitionKeyLike(String caseDefinitionKeyLike);
+    
+    /**
+     * Only select historic case instances with a definition key like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase);
     
     /**
      * Only select historic case instances with the given keys.
@@ -112,9 +142,29 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseDefinitionCategory(String caseDefinitionCategory);
     
     /**
+     * Only select historic case instances with a case definition category like the given value.
+     */
+    HistoricCaseInstanceQuery caseDefinitionCategoryLike(String caseDefinitionCategoryLike);
+    
+    /**
+     * Only select historic case instances with a case definition category like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseDefinitionCategoryLikeIgnoreCase(String caseDefinitionCategoryLikeIgnoreCase);
+    
+    /**
      * Only select historic case instances with the given case definition name.
      */
     HistoricCaseInstanceQuery caseDefinitionName(String caseDefinitionName);
+    
+    /**
+     * Only select historic case instances with a case definition name like the given value.
+     */
+    HistoricCaseInstanceQuery caseDefinitionNameLike(String caseDefinitionNameLike);
+    
+    /**
+     * Only select historic case instances with a case definition name like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseDefinitionNameLikeIgnoreCase(String caseDefinitionNameLikeIgnoreCase);
     
     /**
      * Only select historic case instances with the given case definition version.
@@ -220,6 +270,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have the tenant identifier.
      */
     HistoricCaseInstanceQuery caseInstanceTenantId(String tenantId);
+    
+    /**
+     * Only select historic case instances with a tenant identifier like the given value.
+     */
+    HistoricCaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);
+    
+    /**
+     * Only select historic case instances with a tenant identifier like the given value, ignoring upper/lower case.
+     */
+    HistoricCaseInstanceQuery caseInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
     
     /**
      * Only select historic case instances that have no tenant identifier.

@@ -62,16 +62,26 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return case instances like given case definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like given case definition key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLike", dataType = "string", value = "Only return case instances like the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given case definition category, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLike", dataType = "string", value = "Only return case instances like the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given case definition name, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return case instances with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return case instances like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return case instances like the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given business key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLike", dataType = "string", value = "Only return case instances like the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given business status, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceParentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return case instances started by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return case instances started before the given date.", paramType = "query"),
@@ -88,6 +98,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return case instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return case instances with a tenantId like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return case instances with a tenantId like the given value, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns case instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,caseDefinitionId,tenantId,caseDefinitionKey", paramType = "query"),
     })
@@ -107,6 +118,14 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("caseDefinitionKey")) {
             queryRequest.setCaseDefinitionKey(allRequestParams.get("caseDefinitionKey"));
         }
+        
+        if (allRequestParams.containsKey("caseDefinitionKeyLike")) {
+            queryRequest.setCaseDefinitionKeyLike(allRequestParams.get("caseDefinitionKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionKeyLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionKeyLikeIgnoreCase(allRequestParams.get("caseDefinitionKeyLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("caseDefinitionId")) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
@@ -116,8 +135,24 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
         }
         
+        if (allRequestParams.containsKey("caseDefinitionCategoryLike")) {
+            queryRequest.setCaseDefinitionCategoryLike(allRequestParams.get("caseDefinitionCategoryLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionCategoryLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionCategoryLikeIgnoreCase(allRequestParams.get("caseDefinitionCategoryLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.containsKey("caseDefinitionName")) {
             queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionNameLike")) {
+            queryRequest.setCaseDefinitionNameLike(allRequestParams.get("caseDefinitionNameLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionNameLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionNameLikeIgnoreCase(allRequestParams.get("caseDefinitionNameLikeIgnoreCase"));
         }
         
         if (allRequestParams.containsKey("name")) {
@@ -144,8 +179,24 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
         }
         
+        if (allRequestParams.containsKey("businessKeyLike")) {
+            queryRequest.setCaseInstanceBusinessKeyLike(allRequestParams.get("businessKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessKeyLikeIgnoreCase")) {
+            queryRequest.setCaseInstanceBusinessKeyLikeIgnoreCase(allRequestParams.get("businessKeyLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.containsKey("businessStatus")) {
             queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLike")) {
+            queryRequest.setCaseInstanceBusinessStatusLike(allRequestParams.get("businessStatusLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLikeIgnoreCase")) {
+            queryRequest.setCaseInstanceBusinessStatusLikeIgnoreCase(allRequestParams.get("businessStatusLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("caseInstanceParentId")) {
@@ -210,6 +261,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("tenantIdLike")) {
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (allRequestParams.containsKey("tenantIdLikeIgnoreCase")) {
+            queryRequest.setTenantIdLikeIgnoreCase(allRequestParams.get("tenantIdLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("withoutTenantId")) {

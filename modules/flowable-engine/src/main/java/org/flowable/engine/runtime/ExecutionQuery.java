@@ -28,6 +28,12 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /** Only select executions which have the given process definition key. **/
     ExecutionQuery processDefinitionKey(String processDefinitionKey);
+    
+    /** Only select executions which have a process definition key like the given value. **/
+    ExecutionQuery processDefinitionKeyLike(String processDefinitionKeyLike);
+    
+    /** Only select executions which have a process definition key like the given value, ignoring upper/lower case. **/
+    ExecutionQuery processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase);
 
     /** Only select executions which have process definitions with the given keys. **/
     ExecutionQuery processDefinitionKeys(Set<String> processDefinitionKeys);
@@ -37,9 +43,21 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /** Only select executions which have the given process definition category. */
     ExecutionQuery processDefinitionCategory(String processDefinitionCategory);
+    
+    /** Only select executions which have a process definition category like the given value. */
+    ExecutionQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
+    
+    /** Only select executions which have a process definition category like the given value, ignoring upper/lower case. */
+    ExecutionQuery processDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase);
 
     /** Only select executions which have the given process definition name. */
     ExecutionQuery processDefinitionName(String processDefinitionName);
+    
+    /** Only select executions which have a process definition name like the given value. */
+    ExecutionQuery processDefinitionNameLike(String processDefinitionNameLike);
+    
+    /** Only select executions which have a process definition name like the given value, ignoring upper/lower case. */
+    ExecutionQuery processDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase);
 
     /** Only select executions which have the given process definition engine version. */
     ExecutionQuery processDefinitionEngineVersion(String processDefinitionEngineVersion);
@@ -67,6 +85,32 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
      * Only executions with the given business key. Similar to {@link #processInstanceBusinessKey(String)}, but allows to choose whether child executions are returned or not.
      */
     ExecutionQuery processInstanceBusinessKey(String processInstanceBusinessKey, boolean includeChildExecutions);
+    
+    /**
+     * Only executions that have a business key like the given value.
+     * 
+     * Note that only process instances have a business key and as such, child executions will NOT be returned. If you want to return child executions of the process instance with the given business
+     * key too, use the {@link #processInstanceBusinessKeyLike(String, boolean)} method with a boolean value of <i>true</i> instead.
+     */
+    ExecutionQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike);
+    
+    /**
+     * Only executions that have a business key like the given value. Similar to {@link #processInstanceBusinessKeyLike(String)}, but allows to choose whether child executions are returned or not.
+     */
+    ExecutionQuery processInstanceBusinessKeyLike(String processInstanceBusinessKeyLike, boolean includeChildExecutions);
+    
+    /**
+     * Only executions that have a business key like the given value, ignoring upper/lower case.
+     * 
+     * Note that only process instances have a business key and as such, child executions will NOT be returned. If you want to return child executions of the process instance with the given business
+     * key too, use the {@link #processInstanceBusinessKeyLikeIgnoreCase(String, boolean)} method with a boolean value of <i>true</i> instead.
+     */
+    ExecutionQuery processInstanceBusinessKeyLikeIgnoreCase(String processInstanceBusinessKeyLikeIgnoreCase);
+    
+    /**
+     * Only executions that have a business key like the given value, ignoring upper/lower case. Similar to {@link #processInstanceBusinessKeyLikeIgnoreCase(String)}, but allows to choose whether child executions are returned or not.
+     */
+    ExecutionQuery processInstanceBusinessKeyLikeIgnoreCase(String processInstanceBusinessKeyLikeIgnoreCase, boolean includeChildExecutions);
 
     /** Only select executions with the given id. **/
     ExecutionQuery executionId(String executionId);
@@ -103,6 +147,11 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
      * Only select process instances with a tenant id like the given one.
      */
     ExecutionQuery executionTenantIdLike(String tenantIdLike);
+    
+    /**
+     * Only select process instances with a tenant id like the given one, ignoring upper/lower case.
+     */
+    ExecutionQuery executionTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
 
     /**
      * Only select process instances that do not have a tenant id.
