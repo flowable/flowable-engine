@@ -189,11 +189,11 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike(processDefinitionKey).list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").list()).hasSize(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("none%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").list()).hasSize(1);
         
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase(processDefinitionKey).list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(1);
-        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("none%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(1);
 
         // now complete the task to end the process instance
         org.flowable.task.api.Task task = taskService.createTaskQuery().processDefinitionKey("checkCreditProcess").singleResult();
