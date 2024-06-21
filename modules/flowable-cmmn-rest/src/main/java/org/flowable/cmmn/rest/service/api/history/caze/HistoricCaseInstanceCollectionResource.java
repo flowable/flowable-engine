@@ -47,16 +47,26 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The case definition key of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return historic case instances like the given case definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return historic case instances with the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLike", dataType = "string", value = "Only return historic case instances like the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition category, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return historic case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLike", dataType = "string", value = "Only return historic case instances like the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition name, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return historic case instances with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return historic case instances like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return historic case instances like the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given business key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLike", dataType = "string", value = "Only return historic case instances like the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given business status, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic case instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "finishedAfter", dataType = "string", format="date-time",  value = "Return only historic case instances that were finished after this date.", paramType = "query"),
@@ -74,7 +84,9 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return historic case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return historic case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "An indication if the historic case instance variables should be returned as well.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenant id.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances like the given tenant id.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return instances like the given tenant id, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.\n", paramType = "query"),
             @ApiImplicitParam(name = "withoutCaseInstanceParentId", dataType = "boolean", value = "If true, only returns instances without a parent set. If false, the withoutCaseInstanceParentId parameter is ignored.\n", paramType = "query"),
             @ApiImplicitParam(name = "withoutCaseInstanceCallbackId", dataType = "boolean", value = "If true, only returns instances without a callbackId set. If false, the withoutCaseInstanceCallbackId parameter is ignored.\n", paramType = "query")
@@ -94,6 +106,14 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.get("caseDefinitionKey") != null) {
             queryRequest.setCaseDefinitionKey(allRequestParams.get("caseDefinitionKey"));
         }
+        
+        if (allRequestParams.get("caseDefinitionKeyLike") != null) {
+            queryRequest.setCaseDefinitionKeyLike(allRequestParams.get("caseDefinitionKeyLike"));
+        }
+        
+        if (allRequestParams.get("caseDefinitionKeyLikeIgnoreCase") != null) {
+            queryRequest.setCaseDefinitionKeyLikeIgnoreCase(allRequestParams.get("caseDefinitionKeyLikeIgnoreCase"));
+        }
 
         if (allRequestParams.get("caseDefinitionId") != null) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
@@ -103,8 +123,24 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
         }
         
+        if (allRequestParams.get("caseDefinitionCategoryLike") != null) {
+            queryRequest.setCaseDefinitionCategoryLike(allRequestParams.get("caseDefinitionCategoryLike"));
+        }
+        
+        if (allRequestParams.get("caseDefinitionCategoryLikeIgnoreCase") != null) {
+            queryRequest.setCaseDefinitionCategoryLikeIgnoreCase(allRequestParams.get("caseDefinitionCategoryLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.get("caseDefinitionName") != null) {
             queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
+        
+        if (allRequestParams.get("caseDefinitionNameLike") != null) {
+            queryRequest.setCaseDefinitionNameLike(allRequestParams.get("caseDefinitionNameLike"));
+        }
+        
+        if (allRequestParams.get("caseDefinitionNameLikeIgnoreCase") != null) {
+            queryRequest.setCaseDefinitionNameLikeIgnoreCase(allRequestParams.get("caseDefinitionNameLikeIgnoreCase"));
         }
         
         if (allRequestParams.get("name") != null) {
@@ -123,8 +159,24 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
         }
         
+        if (allRequestParams.get("businessKeyLike") != null) {
+            queryRequest.setCaseInstanceBusinessKeyLike(allRequestParams.get("businessKeyLike"));
+        }
+        
+        if (allRequestParams.get("businessKeyLikeIgnoreCase") != null) {
+            queryRequest.setCaseInstanceBusinessKeyLikeIgnoreCase(allRequestParams.get("businessKeyLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.get("businessStatus") != null) {
             queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+        
+        if (allRequestParams.get("businessStatusLike") != null) {
+            queryRequest.setCaseInstanceBusinessStatusLike(allRequestParams.get("businessStatusLike"));
+        }
+        
+        if (allRequestParams.get("businessStatusLikeIgnoreCase") != null) {
+            queryRequest.setCaseInstanceBusinessStatusLikeIgnoreCase(allRequestParams.get("businessStatusLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("rootScopeId")) {
@@ -205,6 +257,14 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("tenantId") != null) {
             queryRequest.setTenantId(allRequestParams.get("tenantId"));
+        }
+        
+        if (allRequestParams.get("tenantIdLike") != null) {
+            queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (allRequestParams.get("tenantIdLikeIgnoreCase") != null) {
+            queryRequest.setTenantIdLikeIgnoreCase(allRequestParams.get("tenantIdLikeIgnoreCase"));
         }
 
         if (allRequestParams.get("withoutTenantId") != null) {

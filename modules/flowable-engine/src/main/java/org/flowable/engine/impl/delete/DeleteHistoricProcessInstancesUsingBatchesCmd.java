@@ -179,8 +179,10 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "processDefinitionId", query.getProcessDefinitionId());
         putIfNotNull(queryNode, "businessKey", query.getBusinessKey());
         putIfNotNull(queryNode, "businessKeyLike", query.getBusinessKeyLike());
+        putIfNotNull(queryNode, "businessKeyLikeIgnoreCase", query.getBusinessKeyLikeIgnoreCase());
         putIfNotNull(queryNode, "businessStatus", query.getBusinessStatus());
         putIfNotNull(queryNode, "businessStatusLike", query.getBusinessStatusLike());
+        putIfNotNull(queryNode, "businessStatusLikeIgnoreCase", query.getBusinessStatusLikeIgnoreCase());
         putIfNotNull(queryNode, "deploymentId", query.getDeploymentId());
         putIfNotNullOrEmpty(queryNode, "deploymentIds", query.getDeploymentIds());
         putIfTrue(queryNode, "finished", query.isFinished());
@@ -197,8 +199,14 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "finishedBefore", query.getFinishedBefore());
         putIfNotNull(queryNode, "finishedAfter", query.getFinishedAfter());
         putIfNotNull(queryNode, "processDefinitionKey", query.getProcessDefinitionKey());
+        putIfNotNull(queryNode, "processDefinitionKeyLike", query.getProcessDefinitionKeyLike());
+        putIfNotNull(queryNode, "processDefinitionKeyLikeIgnoreCase", query.getProcessDefinitionKeyLikeIgnoreCase());
         putIfNotNull(queryNode, "processDefinitionCategory", query.getProcessDefinitionCategory());
+        putIfNotNull(queryNode, "processDefinitionCategoryLike", query.getProcessDefinitionCategoryLike());
+        putIfNotNull(queryNode, "processDefinitionCategoryLikeIgnoreCase", query.getProcessDefinitionCategoryLikeIgnoreCase());
         putIfNotNull(queryNode, "processDefinitionName", query.getProcessDefinitionName());
+        putIfNotNull(queryNode, "processDefinitionNameLike", query.getProcessDefinitionNameLike());
+        putIfNotNull(queryNode, "processDefinitionNameLikeIgnoreCase", query.getProcessDefinitionNameLikeIgnoreCase());
         putIfNotNull(queryNode, "processDefinitionVersion", query.getProcessDefinitionVersion());
         putIfNotNullOrEmpty(queryNode, "processInstanceIds", query.getProcessInstanceIds());
         putIfNotNull(queryNode, "activeActivityId", query.getActiveActivityId());
@@ -210,6 +218,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfTrue(queryNode, "withJobException", query.isWithJobException());
         putIfNotNull(queryNode, "tenantId", query.getTenantId());
         putIfNotNull(queryNode, "tenantIdLike", query.getTenantIdLike());
+        putIfNotNull(queryNode, "tenantIdLikeIgnoreCase", query.getTenantIdLikeIgnoreCase());
         putIfTrue(queryNode, "withoutTenantId", query.isWithoutTenantId());
         putIfNotNull(queryNode, "name", query.getName());
         putIfNotNull(queryNode, "nameLike", query.getNameLike());

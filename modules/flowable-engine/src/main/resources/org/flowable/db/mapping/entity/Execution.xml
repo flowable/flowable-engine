@@ -679,6 +679,12 @@
       <if test="processDefinitionKey != null">
         and P.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
       </if>
+      <if test="processDefinitionKeyLike != null">
+        and P.KEY_ like #{processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionKeyLikeIgnoreCase != null">
+        and lower(P.KEY_) like lower(#{processDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+      </if>
       <if test="processDefinitionKeys != null and !processDefinitionKeys.empty">
         and P.KEY_ in
         <foreach item="processDefinitionKey" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
@@ -688,8 +694,20 @@
       <if test="processDefinitionCategory != null">
         and P.CATEGORY_ = #{processDefinitionCategory, jdbcType=NVARCHAR}
       </if>
+      <if test="processDefinitionCategoryLike != null">
+        and P.CATEGORY_ like #{processDefinitionCategoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionCategoryLikeIgnoreCase != null">
+        and lower(P.CATEGORY_) like lower(#{processDefinitionCategoryLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+      </if>
       <if test="processDefinitionName != null">
         and P.NAME_ = #{processDefinitionName, jdbcType=NVARCHAR}
+      </if>
+      <if test="processDefinitionNameLike != null">
+        and P.NAME_ like #{processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionNameLikeIgnoreCase != null">
+        and lower(P.NAME_) like lower(#{processDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="processDefinitionVersion != null">
         and P.VERSION_ = #{processDefinitionVersion, jdbcType=INTEGER}
@@ -712,7 +730,7 @@
           #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
       </if>
-      <if test="businessKey != null or businessKeyLike != null">
+      <if test="businessKey != null or businessKeyLike != null or businessKeyLikeIgnoreCase != null">
           <choose>
               <when test="includeChildExecutionsWithBusinessKeyQuery">
                 and exists (
@@ -726,6 +744,9 @@
                       <if test="businessKeyLike != null">
                         and INST.BUSINESS_KEY_ like #{businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                       </if>
+                      <if test="businessKeyLikeIgnoreCase != null">
+                        and lower(INST.BUSINESS_KEY_) like lower(#{businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+                      </if>
                   </where>
                 )
               </when>
@@ -736,6 +757,9 @@
                   <if test="businessKeyLike != null">
                       and RES.BUSINESS_KEY_ like #{businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
                   </if>
+                  <if test="businessKeyLikeIgnoreCase != null">
+                      and lower(RES.BUSINESS_KEY_) like lower(#{businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+                  </if>
               </otherwise>
           </choose>
       </if>
@@ -744,6 +768,9 @@
       </if>
       <if test="businessStatusLike != null">
         and RES.BUSINESS_STATUS_ like #{businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="businessStatusLikeIgnoreCase != null">
+        and lower(RES.BUSINESS_STATUS_) like lower(#{businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId, jdbcType=NVARCHAR} and RES.IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN}
@@ -790,13 +817,13 @@
         </if>
       </if>
       <if test="callbackId != null">
-            and CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
+           and CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
       </if>
       <if test="callbackType != null">
            and CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
       </if>
       <if test="referenceId != null">
-            and REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
+           and REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
       </if>
       <if test="referenceType != null">
            and REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
@@ -806,6 +833,9 @@
       </if>
       <if test="tenantIdLike != null">
         and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="tenantIdLikeIgnoreCase != null">
+        and lower(RES.TENANT_ID_) like lower(#{tenantIdLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
@@ -1009,6 +1039,12 @@
           <if test="orQueryObject.processDefinitionKey != null">
             or P.KEY_ = #{orQueryObject.processDefinitionKey, jdbcType=NVARCHAR}
           </if>
+          <if test="orQueryObject.processDefinitionKeyLike != null">
+            or P.KEY_ like #{orQueryObject.processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionKeyLike != null">
+            or lower(P.KEY_) like lower(#{orQueryObject.processDefinitionKeyLike, jdbcType=NVARCHAR})${wildcardEscapeClause}
+          </if>
           <if test="orQueryObject.processDefinitionKeys != null and !orQueryObject.processDefinitionKeys.empty">
             or P.KEY_ in
             <foreach item="processDefinitionKey" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
@@ -1018,8 +1054,20 @@
           <if test="orQueryObject.processDefinitionCategory != null">
             or P.CATEGORY_ = #{orQueryObject.processDefinitionCategory, jdbcType=NVARCHAR}
           </if>
+          <if test="orQueryObject.processDefinitionCategoryLike != null">
+            or P.CATEGORY_ like #{orQueryObject.processDefinitionCategoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionCategoryLikeIgnoreCase != null">
+            or lower(P.CATEGORY_) like lower(#{orQueryObject.processDefinitionCategoryLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+          </if>
           <if test="orQueryObject.processDefinitionName != null">
             or P.NAME_ = #{orQueryObject.processDefinitionName, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.processDefinitionNameLike != null">
+            or P.NAME_ like #{orQueryObject.processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionNameLikeIgnoreCase != null">
+            or lower(P.NAME_) like lower(#{orQueryObject.processDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.processDefinitionVersion != null">
             or P.VERSION_ = #{orQueryObject.processDefinitionVersion, jdbcType=INTEGER}
@@ -1042,11 +1090,20 @@
           <if test="orQueryObject.businessKey != null">
             or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=NVARCHAR}
           </if>
+          <if test="orQueryObject.businessKeyLike != null">
+            or RES.BUSINESS_KEY_ like #{orQueryObject.businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.businessKeyLikeIgnoreCase != null">
+            or lower(RES.BUSINESS_KEY_) like lower(#{orQueryObject.businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+          </if>
           <if test="orQueryObject.businessStatus != null">
             or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.businessStatusLike != null">
             or RES.BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.businessStatusLikeIgnoreCase != null">
+            or lower(RES.BUSINESS_STATUS_) like lower(#{orQueryObject.businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.activityId != null">
             or (RES.ACT_ID_ = #{orQueryObject.activityId, jdbcType=NVARCHAR} and RES.IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN})
@@ -1100,6 +1157,9 @@
           </if>
           <if test="orQueryObject.tenantIdLike != null">
             or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.tenantIdLikeIgnoreCase != null">
+            or lower(RES.TENANT_ID_) like lower(#{orQueryObject.tenantIdLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.withoutTenantId">
             or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)

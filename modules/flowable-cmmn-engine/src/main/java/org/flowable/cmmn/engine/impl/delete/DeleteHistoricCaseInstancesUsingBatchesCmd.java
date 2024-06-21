@@ -181,10 +181,16 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
 
         putIfNotNull(queryNode, "caseDefinitionId", query.getCaseDefinitionId());
         putIfNotNull(queryNode, "caseDefinitionKey", query.getCaseDefinitionKey());
+        putIfNotNull(queryNode, "caseDefinitionKeyLike", query.getCaseDefinitionKeyLike());
+        putIfNotNull(queryNode, "caseDefinitionKeyLikeIgnoreCase", query.getCaseDefinitionKeyLikeIgnoreCase());
         putIfNotNullOrEmpty(queryNode, "caseDefinitionKeys", query.getCaseDefinitionKeys());
         putIfNotNullOrEmpty(queryNode, "caseDefinitionIds", query.getCaseDefinitionIds());
         putIfNotNull(queryNode, "caseDefinitionName", query.getCaseDefinitionName());
+        putIfNotNull(queryNode, "caseDefinitionNameLike", query.getCaseDefinitionNameLike());
+        putIfNotNull(queryNode, "caseDefinitionNameLikeIgnoreCase", query.getCaseDefinitionNameLikeIgnoreCase());
         putIfNotNull(queryNode, "caseDefinitionCategory", query.getCaseDefinitionCategory());
+        putIfNotNull(queryNode, "caseDefinitionCategoryLike", query.getCaseDefinitionCategoryLike());
+        putIfNotNull(queryNode, "caseDefinitionCategoryLikeIgnoreCase", query.getCaseDefinitionCategoryLikeIgnoreCase());
         putIfNotNull(queryNode, "caseDefinitionVersion", query.getCaseDefinitionVersion());
         putIfNotNull(queryNode, "caseInstanceId", query.getCaseInstanceId());
         putIfNotNullOrEmpty(queryNode, "caseInstanceIds", query.getCaseInstanceIds());
@@ -194,7 +200,11 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "caseInstanceRootScopeId", query.getRootScopeId());
         putIfNotNull(queryNode, "caseInstanceParentScopeId", query.getParentScopeId());
         putIfNotNull(queryNode, "businessKey", query.getBusinessKey());
+        putIfNotNull(queryNode, "businessKeyLike", query.getBusinessKeyLike());
+        putIfNotNull(queryNode, "businessKeyLikeIgnoreCase", query.getBusinessKeyLikeIgnoreCase());
         putIfNotNull(queryNode, "businessStatus", query.getBusinessStatus());
+        putIfNotNull(queryNode, "businessStatusLike", query.getBusinessStatusLike());
+        putIfNotNull(queryNode, "businessStatusLikeIgnoreCase", query.getBusinessStatusLikeIgnoreCase());
         putIfNotNull(queryNode, "state", query.getState());
         putIfNotNull(queryNode, "caseInstanceParentId", query.getCaseInstanceParentId());
         putIfTrue(queryNode, "withoutCaseInstanceParentId", query.isWithoutCaseInstanceParentId());
@@ -216,6 +226,8 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());
         putIfNotNull(queryNode, "referenceType", query.getReferenceType());
         putIfNotNull(queryNode, "tenantId", query.getTenantId());
+        putIfNotNull(queryNode, "tenantIdLike", query.getTenantIdLike());
+        putIfNotNull(queryNode, "tenantIdLikeIgnoreCase", query.getTenantIdLikeIgnoreCase());
         putIfTrue(queryNode, "withoutTenantId", query.isWithoutTenantId());
         putIfNotNull(queryNode, "activePlanItemDefinitionId", query.getActivePlanItemDefinitionId());
         putIfNotNullOrEmpty(queryNode, "activePlanItemDefinitionIds", query.getActivePlanItemDefinitionIds());

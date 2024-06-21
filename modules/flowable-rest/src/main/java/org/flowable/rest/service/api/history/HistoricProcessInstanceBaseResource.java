@@ -88,6 +88,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());
         }
+        if (queryRequest.getProcessDefinitionKeyLike() != null) {
+            query.processDefinitionKeyLike(queryRequest.getProcessDefinitionKeyLike());
+        }
+        if (queryRequest.getProcessDefinitionKeyLikeIgnoreCase() != null) {
+            query.processDefinitionKeyLikeIgnoreCase(queryRequest.getProcessDefinitionKeyLikeIgnoreCase());
+        }
         if (queryRequest.getProcessDefinitionKeyIn() != null) {
             query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeyIn());
         }
@@ -100,11 +106,23 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionName() != null) {
             query.processDefinitionName(queryRequest.getProcessDefinitionName());
         }
+        if (queryRequest.getProcessDefinitionNameLike() != null) {
+            query.processDefinitionNameLike(queryRequest.getProcessDefinitionNameLike());
+        }
+        if (queryRequest.getProcessDefinitionNameLikeIgnoreCase() != null) {
+            query.processDefinitionNameLikeIgnoreCase(queryRequest.getProcessDefinitionNameLikeIgnoreCase());
+        }
         if (queryRequest.getProcessDefinitionVersion() != null) {
             query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
         }
         if (queryRequest.getProcessDefinitionCategory() != null) {
             query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());
+        }
+        if (queryRequest.getProcessDefinitionCategoryLike() != null) {
+            query.processDefinitionCategoryLike(queryRequest.getProcessDefinitionCategoryLike());
+        }
+        if (queryRequest.getProcessDefinitionCategoryLikeIgnoreCase() != null) {
+            query.processDefinitionCategoryLikeIgnoreCase(queryRequest.getProcessDefinitionCategoryLikeIgnoreCase());
         }
         if (queryRequest.getRootScopeId() != null) {
             query.processInstanceRootScopeId(queryRequest.getRootScopeId());
@@ -123,6 +141,18 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getProcessBusinessKeyLike() != null) {
             query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
+        if (queryRequest.getProcessBusinessKeyLikeIgnoreCase() != null) {
+            query.processInstanceBusinessKeyLikeIgnoreCase(queryRequest.getProcessBusinessKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getProcessBusinessStatus() != null) {
+            query.processInstanceBusinessStatus(queryRequest.getProcessBusinessStatus());
+        }
+        if (queryRequest.getProcessBusinessStatusLike() != null) {
+            query.processInstanceBusinessStatusLike(queryRequest.getProcessBusinessStatusLike());
+        }
+        if (queryRequest.getProcessBusinessStatusLikeIgnoreCase() != null) {
+            query.processInstanceBusinessStatusLikeIgnoreCase(queryRequest.getProcessBusinessStatusLikeIgnoreCase());
         }
         if (queryRequest.getActiveActivityId() != null) {
             query.activeActivityId(queryRequest.getActiveActivityId());
@@ -185,6 +215,9 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getTenantIdLike() != null) {
             query.processInstanceTenantIdLike(queryRequest.getTenantIdLike());
+        }
+        if (queryRequest.getTenantIdLikeIgnoreCase() != null) {
+            query.processInstanceTenantIdLikeIgnoreCase(queryRequest.getTenantIdLikeIgnoreCase());
         }
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {

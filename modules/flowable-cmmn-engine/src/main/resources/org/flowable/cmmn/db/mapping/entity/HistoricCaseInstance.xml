@@ -335,6 +335,12 @@
             <if test="caseDefinitionKey != null">
                 and CASE_DEF.KEY_ = #{caseDefinitionKey, jdbcType=VARCHAR}
             </if>
+            <if test="caseDefinitionKeyLike != null">
+                and CASE_DEF.KEY_ like #{caseDefinitionKeyLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+            </if>
+            <if test="caseDefinitionKeyLikeIgnoreCase != null">
+                and lower(CASE_DEF.KEY_) like lower(#{caseDefinitionKeyLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+            </if>
             <if test="caseDefinitionKeys != null">
                 and CASE_DEF.KEY_ IN
                 <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
@@ -344,8 +350,20 @@
             <if test="caseDefinitionCategory != null">
                 and CASE_DEF.CATEGORY_ = #{caseDefinitionCategory, jdbcType=VARCHAR}
             </if>
+            <if test="caseDefinitionCategoryLike != null">
+                and CASE_DEF.CATEGORY_ like #{caseDefinitionCategoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+            </if>
+            <if test="caseDefinitionCategoryLikeIgnoreCase != null">
+                and lower(CASE_DEF.CATEGORY_) like lower(#{caseDefinitionCategoryLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+            </if>
             <if test="caseDefinitionName != null">
                 and CASE_DEF.NAME_ = #{caseDefinitionName, jdbcType=VARCHAR}
+            </if>
+            <if test="caseDefinitionNameLike != null">
+                and CASE_DEF.NAME_ like #{caseDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+            </if>
+            <if test="caseDefinitionNameLikeIgnoreCase != null">
+                and lower(CASE_DEF.NAME_) like lower(#{caseDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
             </if>
             <if test="deploymentId != null">
                 and CASE_DEF.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
@@ -459,6 +477,12 @@
                     <if test="orQueryObject.caseDefinitionKey != null">
                         or CASE_DEF.KEY_ = #{orQueryObject.caseDefinitionKey, jdbcType=VARCHAR}
                     </if>
+                    <if test="orQueryObject.caseDefinitionKeyLike != null">
+                        or CASE_DEF.KEY_ like #{orQueryObject.caseDefinitionKeyLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+                    </if>
+                    <if test="orQueryObject.caseDefinitionKeyLikeIgnoreCase != null">
+                        or lower(CASE_DEF.KEY_) like lower(#{orQueryObject.caseDefinitionKeyLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+                    </if>
                     <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty">
                         or CASE_DEF.KEY_ IN
                         <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
@@ -468,8 +492,20 @@
                     <if test="orQueryObject.caseDefinitionCategory != null">
                         or CASE_DEF.CATEGORY_ = #{orQueryObject.caseDefinitionCategory, jdbcType=VARCHAR}
                     </if>
+                    <if test="orQueryObject.caseDefinitionCategoryLike != null">
+                        or CASE_DEF.CATEGORY_ like #{orQueryObject.caseDefinitionCategoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+                    </if>
+                    <if test="orQueryObject.caseDefinitionCategoryLikeIgnoreCase != null">
+                        or lower(CASE_DEF.CATEGORY_) like lower(#{orQueryObject.caseDefinitionCategoryLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
+                    </if>
                     <if test="orQueryObject.caseDefinitionName != null">
                         or CASE_DEF.NAME_ = #{orQueryObject.caseDefinitionName, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.caseDefinitionNameLike != null">
+                        or CASE_DEF.NAME_ like #{orQueryObject.caseDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                    </if>
+                    <if test="orQueryObject.caseDefinitionNameLikeIgnoreCase != null">
+                        or lower(CASE_DEF.NAME_) like lower(#{orQueryObject.caseDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
                     </if>
                     <if test="orQueryObject.caseDefinitionVersion != null">
                         or CASE_DEF.VERSION_ = #{orQueryObject.caseDefinitionVersion, jdbcType=INTEGER}
@@ -638,8 +674,20 @@
         <if test="businessKey != null">
             and ${queryTablePrefix}BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR}
         </if>
+        <if test="businessKeyLike != null">
+            and ${queryTablePrefix}BUSINESS_KEY_ like #{businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="businessKeyLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}BUSINESS_KEY_) like lower(#{businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+        </if>
         <if test="businessStatus != null">
             and ${queryTablePrefix}BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR}
+        </if>
+        <if test="businessStatusLike != null">
+            and ${queryTablePrefix}BUSINESS_STATUS_ like #{businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="businessStatusLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}BUSINESS_STATUS_) like lower(#{businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
         </if>
         <if test="finished">
             and ${queryTablePrefix}END_TIME_ is not null
@@ -691,6 +739,12 @@
         </if>
         <if test="tenantId != null">
             and ${queryTablePrefix}TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        </if>
+        <if test="tenantIdLike != null">
+            and ${queryTablePrefix}TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="tenantIdLikeIgnoreCase != null">
+            and lower(${queryTablePrefix}TENANT_ID_) like lower(#{tenantIdLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
         </if>
         <if test="withoutTenantId">
             and (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')
@@ -773,8 +827,20 @@
         <if test="orQueryObject.businessKey != null">
             or ${queryTablePrefix}BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=VARCHAR}
         </if>
+        <if test="orQueryObject.businessKeyLike != null">
+            or ${queryTablePrefix}BUSINESS_KEY_ like #{orQueryObject.businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="orQueryObject.businessKeyLikeIgnoreCase != null">
+            or lower(${queryTablePrefix}BUSINESS_KEY_) like lower(#{orQueryObject.businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
+        </if>
         <if test="orQueryObject.businessStatus != null">
             or ${queryTablePrefix}BUSINESS_STATUS_ = #{orQueryObject.businessStatus, jdbcType=VARCHAR}
+        </if>
+        <if test="orQueryObject.businessStatusLike != null">
+            or ${queryTablePrefix}BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="orQueryObject.businessStatusLikeIgnoreCase != null">
+            or lower(${queryTablePrefix}BUSINESS_STATUS_) like lower(#{orQueryObject.businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
         </if>
         <if test="orQueryObject.finished">
             or ${queryTablePrefix}END_TIME_ is not null
@@ -826,6 +892,12 @@
         </if>
         <if test="orQueryObject.tenantId != null">
             or ${queryTablePrefix}TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=VARCHAR}
+        </if>
+        <if test="orQueryObject.tenantIdLike != null">
+            or ${queryTablePrefix}TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+        </if>
+        <if test="orQueryObject.tenantIdLikeIgnoreCase != null">
+            or lower(${queryTablePrefix}TENANT_ID_) like lower(#{orQueryObject.tenantIdLikeIgnoreCase, jdbcType=VARCHAR})${wildcardEscapeClause}
         </if>
         <if test="orQueryObject.withoutTenantId">
             or (${queryTablePrefix}TENANT_ID_ is null or ${queryTablePrefix}TENANT_ID_ = '')

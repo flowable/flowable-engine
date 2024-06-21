@@ -50,15 +50,25 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "processInstanceNameLike", dataType = "string", value = "A name of the historic process instance used in a like query.", paramType = "query"),
         @ApiImplicitParam(name = "processInstanceNameLikeIgnoreCase", dataType = "string", value = "A name of the historic process instance used in a like query ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic process instance.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionKeyLike", dataType = "string", value = "The process definition key used in a like query.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionKeyLikeIgnoreCase", dataType = "string", value = "The process definition key used in a like query ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionName", dataType = "string", value = "The process definition name of the historic process instance.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionNameLike", dataType = "string", value = "The process definition name used in a like query.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionNameLikeIgnoreCase", dataType = "string", value = "The process definition name used in a like query ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionCategory", dataType = "string", value = "The process definition category of the historic process instance.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionCategoryLike", dataType = "string", value = "The process definition category used in a like query.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionCategoryLikeIgnoreCase", dataType = "string", value = "The process definition category used in a like query ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionVersion", dataType = "string", value = "The process definition version of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "The deployment id of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return process instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
         @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return process instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
         @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic process instance.", paramType = "query"),
-        @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return instances with a businessKey like this key.", paramType = "query"),
+        @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return instances with a business key like this key.", paramType = "query"),
+        @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return instances with a business key like this key ignoring case.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "The business status of the historic process instance.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatusLike", dataType = "string", value = "Only return instances with a business status like this status.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatusLikeIgnoreCase", dataType = "string", value = "Only return instances with a business status like this status ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "activeActivityId", dataType = "string", value = "Only return instances which have an active activity instance with the provided activity id.", paramType = "query"),
         @ApiImplicitParam(name = "involvedUser", dataType = "string", value = "An involved user of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic process instance is finished.", paramType = "query"),
@@ -74,7 +84,8 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
         @ApiImplicitParam(name = "withoutCallbackId", dataType = "boolean", value = "Only return instances that do not have a callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
-        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenant id like the given value.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return instances with a tenant id like the given value ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.\n", paramType = "query"),
     })
     @ApiResponses(value = {
@@ -104,6 +115,14 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         if (allRequestParams.get("processDefinitionKey") != null) {
             queryRequest.setProcessDefinitionKey(allRequestParams.get("processDefinitionKey"));
         }
+        
+        if (allRequestParams.get("processDefinitionKeyLike") != null) {
+            queryRequest.setProcessDefinitionKeyLike(allRequestParams.get("processDefinitionKeyLike"));
+        }
+        
+        if (allRequestParams.get("processDefinitionKeyLikeIgnoreCase") != null) {
+            queryRequest.setProcessDefinitionKeyLikeIgnoreCase(allRequestParams.get("processDefinitionKeyLikeIgnoreCase"));
+        }
 
         if (allRequestParams.get("processDefinitionId") != null) {
             queryRequest.setProcessDefinitionId(allRequestParams.get("processDefinitionId"));
@@ -113,8 +132,24 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             queryRequest.setProcessDefinitionName(allRequestParams.get("processDefinitionName"));
         }
         
+        if (allRequestParams.get("processDefinitionNameLike") != null) {
+            queryRequest.setProcessDefinitionNameLike(allRequestParams.get("processDefinitionNameLike"));
+        }
+        
+        if (allRequestParams.get("processDefinitionNameLikeIgnoreCase") != null) {
+            queryRequest.setProcessDefinitionNameLikeIgnoreCase(allRequestParams.get("processDefinitionNameLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.get("processDefinitionCategory") != null) {
             queryRequest.setProcessDefinitionCategory(allRequestParams.get("processDefinitionCategory"));
+        }
+        
+        if (allRequestParams.get("processDefinitionCategoryLike") != null) {
+            queryRequest.setProcessDefinitionCategoryLike(allRequestParams.get("processDefinitionCategoryLike"));
+        }
+        
+        if (allRequestParams.get("processDefinitionCategoryLikeIgnoreCase") != null) {
+            queryRequest.setProcessDefinitionCategoryLikeIgnoreCase(allRequestParams.get("processDefinitionCategoryLikeIgnoreCase"));
         }
         
         if (allRequestParams.get("processDefinitionVersion") != null) {
@@ -139,6 +174,22 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         
         if (allRequestParams.get("businessKeyLike") != null) {
             queryRequest.setProcessBusinessKeyLike(allRequestParams.get("businessKeyLike"));
+        }
+        
+        if (allRequestParams.get("businessKeyLikeIgnoreCase") != null) {
+            queryRequest.setProcessBusinessKeyLikeIgnoreCase(allRequestParams.get("businessKeyLikeIgnoreCase"));
+        }
+        
+        if (allRequestParams.get("businessStatus") != null) {
+            queryRequest.setProcessBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+        
+        if (allRequestParams.get("businessStatusLike") != null) {
+            queryRequest.setProcessBusinessStatusLike(allRequestParams.get("businessStatusLike"));
+        }
+        
+        if (allRequestParams.get("businessStatusLikeIgnoreCase") != null) {
+            queryRequest.setProcessBusinessStatusLikeIgnoreCase(allRequestParams.get("businessStatusLikeIgnoreCase"));
         }
         
         if (allRequestParams.get("activeActivityId") != null) {
@@ -202,6 +253,10 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
 
         if (allRequestParams.get("tenantIdLike") != null) {
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+        
+        if (allRequestParams.get("tenantIdLikeIgnoreCase") != null) {
+            queryRequest.setTenantIdLikeIgnoreCase(allRequestParams.get("tenantIdLikeIgnoreCase"));
         }
 
         if (allRequestParams.get("withoutTenantId") != null) {

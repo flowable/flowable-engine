@@ -48,6 +48,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      */
     ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
     
+    /**
+     * Select process instances with a business key like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceBusinessKeyLikeIgnoreCase(String businessKeyLikeIgnoreCase);
+    
     /** Select process instances with the given business status */
     ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus);
 
@@ -55,6 +60,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select process instances with a business status like the given value.
      */
     ProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
+    
+    /**
+     * Select process instances with a business status like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceBusinessStatusLikeIgnoreCase(String businessStatusLikeIgnoreCase);
 
     /**
      * Only select process instances that have the given tenant id.
@@ -65,6 +75,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with a tenant id like the given one.
      */
     ProcessInstanceQuery processInstanceTenantIdLike(String tenantIdLike);
+    
+    /**
+     * Only select process instances with a tenant id like the given one, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
 
     /**
      * Only select process instances that do not have a tenant id.
@@ -73,11 +88,27 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /** Only select process instances whose process definition category is processDefinitionCategory. */
     ProcessInstanceQuery processDefinitionCategory(String processDefinitionCategory);
+    
+    /** Only select process instances whose process definition category is like the given value. */
+    ProcessInstanceQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
+    
+    /** Only select process instances whose process definition category is like the given value, ignoring upper/lower case. */
+    ProcessInstanceQuery processDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase);
 
     /**
      * Select process instances whose process definition name is processDefinitionName
      */
     ProcessInstanceQuery processDefinitionName(String processDefinitionName);
+    
+    /**
+     * Select process instances whose process definition name is like the given value
+     */
+    ProcessInstanceQuery processDefinitionNameLike(String processDefinitionNameLike);
+    
+    /**
+     * Select process instances whose process definition name is like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase);
 
     /**
      * Only select process instances with a certain process definition version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
@@ -93,6 +124,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances which are defined by process definitions with the given keys.
      */
     ProcessInstanceQuery processDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /**
+     * Select process instances whose process definition key is like the given value
+     */
+    ProcessInstanceQuery processDefinitionKeyLike(String processDefinitionKeyLike);
+    
+    /**
+     * Select process instances whose process definition key is like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase);
 
     /**
      * Select the process instances which are defined by a process definition with the given id.
