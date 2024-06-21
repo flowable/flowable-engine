@@ -51,16 +51,24 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String executionId;
     protected String businessKey;
     protected String businessKeyLike;
+    protected String businessKeyLikeIgnoreCase;
     protected boolean includeChildExecutionsWithBusinessKeyQuery;
     protected String businessStatus;
     protected String businessStatusLike;
+    protected String businessStatusLikeIgnoreCase;
     protected String processDefinitionId;
     protected Set<String> processDefinitionIds;
     protected String processDefinitionCategory;
+    protected String processDefinitionCategoryLike;
+    protected String processDefinitionCategoryLikeIgnoreCase;
     protected String processDefinitionName;
+    protected String processDefinitionNameLike;
+    protected String processDefinitionNameLikeIgnoreCase;
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
     protected String processDefinitionKey;
+    protected String processDefinitionKeyLike;
+    protected String processDefinitionKeyLikeIgnoreCase;
     protected Set<String> processDefinitionKeys;
     protected String processDefinitionEngineVersion;
     protected String deploymentId;
@@ -92,6 +100,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     protected String tenantId;
     protected String tenantIdLike;
+    protected String tenantIdLikeIgnoreCase;
     protected boolean withoutTenantId;
 
     protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
@@ -191,6 +200,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
     
     @Override
+    public ProcessInstanceQuery processInstanceBusinessKeyLikeIgnoreCase(String businessKeyLikeIgnoreCase) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKeyLikeIgnoreCase = businessKeyLikeIgnoreCase;
+        } else {
+            this.businessKeyLikeIgnoreCase = businessKeyLikeIgnoreCase;
+        }
+        return this;
+    }
+    
+    @Override
     public ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus) {
         if (businessStatus == null) {
             throw new FlowableIllegalArgumentException("Business status is null");
@@ -209,6 +228,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.businessStatusLike = businessStatusLike;
         } else {
             this.businessStatusLike = businessStatusLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceBusinessStatusLikeIgnoreCase(String businessStatusLikeIgnoreCase) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatusLikeIgnoreCase = businessStatusLikeIgnoreCase;
+        } else {
+            this.businessStatusLikeIgnoreCase = businessStatusLikeIgnoreCase;
         }
         return this;
     }
@@ -238,6 +267,19 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         }
         return this;
     }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
+        if (tenantIdLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("process instance tenant id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+        } else {
+            this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+        }
+        return this;
+    }
 
     @Override
     public ProcessInstanceQuery processInstanceWithoutTenantId() {
@@ -262,6 +304,34 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         }
         return this;
     }
+    
+    @Override
+    public ProcessInstanceQuery processDefinitionCategoryLike(String processDefinitionCategoryLike) {
+        if (processDefinitionCategoryLike == null) {
+            throw new FlowableIllegalArgumentException("Process definition category is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionCategoryLike = processDefinitionCategoryLike;
+        } else {
+            this.processDefinitionCategoryLike = processDefinitionCategoryLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase) {
+        if (processDefinitionCategoryLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Process definition category is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionCategoryLikeIgnoreCase = processDefinitionCategoryLikeIgnoreCase;
+        } else {
+            this.processDefinitionCategoryLikeIgnoreCase = processDefinitionCategoryLikeIgnoreCase;
+        }
+        return this;
+    }
 
     @Override
     public ProcessInstanceQuery processDefinitionName(String processDefinitionName) {
@@ -273,6 +343,34 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.processDefinitionName = processDefinitionName;
         } else {
             this.processDefinitionName = processDefinitionName;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processDefinitionNameLike(String processDefinitionNameLike) {
+        if (processDefinitionNameLike == null) {
+            throw new FlowableIllegalArgumentException("Process definition name is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionNameLike = processDefinitionNameLike;
+        } else {
+            this.processDefinitionNameLike = processDefinitionNameLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase) {
+        if (processDefinitionNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Process definition name is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionNameLikeIgnoreCase = processDefinitionNameLikeIgnoreCase;
+        } else {
+            this.processDefinitionNameLikeIgnoreCase = processDefinitionNameLikeIgnoreCase;
         }
         return this;
     }
@@ -332,6 +430,34 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.processDefinitionKey = processDefinitionKey;
         } else {
             this.processDefinitionKey = processDefinitionKey;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQueryImpl processDefinitionKeyLike(String processDefinitionKeyLike) {
+        if (processDefinitionKeyLike == null) {
+            throw new FlowableIllegalArgumentException("Process definition key is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKeyLike = processDefinitionKeyLike;
+        } else {
+            this.processDefinitionKeyLike = processDefinitionKeyLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQueryImpl processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase) {
+        if (processDefinitionKeyLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Process definition key is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKeyLikeIgnoreCase = processDefinitionKeyLikeIgnoreCase;
+        } else {
+            this.processDefinitionKeyLikeIgnoreCase = processDefinitionKeyLikeIgnoreCase;
         }
         return this;
     }
@@ -937,6 +1063,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     public String getBusinessKeyLike() {
         return businessKeyLike;
     }
+    
+    public String getBusinessKeyLikeIgnoreCase() {
+        return businessKeyLikeIgnoreCase;
+    }
 
     public String getBusinessStatus() {
         return businessStatus;
@@ -944,6 +1074,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getBusinessStatusLike() {
         return businessStatusLike;
+    }
+    
+    public String getBusinessStatusLikeIgnoreCase() {
+        return businessStatusLikeIgnoreCase;
     }
 
     public boolean isIncludeChildExecutionsWithBusinessKeyQuery() {
@@ -962,8 +1096,28 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return processDefinitionCategory;
     }
 
+    public String getProcessDefinitionCategoryLike() {
+        return processDefinitionCategoryLike;
+    }
+
+    public String getProcessDefinitionCategoryLikeIgnoreCase() {
+        return processDefinitionCategoryLikeIgnoreCase;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
     public String getProcessDefinitionName() {
         return processDefinitionName;
+    }
+    
+    public String getProcessDefinitionNameLike() {
+        return processDefinitionNameLike;
+    }
+
+    public String getProcessDefinitionNameLikeIgnoreCase() {
+        return processDefinitionNameLikeIgnoreCase;
     }
 
     public Integer getProcessDefinitionVersion() {
@@ -972,6 +1126,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
+    }
+    
+    public String getProcessDefinitionKeyLike() {
+        return processDefinitionKeyLike;
+    }
+
+    public String getProcessDefinitionKeyLikeIgnoreCase() {
+        return processDefinitionKeyLikeIgnoreCase;
     }
 
     public Set<String> getProcessDefinitionKeys() {
@@ -1036,6 +1198,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getTenantIdLike() {
         return tenantIdLike;
+    }
+    
+    public String getTenantIdLikeIgnoreCase() {
+        return tenantIdLikeIgnoreCase;
     }
 
     public boolean isWithoutTenantId() {
