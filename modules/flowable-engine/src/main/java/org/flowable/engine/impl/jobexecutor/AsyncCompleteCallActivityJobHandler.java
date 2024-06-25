@@ -33,7 +33,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public class AsyncCompleteCallActivityJobHandler implements JobHandler {
 
-    public static final String TYPE = "async-complete-call-actiivty";
+    public static final String TYPE = "async-complete-call-activity";
 
     @Override
     public String getType() {
