@@ -610,7 +610,7 @@
     </changeSet>
     
     <changeSet id="20" author="flowable" dbms="mssql">
-        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="DESCRIPTION_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="DESCRIPTION_" newDataType="nvarchar(4000)" />
     </changeSet>
 
 </databaseChangeLog>
