@@ -841,7 +841,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("DGRM_RESOURCE_NAME_", "diagramResourceName", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("HAS_START_FORM_KEY_", "hasStartFormKey", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("HAS_GRAPHICAL_NOTATION_", "isGraphicalNotationDefined", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
@@ -1316,7 +1316,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CREATE_TIME_", "createTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         
         info.addQueryParameter("channelDefinitionKey", PARAMETER_TYPE_VARCHAR);
@@ -1347,7 +1347,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("VERSION_", "version", PARAMETER_TYPE_INTEGER);
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("RESOURCE_NAME_", "resourceName", PARAMETER_TYPE_NVARCHAR);
-        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DESCRIPTION_", "description", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         
         info.addQueryParameter("eventDefinitionKey", PARAMETER_TYPE_VARCHAR);

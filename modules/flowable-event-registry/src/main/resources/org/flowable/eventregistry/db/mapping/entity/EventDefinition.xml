@@ -16,7 +16,7 @@
             #{version, jdbcType=INTEGER}, 
             #{deploymentId, jdbcType=VARCHAR},
             #{resourceName, jdbcType=NVARCHAR},
-            #{description, jdbcType=VARCHAR},
+            #{description, jdbcType=NVARCHAR},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
   
@@ -31,7 +31,7 @@
          #{eventDefinition.version, jdbcType=INTEGER},
          #{eventDefinition.deploymentId, jdbcType=VARCHAR},
          #{eventDefinition.resourceName, jdbcType=NVARCHAR},
-         #{eventDefinition.description, jdbcType=VARCHAR},
+         #{eventDefinition.description, jdbcType=NVARCHAR},
          #{eventDefinition.tenantId, jdbcType=VARCHAR})
     </foreach>
   </insert>
@@ -47,7 +47,7 @@
          #{eventDefinition.version, jdbcType=INTEGER},
          #{eventDefinition.deploymentId, jdbcType=VARCHAR},
          #{eventDefinition.resourceName, jdbcType=NVARCHAR},
-         #{eventDefinition.description, jdbcType=VARCHAR},
+         #{eventDefinition.description, jdbcType=NVARCHAR},
          #{eventDefinition.tenantId, jdbcType=VARCHAR})                        
     </foreach>
     SELECT * FROM dual
@@ -87,7 +87,7 @@
     <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- DEFINITION SELECT -->

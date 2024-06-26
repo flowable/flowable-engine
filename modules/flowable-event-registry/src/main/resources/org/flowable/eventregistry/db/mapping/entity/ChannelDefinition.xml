@@ -19,7 +19,7 @@
             #{deploymentId, jdbcType=VARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{resourceName, jdbcType=NVARCHAR},
-            #{description, jdbcType=VARCHAR},
+            #{description, jdbcType=NVARCHAR},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
   
@@ -37,7 +37,7 @@
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
          #{channelDefinition.resourceName, jdbcType=NVARCHAR},
-         #{channelDefinition.description, jdbcType=VARCHAR},
+         #{channelDefinition.description, jdbcType=NVARCHAR},
          #{channelDefinition.tenantId, jdbcType=VARCHAR})
     </foreach>
   </insert>
@@ -56,7 +56,7 @@
          #{channelDefinition.deploymentId, jdbcType=VARCHAR},
          #{channelDefinition.createTime, jdbcType=TIMESTAMP}, 
          #{channelDefinition.resourceName, jdbcType=NVARCHAR},
-         #{channelDefinition.description, jdbcType=VARCHAR},
+         #{channelDefinition.description, jdbcType=NVARCHAR},
          #{channelDefinition.tenantId, jdbcType=VARCHAR})                        
     </foreach>
     SELECT * FROM dual
@@ -109,7 +109,7 @@
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
     <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- DEFINITION SELECT -->
