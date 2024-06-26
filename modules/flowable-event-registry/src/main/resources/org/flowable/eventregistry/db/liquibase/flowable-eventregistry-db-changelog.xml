@@ -116,5 +116,10 @@
         <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="CATEGORY_" newDataType="nvarchar(255)" />
         <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="RESOURCE_NAME_" newDataType="nvarchar(255)" />
     </changeSet>
+    
+    <changeSet id="5" author="flowable" dbms="mssql">
+        <modifyDataType tableName="FLW_CHANNEL_DEFINITION" columnName="DESCRIPTION_" newDataType="nvarchar(255)" />
+        <modifyDataType tableName="FLW_EVENT_DEFINITION" columnName="DESCRIPTION_" newDataType="nvarchar(255)" />
+    </changeSet>
 
 </databaseChangeLog>

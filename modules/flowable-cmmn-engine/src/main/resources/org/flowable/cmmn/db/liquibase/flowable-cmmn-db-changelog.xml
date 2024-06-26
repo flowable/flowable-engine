@@ -608,5 +608,9 @@
         <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="BUSINESS_KEY_" newDataType="nvarchar(255)" />
         <modifyDataType tableName="ACT_CMMN_HI_CASE_INST" columnName="BUSINESS_STATUS_" newDataType="nvarchar(255)" />
     </changeSet>
+    
+    <changeSet id="20" author="flowable" dbms="mssql">
+        <modifyDataType tableName="ACT_CMMN_CASEDEF" columnName="DESCRIPTION_" newDataType="nvarchar(255)" />
+    </changeSet>
 
 </databaseChangeLog>
