@@ -54,16 +54,25 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
 
     @Test
     public void testSimpleMigrationWithActivityAutoMapping() {
+        testSimpleMigrationWithActivityAutoMapping(false, "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+    }
+
+    @Test
+    public void testSimpleMigrationWithActivityAutoMappingAsync() {
+        testSimpleMigrationWithActivityAutoMapping(true, "org/flowable/engine/test/api/runtime/migration/one-async-external-worker-simple-process.bpmn20.xml");
+    }
+
+    protected void testSimpleMigrationWithActivityAutoMapping(boolean async, String processDefinitionPath) {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
 
         //Start an instance of the first version of the process for migration
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the same process
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
         assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
@@ -78,6 +87,11 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
         executions.stream()
                 .map(e -> (ExecutionEntity) e)
                 .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+
+        if (async) {
+            // Start the async executor to create the external worker job
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L, true);
+        }
 
         List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
                 .list();
@@ -131,16 +145,25 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
 
     @Test
     public void testAcquiredBeforeMigration() {
+        testAcquiredBeforeMigration(false, "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+    }
+
+    @Test
+    public void testAcquiredBeforeMigrationAsync() {
+        testAcquiredBeforeMigration(true, "org/flowable/engine/test/api/runtime/migration/one-async-external-worker-simple-process.bpmn20.xml");
+    }
+
+    protected void testAcquiredBeforeMigration(boolean async, String processDefinitionPath) {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
 
         //Start an instance of the first version of the process for migration
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the same process
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
         assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
@@ -155,6 +178,11 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
         executions.stream()
                 .map(e -> (ExecutionEntity) e)
                 .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+
+        if (async) {
+            // Start the async executor to create the external worker job
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L, true);
+        }
 
         List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
                 .list();
@@ -208,16 +236,25 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
 
     @Test
     public void testSuspendedBeforeMigration() {
+        testSuspendedBeforeMigration(false, "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+    }
+
+    @Test
+    public void testSuspendedBeforeMigrationAsync() {
+        testSuspendedBeforeMigration(true, "org/flowable/engine/test/api/runtime/migration/one-async-external-worker-simple-process.bpmn20.xml");
+    }
+
+    protected void testSuspendedBeforeMigration(boolean async, String processDefinitionPath) {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
 
         //Start an instance of the first version of the process for migration
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the same process
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
         assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
 
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery()
@@ -232,6 +269,11 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
         executions.stream()
                 .map(e -> (ExecutionEntity) e)
                 .forEach(e -> assertThat(e.getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId()));
+
+        if (async) {
+            // Start the async executor to create the external worker job
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L, true);
+        }
 
         List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
                 .list();
@@ -291,17 +333,31 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
 
     @Test
     public void testDeadLetterBeforeMigration() {
+        testDeadLetterBeforeMigration(false, "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+    }
+
+    @Test
+    public void testDeadLetterBeforeMigrationAsync() {
+        testDeadLetterBeforeMigration(true, "org/flowable/engine/test/api/runtime/migration/one-async-external-worker-simple-process.bpmn20.xml");
+    }
+
+    protected void testDeadLetterBeforeMigration(boolean async, String processDefinitionPath) {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
 
         //Start an instance of the first version of the process for migration
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the same process
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
         assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
+
+        if (async) {
+            // Start the async executor to create the external worker job
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L, true);
+        }
 
         List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
                 .list();
@@ -370,17 +426,31 @@ public class ProcessInstanceDirectExecutionMigrationExternalWorkerTest extends A
 
     @Test
     public void testRetryBeforeMigration() {
+        testRetryBeforeMigration(false, "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+    }
+
+    @Test
+    public void testRetryBeforeMigrationAsync() {
+        testRetryBeforeMigration(true, "org/flowable/engine/test/api/runtime/migration/one-async-external-worker-simple-process.bpmn20.xml");
+    }
+
+    protected void testRetryBeforeMigration(boolean async, String processDefinitionPath) {
         //Deploy first version of the process
         ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
 
         //Start an instance of the first version of the process for migration
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("MP");
 
         //Deploy second version of the same process
         ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
-                "org/flowable/engine/test/api/runtime/migration/one-external-worker-simple-process.bpmn20.xml");
+                processDefinitionPath);
         assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
+
+        if (async) {
+            // Start the async executor to create the external worker job
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 1000L, 500L, true);
+        }
 
         List<ExternalWorkerJob> externalWorkerJobs = managementService.createExternalWorkerJobQuery()
                 .list();
