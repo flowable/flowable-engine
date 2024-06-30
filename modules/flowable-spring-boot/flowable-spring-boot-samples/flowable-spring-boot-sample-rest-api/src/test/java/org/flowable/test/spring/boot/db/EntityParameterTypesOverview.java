@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.db;
+package org.flowable.test.spring.boot.db;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -167,6 +167,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("BYTES_", "bytes", PARAMETER_TYPE_BLOBTYPE);
         info.addColumn("DEPLOYMENT_ID_", "deploymentId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("GENERATED_", "generated", PARAMETER_TYPE_BOOLEAN);
     }
 
     protected static void addAttachmentParams() {
@@ -335,6 +336,9 @@ public abstract class EntityParameterTypesOverview {
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+
+        // v5
+        info.addColumn("CACHED_ENT_STATE_", "cachedEventState", PARAMETER_TYPE_INTEGER);
     }
 
     protected static void addExternalWorkerJobParams() {
@@ -2014,7 +2018,7 @@ public abstract class EntityParameterTypesOverview {
     }
 
     public static String getColumnType(String entity, String columnName) {
-        return getParameterInfo(entity).getColumnType(columnName);
+        return getParameterInfo(entity).getColumnType(entity, columnName);
     }
 
     private static ParameterInfo getParameterInfo(String entity) {
@@ -2092,10 +2096,10 @@ public abstract class EntityParameterTypesOverview {
             }
         }
 
-        public String getColumnType(String columnName) {
+        public String getColumnType(String entity, String columnName) {
             String parameterName = columnToParameterMap.get(columnName);
             if (StringUtils.isEmpty(parameterName)) {
-                throw new RuntimeException("No parameter type set for column " + columnName);
+                throw new RuntimeException("No parameter type set for column '" + columnName + "' for entity '" + entity + "'");
             }
             return getParameterType(parameterName);
         }
