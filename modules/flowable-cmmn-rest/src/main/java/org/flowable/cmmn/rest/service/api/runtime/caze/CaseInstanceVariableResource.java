@@ -71,7 +71,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     @ApiOperation(value = "Update a single variable on a case instance", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the case instance and existing ones are overridden without any error.\n"
-                    + "Note that scope is ignored, only local variables can be set in a process instance.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
@@ -85,7 +85,7 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     })
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates both the case instance and variable were found and variable is updated."),
-            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the case instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
     @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public RestVariable updateVariable(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,

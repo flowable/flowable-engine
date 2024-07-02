@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 public class CaseInstanceVariableCollectionResource extends BaseVariableResource {
 
     @ApiOperation(value = "List variables for a case instance", nickname="listCaseInstanceVariables", tags = {"Case Instance Variables" },
-            notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
+            notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for case-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and variables are returned."),
             @ApiResponse(code = 400, message = "Indicates the requested case instance was not found.")
@@ -60,12 +60,12 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
 
     @ApiOperation(value = "Update a multiple/single (non)binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createOrUpdateCaseVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "Note that scope is ignored, only local variables can be set in a case instance.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
                     "    \"type\":\"integer\"\n" +
                     "    \"value\":123,\n" +
@@ -90,9 +90,9 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
 
     @ApiOperation(value = "Create variables or new binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createCaseInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "Note that scope is ignored, only local variables can be set in a case instance.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
