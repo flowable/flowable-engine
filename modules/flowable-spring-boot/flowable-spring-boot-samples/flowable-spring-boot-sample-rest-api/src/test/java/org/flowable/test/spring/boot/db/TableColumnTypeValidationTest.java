@@ -61,9 +61,6 @@ public class TableColumnTypeValidationTest {
         assertThat(mappedResources).isNotEmpty();
 
         for (String entity : mappedResources.keySet()) {
-            if (entity.equalsIgnoreCase("Privilege")) {
-                System.out.println();
-            }
             String tableName = findTable(entity, mappedResources.get(entity));
 
             Map<String, String> columnNameToTypeMap = getColumnMetaData(tableName);
@@ -183,22 +180,40 @@ public class TableColumnTypeValidationTest {
                     String columnType = resultSet.getString("TYPE_NAME");
 
                     // The JDBC metadata API doesn't return the same names as used in the mybatis mapping files
-                    if (columnType.equalsIgnoreCase("CHARACTER VARYING")) {
-                        columnType = EntityParameterTypesOverview.PARAMETER_TYPE_VARCHAR;
-                    } else if (columnType.equalsIgnoreCase("BINARY LARGE OBJECT")
+                    if (columnType.equalsIgnoreCase("BINARY LARGE OBJECT")
                             || columnType.equalsIgnoreCase("varbinary")
-                            || columnType.equalsIgnoreCase("binary varying")) {
+                            || columnType.equalsIgnoreCase("BINARY VARYING")
+                            || columnType.equalsIgnoreCase("LONGBLOB") // mariadb
+                            || columnType.equalsIgnoreCase("bytea")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BLOBTYPE;
-                    } else if (columnType.equalsIgnoreCase("CHARACTER LARGE OBJECT")) {
+
+                    } else if (columnType.equalsIgnoreCase("CHARACTER VARYING")
+                            || columnType.equalsIgnoreCase("CHARACTER LARGE OBJECT")
+                            || columnType.equalsIgnoreCase("VARCHAR2") // oracle
+                            || columnType.equalsIgnoreCase("LONGTEXT") // mariadb
+                            || columnType.equalsIgnoreCase("text")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_VARCHAR;
-                    } else if (columnType.equalsIgnoreCase("DOUBLE PRECISION") || columnType.equalsIgnoreCase("float")) {
+
+                    } else if (columnType.equalsIgnoreCase("DOUBLE PRECISION")
+                            || columnType.equalsIgnoreCase("float")
+                            || columnType.equalsIgnoreCase("float8")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_DOUBLE;
-                    } else if (columnType.equalsIgnoreCase("datetime") || columnType.equalsIgnoreCase("datetime2")) {
+
+                    } else if (columnType.equalsIgnoreCase("datetime")
+                            || columnType.equalsIgnoreCase("datetime2")) {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_TIMESTAMP;
-                    } else if (columnType.equalsIgnoreCase("int")) {
+
+                    } else if (columnType.equalsIgnoreCase("int")
+                            || columnType.equalsIgnoreCase("int4")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
-                    } else if (columnType.equalsIgnoreCase("bit")) {
+
+                    } else if (columnType.equalsIgnoreCase("int8"))  { // postgres
+                        columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
+
+                    } else if (columnType.equalsIgnoreCase("bit")
+                            || columnType.equalsIgnoreCase("bool")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
+
                     }
 
                     columnNameToTypeMap.put(columnName, columnType);

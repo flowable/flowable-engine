@@ -2099,6 +2099,12 @@ public abstract class EntityParameterTypesOverview {
         public String getColumnType(String entity, String columnName) {
             String parameterName = columnToParameterMap.get(columnName);
             if (StringUtils.isEmpty(parameterName)) {
+                parameterName = columnToParameterMap.get(columnName.toUpperCase(Locale.ROOT)); // e.g. needed for postgres
+            }
+            if (StringUtils.isEmpty(parameterName)) {
+                parameterName = columnToParameterMap.get(columnName.toLowerCase(Locale.ROOT));
+            }
+            if (StringUtils.isEmpty(parameterName)) {
                 throw new RuntimeException("No parameter type set for column '" + columnName + "' for entity '" + entity + "'");
             }
             return getParameterType(parameterName);
