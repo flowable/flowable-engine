@@ -553,6 +553,7 @@
 		<module>modules/flowable-spring-security</module>
         <module>modules/flowable-http-common</module>
         <module>modules/flowable-mail</module>
+        <module>modules/flowable-assertj</module>
     </modules>
 
 	<build>
@@ -1046,6 +1047,7 @@
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>
+				<module>modules/flowable-assertj</module>
 				<module>tooling/archetypes/flowable-archetype-unittest</module>
 			</modules>
 			<build>
