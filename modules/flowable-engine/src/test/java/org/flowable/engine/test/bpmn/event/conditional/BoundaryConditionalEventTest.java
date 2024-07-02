@@ -175,4 +175,33 @@ public class BoundaryConditionalEventTest extends PluggableFlowableTestCase {
         
         assertProcessEnded(processInstance.getId());
     }
+
+    @Test
+    @Deployment
+    public void testGroovyCondition() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "empty"));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("task1");
+
+        taskService.complete(tasks.get(0).getId());
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "empty"));
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("task1");
+
+        taskService.complete(tasks.get(0).getId());
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(1);
+        assertThat(tasks.get(0).getTaskDefinitionKey()).isEqualTo("boundaryTask");
+
+        taskService.complete(tasks.get(0).getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 }

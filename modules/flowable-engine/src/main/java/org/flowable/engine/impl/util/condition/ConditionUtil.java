@@ -33,6 +33,7 @@ public class ConditionUtil {
 
     public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
         String conditionExpression = null;
+        String conditionLanguage = sequenceFlow.getConditionLanguage();
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode elementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
             conditionExpression = getActiveValue(sequenceFlow.getConditionExpression(), DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
@@ -42,7 +43,7 @@ public class ConditionUtil {
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
 
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression, conditionLanguage);
             Condition condition = new UelExpressionCondition(expression);
             return condition.evaluate(sequenceFlow.getId(), execution);
         } else {

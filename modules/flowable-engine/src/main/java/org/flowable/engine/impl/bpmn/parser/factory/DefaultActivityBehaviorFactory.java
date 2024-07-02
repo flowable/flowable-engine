@@ -535,9 +535,9 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     
     @Override
     public IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
-                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+                    ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage) {
         
-        return new IntermediateCatchConditionalEventActivityBehavior(conditionalEventDefinition, conditionExpression);
+        return new IntermediateCatchConditionalEventActivityBehavior(conditionalEventDefinition, conditionExpression, conditionLanguage);
     }
 
     @Override
@@ -654,9 +654,9 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     
     @Override
     public BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent,
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage, boolean interrupting) {
 
-        return new BoundaryConditionalEventActivityBehavior(conditionalEventDefinition, conditionExpression, interrupting);
+        return new BoundaryConditionalEventActivityBehavior(conditionalEventDefinition, conditionExpression, conditionLanguage, interrupting);
     }
 
     @Override

@@ -18,6 +18,7 @@ package org.flowable.bpmn.model;
 public class ConditionalEventDefinition extends EventDefinition {
 
     protected String conditionExpression;
+    protected String conditionLanguage;
 
     public String getConditionExpression() {
         return conditionExpression;
@@ -25,6 +26,14 @@ public class ConditionalEventDefinition extends EventDefinition {
 
     public void setConditionExpression(String conditionExpression) {
         this.conditionExpression = conditionExpression;
+    }
+
+    public String getConditionLanguage() {
+        return conditionLanguage;
+    }
+
+    public void setConditionLanguage(String conditionLanguage) {
+        this.conditionLanguage = conditionLanguage;
     }
 
     @Override
@@ -37,5 +46,6 @@ public class ConditionalEventDefinition extends EventDefinition {
     public void setValues(ConditionalEventDefinition otherDefinition) {
         super.setValues(otherDefinition);
         setConditionExpression(otherDefinition.getConditionExpression());
+        setConditionLanguage(otherDefinition.getConditionLanguage());
     }
 }

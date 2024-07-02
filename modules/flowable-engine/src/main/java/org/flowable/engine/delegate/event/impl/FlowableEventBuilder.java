@@ -368,7 +368,7 @@ public class FlowableEventBuilder {
         return newEvent;
     }
     
-    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression,
+    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression, String conditionLanguage,
                     String executionId, String processInstanceId, String processDefinitionId) {
         
         FlowableConditionalEventImpl newEvent = new FlowableConditionalEventImpl(type);
@@ -377,6 +377,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setConditionExpression(conditionExpression);
+        newEvent.setConditionLanguage(conditionLanguage);
         return newEvent;
     }
     
