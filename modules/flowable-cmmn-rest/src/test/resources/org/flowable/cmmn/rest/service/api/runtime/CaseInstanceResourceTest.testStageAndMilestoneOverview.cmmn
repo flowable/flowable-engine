@@ -40,28 +40,28 @@
       <milestone id="milestone1" name="Milestone one" flowable:displayOrder="5" />
       
       <stage id="stage1" name="Stage one" flowable:displayOrder="10">
-        <planItem id="planItem12" name="Milestone A" definitionRef="milestone2" />
+        <planItem id="planItem12" name="Milestone two" definitionRef="milestone2" />
         <planItem id="planItem1" name="A" definitionRef="task1"></planItem>
         <milestone id="milestone2" name="Milestone two" flowable:includeInStageOverview="true" flowable:displayOrder="15" />
         <humanTask id="task1" name="A"></humanTask>
       </stage>
       
       <stage id="stage2" name="Stage two" flowable:includeInStageOverview="true" flowable:displayOrder="20">
-        <planItem id="planItem13" name="Milestone B" definitionRef="milestone3" />
+        <planItem id="planItem13" name="Milestone three" definitionRef="milestone3" />
         <planItem id="planItem3" name="B" definitionRef="task2"></planItem>
         <milestone id="milestone3" name="Milestone three" flowable:includeInStageOverview="false" flowable:displayOrder="25" />
         <humanTask id="task2" name="B"></humanTask>
       </stage>
       
       <stage id="stage3" name="Stage three" flowable:includeInStageOverview="false" flowable:displayOrder="34">
-        <planItem id="planItem14" name="Milestone C" definitionRef="milestone4" />
+        <planItem id="planItem14" name="Milestone four" definitionRef="milestone4" />
         <planItem id="planItem5" name="C" definitionRef="task3"></planItem>
         <milestone id="milestone4" name="Milestone four" flowable:includeInStageOverview="${includeInOverview}" flowable:displayOrder="37" />
         <humanTask id="task3" name="C"></humanTask>
       </stage>
       
       <stage id="stage4" name="Stage four" flowable:includeInStageOverview="${includeInOverview}" flowable:displayOrder="40">
-        <planItem id="planItem15" name="Milestone D" definitionRef="milestone5" />
+        <planItem id="planItem15" name="Milestone five" definitionRef="milestone5" />
         <planItem id="planItem7" name="D" definitionRef="task4"></planItem>
         <milestone id="milestone5" name="Milestone five" flowable:includeInStageOverview="${includeInOverviewNegative}" flowable:displayOrder="45" />
         <humanTask id="task4" name="D"></humanTask>
