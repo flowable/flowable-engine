@@ -58,7 +58,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
         // Create a table that the userBean is supposed to fill with some data
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute("create table MY_TABLE (MY_TEXT varchar);");
+        jdbcTemplate.execute("create table MY_TABLE (MY_TEXT int);");
 
         // The hello() method will start the process. The process will wait in a
         // user task
@@ -76,7 +76,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
         assertThat(jdbcTemplate.queryForObject("select count(*) from MY_TABLE", Long.class)).isZero();
 
         // Cleanup
-        jdbcTemplate.execute("drop table MY_TABLE if exists;");
+        jdbcTemplate.execute("drop table MY_TABLE;");
     }
 
     @Test
