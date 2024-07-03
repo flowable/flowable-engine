@@ -12,10 +12,11 @@
  */
 package org.flowable.rest.conf.jpa;
 
+import java.sql.Driver;
+
 import javax.sql.DataSource;
 
-import jakarta.persistence.EntityManagerFactory;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -27,10 +28,24 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import jakarta.persistence.EntityManagerFactory;
+
 @Configuration(proxyBeanMethods = false)
 @EnableJpaRepositories({ "org.flowable.rest.api.jpa.repository" })
 @EnableTransactionManagement
 public class DatabaseConfiguration {
+
+    @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}")
+    protected String jdbcUrl;
+
+    @Value("${jdbc.driver:org.h2.Driver}")
+    protected Class<? extends Driver> jdbcDriver;
+
+    @Value("${jdbc.username:sa}")
+    protected String jdbcUsername;
+
+    @Value("${jdbc.password:}")
+    protected String jdbcPassword;
 
     @Bean(name = "entityManagerFactory")
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
@@ -50,12 +65,10 @@ public class DatabaseConfiguration {
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(org.h2.Driver.class);
-
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername("sa");
-
+        ds.setUrl(jdbcUrl);
+        ds.setDriverClass(jdbcDriver);
+        ds.setUsername(jdbcUsername);
+        ds.setPassword(jdbcPassword);
         return ds;
     }
 
