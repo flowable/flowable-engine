@@ -220,12 +220,14 @@ public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
     }
     
     protected String getChangeLogVersion() {
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectDmnChangeLogVersions");
-        List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
-        if (changeLogItems != null && !changeLogItems.isEmpty()) {
-            ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
-            return lastExecutedItem.getId();
+        if (isTablePresent("ACT_DMN_DATABASECHANGELOG")) {
+            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
+            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectDmnChangeLogVersions");
+            List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
+            if (changeLogItems != null && !changeLogItems.isEmpty()) {
+                ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
+                return lastExecutedItem.getId();
+            }
         }
         
         return null;

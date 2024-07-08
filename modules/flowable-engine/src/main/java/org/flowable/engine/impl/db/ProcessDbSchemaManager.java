@@ -143,6 +143,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         } catch (Exception e) {
             logger.info("Error dropping common tables", e);
         }
+        
+        if (!CommandContextUtil.getProcessEngineConfiguration().isDisableEventRegistry()) {
+            CommandContextUtil.getEventRegistryEngineConfiguration().getSchemaManager().schemaDrop();
+        }
     }
 
     public void dbSchemaPrune() {

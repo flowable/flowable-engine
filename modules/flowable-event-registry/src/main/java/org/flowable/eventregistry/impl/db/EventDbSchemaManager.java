@@ -59,7 +59,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
             }
 
             String errorMessage = null;
-            if (!isDmnTablePresent()) {
+            if (!isEventRegistryTablePresent()) {
                 errorMessage = addMissingComponent(errorMessage, "eventregistry");
             }
 
@@ -103,7 +103,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
     }
 
     protected void schemaCreateInLock() {
-        if (isDmnTablePresent()) {
+        if (isEventRegistryTablePresent()) {
             String dbVersion = getDbVersion();
             if (!EventRegistryEngine.VERSION.equals(dbVersion)) {
                 throw new FlowableWrongDbException(EventRegistryEngine.VERSION, dbVersion);
@@ -143,11 +143,11 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
         int matchingVersionIndex = -1;
         
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        boolean isDmnTablePresent = isDmnTablePresent();
+        boolean isEventRegistryTablePresent = isEventRegistryTablePresent();
         
         String mappedChangeLogVersion = null;
         String changeLogVersion = null;
-        if (isDmnTablePresent) {
+        if (isEventRegistryTablePresent) {
             dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "eventregistry.schema.version");
             if (dbVersionProperty != null) {
                 mappedChangeLogVersion = dbVersionProperty.getValue();
@@ -174,7 +174,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
         }
 
         try {
-            if (isDmnTablePresent) {
+            if (isEventRegistryTablePresent) {
                 matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(mappedChangeLogVersion);
                 isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             }
@@ -189,7 +189,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
 
                 feedback = "upgraded Flowable from " + mappedChangeLogVersion + " to " + EventRegistryEngine.VERSION;
 
-            } else if (!isDmnTablePresent) {
+            } else if (!isEventRegistryTablePresent) {
                 dbSchemaCreateDmnEngine();
             }
 
@@ -202,7 +202,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
 
     }
 
-    public boolean isDmnTablePresent() {
+    public boolean isEventRegistryTablePresent() {
         return isTablePresent("FLW_EVENT_DEFINITION");
     }
     
@@ -220,12 +220,14 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
     }
     
     protected String getChangeLogVersion() {
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectEventRegistryChangeLogVersions");
-        List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
-        if (changeLogItems != null && !changeLogItems.isEmpty()) {
-            ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
-            return lastExecutedItem.getId();
+        if (isTablePresent("FLW_EV_DATABASECHANGELOG")) {
+            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
+            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectEventRegistryChangeLogVersions");
+            List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
+            if (changeLogItems != null && !changeLogItems.isEmpty()) {
+                ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
+                return lastExecutedItem.getId();
+            }
         }
         
         return null;
