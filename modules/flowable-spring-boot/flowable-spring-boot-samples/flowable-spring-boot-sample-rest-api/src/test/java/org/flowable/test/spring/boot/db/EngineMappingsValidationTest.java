@@ -54,6 +54,9 @@ import org.w3c.dom.NodeList;
  * @author Joram Barrez
  */
 public class EngineMappingsValidationTest {
+    
+    private static final List<String> NON_CREATE_ENTITIES = Arrays.asList(
+        "ChangeLog");
 
     private static final List<String> IMMUTABLE_ENTITIES = Arrays.asList(
         "HistoricIdentityLink",
@@ -63,7 +66,8 @@ public class EngineMappingsValidationTest {
         "EventLogEntry",
         "Privilege",
         "PrivilegeMapping",
-        "Membership");
+        "Membership",
+        "ChangeLog");
 
     @ParameterizedTest(name = "Package {0}")
     @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
@@ -100,7 +104,8 @@ public class EngineMappingsValidationTest {
             Document mappingFileContent = mappedResources.get(resource);
 
             Class<?> entityClass = getAndAssertEntityImplClass(mappingFileContent, resource);
-            if (Modifier.isAbstract(entityClass.getModifiers())) {
+            if (Modifier.isAbstract(entityClass.getModifiers())
+                    || NON_CREATE_ENTITIES.contains(resource)) { // these entities have no insert
                 continue;
             }
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityImpl;
@@ -31,6 +32,7 @@ public class EntityDependencyOrder {
     static {
 
         DELETE_ORDER.add(PropertyEntityImpl.class);
+        DELETE_ORDER.add(ChangeLogEntityImpl.class);
         DELETE_ORDER.add(HistoricDecisionExecutionEntityImpl.class);
         DELETE_ORDER.add(DmnResourceEntityImpl.class);
         DELETE_ORDER.add(DmnDeploymentEntityImpl.class);

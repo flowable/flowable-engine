@@ -7,7 +7,7 @@
   <!-- CHANGELOG SELECT -->
   
   <resultMap id="changeLogResultMap" type="org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl">
-    <id property="id" column="ID" jdbcType="NVARCHAR" />
+    <id property="id" column="ID" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="selectCmmnChangeLogVersions" resultMap="changeLogResultMap">

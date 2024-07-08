@@ -56,6 +56,7 @@ public abstract class EntityParameterTypesOverview {
         addProcessDefinitionParams();
         addProcessDefinitionInfoParams();
         addPropertyParams();
+        addChangeLogParams();
         addResourceParams();
         addTaskParams();
         addTimerJobParams();
@@ -716,6 +717,11 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("NAME_", "name", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("VALUE_", "value", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REV_", "revision", PARAMETER_TYPE_INTEGER);
+    }
+    
+    protected static void addChangeLogParams() {
+        ParameterInfo info = addParameterInfo("changeLog");
+        info.addColumn("ID", "id", PARAMETER_TYPE_VARCHAR);
     }
 
     protected static void addResourceParams() {
