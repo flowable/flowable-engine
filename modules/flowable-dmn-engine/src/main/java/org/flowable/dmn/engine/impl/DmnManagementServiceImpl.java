@@ -14,12 +14,14 @@ package org.flowable.dmn.engine.impl;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.CustomSqlExecution;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.cmd.GetTableMetaDataCmd;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.TablePageQueryImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdBuilderImpl;
@@ -65,6 +67,11 @@ public class DmnManagementServiceImpl extends CommonEngineServiceImpl<DmnEngineC
     @Override
     public ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId) {
         return new ChangeTenantIdBuilderImpl(fromTenantId, toTenantId, configuration.getChangeTenantIdManager());
+    }
+    
+    @Override
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate(), configuration.getEngineCfgKey());
     }
 
 }

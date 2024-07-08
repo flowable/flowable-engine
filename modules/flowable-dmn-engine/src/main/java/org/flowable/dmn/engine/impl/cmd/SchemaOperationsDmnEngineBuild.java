@@ -12,19 +12,46 @@
  */
 package org.flowable.dmn.engine.impl.cmd;
 
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class SchemaOperationsDmnEngineBuild implements Command<Void> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaOperationsDmnEngineBuild.class);
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((DmnDbSchemaManager) CommandContextUtil.getDmnEngineConfiguration(commandContext).getSchemaManager()).initSchema();
+        
+        SchemaManager schemaManager = CommandContextUtil.getDmnEngineConfiguration(commandContext).getSchemaManager();
+        String databaseSchemaUpdate = CommandContextUtil.getDmnEngineConfiguration().getDatabaseSchemaUpdate();
+        
+        LOGGER.debug("Executing cmmn schema management with setting {}", databaseSchemaUpdate);
+        if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+            try {
+                schemaManager.schemaDrop();
+            } catch (RuntimeException e) {
+                // ignore
+            }
+        }
+        if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
+                || DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate) || DmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaCreate();
+
+        } else if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaCheckVersion();
+
+        } else if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaUpdate();
+        }
+        
         return null;
     }
 

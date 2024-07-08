@@ -17,11 +17,11 @@ import java.util.regex.Pattern;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableWrongDbException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.ProcessEngine;
@@ -103,14 +103,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     }
 
     protected void schemaCreateInLock() {
-        getIdentityLinkSchemaManager().schemaCreate();
-        getEntityLinkSchemaManager().schemaCreate();
-        getEventSubscriptionSchemaManager().schemaCreate();
-        getTaskSchemaManager().schemaCreate();
-        getVariableSchemaManager().schemaCreate();
-        getJobSchemaManager().schemaCreate();
-        getBatchSchemaManager().schemaCreate();
-        
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
             if (!ProcessEngine.VERSION.equals(dbVersion)) {
@@ -144,48 +136,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             
         } catch (Exception e) {
             logger.info("Error dropping engine tables", e);
-        }
-        
-        try {
-            getBatchSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping batch tables", e);
-        }
-        
-        try {
-            getJobSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping job tables", e);
-        }
-     
-        try {
-            getVariableSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping variable tables", e);
-        }
-        
-        try {
-            getTaskSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping task tables", e);
-        }
-        
-        try {
-            getEventSubscriptionSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping event subscription tables", e);
-        }
-        
-        try {
-            getEntityLinkSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping entity link tables", e);
-        }
-        
-        try {
-            getIdentityLinkSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping identity link tables", e);
         }
         
         try {
@@ -247,14 +197,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
                     dbSchemaUpgradeUntil6120("history", matchingVersionIndex, dbVersion);
                 }
             }
-
-            getIdentityLinkSchemaManager().schemaUpdate(dbVersion);
-            getEntityLinkSchemaManager().schemaUpdate(dbVersion);
-            getEventSubscriptionSchemaManager().schemaUpdate(dbVersion);
-            getTaskSchemaManager().schemaUpdate(dbVersion);
-            getVariableSchemaManager().schemaUpdate(dbVersion);
-            getJobSchemaManager().schemaUpdate(dbVersion);
-            getBatchSchemaManager().schemaUpdate(dbVersion);
 
             if (isUpgradeNeeded) {
                 dbVersionProperty.setValue(ProcessEngine.VERSION);
@@ -363,34 +305,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     protected SchemaManager getCommonSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getCommonSchemaManager();
     }
-    
-    protected SchemaManager getIdentityLinkSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkSchemaManager();
-    }
-    
-    protected SchemaManager getEntityLinkSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getEntityLinkSchemaManager();
-    }
-    
-    protected SchemaManager getEventSubscriptionSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getEventSubscriptionSchemaManager();
-    }
-    
-    protected SchemaManager getVariableSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getVariableSchemaManager();
-    }
-    
-    protected SchemaManager getTaskSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getTaskSchemaManager();
-    }
-    
-    protected SchemaManager getJobSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getJobSchemaManager();
-    }
-    
-    protected SchemaManager getBatchSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getBatchSchemaManager();
-    }
+   
     
     protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return CommandContextUtil.getProcessEngineConfiguration();

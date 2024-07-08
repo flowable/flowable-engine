@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -34,7 +35,6 @@ import javax.sql.DataSource;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
-import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CandidateManager;
 import org.flowable.cmmn.api.CmmnChangeTenantIdEntityTypes;
@@ -228,7 +228,6 @@ import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
@@ -262,15 +261,12 @@ import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
-import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
-import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
@@ -288,7 +284,6 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
@@ -296,14 +291,12 @@ import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.DefaultTaskPostProcessor;
-import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
-import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -396,8 +389,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected ChangeTenantIdManager changeTenantIdManager;
     protected Set<String> changeTenantEntityTypes;
 
-    protected boolean executeServiceSchemaManagers = true;
-
     protected boolean enableSafeCmmnXml;
     protected boolean disableCmmnXmlValidation;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -448,14 +439,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
-
-    protected SchemaManager identityLinkSchemaManager;
-    protected SchemaManager entityLinkSchemaManager;
-    protected SchemaManager eventSubscriptionSchemaManager;
-    protected SchemaManager variableSchemaManager;
-    protected SchemaManager taskSchemaManager;
-    protected SchemaManager jobSchemaManager;
-    protected SchemaManager batchSchemaManager;
 
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
@@ -813,16 +796,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initSchemaManager() {
         super.initSchemaManager();
         initCmmnSchemaManager();
-
-        if (executeServiceSchemaManagers) {
-            initIdentityLinkSchemaManager();
-            initEntityLinkSchemaManager();
-            initEventSubscriptionSchemaManager();
-            initVariableSchemaManager();
-            initTaskSchemaManager();
-            initJobSchemaManager();
-            initBatchSchemaManager();
-        }
     }
     
     public void initSchemaManagementCommand() {
@@ -835,53 +808,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initCmmnSchemaManager() {
         if (this.schemaManager == null) {
-            if (DATABASE_TYPE_COCKROACHDB.equals(databaseType)) {
-                this.schemaManager = new CmmnDbSchemaManager(CmmnDbSchemaManager.LIQUIBASE_CHANGELOG_CRDB);
-            } else {
-                this.schemaManager = new CmmnDbSchemaManager(CmmnDbSchemaManager.LIQUIBASE_CHANGELOG);
-            }
-        }
-    }
-
-    protected void initVariableSchemaManager() {
-        if (this.variableSchemaManager == null) {
-            this.variableSchemaManager = new VariableDbSchemaManager();
-        }
-    }
-
-    protected void initTaskSchemaManager() {
-        if (this.taskSchemaManager == null) {
-            this.taskSchemaManager = new TaskDbSchemaManager();
-        }
-    }
-
-    protected void initIdentityLinkSchemaManager() {
-        if (this.identityLinkSchemaManager == null) {
-            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
-        }
-    }
-    
-    protected void initEntityLinkSchemaManager() {
-        if (this.entityLinkSchemaManager == null) {
-            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
-        }
-    }
-    
-    protected void initEventSubscriptionSchemaManager() {
-        if (this.eventSubscriptionSchemaManager == null) {
-            this.eventSubscriptionSchemaManager = new EventSubscriptionDbSchemaManager();
-        }
-    }
-
-    protected void initJobSchemaManager() {
-        if (this.jobSchemaManager == null) {
-            this.jobSchemaManager = new JobDbSchemaManager();
-        }
-    }
-
-    protected void initBatchSchemaManager() {
-        if (this.batchSchemaManager == null) {
-            this.batchSchemaManager = new BatchDbSchemaManager();
+            this.schemaManager = new CmmnDbSchemaManager();
         }
     }
 
@@ -2635,14 +2562,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public boolean isExecuteServiceSchemaManagers() {
-        return executeServiceSchemaManagers;
-    }
-
-    public void setExecuteServiceSchemaManagers(boolean executeServiceSchemaManagers) {
-        this.executeServiceSchemaManagers = executeServiceSchemaManagers;
-    }
-
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
@@ -2798,69 +2717,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         this.postDefaultELResolvers.add(elResolver);
-        return this;
-    }
-
-    public SchemaManager getIdentityLinkSchemaManager() {
-        return identityLinkSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
-        this.identityLinkSchemaManager = identityLinkSchemaManager;
-        return this;
-    }
-    
-    public SchemaManager getEntityLinkSchemaManager() {
-        return entityLinkSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
-        this.entityLinkSchemaManager = entityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getEventSubscriptionSchemaManager() {
-        return eventSubscriptionSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setEventSubscriptionSchemaManager(SchemaManager eventSubscriptionSchemaManager) {
-        this.eventSubscriptionSchemaManager = eventSubscriptionSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getVariableSchemaManager() {
-        return variableSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setVariableSchemaManager(SchemaManager variableSchemaManager) {
-        this.variableSchemaManager = variableSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getTaskSchemaManager() {
-        return taskSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setTaskSchemaManager(SchemaManager taskSchemaManager) {
-        this.taskSchemaManager = taskSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getJobSchemaManager() {
-        return jobSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setJobSchemaManager(SchemaManager jobSchemaManager) {
-        this.jobSchemaManager = jobSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getBatchSchemaManager() {
-        return batchSchemaManager;
-    }
-
-    public CmmnEngineConfiguration setBatchSchemaManager(SchemaManager batchSchemaManager) {
-        this.batchSchemaManager = batchSchemaManager;
         return this;
     }
 

@@ -91,10 +91,6 @@ import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.exception.DatabaseException;
-
 public class EventRegistryEngineConfiguration extends AbstractEngineConfiguration
         implements EventRegistryConfigurationApi, HasExpressionManagerEngineConfiguration {
 
@@ -352,19 +348,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         if (schemaManagementCmd == null) {
             if (usingRelationalDatabase && databaseSchemaUpdate != null) {
                 this.schemaManagementCmd = new SchemaOperationsEventRegistryEngineBuild();
-            }
-        }
-    }
-
-    private void closeDatabase(Liquibase liquibase) {
-        if (liquibase != null) {
-            Database database = liquibase.getDatabase();
-            if (database != null) {
-                try {
-                    database.close();
-                } catch (DatabaseException e) {
-                    logger.warn("Error closing database", e);
-                }
             }
         }
     }

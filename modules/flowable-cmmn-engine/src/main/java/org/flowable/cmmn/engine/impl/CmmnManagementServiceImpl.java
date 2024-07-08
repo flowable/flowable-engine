@@ -35,11 +35,13 @@ import org.flowable.cmmn.engine.impl.cmd.RescheduleTimerJobCmd;
 import org.flowable.cmmn.engine.impl.runtime.CmmnExternalWorkerTransitionBuilderImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdBuilderImpl;
 import org.flowable.job.api.DeadLetterJobQuery;
@@ -353,6 +355,11 @@ public class CmmnManagementServiceImpl extends CommonEngineServiceImpl<CmmnEngin
             throw new FlowableIllegalArgumentException("The command is null");
         }
         return commandExecutor.execute(config, command);
+    }
+    
+    @Override
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate(), configuration.getEngineCfgKey());
     }
 
 }

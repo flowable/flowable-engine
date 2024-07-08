@@ -63,7 +63,6 @@ import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -73,7 +72,6 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
@@ -81,7 +79,6 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
-import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -124,8 +121,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected boolean disableIdmEngine;
     protected boolean disableEventRegistry;
-
-    protected boolean executeServiceSchemaManagers = true;
     
     protected AppDeployer appDeployer;
     protected AppDeploymentManager deploymentManager;
@@ -136,8 +131,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected ExpressionManager expressionManager;
     protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
-    protected SchemaManager identityLinkSchemaManager;
-    protected SchemaManager variableSchemaManager;
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -244,11 +237,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     public void initSchemaManager() {
         super.initSchemaManager();
         initAppSchemaManager();
-
-        if (executeServiceSchemaManagers) {
-            initIdentityLinkSchemaManager();
-            initVariableSchemaManager();
-        }
     }
     
     public void initSchemaManagementCommand() {
@@ -262,18 +250,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected void initAppSchemaManager() {
         if (this.schemaManager == null) {
             this.schemaManager = new AppDbSchemaManager();
-        }
-    }
-
-    protected void initVariableSchemaManager() {
-        if (this.variableSchemaManager == null) {
-            this.variableSchemaManager = new VariableDbSchemaManager();
-        }
-    }
-
-    protected void initIdentityLinkSchemaManager() {
-        if (this.identityLinkSchemaManager == null) {
-            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
 
@@ -675,14 +651,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public boolean isExecuteServiceSchemaManagers() {
-        return executeServiceSchemaManagers;
-    }
-
-    public void setExecuteServiceSchemaManagers(boolean executeServiceSchemaManagers) {
-        this.executeServiceSchemaManagers = executeServiceSchemaManagers;
-    }
-
     @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
@@ -704,24 +672,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             this.expressionManagerConfigurers = new ArrayList<>();
         }
         this.expressionManagerConfigurers.add(configurer);
-        return this;
-    }
-
-    public SchemaManager getIdentityLinkSchemaManager() {
-        return identityLinkSchemaManager;
-    }
-
-    public AppEngineConfiguration setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
-        this.identityLinkSchemaManager = identityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getVariableSchemaManager() {
-        return variableSchemaManager;
-    }
-
-    public AppEngineConfiguration setVariableSchemaManager(SchemaManager variableSchemaManager) {
-        this.variableSchemaManager = variableSchemaManager;
         return this;
     }
 

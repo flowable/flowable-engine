@@ -89,8 +89,6 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             
         }
 
-        cmmnEngineConfiguration.setExecuteServiceSchemaManagers(false);
-
         initCmmnEngine();
 
         if (processEngineConfiguration != null) {

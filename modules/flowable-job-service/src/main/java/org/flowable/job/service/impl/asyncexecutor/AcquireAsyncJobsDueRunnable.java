@@ -18,8 +18,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
 import org.flowable.job.service.impl.cmd.AcquireJobsWithGlobalAcquireLockCmd;

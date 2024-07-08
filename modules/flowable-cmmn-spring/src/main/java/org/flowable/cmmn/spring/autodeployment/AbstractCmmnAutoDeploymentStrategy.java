@@ -19,7 +19,7 @@ import java.io.UncheckedIOException;
 
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.springframework.core.io.Resource;

@@ -12,19 +12,46 @@
  */
 package org.flowable.app.engine.impl.cmd;
 
-import org.flowable.app.engine.impl.db.AppDbSchemaManager;
+import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class SchemaOperationsAppEngineBuild implements Command<Void> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(SchemaOperationsAppEngineBuild.class);
 
     @Override
     public Void execute(CommandContext commandContext) {
-        ((AppDbSchemaManager) CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager()).initSchema();
+        
+        SchemaManager schemaManager = CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager();
+        String databaseSchemaUpdate = CommandContextUtil.getAppEngineConfiguration().getDatabaseSchemaUpdate();
+        
+        LOGGER.debug("Executing schema management with setting {}", databaseSchemaUpdate);
+        if (AppEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+            try {
+                schemaManager.schemaDrop();
+            } catch (RuntimeException e) {
+                // ignore
+            }
+        }
+        if (AppEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
+                || AppEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate) || AppEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaCreate();
+
+        } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaCheckVersion();
+
+        } else if (AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
+            schemaManager.schemaUpdate();
+        }
+        
         return null;
     }
 

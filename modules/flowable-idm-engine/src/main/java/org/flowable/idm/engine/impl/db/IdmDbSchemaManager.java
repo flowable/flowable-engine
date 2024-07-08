@@ -27,7 +27,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
     
    public IdmDbSchemaManager() {
        // note; no schema property set, managed by this class itself as it has (for historical reasons) it's own property table
-       super(IDM_PROPERTY_TABLE, SCHEMA_COMPONENT, null, VERSION_PROPERTY); 
+       super(IDM_PROPERTY_TABLE, SCHEMA_COMPONENT, VERSION_PROPERTY); 
    }
    
    @Override

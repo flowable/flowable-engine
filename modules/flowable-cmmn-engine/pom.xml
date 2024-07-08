@@ -104,10 +104,6 @@
             <artifactId>flowable-case-validation</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.uuid</groupId>
             <artifactId>java-uuid-generator</artifactId>
         </dependency>
@@ -216,6 +212,8 @@
             org.flowable.cmmn.engine
         </flowable.artifact>
         <flowable.osgi.export.additional>
+            org.flowable.cmmn.db.create,
+            org.flowable.cmmn.db.upgrade,
             org.flowable.cmmn.db.mapping.entity
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>

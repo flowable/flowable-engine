@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,7 +42,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
-import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -70,7 +70,6 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
@@ -358,15 +357,12 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
-import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
-import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -386,7 +382,6 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -395,7 +390,6 @@ import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.DefaultTaskPostProcessor;
-import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -405,7 +399,6 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
-import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -838,14 +831,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected FlowableEngineAgendaFactory agendaFactory;
     protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
-    protected SchemaManager identityLinkSchemaManager;
-    protected SchemaManager entityLinkSchemaManager;
-    protected SchemaManager eventSubscriptionSchemaManager;
-    protected SchemaManager variableSchemaManager;
-    protected SchemaManager taskSchemaManager;
-    protected SchemaManager jobSchemaManager;
-    protected SchemaManager batchSchemaManager;
-
     protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
@@ -1071,15 +1056,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public void initSchemaManager() {
         super.initSchemaManager();
-
         initProcessSchemaManager();
-        initIdentityLinkSchemaManager();
-        initEntityLinkSchemaManager();
-        initEventSubscriptionSchemaManager();
-        initVariableSchemaManager();
-        initTaskSchemaManager();
-        initJobSchemaManager();
-        initBatchSchemaManager();
     }
 
     public void initNonRelationalDataSource() {
@@ -1089,48 +1066,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initProcessSchemaManager() {
         if (this.schemaManager == null) {
             this.schemaManager = new ProcessDbSchemaManager();
-        }
-    }
-
-    protected void initVariableSchemaManager() {
-        if (this.variableSchemaManager == null) {
-            this.variableSchemaManager = new VariableDbSchemaManager();
-        }
-    }
-
-    protected void initTaskSchemaManager() {
-        if (this.taskSchemaManager == null) {
-            this.taskSchemaManager = new TaskDbSchemaManager();
-        }
-    }
-
-    protected void initIdentityLinkSchemaManager() {
-        if (this.identityLinkSchemaManager == null) {
-            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
-        }
-    }
-
-    protected void initEntityLinkSchemaManager() {
-        if (this.entityLinkSchemaManager == null) {
-            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
-        }
-    }
-    
-    protected void initEventSubscriptionSchemaManager() {
-        if (this.eventSubscriptionSchemaManager == null) {
-            this.eventSubscriptionSchemaManager = new EventSubscriptionDbSchemaManager();
-        }
-    }
-
-    protected void initJobSchemaManager() {
-        if (this.jobSchemaManager == null) {
-            this.jobSchemaManager = new JobDbSchemaManager();
-        }
-    }
-    
-    protected void initBatchSchemaManager() {
-        if (this.batchSchemaManager == null) {
-            this.batchSchemaManager = new BatchDbSchemaManager();
         }
     }
 
@@ -4549,69 +4484,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceMigrationCallbacks(List<ProcessInstanceMigrationCallback> processInstanceMigrationCallbacks) {
         this.processInstanceMigrationCallbacks = processInstanceMigrationCallbacks;
-        return this;
-    }
-
-    public SchemaManager getVariableSchemaManager() {
-        return variableSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setVariableSchemaManager(SchemaManager variableSchemaManager) {
-        this.variableSchemaManager = variableSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getTaskSchemaManager() {
-        return taskSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTaskSchemaManager(SchemaManager taskSchemaManager) {
-        this.taskSchemaManager = taskSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getIdentityLinkSchemaManager() {
-        return identityLinkSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
-        this.identityLinkSchemaManager = identityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getEntityLinkSchemaManager() {
-        return entityLinkSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
-        this.entityLinkSchemaManager = entityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getEventSubscriptionSchemaManager() {
-        return eventSubscriptionSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEventSubscriptionSchemaManager(SchemaManager eventSubscriptionSchemaManager) {
-        this.eventSubscriptionSchemaManager = eventSubscriptionSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getJobSchemaManager() {
-        return jobSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setJobSchemaManager(SchemaManager jobSchemaManager) {
-        this.jobSchemaManager = jobSchemaManager;
-        return this;
-    }
-    
-    public SchemaManager getBatchSchemaManager() {
-        return batchSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setBatchSchemaManager(SchemaManager batchSchemaManager) {
-        this.batchSchemaManager = batchSchemaManager;
         return this;
     }
 
