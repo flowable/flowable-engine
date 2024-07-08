@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.db;
+package org.flowable.test.spring.boot.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.flowable.db.EntityParameterTypesOverview.getColumnType;
-import static org.flowable.db.EntityParameterTypesOverview.getParameterType;
+import static org.flowable.test.spring.boot.db.EntityParameterTypesOverview.getColumnType;
+import static org.flowable.test.spring.boot.db.EntityParameterTypesOverview.getParameterType;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,82 +25,35 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.flowable.test.spring.boot.db.EntityHelperUtil.EntityMappingPackageInformation;
+import org.flowable.test.spring.boot.db.EntityHelperUtil.EntityPackageTestArgumentsProvider;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * Various tests for Mybatis mapping files.
- * This test class is here, in the spring boot autoconfigure, as this module has access to all engines and services.
+ * This test class is here, in the spring boot rest api module, as this module has access to all engines and services.
  *
  * @author Joram Barrez
  */
 public class EngineMappingsValidationTest {
-
-    static class PackageArgumentsProvider implements ArgumentsProvider {
-
-        @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
-            return Stream.of(
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable",
-                    EntityDependencyOrder.DELETE_ORDER,
-                    EntityDependencyOrder.INSERT_ORDER)),
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable.cmmn",
-                    org.flowable.cmmn.engine.impl.db.EntityDependencyOrder.DELETE_ORDER,
-                    org.flowable.cmmn.engine.impl.db.EntityDependencyOrder.INSERT_ORDER)),
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable.dmn",
-                    org.flowable.dmn.engine.impl.db.EntityDependencyOrder.DELETE_ORDER,
-                    org.flowable.dmn.engine.impl.db.EntityDependencyOrder.INSERT_ORDER)),
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable.app",
-                    org.flowable.app.engine.impl.db.EntityDependencyOrder.DELETE_ORDER,
-                    org.flowable.app.engine.impl.db.EntityDependencyOrder.INSERT_ORDER)),
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable.idm",
-                    org.flowable.idm.engine.impl.db.EntityDependencyOrder.DELETE_ORDER,
-                    org.flowable.idm.engine.impl.db.EntityDependencyOrder.INSERT_ORDER)),
-
-                Arguments.of(new EntityMappingPackageInformation("org.flowable.eventregistry",
-                    org.flowable.eventregistry.impl.db.EntityDependencyOrder.DELETE_ORDER,
-                    org.flowable.eventregistry.impl.db.EntityDependencyOrder.INSERT_ORDER))
-
-           );
-        }
-
-    }
 
     private static final List<String> IMMUTABLE_ENTITIES = Arrays.asList(
         "HistoricIdentityLink",
@@ -112,13 +65,10 @@ public class EngineMappingsValidationTest {
         "PrivilegeMapping",
         "Membership");
 
-    private static final Pattern ENTITY_RESOURCE_PATTERN = Pattern.compile(".*/entity/(.*)\\.xml");
-
-
     @ParameterizedTest(name = "Package {0}")
-    @ArgumentsSource(PackageArgumentsProvider.class)
+    @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyMappedEntitiesExist(EntityMappingPackageInformation packageInformation) {
-        Map<String, Document> mappedResources = readMappingFile(packageInformation);
+        Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
         assertFalse(mappedResources.isEmpty());
 
         for (String mappedResource : mappedResources.keySet()) {
@@ -129,9 +79,9 @@ public class EngineMappingsValidationTest {
     }
 
     @ParameterizedTest(name = "Package {0}")
-    @ArgumentsSource(PackageArgumentsProvider.class)
+    @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyEntitiesInEntityDependencyOrder(EntityMappingPackageInformation packageInformation) {
-        Map<String, Document> mappedResources = readMappingFile(packageInformation);
+        Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
         for (String mappedResource : mappedResources.keySet()) {
             Document mappingFileContent = mappedResources.get(mappedResource);
             assertTrue(packageInformation.getEntityInsertOrder().contains(getAndAssertEntityImplClass(mappingFileContent, mappedResource)),
@@ -142,9 +92,9 @@ public class EngineMappingsValidationTest {
     }
 
     @ParameterizedTest(name = "Package {0}")
-    @ArgumentsSource(PackageArgumentsProvider.class)
+    @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyInserts(EntityMappingPackageInformation packageInformation) {
-        Map<String, Document> mappedResources = readMappingFile(packageInformation);
+        Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
         for (String resource : mappedResources.keySet()) {
 
             Document mappingFileContent = mappedResources.get(resource);
@@ -209,9 +159,9 @@ public class EngineMappingsValidationTest {
     }
 
     @ParameterizedTest(name = "Package {0}")
-    @ArgumentsSource(PackageArgumentsProvider.class)
+    @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyUpdateStatements(EntityMappingPackageInformation packageInformation) {
-        Map<String, Document> mappedResources = readMappingFile(packageInformation);
+        Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
         for (String resource : mappedResources.keySet()) {
             Document mappingFileContent = mappedResources.get(resource);
 
@@ -246,9 +196,9 @@ public class EngineMappingsValidationTest {
     }
 
     @ParameterizedTest(name = "Package {0}")
-    @ArgumentsSource(PackageArgumentsProvider.class)
+    @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyAllParametersAreTyped(EntityMappingPackageInformation packageInformation) throws IOException {
-        Map<String, String> mappedResources = readMappingFileAsString(packageInformation);
+        Map<String, String> mappedResources = EntityHelperUtil.readMappingFileAsString(packageInformation);
         assertFalse(mappedResources.isEmpty());
 
         for (String mappedResource : mappedResources.keySet()) {
@@ -384,75 +334,6 @@ public class EngineMappingsValidationTest {
         return null;
     }
 
-    /**
-     * Returns a map {entityName, xmlMappingFileContent as Document}
-     */
-    private Map<String, Document> readMappingFile(EntityMappingPackageInformation packageInformation) {
-        try {
-            Document mappingsFile = readXmlDocument(packageInformation.getBasePackageFolder() + "/db/mapping/mappings.xml");
-            Map<String, Document> resources = new HashMap<>();
-            NodeList nodeList = mappingsFile.getElementsByTagName("mapper");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                Matcher resourceMatcher = ENTITY_RESOURCE_PATTERN.matcher(resource);
-                if (resourceMatcher.matches()) {
-                    String entity = resourceMatcher.group(1);
-                    Document entityMappingXmlContent = readXmlDocument(resource);
-                    resources.put(entity, entityMappingXmlContent);
-                }
-            }
-
-            resources.remove("TableData"); // not an entity
-
-            assertFalse(resources.isEmpty());
-
-            return resources;
-        } catch (Exception e) {
-            throw new FlowableException("Error getting mapped resources", e);
-        }
-    }
-
-    private Document readXmlDocument(String resourceLocation) throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setValidating(false);
-        docBuilderFactory.setNamespaceAware(false);
-        docBuilderFactory.setExpandEntityReferences(false);
-        docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        docBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        return docBuilder.parse(this.getClass().getClassLoader().getResourceAsStream(resourceLocation));
-    }
-
-    /**
-     * Returns a map {entityName, xmlMappingFileContent as Document}
-     */
-    private Map<String, String> readMappingFileAsString(EntityMappingPackageInformation packageInformation) {
-        try {
-            Document mappingsFile = readXmlDocument(packageInformation.getBasePackageFolder() + "/db/mapping/mappings.xml");
-            Map<String, String> resources = new HashMap<>();
-            NodeList nodeList = mappingsFile.getElementsByTagName("mapper");
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                Matcher resourceMatcher = ENTITY_RESOURCE_PATTERN.matcher(resource);
-                if (resourceMatcher.matches()) {
-                    String entity = resourceMatcher.group(1);
-                    String entityMappingXmlContent = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream(resource), StandardCharsets.UTF_8);
-                    resources.put(entity, entityMappingXmlContent);
-                }
-            }
-
-            resources.remove("TableData"); // not an entity
-
-            assertFalse(resources.isEmpty());
-
-            return resources;
-        } catch (Exception e) {
-            throw new FlowableException("Error getting mapped resources", e);
-        }
-    }
-
     private String getEntityPackageFromMapperElement(Document mappingFileContent) {
         Node mapperNode = findChildNodes(mappingFileContent, "mapper").get(1); // 1 --> the first element is <!DOCTYPE mapper ..., so we need the second
         String namespace = mapperNode.getAttributes().getNamedItem("namespace").getTextContent();
@@ -513,43 +394,6 @@ public class EngineMappingsValidationTest {
             fail();
         }
         return null;
-    }
-
-    static class EntityMappingPackageInformation {
-
-        private String basePackage;
-        private String basePackageFolder;
-
-        private List<Class<? extends Entity>> entityDeleteOrder;
-        private List<Class<? extends Entity>> entityInsertOrder;
-
-        public EntityMappingPackageInformation(String basePackage,
-                List<Class<? extends Entity>> entityDeleteOrder, List<Class<? extends Entity>> entityInsertOrder) {
-
-            this.basePackage = basePackage;
-            this.basePackageFolder = basePackage.replace(".", "/");
-
-            this.entityDeleteOrder = entityDeleteOrder;
-            this.entityInsertOrder = entityInsertOrder;
-        }
-
-        public String getBasePackage() {
-            return basePackage;
-        }
-        public String getBasePackageFolder() {
-            return basePackageFolder;
-        }
-        public List<Class<? extends Entity>> getEntityDeleteOrder() {
-            return entityDeleteOrder;
-        }
-        public List<Class<? extends Entity>> getEntityInsertOrder() {
-            return entityInsertOrder;
-        }
-
-        @Override
-        public String toString() {
-            return basePackage; // used in name for ParameterizedTest
-        }
     }
 
 }

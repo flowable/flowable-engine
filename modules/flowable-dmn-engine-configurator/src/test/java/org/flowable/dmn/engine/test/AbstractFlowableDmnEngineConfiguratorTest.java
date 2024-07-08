@@ -26,8 +26,6 @@ import org.junit.Rule;
  */
 public class AbstractFlowableDmnEngineConfiguratorTest {
 
-    public static final String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
-
     @Rule
     public FlowableRule flowableRule = new FlowableRule();
 

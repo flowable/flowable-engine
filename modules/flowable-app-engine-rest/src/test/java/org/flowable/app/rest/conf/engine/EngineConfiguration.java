@@ -47,13 +47,10 @@ public class EngineConfiguration {
     @Bean
     public DataSource dataSource() {
         SimpleDriverDataSource ds = new SimpleDriverDataSource();
+        ds.setUrl(jdbcUrl);
         ds.setDriverClass(jdbcDriver);
-
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
         ds.setUsername(jdbcUsername);
         ds.setPassword(jdbcPassword);
-
         return ds;
     }
 

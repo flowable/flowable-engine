@@ -30,9 +30,11 @@ import javax.sql.DataSource;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.test.AbstractTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -69,6 +71,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
     protected ConfigurableApplicationContext applicationContext;
     protected RepositoryService repositoryService;
+    protected ManagementService managementService;
 
     protected void createAppContextWithCreateDropDb() {
         Map<String, Object> properties = new HashMap<>();
@@ -113,11 +116,19 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         applicationContext.refresh();
         this.applicationContext = applicationContext;
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
+        this.managementService = applicationContext.getBean(ManagementService.class);
     }
 
     @AfterEach
     protected void tearDown() throws Exception {
         removeAllDeployments();
+
+        // Make sure the schema is always dropped
+        this.managementService.executeCommand(commandContext -> {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
+            return null;
+        });
+
         if (this.applicationContext != null) {
             this.applicationContext.close();
             this.applicationContext = null;
@@ -403,6 +414,11 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         @Bean
         public RepositoryService repositoryService(ProcessEngine processEngine) {
             return processEngine.getRepositoryService();
+        }
+
+        @Bean
+        public ManagementService managementService(ProcessEngine processEngine) {
+            return processEngine.getManagementService();
         }
     }
 

@@ -22,9 +22,11 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:flowable-context.xml")
+@DirtiesContext
 public class LdapIntegrationTest extends LDAPTestCase {
 
     @Test
