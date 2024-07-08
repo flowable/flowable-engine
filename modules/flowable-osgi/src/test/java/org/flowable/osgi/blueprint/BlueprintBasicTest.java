@@ -129,7 +129,6 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("com.h2database").artifactId("h2").versionAsInProject(),
                 mavenBundle().groupId("org.eclipse.angus").artifactId("angus-mail").versionAsInProject(),
                 mavenBundle().groupId("org.mybatis").artifactId("mybatis").versionAsInProject(),
-                mavenBundle().groupId("org.liquibase").artifactId("liquibase-core").versionAsInProject(),
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-api").versionAsInProject(),
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-reload4j").versionAsInProject(),
                 mavenBundle().groupId("org.junit.jupiter").artifactId("junit-jupiter-api").versionAsInProject(),

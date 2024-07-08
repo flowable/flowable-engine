@@ -118,8 +118,6 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/dmn/db/mapping/mappings.xml";
 
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DMN_";
-
     protected String dmnEngineName = DmnEngines.NAME_DEFAULT;
 
     protected DmnEngineAgendaFactory dmnEngineAgendaFactory;

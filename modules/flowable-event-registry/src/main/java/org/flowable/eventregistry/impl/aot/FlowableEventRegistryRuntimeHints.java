@@ -10,21 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.engine.impl.aot;
+package org.flowable.eventregistry.impl.aot;
 
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
-import org.springframework.aot.hint.ResourceHints;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 
 /**
  * @author Filip Hrisafov
  */
-public class FlowableAppRuntimeHints implements RuntimeHintsRegistrar {
+public class FlowableEventRegistryRuntimeHints implements RuntimeHintsRegistrar {
 
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
-        ResourceHints resourceHints = hints.resources();
-        FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/app/db/mapping", hints, classLoader);
+        FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/eventregistry/db/mapping", hints, classLoader);
     }
 }

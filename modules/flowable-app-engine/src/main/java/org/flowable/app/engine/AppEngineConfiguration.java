@@ -104,7 +104,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 
     protected String appEngineName = AppEngines.NAME_DEFAULT;
 

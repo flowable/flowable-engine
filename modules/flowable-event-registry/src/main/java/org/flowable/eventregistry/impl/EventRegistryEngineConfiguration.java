@@ -96,8 +96,6 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/eventregistry/db/mapping/mappings.xml";
 
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "FLW_EV_";
-
     protected String eventRegistryEngineName = EventRegistryEngines.NAME_DEFAULT;
 
     // SERVICES

@@ -100,7 +100,6 @@ org.apache.geronimo.bundles     json                        20090211_1      The 
 org.apache.groovy               groovy                      4.0.17          The Apache Software License, Version 2.0
 org.apache.groovy               groovy-jsr223               4.0.17          The Apache Software License, Version 2.0
 org.eclipse.angus               angus-mail                  2.0.2           EDL 1.0 / EPL 2.0
-org.liquibase                   liquibase-core              4.5.0           Apache License, Version 2.0
 org.mybatis                     mybatis                     3.5.13          The Apache Software License, Version 2.0
 org.mybatis                     mybatis-spring              3.0.3           The Apache Software License, Version 2.0
 org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
