@@ -80,8 +80,8 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
-        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
+        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "schema.version");
     }
     
     @Override

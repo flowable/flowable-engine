@@ -13,11 +13,8 @@
 
 package org.flowable.dmn.engine.impl.db;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -36,25 +33,21 @@ import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
 public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
-    protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
-
     protected static final String DMN_DB_SCHEMA_LOCK_NAME = "dmnDbSchemaLock";
-    
-    protected static Map<String, String> changeLogVersionMap = new HashMap<>();
-    
-    static {
-        changeLogVersionMap.put("1", "6.0.0.5");
-        changeLogVersionMap.put("2", "6.1.1.0");
-        changeLogVersionMap.put("3", "6.3.0.0");
-        changeLogVersionMap.put("4", "6.3.1.0");
-        changeLogVersionMap.put("5", "6.4.0.0");
-        changeLogVersionMap.put("6", "6.4.1.3");
-        changeLogVersionMap.put("7", "6.6.0.0");
-        changeLogVersionMap.put("8", "6.6.0.0");
-        changeLogVersionMap.put("9", "6.8.0.0");
-        changeLogVersionMap.put("10", "7.1.0.0");
-    }
-    
+
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.0.0.5"),
+            Map.entry("2", "6.1.1.0"),
+            Map.entry("3", "6.3.0.0"),
+            Map.entry("4", "6.3.1.0"),
+            Map.entry("5", "6.4.0.0"),
+            Map.entry("6", "6.4.1.3"),
+            Map.entry("7", "6.6.0.0"),
+            Map.entry("8", "6.6.0.0"),
+            Map.entry("9", "6.8.0.0"),
+            Map.entry("10", "7.1.0.0")
+    );
+
     @Override
     public void schemaCheckVersion() {
         try {
@@ -215,8 +208,8 @@ public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
-        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
+        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "dmn.schema.version");
     }
     
     protected String getChangeLogVersion() {
@@ -231,22 +224,6 @@ public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
         }
         
         return null;
-    }
-
-    protected String getCleanVersion(String versionString) {
-        Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
-        if (!matcher.find()) {
-            throw new FlowableException("Illegal format for version: " + versionString);
-        }
-
-        String cleanString = matcher.group();
-        try {
-            Double.parseDouble(cleanString); // try to parse it, to see if it is
-                                             // really a number
-            return cleanString;
-        } catch (NumberFormatException nfe) {
-            throw new FlowableException("Illegal format for version: " + versionString, nfe);
-        }
     }
 
     protected boolean isMissingTablesException(Exception e) {
@@ -270,13 +247,6 @@ public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
         return false;
     }
 
-    public void performSchemaOperationsProcessEngineClose() {
-        String databaseSchemaUpdate = CommandContextUtil.getDmnEngineConfiguration().getDatabaseSchemaUpdate();
-        if (DmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-            schemaDrop();
-        }
-    }
-    
     protected SchemaManager getCommonSchemaManager() {
         return CommandContextUtil.getDmnEngineConfiguration().getCommonSchemaManager();
     }

@@ -12,11 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.db;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngine;
@@ -35,35 +32,31 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 
 public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
-    protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
-
     protected static final String CMMN_DB_SCHEMA_LOCK_NAME = "cmmnDbSchemaLock";
-    
-    protected static Map<String, String> changeLogVersionMap = new HashMap<>();
-    
-    static {
-        changeLogVersionMap.put("1", "6.2.0.0");
-        changeLogVersionMap.put("2", "6.2.1.0");
-        changeLogVersionMap.put("3", "6.3.0.0");
-        changeLogVersionMap.put("4", "6.3.1.0");
-        changeLogVersionMap.put("5", "6.4.0.0");
-        changeLogVersionMap.put("6", "6.4.1.3");
-        changeLogVersionMap.put("7", "6.4.1.3");
-        changeLogVersionMap.put("8", "6.5.0.6");
-        changeLogVersionMap.put("9", "6.5.0.6");
-        changeLogVersionMap.put("10", "6.5.0.6");
-        changeLogVersionMap.put("11", "6.5.0.6");
-        changeLogVersionMap.put("12", "6.6.0.0");
-        changeLogVersionMap.put("13", "6.6.0.0");
-        changeLogVersionMap.put("14", "6.7.0.0");
-        changeLogVersionMap.put("15", "6.7.1.0");
-        changeLogVersionMap.put("16", "6.7.1.0");
-        changeLogVersionMap.put("17", "6.8.0.0");
-        changeLogVersionMap.put("18", "7.0.1.1");
-        changeLogVersionMap.put("19", "7.1.0.0");
-        changeLogVersionMap.put("20", "7.1.0.0");
-    }
-    
+
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.2.0.0"),
+            Map.entry("2", "6.2.1.0"),
+            Map.entry("3", "6.3.0.0"),
+            Map.entry("4", "6.3.1.0"),
+            Map.entry("5", "6.4.0.0"),
+            Map.entry("6", "6.4.1.3"),
+            Map.entry("7", "6.4.1.3"),
+            Map.entry("8", "6.5.0.6"),
+            Map.entry("9", "6.5.0.6"),
+            Map.entry("10", "6.5.0.6"),
+            Map.entry("11", "6.5.0.6"),
+            Map.entry("12", "6.6.0.0"),
+            Map.entry("13", "6.6.0.0"),
+            Map.entry("14", "6.7.0.0"),
+            Map.entry("15", "6.7.1.0"),
+            Map.entry("16", "6.7.1.0"),
+            Map.entry("17", "6.8.0.0"),
+            Map.entry("18", "7.0.1.1"),
+            Map.entry("19", "7.1.0.0"),
+            Map.entry("20", "7.1.0.0")
+    );
+
     @Override
     public void schemaCheckVersion() {
         try {
@@ -224,8 +217,8 @@ public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectCmmnDbSchemaVersion");
-        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
+        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "cmmn.schema.version");
     }
     
     protected String getChangeLogVersion() {
@@ -240,22 +233,6 @@ public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
         }
         
         return null;
-    }
-
-    protected String getCleanVersion(String versionString) {
-        Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
-        if (!matcher.find()) {
-            throw new FlowableException("Illegal format for version: " + versionString);
-        }
-
-        String cleanString = matcher.group();
-        try {
-            Double.parseDouble(cleanString); // try to parse it, to see if it is
-                                             // really a number
-            return cleanString;
-        } catch (NumberFormatException nfe) {
-            throw new FlowableException("Illegal format for version: " + versionString, nfe);
-        }
     }
 
     protected boolean isMissingTablesException(Exception e) {
@@ -279,13 +256,6 @@ public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
         return false;
     }
 
-    public void performSchemaOperationsProcessEngineClose() {
-        String databaseSchemaUpdate = CommandContextUtil.getCmmnEngineConfiguration().getDatabaseSchemaUpdate();
-        if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-            schemaDrop();
-        }
-    }
-    
     protected SchemaManager getCommonSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getCommonSchemaManager();
     }

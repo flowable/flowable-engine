@@ -76,8 +76,8 @@ public class AppDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectDbSchemaVersion");
-        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
+        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "app.schema.version");
     }
     
     @Override

@@ -12,11 +12,8 @@
  */
 package org.flowable.eventregistry.impl.db;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -36,20 +33,16 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
 public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
-    protected static final Pattern CLEAN_VERSION_REGEX = Pattern.compile("\\d\\.\\d*");
-
     protected static final String EVENTREGISTRY_DB_SCHEMA_LOCK_NAME = "eventRegistryDbSchemaLock";
-    
-    protected static Map<String, String> changeLogVersionMap = new HashMap<>();
-    
-    static {
-        changeLogVersionMap.put("1", "6.5.0.6");
-        changeLogVersionMap.put("2", "6.7.2.0");
-        changeLogVersionMap.put("3", "6.7.2.0");
-        changeLogVersionMap.put("4", "7.1.0.0");
-        changeLogVersionMap.put("5", "7.1.0.0");
-    }
-    
+
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.5.0.6"),
+            Map.entry("2", "6.7.2.0"),
+            Map.entry("3", "6.7.2.0"),
+            Map.entry("4", "7.1.0.0"),
+            Map.entry("5", "7.1.0.0")
+    );
+
     @Override
     public void schemaCheckVersion() {
         try {
@@ -183,7 +176,7 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
                 // Engine upgrade
                 dbSchemaUpgrade("eventregistry", matchingVersionIndex, mappedChangeLogVersion);
                 
-                if (changeLogVersion != null && ("1".equals(changeLogVersion) || "2".equals(changeLogVersion))) {
+                if (("1".equals(changeLogVersion) || "2".equals(changeLogVersion))) {
                     eventRegistryConfiguration.getCommandExecutor().execute(new UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd());
                 }
 
@@ -215,8 +208,9 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
 
     protected String getDbVersion() {
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectEventRegistryDbSchemaVersion");
-        return (String) dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement);
+        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory()
+                .mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
+        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "eventregistry.schema.version");
     }
     
     protected String getChangeLogVersion() {
@@ -231,22 +225,6 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
         }
         
         return null;
-    }
-
-    protected String getCleanVersion(String versionString) {
-        Matcher matcher = CLEAN_VERSION_REGEX.matcher(versionString);
-        if (!matcher.find()) {
-            throw new FlowableException("Illegal format for version: " + versionString);
-        }
-
-        String cleanString = matcher.group();
-        try {
-            Double.parseDouble(cleanString); // try to parse it, to see if it is
-                                             // really a number
-            return cleanString;
-        } catch (NumberFormatException nfe) {
-            throw new FlowableException("Illegal format for version: " + versionString, nfe);
-        }
     }
 
     protected boolean isMissingTablesException(Exception e) {
@@ -270,13 +248,6 @@ public class EventDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager 
         return false;
     }
 
-    public void performSchemaOperationsProcessEngineClose() {
-        String databaseSchemaUpdate = CommandContextUtil.getEventRegistryConfiguration().getDatabaseSchemaUpdate();
-        if (EventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-            schemaDrop();
-        }
-    }
-    
     protected SchemaManager getCommonSchemaManager() {
         return CommandContextUtil.getEventRegistryConfiguration().getCommonSchemaManager();
     }
