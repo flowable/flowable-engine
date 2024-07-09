@@ -81,9 +81,9 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     }
     
     @Override
-    protected void dbSchemaUpgrade(String component, int currentDatabaseVersionsIndex, String engineDbVersion) {
-        super.dbSchemaUpgrade(component, currentDatabaseVersionsIndex, engineDbVersion);
-        if ("6.5.0.6".equals(engineDbVersion) || "6.7.2.0".equals(engineDbVersion)) {
+    protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
+        String version = changeLogVersion.version();
+        if ("1".equals(version) || "2".equals(version)) {
             getEngineConfiguration().getCommandExecutor().execute(new UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd());
         }
     }

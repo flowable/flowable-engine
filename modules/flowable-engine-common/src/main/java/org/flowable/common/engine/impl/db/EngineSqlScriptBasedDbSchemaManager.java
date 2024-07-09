@@ -174,13 +174,15 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         DbSqlSession dbSqlSession = getDbSqlSession();
         boolean isEngineTablePresent = isEngineTablePresent();
 
+        ChangeLogVersion changeLogVersion = null;
         String dbVersion = null;
         if (isEngineTablePresent) {
             dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, getSchemaVersionPropertyName());
             if (dbVersionProperty != null) {
                 dbVersion = dbVersionProperty.getValue();
             } else {
-                dbVersion = getDbVersionFromChangeLog();
+                changeLogVersion = getChangeLogVersion();
+                dbVersion = changeLogVersion.dbVersion();
             }
         }
 
@@ -205,6 +207,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             if (isUpgradeNeeded) {
                 // Engine upgrade
                 dbSchemaUpgrade(context, matchingVersionIndex, dbVersion);
+                dbSchemaUpgraded(changeLogVersion);
 
                 feedback = "upgraded Flowable from " + dbVersion + " to " + getEngineVersion();
 
@@ -218,6 +221,10 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
                 lockManager.releaseLock();
             }
         }
+
+    }
+
+    protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
 
     }
 
@@ -239,7 +246,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, getSchemaVersionPropertyName());
     }
 
-    protected String getDbVersionFromChangeLog() {
+    protected ChangeLogVersion getChangeLogVersion() {
         String changeLogTableName = getChangeLogTableName();
         if (changeLogTableName != null && isTablePresent(changeLogTableName)) {
             DbSqlSession dbSqlSession = getDbSqlSession();
@@ -248,11 +255,11 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             if (changeLogItems != null && !changeLogItems.isEmpty()) {
                 ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
                 String changeLogVersion = lastExecutedItem.getId();
-                return getDbVersionForChangelogVersion(changeLogVersion);
+                return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
             }
         }
 
-        return getDbVersionForChangelogVersion(null);
+        return new ChangeLogVersion(null, getDbVersionForChangelogVersion(null));
     }
 
     protected boolean isMissingTablesException(Exception e) {
@@ -274,6 +281,9 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             }
         }
         return false;
+    }
+
+    protected record ChangeLogVersion(String version, String dbVersion) {
     }
 
 }
