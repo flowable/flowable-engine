@@ -28,7 +28,7 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
             Map.entry("1", "6.5.0.6"),
             Map.entry("2", "6.7.2.0"),
-            Map.entry("3", "6.7.2.1"),
+            Map.entry("3", "6.7.2.0"),
             Map.entry("4", "7.1.0.0"),
             Map.entry("5", "7.1.0.0")
     );
