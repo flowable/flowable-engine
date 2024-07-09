@@ -13,25 +13,15 @@
 
 package org.flowable.dmn.engine.impl.db;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableWrongDbException;
-import org.flowable.common.engine.api.lock.LockManager;
-import org.flowable.common.engine.impl.FlowableVersions;
-import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
-import org.flowable.common.engine.impl.db.DbSqlSession;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.persistence.entity.ChangeLogEntity;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
-public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
+public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
     protected static final String DMN_DB_SCHEMA_LOCK_NAME = "dmnDbSchemaLock";
 
@@ -48,210 +38,50 @@ public class DmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
             Map.entry("10", "7.1.0.0")
     );
 
-    @Override
-    public void schemaCheckVersion() {
-        try {
-            String dbVersion = getDbVersion();
-            if (!DmnEngine.VERSION.equals(dbVersion)) {
-                throw new FlowableWrongDbException(DmnEngine.VERSION, dbVersion);
-            }
-
-            String errorMessage = null;
-            if (!isDmnTablePresent()) {
-                errorMessage = addMissingComponent(errorMessage, "dmn");
-            }
-
-            if (errorMessage != null) {
-                throw new FlowableException("Flowable database problem: " + errorMessage);
-            }
-
-        } catch (Exception e) {
-            if (isMissingTablesException(e)) {
-                throw new FlowableException(
-                        "no flowable tables in db. set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean dmnEngineConfiguration in flowable.dmn.cfg.xml for automatic schema creation",
-                        e);
-            } else {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                } else {
-                    throw new FlowableException("couldn't get dmn db schema version", e);
-                }
-            }
-        }
-
-        logger.debug("flowable dmn db schema check successful");
-    }
-    
-    @Override
-    public void schemaCreate() {
-        
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaCreate();
-
-        DmnEngineConfiguration dmnEngineConfiguration = getDmnEngineConfiguration();
-        if (dmnEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = dmnEngineConfiguration.getDmnManagementService().getLockManager(DMN_DB_SCHEMA_LOCK_NAME);
-            lockManager.waitForLockRunAndRelease(dmnEngineConfiguration.getSchemaLockWaitTime(), () -> {
-                schemaCreateInLock();
-                return null;
-            });
-        } else {
-            schemaCreateInLock();
-        }
-    }
-
-    protected void schemaCreateInLock() {
-        if (isDmnTablePresent()) {
-            String dbVersion = getDbVersion();
-            if (!DmnEngine.VERSION.equals(dbVersion)) {
-                throw new FlowableWrongDbException(DmnEngine.VERSION, dbVersion);
-            }
-        } else {
-            dbSchemaCreateDmnEngine();
-        }
-    }
-
-    protected void dbSchemaCreateDmnEngine() {
-        executeMandatorySchemaResource("create", "dmn");
+    public DmnDbSchemaManager() {
+        super("dmn");
     }
 
     @Override
-    public void schemaDrop() {
-        
-        try {
-            executeMandatorySchemaResource("drop", "dmn");
-            
-        } catch (Exception e) {
-            logger.info("Error dropping dmn tables", e);
-        }
-        
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
+    protected String getEngineVersion() {
+        return DmnEngine.VERSION;
     }
 
     @Override
-    public String schemaUpdate() {
-        
-        PropertyEntity dbVersionProperty = null;
-        String feedback = null;
-        boolean isUpgradeNeeded = false;
-        int matchingVersionIndex = -1;
-        
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        boolean isDmnTablePresent = isDmnTablePresent();
-        
-        String mappedChangeLogVersion = null;
-        if (isDmnTablePresent) {
-            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "dmn.schema.version");
-            if (dbVersionProperty != null) {
-                mappedChangeLogVersion = dbVersionProperty.getValue();
-            } else {
-                String changeLogVersion = getChangeLogVersion();
-                if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
-                    mappedChangeLogVersion = changeLogVersionMap.get(changeLogVersion);
-                } else {
-                    mappedChangeLogVersion = "5.99.0.0";
-                }
-            }
+    protected String getSchemaVersionPropertyName() {
+        return "dmn.schema.version";
+    }
+
+    @Override
+    protected String getDbSchemaLockName() {
+        return DMN_DB_SCHEMA_LOCK_NAME;
+    }
+
+    @Override
+    protected String getEngineTableName() {
+        return "ACT_DMN_DECISION";
+    }
+
+    @Override
+    protected String getChangeLogTableName() {
+        return "ACT_DMN_DATABASECHANGELOG";
+    }
+
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
-        
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaUpdate(mappedChangeLogVersion);
-
-        DmnEngineConfiguration dmnEngineConfiguration = getDmnEngineConfiguration();
-        LockManager lockManager;
-        if (dmnEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            lockManager = dmnEngineConfiguration.getDmnManagementService().getLockManager(DMN_DB_SCHEMA_LOCK_NAME);
-            lockManager.waitForLock(dmnEngineConfiguration.getSchemaLockWaitTime());
-        } else {
-            lockManager = null;
-        }
-
-        try {
-            if (isDmnTablePresent) {
-                matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(mappedChangeLogVersion);
-                isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
-            }
-
-            if (isUpgradeNeeded) {
-                // Engine upgrade
-                dbSchemaUpgrade("dmn", matchingVersionIndex, mappedChangeLogVersion);
-
-                feedback = "upgraded Flowable from " + mappedChangeLogVersion + " to " + DmnEngine.VERSION;
-
-            } else if (!isDmnTablePresent) {
-                dbSchemaCreateDmnEngine();
-            }
-
-            return feedback;
-        } finally {
-            if (lockManager != null) {
-                lockManager.releaseLock();
-            }
-        }
-
+        return "5.99.0.0";
     }
 
-    public boolean isDmnTablePresent() {
-        return isTablePresent("ACT_DMN_DECISION");
-    }
-    
-    protected String addMissingComponent(String missingComponents, String component) {
-        if (missingComponents == null) {
-            return "Tables missing for component(s) " + component;
-        }
-        return missingComponents + ", " + component;
+    @Override
+    protected String getChangeLogVersionsStatement() {
+        return "org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectDmnChangeLogVersions";
     }
 
-    protected String getDbVersion() {
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
-        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "dmn.schema.version");
-    }
-    
-    protected String getChangeLogVersion() {
-        if (isTablePresent("ACT_DMN_DATABASECHANGELOG")) {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectDmnChangeLogVersions");
-            List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
-            if (changeLogItems != null && !changeLogItems.isEmpty()) {
-                ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
-                return lastExecutedItem.getId();
-            }
-        }
-        
-        return null;
-    }
-
-    protected boolean isMissingTablesException(Exception e) {
-        String exceptionMessage = e.getMessage();
-        if (e.getMessage() != null) {
-            // Matches message returned from H2
-            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
-                return true;
-            }
-
-            // Message returned from MySQL and Oracle
-            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
-                return true;
-            }
-
-            // Message returned from Postgres
-            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getDmnEngineConfiguration().getCommonSchemaManager();
-    }
-    
-    protected DmnEngineConfiguration getDmnEngineConfiguration() {
+    @Override
+    protected AbstractEngineConfiguration getEngineConfiguration() {
         return CommandContextUtil.getDmnEngineConfiguration();
     }
 

@@ -12,25 +12,15 @@
  */
 package org.flowable.cmmn.engine.impl.db;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableWrongDbException;
-import org.flowable.common.engine.api.lock.LockManager;
-import org.flowable.common.engine.impl.FlowableVersions;
-import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
-import org.flowable.common.engine.impl.db.DbSqlSession;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.persistence.entity.ChangeLogEntity;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 
-public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
+public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
     protected static final String CMMN_DB_SCHEMA_LOCK_NAME = "cmmnDbSchemaLock";
 
@@ -57,211 +47,51 @@ public class CmmnDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
             Map.entry("20", "7.1.0.0")
     );
 
-    @Override
-    public void schemaCheckVersion() {
-        try {
-            String dbVersion = getDbVersion();
-            if (!CmmnEngine.VERSION.equals(dbVersion)) {
-                throw new FlowableWrongDbException(CmmnEngine.VERSION, dbVersion);
-            }
-
-            String errorMessage = null;
-            if (!isCmmnTablePresent()) {
-                errorMessage = addMissingComponent(errorMessage, "cmmn");
-            }
-
-            if (errorMessage != null) {
-                throw new FlowableException("Flowable database problem: " + errorMessage);
-            }
-
-        } catch (Exception e) {
-            if (isMissingTablesException(e)) {
-                throw new FlowableException(
-                        "no flowable tables in db. set <property name=\"databaseSchemaUpdate\" to value=\"true\" or value=\"create-drop\" (use create-drop for testing only!) in bean cmmnEngineConfiguration in flowable.cmmn.cfg.xml for automatic schema creation",
-                        e);
-            } else {
-                if (e instanceof RuntimeException) {
-                    throw (RuntimeException) e;
-                } else {
-                    throw new FlowableException("couldn't get cmmn db schema version", e);
-                }
-            }
-        }
-
-        logger.debug("flowable cmmn db schema check successful");
-    }
-    
-    @Override
-    public void schemaCreate() {
-        
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaCreate();
-
-        CmmnEngineConfiguration cmmnEngineConfiguration = getCmmnEngineConfiguration();
-        if (cmmnEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = cmmnEngineConfiguration.getCmmnManagementService().getLockManager(CMMN_DB_SCHEMA_LOCK_NAME);
-            lockManager.waitForLockRunAndRelease(cmmnEngineConfiguration.getSchemaLockWaitTime(), () -> {
-                schemaCreateInLock();
-                return null;
-            });
-        } else {
-            schemaCreateInLock();
-        }
-    }
-
-    protected void schemaCreateInLock() {
-        if (isCmmnTablePresent()) {
-            String dbVersion = getDbVersion();
-            if (!CmmnEngine.VERSION.equals(dbVersion)) {
-                throw new FlowableWrongDbException(CmmnEngine.VERSION, dbVersion);
-            }
-        } else {
-            dbSchemaCreateCmmnEngine();
-        }
-    }
-
-    protected void dbSchemaCreateCmmnEngine() {
-        executeMandatorySchemaResource("create", "cmmn");
+    public CmmnDbSchemaManager() {
+        super("cmmn");
     }
 
     @Override
-    public void schemaDrop() {
-        
-        try {
-            executeMandatorySchemaResource("drop", "cmmn");
-            
-        } catch (Exception e) {
-            logger.info("Error dropping cmmn tables", e);
-        }
-        
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
+    protected String getEngineVersion() {
+        return CmmnEngine.VERSION;
     }
 
     @Override
-    public String schemaUpdate() {
-        
-        PropertyEntity dbVersionProperty = null;
-        String feedback = null;
-        boolean isUpgradeNeeded = false;
-        int matchingVersionIndex = -1;
-        
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        boolean isCmmnTablePresent = isCmmnTablePresent();
-        
-        String mappedChangeLogVersion = null;
-        if (isCmmnTablePresent) {
-            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "cmmn.schema.version");
-            if (dbVersionProperty != null) {
-                mappedChangeLogVersion = dbVersionProperty.getValue();
-            } else {
-                String changeLogVersion = getChangeLogVersion();
-                if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
-                    mappedChangeLogVersion = changeLogVersionMap.get(changeLogVersion);
-                } else {
-                    mappedChangeLogVersion = "6.1.2.0";
-                }
-            }
+    protected String getSchemaVersionPropertyName() {
+        return "cmmn.schema.version";
+    }
+
+    @Override
+    protected String getDbSchemaLockName() {
+        return CMMN_DB_SCHEMA_LOCK_NAME;
+    }
+
+    @Override
+    protected String getEngineTableName() {
+        return "ACT_CMMN_RU_CASE_INST";
+    }
+
+    @Override
+    protected String getChangeLogTableName() {
+        return "ACT_CMMN_DATABASECHANGELOG";
+    }
+
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
-        
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaUpdate(mappedChangeLogVersion);
-
-        CmmnEngineConfiguration cmmnEngineConfiguration = getCmmnEngineConfiguration();
-        LockManager lockManager;
-        if (cmmnEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            lockManager = cmmnEngineConfiguration.getCmmnManagementService().getLockManager(CMMN_DB_SCHEMA_LOCK_NAME);
-            lockManager.waitForLock(cmmnEngineConfiguration.getSchemaLockWaitTime());
-        } else {
-            lockManager = null;
-        }
-
-        try {
-            if (isCmmnTablePresent) {
-                matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(mappedChangeLogVersion);
-                isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
-            }
-
-            if (isUpgradeNeeded) {
-                // Engine upgrade
-                dbSchemaUpgrade("cmmn", matchingVersionIndex, mappedChangeLogVersion);
-
-                feedback = "upgraded Flowable from " + mappedChangeLogVersion + " to " + CmmnEngine.VERSION;
-
-            } else if (!isCmmnTablePresent) {
-                dbSchemaCreateCmmnEngine();
-            }
-
-            return feedback;
-        } finally {
-            if (lockManager != null) {
-                lockManager.releaseLock();
-            }
-        }
-
+        return "6.1.2.0";
     }
 
-    public boolean isCmmnTablePresent() {
-        return isTablePresent("ACT_CMMN_RU_CASE_INST");
-    }
-    
-    protected String addMissingComponent(String missingComponents, String component) {
-        if (missingComponents == null) {
-            return "Tables missing for component(s) " + component;
-        }
-        return missingComponents + ", " + component;
-    }
-
-    protected String getDbVersion() {
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
-        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, "cmmn.schema.version");
-    }
-    
-    protected String getChangeLogVersion() {
-        if (isTablePresent("ACT_CMMN_DATABASECHANGELOG")) {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectCmmnChangeLogVersions");
-            List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
-            if (changeLogItems != null && !changeLogItems.isEmpty()) {
-                ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
-                return lastExecutedItem.getId();
-            }
-        }
-        
-        return null;
-    }
-
-    protected boolean isMissingTablesException(Exception e) {
-        String exceptionMessage = e.getMessage();
-        if (e.getMessage() != null) {
-            // Matches message returned from H2
-            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
-                return true;
-            }
-
-            // Message returned from MySQL and Oracle
-            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
-                return true;
-            }
-
-            // Message returned from Postgres
-            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getCommonSchemaManager();
-    }
-    
-    protected CmmnEngineConfiguration getCmmnEngineConfiguration() {
+    @Override
+    protected AbstractEngineConfiguration getEngineConfiguration() {
         return CommandContextUtil.getCmmnEngineConfiguration();
+    }
+
+    @Override
+    protected String getChangeLogVersionsStatement() {
+        return "org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectCmmnChangeLogVersions";
     }
 
     @Override
