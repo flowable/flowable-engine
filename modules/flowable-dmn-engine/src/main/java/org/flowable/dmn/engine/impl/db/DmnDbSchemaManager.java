@@ -77,7 +77,7 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
     @Override
     protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectDmnChangeLogVersions";
+        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectDmnChangeLogVersions";
     }
 
     @Override

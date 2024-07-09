@@ -29,7 +29,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityI
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntityImpl;
-import org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
@@ -64,7 +63,6 @@ public class EntityDependencyOrder {
     static {
 
         DELETE_ORDER.add(PropertyEntityImpl.class);
-        DELETE_ORDER.add(ChangeLogEntityImpl.class);
         DELETE_ORDER.add(BatchPartEntityImpl.class);
         DELETE_ORDER.add(BatchEntityImpl.class);
         DELETE_ORDER.add(JobEntityImpl.class);

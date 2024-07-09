@@ -61,9 +61,6 @@ public class TableColumnTypeValidationTest {
         assertThat(mappedResources).isNotEmpty();
 
         for (String entity : mappedResources.keySet()) {
-            if ("ChangeLog".equalsIgnoreCase(entity)) {
-                continue;
-            }
 
             String tableName = findTable(entity, mappedResources.get(entity));
 

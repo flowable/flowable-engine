@@ -19,7 +19,6 @@ import org.flowable.common.engine.api.FlowableWrongDbException;
 import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.FlowableVersions;
-import org.flowable.common.engine.impl.persistence.entity.ChangeLogEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 
@@ -251,10 +250,9 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         if (changeLogTableName != null && isTablePresent(changeLogTableName)) {
             DbSqlSession dbSqlSession = getDbSqlSession();
             String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement(getChangeLogVersionsStatement());
-            List<ChangeLogEntity> changeLogItems = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
-            if (changeLogItems != null && !changeLogItems.isEmpty()) {
-                ChangeLogEntity lastExecutedItem = changeLogItems.get(changeLogItems.size() - 1);
-                String changeLogVersion = lastExecutedItem.getId();
+            List<String> changeLogIds = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
+            if (changeLogIds != null && !changeLogIds.isEmpty()) {
+                String changeLogVersion = changeLogIds.get(changeLogIds.size() - 1);
                 return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
             }
         }

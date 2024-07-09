@@ -72,7 +72,7 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
     @Override
     protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.entity.ChangeLogEntityImpl.selectEventRegistryChangeLogVersions";
+        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectEventRegistryChangeLogVersions";
     }
 
     @Override

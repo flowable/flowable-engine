@@ -9,7 +9,7 @@
   <mappers>
     <!-- Common mappers -->
     <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
-    <mapper resource="org/flowable/common/db/mapping/entity/ChangeLog.xml" />
+    <mapper resource="org/flowable/common/db/mapping/ChangeLog.xml" />
     <mapper resource="org/flowable/common/db/mapping/common.xml" />
 
     <mapper resource="org/flowable/dmn/db/mapping/ChangeTenantDmn.xml" />
