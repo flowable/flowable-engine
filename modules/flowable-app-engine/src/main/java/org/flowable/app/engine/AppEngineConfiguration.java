@@ -28,10 +28,10 @@ import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppResourceConverter;
 import org.flowable.app.engine.impl.AppEngineImpl;
+import org.flowable.app.engine.impl.AppEnginePostEngineBuildConsumer;
 import org.flowable.app.engine.impl.AppManagementServiceImpl;
 import org.flowable.app.engine.impl.AppRepositoryServiceImpl;
 import org.flowable.app.engine.impl.cfg.StandaloneInMemAppEngineConfiguration;
-import org.flowable.app.engine.impl.cmd.SchemaOperationsAppEngineBuild;
 import org.flowable.app.engine.impl.db.AppDbSchemaManager;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.deployer.AppDeployer;
@@ -52,6 +52,7 @@ import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDeplo
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -63,6 +64,7 @@ import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -100,7 +102,7 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-public class AppEngineConfiguration extends AbstractEngineConfiguration implements
+public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration<AppEngine> implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
@@ -183,11 +185,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return new StandaloneInMemAppEngineConfiguration();
     }
 
-    public AppEngine buildAppEngine() {
-        init();
+    @Override
+    protected AppEngine createEngine() {
         return new AppEngineImpl(this);
     }
 
+    @Override
+    protected Consumer<AppEngine> createPostEngineBuildConsumer() {
+        return new AppEnginePostEngineBuildConsumer();
+    }
+
+    public AppEngine buildAppEngine() {
+        return buildEngine();
+    }
+
+    @Override
     protected void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -233,23 +245,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        initAppSchemaManager();
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsAppEngineBuild();
-            }
-        }
-    }
-
-    protected void initAppSchemaManager() {
-        if (this.schemaManager == null) {
-            this.schemaManager = new AppDbSchemaManager();
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new AppDbSchemaManager();
     }
 
     @Override

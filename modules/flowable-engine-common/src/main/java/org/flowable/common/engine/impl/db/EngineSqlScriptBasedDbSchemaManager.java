@@ -44,37 +44,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
 
     protected abstract String getChangeLogVersionsStatement();
 
-    protected SchemaManager getCommonSchemaManager() {
-        return getEngineConfiguration().getCommonSchemaManager();
-    }
-
     protected abstract AbstractEngineConfiguration getEngineConfiguration();
-
-    public void initSchema(String databaseSchemaUpdate) {
-        logger.debug("Executing {} schema management with setting {}", context, databaseSchemaUpdate);
-        try {
-            if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                try {
-                    schemaDrop();
-                } catch (RuntimeException e) {
-                    // ignore
-                }
-            }
-            if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)
-                    || AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
-                    || AbstractEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
-                schemaCreate();
-
-            } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                schemaCheckVersion();
-
-            } else if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                schemaUpdate();
-            }
-        } catch (Exception e) {
-            throw new FlowableException("Error initialising " + context + " data model", e);
-        }
-    }
 
     @Override
     public void schemaCheckVersion() {
@@ -114,9 +84,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     @Override
     public void schemaCreate() {
 
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaCreate();
-
         AbstractEngineConfiguration engineConfiguration = getEngineConfiguration();
         if (engineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
             LockManager lockManager = engineConfiguration.getLockManager(getDbSchemaLockName());
@@ -155,11 +122,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             logger.info("Error dropping {} tables", context, e);
         }
 
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
     }
 
     @Override
@@ -184,9 +146,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
                 dbVersion = changeLogVersion.dbVersion();
             }
         }
-
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaUpdate(dbVersion);
 
         AbstractEngineConfiguration engineConfiguration = getEngineConfiguration();
         LockManager lockManager;

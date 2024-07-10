@@ -48,12 +48,6 @@ public class AppEngineImpl implements AppEngine {
         LOGGER.info("AppEngine {} created", name);
         
         AppEngines.registerAppEngine(this);
-
-        if (appEngineConfiguration.getEngineLifecycleListeners() != null) {
-            for (EngineLifecycleListener engineLifecycleListener : appEngineConfiguration.getEngineLifecycleListeners()) {
-                engineLifecycleListener.onEngineBuilt(this);
-            }
-        }
     }
     
     @Override

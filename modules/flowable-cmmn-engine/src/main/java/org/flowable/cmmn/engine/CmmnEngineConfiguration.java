@@ -53,6 +53,7 @@ import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
+import org.flowable.cmmn.engine.impl.CmmnEnginePostEngineBuildConsumer;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
@@ -68,7 +69,6 @@ import org.flowable.cmmn.engine.impl.cfg.DefaultTaskAssignmentManager;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.cmd.JobRetryCmd;
-import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
@@ -206,6 +206,7 @@ import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -228,6 +229,7 @@ import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
@@ -318,7 +320,7 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi,
+public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguration<CmmnEngine> implements CmmnEngineConfigurationApi,
         ScriptingEngineAwareEngineConfiguration, HasExpressionManagerEngineConfiguration, HasVariableTypes, 
         HasVariableServiceConfiguration {
 
@@ -692,16 +694,20 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     public CmmnEngine buildCmmnEngine() {
-        init();
-        CmmnEngineImpl cmmnEngine = new CmmnEngineImpl(this);
-
-        if (handleCmmnEngineExecutorsAfterEngineCreate) {
-            cmmnEngine.startExecutors();
-        }
-
-        return cmmnEngine;
+        return buildEngine();
     }
 
+    @Override
+    protected CmmnEngine createEngine() {
+        return new CmmnEngineImpl(this);
+    }
+
+    @Override
+    protected Consumer<CmmnEngine> createPostEngineBuildConsumer() {
+        return new CmmnEnginePostEngineBuildConsumer();
+    }
+
+    @Override
     protected void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -792,23 +798,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        initCmmnSchemaManager();
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsCmmnEngineBuild();
-            }
-        }
-    }
-
-    protected void initCmmnSchemaManager() {
-        if (this.schemaManager == null) {
-            this.schemaManager = new CmmnDbSchemaManager();
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new CmmnDbSchemaManager();
     }
 
     @Override

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -68,6 +69,7 @@ import org.apache.ibatis.type.SqlxmlTypeHandler;
 import org.apache.ibatis.type.StringTypeHandler;
 import org.apache.ibatis.type.TimeOnlyTypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -87,6 +89,7 @@ import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -172,6 +175,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected Collection<SchemaManager> additionalSchemaManagers;
     protected SchemaManager commonSchemaManager;
     protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
@@ -431,7 +435,7 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
-    
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -548,8 +552,22 @@ public abstract class AbstractEngineConfiguration {
         if (this.commonSchemaManager == null) {
             this.commonSchemaManager = new CommonDbSchemaManager();
         }
+
+        if (this.schemaManager == null) {
+            this.schemaManager = createEngineSchemaManager();
+        }
+
     }
 
+    protected abstract SchemaManager createEngineSchemaManager();
+
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsEngineBuild(getEngineScopeType());
+            }
+        }
+    }
     // session factories ////////////////////////////////////////////////////////
 
     public void addSessionFactory(SessionFactory sessionFactory) {
@@ -1215,6 +1233,18 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setSchemaManager(SchemaManager schemaManager) {
         this.schemaManager = schemaManager;
         return this;
+    }
+
+    public AbstractEngineConfiguration addAdditionalSchemaManager(SchemaManager schemaManager) {
+        if (this.additionalSchemaManagers == null) {
+            this.additionalSchemaManagers = new ArrayList<>();
+        }
+        this.additionalSchemaManagers.add(schemaManager);
+        return this;
+    }
+
+    public Collection<SchemaManager> getAdditionalSchemaManagers() {
+        return additionalSchemaManagers;
     }
 
     public SchemaManager getCommonSchemaManager() {

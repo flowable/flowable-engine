@@ -21,7 +21,6 @@ import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.FlowableVersions;
 import org.flowable.common.engine.impl.db.AbstractSqlScriptBasedDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.ProcessEngine;
@@ -87,9 +86,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void schemaCreate() {
         
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaCreate();
-
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
         if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
             LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME);
@@ -138,15 +134,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             logger.info("Error dropping engine tables", e);
         }
         
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
-        
-        if (!CommandContextUtil.getProcessEngineConfiguration().isDisableEventRegistry()) {
-            CommandContextUtil.getEventRegistryEngineConfiguration().getSchemaManager().schemaDrop();
-        }
     }
 
     public void dbSchemaPrune() {
@@ -172,9 +159,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             dbVersion = dbVersionProperty.getValue();
         }
         
-        // The common schema manager is special and would handle its own locking mechanism
-        getCommonSchemaManager().schemaUpdate(dbVersion);
-
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
         LockManager lockManager;
         if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
@@ -300,16 +284,13 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     }
 
     public void performSchemaOperationsProcessEngineClose() {
-        String databaseSchemaUpdate = CommandContextUtil.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
+        ProcessEngineConfigurationImpl engineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        String databaseSchemaUpdate = engineConfiguration.getDatabaseSchemaUpdate();
         if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
             schemaDrop();
+            engineConfiguration.getCommonSchemaManager().schemaDrop();
         }
     }
-    
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getProcessEngineConfiguration().getCommonSchemaManager();
-    }
-   
     
     protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return CommandContextUtil.getProcessEngineConfiguration();

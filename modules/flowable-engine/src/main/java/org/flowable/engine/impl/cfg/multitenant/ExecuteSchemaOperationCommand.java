@@ -37,10 +37,18 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        SchemaManager processSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
+        ProcessEngineConfigurationImpl engineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        SchemaManager processSchemaManager = engineConfiguration.getSchemaManager();
+        SchemaManager commonSchemaManager = engineConfiguration.getCommonSchemaManager();
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {
             try {
                 processSchemaManager.schemaDrop();
+            } catch (RuntimeException e) {
+                // ignore
+            }
+
+            try {
+                commonSchemaManager.schemaDrop();
             } catch (RuntimeException e) {
                 // ignore
             }
@@ -48,12 +56,15 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)
                 || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(schemaOperation)) {
+            commonSchemaManager.schemaCreate();
             processSchemaManager.schemaCreate();
 
         } else if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(schemaOperation)) {
+            commonSchemaManager.schemaCreate();
             processSchemaManager.schemaCheckVersion();
 
         } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(schemaOperation)) {
+            commonSchemaManager.schemaUpdate();
             processSchemaManager.schemaUpdate();
         }
 

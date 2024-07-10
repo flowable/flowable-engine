@@ -49,7 +49,11 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
 
     @Override
     public void schemaDrop() {
-        executeMandatorySchemaResource("drop", schemaComponent);
+        try {
+            executeMandatorySchemaResource("drop", schemaComponent);
+        } catch (Exception e) {
+            logger.info("Error dropping {} tables", schemaComponent, e);
+        }
     }
 
     @Override

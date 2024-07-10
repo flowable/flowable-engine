@@ -30,4 +30,8 @@ public class CommonDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager 
         return "org/flowable/common/db/";
     }
     
+    @Override
+    public void schemaCheckVersion() {
+        // Schema check is ignored for the common DB
+    }
 }

@@ -70,6 +70,7 @@ import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FlowableAstFunctionCreator;
 import org.flowable.common.engine.impl.el.function.VariableBase64ExpressionFunction;
@@ -87,9 +88,7 @@ import org.flowable.common.engine.impl.el.function.VariableLowerThanExpressionFu
 import org.flowable.common.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
@@ -154,7 +153,6 @@ import org.flowable.engine.impl.ProcessMigrationServiceImpl;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -859,34 +857,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // ///////////////////////////////////////////////////////
 
     @Override
-    public ProcessEngine buildProcessEngine() {
-        init();
-        ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+    protected ProcessEngine createEngine() {
+        return new ProcessEngineImpl(this);
+    }
 
-        if (handleProcessEngineExecutorsAfterEngineCreate) {
-            processEngine.startExecutors();
-        }
-
-        // trigger build of Flowable 5 Engine
-        if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
-            commandExecutor.execute(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    flowable5CompatibilityHandler.getRawProcessEngine();
-                    return null;
-                }
-            });
-        }
-
-        postProcessEngineInitialisation();
-
-        return processEngine;
+    @Override
+    protected Consumer<ProcessEngine> createPostEngineBuildConsumer() {
+        return new ProcessEnginePostEngineBuildConsumer();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     public void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -1053,28 +1036,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initService(processInstanceMigrationService);
     }
 
-    @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        initProcessSchemaManager();
-    }
-
     public void initNonRelationalDataSource() {
         // for subclassing
     }
 
-    protected void initProcessSchemaManager() {
-        if (this.schemaManager == null) {
-            this.schemaManager = new ProcessDbSchemaManager();
-        }
-    }
-
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsProcessEngineBuild();
-            }
-        }
+    @Override
+    protected SchemaManager createEngineSchemaManager() {
+        return new ProcessDbSchemaManager();
     }
 
     @Override

@@ -15,7 +15,6 @@ package org.flowable.engine.spring.configurator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.spring.SpringEngineConfiguration;
-import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.configurator.ProcessEngineConfigurator;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
@@ -44,18 +43,9 @@ public class SpringProcessEngineConfigurator extends ProcessEngineConfigurator {
             springProcessEngineConfiguration.setBeans(springProcessEngineConfiguration.getBeans());
         }
 
-        initProcessEngine();
+        initEngine();
 
         initServiceConfigurations(engineConfiguration, processEngineConfiguration);
-    }
-
-    @Override
-    protected synchronized ProcessEngine initProcessEngine() {
-        if (processEngineConfiguration == null) {
-            throw new FlowableException("ProcessEngineConfiguration is required");
-        }
-
-        return processEngineConfiguration.buildProcessEngine();
     }
 
     @Override
