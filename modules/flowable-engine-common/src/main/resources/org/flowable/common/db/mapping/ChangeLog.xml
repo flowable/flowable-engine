@@ -6,6 +6,10 @@
 
   <!-- CHANGELOG SELECT -->
   
+  <select id="selectAppChangeLogVersions" resultType="string">
+    select ID from ${prefix}ACT_APP_DATABASECHANGELOG order by ORDEREXECUTED
+  </select>
+  
   <select id="selectCmmnChangeLogVersions" resultType="string">
     select ID from ${prefix}ACT_CMMN_DATABASECHANGELOG order by ORDEREXECUTED
   </select>
@@ -16,6 +20,10 @@
   
   <select id="selectEventRegistryChangeLogVersions" resultType="string">
     select ID from ${prefix}FLW_EV_DATABASECHANGELOG order by ORDEREXECUTED
+  </select>
+  
+  <select id="selectFlowableChangeLogVersions" parameterType="string" resultType="string">
+    select ID from ${prefix}FLW_#{name, jdbcType=VARCHAR}_DATABASECHANGELOG order by ORDEREXECUTED
   </select>
   
 </mapper>

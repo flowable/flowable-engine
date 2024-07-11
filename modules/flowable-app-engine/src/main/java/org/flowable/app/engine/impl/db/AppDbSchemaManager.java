@@ -12,6 +12,9 @@
  */
 package org.flowable.app.engine.impl.db;
 
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -20,6 +23,12 @@ import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     
     protected static final String APP_DB_SCHEMA_LOCK_NAME = "appDbSchemaLock";
+    
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.3.1.0"),
+            Map.entry("2", "6.4.0.0"),
+            Map.entry("3", "6.4.1.3")
+    );
 
     public AppDbSchemaManager() {
         super("app");
@@ -47,17 +56,20 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
     @Override
     protected String getChangeLogTableName() {
-        return null;
+        return "ACT_APP_DATABASECHANGELOG";
     }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
-        return null;
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
+        }
+        return "6.3.0.1";
     }
 
     @Override
     protected String getChangeLogVersionsStatement() {
-        return null;
+        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectAppChangeLogVersions";
     }
 
     @Override

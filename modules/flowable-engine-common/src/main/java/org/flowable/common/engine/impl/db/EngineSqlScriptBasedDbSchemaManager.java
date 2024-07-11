@@ -240,7 +240,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         return false;
     }
 
-    protected record ChangeLogVersion(String version, String dbVersion) {
+    public record ChangeLogVersion(String version, String dbVersion) {
     }
 
 }
