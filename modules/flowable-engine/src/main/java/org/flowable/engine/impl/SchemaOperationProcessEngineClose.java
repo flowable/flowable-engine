@@ -30,7 +30,7 @@ public class SchemaOperationProcessEngineClose implements Command<Void> {
         if (processEngineConfiguration.isUsingRelationalDatabase()) {
             String databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
             if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-                new SchemaOperationsEngineDropDbCmd(processEngineConfiguration.getEngineScopeType());
+                new SchemaOperationsEngineDropDbCmd(processEngineConfiguration.getEngineScopeType()).execute(commandContext);
             }
         }
         return null;
