@@ -53,6 +53,7 @@ public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
                 processEngineConfiguration.setDatabaseSchemaUpdate(originalDatabaseSchemaUpdate);
             }
             databaseReset = true;
+            createUsers();
         }
     }
 
