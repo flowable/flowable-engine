@@ -170,16 +170,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 processEngine.getProcessEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<>() {
-
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                processEngine.getProcessEngineConfiguration().getSchemaManagementCmd()
         );
     }
 

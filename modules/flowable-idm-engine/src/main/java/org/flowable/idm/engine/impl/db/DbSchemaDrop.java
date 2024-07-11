@@ -13,13 +13,11 @@
 
 package org.flowable.idm.engine.impl.db;
 
-import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -30,12 +28,6 @@ public class DbSchemaDrop {
         IdmEngine idmEngine = IdmEngines.getDefaultIdmEngine();
         CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new Command<>() {
-            @Override
-            public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
-                return null;
-            }
-        });
+        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(idmEngine.getIdmEngineConfiguration().getEngineScopeType()));
     }
 }

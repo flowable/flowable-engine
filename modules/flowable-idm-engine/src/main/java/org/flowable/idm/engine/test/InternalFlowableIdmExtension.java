@@ -92,16 +92,7 @@ public abstract class InternalFlowableIdmExtension implements AfterEachCallback,
                 idmEngine.getIdmEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<>() {
-
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                idmEngine.getIdmEngineConfiguration().getSchemaManagementCmd()
         );
     }
 

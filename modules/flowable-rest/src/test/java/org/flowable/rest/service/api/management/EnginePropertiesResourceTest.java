@@ -21,6 +21,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
@@ -44,16 +45,13 @@ public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
     @Before
     public void createDatabase() throws Exception {
         if (!databaseReset) {
-            managementService.executeCommand(new Command<Object>() {
-
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    processEngineConfiguration.getSchemaManager().schemaDrop();
-                    processEngineConfiguration.getSchemaManager().schemaCreate();
-                    return null;
-                }
-
-            });
+            String originalDatabaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
+            try {
+                processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
+                managementService.executeCommand(processEngineConfiguration.getSchemaManagementCmd());
+            } finally {
+                processEngineConfiguration.setDatabaseSchemaUpdate(originalDatabaseSchemaUpdate);
+            }
             databaseReset = true;
         }
     }

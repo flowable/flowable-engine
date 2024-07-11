@@ -13,13 +13,11 @@
 
 package org.flowable.eventregistry.impl.db;
 
-import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.eventregistry.impl.EventRegistryEngineImpl;
 import org.flowable.eventregistry.impl.EventRegistryEngines;
-import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -30,12 +28,6 @@ public class DbSchemaDrop {
         EventRegistryEngineImpl eventRegistryEngine = (EventRegistryEngineImpl) EventRegistryEngines.getDefaultEventRegistryEngine();
         CommandExecutor commandExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new Command<>() {
-            @Override
-            public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager().schemaDrop();
-                return null;
-            }
-        });
+        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(eventRegistryEngine.getEventRegistryEngineConfiguration().getEngineScopeType()));
     }
 }

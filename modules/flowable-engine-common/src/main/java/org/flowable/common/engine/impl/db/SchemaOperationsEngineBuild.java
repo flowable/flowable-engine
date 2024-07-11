@@ -32,9 +32,15 @@ public class SchemaOperationsEngineBuild implements Command<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaOperationsEngineBuild.class);
 
     protected final String engineScopeType;
+    protected final String schemaOperation;
 
     public SchemaOperationsEngineBuild(String engineScopeType) {
+        this(engineScopeType, null);
+    }
+
+    public SchemaOperationsEngineBuild(String engineScopeType, String schemaOperation) {
         this.engineScopeType = engineScopeType;
+        this.schemaOperation = schemaOperation;
     }
 
     @Override
@@ -46,7 +52,7 @@ public class SchemaOperationsEngineBuild implements Command<Void> {
             throw new FlowableIllegalArgumentException("There is no engine configuration for scope " + engineScopeType);
         }
 
-        String databaseSchemaUpdate = engineConfiguration.getDatabaseSchemaUpdate();
+        String databaseSchemaUpdate = schemaOperation == null ? engineConfiguration.getDatabaseSchemaUpdate() : schemaOperation;
         List<SchemaManager> schemaManagers = new ArrayList<>();
         schemaManagers.add(engineConfiguration.getCommonSchemaManager());
         schemaManagers.add(engineConfiguration.getSchemaManager());

@@ -13,10 +13,9 @@
 package org.flowable.engine.impl.cfg.multitenant;
 
 import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -38,35 +37,7 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl engineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        SchemaManager processSchemaManager = engineConfiguration.getSchemaManager();
-        SchemaManager commonSchemaManager = engineConfiguration.getCommonSchemaManager();
-        if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {
-            try {
-                processSchemaManager.schemaDrop();
-            } catch (RuntimeException e) {
-                // ignore
-            }
-
-            try {
-                commonSchemaManager.schemaDrop();
-            } catch (RuntimeException e) {
-                // ignore
-            }
-        }
-        if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(schemaOperation)
-                || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)
-                || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(schemaOperation)) {
-            commonSchemaManager.schemaCreate();
-            processSchemaManager.schemaCreate();
-
-        } else if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(schemaOperation)) {
-            commonSchemaManager.schemaCreate();
-            processSchemaManager.schemaCheckVersion();
-
-        } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(schemaOperation)) {
-            commonSchemaManager.schemaUpdate();
-            processSchemaManager.schemaUpdate();
-        }
+        new SchemaOperationsEngineBuild(engineConfiguration.getEngineScopeType(), schemaOperation).execute(commandContext);
 
         return null;
     }

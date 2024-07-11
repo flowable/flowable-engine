@@ -365,15 +365,7 @@ public class BaseSpringRestTestCase {
                 processEngineConfiguration,
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 exception == null,
-                new Command<Void>() {
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                processEngineConfiguration.getSchemaManagementCmd()
         );
     }
 

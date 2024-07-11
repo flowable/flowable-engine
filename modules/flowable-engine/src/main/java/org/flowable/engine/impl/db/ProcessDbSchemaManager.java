@@ -283,15 +283,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         return false;
     }
 
-    public void performSchemaOperationsProcessEngineClose() {
-        ProcessEngineConfigurationImpl engineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        String databaseSchemaUpdate = engineConfiguration.getDatabaseSchemaUpdate();
-        if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-            schemaDrop();
-            engineConfiguration.getCommonSchemaManager().schemaDrop();
-        }
-    }
-    
     protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return CommandContextUtil.getProcessEngineConfiguration();
     }
