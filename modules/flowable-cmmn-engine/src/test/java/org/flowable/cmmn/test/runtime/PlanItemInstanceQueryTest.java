@@ -57,8 +57,10 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
     public void testByCaseDefinitionId() {
         startInstances(5);
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseDefinitionId(caseDefinitionId).list()).hasSize(20);
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
