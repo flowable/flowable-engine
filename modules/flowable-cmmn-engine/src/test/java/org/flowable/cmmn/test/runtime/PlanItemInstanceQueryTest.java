@@ -48,7 +48,6 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void deployCaseDefinition() {
         String deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceQueryTest.testPlanItemInstanceQuery.cmmn")
-                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .deploy());
         caseDefinitionId = cmmnRepositoryService.createCaseDefinitionQuery()
                 .deploymentId(deploymentId)
