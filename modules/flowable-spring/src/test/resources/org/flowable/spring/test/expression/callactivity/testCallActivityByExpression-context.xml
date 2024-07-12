@@ -6,9 +6,9 @@
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-        <property name="driverClass" value="${jdbc.driver:org.h2.Driver}" />
-        <property name="url" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+        <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
         <property name="username" value="${jdbc.username:sa}" />
         <property name="password" value="${jdbc.password:}" />
     </bean>
@@ -26,7 +26,10 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
+        <property name="idmEngineConfigurator" ref="idmEngineConfigurator" />
     </bean>
+
+    <bean id="idmEngineConfigurator" class="org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator" />
 
     <bean id="processEngine" class="org.flowable.spring.ProcessEngineFactoryBean">
         <property name="processEngineConfiguration" ref="processEngineConfiguration"/>

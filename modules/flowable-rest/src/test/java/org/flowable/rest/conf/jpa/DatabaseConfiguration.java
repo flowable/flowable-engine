@@ -12,21 +12,20 @@
  */
 package org.flowable.rest.conf.jpa;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 import jakarta.persistence.EntityManagerFactory;
 
@@ -39,7 +38,7 @@ public class DatabaseConfiguration {
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
-    protected Class<? extends Driver> jdbcDriver;
+    protected String jdbcDriver;
 
     @Value("${jdbc.username:sa}")
     protected String jdbcUsername;
@@ -64,12 +63,12 @@ public class DatabaseConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setUrl(jdbcUrl);
-        ds.setDriverClass(jdbcDriver);
-        ds.setUsername(jdbcUsername);
-        ds.setPassword(jdbcPassword);
-        return ds;
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriver);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
+        return dataSource;
     }
 
     @Bean(name = "transactionManager")

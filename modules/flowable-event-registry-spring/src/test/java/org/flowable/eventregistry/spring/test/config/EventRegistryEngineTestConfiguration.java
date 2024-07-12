@@ -12,7 +12,6 @@
  */
 package org.flowable.eventregistry.spring.test.config;
 
-import java.sql.Driver;
 import java.util.function.Consumer;
 
 import javax.sql.DataSource;
@@ -23,13 +22,15 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.spring.EventRegistryFactoryBean;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Filip Hrisafov
@@ -40,13 +41,13 @@ public class EventRegistryEngineTestConfiguration {
     @Bean
     public DataSource dataSource(
         @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000}") String jdbcUrl,
-        @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> jdbcDriverClass,
+        @Value("${jdbc.driver:org.h2.Driver}") String jdbcDriverClass,
         @Value("${jdbc.username:sa}") String jdbcUsername,
         @Value("${jdbc.password:}") String jdbcPassword
     ) {
-        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-        dataSource.setUrl(jdbcUrl);
-        dataSource.setDriverClass(jdbcDriverClass);
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriverClass);
         dataSource.setUsername(jdbcUsername);
         dataSource.setPassword(jdbcPassword);
         return dataSource;
@@ -59,7 +60,8 @@ public class EventRegistryEngineTestConfiguration {
 
     @Bean
     public SpringEventRegistryEngineConfiguration eventRegistryEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
-                    ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator,
+            ObjectProvider<ChannelModelProcessor> channelDefinitionProcessors,
             ObjectProvider<Consumer<SpringEventRegistryEngineConfiguration>> configurationConfigurers) {
         
         SpringEventRegistryEngineConfiguration engineConfiguration = new SpringEventRegistryEngineConfiguration();
@@ -71,11 +73,19 @@ public class EventRegistryEngineTestConfiguration {
 
         engineConfiguration.setEnableEventRegistryChangeDetection(true);
 
+        engineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
         configurationConfigurers.orderedStream()
                 .forEach(consumer -> consumer.accept(engineConfiguration));
 
         return engineConfiguration;
     }
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
+    }
+
 
     @Bean("eventRegistryEngine")
     public EventRegistryFactoryBean eventRegistryFactoryBean(SpringEventRegistryEngineConfiguration eventRegistryEngineConfiguration) {

@@ -133,6 +133,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-cmmn-spring</artifactId>
       <scope>test</scope>
@@ -208,6 +213,11 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <version>${jetty.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-idm-spring-configurator</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

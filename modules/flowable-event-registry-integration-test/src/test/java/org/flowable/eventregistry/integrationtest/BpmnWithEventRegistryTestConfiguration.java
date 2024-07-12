@@ -12,8 +12,6 @@
  */
 package org.flowable.eventregistry.integrationtest;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.flowable.engine.ManagementService;
@@ -25,6 +23,7 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
@@ -32,10 +31,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class BpmnWithEventRegistryTestConfiguration {
@@ -43,13 +42,13 @@ public class BpmnWithEventRegistryTestConfiguration {
     @Bean
     public DataSource dataSource(
         @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000}") String jdbcUrl,
-        @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> jdbcDriverClass,
+        @Value("${jdbc.driver:org.h2.Driver}") String jdbcDriverClass,
         @Value("${jdbc.username:sa}") String jdbcUsername,
         @Value("${jdbc.password:}") String jdbcPassword
     ) {
-        SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-        dataSource.setUrl(jdbcUrl);
-        dataSource.setDriverClass(jdbcDriverClass);
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriverClass);
         dataSource.setUsername(jdbcUsername);
         dataSource.setPassword(jdbcPassword);
         return dataSource;
@@ -67,15 +66,21 @@ public class BpmnWithEventRegistryTestConfiguration {
     
     @Bean
     public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
-            SpringEventRegistryConfigurator eventRegistryConfigurator) {
+            SpringEventRegistryConfigurator eventRegistryConfigurator, SpringIdmEngineConfigurator springIdmEngineConfigurator) {
         
         SpringProcessEngineConfiguration engineConfiguration = new SpringProcessEngineConfiguration();
         engineConfiguration.setDataSource(dataSource);
         engineConfiguration.setTransactionManager(transactionManager);
         engineConfiguration.setDatabaseSchemaUpdate(SpringEventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         engineConfiguration.setEventRegistryConfigurator(eventRegistryConfigurator);
+        engineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
 
         return engineConfiguration;
+    }
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
     }
     
     @Bean

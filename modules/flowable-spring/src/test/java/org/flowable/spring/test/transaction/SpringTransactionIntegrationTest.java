@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import javax.sql.DataSource;
 
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
@@ -58,7 +59,11 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
         // Create a table that the userBean is supposed to fill with some data
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute("create table MY_TABLE (MY_TEXT int);");
+        if (processEngineConfiguration.getDatabaseType().equals(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE)) {
+            jdbcTemplate.execute("create table MY_TABLE (MY_TEXT INTEGER, primary key (MY_COLUMN));");
+        } else {
+            jdbcTemplate.execute("create table MY_TABLE (MY_COLUMN int);");
+        }
 
         // The hello() method will start the process. The process will wait in a
         // user task
