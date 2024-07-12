@@ -187,12 +187,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         return context;
     }
 
-    @Override
-    protected String getResourcesRootDirectory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
 
     }
