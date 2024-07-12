@@ -435,6 +435,94 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueLessThan("numberVar", 5).count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueLessThanOrEqual("numberVar", 10).count()).isEqualTo(4);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueLessThanOrEqual("numberVar", 9).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueEquals(9).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueEquals(10).count()).isEqualTo(4);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableExists("numberVar").count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableExists("notExisting").count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableNotExists("numberVar").count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableNotExists("notExisting").count()).isEqualTo(4);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueEquals("var", "test").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueEquals("var", "test2").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueEqualsIgnoreCase("var", "TEST").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueEqualsIgnoreCase("var", "TEST2").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueNotEquals("var", "test2").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueNotEquals("var", "test").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueNotEqualsIgnoreCase("var", "TEST2").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueNotEqualsIgnoreCase("var", "TEST").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLike("var", "te%").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLike("var", "te2%").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLikeIgnoreCase("var", "TE%").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLikeIgnoreCase("var", "TE2%").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueGreaterThan("numberVar", 5).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueGreaterThan("numberVar", 11).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueGreaterThanOrEqual("numberVar", 10).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueGreaterThanOrEqual("numberVar", 11).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLessThan("numberVar", 20).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLessThan("numberVar", 5).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLessThanOrEqual("numberVar", 10).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefined").caseVariableValueLessThanOrEqual("numberVar", 9).endOr()
+                .count()).isZero();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueEquals(9).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueEquals(10).endOr()
+                .count()).isEqualTo(4);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableExists("numberVar").endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableExists("notExisting").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableNotExists("numberVar").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableNotExists("notExisting").endOr()
+                .count()).isEqualTo(4);
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -459,6 +547,8 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseVariableValueEquals("localVar", "test").count()).isZero();
 
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableExists("localNumberVar").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableNotExists("localNumberVar").count()).isEqualTo(3);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueEquals("localVar", "test").count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueEquals("localVar", "test2").count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueEqualsIgnoreCase("localVar", "TEST").count()).isEqualTo(1);
@@ -473,6 +563,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueLikeIgnoreCase("localVar", "TE2%").count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueGreaterThan("localNumberVar", 5).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueGreaterThan("localNumberVar", 17).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueGreaterThan("localNumberVar", 17).count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueGreaterThanOrEqual("localNumberVar", 15).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueGreaterThanOrEqual("localNumberVar", 16).count()).isZero();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueLessThan("localNumberVar", 20).count()).isEqualTo(1);
@@ -480,6 +571,91 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueLessThanOrEqual("localNumberVar", 15).count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().variableValueLessThanOrEqual("localNumberVar", 9).count()).isZero();
 
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableExists("localNumberVar").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableNotExists("localNumberVar").endOr()
+                .count()).isEqualTo(3);
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueGreaterThan("numberVar", 10).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueGreaterThan("numberVar", 11).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueGreaterThanOrEqual("numberVar", 11).endOr()
+                .count()).isEqualTo(4);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueGreaterThanOrEqual("numberVar", 12).endOr()
+                .count()).isZero();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseVariableValueEquals("localVar", "test").endOr()
+                .count()).isZero();
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueEquals("localVar", "test").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueEquals("localVar", "test2").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueEqualsIgnoreCase("localVar", "TEST").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueEqualsIgnoreCase("localVar", "TEST2").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueNotEquals("localVar", "test2").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueNotEquals("localVar", "test").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueNotEqualsIgnoreCase("localVar", "TEST2").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueNotEqualsIgnoreCase("localVar", "TEST").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLike("localVar", "te%").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLike("localVar", "te2%").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLikeIgnoreCase("localVar", "TE%").endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLikeIgnoreCase("localVar", "TE2%").endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueGreaterThan("localNumberVar", 5).endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueGreaterThan("localNumberVar", 17).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueGreaterThanOrEqual("localNumberVar", 15).endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueGreaterThanOrEqual("localNumberVar", 16).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLessThan("localNumberVar", 20).endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLessThan("localNumberVar", 5).endOr()
+                .count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLessThanOrEqual("localNumberVar", 15).endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").variableValueLessThanOrEqual("localNumberVar", 9).endOr()
+                .count()).isZero();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult();
@@ -1176,6 +1352,14 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().count()).isEqualTo(1);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").planItemInstanceWithoutTenantId().list()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").planItemInstanceName("Task A").endOr()
+                .or().caseInstanceId("undefinedId").planItemInstanceWithoutTenantId().endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").planItemInstanceName("Task A").endOr()
+                .or().caseInstanceId("undefinedId").planItemInstanceWithoutTenantId().endOr()
+                .list()).hasSize(1);
     }
 
     @Test

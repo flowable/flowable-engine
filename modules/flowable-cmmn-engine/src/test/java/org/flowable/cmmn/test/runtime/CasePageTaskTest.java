@@ -81,6 +81,14 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertThat(pagePlanItemInstance).isNotNull();
 
+        pagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseInstanceId(caseInstance.getId()).endOr()
+                .or().caseInstanceId("undefinedId").planItemDefinitionId("casePageTask1").endOr()
+                .or().caseInstanceId("undefinedId").planItemInstanceFormKey("myFormKeyValue").endOr()
+                .includeEnded()
+                .singleResult();
+        assertThat(pagePlanItemInstance).isNotNull();
+
         // page tasks go into terminated or completed state, depending on the parent ending type like complete or exit
         assertThat(pagePlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.COMPLETED);
         assertThat(pagePlanItemInstance.getFormKey()).isEqualTo("myFormKeyValue");
@@ -178,11 +186,19 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("janedoe").singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").involvedUser("janedoe").endOr().singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
+
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe2").singleResult();
         assertThat(planItemInstance).isNull();
 
         List<String> groups = Collections.singletonList("sales");
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(groups).singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
+
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").involvedGroups(groups).endOr().singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(groups).singleResult();
