@@ -773,9 +773,9 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("orQueryObject.deploymentId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("assigneeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("candidateUser", PARAMETER_TYPE_NVARCHAR);
-        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR); // CMMN = liquibase
-        info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_VARCHAR);  // CMMN = liquibase
-        info.addQueryParameter("cmmnDeploymentId", PARAMETER_TYPE_VARCHAR);  // CMMN = liquibase
+        info.addQueryParameter("caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("caseInstanceIdWithChildren", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("cmmnDeploymentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("createTimeAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("createTimeBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("dueAfter", PARAMETER_TYPE_TIMESTAMP);

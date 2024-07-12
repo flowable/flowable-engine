@@ -39,10 +39,10 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     protected abstract String getEngineTableName();
 
     protected abstract String getChangeLogTableName();
+    
+    protected abstract String getChangeLogTablePrefixName();
 
     protected abstract String getDbVersionForChangelogVersion(String changeLogVersion);
-
-    protected abstract String getChangeLogVersionsStatement();
 
     protected abstract AbstractEngineConfiguration getEngineConfiguration();
 
@@ -174,12 +174,23 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             }
 
             return feedback;
+            
         } finally {
             if (lockManager != null) {
                 lockManager.releaseLock();
             }
         }
+    }
 
+    @Override
+    public String getContext() {
+        return context;
+    }
+
+    @Override
+    protected String getResourcesRootDirectory() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
@@ -208,8 +219,8 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         String changeLogTableName = getChangeLogTableName();
         if (changeLogTableName != null && isTablePresent(changeLogTableName)) {
             DbSqlSession dbSqlSession = getDbSqlSession();
-            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement(getChangeLogVersionsStatement());
-            List<String> changeLogIds = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement);
+            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.change.ChangeLog.selectFlowableChangeLogVersions");
+            List<String> changeLogIds = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement, getChangeLogTablePrefixName());
             if (changeLogIds != null && !changeLogIds.isEmpty()) {
                 String changeLogVersion = changeLogIds.get(changeLogIds.size() - 1);
                 return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));

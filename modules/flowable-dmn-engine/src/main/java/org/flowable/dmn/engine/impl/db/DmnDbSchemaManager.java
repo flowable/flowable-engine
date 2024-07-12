@@ -66,6 +66,11 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_DMN_DATABASECHANGELOG";
     }
+    
+    @Override
+    protected String getChangeLogTablePrefixName() {
+        return "ACT_DMN";
+    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -73,11 +78,6 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "5.99.0.0";
-    }
-
-    @Override
-    protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectDmnChangeLogVersions";
     }
 
     @Override

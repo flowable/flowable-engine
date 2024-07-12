@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -69,7 +68,6 @@ import org.apache.ibatis.type.SqlxmlTypeHandler;
 import org.apache.ibatis.type.StringTypeHandler;
 import org.apache.ibatis.type.TimeOnlyTypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -175,7 +173,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
-    protected Collection<SchemaManager> additionalSchemaManagers;
+    protected Map<String, SchemaManager> additionalSchemaManagers;
     protected SchemaManager commonSchemaManager;
     protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
@@ -1237,13 +1235,13 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration addAdditionalSchemaManager(SchemaManager schemaManager) {
         if (this.additionalSchemaManagers == null) {
-            this.additionalSchemaManagers = new ArrayList<>();
+            this.additionalSchemaManagers = new HashMap<>();
         }
-        this.additionalSchemaManagers.add(schemaManager);
+        this.additionalSchemaManagers.put(schemaManager.getContext(), schemaManager);
         return this;
     }
 
-    public Collection<SchemaManager> getAdditionalSchemaManagers() {
+    public Map<String, SchemaManager> getAdditionalSchemaManagers() {
         return additionalSchemaManagers;
     }
 

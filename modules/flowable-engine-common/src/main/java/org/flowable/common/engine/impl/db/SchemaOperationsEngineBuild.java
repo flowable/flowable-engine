@@ -13,9 +13,9 @@
 package org.flowable.common.engine.impl.db;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -57,10 +57,10 @@ public class SchemaOperationsEngineBuild implements Command<Void> {
         schemaManagers.add(engineConfiguration.getCommonSchemaManager());
         schemaManagers.add(engineConfiguration.getSchemaManager());
 
-        Collection<SchemaManager> additionalSchemaManagers = engineConfiguration.getAdditionalSchemaManagers();
+        Map<String, SchemaManager> additionalSchemaManagers = engineConfiguration.getAdditionalSchemaManagers();
 
         if (additionalSchemaManagers != null) {
-            schemaManagers.addAll(additionalSchemaManagers);
+            schemaManagers.addAll(additionalSchemaManagers.values());
         }
 
         executeSchemaUpdate(schemaManagers, databaseSchemaUpdate);

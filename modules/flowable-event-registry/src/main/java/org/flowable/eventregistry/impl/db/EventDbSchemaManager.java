@@ -61,6 +61,11 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "FLW_EV_DATABASECHANGELOG";
     }
+    
+    @Override
+    protected String getChangeLogTablePrefixName() {
+        return "FLW_EV";
+    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -68,11 +73,6 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "6.5.0.0";
-    }
-
-    @Override
-    protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectEventRegistryChangeLogVersions";
     }
 
     @Override

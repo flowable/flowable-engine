@@ -291,5 +291,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     protected String getResourcesRootDirectory() {
         return "org/flowable/db/";
     }
+    
+    @Override
+    public String getContext() {
+        return "bpmn";
+    }
 
 }

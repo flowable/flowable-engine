@@ -129,4 +129,8 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
        return false;
    }
    
+   @Override
+   public String getContext() {
+       return SCHEMA_COMPONENT;
+   }
 }

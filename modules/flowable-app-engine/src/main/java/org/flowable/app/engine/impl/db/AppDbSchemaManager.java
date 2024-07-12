@@ -58,6 +58,11 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_APP_DATABASECHANGELOG";
     }
+    
+    @Override
+    protected String getChangeLogTablePrefixName() {
+        return "ACT_APP";
+    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -65,11 +70,6 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "6.3.0.1";
-    }
-
-    @Override
-    protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectAppChangeLogVersions";
     }
 
     @Override

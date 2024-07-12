@@ -34,4 +34,10 @@ public class CommonDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager 
     public void schemaCheckVersion() {
         // Schema check is ignored for the common DB
     }
+
+    @Override
+    public String getContext() {
+        return SCHEMA_COMPONENT;
+    }
+    
 }

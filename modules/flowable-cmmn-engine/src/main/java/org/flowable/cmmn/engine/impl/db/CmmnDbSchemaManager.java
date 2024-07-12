@@ -75,6 +75,11 @@ public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_CMMN_DATABASECHANGELOG";
     }
+    
+    @Override
+    protected String getChangeLogTablePrefixName() {
+        return "ACT_CMMN";
+    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -87,11 +92,6 @@ public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     @Override
     protected AbstractEngineConfiguration getEngineConfiguration() {
         return CommandContextUtil.getCmmnEngineConfiguration();
-    }
-
-    @Override
-    protected String getChangeLogVersionsStatement() {
-        return "org.flowable.common.engine.impl.persistence.change.ChangeLog.selectCmmnChangeLogVersions";
     }
 
     @Override
