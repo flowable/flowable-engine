@@ -634,6 +634,297 @@
             </otherwise>
         </choose>
       </foreach>
+        <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+            and
+            <trim prefix="(" prefixOverrides="OR" suffix=")">
+                <if test="orQueryObject.caseDefinitionId != null">
+                    or RES.CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.derivedCaseDefinitionId != null">
+                    or RES.DERIVED_CASE_DEF_ID_ = #{orQueryObject.derivedCaseDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.caseInstanceId != null">
+                    or RES.CASE_INST_ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.stageInstanceId != null">
+                    or RES.STAGE_INST_ID_ = #{orQueryObject.stageInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemInstanceId != null">
+                    or RES.ID_ = #{orQueryObject.planItemInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.elementId != null">
+                    or RES.ELEMENT_ID_ = #{orQueryObject.elementId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionId != null">
+                    or RES.ITEM_DEFINITION_ID_ = #{orQueryObject.planItemDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionType != null">
+                    or RES.ITEM_DEFINITION_TYPE_ = #{orQueryObject.planItemDefinitionType, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionTypes != null">
+                    or RES.ITEM_DEFINITION_TYPE_ in
+                    <foreach item="planItemDefinitionType" index="index" collection="orQueryObject.planItemDefinitionTypes" open="(" separator="," close=")">
+                        #{planItemDefinitionType, jdbcType=VARCHAR}
+                    </foreach>
+                </if>
+                <if test="orQueryObject.name != null">
+                    or RES.NAME_ = #{orQueryObject.name, jdbcType=NVARCHAR}
+                </if>
+                <if test="orQueryObject.state != null">
+                    or RES.STATE_ = #{orQueryObject.state, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.createdBefore != null">
+                    or RES.CREATE_TIME_ &lt;= #{orQueryObject.createdBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.createdAfter != null">
+                    or RES.CREATE_TIME_ &gt;= #{orQueryObject.createdAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastAvailableBefore != null">
+                    or RES.LAST_AVAILABLE_TIME_ &lt;= #{orQueryObject.lastAvailableBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastAvailableAfter != null">
+                    or RES.LAST_AVAILABLE_TIME_ &gt;= #{orQueryObject.lastAvailableAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastUnavailableBefore != null">
+                    or RES.LAST_UNAVAILABLE_TIME_ &lt;= #{orQueryObject.lastUnavailableBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastUnavailableAfter != null">
+                    or RES.LAST_UNAVAILABLE_TIME_ &gt;= #{orQueryObject.lastUnavailableAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastEnabledBefore != null">
+                    or RES.LAST_ENABLED_TIME_ &lt;= #{orQueryObject.lastEnabledBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastEnabledAfter != null">
+                    or RES.LAST_ENABLED_TIME_ &gt;= #{orQueryObject.lastEnabledAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastDisabledBefore != null">
+                    or RES.LAST_DISABLED_TIME_ &lt;= #{orQueryObject.lastDisabledBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastDisabledAfter != null">
+                    or RES.LAST_DISABLED_TIME_ &gt;= #{orQueryObject.lastDisabledAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastStartedBefore != null">
+                    or RES.LAST_STARTED_TIME_ &lt;= #{orQueryObject.lastStartedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastStartedAfter != null">
+                    or RES.LAST_STARTED_TIME_ &gt;= #{orQueryObject.lastStartedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastSuspendedBefore != null">
+                    or RES.LAST_SUSPENDED_TIME_ &lt;= #{orQueryObject.lastSuspendedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastSuspendedAfter != null">
+                    or RES.LAST_SUSPENDED_TIME_ &gt;= #{orQueryObject.lastSuspendedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.completedBefore != null">
+                    or RES.COMPLETED_TIME_ &lt;= #{orQueryObject.completedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.completedAfter != null">
+                    or RES.COMPLETED_TIME_ &gt;= #{orQueryObject.completedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.occurredBefore != null">
+                    or RES.OCCURRED_TIME_ &lt;= #{orQueryObject.occurredBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.occurredAfter != null">
+                    or RES.OCCURRED_TIME_ &gt;= #{orQueryObject.occurredAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.terminatedBefore != null">
+                    or RES.TERMINATED_TIME_ &lt;= #{orQueryObject.terminatedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.terminatedAfter != null">
+                    or RES.TERMINATED_TIME_ &gt;= #{orQueryObject.terminatedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.exitBefore != null">
+                    or RES.EXIT_TIME_ &lt;= #{orQueryObject.exitBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.exitAfter != null">
+                    or RES.EXIT_TIME_ &gt;= #{orQueryObject.exitAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.endedBefore != null">
+                    or RES.ENDED_TIME_ &lt;= #{orQueryObject.endedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.endedAfter != null">
+                    or RES.ENDED_TIME_ &gt;= #{orQueryObject.endedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.ended">
+                    or RES.ENDED_TIME_ is not null
+                </if>
+                <if test="orQueryObject.startUserId != null">
+                    or RES.START_USER_ID_ = #{orQueryObject.startUserId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.referenceId != null">
+                    or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.referenceType != null">
+                    or RES.REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.completable">
+                    or RES.IS_COMPLETEABLE_ = #{orQueryObject.completable, jdbcType=BOOLEAN}
+                </if>
+                <if test="orQueryObject.entryCriterionId != null">
+                    or RES.ENTRY_CRITERION_ID_ = #{orQueryObject.entryCriterionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.exitCriterionId != null">
+                    or RES.EXIT_CRITERION_ID_ = #{orQueryObject.exitCriterionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.formKey != null">
+                    or RES.EXTRA_VALUE_ = #{orQueryObject.formKey, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.extraValue != null">
+                    or RES.EXTRA_VALUE_ = #{orQueryObject.extraValue, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.tenantId != null">
+                    or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.withoutTenantId">
+                    or (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
+                </if>
+                <if test="orQueryObject.onlyStages">
+                    or RES.IS_STAGE_ = #{orQueryObject.onlyStages, jdbcType=BOOLEAN}
+                </if>
+                <if test="orQueryObject.involvedUser != null || orQueryObject.involvedGroups != null">
+                    or exists(select I.ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SUB_SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'planItem'
+                    and
+                    (
+                    <if test="orQueryObject.involvedUser != null">
+                        I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.involvedUser != null &amp;&amp; orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                        or
+                    </if>
+                    <if test="orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                        (
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                            <if test="groupIndex &gt; 0">
+                                or
+                            </if>
+                            I.GROUP_ID_ IN
+                            <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
+                                     open="(" separator="," close=")">
+                                #{involvedGroup, jdbcType=NVARCHAR}
+                            </foreach>
+                        </foreach>
+                        )
+                    </if>
+                    )
+                    )
+                </if>
+                <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
+                    or
+                    <trim prefix="(" prefixOverrides="AND" suffix=")">
+                        <choose>
+                            <when test="queryVariableValue.operator.equals('EXISTS')">
+                                and EXISTS (
+                                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                <if test="!queryVariableValue.local">
+                                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                <if test="queryVariableValue.local">
+                                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                )
+                            </when>
+                            <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+                                and NOT EXISTS (
+                                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                <if test="!queryVariableValue.local">
+                                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                <if test="queryVariableValue.local">
+                                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                )
+                            </when>
+                            <otherwise>
+                                and exists (
+                                select 1
+                                from ${prefix}ACT_RU_VARIABLE V
+                                <where>
+                                    <if test="queryVariableValue.local">
+                                        and RES.ID_ = V.SUB_SCOPE_ID_
+                                        and V.SCOPE_TYPE_ = 'cmmn'
+                                    </if>
+                                    <if test="!queryVariableValue.local">
+                                        and RES.CASE_INST_ID_ = V.SCOPE_ID_
+                                        and V.SUB_SCOPE_ID_ is null
+                                        and V.SCOPE_TYPE_ = 'cmmn'
+                                    </if>
+                                    <if test="queryVariableValue.name != null">
+                                        <!-- Match-all variable-names when name is null -->
+                                        and V.NAME_= #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                    </if>
+                                    <if test="queryVariableValue.needsTypeCheck()">
+                                        and V.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
+                                    </if>
+                                    <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                                and (lower(V.TEXT_)
+                                            </when>
+                                            <otherwise>
+                                                and (V.TEXT_
+                                            </otherwise>
+                                        </choose>
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                                            <otherwise><include refid="variableOperator" /></otherwise>
+                                        </choose>
+                                        #{queryVariableValue.textValue, jdbcType=NVARCHAR}
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                                        </choose>
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.TEXT_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <if test="queryVariableValue.textValue2 != null">
+                                        and V.TEXT2_
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                                            <otherwise><include refid="variableOperator" /></otherwise>
+                                        </choose>
+                                        #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                                        </choose>
+                                    </if>
+                                    <if test="queryVariableValue.longValue != null">
+                                        and (V.LONG_
+                                        <include refid="variableOperator" />
+                                        #{queryVariableValue.longValue, jdbcType=BIGINT}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.LONG_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <if test="queryVariableValue.doubleValue != null">
+                                        and (V.DOUBLE_
+                                        <include refid="variableOperator" />
+                                        #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.DOUBLE_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <!-- Null variable type -->
+                                    <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                                and (V.TEXT_ is not null or V.TEXT2_ is not null or V.LONG_ is not null or V.DOUBLE_ is not null or V.BYTEARRAY_ID_ is not null)
+                                            </when>
+                                            <otherwise>
+                                                and V.TEXT_ is null and V.TEXT2_ is null and V.LONG_ is null and V.DOUBLE_ is null and V.BYTEARRAY_ID_ is null
+                                            </otherwise>
+                                        </choose>
+                                    </if>
+                                </where>
+                                )
+                            </otherwise>
+                        </choose>
+                    </trim>
+                </foreach>
+            </trim>
+        </foreach>
     </where>
 
   </sql>

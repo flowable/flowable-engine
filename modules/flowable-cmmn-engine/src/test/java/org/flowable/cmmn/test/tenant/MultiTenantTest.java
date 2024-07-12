@@ -63,6 +63,10 @@ public class MultiTenantTest extends FlowableCmmnTestCase {
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceWithoutTenantId().count()).isEqualTo(3);
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceTenantId("test-tenant").count()).isEqualTo(5);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").planItemInstanceTenantId("test-tenant").endOr()
+                .count()).isEqualTo(5);
+
     }
 
 }
