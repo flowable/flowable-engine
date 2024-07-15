@@ -1,12 +1,24 @@
 drop index FLW_IDX_BATCH_PART;
 
+alter table FLW_RU_BATCH_PART
+    drop CONSTRAINT FLW_FK_BATCH_PART_PARENT;
+
 drop table FLW_RU_BATCH_PART;
 drop table FLW_RU_BATCH;
 
 drop index ACT_IDX_ENT_LNK_SCOPE;
+drop index ACT_IDX_ENT_LNK_REF_SCOPE;
+drop index ACT_IDX_ENT_LNK_ROOT_SCOPE;
 drop index ACT_IDX_ENT_LNK_SCOPE_DEF;
 
 drop table ACT_RU_ENTITYLINK;
+
+drop index ACT_IDX_HI_ENT_LNK_SCOPE;
+drop index ACT_IDX_HI_ENT_LNK_REF_SCOPE;
+drop index ACT_IDX_HI_ENT_LNK_ROOT_SCOPE;
+drop index ACT_IDX_HI_ENT_LNK_SCOPE_DEF;
+
+drop table ACT_HI_ENTITYLINK;
 
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
@@ -21,6 +33,13 @@ drop index ACT_IDX_IDENT_LNK_SUB_SCOPE;
 drop index ACT_IDX_IDENT_LNK_SCOPE_DEF;
 
 drop table ACT_RU_IDENTITYLINK;
+
+drop index ACT_IDX_HI_IDENT_LNK_USER;
+drop index ACT_IDX_HI_IDENT_LNK_GROUP;
+drop index ACT_IDX_HI_IDENT_LNK_SCOPE;
+drop index ACT_IDX_HI_IDENT_LNK_SUB_SCOPE;
+
+drop table ACT_HI_IDENTITYLINK;
 
 drop index ACT_IDX_JOB_SCOPE;
 drop index ACT_IDX_JOB_SUB_SCOPE;
@@ -104,6 +123,16 @@ drop index ACT_IDX_TASK_SCOPE_DEF;
 
 drop table ACT_RU_TASK;
 
+drop index ACT_IDX_ACT_HI_TSK_LOG_TASK;
+
+drop table ACT_HI_TSK_LOG;
+
+drop index ACT_IDX_HI_TASK_SCOPE;
+drop index ACT_IDX_HI_TASK_SUB_SCOPE;
+drop index ACT_IDX_HI_TASK_SCOPE_DEF;
+
+drop table ACT_HI_TASKINST;
+
 drop index ACT_IDX_VAR_BYTEARRAY;
 drop index ACT_IDX_RU_VAR_SCOPE_ID_TYPE;
 drop index ACT_IDX_RU_VAR_SUB_ID_TYPE;
@@ -112,6 +141,12 @@ alter table ACT_RU_VARIABLE
     drop CONSTRAINT ACT_FK_VAR_BYTEARRAY;
 
 drop table ACT_RU_VARIABLE;
+
+drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
+drop index ACT_IDX_HI_VAR_SCOPE_ID_TYPE;
+drop index ACT_IDX_HI_VAR_SUB_ID_TYPE;
+
+drop table ACT_HI_VARINST;
 
 
 drop table ACT_GE_BYTEARRAY;
