@@ -18,7 +18,6 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.CmmnDiEdge;
