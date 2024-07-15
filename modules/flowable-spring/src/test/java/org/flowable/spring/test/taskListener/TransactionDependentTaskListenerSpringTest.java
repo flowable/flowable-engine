@@ -20,12 +20,14 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Yvo Swillens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/taskListener/TaskListenerDelegateExpressionTest-context.xml")
+@DirtiesContext
 public class TransactionDependentTaskListenerSpringTest extends SpringFlowableTestCase {
 
     @Autowired

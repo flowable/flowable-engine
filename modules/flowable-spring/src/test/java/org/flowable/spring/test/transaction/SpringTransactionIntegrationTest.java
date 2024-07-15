@@ -26,12 +26,14 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Tom Baeyens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
+@DirtiesContext
 public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
     @Autowired

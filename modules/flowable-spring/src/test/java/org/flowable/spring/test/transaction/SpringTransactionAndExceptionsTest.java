@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -54,6 +55,7 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Joram Barrez
  */
 @ContextConfiguration(classes = SpringTransactionAndExceptionsTest.TestConfiguration.class)
+@DirtiesContext
 public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
 
     @Autowired

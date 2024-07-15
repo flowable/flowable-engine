@@ -22,12 +22,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Frederik Heremans
  */
 @ContextConfiguration(locations = "JPASpringTest-context.xml")
+@DirtiesContext
 public class JpaTest extends SpringFlowableTestCase {
 
     @Test
