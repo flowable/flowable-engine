@@ -15,7 +15,6 @@ package org.flowable.cmmn.test.db;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.junit.Test;
@@ -29,13 +28,17 @@ public class CmmnEngineDropScriptsTest extends FlowableCmmnTestCase {
     public void testDropSchema() {
 
         // Dropping and recreating the schema should not have an impact on other tests
-        SchemaManager schemaManager = cmmnEngineConfiguration.getSchemaManager();
+        long originalTableCount = countTables();
+        assertThat(originalTableCount).isGreaterThan(0);
         cmmnEngineConfiguration.getCommandExecutor().execute(new SchemaOperationsEngineDropDbCmd(cmmnEngineConfiguration.getEngineScopeType()));
-        assertThat(cmmnEngineConfiguration.getCmmnManagementService().getTableCounts().
-                keySet().stream().filter(tableName -> tableName.toLowerCase().startsWith("act_cmmn"))).hasSize(0);
+        assertThat(countTables()).isZero();
 
         cmmnEngineConfiguration.getCommandExecutor().execute(new SchemaOperationsEngineBuild(cmmnEngineConfiguration.getEngineScopeType()));
-        assertThat(cmmnEngineConfiguration.getCmmnManagementService().getTableCounts().
-                keySet().stream().filter(tableName -> tableName.toLowerCase().startsWith("act_cmmn"))).hasSize(10);
+        assertThat(countTables()).isEqualTo(originalTableCount);
+    }
+
+    private long countTables() {
+        return cmmnEngineConfiguration.getCmmnManagementService().getTableCounts().
+                keySet().stream().filter(tableName -> tableName.toLowerCase().startsWith("act_cmmn")).count();
     }
 }
