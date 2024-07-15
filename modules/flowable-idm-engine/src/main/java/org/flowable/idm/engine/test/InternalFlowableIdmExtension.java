@@ -12,14 +12,10 @@
  */
 package org.flowable.idm.engine.test;
 
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;

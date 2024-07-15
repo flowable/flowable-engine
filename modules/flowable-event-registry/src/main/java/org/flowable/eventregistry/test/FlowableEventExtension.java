@@ -19,16 +19,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
