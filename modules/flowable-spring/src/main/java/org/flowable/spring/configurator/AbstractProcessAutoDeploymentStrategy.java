@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.zip.ZipInputStream;
 
-import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.engine.ProcessEngine;

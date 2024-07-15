@@ -69,10 +69,6 @@
         </dependency>
 
         <!-- DATABASE -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -128,7 +124,8 @@
             org.flowable.eventregistry.impl
         </flowable.artifact>
         <flowable.osgi.export.additional>
-            org.flowable.eventregistry.db.liquibase,
+            org.flowable.eventregistry.db.create,
+            org.flowable.eventregistry.db.upgrade,
             org.flowable.eventregistry.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
@@ -136,7 +133,6 @@
             org.junit*;resolution:=optional,
             org.junit.jupiter*;resolution:=optional,
             com.sun*;resolution:=optional,
-            liquibase*;resolution:=optional,
             jakarta.activation*;resolution:=optional,
             jakarta.persistence*;resolution:=optional,
             jakarta.mail*;resolution:=optional,

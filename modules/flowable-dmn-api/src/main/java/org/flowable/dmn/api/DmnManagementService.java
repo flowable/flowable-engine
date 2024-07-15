@@ -14,6 +14,7 @@ package org.flowable.dmn.api;
 
 import java.util.Map;
 
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
@@ -54,4 +55,15 @@ public interface DmnManagementService {
      */
     ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
     
+    /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
 }

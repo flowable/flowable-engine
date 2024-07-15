@@ -52,10 +52,6 @@
             <artifactId>flowable-identitylink-service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.uuid</groupId>
             <artifactId>java-uuid-generator</artifactId>
         </dependency>

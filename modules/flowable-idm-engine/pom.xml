@@ -20,7 +20,7 @@
 		</flowable.artifact>
         <flowable.osgi.export.additional>
             org.flowable.idm.db.create,
-            org.flowable.idm.db.update,
+            org.flowable.idm.db.upgrade,
             org.flowable.idm.db.mapping,
             org.flowable.idm.db.mapping.entity,
         </flowable.osgi.export.additional>

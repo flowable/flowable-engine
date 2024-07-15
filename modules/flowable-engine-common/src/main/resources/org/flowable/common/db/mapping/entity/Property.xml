@@ -77,8 +77,8 @@
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
-  <select id="selectDbSchemaVersion" resultType="string">
-    select VALUE_ from ${prefix}ACT_GE_PROPERTY where NAME_ = 'schema.version'
+  <select id="selectPropertyValue" parameterType="string" resultType="string">
+    select VALUE_ from ${prefix}ACT_GE_PROPERTY where NAME_ = #{name, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectProperty" parameterType="string" resultMap="propertyResultMap">

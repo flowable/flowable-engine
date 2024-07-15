@@ -18,11 +18,9 @@ import java.io.InputStream;
 
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.util.CommandContextUtil;
 import org.flowable.app.engine.test.FlowableAppTestCase;
-import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +37,7 @@ public class DbSchemaDrop {
             AppEngine cmmnEngine = AppEngineConfiguration.createAppEngineConfigurationFromInputStream(inputStream).buildAppEngine();
             CommandExecutor commandExecutor = cmmnEngine.getAppEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
-            commandExecutor.execute(config, new Command<>() {
-                @Override
-                public Object execute(CommandContext commandContext) {
-                    CommandContextUtil.getAppEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
-                    return null;
-                }
-            });
+            commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(cmmnEngine.getAppEngineConfiguration().getEngineScopeType()));
             
         } catch (IOException e) {
             LOGGER.error("Could not create App engine", e);

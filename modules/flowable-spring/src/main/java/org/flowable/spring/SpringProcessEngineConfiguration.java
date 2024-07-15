@@ -72,8 +72,8 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     }
 
     @Override
-    public ProcessEngine buildProcessEngine() {
-        ProcessEngine processEngine = super.buildProcessEngine();
+    public ProcessEngine buildEngine() {
+        ProcessEngine processEngine = super.buildEngine();
         ProcessEngines.setInitialized(true);
         enginesBuild.add(processEngine.getName());
         return processEngine;

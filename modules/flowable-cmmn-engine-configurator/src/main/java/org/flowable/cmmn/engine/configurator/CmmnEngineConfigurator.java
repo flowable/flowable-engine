@@ -41,7 +41,7 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 /**
  * @author Joram Barrez
  */
-public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
+public class CmmnEngineConfigurator extends AbstractEngineConfigurator<CmmnEngine> {
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
@@ -89,9 +89,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
             
         }
 
-        cmmnEngineConfiguration.setExecuteServiceSchemaManagers(false);
-
-        initCmmnEngine();
+        initEngine();
 
         if (processEngineConfiguration != null) {
             cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
@@ -178,7 +176,8 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         return EntityDependencyOrder.DELETE_ORDER;
     }
 
-    protected synchronized CmmnEngine initCmmnEngine() {
+    @Override
+    protected CmmnEngine buildEngine() {
         if (cmmnEngineConfiguration == null) {
             throw new FlowableException("CmmnEngineConfiguration is required");
         }

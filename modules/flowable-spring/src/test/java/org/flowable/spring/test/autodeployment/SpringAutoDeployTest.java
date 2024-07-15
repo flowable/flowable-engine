@@ -27,13 +27,14 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.test.AbstractTestCase;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -125,10 +126,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         removeAllDeployments();
 
         // Make sure the schema is always dropped
-        this.managementService.executeCommand(commandContext -> {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
-            return null;
-        });
+        this.managementService.executeCommand(new SchemaOperationsEngineDropDbCmd(ScopeTypes.BPMN));
 
         if (this.applicationContext != null) {
             this.applicationContext.close();

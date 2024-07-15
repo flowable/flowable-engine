@@ -16,8 +16,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableWrongDbException;
 import org.flowable.common.engine.impl.db.ServiceSqlScriptBasedDbSchemaManager;
 import org.flowable.idm.engine.IdmEngine;
-import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
     
@@ -27,7 +25,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
     
    public IdmDbSchemaManager() {
        // note; no schema property set, managed by this class itself as it has (for historical reasons) it's own property table
-       super(IDM_PROPERTY_TABLE, SCHEMA_COMPONENT, null, VERSION_PROPERTY); 
+       super(IDM_PROPERTY_TABLE, SCHEMA_COMPONENT, VERSION_PROPERTY); 
    }
    
    @Override
@@ -131,26 +129,8 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
        return false;
    }
    
-   public void performSchemaOperationsIdmEngineBuild() {
-       String databaseSchemaUpdate = CommandContextUtil.getIdmEngineConfiguration().getDatabaseSchemaUpdate();
-       if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-           try {
-               schemaDrop();
-           } catch (RuntimeException e) {
-               // ignore
-           }
-       }
-       if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate) || IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
-               || IdmEngineConfiguration.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)) {
-           schemaCreate();
-
-       } else if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-           schemaCheckVersion();
-
-       } else if (IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-           schemaUpdate();
-       }
+   @Override
+   public String getContext() {
+       return SCHEMA_COMPONENT;
    }
-
-
 }

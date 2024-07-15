@@ -23,6 +23,7 @@ import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.cmmn.api.runtime.CmmnExternalWorkerTransitionBuilder;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
 import org.flowable.job.api.DeadLetterJobQuery;
 import org.flowable.job.api.ExternalWorkerJobAcquireBuilder;
@@ -424,4 +425,16 @@ public interface CmmnManagementService {
      * will be changed to the target tenant id.
      */
     ChangeTenantIdBuilder createChangeTenantIdBuilder(String fromTenantId, String toTenantId);
+    
+    /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
 }

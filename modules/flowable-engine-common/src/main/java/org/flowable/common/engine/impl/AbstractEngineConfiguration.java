@@ -73,6 +73,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
@@ -86,6 +87,7 @@ import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -99,7 +101,6 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.logging.LoggingListener;
 import org.flowable.common.engine.impl.logging.LoggingSession;
@@ -172,6 +173,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected Map<String, SchemaManager> additionalSchemaManagers;
     protected SchemaManager commonSchemaManager;
     protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
@@ -431,7 +433,7 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
-    
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -548,8 +550,22 @@ public abstract class AbstractEngineConfiguration {
         if (this.commonSchemaManager == null) {
             this.commonSchemaManager = new CommonDbSchemaManager();
         }
+
+        if (this.schemaManager == null) {
+            this.schemaManager = createEngineSchemaManager();
+        }
+
     }
 
+    protected abstract SchemaManager createEngineSchemaManager();
+
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsEngineBuild(getEngineScopeType());
+            }
+        }
+    }
     // session factories ////////////////////////////////////////////////////////
 
     public void addSessionFactory(SessionFactory sessionFactory) {
@@ -1215,6 +1231,18 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setSchemaManager(SchemaManager schemaManager) {
         this.schemaManager = schemaManager;
         return this;
+    }
+
+    public AbstractEngineConfiguration addAdditionalSchemaManager(SchemaManager schemaManager) {
+        if (this.additionalSchemaManagers == null) {
+            this.additionalSchemaManagers = new HashMap<>();
+        }
+        this.additionalSchemaManagers.put(schemaManager.getContext(), schemaManager);
+        return this;
+    }
+
+    public Map<String, SchemaManager> getAdditionalSchemaManagers() {
+        return additionalSchemaManagers;
     }
 
     public SchemaManager getCommonSchemaManager() {

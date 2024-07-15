@@ -28,8 +28,6 @@ public class FlowableCmmnRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/cmmn/db/mapping", hints, classLoader);
-        resourceHints.registerPattern("org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml");
-        resourceHints.registerPattern("org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog-crdb.xml");
         resourceHints.registerPattern("org/flowable/impl/cmmn/parser/*.xsd");
 
         hints.reflection()

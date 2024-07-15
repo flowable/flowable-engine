@@ -17,6 +17,12 @@
 		<flowable.artifact>
 			org.flowable.dmn.engine
 		</flowable.artifact>
+		<flowable.osgi.export.additional>
+            org.flowable.dmn.db.create,
+            org.flowable.dmn.db.upgrade,
+            org.flowable.dmn.db.mapping,
+            org.flowable.dmn.db.mapping.entity,
+        </flowable.osgi.export.additional>
 		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
 		</flowable.osgi.import.additional>
@@ -82,11 +88,6 @@
       	</dependency>
 
         <!-- DATABASE -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>

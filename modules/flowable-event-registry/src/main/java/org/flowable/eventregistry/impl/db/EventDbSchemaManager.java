@@ -12,59 +12,85 @@
  */
 package org.flowable.eventregistry.impl.db;
 
-import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
-import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
+import org.flowable.eventregistry.impl.cmd.UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
-public class EventDbSchemaManager extends LiquibaseBasedSchemaManager {
-    
-    public static final String LIQUIBASE_CHANGELOG = "org/flowable/eventregistry/db/liquibase/flowable-eventregistry-db-changelog.xml";
+public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
+
+    protected static final String EVENTREGISTRY_DB_SCHEMA_LOCK_NAME = "eventRegistryDbSchemaLock";
+
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.5.0.6"),
+            Map.entry("2", "6.7.2.0"),
+            Map.entry("3", "6.7.2.0"),
+            Map.entry("4", "7.1.0.0"),
+            Map.entry("5", "7.1.0.0")
+    );
 
     public EventDbSchemaManager() {
-        super("eventregistry", LIQUIBASE_CHANGELOG, EventRegistryEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
+        super("eventregistry");
     }
 
     @Override
-    protected LiquibaseDatabaseConfiguration getDatabaseConfiguration() {
-        return new EngineDatabaseConfiguration(CommandContextUtil.getEventRegistryConfiguration());
-    }
-
-    public void initSchema(EventRegistryEngineConfiguration eventRegistryConfiguration) {
-        initSchema(eventRegistryConfiguration.getDatabaseSchemaUpdate());
+    protected String getEngineVersion() {
+        return EventRegistryEngine.VERSION;
     }
 
     @Override
-    public void schemaCreate() {
-        getCommonSchemaManager().schemaCreate();
-        super.schemaCreate();
+    protected String getSchemaVersionPropertyName() {
+        return "eventregistry.schema.version";
     }
 
     @Override
-    public void schemaDrop() {
-        try {
-            super.schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping event registry engine tables", e);
+    protected String getDbSchemaLockName() {
+        return EVENTREGISTRY_DB_SCHEMA_LOCK_NAME;
+    }
+
+    @Override
+    protected String getEngineTableName() {
+        return "FLW_EVENT_DEFINITION";
+    }
+
+    @Override
+    protected String getChangeLogTableName() {
+        return "FLW_EV_DATABASECHANGELOG";
+    }
+    
+    @Override
+    protected String getChangeLogTablePrefixName() {
+        return "FLW_EV";
+    }
+
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
+        return "6.5.0.0";
+    }
 
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
+    @Override
+    protected AbstractEngineConfiguration getEngineConfiguration() {
+        return CommandContextUtil.getEventRegistryConfiguration();
+    }
+    
+    @Override
+    protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
+        String version = changeLogVersion.version();
+        if ("1".equals(version) || "2".equals(version)) {
+            getEngineConfiguration().getCommandExecutor().execute(new UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd());
         }
     }
 
     @Override
-    public String schemaUpdate() {
-        getCommonSchemaManager().schemaUpdate();
-        return super.schemaUpdate();
-    }
-
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getEventRegistryConfiguration().getCommonSchemaManager();
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/eventregistry/db/";
     }
 
 }

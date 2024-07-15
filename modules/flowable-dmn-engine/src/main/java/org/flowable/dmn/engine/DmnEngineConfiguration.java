@@ -28,10 +28,12 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -52,6 +54,7 @@ import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.DmnDecisionServiceImpl;
 import org.flowable.dmn.engine.impl.DmnEngineImpl;
+import org.flowable.dmn.engine.impl.DmnEnginePostEngineBuildConsumer;
 import org.flowable.dmn.engine.impl.DmnHistoryServiceImpl;
 import org.flowable.dmn.engine.impl.DmnManagementServiceImpl;
 import org.flowable.dmn.engine.impl.DmnRepositoryServiceImpl;
@@ -61,7 +64,6 @@ import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaFactory;
 import org.flowable.dmn.engine.impl.agenda.DmnEngineAgendaSessionFactory;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.cmd.SchemaOperationsDmnEngineBuild;
 import org.flowable.dmn.engine.impl.db.DmnDbSchemaManager;
 import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
@@ -113,12 +115,10 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoric
 import org.flowable.dmn.image.DecisionRequirementsDiagramGenerator;
 import org.flowable.dmn.image.impl.DefaultDecisionRequirementsDiagramGenerator;
 
-public class DmnEngineConfiguration extends AbstractEngineConfiguration
+public class DmnEngineConfiguration extends AbstractBuildableEngineConfiguration<DmnEngine>
         implements DmnEngineConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/dmn/db/mapping/mappings.xml";
-
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_DMN_";
 
     protected String dmnEngineName = DmnEngines.NAME_DEFAULT;
 
@@ -239,14 +239,24 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // buildDmnEngine
     // ///////////////////////////////////////////////////////
 
-    public DmnEngine buildDmnEngine() {
-        init();
+    @Override
+    protected DmnEngine createEngine() {
         return new DmnEngineImpl(this);
+    }
+
+    @Override
+    protected Consumer<DmnEngine> createPostEngineBuildConsumer() {
+        return new DmnEnginePostEngineBuildConsumer();
+    }
+
+    public DmnEngine buildDmnEngine() {
+        return buildEngine();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     protected void init() {
         initEngineConfigurations();
         initClock();
@@ -337,19 +347,8 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration
     // ///////////////////////////////////////////////////////////////
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        if (this.schemaManager == null) {
-            this.schemaManager = new DmnDbSchemaManager();
-        }
-    }
-
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsDmnEngineBuild();
-            }
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new DmnDbSchemaManager();
     }
 
     // session factories ////////////////////////////////////////////////////////

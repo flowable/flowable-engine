@@ -26,7 +26,6 @@ public class FlowableDmnRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/dmn/db/mapping", hints, classLoader);
-        resourceHints.registerPattern("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml");
         resourceHints.registerPattern("org/flowable/impl/dmn/parser/*.xsd");
     }
 }

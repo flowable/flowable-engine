@@ -61,6 +61,7 @@ public class TableColumnTypeValidationTest {
         assertThat(mappedResources).isNotEmpty();
 
         for (String entity : mappedResources.keySet()) {
+
             String tableName = findTable(entity, mappedResources.get(entity));
 
             Map<String, String> columnNameToTypeMap = getColumnMetaData(tableName);

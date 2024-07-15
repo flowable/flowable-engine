@@ -169,16 +169,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
                 eventRegistryEngine.getEventRegistryEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<>() {
-
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getSchemaManagementCmd()
 
         );
     }

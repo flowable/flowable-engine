@@ -29,5 +29,7 @@ public interface SchemaManager {
     }
     
     void schemaCheckVersion();
+    
+    String getContext();
 
 }

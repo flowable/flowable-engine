@@ -312,12 +312,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 cmmnEngineConfiguration,
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 exception == null,
-                commandContext -> {
-                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
+                cmmnEngineConfiguration.getSchemaManagementCmd()
         );
     }
 

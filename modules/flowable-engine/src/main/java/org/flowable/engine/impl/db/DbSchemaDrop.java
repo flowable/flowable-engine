@@ -13,13 +13,11 @@
 
 package org.flowable.engine.impl.db;
 
-import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -30,12 +28,6 @@ public class DbSchemaDrop {
         ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine();
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new Command<>() {
-            @Override
-            public Object execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaDrop();
-                return null;
-            }
-        });
+        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(processEngine.getProcessEngineConfiguration().getEngineScopeType()));
     }
 }

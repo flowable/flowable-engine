@@ -13,19 +13,11 @@
 
 package org.flowable.eventregistry.impl.db;
 
-import javax.sql.DataSource;
-
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.eventregistry.impl.EventRegistryEngine;
-import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
+import org.flowable.common.engine.impl.interceptor.CommandConfig;
+import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.eventregistry.impl.EventRegistryEngineImpl;
 import org.flowable.eventregistry.impl.EventRegistryEngines;
-
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 
 /**
  * @author Tijs Rademakers
@@ -33,32 +25,9 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 public class DbSchemaDrop {
 
     public static void main(String[] args) {
-        try {
-            EventRegistryEngine eventRegistryEngine = EventRegistryEngines.getDefaultEventRegistryEngine();
-            EventRegistryEngineConfiguration eventRegistryEngineConfiguration = eventRegistryEngine.getEventRegistryEngineConfiguration();
-            DataSource dataSource = eventRegistryEngineConfiguration.getDataSource();
-
-            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-            database.setDatabaseChangeLogTableName(EventRegistryEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-            database.setDatabaseChangeLogLockTableName(EventRegistryEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            if (StringUtils.isNotEmpty(eventRegistryEngineConfiguration.getDatabaseSchema())) {
-                database.setDefaultSchemaName(eventRegistryEngineConfiguration.getDatabaseSchema());
-                database.setLiquibaseSchemaName(eventRegistryEngineConfiguration.getDatabaseSchema());
-            }
-
-            if (StringUtils.isNotEmpty(eventRegistryEngineConfiguration.getDatabaseCatalog())) {
-                database.setDefaultCatalogName(eventRegistryEngineConfiguration.getDatabaseCatalog());
-                database.setLiquibaseCatalogName(eventRegistryEngineConfiguration.getDatabaseCatalog());
-            }
-
-            Liquibase liquibase = new Liquibase("org/flowable/eventregistry/db/liquibase/flowable-eventregistry-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-            liquibase.dropAll();
-            liquibase.getDatabase().close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        EventRegistryEngineImpl eventRegistryEngine = (EventRegistryEngineImpl) EventRegistryEngines.getDefaultEventRegistryEngine();
+        CommandExecutor commandExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getCommandExecutor();
+        CommandConfig config = new CommandConfig().transactionNotSupported();
+        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(eventRegistryEngine.getEventRegistryEngineConfiguration().getEngineScopeType()));
     }
 }

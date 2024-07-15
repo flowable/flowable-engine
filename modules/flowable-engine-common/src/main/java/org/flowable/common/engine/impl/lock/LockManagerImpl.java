@@ -19,6 +19,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.cfg.TransactionPropagation;
 import org.flowable.common.engine.impl.cmd.GetLockValueCmd;
 import org.flowable.common.engine.impl.cmd.LockCmd;

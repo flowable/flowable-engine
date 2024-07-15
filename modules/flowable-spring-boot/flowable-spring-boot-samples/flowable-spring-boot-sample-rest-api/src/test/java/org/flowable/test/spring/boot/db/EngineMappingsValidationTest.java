@@ -54,7 +54,7 @@ import org.w3c.dom.NodeList;
  * @author Joram Barrez
  */
 public class EngineMappingsValidationTest {
-
+    
     private static final List<String> IMMUTABLE_ENTITIES = Arrays.asList(
         "HistoricIdentityLink",
         "HistoricTaskLogEntry",

@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.spring.configurator;
 
-import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
@@ -62,7 +61,7 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
             cmmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
         }
 
-        initCmmnEngine();
+        initEngine();
 
         if (springProcessEngineConfiguration != null) {
             cmmnEngineConfiguration.getJobServiceConfiguration().getInternalJobManager()
@@ -79,15 +78,6 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
         }
 
         initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
-    }
-
-    @Override
-    protected synchronized CmmnEngine initCmmnEngine() {
-        if (cmmnEngineConfiguration == null) {
-            throw new FlowableException("CmmnEngineConfiguration is required");
-        }
-
-        return cmmnEngineConfiguration.buildCmmnEngine();
     }
 
     @Override
