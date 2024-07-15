@@ -15,7 +15,6 @@ package org.flowable.eventregistry.spring.test.autodeployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Driver;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.spring.EventRegistryFactoryBean;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,8 +46,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 @ExtendWith(LoggingExtension.class)
 public class SpringAutoDeployTest {
@@ -250,18 +251,17 @@ public class SpringAutoDeployTest {
     static class SpringEventAutoDeployTestConfiguration {
 
         @Bean
-        public SimpleDriverDataSource dataSource(
-            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+        public DataSource dataSource(
+            @Value("${jdbc.driver:org.h2.Driver}") String driverClass,
             @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
             @Value("${jdbc.username:sa}") String username,
             @Value("${jdbc.password:}") String password
         ) {
-            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-            dataSource.setDriverClass(driverClass);
-            dataSource.setUrl(url);
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(url);
+            dataSource.setDriverClassName(driverClass);
             dataSource.setUsername(username);
             dataSource.setPassword(password);
-
             return dataSource;
         }
 
@@ -272,6 +272,7 @@ public class SpringAutoDeployTest {
 
         @Bean
         public SpringEventRegistryEngineConfiguration eventRegistryConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator,
             @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
             @Value("${deploymentMode:#{null}}") String deploymentMode,
             @Value("${deploymentResources}") Resource[] deploymentResources,
@@ -297,8 +298,16 @@ public class SpringAutoDeployTest {
                     });
             }
 
+            eventEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
             return eventEngineConfiguration;
         }
+
+        @Bean(name = "springIdmEngineConfigurator")
+        public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+            return new SpringIdmEngineConfigurator();
+        }
+
 
         @Bean
         public EventRegistryFactoryBean eventRegistryEngine(SpringEventRegistryEngineConfiguration eventEngineConfiguration) {

@@ -12,8 +12,6 @@
  */
 package org.flowable.rest.conf.engine;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -32,6 +30,7 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.rest.conf.MockFormHandlerRestApiInterceptor;
 import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
 import org.flowable.spring.ProcessEngineFactoryBean;
@@ -40,10 +39,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -52,7 +51,7 @@ public class EngineConfiguration {
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
-    protected Class<? extends Driver> jdbcDriver;
+    protected String jdbcDriver;
 
     @Value("${jdbc.username:sa}")
     protected String jdbcUsername;
@@ -62,15 +61,12 @@ public class EngineConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(jdbcDriver);
-
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername(jdbcUsername);
-        ds.setPassword(jdbcPassword);
-
-        return ds;
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriver);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
+        return dataSource;
     }
 
     @Bean(name = "transactionManager")
@@ -88,7 +84,8 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "processEngineConfiguration")
-    public ProcessEngineConfigurationImpl processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+    public ProcessEngineConfigurationImpl processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator) {
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
         processEngineConfiguration.setDataSource(dataSource);
         processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -99,13 +96,21 @@ public class EngineConfiguration {
 
         configureProcessEngine(processEngineConfiguration);
 
+        processEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
         return processEngineConfiguration;
     }
 
     protected void configureProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
     }
-    
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
+    }
+
+
     @Bean
     public RepositoryService repositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();

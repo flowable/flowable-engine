@@ -12,8 +12,6 @@
  */
 package org.flowable.app.rest.conf.engine;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.flowable.app.api.AppManagementService;
@@ -22,12 +20,14 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.AppEngineFactoryBean;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -36,7 +36,7 @@ public class EngineConfiguration {
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
-    protected Class<? extends Driver> jdbcDriver;
+    protected String jdbcDriver;
 
     @Value("${jdbc.username:sa}")
     protected String jdbcUsername;
@@ -46,15 +46,12 @@ public class EngineConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(jdbcDriver);
-
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername(jdbcUsername);
-        ds.setPassword(jdbcPassword);
-
-        return ds;
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriver);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
+        return dataSource;
     }
 
     @Bean(name = "transactionManager")
@@ -72,12 +69,21 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "appEngineConfiguration")
-    public AppEngineConfiguration appEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+    public AppEngineConfiguration appEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator) {
         SpringAppEngineConfiguration appEngineConfiguration = new SpringAppEngineConfiguration();
         appEngineConfiguration.setDataSource(dataSource);
         appEngineConfiguration.setDatabaseSchemaUpdate(AppEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         appEngineConfiguration.setTransactionManager(transactionManager);
+
+        appEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
         return appEngineConfiguration;
+    }
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
     }
 
     @Bean

@@ -16,7 +16,6 @@ package org.flowable.spring.test.autodeployment;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.sql.Driver;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +36,7 @@ import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.xml.exception.DmnXMLException;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -45,8 +45,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Tijs Rademakers
@@ -296,18 +297,17 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     static class SpringDmnAutoDeployTestConfiguration {
 
         @Bean
-        public SimpleDriverDataSource dataSource(
-            @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+        public DataSource dataSource(
+            @Value("${jdbc.driver:org.h2.Driver}") String driver,
             @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
             @Value("${jdbc.username:sa}") String username,
             @Value("${jdbc.password:}") String password
         ) {
-            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-            dataSource.setDriverClass(driverClass);
-            dataSource.setUrl(url);
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(url);
+            dataSource.setDriverClassName(driver);
             dataSource.setUsername(username);
             dataSource.setPassword(password);
-
             return dataSource;
         }
 
@@ -318,6 +318,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
 
         @Bean
         public SpringDmnEngineConfiguration dmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator,
             @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
             @Value("${deploymentMode:#{null}}") String deploymentMode,
             @Value("${deploymentResources}") Resource[] deploymentResources,
@@ -343,7 +344,14 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
                     });
             }
 
+            dmnEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
             return dmnEngineConfiguration;
+        }
+
+        @Bean(name = "springIdmEngineConfigurator")
+        public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+            return new SpringIdmEngineConfigurator();
         }
 
         @Bean

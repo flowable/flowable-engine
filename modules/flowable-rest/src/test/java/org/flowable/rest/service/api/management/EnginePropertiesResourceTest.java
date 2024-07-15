@@ -21,11 +21,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,6 +38,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  */
 public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
+
+    protected boolean databaseReset;
+
+    @Before
+    public void createDatabase() throws Exception {
+        if (!databaseReset) {
+            managementService.executeCommand(new Command<Object>() {
+
+                @Override
+                public Object execute(CommandContext commandContext) {
+                    processEngineConfiguration.getSchemaManager().schemaDrop();
+                    processEngineConfiguration.getSchemaManager().schemaCreate();
+                    return null;
+                }
+
+            });
+            databaseReset = true;
+        }
+    }
 
     @Test
     public void testGetAllProperties() throws Exception {
