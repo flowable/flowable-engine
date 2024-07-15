@@ -1,4 +1,8 @@
-alter table ACT_ID_MEMBERSHIP 
+drop index ACT_IDX_PRIV_USER;
+drop index ACT_IDX_PRIV_GROUP;
+drop index ACT_IDX_PRIV_MAPPING;
+
+alter table ACT_ID_MEMBERSHIP
     drop foreign key ACT_FK_MEMB_GROUP;
     
 alter table ACT_ID_MEMBERSHIP 
