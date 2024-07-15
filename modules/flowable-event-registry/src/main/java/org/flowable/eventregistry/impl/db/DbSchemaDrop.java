@@ -13,9 +13,15 @@
 
 package org.flowable.eventregistry.impl.db;
 
+import java.io.Closeable;
+import java.io.IOException;
+
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.ClosingDataSource;
 import org.flowable.eventregistry.impl.EventRegistryEngineImpl;
 import org.flowable.eventregistry.impl.EventRegistryEngines;
 
@@ -25,9 +31,26 @@ import org.flowable.eventregistry.impl.EventRegistryEngines;
 public class DbSchemaDrop {
 
     public static void main(String[] args) {
-        EventRegistryEngineImpl eventRegistryEngine = (EventRegistryEngineImpl) EventRegistryEngines.getDefaultEventRegistryEngine();
-        CommandExecutor commandExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getCommandExecutor();
-        CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(eventRegistryEngine.getEventRegistryEngineConfiguration().getEngineScopeType()));
+        EventRegistryEngineImpl eventRegistryEngine = null;
+        try {
+            eventRegistryEngine = (EventRegistryEngineImpl) EventRegistryEngines.getDefaultEventRegistryEngine();
+            CommandExecutor commandExecutor = eventRegistryEngine.getEventRegistryEngineConfiguration().getCommandExecutor();
+            CommandConfig config = new CommandConfig().transactionNotSupported();
+            commandExecutor.execute(config,
+                    new SchemaOperationsEngineDropDbCmd(eventRegistryEngine.getEventRegistryEngineConfiguration().getEngineScopeType()));
+        } finally {
+            if (eventRegistryEngine != null) {
+                DataSource dataSource = eventRegistryEngine.getEventRegistryEngineConfiguration().getDataSource();
+                if (dataSource instanceof Closeable) {
+                    try {
+                        ((Closeable) dataSource).close();
+                    } catch (IOException e) {
+                        // Ignored
+                    }
+                } else if (dataSource instanceof ClosingDataSource) {
+                    ((ClosingDataSource) dataSource).onEngineClosed(eventRegistryEngine);
+                }
+            }
+        }
     }
 }

@@ -126,13 +126,16 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         removeAllDeployments();
 
         // Make sure the schema is always dropped
-        this.managementService.executeCommand(new SchemaOperationsEngineDropDbCmd(ScopeTypes.BPMN));
+        if (managementService != null) {
+            this.managementService.executeCommand(new SchemaOperationsEngineDropDbCmd(ScopeTypes.BPMN));
+        }
 
         if (this.applicationContext != null) {
             this.applicationContext.close();
             this.applicationContext = null;
         }
         this.repositoryService = null;
+        this.managementService = null;
     }
 
     @Test

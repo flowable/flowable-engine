@@ -13,9 +13,15 @@
 
 package org.flowable.idm.engine.impl.db;
 
+import java.io.Closeable;
+import java.io.IOException;
+
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.ClosingDataSource;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngines;
 
@@ -25,9 +31,25 @@ import org.flowable.idm.engine.IdmEngines;
 public class DbSchemaDrop {
 
     public static void main(String[] args) {
-        IdmEngine idmEngine = IdmEngines.getDefaultIdmEngine();
-        CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
-        CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(idmEngine.getIdmEngineConfiguration().getEngineScopeType()));
+        IdmEngine idmEngine = null;
+        try {
+            idmEngine = IdmEngines.getDefaultIdmEngine();
+            CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
+            CommandConfig config = new CommandConfig().transactionNotSupported();
+            commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(idmEngine.getIdmEngineConfiguration().getEngineScopeType()));
+        } finally {
+            if (idmEngine != null) {
+                DataSource dataSource = idmEngine.getIdmEngineConfiguration().getDataSource();
+                if (dataSource instanceof Closeable) {
+                    try {
+                        ((Closeable) dataSource).close();
+                    } catch (IOException e) {
+                        // Ignored
+                    }
+                } else if (dataSource instanceof ClosingDataSource) {
+                    ((ClosingDataSource) dataSource).onEngineClosed(idmEngine);
+                }
+            }
+        }
     }
 }

@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.engine.impl.db;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.sql.DataSource;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -22,6 +25,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.ClosingDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,14 +37,28 @@ public class DbSchemaDrop {
     private static final Logger LOGGER = LoggerFactory.getLogger(DbSchemaDrop.class);
 
     public static void main(String[] args) {
+        CmmnEngine cmmnEngine = null;
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream("flowable.cmmn.cfg.xml")) {
-            CmmnEngine cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
+            cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
             CommandExecutor commandExecutor = cmmnEngine.getCmmnEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(cmmnEngine.getCmmnEngineConfiguration().getEngineScopeType()));
             
         } catch (IOException e) {
             LOGGER.error("Could not create CMMN engine", e);
+        } finally {
+            if (cmmnEngine != null) {
+                DataSource dataSource = cmmnEngine.getCmmnEngineConfiguration().getDataSource();
+                if (dataSource instanceof Closeable) {
+                    try {
+                        ((Closeable) dataSource).close();
+                    } catch (IOException e) {
+                        // Ignored
+                    }
+                } else if (dataSource instanceof ClosingDataSource) {
+                    ((ClosingDataSource) dataSource).onEngineClosed(cmmnEngine);
+                }
+            }
         }
     }
 }

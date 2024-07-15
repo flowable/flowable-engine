@@ -12,9 +12,15 @@
  */
 package org.flowable.cmmn.test;
 
+import java.io.Closeable;
+import java.io.IOException;
+
+import javax.sql.DataSource;
+
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.test.ClosingDataSource;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.ProcessEngineImpl;
 
@@ -24,10 +30,26 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 public class DbSchemaDrop {
 
     public static void main(String[] args) {
-        ProcessEngineImpl processEngine = (ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine();
-        CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
-        CommandConfig config = new CommandConfig().transactionNotSupported();
-        commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(processEngine.getProcessEngineConfiguration().getEngineScopeType()));
+        ProcessEngineImpl processEngine = null;
+        try {
+            processEngine = (ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine();
+            CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
+            CommandConfig config = new CommandConfig().transactionNotSupported();
+            commandExecutor.execute(config, new SchemaOperationsEngineDropDbCmd(processEngine.getProcessEngineConfiguration().getEngineScopeType()));
+        } finally {
+            if (processEngine != null) {
+                DataSource dataSource = processEngine.getProcessEngineConfiguration().getDataSource();
+                if (dataSource instanceof Closeable) {
+                    try {
+                        ((Closeable) dataSource).close();
+                    } catch (IOException e) {
+                        // Ignored
+                    }
+                } else if (dataSource instanceof ClosingDataSource) {
+                    ((ClosingDataSource) dataSource).onEngineClosed(processEngine);
+                }
+            }
+        }
     }
 
 }
