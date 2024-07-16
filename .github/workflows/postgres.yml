@@ -44,7 +44,8 @@ jobs:
         run: >-
           ./mvnw clean install
           ${MAVEN_ARGS}
-          -PcleanDb,postgresql,check
+          -PcleanDb,postgresql,distro
+          -P'!include-spring-boot-samples
           -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable

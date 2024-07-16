@@ -51,7 +51,8 @@ jobs:
         run: >-
           ./mvnw clean install
           ${MAVEN_ARGS}
-          -PcleanDb,db2,check
+          -PcleanDb,db2,distro
+          -P'!include-spring-boot-samples
           -Djdbc.url=jdbc:db2://localhost:${{ job.services.db2.ports[50000] }}/flowable
           -Djdbc.username=db2inst1
           -Djdbc.password=flowable

@@ -16,7 +16,6 @@
 
     <modules>
         <module>flowable-spring-boot-starters</module>
-        <module>flowable-spring-boot-samples</module>
     </modules>
 
     <properties>
@@ -105,5 +104,17 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>include-spring-boot-samples</id>
+            <modules>
+                <module>flowable-spring-boot-samples</module>
+            </modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 
 </project>

@@ -57,7 +57,8 @@ jobs:
         run: >-
           ./mvnw clean install
           ${MAVEN_ARGS}
-          -PcleanDb,oracle,check
+          -PcleanDb,oracle,distro
+          -P'!include-spring-boot-samples
           -Djdbc.url=jdbc:oracle:thin:@localhost:${{ job.services.oracle.ports[1521] }}/${{ matrix.serviceName }}
           -Djdbc.username=flowable
           -Djdbc.password=flowable
