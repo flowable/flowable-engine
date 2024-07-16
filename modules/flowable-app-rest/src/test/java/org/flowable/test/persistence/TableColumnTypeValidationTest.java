@@ -110,12 +110,21 @@ public class TableColumnTypeValidationTest {
     private String findTable(String entity, String mappingFileContent) {
 
         // CaseInstance is an exception: there's more ACT_RU_ENTITYLINK in there than case instance
+        String directMapping = null;
         if (entity.equalsIgnoreCase("CaseInstance")) {
-            return "ACT_CMMN_RU_CASE_INST";
+            directMapping = "ACT_CMMN_RU_CASE_INST";
         } else if (entity.equalsIgnoreCase("HistoricCaseInstance")) {
-            return "ACT_CMMN_HI_CASE_INST";
+            directMapping = "ACT_CMMN_HI_CASE_INST";
         } else if (entity.equalsIgnoreCase("Privilege")) {
-            return "ACT_ID_PRIV";
+            directMapping = "ACT_ID_PRIV";
+        }
+
+        if (directMapping != null) {
+            if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES)) {
+                return directMapping.toLowerCase(Locale.ROOT);
+            } else {
+                return directMapping;
+            }
         }
 
         // Simplistic approach: check for ${prefix}<TABLE> patterns. The one that is most in the mapping file, is most likely the table name.
@@ -145,6 +154,10 @@ public class TableColumnTypeValidationTest {
             if (result == null || count > tables.get(result).get()) {
                 result = tableName;
             }
+        }
+
+        if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES)) {
+            result = result.toLowerCase(Locale.ROOT);
         }
 
         return result.trim();
@@ -204,10 +217,12 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_TIMESTAMP;
 
                     } else if (columnType.equalsIgnoreCase("int")
+                            || columnType.equalsIgnoreCase("int2") // postgres
                             || columnType.equalsIgnoreCase("int4")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
 
-                    } else if (columnType.equalsIgnoreCase("int8"))  { // postgres
+                    } else if (columnType.equalsIgnoreCase("int8") // postgres
+                            || columnType.equalsIgnoreCase("serial"))  { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
