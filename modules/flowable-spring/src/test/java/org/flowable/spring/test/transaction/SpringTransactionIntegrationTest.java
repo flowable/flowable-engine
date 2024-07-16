@@ -62,7 +62,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
         // Create a table that the userBean is supposed to fill with some data
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         if (processEngineConfiguration.getDatabaseType().equals(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE)) {
-            jdbcTemplate.execute("create table MY_TABLE (MY_TEXT INTEGER, primary key (MY_COLUMN));");
+            jdbcTemplate.execute("create table MY_TABLE (MY_TEXT INTEGER);");
         } else {
             jdbcTemplate.execute("create table MY_TABLE (MY_COLUMN int);");
         }
