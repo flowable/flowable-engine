@@ -16,6 +16,7 @@
         <flowable.artifact>
             org.flowable.spring.security
         </flowable.artifact>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <dependencies>

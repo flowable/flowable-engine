@@ -21,6 +21,7 @@
           org.springframework.test.context*;resolution:=optional,
         </flowable.osgi.import.additional>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <dependencies>

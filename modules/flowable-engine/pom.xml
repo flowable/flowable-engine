@@ -324,6 +324,7 @@
         <exclude.tests>nothing-to-exclude</exclude.tests>
         <exclude.tests2>nothing-to-exclude</exclude.tests2>
         <exclude.tests3>nothing-to-exclude</exclude.tests3>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>
@@ -442,30 +443,6 @@
             <properties>
                 <skipTests>true</skipTests>
             </properties>
-        </profile>
-        <profile>
-            <id>cleanDb</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>drop-idm-schema</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                                <configuration>
-                                    <mainClass>org.flowable.engine.impl.db.DbSchemaDrop</mainClass>
-                                    <classpathScope>test</classpathScope>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <!-- database qa profile -->

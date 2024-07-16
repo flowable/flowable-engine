@@ -20,6 +20,7 @@
         <flowable.artifact>
             org.flowable.rest
         </flowable.artifact>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>

@@ -18,6 +18,7 @@
     <flowable.artifact>
       org.flowable.cxf
     </flowable.artifact>
+    <skip.test.db.drop>false</skip.test.db.drop>
   </properties>
 
   <build>

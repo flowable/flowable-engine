@@ -19,6 +19,7 @@
         <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
         <docker.publisher.user>-</docker.publisher.user>
         <docker.publisher.password>-</docker.publisher.password>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>

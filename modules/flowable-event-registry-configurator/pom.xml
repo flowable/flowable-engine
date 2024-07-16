@@ -16,6 +16,7 @@
         <flowable.artifact>
             org.flowable.eventregistry.impl.configurator
         </flowable.artifact>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <dependencies>

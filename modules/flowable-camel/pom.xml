@@ -134,5 +134,6 @@
     <flowable.artifact>
       org.flowable.camel
     </flowable.artifact>
+    <skip.test.db.drop>false</skip.test.db.drop>
   </properties>
 </project>

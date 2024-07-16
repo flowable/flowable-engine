@@ -19,6 +19,7 @@
         <flowable.artifact>
             org.flowable.dmn.rest.service
         </flowable.artifact>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>

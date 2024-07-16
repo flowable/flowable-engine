@@ -11,6 +11,10 @@
 
     <artifactId>flowable-spring-boot-autoconfigure</artifactId>
 
+    <properties>
+        <skip.test.db.drop>false</skip.test.db.drop>
+    </properties>
+
     <dependencies>
         <!-- Support for auto-completion support in Boot 1.2 -->
         <dependency>

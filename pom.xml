@@ -86,6 +86,8 @@
 		<flowable.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</flowable.osgi.remove.headers>
 		<flowable.osgi.include.resource>{maven-resources}</flowable.osgi.include.resource>
 		<flowable.osgi.embed></flowable.osgi.embed>
+
+		<skip.test.db.drop>true</skip.test.db.drop>
 	</properties>
 
 	<dependencyManagement>
@@ -721,6 +723,12 @@
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>1.4</version>
 				</plugin>
+				<!-- The liquibase plugin is used only to make sure that the DB is clean before running a maven module -->
+				<plugin>
+					<groupId>org.liquibase</groupId>
+					<artifactId>liquibase-maven-plugin</artifactId>
+					<version>4.28.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -1283,6 +1291,35 @@
 				</dependency>
 			</dependencies>
 		</profile>
+		<profile>
+			<id>cleanDb</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<version>4.28.0</version>
+						<executions>
+							<execution>
+								<id>database-test-drop-schema</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>dropAll</goal>
+								</goals>
+								<configuration>
+									<skip>${skip.test.db.drop}</skip>
+									<url>${jdbc.url}</url>
+									<username>${jdbc.username}</username>
+									<password>${jdbc.password}</password>
+									<driver>${jdbc.driver}</driver>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 	</profiles>
 
 	<!-- Various information, not used by the build -->

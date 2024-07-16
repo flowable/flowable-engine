@@ -20,6 +20,7 @@
         <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,
         </flowable.osgi.import.additional>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>

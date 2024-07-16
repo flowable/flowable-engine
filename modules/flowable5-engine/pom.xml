@@ -179,6 +179,7 @@
 			jakarta.transaction;resolution:=optional,
 			jakarta.enterprise.concurrent;resolution:=optional,
 		</flowable.osgi.import.additional>
+		<skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 
 	<build>
@@ -294,30 +295,6 @@
 			<properties>
 				<skipTests>true</skipTests>
 			</properties>
-		</profile>
-		<profile>
-			<id>cleanDb</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>drop-idm-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>java</goal>
-								</goals>
-								<configuration>
-									<mainClass>org.activiti.engine.impl.db.DbSchemaDrop</mainClass>
-									<classpathScope>test</classpathScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>
 
 		<!-- database qa profile -->

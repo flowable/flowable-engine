@@ -17,6 +17,7 @@
 	  <flowable.artifact>
 	    org.flowable.jmx
 	  </flowable.artifact>
+      <skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 
 	<dependencies>

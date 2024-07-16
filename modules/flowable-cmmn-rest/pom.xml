@@ -19,6 +19,7 @@
     <flowable.artifact>
       org.flowable.cmmn.rest
     </flowable.artifact>
+    <skip.test.db.drop>false</skip.test.db.drop>
   </properties>
 
   <build>

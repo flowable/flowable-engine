@@ -26,6 +26,7 @@
 		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
 		</flowable.osgi.import.additional>
+		<skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 
     <dependencies>
@@ -237,30 +238,6 @@
                 </plugins>
             </build>
         </profile>
-		<profile>
-			<id>cleanDb</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>drop-idm-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>java</goal>
-								</goals>
-								<configuration>
-									<mainClass>org.flowable.dmn.engine.impl.db.DbSchemaDrop</mainClass>
-									<classpathScope>test</classpathScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<!-- database qa profile -->
 		<profile>
 			<id>databasedmn</id>
