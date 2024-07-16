@@ -13,8 +13,10 @@
 package org.flowable.eventregistry.impl.aot;
 
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
+import org.flowable.common.engine.impl.aot.FlowableSqlResourceHintsRegistrar;
 import org.flowable.eventregistry.impl.persistence.ResourceRefTypeHandler;
 import org.springframework.aot.hint.MemberCategory;
+import org.springframework.aot.hint.ResourceHints;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
 
@@ -28,5 +30,7 @@ public class FlowableEventRegistryRuntimeHints implements RuntimeHintsRegistrar 
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/eventregistry/db/mapping", hints, classLoader);
         hints.reflection()
                 .registerType(ResourceRefTypeHandler.class, MemberCategory.values());
+        ResourceHints resourceHints = hints.resources();
+        FlowableSqlResourceHintsRegistrar.registerSqlResources("org/flowable/eventregistry/db", resourceHints);
     }
 }

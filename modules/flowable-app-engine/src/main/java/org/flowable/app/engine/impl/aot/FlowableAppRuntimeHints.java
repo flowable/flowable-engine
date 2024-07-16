@@ -13,6 +13,7 @@
 package org.flowable.app.engine.impl.aot;
 
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
+import org.flowable.common.engine.impl.aot.FlowableSqlResourceHintsRegistrar;
 import org.springframework.aot.hint.ResourceHints;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -26,5 +27,6 @@ public class FlowableAppRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/app/db/mapping", hints, classLoader);
+        FlowableSqlResourceHintsRegistrar.registerSqlResources("org/flowable/app/db", resourceHints);
     }
 }
