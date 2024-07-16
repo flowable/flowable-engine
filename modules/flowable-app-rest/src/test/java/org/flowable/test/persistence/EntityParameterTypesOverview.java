@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.test.spring.boot.db;
+package org.flowable.test.persistence;
 
 import java.util.HashMap;
 import java.util.Locale;

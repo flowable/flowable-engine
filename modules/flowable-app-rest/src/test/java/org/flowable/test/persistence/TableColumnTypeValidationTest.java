@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.test.spring.boot.db;
+package org.flowable.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,20 +27,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.rest.app.FlowableRestApplication;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import flowable.Application;
-
 /**
  * This test was introduced after the major refactoring of the varchar / nvarchar mappings of colum types in the MyBatis files.
  * The @{@link EngineMappingsValidationTest} tests the mapping xml's itself, this test compares the expected column types with the real JDBC metadata.
  * Since it runs on the QA env, it will be validated for each database.
  */
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowableRestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TableColumnTypeValidationTest {
 
     @Autowired

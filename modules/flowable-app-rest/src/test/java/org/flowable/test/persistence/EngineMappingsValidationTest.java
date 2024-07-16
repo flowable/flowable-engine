@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.test.spring.boot.db;
+package org.flowable.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.flowable.test.spring.boot.db.EntityParameterTypesOverview.getColumnType;
-import static org.flowable.test.spring.boot.db.EntityParameterTypesOverview.getParameterType;
+import static org.flowable.test.persistence.EntityParameterTypesOverview.getColumnType;
+import static org.flowable.test.persistence.EntityParameterTypesOverview.getParameterType;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,8 +39,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.test.spring.boot.db.EntityHelperUtil.EntityMappingPackageInformation;
-import org.flowable.test.spring.boot.db.EntityHelperUtil.EntityPackageTestArgumentsProvider;
+import org.flowable.test.persistence.EntityHelperUtil.EntityMappingPackageInformation;
+import org.flowable.test.persistence.EntityHelperUtil.EntityPackageTestArgumentsProvider;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.w3c.dom.Document;
