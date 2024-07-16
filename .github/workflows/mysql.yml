@@ -49,7 +49,7 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,mysql,distro
-          -P'!include-spring-boot-samples
+          -P'!include-spring-boot-samples'
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
           -Djdbc.password=flowable
