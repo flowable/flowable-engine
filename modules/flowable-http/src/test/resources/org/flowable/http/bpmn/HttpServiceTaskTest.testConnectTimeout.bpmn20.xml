@@ -9,7 +9,7 @@
           <flowable:string><![CDATA[GET]]></flowable:string>
         </flowable:field>
         <flowable:field name="requestUrl">
-          <flowable:string><![CDATA[http://localhost:9798/api?delay=7000]]></flowable:string>
+          <flowable:string><![CDATA[http://localhost:9798/api?delay=10000]]></flowable:string>
         </flowable:field>
       </extensionElements>
     </serviceTask>
