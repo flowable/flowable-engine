@@ -164,6 +164,17 @@ public class TableColumnTypeValidationTest {
     }
 
     protected Map<String, String> getColumnMetaData(String tableName) {
+        Map<String, String> result = internalGetColumnMetaData(tableName);
+
+        if (result.isEmpty()) { // certain dbs such as postgres / mysql 5.x only can do lowercased metadata calls
+            result = internalGetColumnMetaData(tableName.toLowerCase(Locale.ROOT));
+        }
+
+        return result;
+    }
+
+
+    protected Map<String, String> internalGetColumnMetaData(String tableName) {
         return processEngine.getManagementService().executeCommand(commandContext -> {
             try {
                 DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
