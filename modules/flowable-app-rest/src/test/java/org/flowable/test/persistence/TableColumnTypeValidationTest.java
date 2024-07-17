@@ -194,6 +194,7 @@ public class TableColumnTypeValidationTest {
 
                     // The JDBC metadata API doesn't return the same names as used in the mybatis mapping files
                     if (columnType.equalsIgnoreCase("BINARY LARGE OBJECT")
+                            || columnType.equalsIgnoreCase("BLOB") // oracle
                             || columnType.equalsIgnoreCase("varbinary")
                             || columnType.equalsIgnoreCase("BINARY VARYING")
                             || columnType.equalsIgnoreCase("LONGBLOB") // mariadb
@@ -202,6 +203,7 @@ public class TableColumnTypeValidationTest {
 
                     } else if (columnType.equalsIgnoreCase("CHARACTER VARYING")
                             || columnType.equalsIgnoreCase("CHARACTER LARGE OBJECT")
+                            || columnType.equalsIgnoreCase("CLOB") // SQL server
                             || columnType.equalsIgnoreCase("VARCHAR2") // oracle
                             || columnType.equalsIgnoreCase("LONGTEXT") // mariadb
                             || columnType.equalsIgnoreCase("text")) { // postgres
@@ -222,10 +224,11 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
 
                     } else if (columnType.equalsIgnoreCase("int8") // postgres
-                            || columnType.equalsIgnoreCase("serial"))  { // postgres
+                            || columnType.equalsIgnoreCase("serial")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
+                            || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("bool")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
 

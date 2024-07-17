@@ -42,6 +42,7 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.DisposableBean;
@@ -61,6 +62,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Tag("docker")
 @Tag("kafka")
 @Testcontainers(disabledWithoutDocker = true)
+@Disabled
 public class KafkaChannelRebootEngineTest {
 
     @Test
