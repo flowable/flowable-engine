@@ -228,6 +228,7 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
+                            || columnType.equalsIgnoreCase("TINYINT") // mariadb
                             || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("bool")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
