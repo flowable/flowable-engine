@@ -194,7 +194,10 @@ public class TableColumnTypeValidationTest {
 
                 Map<String, String> columnNameToTypeMap = new HashMap<>();
 
-                if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL) && StringUtils.isEmpty(catalog)) {
+                if (StringUtils.isEmpty(catalog) &&
+                        (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL)
+                         || databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MYSQL))
+                ) {
                     catalog = null; // Otherwise SQL server errors out
                 }
 
@@ -239,6 +242,7 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
+                            || columnType.equalsIgnoreCase("SMALLINT")
                             || columnType.equalsIgnoreCase("TINYINT") // mariadb
                             || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("bool")) { // postgres
