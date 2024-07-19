@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.runtime.TerminateExecutionContainer;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -33,6 +34,7 @@ public class ProcessInstanceChangeState {
     protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
+    protected List<TerminateExecutionContainer> terminateExecutionContainers;
     protected List<EnableActivityContainer> enableActivityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
     protected HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution = new HashMap<>();
@@ -98,6 +100,16 @@ public class ProcessInstanceChangeState {
         this.moveExecutionEntityContainers = moveExecutionEntityContainers;
         return this;
     }
+
+    public List<TerminateExecutionContainer> getTerminateExecutionContainers() {
+        return terminateExecutionContainers;
+    }
+
+    public ProcessInstanceChangeState setTerminateExecutionContainers(List<TerminateExecutionContainer> terminateExecutionContainerList) {
+        this.terminateExecutionContainers = terminateExecutionContainerList;
+        return this;
+    }
+
 
     public HashMap<String, ExecutionEntity> getCreatedEmbeddedSubProcesses() {
         return createdEmbeddedSubProcess;

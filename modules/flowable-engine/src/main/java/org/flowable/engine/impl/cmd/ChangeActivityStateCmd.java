@@ -34,9 +34,10 @@ public class ChangeActivityStateCmd implements Command<Void> {
     @Override
     public Void execute(CommandContext commandContext) {
         if (changeActivityStateBuilder.getMoveExecutionIdList().isEmpty() && changeActivityStateBuilder.getMoveActivityIdList().isEmpty()
-                && changeActivityStateBuilder.getEnableActivityIdList().isEmpty()) {
+                && changeActivityStateBuilder.getEnableActivityIdList().isEmpty() && changeActivityStateBuilder.getTerminateActivityIdList().isEmpty()
+                && changeActivityStateBuilder.getTerminateExecutionIdList().isEmpty()) {
             
-            throw new FlowableIllegalArgumentException("No move execution or activity ids or enable activity ids provided");
+            throw new FlowableIllegalArgumentException("No move, enable or terminate activity ids provided");
 
         } else if ((!changeActivityStateBuilder.getMoveActivityIdList().isEmpty() || !changeActivityStateBuilder.getEnableActivityIdList().isEmpty()) && changeActivityStateBuilder.getProcessInstanceId() == null) {
             throw new FlowableIllegalArgumentException("Process instance id is required");
