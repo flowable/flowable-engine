@@ -713,24 +713,6 @@ public abstract class AbstractDynamicStateManager {
             }
         }
 
-        // TODO:
-//        for(TerminateActivityContainer terminateActivityContainer : processInstanceChangeState.getTerminateActivityContainers()) {
-//            if (terminateActivityContainer.getActivityIds() != null  && !terminateActivityContainer.getActivityIds().isEmpty()) {
-//                ExecutionEntity toDeleteParentExecution = resolveParentExecutionToDelete(parentExecution, moveToFlowElements);
-//                ExecutionEntity finalDeleteExecution = null;
-//                if (toDeleteParentExecution != null) {
-//                    finalDeleteExecution = toDeleteParentExecution;
-//                } else {
-//                    finalDeleteExecution = parentExecution;
-//                }
-//
-//                parentExecution = finalDeleteExecution.getParent();
-//
-//                String flowElementIdsLine = printFlowElementIds(moveToFlowElements);
-//                executionEntityManager.deleteChildExecutions(finalDeleteExecution, executionIdsNotToDelete, null, "Change activity to " + flowElementIdsLine, true, null);
-//                executionEntityManager.deleteExecutionAndRelatedData(finalDeleteExecution, "Change activity to " + flowElementIdsLine, false, false, true, finalDeleteExecution.getCurrentFlowElement());
-//            }
-//        }
 
         // Terminate executions
         for(TerminateExecutionContainer terminateExecutionContainer : processInstanceChangeState.getTerminateExecutionContainers()) {
@@ -741,7 +723,6 @@ public abstract class AbstractDynamicStateManager {
                     }
                     executionEntityManager.deleteChildExecutions(execution, Collections.emptyList(), null, "Terminate execution " + execution.getId() + " with activity id " + execution.getActivityId(), true, null);
                     executionEntityManager.deleteExecutionAndRelatedData(execution, "Terminate execution " + execution.getId() + " with activity id " + execution.getActivityId(), false, false, true, execution.getCurrentFlowElement());
-                    CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(execution);
                 }
             }
         }
