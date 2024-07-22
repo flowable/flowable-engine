@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.Arrays;
 import java.util.List;
 
+import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
