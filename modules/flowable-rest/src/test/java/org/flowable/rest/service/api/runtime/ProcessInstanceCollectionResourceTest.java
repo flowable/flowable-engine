@@ -546,6 +546,73 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 );
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testStartProcessWithJsonVariable() throws Exception {
+        ObjectNode request = objectMapper.createObjectNode();
+        request.put("processDefinitionKey", "processOne");
+        ArrayNode variablesNode = request.putArray("variables");
+
+        ObjectNode customerVariable = variablesNode.addObject();
+        customerVariable.put("name", "customer");
+        customerVariable.put("type", "json");
+        customerVariable.putObject("value")
+                .put("name", "kermit")
+                .put("age", 30)
+                .putObject("address")
+                .put("city", "New York");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(request.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   ended: false"
+                        + "}");
+        assertThatJson(responseNode)
+                .inPath("variables")
+                .isEqualTo("""
+                        [
+                          {
+                            name: 'customer',
+                            type: 'json',
+                            scope: 'local',
+                            value: {
+                              name: 'kermit',
+                              age: 30,
+                              address: {
+                                city: 'New York'
+                              }
+                            }
+                          }
+                        ]
+                        """);
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+
+        // Check if engine has correct variables set
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+        assertThat(processVariables).containsOnlyKeys("customer");
+
+        assertThat(processVariables.get("customer"))
+                .isInstanceOf(JsonNode.class);
+        assertThatJson(processVariables.get("customer"))
+                .isEqualTo("""
+                        {
+                          name: 'kermit',
+                          age: 30,
+                          address: {
+                            city: 'New York'
+                          }
+                        }
+                        """);
+    }
+
     /**
      * Test starting a process instance passing in variables to set.
      */
