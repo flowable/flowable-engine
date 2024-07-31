@@ -66,3 +66,8 @@ jobs:
           -Dspring.datasource.username=flowable
           -Dspring.datasource.password=flowable
           -Dmaven.test.redirectTestOutputToFile=false
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: '**/target/surefire-reports/*'

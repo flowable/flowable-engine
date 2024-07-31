@@ -69,3 +69,8 @@ jobs:
           -Doracle.jdbc.version=${{ matrix.driverVersion }}
           -Doracle.jdbc.artifact=${{ matrix.driverArtifact }}
           -Dmaven.test.redirectTestOutputToFile=false
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: '**/target/surefire-reports/*'
