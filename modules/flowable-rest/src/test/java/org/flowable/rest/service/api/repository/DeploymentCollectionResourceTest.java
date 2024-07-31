@@ -90,6 +90,39 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
+        } finally {
+            // Always cleanup any created deployments, even if the test failed
+            List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
+            for (Deployment deployment : deployments) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
+
+
+    @Test
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            processEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            Deployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml")
+                    .tenantId("acme")
+                    .deploy();
+
+            processEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            Deployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml")
+                    .tenantId("myTenant")
+                    .deploy();
+
+            String baseUrl = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION);
+            assertResultsPresentInDataResponse(baseUrl, firstDeployment.getId(), secondDeployment.getId());
+
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(
                     new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
