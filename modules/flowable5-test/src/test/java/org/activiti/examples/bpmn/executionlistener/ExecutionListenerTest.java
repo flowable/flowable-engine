@@ -111,12 +111,12 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("executionListenersProcess", variables);
 
-        Object varSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
-        assertNotNull(varSetByListener);
-        assertTrue(varSetByListener instanceof String);
+        Object variableSetByListener = runtimeService.getVariable(processInstance.getId(), "var");
+        assertNotNull(variableSetByListener);
+        assertTrue(variableSetByListener instanceof String);
 
         // Result is a concatenation of fixed injected field and injected expression
-        assertEquals("Yes, I am listening!", varSetByListener);
+        assertEquals("Yes, I am listening!", variableSetByListener);
     }
 
     @Deployment(resources = { "org/activiti/examples/bpmn/executionlistener/ExecutionListenersCurrentActivity.bpmn20.xml" })

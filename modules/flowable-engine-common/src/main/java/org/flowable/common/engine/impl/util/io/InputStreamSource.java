@@ -32,7 +32,7 @@ public class InputStreamSource implements StreamSource {
     // re-read it.
 
     protected BufferedInputStream inputStream;
-    protected byte[] bytes;
+    protected byte[] byteArray;
 
     public InputStreamSource(InputStream inputStream) {
         this.inputStream = new BufferedInputStream(inputStream);
@@ -40,14 +40,14 @@ public class InputStreamSource implements StreamSource {
 
     @Override
     public InputStream getInputStream() {
-        if (bytes == null) {
+        if (byteArray == null) {
             try {
-                bytes = getBytesFromInputStream(inputStream);
+                byteArray = getBytesFromInputStream(inputStream);
             } catch (IOException e) {
                 throw new FlowableException("Could not read from inputstream", e);
             }
         }
-        return new BufferedInputStream(new ByteArrayInputStream(bytes));
+        return new BufferedInputStream(new ByteArrayInputStream(byteArray));
     }
 
     @Override
@@ -55,13 +55,13 @@ public class InputStreamSource implements StreamSource {
         return "InputStream";
     }
 
-    public byte[] getBytesFromInputStream(InputStream inStream) throws IOException {
-        long length = inStream.available();
+    public byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        long length = inputStream.available();
         byte[] bytes = new byte[(int) length];
 
         int offset = 0;
         int numRead = 0;
-        while (offset < bytes.length && (numRead = inStream.read(bytes, offset, bytes.length - offset)) >= 0) {
+        while (offset < bytes.length && (numRead = inputStream.read(bytes, offset, bytes.length - offset)) >= 0) {
             offset += numRead;
         }
 
@@ -70,7 +70,7 @@ public class InputStreamSource implements StreamSource {
         }
 
         // Close the input stream and return bytes
-        inStream.close();
+        inputStream.close();
         return bytes;
     }
 
