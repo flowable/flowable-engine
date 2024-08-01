@@ -74,5 +74,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with:
-          name: surefire-test-reports
+          name: surefire-test-reports-${{ matrix.oracle }}
           path: '**/target/surefire-reports/*'
