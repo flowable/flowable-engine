@@ -238,7 +238,8 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
 
                     } else if (columnType.equalsIgnoreCase("int8") // postgres
-                            || columnType.equalsIgnoreCase("serial")) { // postgres
+                            || columnType.equalsIgnoreCase("serial") // postgres
+                            || columnType.equalsIgnoreCase("numeric")) { // sql server
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
