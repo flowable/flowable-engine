@@ -229,7 +229,8 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_DOUBLE;
 
                     } else if (columnType.equalsIgnoreCase("datetime")
-                            || columnType.equalsIgnoreCase("datetime2")) {
+                            || columnType.equalsIgnoreCase("datetime2")
+                            || columnType.toLowerCase(Locale.ROOT).startsWith("timestamp(")) {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_TIMESTAMP;
 
                     } else if (columnType.equalsIgnoreCase("int")
