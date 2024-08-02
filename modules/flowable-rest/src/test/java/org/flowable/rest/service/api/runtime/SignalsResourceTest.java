@@ -211,7 +211,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" }, tenantId = "acme")
     public void testGetEventSubscription() throws Exception {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
 
@@ -229,7 +229,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
                         + "activityId: '" + eventSubscription.getActivityId() + "',"
                         + "processDefinitionId: '" + eventSubscription.getProcessDefinitionId() + "',"
                         + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
-                        + "tenantId: ''"
+                        + "tenantId: 'acme'"
                         + "}");
     }
 }
