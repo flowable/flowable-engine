@@ -179,7 +179,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
      */
     public void testUpdateTaskNoOverrides() throws Exception {
         try {
-            Instant now = Instant.now();
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
 
@@ -234,7 +234,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Instant dueDate = Instant.now();
+            Instant dueDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             String dueDateString = getISODateString(Date.from(dueDate));
 
             requestNode.put("name", "New task name");
