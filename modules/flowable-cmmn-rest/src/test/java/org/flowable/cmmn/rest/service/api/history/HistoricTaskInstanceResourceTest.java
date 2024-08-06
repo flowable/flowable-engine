@@ -17,8 +17,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -64,12 +66,12 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseTask() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Calendar now = Calendar.getInstance();
-            cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
             CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
             Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-            taskService.setDueDate(task.getId(), now.getTime());
+            taskService.setDueDate(task.getId(), Date.from(now));
             taskService.setOwner(task.getId(), "owner");
             task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -109,8 +111,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
 
-                Calendar now = Calendar.getInstance();
-                cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
+                Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+                cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
                 Task parentTask = taskService.newTask();
                 taskService.saveTask(parentTask);
@@ -122,7 +124,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 task.setAssignee("kermit");
                 task.setDelegationState(DelegationState.RESOLVED);
                 task.setDescription("Description");
-                task.setDueDate(now.getTime());
+                task.setDueDate(Date.from(now));
                 task.setOwner("owner");
                 task.setPriority(20);
                 taskService.saveTask(task);
