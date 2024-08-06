@@ -219,6 +219,7 @@ public class TableColumnTypeValidationTest {
                             || columnType.equalsIgnoreCase("CHARACTER LARGE OBJECT")
                             || columnType.equalsIgnoreCase("CLOB") // SQL server
                             || columnType.equalsIgnoreCase("VARCHAR2") // oracle
+                            || columnType.equalsIgnoreCase("NVARCHAR2") // oracle
                             || columnType.equalsIgnoreCase("LONGTEXT") // mariadb
                             || columnType.equalsIgnoreCase("text")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_VARCHAR;
@@ -240,6 +241,7 @@ public class TableColumnTypeValidationTest {
 
                     } else if (columnType.equalsIgnoreCase("int8") // postgres
                             || columnType.equalsIgnoreCase("serial") // postgres
+                            || columnType.equalsIgnoreCase("numeric() identity") // sql server
                             || columnType.equalsIgnoreCase("numeric")) { // sql server
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
