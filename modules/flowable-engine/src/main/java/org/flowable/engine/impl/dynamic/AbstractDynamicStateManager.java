@@ -673,6 +673,7 @@ public abstract class AbstractDynamicStateManager {
 
         //Confirm that all the subProcessExecutions are in the executionsPool
         List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
+        subProcessExecutions = subProcessExecutions.stream().filter(e -> !(e.getCurrentFlowElement() instanceof BoundaryEvent)).collect(Collectors.toList());
         HashSet<String> executionIdsToMove = executionsPool.stream().map(ExecutionEntity::getId).collect(Collectors.toCollection(HashSet::new));
         Optional<ExecutionEntity> notIncludedExecution = subProcessExecutions.stream().filter(e -> !executionIdsToMove.contains(e.getId())).findAny();
         if (notIncludedExecution.isPresent()) {
