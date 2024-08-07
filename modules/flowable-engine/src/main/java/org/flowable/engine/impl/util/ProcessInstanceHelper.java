@@ -455,7 +455,6 @@ public class ProcessInstanceHelper {
         Signal signal = null;
         if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
             signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-            signalEventDefinition.setSignalRef(signal.getName());
         }
 
         ExecutionEntity signalExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
