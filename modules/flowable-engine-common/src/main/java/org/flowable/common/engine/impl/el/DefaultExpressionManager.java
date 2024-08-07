@@ -30,6 +30,7 @@ import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
 import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 
 /**
  * Default {@link ExpressionManager} implementation that contains the logic for creating 
@@ -43,6 +44,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
  */
 public class DefaultExpressionManager implements ExpressionManager {
 
+    public static final String JUEL_EXPRESSION_LANGUAGE = "juel";
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
     protected FlowableFunctionResolver functionResolver;
@@ -70,44 +72,60 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     @Override
     public Expression createExpression(String text) {
-        
-        if (isCacheEnabled(text)) {
-            Expression cachedExpression = expressionCache.get(text);
-            if (cachedExpression != null) {
-                return cachedExpression;
-            }
-        }
-        
-        if (parsingElContext == null) {
-            this.parsingElContext = new ParsingElContext(functionResolver);
-        } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
-            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionResolver(functionResolver);
-        }
+        return createExpression(text, ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE);
+    }
 
+    @Override
+    public Expression createExpression(String text, String language) {
         String expressionText = text.trim();
-        
-        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
-        Expression expression = createJuelExpression(text, valueExpression);
-        
-        if (isCacheEnabled(text)) {
-            expressionCache.add(text, expression);
+
+        if (language == null || ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE.equals(language)) {
+            return createJuelExpression(expressionText);
+        } else {
+            return createScriptEngineExpression(expressionText, language);
         }
-        
-        return expression;
     }
 
     protected boolean isCacheEnabled(String text) {
         return expressionCache != null && (expressionTextLengthCacheLimit < 0 || text.length() <= expressionTextLengthCacheLimit);
     }
 
+    protected Expression createJuelExpression(String expressionText) {
+        if (isCacheEnabled(expressionText)) {
+            Expression cachedExpression = expressionCache.get(expressionText);
+            if (cachedExpression != null) {
+                return cachedExpression;
+            }
+        }
+        if (parsingElContext == null) {
+            this.parsingElContext = new ParsingElContext(functionResolver);
+        } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
+            ((FlowableFunctionMapper) parsingElContext.getFunctionMapper()).setFunctionResolver(functionResolver);
+        }
+
+        ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
+        Expression expression = createJuelExpression(expressionText, valueExpression);
+
+        if (isCacheEnabled(expressionText)) {
+            expressionCache.add(expressionText, expression);
+        }
+
+        return expression;
+    }
+
     protected Expression createJuelExpression(String expression, ValueExpression valueExpression) {
         return new JuelExpression(this, valueExpression, expression);
+    }
+
+    private Expression createScriptEngineExpression(String text, String language) {
+        return new ScriptEngineExpression(text, language);
     }
 
     public void setExpressionFactory(ExpressionFactory expressionFactory) {
         this.expressionFactory = expressionFactory;
     }
-    
+
+
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
         ELResolver elResolver = getOrCreateStaticElResolver();

@@ -588,6 +588,10 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
         if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
             xtw.writeStartElement(ELEMENT_CONDITION);
+            if (conditionalDefinition.getConditionLanguage() != null) {
+                xtw.writeAttribute(XSI_PREFIX, XSI_NAMESPACE, "type", "tFormalExpression");
+                BpmnXMLUtil.writeDefaultAttribute(BpmnXMLConstants.ATTRIBUTE_SCRIPT_LANGUAGE, conditionalDefinition.getConditionLanguage(), xtw);
+            }
             xtw.writeCharacters(conditionalDefinition.getConditionExpression());
             xtw.writeEndElement();
         }

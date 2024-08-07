@@ -24,4 +24,8 @@ public interface FlowableConditionalEvent extends FlowableActivityEvent {
      */
     String getConditionExpression();
 
+    /**
+     * @return the scripting language of the condition expression.
+     */
+    String getConditionLanguage();
 }

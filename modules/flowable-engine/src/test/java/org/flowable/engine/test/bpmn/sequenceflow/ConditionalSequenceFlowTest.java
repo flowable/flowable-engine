@@ -144,4 +144,15 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         assertThat(task.getName()).isEqualTo("task not left");
         taskService.complete(task.getId());
     }
+
+    @Test
+    @Deployment
+    public void testGroovyExpression() {
+        Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowGroovyExpr", variables);
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+
+        assertThat(task.getName()).isEqualTo("task right");
+    }
 }
