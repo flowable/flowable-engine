@@ -50,6 +50,18 @@ public abstract class ScopeAwareInternalJobManager implements InternalJobManager
     protected abstract VariableScope resolveVariableScopeInternal(Job job);
 
     @Override
+    public final String resolveJobLockId(Job job) {
+        InternalJobManager internalJobManager = findInternalJobManager(job);
+        if (internalJobManager == null) {
+            return resolveJobLockIdInternal(job);
+        }
+
+        return internalJobManager.resolveJobLockId(job);
+    }
+
+    protected abstract String resolveJobLockIdInternal(Job job);
+
+    @Override
     public final boolean handleJobInsert(Job job) {
         InternalJobManager internalJobManager = findInternalJobManager(job);
         if (internalJobManager == null) {
