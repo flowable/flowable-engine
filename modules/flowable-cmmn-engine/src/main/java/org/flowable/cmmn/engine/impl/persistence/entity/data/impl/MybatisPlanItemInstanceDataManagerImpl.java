@@ -189,5 +189,11 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
         }
+
+        if (planItemInstanceQuery.getOrQueryObjects() != null && !planItemInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (PlanItemInstanceQueryImpl oInstanceQuery : planItemInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(oInstanceQuery);
+            }
+        }
     }
 }
