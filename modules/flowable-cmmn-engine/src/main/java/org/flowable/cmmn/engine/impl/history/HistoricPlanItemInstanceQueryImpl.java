@@ -88,6 +88,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean withoutTenantId;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean includeLocalVariables;
 
     public HistoricPlanItemInstanceQueryImpl() {
 
@@ -440,6 +441,13 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery includeLocalVariables() {
+        this.includeLocalVariables = true;
+        return this;
+    }
+
+
+    @Override
     public HistoricPlanItemInstanceQuery orderByCreateTime() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
     }
@@ -511,7 +519,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
-        List<HistoricPlanItemInstance> historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        List<HistoricPlanItemInstance> historicPlanItems;
+        if(includeLocalVariables){
+            historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+        }else{
+             historicPlanItems =CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        }
 
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getPlanItemLocalizationManager() != null) {
@@ -675,6 +688,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+    public boolean isIncludeLocalVariables() {
+        return includeLocalVariables;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

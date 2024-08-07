@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -243,6 +245,37 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                             "Plano traduzido"
                     );
         }
+    }
+
+    @Test
+    public void testIncludeLocalVariables() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testQuery")
+                .variable("caseVar","caseVarValur")
+                .name("With string value")
+                .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().list();
+
+        cmmnRuntimeService.setLocalVariable(planItemInstances.get(0).getId(), "localVar", "someValue");
+
+        Task task = cmmnTaskService.createTaskQuery()
+                .includeCaseVariables()
+                .includeTaskLocalVariables()
+                .singleResult();
+
+        cmmnTaskService.complete(task.getId());
+        HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstances.get(0).getId()).singleResult();
+        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).isEmpty();
+
+        planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(0).getId()).includeLocalVariables()
+                .singleResult();
+        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).isNotNull();
+
+        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).containsOnly(
+                entry("localVar", "someValue")
+        );
     }
 
     private List<String> startInstances(int numberOfInstances) {

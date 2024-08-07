@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 /**
@@ -38,6 +39,8 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     
     List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
 
+    List<PlanItemInstance> findWithVariablesByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
+
     List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId);
 
     List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId);
@@ -55,4 +58,5 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     void deleteByStageInstanceId(String stageInstanceId);
 
     void deleteByCaseInstanceId(String caseInstanceId);
+
 }

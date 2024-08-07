@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -74,6 +77,8 @@ public class PlanItemInstanceResponse {
     protected String formKey;
     protected String extraValue;
     protected String tenantId;
+    protected List<RestVariable> localVariables = new ArrayList<>();
+
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -364,5 +369,17 @@ public class PlanItemInstanceResponse {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public void setLocalVariables(List<RestVariable> localVariables){
+        this.localVariables = localVariables;
+    }
+
+    public List<RestVariable> getLocalVariables() {
+        return localVariables;
+    }
+
+    public void addLocalVariable(RestVariable restVariable) {
+        localVariables.add(restVariable);
     }
 }

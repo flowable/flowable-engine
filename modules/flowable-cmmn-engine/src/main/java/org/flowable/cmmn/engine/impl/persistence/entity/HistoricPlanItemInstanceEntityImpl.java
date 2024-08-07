@@ -14,11 +14,14 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Dennis Federico
@@ -57,6 +60,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected String localizedName;
+    protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricPlanItemInstanceEntityImpl() {
     }
@@ -464,6 +468,19 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
+    }
+
+    @Override
+    public Map<String, Object> getLocalPlanItemInstanceVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (HistoricVariableInstance variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
+                    variables.put(variableInstance.getVariableName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
     }
 
     @Override

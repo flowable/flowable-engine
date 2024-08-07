@@ -574,6 +574,14 @@ public class CmmnRestResponseFactory {
         result.setExtraValue(planItemInstance.getExtraValue());
         result.setTenantId(planItemInstance.getTenantId());
 
+        if (planItemInstance.getLocalPlanItemInstanceVariables() != null) {
+            Map<String, Object> variableMap = planItemInstance.getLocalPlanItemInstanceVariables();
+            for (String name : variableMap.keySet()) {
+                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
+                        planItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+            }
+        }
+
         return result;
     }
     
@@ -916,6 +924,15 @@ public class CmmnRestResponseFactory {
         if (historicPlanItemInstance.getStageInstanceId() != null) {
             result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getStageInstanceId()));
         }
+
+        if (historicPlanItemInstance.getLocalPlanItemInstanceVariables() != null) {
+            Map<String, Object> variableMap = historicPlanItemInstance.getLocalPlanItemInstanceVariables();
+            for (String name : variableMap.keySet()) {
+                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
+                        historicPlanItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+            }
+        }
+
         return result;
     }
 

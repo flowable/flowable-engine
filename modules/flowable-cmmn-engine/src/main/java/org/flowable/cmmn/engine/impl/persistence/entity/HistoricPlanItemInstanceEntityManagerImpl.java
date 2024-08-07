@@ -69,4 +69,9 @@ public class HistoricPlanItemInstanceEntityManagerImpl
     public void deleteHistoricPlanItemInstancesForNonExistingCaseInstances() {
         dataManager.deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
     }
+
+    @Override
+    public List<HistoricPlanItemInstance> findWithVariablesByCriteria(HistoricPlanItemInstanceQueryImpl historicPlanItemInstanceQuery) {
+        return dataManager.findWithVariablesByCriteria(historicPlanItemInstanceQuery);
+    }
 }

@@ -77,7 +77,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String exitCriterionId;
     protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
-    
+    protected List<VariableInstanceEntity> queryVariables;
     // Counts
     protected boolean countEnabled;
     protected int variableCount;
@@ -457,6 +457,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public String getTenantId() {
         return tenantId;
     }
+
+    @Override
+    public Map<String, Object> getLocalPlanItemInstanceVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (VariableInstance variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
