@@ -402,6 +402,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("OWNER_", "owner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TRANSACTION_ORDER_", "transactionOrder", PARAMETER_TYPE_INTEGER);

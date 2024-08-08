@@ -68,7 +68,6 @@ public class JPAFlowableEngineConfiguration {
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setJpaEntityManagerFactory(entityManagerFactory);
         processEngineConfiguration.setJpaHandleTransaction(false);
-        processEngineConfiguration.setJpaHandleTransaction(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         processEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
         return processEngineConfiguration;

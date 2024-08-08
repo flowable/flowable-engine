@@ -110,12 +110,21 @@ public class TableColumnTypeValidationTest {
     private String findTable(String entity, String mappingFileContent) {
 
         // CaseInstance is an exception: there's more ACT_RU_ENTITYLINK in there than case instance
+        String directMapping = null;
         if (entity.equalsIgnoreCase("CaseInstance")) {
-            return "ACT_CMMN_RU_CASE_INST";
+            directMapping = "ACT_CMMN_RU_CASE_INST";
         } else if (entity.equalsIgnoreCase("HistoricCaseInstance")) {
-            return "ACT_CMMN_HI_CASE_INST";
+            directMapping = "ACT_CMMN_HI_CASE_INST";
         } else if (entity.equalsIgnoreCase("Privilege")) {
-            return "ACT_ID_PRIV";
+            directMapping = "ACT_ID_PRIV";
+        }
+
+        if (directMapping != null) {
+            if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES)) {
+                return directMapping.toLowerCase(Locale.ROOT);
+            } else {
+                return directMapping;
+            }
         }
 
         // Simplistic approach: check for ${prefix}<TABLE> patterns. The one that is most in the mapping file, is most likely the table name.
@@ -147,10 +156,25 @@ public class TableColumnTypeValidationTest {
             }
         }
 
+        if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES)) {
+            result = result.toLowerCase(Locale.ROOT);
+        }
+
         return result.trim();
     }
 
     protected Map<String, String> getColumnMetaData(String tableName) {
+        Map<String, String> result = internalGetColumnMetaData(tableName);
+
+        if (result.isEmpty()) { // certain dbs such as postgres / mysql 5.x only can do lowercased metadata calls
+            result = internalGetColumnMetaData(tableName.toLowerCase(Locale.ROOT));
+        }
+
+        return result;
+    }
+
+
+    protected Map<String, String> internalGetColumnMetaData(String tableName) {
         return processEngine.getManagementService().executeCommand(commandContext -> {
             try {
                 DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
@@ -170,7 +194,10 @@ public class TableColumnTypeValidationTest {
 
                 Map<String, String> columnNameToTypeMap = new HashMap<>();
 
-                if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL) && StringUtils.isEmpty(catalog)) {
+                if (StringUtils.isEmpty(catalog) &&
+                        (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL)
+                         || databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MYSQL))
+                ) {
                     catalog = null; // Otherwise SQL server errors out
                 }
 
@@ -181,6 +208,7 @@ public class TableColumnTypeValidationTest {
 
                     // The JDBC metadata API doesn't return the same names as used in the mybatis mapping files
                     if (columnType.equalsIgnoreCase("BINARY LARGE OBJECT")
+                            || columnType.equalsIgnoreCase("BLOB") // oracle
                             || columnType.equalsIgnoreCase("varbinary")
                             || columnType.equalsIgnoreCase("BINARY VARYING")
                             || columnType.equalsIgnoreCase("LONGBLOB") // mariadb
@@ -189,7 +217,9 @@ public class TableColumnTypeValidationTest {
 
                     } else if (columnType.equalsIgnoreCase("CHARACTER VARYING")
                             || columnType.equalsIgnoreCase("CHARACTER LARGE OBJECT")
+                            || columnType.equalsIgnoreCase("CLOB") // SQL server
                             || columnType.equalsIgnoreCase("VARCHAR2") // oracle
+                            || columnType.equalsIgnoreCase("NVARCHAR2") // oracle
                             || columnType.equalsIgnoreCase("LONGTEXT") // mariadb
                             || columnType.equalsIgnoreCase("text")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_VARCHAR;
@@ -200,17 +230,25 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_DOUBLE;
 
                     } else if (columnType.equalsIgnoreCase("datetime")
-                            || columnType.equalsIgnoreCase("datetime2")) {
+                            || columnType.equalsIgnoreCase("datetime2")
+                            || columnType.toLowerCase(Locale.ROOT).startsWith("timestamp(")) {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_TIMESTAMP;
 
                     } else if (columnType.equalsIgnoreCase("int")
+                            || columnType.equalsIgnoreCase("int2") // postgres
                             || columnType.equalsIgnoreCase("int4")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
 
-                    } else if (columnType.equalsIgnoreCase("int8"))  { // postgres
+                    } else if (columnType.equalsIgnoreCase("int8") // postgres
+                            || columnType.equalsIgnoreCase("serial") // postgres
+                            || columnType.equalsIgnoreCase("numeric() identity") // sql server
+                            || columnType.equalsIgnoreCase("numeric")) { // sql server
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
 
                     } else if (columnType.equalsIgnoreCase("bit")
+                            || columnType.equalsIgnoreCase("SMALLINT")
+                            || columnType.equalsIgnoreCase("TINYINT") // mariadb
+                            || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("bool")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
 

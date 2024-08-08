@@ -19,8 +19,10 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -77,12 +79,12 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseTask() throws Exception {
-        Calendar now = Calendar.getInstance();
-        cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        taskService.setDueDate(task.getId(), now.getTime());
+        taskService.setDueDate(task.getId(), Date.from(now));
         taskService.setOwner(task.getId(), "owner");
         task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -120,8 +122,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessAdhoc() throws Exception {
         try {
 
-            Calendar now = Calendar.getInstance();
-            cmmnEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
@@ -133,7 +135,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -177,7 +179,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
      */
     public void testUpdateTaskNoOverrides() throws Exception {
         try {
-            Calendar now = Calendar.getInstance();
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
 
@@ -188,7 +190,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -207,7 +209,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(now.getTime());
+            assertThat(task.getDueDate()).isEqualTo(now);
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
@@ -232,8 +234,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            Instant dueDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            String dueDateString = getISODateString(Date.from(dueDate));
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");

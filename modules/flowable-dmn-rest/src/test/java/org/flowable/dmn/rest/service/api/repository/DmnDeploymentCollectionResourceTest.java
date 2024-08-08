@@ -182,6 +182,36 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
+        } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
+            // Always cleanup any created deployments, even if the test failed
+            List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
+            for (DmnDeployment deployment : deployments) {
+                dmnRepositoryService.deleteDeployment(deployment.getId());
+            }
+        }
+    }
+
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            dmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .tenantId("acme")
+                    .deploy();
+
+            dmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .tenantId("myTenant")
+                    .deploy();
+
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(
                     new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
@@ -310,6 +340,36 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             // Check without tenantId filtering
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
+
+        } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
+            // Always cleanup any created deployments, even if the test failed
+            List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
+            for (DmnDeployment deployment : deployments) {
+                dmnRepositoryService.deleteDeployment(deployment.getId());
+            }
+        }
+    }
+
+    public void testGetDeploymentsDecisionServiceSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            dmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/decision_service-1.dmn")
+                    .tenantId("acme")
+                    .deploy();
+
+            dmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/decision_service-1.dmn")
+                    .tenantId("myTenant")
+                    .deploy();
 
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(

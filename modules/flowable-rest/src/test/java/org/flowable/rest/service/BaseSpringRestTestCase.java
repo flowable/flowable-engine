@@ -454,7 +454,10 @@ public class BaseSpringRestTestCase {
     }
 
     public boolean areJobsAvailable() {
-        return !managementService.createJobQuery().list().isEmpty();
+        if (managementService.createTimerJobQuery().list().isEmpty()) {
+            return !managementService.createJobQuery().list().isEmpty();
+        }
+        return true;
     }
 
     private static class InterruptTask extends TimerTask {
