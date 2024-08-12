@@ -43,15 +43,15 @@ The example we’ll build is a simple *holiday request* process:
 
 First, we create a new Maven project through *File → New → Other → Maven Project*
 
-![getting.started.new.maven](assets/bpmn/getting.started.new.maven.png)
+![getting.started.new.maven](../assets/bpmn/getting.started.new.maven.png)
 
 In the next screen, we check '*create a simple project (skip archetype selection)*'
 
-![getting.started.new.maven2](assets/bpmn/getting.started.new.maven2.png)
+![getting.started.new.maven2](../assets/bpmn/getting.started.new.maven2.png)
 
 And fill in some *'Group Id'* and *'Artifact id'*:
 
-![getting.started.new.maven3](assets/bpmn/getting.started.new.maven3.png)
+![getting.started.new.maven3](../assets/bpmn/getting.started.new.maven3.png)
 
 We now have an empty Maven project, to which we’ll add two dependencies:
 
@@ -126,11 +126,11 @@ The **ProcessEngine** object is then created using this configuration (line 17).
 
 You can now run this. The easiest way in Eclipse is to right-click on the class file and select *Run As → Java Application*:
 
-![getting.started.run.main](assets/bpmn/getting.started.run.main.png)
+![getting.started.run.main](../assets/bpmn/getting.started.run.main.png)
 
 The application runs without problems, however, no useful information is shown in the console except a message stating that the logging has not been configured properly:
 
-![getting.started.console.logging](assets/bpmn/getting.started.console.logging.png)
+![getting.started.console.logging](../assets/bpmn/getting.started.console.logging.png)
 
 Flowable uses [SLF4J](http://www.slf4j.org/) as its logging framework internally. For this example, we’ll use the log4j logger over SLF4j, so add the following dependencies to the pom.xml file:
 
@@ -155,7 +155,7 @@ Log4j needs a properties file for configuration. Add a *log4j.properties* file t
 
 Rerun the application. You should now see informative logging about the engine booting up and the database schema being created in the database:
 
-![getting.started.console.logging2](assets/bpmn/getting.started.console.logging2.png)
+![getting.started.console.logging2](../assets/bpmn/getting.started.console.logging2.png)
 
 We’ve now got a process engine booted up and ready to go. Time to feed it a process!
 
@@ -170,7 +170,7 @@ these different steps to each other. Through this, the BPMN 2.0 standard allows 
 
 The process definition we’ll use is the following:
 
-![getting.started.bpmn.process](assets/bpmn/getting.started.bpmn.process.png)
+![getting.started.bpmn.process](../assets/bpmn/getting.started.bpmn.process.png)
 
 The process should be quite self-explanatory, but for clarity’s sake let’s describe the different bits:
 
@@ -358,7 +358,7 @@ Using the task identifier, we can now get the specific process instance variable
 
 Which, if you run this, should look something like this:
 
-![getting.started.console.logging3](assets/bpmn/getting.started.console.logging3.png)
+![getting.started.console.logging3](../assets/bpmn/getting.started.console.logging3.png)
 
 The manager can now **complete the task**. In reality, this often means that a form is submitted by the user. The data from the form is then passed as *process
 variables*. Here, we’ll mimic this by passing a map with the 'approved' variable (the name is important, as it’s used later on in the conditions of the sequence flow!) when the task is completed:
@@ -400,7 +400,7 @@ When the *execution* arrives at the *service task*, the class that is referenced
 
 When running the example now, the logging message is shown, demonstrating the custom logic is indeed executed:
 
-![getting.started.console.logging4](assets/bpmn/getting.started.console.logging4.png)
+![getting.started.console.logging4](../assets/bpmn/getting.started.console.logging4.png)
 
 ### Working with historical data
 

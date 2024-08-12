@@ -168,7 +168,7 @@ A more advanced example, JPASpringTest, can be found in flowable-spring-examples
 
 Please note that the process doesn’t contain any forms, since it is only used in a unit test.
 
-![jpa.spring.example.process](assets/bpmn/jpa.spring.example.process.png)
+![jpa.spring.example.process](../assets/bpmn/jpa.spring.example.process.png)
 
     <?xml version="1.0" encoding="UTF-8"?>
     <definitions id="taskAssigneeExample"

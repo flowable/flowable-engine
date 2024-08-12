@@ -34,15 +34,15 @@ We’ll implement a very simple use case: determining the discount percentage ba
 
 Start by opening the decision tables section within the Flowable modeler.
 
-![decision tables 1](assets/dmn/decision_tables_1.png)
+![decision tables 1](../assets/dmn/decision_tables_1.png)
 
 And select **Create Decision Table**.
 
-![decision tables 2](assets/dmn/decision_tables_2.png)
+![decision tables 2](../assets/dmn/decision_tables_2.png)
 
 Provide a decision table name and a unique decision table key and select **Create new decision table**.
 
-![decision tables 3](assets/dmn/decision_tables_3.png)
+![decision tables 3](../assets/dmn/decision_tables_3.png)
 
 You’re now ready to define your decision table. Let’s describe what is presented within the editor.
 
@@ -85,11 +85,11 @@ There are 7 hit policies available;
 
 The header of the decision table itself is divided in two sections; blue and green. In the blue section are the **input expressions**; the green the **output expressions**.
 
-![decision tables 4](assets/dmn/decision_tables_4.png)
+![decision tables 4](../assets/dmn/decision_tables_4.png)
 
 Within an input expression, you can define the variable that will be used in the expression of the rule input entries (explained below). It’s possible to define multiple input expressions by selecting **Add Input** (right click option menu or by clicking the plus icon).
 
-![decision tables 5](assets/dmn/decision_tables_5.png)
+![decision tables 5](../assets/dmn/decision_tables_5.png)
 
 Within an output expression, you can define what variable will be created to form the result of a decision table execution (the value of the variable will be determined by the output entry expression; explained below). It’s possible to define multiple output expressions by selecting **Add Output** (right click option menu or by clicking the plus icon).
 
@@ -102,23 +102,23 @@ A input entry is an expression that will be evaluated against the input variable
 >
 > The DMN specification defines an expression language: (S)-FEEL. Currently, we do not supported this part of the specification. Within Flowable DMN, we use JUEL as the expression language.
 
-![decision tables 6](assets/dmn/decision_tables_6.png)
+![decision tables 6](../assets/dmn/decision_tables_6.png)
 
 To enter an expression, double-click on the corresponding cell.
 In this example, the expression *== BRONZE* is entered. Combined with the variable defined in the corresponding input expression (column header), this will result at runtime in the full expression *customerCat == "BRONZE"*.
 
-![decision tables 7](assets/dmn/decision_tables_7.png)
+![decision tables 7](../assets/dmn/decision_tables_7.png)
 
 To enter an output expression, double-click the corresponding cell.
 In this example the expression *5* is entered. This is actually more like an implicit assignment. The value 5 will be assigned to the variable in the corresponding output entry (column) when all input entries of that rule are evaluated true.
 
 We can then continue completing the decision table by adding more rules (by selecting Add Rule).
 
-![decision tables 8](assets/dmn/decision_tables_8.png)
+![decision tables 8](../assets/dmn/decision_tables_8.png)
 
 In our example, rule 4 has an empty input entry. Empty input entries will be evaluated by the engine as true. This means that if none of the other rules are valid, the outcome of rule 4 will be the output of this decision table. In this case, variable **discountPerc** will have value **0**.
 
-![decision tables 9](assets/dmn/decision_tables_9.png)
+![decision tables 9](../assets/dmn/decision_tables_9.png)
 
 The decision table can now be saved. Provide a unique Decision Table key.
 
@@ -126,7 +126,7 @@ The decision table can now be saved. Provide a unique Decision Table key.
 
 The newly created decision table can be used in a BPMN2.0 process by including a **Decision task** and selecting the **Decision table reference**.
 
-![decision tables 10](assets/dmn/decision_tables_10.png)
+![decision tables 10](../assets/dmn/decision_tables_10.png)
 
 In the process above, the process has a start form that will provide the **customer category** to the process instance (and thus to the decision table).
 The **Display Discount** user task displays the result of the decision table with an expression form field, using the expression; ${discountperc}.
