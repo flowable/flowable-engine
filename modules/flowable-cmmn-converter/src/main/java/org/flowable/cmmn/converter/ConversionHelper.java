@@ -59,6 +59,7 @@ public class ConversionHelper {
     protected CmmnDiShape currentDiShape;
     protected CmmnDiEdge currentDiEdge;
     protected GraphicInfo currentLabelGraphicInfo;
+    protected LinkedList<PlanItemDefinition> planItemDefinitionsStack = new LinkedList<>();
 
     protected Map<Case, List<CaseElement>> caseElements = new HashMap<>();
     protected List<Stage> stages = new ArrayList<>();
@@ -247,6 +248,20 @@ public class ConversionHelper {
 
     public void removeCurrentPlanFragment() {
         this.planFragmentsStack.removeLast();
+    }
+
+    public PlanItemDefinition getCurrentPlanItemDefinition() {
+        return planItemDefinitionsStack.peekLast();
+    }
+
+    public void setCurrentPlanItemDefinition(PlanItemDefinition currentPlanItemDefinition) {
+        if (currentPlanItemDefinition != null) {
+            this.planItemDefinitionsStack.add(currentPlanItemDefinition);
+        }
+    }
+
+    public void removeCurrentPlanItemDefinition() {
+        this.planItemDefinitionsStack.removeLast();
     }
 
     public Stage getCurrentStage() {

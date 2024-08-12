@@ -12,8 +12,12 @@
  */
 package org.flowable.cmmn.converter;
 
+import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME;
+
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -35,8 +39,24 @@ public abstract class PlanItemDefinitionXmlConverter extends CaseElementXmlConve
             if (parentStage != null) {
                 parentStage.addPlanItemDefinition(planItemDefinition);
             }
-        }   
+        }
+
+        conversionHelper.setCurrentPlanItemDefinition(planItemDefinition);
+
         return planItemDefinition;
+    }
+
+    @Override
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        super.elementEnd(xtr, conversionHelper);
+
+        PlanItemDefinition planItemDefinition = conversionHelper.getCurrentPlanItemDefinition();
+        // Set name if ATTRIBUTE_ELEMENT_NAME extension element was found in plan item definition
+        if (planItemDefinition != null && StringUtils.isNotEmpty(CmmnXmlUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, planItemDefinition))) {
+            planItemDefinition.setName(CmmnXmlUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, planItemDefinition));
+        }
+
+        conversionHelper.removeCurrentPlanItemDefinition();
     }
     
 }

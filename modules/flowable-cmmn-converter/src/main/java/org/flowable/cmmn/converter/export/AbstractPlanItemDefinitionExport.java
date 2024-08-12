@@ -68,7 +68,14 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
         xtw.writeAttribute(ATTRIBUTE_ID, planItemDefinition.getId());
 
         if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
-            xtw.writeAttribute(ATTRIBUTE_NAME, planItemDefinition.getName());
+            String name = planItemDefinition.getName();
+            if (name != null && CmmnXmlUtil.containsNewLine(name)) {
+                // Save name in extension element if name contains any newlines
+                // because new lines are changed into spaces when xml attribute is parsed
+                planItemDefinition.addExtensionElement(CmmnXmlUtil.createExtensionElement(ATTRIBUTE_NAME, name));
+            } else {
+                xtw.writeAttribute(ATTRIBUTE_NAME, planItemDefinition.getName());
+            }
         }
     }
 

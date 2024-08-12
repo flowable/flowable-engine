@@ -111,6 +111,10 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
             FlowElement currentFlowElement = (FlowElement) parsedElement;
             currentFlowElement.setId(elementId);
+
+            if (StringUtils.isNotEmpty(BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, parsedElement))) {
+                elementName = BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, parsedElement);
+            }
             currentFlowElement.setName(elementName);
 
             if (currentFlowElement instanceof FlowNode) {
@@ -167,7 +171,14 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         boolean didWriteExtensionStartElement = false;
         writeDefaultAttribute(ATTRIBUTE_ID, baseElement.getId(), xtw);
         if (baseElement instanceof FlowElement) {
-            writeDefaultAttribute(ATTRIBUTE_NAME, ((FlowElement) baseElement).getName(), xtw);
+            String name = ((FlowElement) baseElement).getName();
+            if (name != null && BpmnXMLUtil.containsNewLine(name)) {
+                // Save name in extension element if name contains any newlines
+                // because new lines are changed into spaces when xml attribute is parsed
+                baseElement.addExtensionElement(BpmnXMLUtil.createExtensionElement(ATTRIBUTE_ELEMENT_NAME, name));
+            } else {
+                writeDefaultAttribute(ATTRIBUTE_NAME, name, xtw);
+            }
         }
 
         if (baseElement instanceof FlowNode) {

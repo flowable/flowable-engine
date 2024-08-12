@@ -313,6 +313,12 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                         ELEMENT_TRANSACTION.equals(xtr.getLocalName()) ||
                         ELEMENT_ADHOC_SUBPROCESS.equals(xtr.getLocalName()))) {
 
+                    // Set name if ATTRIBUTE_ELEMENT_NAME extension element was found in subprocess
+                    SubProcess subProcess = activeSubProcessList.get(activeSubProcessList.size() - 1);
+                    if (StringUtils.isNotEmpty(BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, subProcess))) {
+                        subProcess.setName(BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, subProcess));
+                    }
+
                     activeSubProcessList.remove(activeSubProcessList.size() - 1);
                 }
 

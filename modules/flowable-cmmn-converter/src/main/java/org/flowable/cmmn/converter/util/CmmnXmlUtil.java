@@ -86,6 +86,24 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         }
         return extensionElement;
     }
+
+    public static ExtensionElement createExtensionElement(String name, String value) {
+        ExtensionElement extensionElement = new ExtensionElement();
+        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
+        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
+        extensionElement.setName(name);
+        extensionElement.setElementText(value);
+        return extensionElement;
+    }
+
+    public static String getExtensionElementValue(String name, BaseElement element) {
+        String value = "";
+        if (element.getExtensionElements().get(name) != null && !element.getExtensionElements().get(name).isEmpty()) {
+            ExtensionElement extensionElement = element.getExtensionElements().get(name).get(0);
+            value = extensionElement.getElementText();
+        }
+        return value;
+    }
     
     public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
         String attributeValue = xtr.getAttributeValue(FLOWABLE_EXTENSIONS_NAMESPACE, attributeName);
@@ -295,5 +313,9 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             }
         }
         return false;
+    }
+
+    public static boolean containsNewLine(String str) {
+        return str.contains("\n");
     }
 }
