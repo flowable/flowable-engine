@@ -28,28 +28,23 @@ public class NameWithNewLineTest {
 
         PlanItemDefinition itemDefinition = cmmnModel.findPlanItemDefinition("cmmnStage_1");
         assertThat(itemDefinition.getName()).isEqualTo("stage\ntest");
-        ExtensionElement extensionElement = itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("stage\ntest");
+        assertThat(itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("cmmnTask_2");
         assertThat(itemDefinition.getName()).isEqualTo("human\ntask");
-        extensionElement = itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("human\ntask");
+        assertThat(itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("cmmnEventListener_3");
         assertThat(itemDefinition.getName()).isEqualTo("timer\nevent");
-        extensionElement = itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("timer\nevent");
+        assertThat(itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("cmmnPlanFragment_6");
         assertThat(itemDefinition.getName()).isEqualTo("plan\nfragment");
-        extensionElement = itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("plan\nfragment");
+        assertThat(itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         itemDefinition = cmmnModel.findPlanItemDefinition("cmmnMilestone_7");
         assertThat(itemDefinition.getName()).isEqualTo("mile\nstone");
-        extensionElement = itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("mile\nstone");
+        assertThat(itemDefinition.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
     }
 

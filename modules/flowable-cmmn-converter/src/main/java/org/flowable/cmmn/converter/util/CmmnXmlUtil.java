@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.ExtensionAttribute;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.GraphicInfo;
@@ -85,24 +86,6 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             }
         }
         return extensionElement;
-    }
-
-    public static ExtensionElement createExtensionElement(String name, String value) {
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        extensionElement.setName(name);
-        extensionElement.setElementText(value);
-        return extensionElement;
-    }
-
-    public static String getExtensionElementValue(String name, BaseElement element) {
-        String value = "";
-        if (element.getExtensionElements().get(name) != null && !element.getExtensionElements().get(name).isEmpty()) {
-            ExtensionElement extensionElement = element.getExtensionElements().get(name).get(0);
-            value = extensionElement.getElementText();
-        }
-        return value;
     }
     
     public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
@@ -243,6 +226,22 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
         }
     }
 
+    public static boolean writeElementNameExtensionElement(CaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        String name = element.getName();
+        if (containsNewLine(name)) {
+            if (!didWriteExtensionStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+                didWriteExtensionStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_ELEMENT_NAME, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeCharacters(element.getName());
+            xtw.writeEndElement();
+        }
+
+        return didWriteExtensionStartElement;
+    }
+
     public static void writeCustomAttributes(Collection<List<ExtensionAttribute>> attributes, XMLStreamWriter xtw, List<ExtensionAttribute>... blackLists) throws XMLStreamException {
         writeCustomAttributes(attributes, xtw, new LinkedHashMap<>(), blackLists);
     }
@@ -316,6 +315,6 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
     }
 
     public static boolean containsNewLine(String str) {
-        return str.contains("\n");
+        return str != null && str.contains("\n");
     }
 }

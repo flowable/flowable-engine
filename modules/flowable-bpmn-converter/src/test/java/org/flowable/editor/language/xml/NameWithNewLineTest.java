@@ -27,38 +27,31 @@ class NameWithNewLineTest {
     void validateModel(BpmnModel model) {
         FlowElement flowElement = model.getMainProcess().getFlowElement("startnoneevent1");
         assertThat(flowElement.getName()).isEqualTo("start\nevent");
-        ExtensionElement extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("start\nevent");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         flowElement = model.getMainProcess().getFlowElement("bpmnCatchEvent_12");
         assertThat(flowElement.getName()).isEqualTo("intermediate\nevent");
-        extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("intermediate\nevent");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         flowElement = model.getMainProcess().getFlowElement("bpmnGateway_14");
         assertThat(flowElement.getName()).isEqualTo("gate\nway");
-        extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("gate\nway");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         flowElement = model.getMainProcess().getFlowElement("bpmnEndEvent_3");
         assertThat(flowElement.getName()).isEqualTo("end\nevent");
-        extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("end\nevent");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         SubProcess subProcess = (SubProcess) model.getMainProcess().getFlowElement("bpmnStructure_1");
         assertThat(subProcess.getName()).isEqualTo("sub\nprocess");
-        extensionElement = subProcess.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("sub\nprocess");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         flowElement = subProcess.getFlowElement("bpmnTask_5");
         assertThat(flowElement.getName()).isEqualTo("user\ntask");
-        extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("user\ntask");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
 
         flowElement = subProcess.getFlowElement("bpmnBoundaryEvent_10");
         assertThat(flowElement.getName()).isEqualTo("boundary\nevent");
-        extensionElement = flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME).get(0);
-        assertThat(extensionElement.getElementText()).isEqualTo("boundary\nevent");
+        assertThat(flowElement.getExtensionElements().get(ATTRIBUTE_ELEMENT_NAME)).isNull();
     }
 
     @BpmnXmlConverterTest("nameWithoutNewLineTestProcess.bpmn")

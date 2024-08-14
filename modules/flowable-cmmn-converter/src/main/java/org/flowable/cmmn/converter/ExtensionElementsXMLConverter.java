@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter;
 
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_CLASS;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_DELEGATE_EXPRESSION;
+import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
 
@@ -28,6 +29,7 @@ import org.flowable.cmmn.converter.util.ListenerXmlConverterUtil;
 import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CompletionNeutralRule;
@@ -124,6 +126,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     } else if (CmmnXmlConstants.ELEMENT_VARIABLE_AGGREGATION.equals(xtr.getLocalName())) {
                         readVariableAggregationDefinition(xtr, conversionHelper);
 
+                    } else if (CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME.equals(xtr.getLocalName())) {
+                        readElementName(xtr, conversionHelper);
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
                         conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
@@ -459,6 +463,24 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             } catch (Exception e) {
                 LOGGER.warn("Error parsing collection child elements", e);
             }
+        }
+
+    }
+
+    protected void readElementName(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+
+        if (currentCmmnElement instanceof CaseElement) {
+            try {
+                String elementName = xtr.getElementText();
+
+                if (StringUtils.isNotEmpty(elementName)) {
+                    ((CaseElement) currentCmmnElement).setName(elementName.trim());
+                }
+            } catch (Exception e) {
+                throw new FlowableException("Error while reading " + ATTRIBUTE_ELEMENT_NAME + " extension element", e);
+            }
+
         }
 
     }

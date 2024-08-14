@@ -111,11 +111,9 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
             FlowElement currentFlowElement = (FlowElement) parsedElement;
             currentFlowElement.setId(elementId);
-
-            if (StringUtils.isNotEmpty(BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, parsedElement))) {
-                elementName = BpmnXMLUtil.getExtensionElementValue(ATTRIBUTE_ELEMENT_NAME, parsedElement);
+            if (currentFlowElement.getName() == null) {
+                currentFlowElement.setName(elementName);
             }
-            currentFlowElement.setName(elementName);
 
             if (currentFlowElement instanceof FlowNode) {
                 FlowNode flowNode = (FlowNode) currentFlowElement;
@@ -172,11 +170,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         writeDefaultAttribute(ATTRIBUTE_ID, baseElement.getId(), xtw);
         if (baseElement instanceof FlowElement) {
             String name = ((FlowElement) baseElement).getName();
-            if (name != null && BpmnXMLUtil.containsNewLine(name)) {
-                // Save name in extension element if name contains any newlines
-                // because new lines are changed into spaces when xml attribute is parsed
-                baseElement.addExtensionElement(BpmnXMLUtil.createExtensionElement(ATTRIBUTE_ELEMENT_NAME, name));
-            } else {
+            if (!BpmnXMLUtil.containsNewLine(name)) {
                 writeDefaultAttribute(ATTRIBUTE_NAME, name, xtw);
             }
         }
@@ -231,6 +225,8 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 xtw.writeCharacters(flowElement.getDocumentation());
                 xtw.writeEndElement();
             }
+
+            didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(flowElement, didWriteExtensionStartElement, xtw);
         }
 
         didWriteExtensionStartElement = writeExtensionChildElements(baseElement, didWriteExtensionStartElement, xtw);

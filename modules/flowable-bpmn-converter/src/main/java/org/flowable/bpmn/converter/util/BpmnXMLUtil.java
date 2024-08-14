@@ -37,6 +37,7 @@ import org.flowable.bpmn.converter.child.DataInputAssociationParser;
 import org.flowable.bpmn.converter.child.DataOutputAssociationParser;
 import org.flowable.bpmn.converter.child.DataStateParser;
 import org.flowable.bpmn.converter.child.DocumentationParser;
+import org.flowable.bpmn.converter.child.ElementNameParser;
 import org.flowable.bpmn.converter.child.ErrorEventDefinitionParser;
 import org.flowable.bpmn.converter.child.EscalationEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
@@ -65,6 +66,7 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.IOParameter;
 
@@ -104,6 +106,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new FlowNodeRefParser());
         addGenericParser(new FlowableFailedjobRetryParser());
         addGenericParser(new FlowableMapExceptionParser());
+        addGenericParser(new ElementNameParser());
     }
 
     private static void addGenericParser(BaseChildElementParser parser) {
@@ -206,24 +209,6 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             }
         }
         return extensionElement;
-    }
-
-    public static ExtensionElement createExtensionElement(String name, String value) {
-        ExtensionElement extensionElement = new ExtensionElement();
-        extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);
-        extensionElement.setNamespacePrefix(FLOWABLE_EXTENSIONS_PREFIX);
-        extensionElement.setName(name);
-        extensionElement.setElementText(value);
-        return extensionElement;
-    }
-
-    public static String getExtensionElementValue(String name, BaseElement element) {
-        String value = "";
-        if (element.getExtensionElements().get(name) != null && !element.getExtensionElements().get(name).isEmpty()) {
-            ExtensionElement extensionElement = element.getExtensionElements().get(name).get(0);
-            value = extensionElement.getElementText();
-        }
-        return value;
     }
 
     public static String getAttributeValue(String attributeName, XMLStreamReader xtr) {
@@ -425,6 +410,22 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
             xtw.writeEndElement();
         }
+    }
+
+    public static boolean writeElementNameExtensionElement(FlowElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        String name = element.getName();
+        if (BpmnXMLUtil.containsNewLine(name)) {
+            if (!didWriteExtensionStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                didWriteExtensionStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_ELEMENT_NAME, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeCharacters(element.getName());
+            xtw.writeEndElement();
+        }
+
+        return didWriteExtensionStartElement;
     }
     
     public static boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
@@ -634,6 +635,6 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     }
 
     public static boolean containsNewLine(String str) {
-        return str.contains("\n");
+        return str != null && str.contains("\n");
     }
 }
