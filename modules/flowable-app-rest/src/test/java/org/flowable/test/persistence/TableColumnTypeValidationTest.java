@@ -80,15 +80,25 @@ public class TableColumnTypeValidationTest {
                     configuredColumnType = EntityParameterTypesOverview.PARAMETER_TYPE_VARCHAR;
                 }
 
+                // Oracle returns INTEGER for both BIGINT, Boolean and Double
+                if (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE)
+                        && columnTypeFromMetaData.equalsIgnoreCase(EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER)) {
+
+                    if (configuredColumnType.equalsIgnoreCase(EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT)) {
+                        columnTypeFromMetaData = EntityParameterTypesOverview.PARAMETER_TYPE_BIGINT;
+                    } else if (configuredColumnType.equalsIgnoreCase(EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN)) {
+                        columnTypeFromMetaData = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
+                    } else if (configuredColumnType.equalsIgnoreCase(EntityParameterTypesOverview.PARAMETER_TYPE_DOUBLE)) {
+                        columnTypeFromMetaData = EntityParameterTypesOverview.PARAMETER_TYPE_DOUBLE;
+                    }
+                }
+
                 // Some databases report boolean for tinyint columns
                 if (columnTypeFromMetaData.equalsIgnoreCase(EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN)) {
                     assertThat(configuredColumnType)
                             .withFailMessage("Column type does not match. Expecting <" + configuredColumnType
                                     + "> for column " + columnName + " of table " + tableName + ", but JDBC metadata returned <" + columnTypeFromMetaData + ">")
-                            .satisfiesAnyOf(
-                                    param -> assertThat(param).isEqualTo(EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN),
-                                    param -> assertThat(param).isEqualTo(EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER)
-                            );
+                            .isIn(EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN, EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER);
 
                 } else {
 
@@ -235,6 +245,7 @@ public class TableColumnTypeValidationTest {
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_TIMESTAMP;
 
                     } else if (columnType.equalsIgnoreCase("int")
+                            || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("int2") // postgres
                             || columnType.equalsIgnoreCase("int4")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_INTEGER;
@@ -248,7 +259,6 @@ public class TableColumnTypeValidationTest {
                     } else if (columnType.equalsIgnoreCase("bit")
                             || columnType.equalsIgnoreCase("SMALLINT")
                             || columnType.equalsIgnoreCase("TINYINT") // mariadb
-                            || columnType.equalsIgnoreCase("NUMBER") // oracle
                             || columnType.equalsIgnoreCase("bool")) { // postgres
                         columnType = EntityParameterTypesOverview.PARAMETER_TYPE_BOOLEAN;
 
