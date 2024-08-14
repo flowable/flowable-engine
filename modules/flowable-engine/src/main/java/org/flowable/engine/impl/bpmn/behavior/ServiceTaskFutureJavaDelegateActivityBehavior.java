@@ -32,6 +32,8 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegateContextImpl;
 import org.flowable.engine.impl.delegate.invocation.FutureJavaDelegateInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
@@ -78,6 +80,22 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
             }
 
             leave(execution);
+
+        } else if (triggerable && futureJavaDelegate instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                        "Triggering service task with java class " + futureJavaDelegate.getClass().getName(), execution);
+            }
+            TriggerableJavaDelegateContextImpl context = new TriggerableJavaDelegateContextImpl(execution, null, null);
+            triggerableJavaDelegate.trigger(context);
+
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                        "Triggered service task with java class " + futureJavaDelegate.getClass().getName(), execution);
+            }
+            if (context.shouldLeave()) {
+                leave(execution);
+            }
 
         } else {
             if (processEngineConfiguration.isLoggingSessionEnabled()) {

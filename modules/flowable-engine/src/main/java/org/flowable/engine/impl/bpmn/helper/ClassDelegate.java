@@ -42,6 +42,8 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegateContextImpl;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -211,7 +213,26 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             try {
                 ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-                if (triggerable) {
+                //We should not leave if activityBehaviorInstance is instanceof one of these two classes. If you want to leave, the leave should be called within the
+                // ServiceTaskJavaDelegateActivityBehavior.trigger or ServiceTaskFutureJavaDelegateActivityBehavior.trigger otherwise we would call it twice.
+                if (triggerable &&
+                        !(activityBehaviorInstance instanceof ServiceTaskJavaDelegateActivityBehavior
+                        || activityBehaviorInstance instanceof ServiceTaskFutureJavaDelegateActivityBehavior)) {
+                    leave(execution);
+                }
+            } catch (BpmnError error) {
+                ErrorPropagation.propagateError(error, execution);
+            } catch (RuntimeException e) {
+                if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                    throw e;
+                }
+            }
+        }
+        else if (activityBehaviorInstance instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+            try {
+                TriggerableJavaDelegateContextImpl context = new TriggerableJavaDelegateContextImpl(execution, null, null);
+                triggerableJavaDelegate.trigger(context);
+                if (triggerable && context.shouldLeave()) {
                     leave(execution);
                 }
             } catch (BpmnError error) {

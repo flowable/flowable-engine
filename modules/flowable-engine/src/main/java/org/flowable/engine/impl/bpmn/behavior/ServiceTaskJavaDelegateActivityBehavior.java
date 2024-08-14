@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
@@ -23,6 +24,8 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegateContextImpl;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -67,6 +70,22 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
             
             leave(execution);
         
+        } else if (triggerable && javaDelegate instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+            TriggerableJavaDelegateContextImpl triggerableJavaDelegateContext = null;
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                        "Triggering service task with java delegate " + triggerableJavaDelegate, execution);
+            }
+            triggerableJavaDelegateContext = new TriggerableJavaDelegateContextImpl(execution, signalName, signalData);
+            triggerableJavaDelegate.trigger(triggerableJavaDelegateContext);
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                        "Triggered service task with delegate " + triggerableJavaDelegate, execution);
+            }
+
+            if (triggerableJavaDelegateContext.shouldLeave()) {
+                leave(execution);
+            }
         } else {
             if (processEngineConfiguration.isLoggingSessionEnabled()) {
                 if (!triggerable) {
