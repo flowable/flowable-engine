@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -57,6 +57,8 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         Authentication.setAuthenticatedUserId("getCaseUser");
+        cmmnEngineConfiguration.getClock()
+                .setCurrentTime(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)));
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneHumanTaskCase")
                 .businessKey("myBusinessKey")
