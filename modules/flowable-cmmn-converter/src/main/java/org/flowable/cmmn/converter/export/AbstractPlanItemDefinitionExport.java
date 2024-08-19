@@ -67,7 +67,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
     protected void writePlanItemDefinitionCommonAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
         xtw.writeAttribute(ATTRIBUTE_ID, planItemDefinition.getId());
 
-        if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
+        if (StringUtils.isNotEmpty(planItemDefinition.getName()) && !CmmnXmlUtil.containsNewLine(planItemDefinition.getName())) {
             xtw.writeAttribute(ATTRIBUTE_NAME, planItemDefinition.getName());
         }
     }
@@ -98,8 +98,10 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
             xtw.writeCharacters(planItemDefinition.getDocumentation());
             xtw.writeEndElement();
         }
+
+        boolean didWriteExtensionStartElement = CmmnXmlUtil.writeElementNameExtensionElement(planItemDefinition, false, xtw);
         
-        return CmmnXmlUtil.writeExtensionElements(planItemDefinition, false, model.getNamespaces(), xtw);
+        return CmmnXmlUtil.writeExtensionElements(planItemDefinition, didWriteExtensionStartElement, model.getNamespaces(), xtw);
     }
     
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
