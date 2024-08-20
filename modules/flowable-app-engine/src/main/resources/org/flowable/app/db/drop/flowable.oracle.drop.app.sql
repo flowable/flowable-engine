@@ -8,3 +8,5 @@ alter table ACT_APP_APPDEF
 drop table ACT_APP_APPDEF;
 drop table ACT_APP_DEPLOYMENT_RESOURCE;
 drop table ACT_APP_DEPLOYMENT;
+
+delete from ACT_GE_PROPERTY where NAME_ = 'app.schema.version';
