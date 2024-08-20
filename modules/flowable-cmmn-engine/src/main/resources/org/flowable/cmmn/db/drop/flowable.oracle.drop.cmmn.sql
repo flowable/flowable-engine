@@ -36,5 +36,3 @@ drop table ACT_CMMN_RU_CASE_INST;
 drop table ACT_CMMN_CASEDEF;
 drop table ACT_CMMN_DEPLOYMENT_RESOURCE;
 drop table ACT_CMMN_DEPLOYMENT;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'cmmn.schema.version';

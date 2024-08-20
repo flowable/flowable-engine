@@ -5,5 +5,3 @@ drop table if exists FLW_CHANNEL_DEFINITION cascade constraints;
 drop table if exists FLW_EVENT_DEFINITION cascade constraints;
 drop table if exists FLW_EVENT_RESOURCE cascade constraints;
 drop table if exists FLW_EVENT_DEPLOYMENT cascade constraints;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'eventregistry.schema.version';
