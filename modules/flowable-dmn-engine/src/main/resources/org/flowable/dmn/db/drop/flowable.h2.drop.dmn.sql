@@ -5,3 +5,5 @@ drop table if exists ACT_DMN_DEPLOYMENT cascade constraints;
 
 drop index if exists ACT_IDX_DMN_INSTANCE_ID;
 drop index if exists ACT_IDX_DMN_DEC_UNIQ;
+
+delete from ACT_GE_PROPERTY where NAME_ = 'dmn.schema.version';

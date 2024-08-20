@@ -5,3 +5,5 @@ drop table if exists ACT_DMN_HI_DECISION_EXECUTION;
 drop table if exists ACT_DMN_DECISION;
 drop table if exists ACT_DMN_DEPLOYMENT_RESOURCE;
 drop table if exists ACT_DMN_DEPLOYMENT;
+
+delete from ACT_GE_PROPERTY where NAME_ = 'dmn.schema.version';
