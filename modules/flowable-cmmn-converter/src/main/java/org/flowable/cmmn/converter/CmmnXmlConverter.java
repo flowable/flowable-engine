@@ -91,6 +91,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected static Map<String, BaseCmmnXmlConverter> elementConverters = new HashMap<>();
 
+    protected CmmnXmlConverterOptions options = new CmmnXmlConverterOptions();
+
     protected ClassLoader classloader;
 
     static {
@@ -295,7 +297,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
                 Stage planModel = caseModel.getPlanModel();
 
-                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw);
+                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw, options);
 
                 // end case element
                 xtw.writeEndElement();
@@ -717,6 +719,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
         }
+    }
+
+    public CmmnXmlConverterOptions getCmmnXmlConverterOptions() {
+        return options;
+    }
+
+    public void setCmmnXmlConverterOptions(CmmnXmlConverterOptions options) {
+        this.options = options;
     }
 
     public void setClassloader(ClassLoader classloader) {

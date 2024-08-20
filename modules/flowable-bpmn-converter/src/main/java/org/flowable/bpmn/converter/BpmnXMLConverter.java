@@ -116,6 +116,8 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
 
+    protected BpmnXMLConverterOptions options = new BpmnXMLConverterOptions();
+
     protected BpmnEdgeParser bpmnEdgeParser = new BpmnEdgeParser();
     protected BpmnShapeParser bpmnShapeParser = new BpmnShapeParser();
     protected DefinitionsParser definitionsParser = new DefinitionsParser();
@@ -202,6 +204,14 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
     public static void addConverter(BaseBpmnXMLConverter converter, Class<? extends BaseElement> elementType) {
         convertersToBpmnMap.put(converter.getXMLElementName(), converter);
         convertersToXMLMap.put(elementType, converter);
+    }
+
+    public BpmnXMLConverterOptions getBpmnXmlConverterOptions() {
+        return options;
+    }
+
+    public void setBpmnXmlConverterOptions(BpmnXMLConverterOptions options) {
+        this.options = options;
     }
 
     public void setClassloader(ClassLoader classloader) {
@@ -619,7 +629,9 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             boolean didWriteExtensionStartElement = FlowableListenerExport.writeListeners(subProcess, false, xtw);
 
-            didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(subProcess, didWriteExtensionStartElement, xtw);
+            if (options.getSaveElementNameWithNewLineInExtensionElement()) {
+                didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(subProcess, didWriteExtensionStartElement, xtw);
+            }
 
             didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(subProcess, didWriteExtensionStartElement, model.getNamespaces(), xtw);
             if (didWriteExtensionStartElement) {
@@ -656,7 +668,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 throw new XMLException("No converter for " + flowElement.getClass() + " found");
             }
 
-            converter.convertToXML(xtw, flowElement, model);
+            converter.convertToXML(xtw, flowElement, model, options);
         }
     }
 
@@ -668,6 +680,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             throw new XMLException("No converter for " + artifact.getClass() + " found");
         }
 
-        converter.convertToXML(xtw, artifact, model);
+        converter.convertToXML(xtw, artifact, model, options);
     }
 }

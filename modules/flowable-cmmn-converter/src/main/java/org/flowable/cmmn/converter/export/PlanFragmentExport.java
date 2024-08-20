@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -49,8 +50,8 @@ public class PlanFragmentExport extends AbstractPlanItemDefinitionExport<PlanFra
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, PlanFragment planFragment, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, planFragment, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, PlanFragment planFragment, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, planFragment, xtw, options);
         for (PlanItem planItem : planFragment.getPlanItems()) {
             PlanItemExport.writePlanItem(model, planItem, xtw);
         }

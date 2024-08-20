@@ -164,13 +164,13 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         }
     }
 
-    public void convertToXML(XMLStreamWriter xtw, BaseElement baseElement, BpmnModel model) throws Exception {
+    public void convertToXML(XMLStreamWriter xtw, BaseElement baseElement, BpmnModel model, BpmnXMLConverterOptions options) throws Exception {
         xtw.writeStartElement(getXMLElementName());
         boolean didWriteExtensionStartElement = false;
         writeDefaultAttribute(ATTRIBUTE_ID, baseElement.getId(), xtw);
         if (baseElement instanceof FlowElement) {
             String name = ((FlowElement) baseElement).getName();
-            if (!BpmnXMLUtil.containsNewLine(name)) {
+            if (!(options.getSaveElementNameWithNewLineInExtensionElement() && BpmnXMLUtil.containsNewLine(name))) {
                 writeDefaultAttribute(ATTRIBUTE_NAME, name, xtw);
             }
         }
@@ -226,7 +226,9 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 xtw.writeEndElement();
             }
 
-            didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(flowElement, didWriteExtensionStartElement, xtw);
+            if (options.getSaveElementNameWithNewLineInExtensionElement()) {
+                didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(flowElement, didWriteExtensionStartElement, xtw);
+            }
         }
 
         didWriteExtensionStartElement = writeExtensionChildElements(baseElement, didWriteExtensionStartElement, xtw);

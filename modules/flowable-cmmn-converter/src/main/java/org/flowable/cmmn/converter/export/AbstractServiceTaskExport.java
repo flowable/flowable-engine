@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
@@ -93,8 +94,8 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, serviceTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, ServiceTask serviceTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, serviceTask, xtw, options);
     }
 
     public static class ServiceTaskExport extends AbstractServiceTaskExport<ServiceTask> {
