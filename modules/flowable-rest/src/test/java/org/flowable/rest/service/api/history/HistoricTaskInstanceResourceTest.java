@@ -17,8 +17,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -84,12 +86,12 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Deployment
     public void testGetProcessTask() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Calendar now = Calendar.getInstance();
-            processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Date now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+            processEngineConfiguration.getClock().setCurrentTime(now);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            taskService.setDueDate(task.getId(), now.getTime());
+            taskService.setDueDate(task.getId(), now);
             taskService.setOwner(task.getId(), "owner");
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -131,8 +133,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
 
-                Calendar now = Calendar.getInstance();
-                processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+                Date now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+                processEngineConfiguration.getClock().setCurrentTime(now);
 
                 Task parentTask = taskService.newTask();
                 taskService.saveTask(parentTask);
@@ -144,7 +146,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 task.setAssignee("kermit");
                 task.setDelegationState(DelegationState.RESOLVED);
                 task.setDescription("Description");
-                task.setDueDate(now.getTime());
+                task.setDueDate(now);
                 task.setOwner("owner");
                 task.setPriority(20);
                 taskService.saveTask(task);
