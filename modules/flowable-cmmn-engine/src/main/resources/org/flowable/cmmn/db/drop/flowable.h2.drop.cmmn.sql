@@ -25,3 +25,5 @@ drop index if exists ACT_IDX_CASE_INST_PARENT;
 drop index if exists ACT_IDX_CASE_INST_CASE_DEF;
 drop index if exists ACT_IDX_CASE_DEF_DPLY;
 drop index if exists ACT_IDX_CMMN_RSRC_DPL;
+
+delete from ACT_GE_PROPERTY where NAME_ = 'cmmn.schema.version';
