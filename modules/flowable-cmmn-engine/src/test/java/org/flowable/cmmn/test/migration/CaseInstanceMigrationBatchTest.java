@@ -76,8 +76,10 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
         }
 
         // WHEN
-        // Start async executor to process the batches
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllAsyncJobs(cmmnEngineConfiguration, 5000L, 500L, true);
+        // We are manually executing because on SQL Server on our CI there is a deadlock exception from SQL Server when multiple threads run
+        for (Job job : cmmnManagementService.createJobQuery().handlerType(CaseInstanceMigrationJobHandler.TYPE).list()) {
+            cmmnManagementService.executeJob(job.getId());
+        }
         assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isFalse();
         executeMigrationJobStatusHandlerTimerJob();
 

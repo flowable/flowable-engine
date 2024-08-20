@@ -18,8 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -98,12 +101,12 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment
     public void testGetProcessTask() throws Exception {
-        Calendar now = Calendar.getInstance();
-        processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.setDueDate(task.getId(), now.getTime());
+        taskService.setDueDate(task.getId(), Date.from(now));
         taskService.setOwner(task.getId(), "owner");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -152,8 +155,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessAdhoc() throws Exception {
         try {
 
-            Calendar now = Calendar.getInstance();
-            processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
@@ -165,7 +168,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -211,7 +214,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     public void testUpdateTaskNoOverrides() throws Exception {
         try {
-            Calendar now = Calendar.getInstance();
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
 
@@ -222,7 +225,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -241,7 +244,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(now.getTime());
+            assertThat(task.getDueDate()).isEqualTo(Date.from(now));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
