@@ -210,14 +210,11 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance();
         }
-        if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
+        if (activityBehaviorInstance instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
             try {
-                ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-                //We should not leave if activityBehaviorInstance is instanceof one of these two classes. If you want to leave, the leave should be called within the
-                // ServiceTaskJavaDelegateActivityBehavior.trigger or ServiceTaskFutureJavaDelegateActivityBehavior.trigger otherwise we would call it twice.
-                if (triggerable &&
-                        !(activityBehaviorInstance instanceof ServiceTaskJavaDelegateActivityBehavior
-                        || activityBehaviorInstance instanceof ServiceTaskFutureJavaDelegateActivityBehavior)) {
+                TriggerableJavaDelegateContextImpl context = new TriggerableJavaDelegateContextImpl(execution, null, null);
+                triggerableJavaDelegate.trigger(context);
+                if (triggerable && context.shouldLeave()) {
                     leave(execution);
                 }
             } catch (BpmnError error) {
@@ -227,12 +224,10 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                     throw e;
                 }
             }
-        }
-        else if (activityBehaviorInstance instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+        } else if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
             try {
-                TriggerableJavaDelegateContextImpl context = new TriggerableJavaDelegateContextImpl(execution, null, null);
-                triggerableJavaDelegate.trigger(context);
-                if (triggerable && context.shouldLeave()) {
+                ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+                if (triggerable) {
                     leave(execution);
                 }
             } catch (BpmnError error) {

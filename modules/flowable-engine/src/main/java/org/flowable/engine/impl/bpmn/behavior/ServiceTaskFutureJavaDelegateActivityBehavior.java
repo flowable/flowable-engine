@@ -42,7 +42,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 /**
  * @author Filip Hrisafov
  */
-public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityBehavior implements ActivityBehavior {
+public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityBehavior implements ActivityBehavior, TriggerableJavaDelegate {
 
     private static final long serialVersionUID = 1L;
 
@@ -79,8 +79,6 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                                 "Triggered service task with java class " + futureJavaDelegate.getClass().getName(), execution);
             }
 
-            leave(execution);
-
         } else if (triggerable && futureJavaDelegate instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
             if (processEngineConfiguration.isLoggingSessionEnabled()) {
                 BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
@@ -92,9 +90,6 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
             if (processEngineConfiguration.isLoggingSessionEnabled()) {
                 BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
                         "Triggered service task with java class " + futureJavaDelegate.getClass().getName(), execution);
-            }
-            if (context.shouldLeave()) {
-                leave(execution);
             }
 
         } else {
@@ -165,7 +160,49 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                 leave(execution);
             }
         }
+    }
 
+    @Override
+    public void trigger(Context context) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (triggerable && futureJavaDelegate instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                        "Triggering service task with java class " + futureJavaDelegate.getClass().getName(), context.getExecution());
+            }
+            triggerableJavaDelegate.trigger(context);
+
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                        "Triggered service task with java class " + futureJavaDelegate.getClass().getName(), context.getExecution());
+            }
+
+        } else if (triggerable && futureJavaDelegate instanceof TriggerableActivityBehavior) {
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                        "Triggering service task with java class " + futureJavaDelegate.getClass().getName(), context.getExecution());
+            }
+
+            ((TriggerableActivityBehavior) futureJavaDelegate).trigger(context.getExecution(), context.getSignalName(), context.getSignalData());
+
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                        "Triggered service task with java class " + futureJavaDelegate.getClass().getName(), context.getExecution());
+            }
+
+        } else {
+            if (processEngineConfiguration.isLoggingSessionEnabled()) {
+                if (!triggerable) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
+                            "Service task with java class triggered but not triggerable " + futureJavaDelegate.getClass().getName(), context.getExecution());
+                } else {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
+                            "Service task with java class triggered but not implementing TriggerableActivityBehavior " + futureJavaDelegate.getClass()
+                                    .getName(), context.getExecution());
+                }
+            }
+        }
     }
 
     protected void handleException(Throwable throwable, DelegateExecution execution, boolean loggingSessionEnabled) {
