@@ -5,5 +5,3 @@ drop table ACT_DMN_HI_DECISION_EXECUTION;
 drop table ACT_DMN_DECISION;
 drop table ACT_DMN_DEPLOYMENT_RESOURCE;
 drop table ACT_DMN_DEPLOYMENT;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'dmn.schema.version';

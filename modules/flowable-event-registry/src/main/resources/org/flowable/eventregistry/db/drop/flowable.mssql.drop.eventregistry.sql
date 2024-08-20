@@ -5,5 +5,3 @@ if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = '
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'FLW_EVENT_DEFINITION') drop table FLW_EVENT_DEFINITION;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'FLW_EVENT_RESOURCE') drop table FLW_EVENT_RESOURCE;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'FLW_EVENT_DEPLOYMENT') drop table FLW_EVENT_DEPLOYMENT;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'eventregistry.schema.version';

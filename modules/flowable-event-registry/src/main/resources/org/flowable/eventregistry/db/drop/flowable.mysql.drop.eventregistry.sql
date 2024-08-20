@@ -5,5 +5,3 @@ drop table if exists FLW_CHANNEL_DEFINITION;
 drop table if exists FLW_EVENT_DEFINITION;
 drop table if exists FLW_EVENT_RESOURCE;
 drop table if exists FLW_EVENT_DEPLOYMENT;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'eventregistry.schema.version';

@@ -8,5 +8,3 @@ drop table ACT_CMMN_RU_CASE_INST cascade;
 drop table ACT_CMMN_CASEDEF cascade;
 drop table ACT_CMMN_DEPLOYMENT_RESOURCE cascade;
 drop table ACT_CMMN_DEPLOYMENT cascade;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'cmmn.schema.version';

@@ -5,5 +5,3 @@ drop table if exists ACT_APP_DEPLOYMENT cascade constraints;
 drop index if exists ACT_IDX_APP_RSRC_DPL;
 drop index if exists ACT_IDX_APP_DEF_DPLY;
 drop index if exists ACT_IDX_APP_DEF_UNIQ;
-
-delete from ACT_GE_PROPERTY where NAME_ = 'app.schema.version';
