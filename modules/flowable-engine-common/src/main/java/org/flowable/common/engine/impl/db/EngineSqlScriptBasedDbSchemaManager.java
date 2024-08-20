@@ -109,13 +109,11 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     }
 
     protected void dbSchemaCreateEngine() {
-        System.out.println("!!!!!!!!!!! schemaCreate " + getContext());
         executeMandatorySchemaResource("create", context);
     }
 
     @Override
     public void schemaDrop() {
-        System.out.println("!!!!!!!!!!! schemaDrop " + getContext());
         try {
             executeMandatorySchemaResource("drop", context);
 
@@ -127,8 +125,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
 
     @Override
     public String schemaUpdate() {
-    	System.out.println("!!!!!!!!!!! schemaUpdate " + getContext());
-        PropertyEntity dbVersionProperty = null;
+    	PropertyEntity dbVersionProperty = null;
         String feedback = null;
         boolean isUpgradeNeeded = false;
         int matchingVersionIndex = -1;
