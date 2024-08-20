@@ -248,7 +248,8 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         String sqlStatement = null;
         String exceptionSqlStatement = null;
         DbSqlSession dbSqlSession = getDbSqlSession();
-        try (Connection connection = dbSqlSession.getSqlSession().getConnection();) {
+        try {
+            Connection connection = dbSqlSession.getSqlSession().getConnection();
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
             String ddlStatements = new String(bytes, StandardCharsets.UTF_8);
