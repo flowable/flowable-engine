@@ -591,7 +591,9 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             xtw.writeAttribute(ATTRIBUTE_ID, subProcess.getId());
             if (StringUtils.isNotEmpty(subProcess.getName())) {
-                xtw.writeAttribute(ATTRIBUTE_NAME, subProcess.getName());
+                if (!(options.isSaveElementNameWithNewLineInExtensionElement() && BpmnXMLUtil.containsNewLine(subProcess.getName()))) {
+                    xtw.writeAttribute(ATTRIBUTE_NAME, subProcess.getName());
+                }
             } else {
                 xtw.writeAttribute(ATTRIBUTE_NAME, "subProcess");
             }
@@ -629,7 +631,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             boolean didWriteExtensionStartElement = FlowableListenerExport.writeListeners(subProcess, false, xtw);
 
-            if (options.getSaveElementNameWithNewLineInExtensionElement()) {
+            if (options.isSaveElementNameWithNewLineInExtensionElement()) {
                 didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(subProcess, didWriteExtensionStartElement, xtw);
             }
 
