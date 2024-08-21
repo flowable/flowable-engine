@@ -14,7 +14,7 @@ package org.flowable.bpmn.converter;
 
 public class BpmnXMLConverterOptions {
 
-    boolean saveElementNameWithNewLineInExtensionElement = false;
+    protected boolean saveElementNameWithNewLineInExtensionElement = false;
 
     public boolean isSaveElementNameWithNewLineInExtensionElement() {
         return saveElementNameWithNewLineInExtensionElement;

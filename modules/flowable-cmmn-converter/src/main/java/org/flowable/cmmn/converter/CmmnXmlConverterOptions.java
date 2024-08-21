@@ -14,7 +14,7 @@ package org.flowable.cmmn.converter;
 
 public class CmmnXmlConverterOptions {
 
-    boolean saveElementNameWithNewLineInExtensionElement = false;
+    protected boolean saveElementNameWithNewLineInExtensionElement = false;
 
     public boolean isSaveElementNameWithNewLineInExtensionElement() {
         return saveElementNameWithNewLineInExtensionElement;
