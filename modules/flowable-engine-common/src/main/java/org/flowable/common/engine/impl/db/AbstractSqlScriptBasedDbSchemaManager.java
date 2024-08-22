@@ -318,12 +318,10 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length() - 1));
                         }
 
-                        Statement jdbcStatement = connection.createStatement();
-                        try {
+                        try (Statement jdbcStatement = connection.createStatement();) {
 
                             logger.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
-                            jdbcStatement.close();
                             
                         } catch (Exception e) {
                             if (exception == null) {
