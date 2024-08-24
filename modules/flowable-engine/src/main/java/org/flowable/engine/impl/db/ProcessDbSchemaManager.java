@@ -262,27 +262,6 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
     }
 
-    protected boolean isMissingTablesException(Exception e) {
-        String exceptionMessage = e.getMessage();
-        if (e.getMessage() != null) {
-            // Matches message returned from H2
-            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
-                return true;
-            }
-
-            // Message returned from MySQL and Oracle
-            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
-                return true;
-            }
-
-            // Message returned from Postgres
-            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     protected ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return CommandContextUtil.getProcessEngineConfiguration();
     }
