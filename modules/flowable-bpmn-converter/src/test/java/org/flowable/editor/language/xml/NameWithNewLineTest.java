@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.ATTRIBUTE_ELEMENT_NAME;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;

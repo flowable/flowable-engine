@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 
@@ -46,8 +47,8 @@ public class CaseTaskExport extends AbstractChildTaskExport<CaseTask> {
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, CaseTask caseTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, caseTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, CaseTask caseTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, caseTask, xtw, options);
 
         // Always export the case reference as an expression, even if the caseRef is set
         if (StringUtils.isNotEmpty(caseTask.getCaseRef()) || StringUtils.isNotEmpty(caseTask.getCaseRefExpression())) {

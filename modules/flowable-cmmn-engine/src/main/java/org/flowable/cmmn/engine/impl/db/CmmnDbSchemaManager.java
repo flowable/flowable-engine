@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
 import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 
 public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
@@ -48,7 +48,7 @@ public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     );
 
     public CmmnDbSchemaManager() {
-        super("cmmn");
+        super("cmmn", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getCmmnEngineConfiguration));
     }
 
     @Override
@@ -75,11 +75,6 @@ public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_CMMN_DATABASECHANGELOG";
     }
-    
-    @Override
-    protected String getChangeLogTablePrefixName() {
-        return "ACT_CMMN";
-    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -87,11 +82,6 @@ public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "6.1.2.0";
-    }
-
-    @Override
-    protected AbstractEngineConfiguration getEngineConfiguration() {
-        return CommandContextUtil.getCmmnEngineConfiguration();
     }
 
     @Override

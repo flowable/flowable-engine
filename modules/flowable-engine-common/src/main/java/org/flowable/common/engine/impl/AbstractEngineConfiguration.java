@@ -87,6 +87,8 @@ import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManagerDatabaseConfiguration;
+import org.flowable.common.engine.impl.db.SchemaManagerDatabaseConfigurationSessionFactory;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
@@ -122,6 +124,7 @@ import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisByteA
 import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.util.DbUtil;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
@@ -382,38 +385,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
 
     public static Properties getDefaultDatabaseTypeMappings() {
-        Properties databaseTypeMappings = new Properties();
-        databaseTypeMappings.setProperty("H2", DATABASE_TYPE_H2);
-        databaseTypeMappings.setProperty("HSQL Database Engine", DATABASE_TYPE_HSQL);
-        databaseTypeMappings.setProperty("MySQL", DATABASE_TYPE_MYSQL);
-        databaseTypeMappings.setProperty("MariaDB", DATABASE_TYPE_MYSQL);
-        databaseTypeMappings.setProperty("Oracle", DATABASE_TYPE_ORACLE);
-        databaseTypeMappings.setProperty(PRODUCT_NAME_POSTGRES, DATABASE_TYPE_POSTGRES);
-        databaseTypeMappings.setProperty("Microsoft SQL Server", DATABASE_TYPE_MSSQL);
-        databaseTypeMappings.setProperty(DATABASE_TYPE_DB2, DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/NT", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/NT64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDP", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUX390", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXX8664", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXZ64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXPPC64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXPPC64LE", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/400 SQL", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/6000", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDB iSeries", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/AIX64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/HPUX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/HP64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/SUN", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/SUN64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/PTX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
-        return databaseTypeMappings;
+        return DbUtil.getDefaultDatabaseTypeMappings();
     }
 
     protected Map<Object, Object> beans;
@@ -498,46 +470,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public void initDatabaseType() {
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
-            String databaseProductName = databaseMetaData.getDatabaseProductName();
-            logger.debug("database product name: '{}'", databaseProductName);
-
-            // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
-            if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
-                        ResultSet resultSet = preparedStatement.executeQuery()) {
-                    String version = null;
-                    if (resultSet.next()) {
-                        version = resultSet.getString("version");
-                    }
-
-                    if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
-                        databaseProductName = PRODUCT_NAME_CRDB;
-                        logger.info("CockroachDB version '{}' detected", version);
-                    }
-                }
-            }
-
-            databaseType = databaseTypeMappings.getProperty(databaseProductName);
-            if (databaseType == null) {
-                throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
-            }
-            logger.debug("using database type: {}", databaseType);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Exception while initializing Database connection", e);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception while closing the Database connection", e);
-            }
-        }
+        databaseType = DbUtil.determineDatabaseType(dataSource, logger, databaseTypeMappings);
 
         // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
         // Especially with executions, with 100 as default, this limit is passed.
@@ -765,6 +698,7 @@ public abstract class AbstractEngineConfiguration {
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
+                initSchemaManagerDatabaseConfigurationSessionFactory();
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
@@ -809,6 +743,12 @@ public abstract class AbstractEngineConfiguration {
         initDbSqlSessionFactoryEntitySettings();
 
         addSessionFactory(dbSqlSessionFactory);
+    }
+
+    protected void initSchemaManagerDatabaseConfigurationSessionFactory() {
+        if (!sessionFactories.containsKey(SchemaManagerDatabaseConfiguration.class)) {
+            addSessionFactory(new SchemaManagerDatabaseConfigurationSessionFactory());
+        }
     }
 
     public DbSqlSessionFactory createDbSqlSessionFactory() {

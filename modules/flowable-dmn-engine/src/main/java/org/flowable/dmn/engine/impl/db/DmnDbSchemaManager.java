@@ -16,7 +16,7 @@ package org.flowable.dmn.engine.impl.db;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
 import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
@@ -39,7 +39,7 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     );
 
     public DmnDbSchemaManager() {
-        super("dmn");
+        super("dmn", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getDmnEngineConfiguration));
     }
 
     @Override
@@ -66,11 +66,6 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_DMN_DATABASECHANGELOG";
     }
-    
-    @Override
-    protected String getChangeLogTablePrefixName() {
-        return "ACT_DMN";
-    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -78,11 +73,6 @@ public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "5.99.0.0";
-    }
-
-    @Override
-    protected AbstractEngineConfiguration getEngineConfiguration() {
-        return CommandContextUtil.getDmnEngineConfiguration();
     }
 
     @Override

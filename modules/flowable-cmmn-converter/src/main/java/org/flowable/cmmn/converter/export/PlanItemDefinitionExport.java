@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.api.FlowableException;
@@ -51,12 +52,12 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         planItemDefinitionExporters.put(exporter.getExportablePlanItemDefinitionClass().getCanonicalName(), exporter);
     }
 
-    public static void writePlanItemDefinition(CmmnModel model, PlanItemDefinition planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    public static void writePlanItemDefinition(CmmnModel model, PlanItemDefinition planItemDefinition, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
         AbstractPlanItemDefinitionExport exporter = determineExporter(planItemDefinition);
         if (exporter == null) {
             throw new FlowableException("Cannot find a PlanItemDefinitionExporter for '" + planItemDefinition.getClass().getCanonicalName() + "'");
         }
-        exporter.writePlanItemDefinition(model, planItemDefinition, xtw);
+        exporter.writePlanItemDefinition(model, planItemDefinition, xtw, options);
     }
 
     protected static AbstractPlanItemDefinitionExport determineExporter(PlanItemDefinition planItemDefinition) {
