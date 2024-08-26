@@ -198,12 +198,15 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
                 changeLogTableName = prependDatabaseTablePrefix(changeLogTableName);
             }
             try (PreparedStatement statement = databaseConfiguration.getConnection()
-                    .prepareStatement("select ID from " + changeLogTableName + " order by DATEEXECUTED desc")) {
+                    .prepareStatement("select ID from " + changeLogTableName + " order by DATEEXECUTED")) {
+                String changeLogVersion = null;
                 try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        String changeLogVersion = resultSet.getString(1);
-                        return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
+                    while (resultSet.next()) {
+                        changeLogVersion = resultSet.getString(1);
                     }
+                }
+                if (changeLogVersion != null) {
+                    return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
                 }
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to get change log version from " + changeLogTableName, e);
