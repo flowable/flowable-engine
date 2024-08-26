@@ -31,12 +31,18 @@ public class XmlTestUtils {
     }
 
     public static BpmnModel exportAndReadXMLFile(BpmnModel model) {
-        byte[] xml = new BpmnXMLConverter().convertToXML(model);
-        return new BpmnXMLConverter().convertToBpmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
+        byte[] xml = getBpmnXMLConverter().convertToXML(model);
+        return getBpmnXMLConverter().convertToBpmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }
 
     public static BpmnModel readXMLFile(String resource) {
-        return new BpmnXMLConverter().convertToBpmnModel(new ClasspathStreamResource(resource), true, false);
+        return getBpmnXMLConverter().convertToBpmnModel(new ClasspathStreamResource(resource), true, false);
+    }
+
+    private static BpmnXMLConverter getBpmnXMLConverter() {
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        converter.getBpmnXmlConverterOptions().setSaveElementNameWithNewLineInExtensionElement(true);
+        return converter;
     }
 
     protected static class ClasspathStreamResource implements InputStreamProvider {

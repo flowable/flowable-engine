@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
 
@@ -43,8 +44,8 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport<Decisio
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, decisionTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, DecisionTask decisionTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, decisionTask, xtw, options);
         if (StringUtils.isNotEmpty(decisionTask.getDecisionRef()) || StringUtils.isNotEmpty(decisionTask.getDecisionRefExpression())) {
             xtw.writeStartElement(ELEMENT_DECISION_REF_EXPRESSION);
             xtw.writeCData(
