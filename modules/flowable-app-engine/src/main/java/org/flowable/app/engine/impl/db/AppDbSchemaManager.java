@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
 import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 
 public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
@@ -31,7 +31,7 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     );
 
     public AppDbSchemaManager() {
-        super("app");
+        super("app", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getAppEngineConfiguration));
     }
 
     @Override
@@ -58,11 +58,6 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     protected String getChangeLogTableName() {
         return "ACT_APP_DATABASECHANGELOG";
     }
-    
-    @Override
-    protected String getChangeLogTablePrefixName() {
-        return "ACT_APP";
-    }
 
     @Override
     protected String getDbVersionForChangelogVersion(String changeLogVersion) {
@@ -72,10 +67,6 @@ public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
         return "6.3.0.1";
     }
 
-    @Override
-    protected AbstractEngineConfiguration getEngineConfiguration() {
-        return CommandContextUtil.getAppEngineConfiguration();
-    }
     @Override
     protected String getResourcesRootDirectory() {
         return "org/flowable/app/db/";

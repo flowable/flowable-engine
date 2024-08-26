@@ -36,6 +36,8 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegateContextImpl;
 import org.flowable.engine.impl.delegate.invocation.DelegateInvocation;
 import org.flowable.engine.impl.delegate.invocation.FutureJavaDelegateInvocation;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
@@ -79,6 +81,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean loggingSessionEnabled = processEngineConfiguration.isLoggingSessionEnabled();
+        TriggerableJavaDelegateContextImpl triggerableJavaDelegateContext = null;
         try {
             if (triggerable && delegate instanceof TriggerableActivityBehavior) {
                 if (loggingSessionEnabled) {
@@ -92,7 +95,17 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                     BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
                             "Triggered service task with delegate " + delegate, execution);
                 }
-
+            } else if (triggerable && delegate instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_BEFORE_TRIGGER,
+                            "Triggering service task with java delegate " + delegate, execution);
+                }
+                triggerableJavaDelegateContext = new TriggerableJavaDelegateContextImpl(execution, signalName, signalData);
+                triggerableJavaDelegate.trigger(triggerableJavaDelegateContext);
+                if (loggingSessionEnabled) {
+                    BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_AFTER_TRIGGER,
+                            "Triggered service task with java delegate " + delegate, execution);
+                }
             } else if (loggingSessionEnabled) {
                 if (!triggerable) {
                     BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_WRONG_TRIGGER,
@@ -103,7 +116,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                 }
 
             }
-            leave(execution);
+
+            if (triggerableJavaDelegateContext == null || triggerableJavaDelegateContext.shouldLeave()) {
+                leave(execution);
+            }
         } catch (Exception exc) {
             handleException(exc, execution, loggingSessionEnabled);
         }

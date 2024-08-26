@@ -1252,6 +1252,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
+                initSchemaManagerDatabaseConfigurationSessionFactory();
             }
 
             if (agendaFactory != null) {

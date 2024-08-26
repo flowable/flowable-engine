@@ -12,22 +12,23 @@
  */
 package org.flowable.common.engine.impl.db;
 
-import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableWrongDbException;
 import org.flowable.common.engine.api.lock.LockManager;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.FlowableVersions;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
-import org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl;
 
 public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager {
 
     protected final String context;
+    protected final SchemaManagerLockConfiguration lockConfiguration;
 
-    protected EngineSqlScriptBasedDbSchemaManager(String context) {
+    protected EngineSqlScriptBasedDbSchemaManager(String context, SchemaManagerLockConfiguration lockConfiguration) {
         this.context = context;
+        this.lockConfiguration = lockConfiguration;
     }
 
     protected abstract String getEngineVersion();
@@ -39,12 +40,8 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     protected abstract String getEngineTableName();
 
     protected abstract String getChangeLogTableName();
-    
-    protected abstract String getChangeLogTablePrefixName();
 
     protected abstract String getDbVersionForChangelogVersion(String changeLogVersion);
-
-    protected abstract AbstractEngineConfiguration getEngineConfiguration();
 
     @Override
     public void schemaCheckVersion() {
@@ -84,10 +81,9 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     @Override
     public void schemaCreate() {
 
-        AbstractEngineConfiguration engineConfiguration = getEngineConfiguration();
-        if (engineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = engineConfiguration.getLockManager(getDbSchemaLockName());
-            lockManager.waitForLockRunAndRelease(engineConfiguration.getSchemaLockWaitTime(), () -> {
+        if (lockConfiguration.isUseLockForDatabaseSchemaUpdate()) {
+            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName());
+            lockManager.waitForLockRunAndRelease(lockConfiguration.getSchemaLockWaitTime(), () -> {
                 schemaCreateInLock();
                 return null;
             });
@@ -126,60 +122,48 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
 
     @Override
     public String schemaUpdate() {
+        if (lockConfiguration.isUseLockForDatabaseSchemaUpdate()) {
+            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName());
+            return lockManager.waitForLockRunAndRelease(lockConfiguration.getSchemaLockWaitTime(), this::schemaUpdateInLock);
+        } else {
+            return schemaUpdateInLock();
+        }
+    }
 
-        PropertyEntity dbVersionProperty = null;
+    protected String schemaUpdateInLock() {
         String feedback = null;
         boolean isUpgradeNeeded = false;
         int matchingVersionIndex = -1;
 
-        DbSqlSession dbSqlSession = getDbSqlSession();
         boolean isEngineTablePresent = isEngineTablePresent();
 
         ChangeLogVersion changeLogVersion = null;
         String dbVersion = null;
         if (isEngineTablePresent) {
-            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, getSchemaVersionPropertyName());
-            if (dbVersionProperty != null) {
-                dbVersion = dbVersionProperty.getValue();
-            } else {
+            dbVersion = getDbVersion();
+            if (dbVersion == null) {
                 changeLogVersion = getChangeLogVersion();
                 dbVersion = changeLogVersion.dbVersion();
             }
         }
 
-        AbstractEngineConfiguration engineConfiguration = getEngineConfiguration();
-        LockManager lockManager;
-        if (engineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            lockManager = engineConfiguration.getLockManager(getDbSchemaLockName());
-            lockManager.waitForLock(engineConfiguration.getSchemaLockWaitTime());
-        } else {
-            lockManager = null;
+        if (isEngineTablePresent) {
+            matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(dbVersion);
+            isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
         }
 
-        try {
-            if (isEngineTablePresent) {
-                matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(dbVersion);
-                isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
-            }
+        if (isUpgradeNeeded) {
+            // Engine upgrade
+            dbSchemaUpgrade(context, matchingVersionIndex, dbVersion);
+            dbSchemaUpgraded(changeLogVersion);
 
-            if (isUpgradeNeeded) {
-                // Engine upgrade
-                dbSchemaUpgrade(context, matchingVersionIndex, dbVersion);
-                dbSchemaUpgraded(changeLogVersion);
+            feedback = "upgraded Flowable from " + dbVersion + " to " + getEngineVersion();
 
-                feedback = "upgraded Flowable from " + dbVersion + " to " + getEngineVersion();
-
-            } else if (!isEngineTablePresent) {
-                dbSchemaCreateEngine();
-            }
-
-            return feedback;
-            
-        } finally {
-            if (lockManager != null) {
-                lockManager.releaseLock();
-            }
+        } else if (!isEngineTablePresent) {
+            dbSchemaCreateEngine();
         }
+
+        return feedback;
     }
 
     @Override
@@ -203,46 +187,33 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     }
 
     protected String getDbVersion() {
-        DbSqlSession dbSqlSession = getDbSqlSession();
-        String selectSchemaVersionStatement = dbSqlSession.getDbSqlSessionFactory()
-                .mapStatement("org.flowable.common.engine.impl.persistence.entity.PropertyEntityImpl.selectPropertyValue");
-        return dbSqlSession.getSqlSession().selectOne(selectSchemaVersionStatement, getSchemaVersionPropertyName());
+        return getProperty(getSchemaVersionPropertyName(), false);
     }
 
     protected ChangeLogVersion getChangeLogVersion() {
         String changeLogTableName = getChangeLogTableName();
         if (changeLogTableName != null && isTablePresent(changeLogTableName)) {
-            DbSqlSession dbSqlSession = getDbSqlSession();
-            String selectChangeLogVersionsStatement = dbSqlSession.getDbSqlSessionFactory().mapStatement("org.flowable.common.engine.impl.persistence.change.ChangeLog.selectFlowableChangeLogVersions");
-            List<String> changeLogIds = dbSqlSession.getSqlSession().selectList(selectChangeLogVersionsStatement, getChangeLogTablePrefixName());
-            if (changeLogIds != null && !changeLogIds.isEmpty()) {
-                String changeLogVersion = changeLogIds.get(changeLogIds.size() - 1);
-                return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
+            SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
+            if (!databaseConfiguration.isTablePrefixIsSchema()) {
+                changeLogTableName = prependDatabaseTablePrefix(changeLogTableName);
+            }
+            try (PreparedStatement statement = databaseConfiguration.getConnection()
+                    .prepareStatement("select ID from " + changeLogTableName + " order by DATEEXECUTED")) {
+                String changeLogVersion = null;
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        changeLogVersion = resultSet.getString(1);
+                    }
+                }
+                if (changeLogVersion != null) {
+                    return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to get change log version from " + changeLogTableName, e);
             }
         }
 
         return new ChangeLogVersion(null, getDbVersionForChangelogVersion(null));
-    }
-
-    protected boolean isMissingTablesException(Exception e) {
-        String exceptionMessage = e.getMessage();
-        if (e.getMessage() != null) {
-            // Matches message returned from H2
-            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
-                return true;
-            }
-
-            // Message returned from MySQL and Oracle
-            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
-                return true;
-            }
-
-            // Message returned from Postgres
-            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public record ChangeLogVersion(String version, String dbVersion) {
