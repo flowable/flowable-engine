@@ -202,7 +202,7 @@ public class DmnRestResponseFactory {
         response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
         return response;
     }
-
+    
     public List<HistoricDecisionExecutionResponse> createHistoricDecisionExecutionResponseList(List<DmnHistoricDecisionExecution> historicDecisionExecutions) {
         DmnRestUrlBuilder urlBuilder = createUrlBuilder();
         List<HistoricDecisionExecutionResponse> responseList = new ArrayList<>(historicDecisionExecutions.size());
@@ -211,11 +211,11 @@ public class DmnRestResponseFactory {
         }
         return responseList;
     }
-
+    
     public HistoricDecisionExecutionResponse createHistoryDecisionExecutionResponse(DmnHistoricDecisionExecution execution) {
         return createHistoryDecisionExecutionResponse(execution, createUrlBuilder());
     }
-
+    
     public HistoricDecisionExecutionResponse createHistoryDecisionExecutionResponse(DmnHistoricDecisionExecution execution, DmnRestUrlBuilder urlBuilder) {
         HistoricDecisionExecutionResponse response = new HistoricDecisionExecutionResponse(execution);
         response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION, execution.getId()));

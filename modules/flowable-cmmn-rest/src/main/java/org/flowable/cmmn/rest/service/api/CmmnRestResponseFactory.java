@@ -244,7 +244,7 @@ public class CmmnRestResponseFactory {
         }
         return response;
     }
-
+    
     public String getFormModelString(FormModelResponse formModelResponse) {
         try {
             return objectMapper.writeValueAsString(formModelResponse);
@@ -576,7 +576,7 @@ public class CmmnRestResponseFactory {
 
         return result;
     }
-
+    
     public List<VariableInstanceResponse> createVariableInstanceResponseList(List<VariableInstance> variableInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<VariableInstanceResponse> responseList = new ArrayList<>(variableInstances.size());
@@ -612,7 +612,7 @@ public class CmmnRestResponseFactory {
                         urlBuilder));
         return result;
     }
-
+    
     public List<EventSubscriptionResponse> createEventSubscriptionResponseList(List<EventSubscription> eventSubscriptions) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<EventSubscriptionResponse> responseList = new ArrayList<>(eventSubscriptions.size());
@@ -958,7 +958,7 @@ public class CmmnRestResponseFactory {
 
         return formDefinitionResponse;
     }
-
+    
     public List<JobResponse> createJobResponseList(List<Job> jobs) {
         return createJobResponseList(jobs, CmmnRestUrls.URL_JOB);
     }
@@ -983,11 +983,11 @@ public class CmmnRestResponseFactory {
         }
         return responseList;
     }
-
+    
     public JobResponse createJobResponse(Job job) {
         return createJobResponse(job, createUrlBuilder(), CmmnRestUrls.URL_JOB);
     }
-
+    
     public JobResponse createTimerJobResponse(Job job) {
         return createJobResponse(job, createUrlBuilder(), CmmnRestUrls.URL_TIMER_JOB);
     }

@@ -1,9 +1,11 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,11 +119,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
- *
+ * 
  * Added a new "createProcessInstanceResponse" method (with a different signature) to conditionally return the process variables that exist within the process instance when the first wait state is
  * encountered (or when the process instance completes). Also added the population of a "completed" flag - within both the original "createProcessInstanceResponse" method and the new one with the
  * different signature - to let the caller know whether the process instance has completed or not.
- *
+ * 
  * @author Frederik Heremans
  * @author Ryan Johnston (@rjfsu)
  */
@@ -277,7 +279,7 @@ public class RestResponseFactory {
         }
         return response;
     }
-
+    
     public String getFormModelString(FormModelResponse formModelResponse) {
         try {
             return objectMapper.writeValueAsString(formModelResponse);
@@ -685,7 +687,7 @@ public class RestResponseFactory {
         }
         return result;
     }
-
+    
     public List<ActivityInstanceResponse> createActivityInstanceResponseList(List<ActivityInstance> activityInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<ActivityInstanceResponse> responseList = new ArrayList<>(activityInstances.size());
@@ -719,7 +721,7 @@ public class RestResponseFactory {
         result.setTenantId(activityInstance.getTenantId());
         return result;
     }
-
+    
     public List<VariableInstanceResponse> createVariableInstanceResponseList(List<VariableInstance> variableInstances) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<VariableInstanceResponse> responseList = new ArrayList<>(variableInstances.size());
@@ -1220,7 +1222,7 @@ public class RestResponseFactory {
 
         return response;
     }
-
+    
     public List<BatchResponse> createBatchResponse(List<Batch> batches) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<BatchResponse> responseList = new ArrayList<>(batches.size());
@@ -1249,7 +1251,7 @@ public class RestResponseFactory {
 
         return response;
     }
-
+    
     public List<BatchPartResponse> createBatchPartResponse(List<BatchPart> batchParts) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<BatchPartResponse> responseList = new ArrayList<>(batchParts.size());
@@ -1357,7 +1359,7 @@ public class RestResponseFactory {
         response.setEmail(user.getEmail());
         response.setUrl(urlBuilder.buildUrl(RestUrls.URL_USER, user.getId()));
         response.setTenantId(user.getTenantId());
-
+        
         if (incudePassword) {
             response.setPassword(user.getPassword());
         }
