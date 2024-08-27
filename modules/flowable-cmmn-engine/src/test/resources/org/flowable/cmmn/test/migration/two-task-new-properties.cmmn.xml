@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="Two Task Test Case" flowable:initiatorVariableName="initiator"
+          flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="Task 1" definitionRef="humanTask1"/>
+            <planItem id="planItem2" name="Task 3" definitionRef="humanTask2"/>
+            <humanTask id="humanTask1" name="Task 2" flowable:formKey="myForm" flowable:category="myCategory">
+                <documentation>Example description</documentation>
+            </humanTask>
+            <humanTask id="humanTask2" name="Task 3" flowable:formKey="myForm2" flowable:category="myCategory2">
+                <documentation>Example description2</documentation>
+            </humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

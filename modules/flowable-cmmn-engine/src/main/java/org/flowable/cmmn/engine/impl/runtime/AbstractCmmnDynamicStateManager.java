@@ -134,7 +134,7 @@ public abstract class AbstractCmmnDynamicStateManager {
         
         executeChangePlanItemIds(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
         
-        navigatePlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo());
+        navigatePlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo(), originalCaseDefinitionId);
         
         // Set the case variables first so they are available during the change state logic
         caseInstance.setVariables(caseInstanceChangeState.getCaseVariables());
@@ -755,9 +755,11 @@ public abstract class AbstractCmmnDynamicStateManager {
         }
     }
     
-    protected void navigatePlanItemInstances(Map<String, List<PlanItemInstanceEntity>> stagesByPlanItemDefinitionId, CaseDefinition caseDefinition) {
+    protected void navigatePlanItemInstances(Map<String, List<PlanItemInstanceEntity>> stagesByPlanItemDefinitionId, CaseDefinition caseDefinition, String originalCaseDefinitionId) {
         if (caseDefinition != null) {
             TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
+            CmmnModel originalCmmnModel = CaseDefinitionUtil.getCmmnModel(originalCaseDefinitionId);
+            CmmnModel targetCmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
             for (List<PlanItemInstanceEntity> planItemInstances : stagesByPlanItemDefinitionId.values()) {
                 for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
                     
@@ -768,6 +770,31 @@ public abstract class AbstractCmmnDynamicStateManager {
                                 .subScopeId(planItemInstance.getId()).scopeType(ScopeTypes.CMMN).singleResult();
                         if (task != null) {
                             task.setScopeDefinitionId(caseDefinition.getId());
+                            PlanItemDefinition originalTaskDef = originalCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
+                            PlanItemDefinition targetTaskDef = targetCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
+                            if (originalTaskDef != null && targetTaskDef != null && originalTaskDef instanceof HumanTask && targetTaskDef instanceof HumanTask) {
+                                HumanTask originalHumanTask = (HumanTask) originalTaskDef;
+                                HumanTask targetHumanTask = (HumanTask) targetTaskDef;
+
+                                if (taskPropertyValueIsDifferent(originalHumanTask.getName(), targetHumanTask.getName())) {
+                                    task.setName(targetHumanTask.getName());
+                                }
+
+                                if (taskPropertyValueIsDifferent(originalHumanTask.getFormKey(), targetHumanTask.getFormKey())) {
+                                    task.setFormKey(targetHumanTask.getFormKey());
+                                }
+
+                                if (taskPropertyValueIsDifferent(originalHumanTask.getCategory(), targetHumanTask.getCategory())) {
+                                    task.setCategory(targetHumanTask.getCategory());
+                                }
+
+                                if (taskPropertyValueIsDifferent(originalHumanTask.getDocumentation(), targetHumanTask.getDocumentation())) {
+                                    task.setDescription(targetHumanTask.getDocumentation());
+                                }
+                            }
+
+                            CmmnHistoryManager cmmnHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
+                            cmmnHistoryManager.recordTaskInfoChange(task, cmmnEngineConfiguration.getClock().getCurrentTime());
                         }
                     }
                 }
@@ -1204,4 +1231,8 @@ public abstract class AbstractCmmnDynamicStateManager {
         return caseDefinitionIdToMigrateTo;
     }
 
+    protected boolean taskPropertyValueIsDifferent(String originalValue, String targetValue) {
+        return (StringUtils.isNotEmpty(originalValue) && !originalValue.equals(targetValue)) ||
+                (StringUtils.isEmpty(originalValue) && StringUtils.isNotEmpty(targetValue));
+    }
 }
