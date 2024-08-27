@@ -68,6 +68,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.common.rest.variable.UUIDRestVariableConverter;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.form.api.FormDefinition;
@@ -1093,6 +1094,7 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new InstantRestVariableConverter());
         variableConverters.add(new LocalDateRestVariableConverter());
         variableConverters.add(new LocalDateTimeRestVariableConverter());
+        variableConverters.add(new UUIDRestVariableConverter());
         variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 
