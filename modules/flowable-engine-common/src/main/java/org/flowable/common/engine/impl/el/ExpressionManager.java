@@ -33,7 +33,7 @@ public interface ExpressionManager {
      * Expression are resolved against a {@link VariableContainer} (e.g. a process Execution, a case instance plan item, etc.)
      */
     Expression createExpression(String expression);
-
+    
     /**
      * Creates an {@link ELContext} against which {@link Expression} instance can be resolved.
      */

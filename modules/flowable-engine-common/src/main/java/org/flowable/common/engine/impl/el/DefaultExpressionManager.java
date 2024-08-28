@@ -70,14 +70,14 @@ public class DefaultExpressionManager implements ExpressionManager {
 
     @Override
     public Expression createExpression(String text) {
-
+        
         if (isCacheEnabled(text)) {
             Expression cachedExpression = expressionCache.get(text);
             if (cachedExpression != null) {
                 return cachedExpression;
             }
         }
-
+        
         if (parsingElContext == null) {
             this.parsingElContext = new ParsingElContext(functionResolver);
         } else if (parsingElContext.getFunctionMapper() != null && parsingElContext.getFunctionMapper() instanceof FlowableFunctionMapper) {
@@ -85,14 +85,14 @@ public class DefaultExpressionManager implements ExpressionManager {
         }
 
         String expressionText = text.trim();
-
+        
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expressionText, Object.class);
         Expression expression = createJuelExpression(text, valueExpression);
-
+        
         if (isCacheEnabled(text)) {
             expressionCache.add(text, expression);
         }
-
+        
         return expression;
     }
 
@@ -107,7 +107,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     public void setExpressionFactory(ExpressionFactory expressionFactory) {
         this.expressionFactory = expressionFactory;
     }
-
+    
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
         ELResolver elResolver = getOrCreateStaticElResolver();

@@ -52,7 +52,7 @@ public class ConditionUtil {
 
     }
 
-	public static boolean hasTrueCondition(String id, String conditionExpression, String conditionLanguage, DelegateExecution execution) {
+	public static boolean hasTrueCondition(String elementId, String conditionExpression, String conditionLanguage, DelegateExecution execution) {
 		Condition condition;
 		if (conditionLanguage == null) {
 			Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
@@ -60,7 +60,7 @@ public class ConditionUtil {
 		} else {
 			condition = new ScriptCondition(conditionExpression, conditionLanguage);
 		}
-		return condition.evaluate(id, execution);
+		return condition.evaluate(elementId, execution);
 	}
 
     protected static String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
