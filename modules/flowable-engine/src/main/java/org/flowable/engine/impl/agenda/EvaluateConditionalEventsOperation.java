@@ -26,10 +26,12 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.debug.ExecutionTreeUtil;
+import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
@@ -92,12 +94,9 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                             boolean conditionIsTrue = false;
                             String conditionExpression = conditionalEventDefinition.getConditionExpression();
                             if (StringUtils.isNotEmpty(conditionExpression)) {
-                                String conditionLanguage = conditionalEventDefinition.getConditionLanguage();
-                                Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(conditionExpression, conditionLanguage);
-                                Object result = expression.getValue(parentExecution);
-                                if (result instanceof Boolean && (Boolean) result) {
-                                    conditionIsTrue = true;
-                                }
+	                            String conditionLanguage = conditionalEventDefinition.getConditionLanguage();
+	                            Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
+                                conditionIsTrue = condition.evaluate(startEvent.getId(), parentExecution);
                             
                             } else {
                                 conditionIsTrue = true;

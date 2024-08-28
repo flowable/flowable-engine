@@ -35,12 +35,6 @@ public interface ExpressionManager {
     Expression createExpression(String expression);
 
     /**
-     * Creates an {@link Expression} instance from the given String using the specified scripting language.
-     * Expression are resolved against a {@link VariableContainer} (e.g. a process Execution, a case instance plan item, etc.)
-     */
-    Expression createExpression(String expression, String expressionLanguage);
-
-    /**
      * Creates an {@link ELContext} against which {@link Expression} instance can be resolved.
      */
     ELContext getElContext(VariableContainer variableContainer);

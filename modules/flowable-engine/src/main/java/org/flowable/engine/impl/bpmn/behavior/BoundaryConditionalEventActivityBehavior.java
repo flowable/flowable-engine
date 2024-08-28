@@ -20,8 +20,10 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -61,9 +63,9 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression, conditionLanguage);
-        Object result = expression.getValue(execution);
-        if (result instanceof Boolean && (Boolean) result) {
+		Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
+		boolean result = condition.evaluate(executionEntity.getActivityId(), executionEntity);
+        if (result) {
             processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(executionEntity);
             
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();

@@ -12,18 +12,16 @@
  */
 package org.flowable.engine.impl.util.condition;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
-import org.flowable.engine.impl.el.UelExpressionCondition;
+import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -42,9 +40,7 @@ public class ConditionUtil {
         }
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
-
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression, conditionLanguage);
-            Condition condition = new UelExpressionCondition(expression);
+            Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
             return condition.evaluate(sequenceFlow.getId(), execution);
         } else {
             return true;
