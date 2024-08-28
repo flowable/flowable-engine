@@ -16,12 +16,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
+import org.flowable.engine.impl.el.UelExpressionCondition;
 import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -31,7 +36,6 @@ public class ConditionUtil {
 
     public static boolean hasTrueCondition(SequenceFlow sequenceFlow, DelegateExecution execution) {
         String conditionExpression = null;
-        String conditionLanguage = sequenceFlow.getConditionLanguage();
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode elementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(sequenceFlow.getId(), execution.getProcessDefinitionId());
             conditionExpression = getActiveValue(sequenceFlow.getConditionExpression(), DynamicBpmnConstants.SEQUENCE_FLOW_CONDITION, elementProperties);
@@ -40,13 +44,24 @@ public class ConditionUtil {
         }
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
-            Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
-            return condition.evaluate(sequenceFlow.getId(), execution);
+	        String conditionLanguage = sequenceFlow.getConditionLanguage();
+	        return hasTrueCondition(sequenceFlow.getId(), conditionExpression, conditionLanguage, execution);
         } else {
             return true;
         }
 
     }
+
+	public static boolean hasTrueCondition(String id, String conditionExpression, String conditionLanguage, DelegateExecution execution) {
+		Condition condition;
+		if (conditionLanguage == null) {
+			Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+			condition = new UelExpressionCondition(expression);
+		} else {
+			condition = new ScriptCondition(conditionExpression, conditionLanguage);
+		}
+		return condition.evaluate(id, execution);
+	}
 
     protected static String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
         String activeValue = originalValue;

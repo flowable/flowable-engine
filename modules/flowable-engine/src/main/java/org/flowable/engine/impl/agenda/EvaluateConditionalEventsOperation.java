@@ -34,6 +34,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.impl.util.condition.ConditionUtil;
 
 /**
  * Operation that triggers conditional events for which the condition evaluate to true and continues the process, leaving that activity.
@@ -95,8 +96,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                             String conditionExpression = conditionalEventDefinition.getConditionExpression();
                             if (StringUtils.isNotEmpty(conditionExpression)) {
 	                            String conditionLanguage = conditionalEventDefinition.getConditionLanguage();
-	                            Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
-                                conditionIsTrue = condition.evaluate(startEvent.getId(), parentExecution);
+	                            conditionIsTrue = ConditionUtil.hasTrueCondition(startEvent.getId(), conditionExpression, conditionLanguage, parentExecution);
                             
                             } else {
                                 conditionIsTrue = true;

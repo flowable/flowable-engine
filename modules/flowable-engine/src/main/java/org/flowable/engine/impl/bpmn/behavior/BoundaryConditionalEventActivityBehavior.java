@@ -25,6 +25,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.condition.ConditionUtil;
 
 /**
  * @author Tijs Rademakers
@@ -63,8 +64,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-		Condition condition = new ScriptCondition(conditionExpression, conditionLanguage);
-		boolean result = condition.evaluate(executionEntity.getActivityId(), executionEntity);
+		boolean result = ConditionUtil.hasTrueCondition(executionEntity.getActivityId(), conditionExpression, conditionLanguage, executionEntity);
         if (result) {
             processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(executionEntity);
             

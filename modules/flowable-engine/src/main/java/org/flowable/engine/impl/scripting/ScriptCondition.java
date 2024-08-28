@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.scripting;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -35,26 +34,20 @@ public class ScriptCondition implements Condition {
 
     @Override
     public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
-	    Object result;
-	    if (language == null) {
-		    result = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(expression).getValue(execution);
-	    } else {
-		    ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
+        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
 
-		    ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
-				    .script(expression)
-				    .language(language)
-				    .variableContainer(execution);
-		    result = scriptingEngines.evaluate(builder.build()).getResult();
-	    }
-
-	    if (result == null) {
-		    throw new FlowableException("condition script returns null: " + expression + " for " + execution);
-	    }
-	    if (!(result instanceof Boolean)) {
-		    throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ") for " + execution);
-	    }
-	    return (Boolean) result;
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
+                .script(expression)
+                .language(language)
+                .variableContainer(execution);
+        Object result = scriptingEngines.evaluate(builder.build()).getResult();
+        if (result == null) {
+            throw new FlowableException("condition script returns null: " + expression + " for " + execution);
+        }
+        if (!(result instanceof Boolean)) {
+            throw new FlowableException("condition script returns non-Boolean: " + result + " (" + result.getClass().getName() + ") for " + execution);
+        }
+        return (Boolean) result;
     }
 
 }
