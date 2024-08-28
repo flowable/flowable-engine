@@ -596,4 +596,28 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
             cmmnEngineConfiguration.getJobServiceConfiguration().setJobHandlers(existingJobHandlers);
         }
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testTaskNonBlockingWithEntryAndExitCriterion() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("task1").list()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateEnabled().list()).hasSize(1);
+        
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateEnabled().singleResult().getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateActive().list()).hasSize(0);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+    }
 }

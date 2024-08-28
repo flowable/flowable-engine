@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-engage-case-palette">
+  <case id="myCase">
+    <casePlanModel id="onecaseplanmodel1">
+      <planItem id="planItemexpandedStage1" name="Stage 1" definitionRef="expandedStage1"></planItem>
+      <stage id="expandedStage1" name="Stage 1">
+        <planItem id="planItem1" definitionRef="task1">
+          <itemControl>
+            <manualActivationRule></manualActivationRule>
+          </itemControl>
+          <entryCriterion id="entryCriterion5" sentryRef="sentryentryCriterion5"></entryCriterion>
+          <exitCriterion id="exitCriterion1" sentryRef="sentryexitCriterion1"></exitCriterion>
+        </planItem>
+        <sentry id="sentryentryCriterion5" />
+        <sentry id="sentryexitCriterion1">
+            <ifPart>
+                <condition>${false}</condition>
+            </ifPart>
+        </sentry>
+        <humanTask id="task1" isBlocking="false" />
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>
