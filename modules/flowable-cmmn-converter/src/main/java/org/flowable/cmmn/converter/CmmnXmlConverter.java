@@ -41,7 +41,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
@@ -71,7 +70,6 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TextAnnotation;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableException;
@@ -528,20 +526,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
 
         if (!planItem.getExitCriteria().isEmpty()) {
-            boolean exitCriteriaAllowed = true;
-            if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
-                    exitCriteriaAllowed = false;
-                }
-            }
-
-            if (exitCriteriaAllowed) {
-                resolveExitCriteriaSentry(planItem);
-            } else {
-                LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
-                planItem.getExitCriteria().clear();
-            }
+            resolveExitCriteriaSentry(planItem);
         }
 
         if (planItemDefinition instanceof Stage) {
