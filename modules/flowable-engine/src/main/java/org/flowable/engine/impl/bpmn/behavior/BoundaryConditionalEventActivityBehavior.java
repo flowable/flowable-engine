@@ -64,7 +64,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-		boolean result = ConditionUtil.hasTrueCondition(executionEntity.getActivityId(), conditionExpression, conditionLanguage, executionEntity);
+		boolean result = ConditionUtil.hasTrueCondition(conditionalEventDefinition.getId(), conditionExpression, conditionLanguage, executionEntity);
         if (result) {
             processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(executionEntity);
             
