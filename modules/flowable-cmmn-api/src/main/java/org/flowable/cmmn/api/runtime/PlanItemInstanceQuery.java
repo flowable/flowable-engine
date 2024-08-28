@@ -97,6 +97,16 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionType);
 
     /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    PlanItemInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    PlanItemInstanceQuery endOr();
+
+    /**
      * @return The query will only return ended (completed/terminated/occurred/exited) plan item instances.
      *         No runtime instances will be returned.
      */
