@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME;
 
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 

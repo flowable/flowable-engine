@@ -15,11 +15,7 @@ package org.flowable.engine.test.bpmn.servicetask;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-import org.flowable.common.engine.api.async.AsyncTaskInvoker;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.delegate.MapBasedFlowableFutureJavaDelegate;
 import org.flowable.engine.delegate.ReadOnlyDelegateExecution;
 import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
