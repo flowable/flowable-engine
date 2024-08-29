@@ -198,14 +198,22 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             }
             try (PreparedStatement statement = databaseConfiguration.getConnection()
                     .prepareStatement("select ID from " + changeLogTableName + " order by DATEEXECUTED")) {
-                String changeLogVersion = null;
+                int changeLogVersion = 0;
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
-                        changeLogVersion = resultSet.getString(1);
+                        String changeLogVersionId = resultSet.getString(1);
+                        int parsedChangeLogVersion = Integer.parseInt(changeLogVersionId);
+                        if (parsedChangeLogVersion > changeLogVersion) {
+                            // Even though we are ordering by DATEEXECUTED, and the last ID should be the last executed one.
+                            // It is still possible that there are multiple entries with the same DATEEXECUTED value and the order might not be correct.
+                            // e.g. MySQL 8.0 sometimes does not return the correct order.
+                            changeLogVersion = parsedChangeLogVersion;
+                        }
                     }
                 }
-                if (changeLogVersion != null) {
-                    return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
+                if (changeLogVersion > 0) {
+                    String changeLogVersionString = String.valueOf(changeLogVersion);
+                    return new ChangeLogVersion(changeLogVersionString, getDbVersionForChangelogVersion(changeLogVersionString));
                 }
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to get change log version from " + changeLogTableName, e);

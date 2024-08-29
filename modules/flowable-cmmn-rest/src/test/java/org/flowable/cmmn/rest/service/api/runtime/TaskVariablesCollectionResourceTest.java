@@ -25,6 +25,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -71,6 +72,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         caseVariables.put("dateProcVar", cal.getTime());
         caseVariables.put("byteArrayProcVar", "Some raw bytes".getBytes());
         caseVariables.put("overlappingVariable", "case-value");
+        caseVariables.put("uuidVar", UUID.fromString("a053505c-43c9-479f-ae01-5352ce559786"));
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
 
         // Set local task variables, including one that has the same name as one
@@ -86,6 +88,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         taskVariables.put("dateTaskVar", cal.getTime());
         taskVariables.put("byteArrayTaskVar", "Some raw bytes".getBytes());
         taskVariables.put("overlappingVariable", "task-value");
+        taskVariables.put("uuidVar", UUID.fromString("a053505c-43c9-479f-ae01-5352ce559786"));
         taskService.setVariablesLocal(task.getId(), taskVariables);
 
         // Request all variables (no scope provides) which include global an local
@@ -97,7 +100,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();
-        assertThat(responseNode).hasSize(17);
+        assertThat(responseNode).hasSize(18);
 
         // Overlapping variable should contain task-value AND be defined as "local"
         assertThatJson(responseNode)
@@ -148,6 +151,9 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
                         + " },"
                         + " {"
                         + " scope: 'local'"
+                        + " },"
+                        + " {"
+                        + " scope: 'local'"
                         + " }"
                         + "]");
 
@@ -160,7 +166,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();
-        assertThat(responseNode).hasSize(9);
+        assertThat(responseNode).hasSize(10);
         assertThatJson(responseNode)
                 .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS)
                 .isEqualTo("["

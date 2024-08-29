@@ -207,6 +207,8 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         Authentication.setAuthenticatedUserId("queryCaseUser");
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
+        caseInstance1 = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).singleResult();
+        caseInstance2 = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).singleResult();
 
         // Create request node
         ObjectNode requestNode = objectMapper.createObjectNode();
