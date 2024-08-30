@@ -133,6 +133,8 @@ public abstract class AbstractCmmnDynamicStateManager {
         
         executeTerminatePlanItemInstances(caseInstanceChangeState, caseInstance, commandContext);
         
+        executeTerminateNonExistingPlanItemInstancesInTargetCmmnModel(caseInstanceChangeState, commandContext);
+        
         setCaseDefinitionIdForPlanItemInstances(currentPlanItemInstances, caseInstanceChangeState.getCaseDefinitionToMigrateTo());
         
         executeChangePlanItemIds(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
@@ -829,6 +831,35 @@ public abstract class AbstractCmmnDynamicStateManager {
                         
                         terminatePlanItemInstance(planItemInstance, commandContext);
                         caseInstanceChangeState.addTerminatedPlanItemInstance(planItemInstance.getPlanItemDefinitionId(), planItemInstance);
+                    }
+                }
+            }
+        }
+    }
+    
+    protected void executeTerminateNonExistingPlanItemInstancesInTargetCmmnModel(CaseInstanceChangeState caseInstanceChangeState, CommandContext commandContext) {
+        if (caseInstanceChangeState.getCaseDefinitionToMigrateTo() != null) {
+            CmmnModel targetCmmnModel = CaseDefinitionUtil.getCmmnModel(caseInstanceChangeState.getCaseDefinitionToMigrateTo().getId());
+            List<String> excludePlanItemDefinitionIds = new ArrayList<>();
+            for (TerminatePlanItemDefinitionMapping planItemDefinitionMapping : caseInstanceChangeState.getTerminatePlanItemDefinitions()) {
+                excludePlanItemDefinitionIds.add(planItemDefinitionMapping.getPlanItemDefinitionId());
+            }
+            
+            for (ChangePlanItemDefinitionWithNewTargetIdsMapping newTargetIdsMapping : caseInstanceChangeState.getChangePlanItemDefinitionWithNewTargetIds()) {
+                excludePlanItemDefinitionIds.add(newTargetIdsMapping.getExistingPlanItemDefinitionId());
+            }
+            
+            for (ChangePlanItemIdWithDefinitionIdMapping definitionIdMapping : caseInstanceChangeState.getChangePlanItemIdsWithDefinitionId()) {
+                excludePlanItemDefinitionIds.add(definitionIdMapping.getExistingPlanItemDefinitionId());
+            }
+            
+            for (String currentPlanItemDefinitionId : caseInstanceChangeState.getCurrentPlanItemInstances().keySet()) {
+                if (!excludePlanItemDefinitionIds.contains(currentPlanItemDefinitionId) && targetCmmnModel.findPlanItemDefinition(currentPlanItemDefinitionId) == null) {
+                    for (PlanItemInstanceEntity currentPlanItemInstance : caseInstanceChangeState.getCurrentPlanItemInstances().get(currentPlanItemDefinitionId)) {
+                        if (!PlanItemInstanceState.TERMINAL_STATES.contains(currentPlanItemInstance.getState())) {
+                            terminatePlanItemInstance(currentPlanItemInstance, commandContext);
+                            caseInstanceChangeState.addTerminatedPlanItemInstance(currentPlanItemInstance.getPlanItemDefinitionId(), currentPlanItemInstance);
+                        }
                     }
                 }
             }
