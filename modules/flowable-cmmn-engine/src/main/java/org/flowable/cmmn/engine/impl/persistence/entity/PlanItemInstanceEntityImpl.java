@@ -94,6 +94,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
     protected boolean plannedForActivationInMigration;
 
+    protected boolean stateChangeUnprocessed; // only set to true when an agenda operation is planned and this has not been executed yet
+
     public PlanItemInstanceEntityImpl() {
     }
 
@@ -655,6 +657,16 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setPlannedForActivationInMigration(boolean plannedForActivationInMigration) {
         this.plannedForActivationInMigration = plannedForActivationInMigration;
+    }
+
+    @Override
+    public boolean isStateChangeUnprocessed() {
+        return stateChangeUnprocessed;
+    }
+
+    @Override
+    public void setStateChangeUnprocessed(boolean stateChangeUnprocessed) {
+        this.stateChangeUnprocessed = stateChangeUnprocessed;
     }
 
     @Override

@@ -145,7 +145,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
         } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 
-            if (PlanItemInstanceState.ACTIVE.equals(state)) {
+            if (PlanItemInstanceState.ACTIVE.equals(state) && !planItemInstanceEntity.isStateChangeUnprocessed()) {
                 boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity, null);
                 if (criteriaChangeOrActiveChildrenForStage) {
                     evaluationResult.markCriteriaChanged();
