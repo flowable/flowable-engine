@@ -27,6 +27,9 @@ public interface PlanItemInstanceEntity extends Entity, HasRevision, DelegatePla
     VariableScope getParentVariableScope();
     
     boolean isPlannedForActivationInMigration();
-
     void setPlannedForActivationInMigration(boolean plannedForActivationInMigration);
+
+    boolean isStateChangeUnprocessed();
+    void setStateChangeUnprocessed(boolean stateChangeUnprocessed);
+
 }

@@ -267,7 +267,8 @@ public abstract class AbstractFlowableCmmnTestCase {
             .collect(Collectors.toList());
 
         if (planItemInstanceStates.isEmpty()) {
-            fail("No plan item instances found with name " + name);
+            List<String> planItemInstanceNames = planItemInstances.stream().map(PlanItemInstance::getName).collect(Collectors.toList());
+            fail("No plan item instances found with name " + name + ", following names were found:" + String.join(",", planItemInstanceNames));
         }
 
         assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
