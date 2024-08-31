@@ -413,6 +413,88 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
     }
 
     @Test
+    public void testMigrateNonInterruptingSignalEventSubProcessWithTwoStartedSubProcess() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+
+        //Start an instance of the first version of the process for migration
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(version1ProcessDef.getKey());
+
+        //Deploy second version of the same process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-signal-event-subprocess.bpmn20.xml");
+        assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
+
+        //Fire the signal to start the first sub process
+        runtimeService.signalEventReceived("eventSignal");
+        //Fire the signal to start the second sub process
+        runtimeService.signalEventReceived("eventSignal");
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version1ProcessDef.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId())
+                );
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getEventName, EventSubscription::getActivityId, EventSubscription::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventSignal", "eventSubProcessStart", version1ProcessDef.getId()));
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version2ProcessDef.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId())
+                );
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getEventName, EventSubscription::getActivityId, EventSubscription::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("eventSignal", "eventSubProcessStart", version2ProcessDef.getId()));
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
     public void testMigrateSimpleActivityToActivityInsideNonInterruptingSignalEventSubProcessInNewDefinition() {
         ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
                 "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
@@ -608,6 +690,90 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
                 .containsExactlyInAnyOrder(
                         Tuple.tuple("processTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId())
+                );
+
+        eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getEventName, EventSubscription::getActivityId, EventSubscription::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("someMessage", "eventSubProcessStart", version2ProcessDef.getId()));
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateNonInterruptingMessageEventSubProcessWithTwoStartedSubProcess() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+
+        //Start an instance of the first version of the process for migration
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(version1ProcessDef.getKey());
+
+        //Deploy second version of the same process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-message-event-subprocess.bpmn20.xml");
+        assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
+
+        Execution messageSubscriptionExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId())
+                .messageEventSubscriptionName("someMessage").singleResult();
+        //Trigger the event to create the first sub process
+        runtimeService.messageEventReceived("someMessage", messageSubscriptionExecution.getId());
+        //Trigger the event to create the second sub process
+        runtimeService.messageEventReceived("someMessage", messageSubscriptionExecution.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version1ProcessDef.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId())
+                );
+        List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(eventSubscriptions)
+                .extracting(EventSubscription::getEventName, EventSubscription::getActivityId, EventSubscription::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(Tuple.tuple("someMessage", "eventSubProcessStart", version1ProcessDef.getId()));
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version2ProcessDef.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId()),
                         Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId())
                 );
 
@@ -818,6 +984,98 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
                 .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
                 .containsExactlyInAnyOrder(
                         Tuple.tuple("processTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId())
+                );
+
+        timerJobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timerJobs)
+                .extracting(Job::getProcessDefinitionId, Job::getElementId)
+                .containsExactlyInAnyOrder(Tuple.tuple(version2ProcessDef.getId(), "eventSubProcessStart"));
+
+        completeProcessInstanceTasks(processInstance.getId());
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    public void testMigrateNonInterruptingTimerEventSubProcessWithTwoStartedSubProcess() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-timer-event-subprocess.bpmn20.xml");
+
+        //Start an instance of the first version of the process for migration
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(version1ProcessDef.getKey());
+
+        //Deploy second version of the same process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/non-interrupting-timer-event-subprocess.bpmn20.xml");
+        assertThat(version1ProcessDef.getId()).isNotEqualTo(version2ProcessDef.getId());
+
+        //Trigger the timer job to create the first sub process
+        List<Job> timerJobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timerJobs).hasSize(1);
+
+        managementService.moveTimerToExecutableJob(timerJobs.get(0).getId());
+        managementService.executeJob(timerJobs.get(0).getId());
+
+        //Trigger the timer job to create the second sub process
+        timerJobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timerJobs).hasSize(1);
+
+        managementService.moveTimerToExecutableJob(timerJobs.get(0).getId());
+        managementService.executeJob(timerJobs.get(0).getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version1ProcessDef.getId());
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version1ProcessDef.getId())
+                );
+
+        timerJobs = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timerJobs)
+                .extracting(Job::getProcessDefinitionId, Job::getElementId)
+                .containsExactlyInAnyOrder(Tuple.tuple(version1ProcessDef.getId(), "eventSubProcessStart"));
+
+        changeStateEventListener.clear();
+
+        //Migrate to the other processDefinition
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId());
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder(
+                        "processTask", "eventSubProcessStart", "eventSubProcess", "eventSubProcessTask", "eventSubProcess", "eventSubProcessTask"
+                );
+        assertThat(executions)
+                .extracting("processDefinitionId")
+                .containsOnly(version2ProcessDef.getId());
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey, Task::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        Tuple.tuple("processTask", version2ProcessDef.getId()),
+                        Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId()),
                         Tuple.tuple("eventSubProcessTask", version2ProcessDef.getId())
                 );
 
