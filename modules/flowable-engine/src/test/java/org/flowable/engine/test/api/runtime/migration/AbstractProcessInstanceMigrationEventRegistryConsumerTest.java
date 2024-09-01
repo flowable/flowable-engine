@@ -12,24 +12,22 @@
  */
 package org.flowable.engine.test.api.runtime.migration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.test.eventregistry.FlowableEventRegistryBpmnTestCase;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
-import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Provides a test channel and test events.
