@@ -46,6 +46,7 @@ public class MoveExecutionEntityContainer {
     protected Map<String, FlowElementMoveEntry> currentActivityToNewElementMap = new LinkedHashMap<>();
     protected Map<String, Map<String, Object>> flowElementLocalVariableMap = new HashMap<>();
     protected List<String> newExecutionIds = new ArrayList<>();
+    protected Map<String, ExecutionEntity> createdEventSubProcesses = new HashMap<>();
 
     public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
         this.executions = executions;
@@ -214,6 +215,14 @@ public class MoveExecutionEntityContainer {
 
     public void addNewExecutionId(String executionId) {
         this.newExecutionIds.add(executionId);
+    }
+
+    public ExecutionEntity getCreatedEventSubProcess(String processDefinitionId) {
+        return createdEventSubProcesses.get(processDefinitionId);
+    }
+
+    public void addCreatedEventSubProcess(String processDefinitionId, ExecutionEntity executionEntity) {
+        createdEventSubProcesses.put(processDefinitionId, executionEntity);
     }
 
     public Map<String, Map<String, Object>> getFlowElementLocalVariableMap() {
