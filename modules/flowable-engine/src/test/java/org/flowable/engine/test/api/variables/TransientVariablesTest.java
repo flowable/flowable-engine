@@ -340,6 +340,9 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
      */
     public static class ServiceTask02 implements JavaDelegate {
 
+        public ServiceTask02() {
+            System.out.println("");
+        }
         @Override
         public void execute(DelegateExecution execution) {
             String response = (String) execution.getTransientVariable("response");
@@ -454,6 +457,9 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         public static String processInstanceId;
         public static String processDefinitionId;
         public static String metaInfo;
+
+        public TestServiceDelegate02() {
+        }
 
         @Override
         public void execute(DelegateExecution execution) {
