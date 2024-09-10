@@ -13,12 +13,6 @@
 
 package org.flowable.engine.test.bpmn.event.compensate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -33,6 +27,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Tijs Rademakers
@@ -335,6 +335,13 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
 
+    }
+
+    @Test
+    @Deployment
+    public void testTwoBoundaryEventAndFirstIsCompensation() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        assertThat(processInstance).isNotNull();
     }
 
 }
