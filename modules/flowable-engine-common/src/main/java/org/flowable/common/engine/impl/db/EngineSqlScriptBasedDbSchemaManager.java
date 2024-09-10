@@ -190,6 +190,10 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         return getProperty(getSchemaVersionPropertyName(), false);
     }
 
+    protected int getChangeLogVersionOrder(String changeLogVersion) {
+        return Integer.parseInt(changeLogVersion);
+    }
+
     protected ChangeLogVersion getChangeLogVersion() {
         String changeLogTableName = getChangeLogTableName();
         if (changeLogTableName != null && isTablePresent(changeLogTableName)) {
@@ -199,22 +203,22 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
             }
             try (PreparedStatement statement = databaseConfiguration.getConnection()
                     .prepareStatement("select ID from " + changeLogTableName + " order by DATEEXECUTED")) {
-                int changeLogVersion = 0;
+                int latestChangeLogVersionOrder = 0;
+                String changeLogVersion = null;
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
                         String changeLogVersionId = resultSet.getString(1);
-                        int parsedChangeLogVersion = Integer.parseInt(changeLogVersionId);
-                        if (parsedChangeLogVersion > changeLogVersion) {
+                        int changeLogVersionOrder = getChangeLogVersionOrder(changeLogVersionId);
+                        if (changeLogVersionOrder > latestChangeLogVersionOrder) {
                             // Even though we are ordering by DATEEXECUTED, and the last ID should be the last executed one.
                             // It is still possible that there are multiple entries with the same DATEEXECUTED value and the order might not be correct.
                             // e.g. MySQL 8.0 sometimes does not return the correct order.
-                            changeLogVersion = parsedChangeLogVersion;
+                            changeLogVersion = changeLogVersionId;
                         }
                     }
                 }
-                if (changeLogVersion > 0) {
-                    String changeLogVersionString = String.valueOf(changeLogVersion);
-                    return new ChangeLogVersion(changeLogVersionString, getDbVersionForChangelogVersion(changeLogVersionString));
+                if (changeLogVersion != null) {
+                    return new ChangeLogVersion(changeLogVersion, getDbVersionForChangelogVersion(changeLogVersion));
                 }
             } catch (SQLException e) {
                 throw new RuntimeException("Failed to get change log version from " + changeLogTableName, e);
