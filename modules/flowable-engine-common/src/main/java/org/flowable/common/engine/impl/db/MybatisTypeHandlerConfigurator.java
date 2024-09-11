@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.db;
 
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 
 /**
  * This class configures {@link TypeHandler} in {@link TypeHandlerRegistry}
@@ -22,5 +23,5 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  */
 public interface MybatisTypeHandlerConfigurator {
 
-    void configure(TypeHandlerRegistry typeHandlerRegistry);
+    void configure(AbstractEngineConfiguration engineConfiguration, TypeHandlerRegistry typeHandlerRegistry);
 }
