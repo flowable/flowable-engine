@@ -84,4 +84,34 @@ public class ScriptServiceTaskCmmnXmlConverterTest {
                 });
     }
 
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/script-task-expression-field.cmmn")
+    public void scriptTaskWithExpressionField(CmmnModel cmmnModel) {
+        assertThat(cmmnModel).isNotNull();
+
+        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.getScriptFormat()).isEqualTo("javascript");
+                    assertThat(scriptTask.getScript()).isEqualTo("var a = '${testA}';");
+                    assertThat(scriptTask.getResultVariableName()).isEqualTo("scriptResult");
+                    assertThat(scriptTask.isAutoStoreVariables()).isFalse();
+                    assertThat(scriptTask.isBlocking()).isTrue();
+                    assertThat(scriptTask.isAsync()).isFalse();
+                });
+
+        PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
+        planItemDefinition = planItemTaskB.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
+                    assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
+                    assertThat(scriptServiceTask.getScript()).isEqualTo("var b = '${testB}';");
+                    assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+                });
+    }
+
 }

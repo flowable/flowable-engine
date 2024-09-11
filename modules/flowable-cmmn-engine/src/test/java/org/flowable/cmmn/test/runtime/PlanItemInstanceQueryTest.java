@@ -13,10 +13,8 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
-import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +30,6 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;

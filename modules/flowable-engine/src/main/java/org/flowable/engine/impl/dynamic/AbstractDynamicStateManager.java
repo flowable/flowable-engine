@@ -654,11 +654,24 @@ public abstract class AbstractDynamicStateManager {
     }
 
     protected void processPendingEventSubProcessesStartEvents(ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
-        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        ProcessInstanceHelper processInstanceHelper = processEngineConfiguration.getProcessInstanceHelper();
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        ManagementService managementService = processEngineConfiguration.getManagementService();
+
         for (Map.Entry<? extends StartEvent, ExecutionEntity> pendingStartEventEntry : processInstanceChangeState.getPendingEventSubProcessesStartEvents().entrySet()) {
             StartEvent startEvent = pendingStartEventEntry.getKey();
             ExecutionEntity parentExecution = pendingStartEventEntry.getValue();
-            if (!processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(startEvent.getSubProcess().getId())) {
+            EventDefinition eventDefinition = startEvent.getEventDefinitions().isEmpty() ? null : startEvent.getEventDefinitions().get(0);
+
+            //Process event sub process when no subscriptions/timer jobs are found
+            boolean processEventSubProcess = false;
+            if (eventDefinition instanceof TimerEventDefinition) {
+                processEventSubProcess = managementService.createTimerJobQuery().executionId(parentExecution.getId()).list().isEmpty();
+            } else {
+                processEventSubProcess = eventSubscriptionService.findEventSubscriptionsByExecution(parentExecution.getId()).isEmpty();
+            }
+            if (processEventSubProcess) {
                 processInstanceHelper.processEventSubProcess(parentExecution, (EventSubProcess) startEvent.getSubProcess(), commandContext);
             }
         }
@@ -809,7 +822,10 @@ public abstract class AbstractDynamicStateManager {
 
         // Build the subProcess hierarchy
         for (SubProcess subProcess : subProcessesToCreate.values()) {
-            if (!processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(subProcess.getId())) {
+            if (subProcess instanceof EventSubProcess) {
+                ExecutionEntity embeddedSubProcess = createEmbeddedSubProcessHierarchy(subProcess, defaultContinueParentExecution, subProcessesToCreate, movingExecutionIds, processInstanceChangeState, commandContext);
+                moveExecutionEntityContainer.addCreatedEventSubProcess(subProcess.getId(), embeddedSubProcess);
+            } else if (!processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(subProcess.getId())) {
                 ExecutionEntity embeddedSubProcess = createEmbeddedSubProcessHierarchy(subProcess, defaultContinueParentExecution, subProcessesToCreate, movingExecutionIds, processInstanceChangeState, commandContext);
                 processInstanceChangeState.addCreatedEmbeddedSubProcess(subProcess.getId(), embeddedSubProcess);
             }
@@ -820,7 +836,9 @@ public abstract class AbstractDynamicStateManager {
         for (FlowElementMoveEntry flowElementMoveEntry : moveToFlowElements) {
             FlowElement newFlowElement = flowElementMoveEntry.getNewFlowElement();
             ExecutionEntity parentExecution;
-            if (newFlowElement.getSubProcess() != null && processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(newFlowElement.getSubProcess().getId())) {
+            if (newFlowElement.getSubProcess() != null && moveExecutionEntityContainer.getCreatedEventSubProcess(newFlowElement.getSubProcess().getId()) != null) {
+                parentExecution = moveExecutionEntityContainer.getCreatedEventSubProcess(newFlowElement.getSubProcess().getId());
+            } else  if (newFlowElement.getSubProcess() != null && processInstanceChangeState.getCreatedEmbeddedSubProcesses().containsKey(newFlowElement.getSubProcess().getId())) {
                 parentExecution = processInstanceChangeState.getCreatedEmbeddedSubProcesses().get(newFlowElement.getSubProcess().getId());
             
             } else if ((newFlowElement instanceof Task || newFlowElement instanceof CallActivity) && isFlowElementMultiInstance(newFlowElement) && !movingExecutions.get(0).isMultiInstanceRoot() &&
