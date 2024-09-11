@@ -26,6 +26,7 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.VariableService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -257,6 +258,12 @@ class ScopeAwareInternalJobManagerTest {
             invokedMethods.add("preRepeatedTimerScheduleInternal");
             repeatedTimerScheduleInternal = timerJobEntity;
             repeatedTimerScheduleInternalVariableScope = variableScope;
+        }
+
+        @Override
+        public VariableService getVariableService(Job job) {
+            invokedMethods.add("getVariableService");
+            return null;
         }
     }
 

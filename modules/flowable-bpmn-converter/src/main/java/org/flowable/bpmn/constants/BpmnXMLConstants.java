@@ -217,6 +217,9 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC = "topic";
+    public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_EXPLICIT_IO_PARAMETERS = "explicitIOParameters";
+    public static final String ELEMENT_EXTERNAL_WORKER_IN_PARAMETER = "externalWorkerInParameter";
+    public static final String ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER = "externalWorkerOutParameter";
 
     public static final String ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 

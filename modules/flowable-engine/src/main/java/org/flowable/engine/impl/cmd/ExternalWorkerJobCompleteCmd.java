@@ -43,10 +43,13 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
         // We need to remove the job handler configuration
         externalWorkerJob.setJobHandlerConfiguration(null);
 
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+
+        variableService.deleteVariablesByScopeIdAndScopeType(externalJobId, ScopeTypes.EXTERNAL_WORKER);
+
         if (variables != null && !variables.isEmpty()) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
-            VariableService variableService = variableServiceConfiguration.getVariableService();
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();

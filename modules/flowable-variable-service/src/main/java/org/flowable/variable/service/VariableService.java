@@ -62,4 +62,6 @@ public interface VariableService {
     
     void deleteVariablesByTaskId(String taskId);
 
+    void deleteVariablesByScopeIdAndScopeType(String scopeId, String scopeType);
+
 }

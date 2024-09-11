@@ -49,6 +49,7 @@ import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.VariableService;
 
 /**
  * @author Tijs Rademakers
@@ -294,5 +295,10 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
 
     protected ExecutionEntityManager getExecutionEntityManager() {
         return processEngineConfiguration.getExecutionEntityManager();
+    }
+
+    @Override
+    public VariableService getVariableService(Job job) {
+        return processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
     }
 }

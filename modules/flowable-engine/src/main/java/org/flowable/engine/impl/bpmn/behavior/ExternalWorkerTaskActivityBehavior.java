@@ -19,8 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -34,6 +36,9 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
@@ -124,6 +129,23 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
             }
 
             jobService.insertExternalWorkerJob(job);
+
+            if (externalWorkerServiceTask.isExplicitIOParameters()) {
+                List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();
+                VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
+                for (IOParameter inParameter : inParameters) {
+                    VariableInstance sourceVariable = execution.getVariableInstance(inParameter.getSource());
+                    if (sourceVariable instanceof VariableInstanceEntity sourceVariableEntity) {
+                        VariableInstanceEntity variableInstance = variableService.createVariableInstance(inParameter.getTarget());
+                        variableInstance.setScopeId(job.getId());
+                        variableInstance.setScopeType(ScopeTypes.EXTERNAL_WORKER);
+
+                        variableInstance.setType(sourceVariableEntity.getType());
+                        variableInstance.setValue(sourceVariable.getValue());
+                        variableService.insertVariableInstance(variableInstance);
+                    }
+                }
+            }
 
             if (interceptor != null) {
                 interceptor.afterCreateExternalWorkerJob(new CreateExternalWorkerJobAfterContext(

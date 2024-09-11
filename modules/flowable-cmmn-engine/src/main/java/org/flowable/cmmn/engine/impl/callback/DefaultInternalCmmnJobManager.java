@@ -34,6 +34,7 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.VariableService;
 
 /**
  * @author Joram Barrez
@@ -163,5 +164,10 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
                 timerJobEntity.setElementName(timerEventListener.getName());
             }
         }
+    }
+
+    @Override
+    public VariableService getVariableService(Job job) {
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
     }
 }
