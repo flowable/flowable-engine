@@ -113,7 +113,7 @@ public abstract class AbstractEngineConfigurator<E extends Engine> implements En
                     Node node = typeAliasList.item(i);
                     MybatisTypeAliasConfigurator typeAlias = new MybatisTypeAliasConfigurator() {
                         @Override
-                        public void configure(TypeAliasRegistry typeAliasRegistry) {
+                        public void configure(AbstractEngineConfiguration abstractEngineConfiguration, TypeAliasRegistry typeAliasRegistry) {
                             try {
                                 typeAliasRegistry.registerAlias(node.getAttributes().getNamedItem("alias").getTextContent(), 
                                                 Class.forName(node.getAttributes().getNamedItem("type").getTextContent()));
@@ -131,7 +131,7 @@ public abstract class AbstractEngineConfigurator<E extends Engine> implements En
                     Node node = typeHandlerList.item(i);
                     MybatisTypeHandlerConfigurator typeHandler = new MybatisTypeHandlerConfigurator() {
                         @Override
-                        public void configure(TypeHandlerRegistry typeHandlerRegistry) {
+                        public void configure(AbstractEngineConfiguration abstractEngineConfiguration, TypeHandlerRegistry typeHandlerRegistry) {
                             try {
                                 typeHandlerRegistry.register(node.getAttributes().getNamedItem("javaType").getTextContent(),
                                                 node.getAttributes().getNamedItem("handler").getTextContent());

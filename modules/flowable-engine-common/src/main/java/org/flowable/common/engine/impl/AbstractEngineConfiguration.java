@@ -954,12 +954,12 @@ public abstract class AbstractEngineConfiguration {
 
         if (dependentEngineMybatisTypeAliasConfigs != null) {
             for (MybatisTypeAliasConfigurator typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
-                typeAliasConfig.configure(configuration.getTypeAliasRegistry());
+                typeAliasConfig.configure(this, configuration.getTypeAliasRegistry());
             }
         }
         if (dependentEngineMybatisTypeHandlerConfigs != null) {
             for (MybatisTypeHandlerConfigurator typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
-                typeHandlerConfig.configure(configuration.getTypeHandlerRegistry());
+                typeHandlerConfig.configure(this, configuration.getTypeHandlerRegistry());
             }
         }
 
