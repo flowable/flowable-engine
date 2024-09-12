@@ -386,6 +386,14 @@
     </annotation>
   </attribute>
 
+  <attribute name="explicitIOParameters" type="string">
+    <annotation>
+      <documentation>
+        The topic that should be used for external worker tasks.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <element name="field">
     <annotation>
       <documentation>

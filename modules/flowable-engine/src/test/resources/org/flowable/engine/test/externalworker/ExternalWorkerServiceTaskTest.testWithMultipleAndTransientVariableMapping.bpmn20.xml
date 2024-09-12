@@ -13,11 +13,11 @@
 
         <serviceTask id="externalWorkerTask" flowable:type="external-worker" flowable:topic="simple" flowable:explicitIOParameters="true">
             <extensionElements>
-                <flowable:externalWorkerInParameter source="name" target="theName"></flowable:externalWorkerInParameter>
-                <flowable:externalWorkerInParameter source="description" target="theDescription"></flowable:externalWorkerInParameter>
-                <flowable:externalWorkerOutParameter source="theResult1" target="result1"></flowable:externalWorkerOutParameter>
-                <flowable:externalWorkerOutParameter source="theResult2" target="result2" transient="true"></flowable:externalWorkerOutParameter>
-                <flowable:externalWorkerOutParameter source="theResult3" target="result3"></flowable:externalWorkerOutParameter>
+                <flowable:externalWorkerInParameter source="name" target="theName"/>
+                <flowable:externalWorkerInParameter source="description" target="theDescription"/>
+                <flowable:externalWorkerOutParameter source="theResult1" target="result1"/>
+                <flowable:externalWorkerOutParameter source="theResult2" target="result2" transient="true"/>
+                <flowable:externalWorkerOutParameter source="theResult3" target="result3"/>
             </extensionElements>
         </serviceTask>
 
