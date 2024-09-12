@@ -19,7 +19,6 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.IOParameter;
-import org.flowable.bpmn.model.SendEventServiceTask;
 
 /**
  * @author Valentin Zickner
