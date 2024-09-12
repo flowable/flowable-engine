@@ -64,11 +64,6 @@ public class VariableServiceImpl extends CommonServiceImpl<VariableServiceConfig
         getVariableInstanceEntityManager().deleteVariablesByTaskId(taskId);
     }
 
-    @Override
-    public void deleteVariablesByScopeIdAndScopeType(String scopeId, String scopeType) {
-        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(scopeId, scopeType);
-    }
-
     public VariableInstanceEntityManager getVariableInstanceEntityManager() {
         return configuration.getVariableInstanceEntityManager();
     }
