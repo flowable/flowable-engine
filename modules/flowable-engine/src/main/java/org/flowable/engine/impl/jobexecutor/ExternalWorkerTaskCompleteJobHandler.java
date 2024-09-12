@@ -54,31 +54,29 @@ public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> jobVariables = variableService.findVariableInstanceBySubScopeIdAndScopeType(executionEntity.getId(), ScopeTypes.BPMN_EXTERNAL_WORKER);
 
-        if (externalWorkerServiceTask.isExplicitIOParameters()) {
-            List<IOParameter> outParameters = externalWorkerServiceTask.getOutParameters();
+        List<IOParameter> outParameters = externalWorkerServiceTask.getOutParameters();
 
-            if (outParameters != null && !outParameters.isEmpty()) {
-                VariableContainerWrapper temporaryVariableContainer = new VariableContainerWrapper(new HashMap<>());
-                for (VariableInstanceEntity jobVariable : jobVariables) {
-                    temporaryVariableContainer.setVariable(jobVariable.getName(), jobVariable.getValue());
-                    CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
-                    variableService.deleteVariableInstance(jobVariable);
+        if (outParameters != null && !outParameters.isEmpty()) {
+            VariableContainerWrapper temporaryVariableContainer = new VariableContainerWrapper(new HashMap<>());
+            for (VariableInstanceEntity jobVariable : jobVariables) {
+                temporaryVariableContainer.setVariable(jobVariable.getName(), jobVariable.getValue());
+                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
+                variableService.deleteVariableInstance(jobVariable);
+            }
+
+            for (IOParameter outParameter : outParameters) {
+                Object variableValue;
+                if (StringUtils.isNotEmpty(outParameter.getSource())) {
+                    variableValue = temporaryVariableContainer.getVariable(outParameter.getSource());
+                } else {
+                    Expression categoryExpression = processEngineConfiguration.getExpressionManager()
+                            .createExpression(outParameter.getSourceExpression());
+                    variableValue = categoryExpression.getValue(temporaryVariableContainer);
                 }
-
-                for (IOParameter outParameter : outParameters) {
-                    Object variableValue = null;
-                    if (StringUtils.isNotEmpty(outParameter.getSource())) {
-                        variableValue = temporaryVariableContainer.getVariable(outParameter.getSource());
-                    } else {
-                        Expression categoryExpression = processEngineConfiguration.getExpressionManager()
-                                .createExpression(outParameter.getSourceExpression());
-                        variableValue = categoryExpression.getValue(temporaryVariableContainer);
-                    }
-                    if (outParameter.isTransient()) {
-                        executionEntity.setTransientVariable(outParameter.getTarget(), variableValue);
-                    } else {
-                        executionEntity.setVariable(outParameter.getTarget(), variableValue);
-                    }
+                if (outParameter.isTransient()) {
+                    executionEntity.setTransientVariable(outParameter.getTarget(), variableValue);
+                } else {
+                    executionEntity.setVariable(outParameter.getTarget(), variableValue);
                 }
             }
 
