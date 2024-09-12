@@ -1424,7 +1424,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testWithMultipleAndTransientVariableMapping() {
+    public void testWithMultipleVariableMapping() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("simpleExternalWorker")
                 .variable("name", "kermit")
@@ -1481,7 +1481,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
         cmmnManagementService.createCmmnExternalWorkerTransitionBuilder(externalWorkerJob.getId(), "testWorker")
                 .variable("theResult1", "r1")
-                .variable("theResult2", "transient_r2")
+                .variable("theResult2", "r2")
                 .variable("theResult3", "r3")
                 .variable("theSecretResult", "secret result")
                 .complete();
@@ -1506,8 +1506,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().list()).hasSize(1);
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "result1")).isEqualTo("r1");
-        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "result2")).isNull(); // because it's transient
-        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "copyResult2")).isEqualTo("transient_r2");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "result2")).isEqualTo("r2");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "result3")).isEqualTo("r3");
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "theSecretResult")).isNull();
     }

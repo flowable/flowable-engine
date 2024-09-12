@@ -1301,7 +1301,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
-    void testWithMultipleAndTransientVariableMapping() {
+    void testWithMultipleVariableMapping() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("simpleExternalWorker")
                 .variable("name", "kermit")
@@ -1355,7 +1355,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
                 .variable("theResult1", "r1")
-                .variable("theResult2", "transient_r2")
+                .variable("theResult2", "r2")
                 .variable("theResult3", "r3")
                 .variable("theSecretResult", "secret result")
                 .complete();
@@ -1379,8 +1379,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().list()).hasSize(1);
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "result1")).isEqualTo("r1");
-        assertThat(runtimeService.getVariable(processInstance.getId(), "result2")).isNull(); // because it's transient
-        assertThat(runtimeService.getVariable(processInstance.getId(), "copyResult2")).isEqualTo("transient_r2");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "result2")).isEqualTo("r2");
         assertThat(runtimeService.getVariable(processInstance.getId(), "result3")).isEqualTo("r3");
         assertThat(runtimeService.getVariable(processInstance.getId(), "theSecretResult")).isNull();
     }

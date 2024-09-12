@@ -12,15 +12,9 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.ExternalWorkerServiceTask;
-import org.flowable.bpmn.model.IOParameter;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -48,44 +42,14 @@ public class ExternalWorkerTaskCompleteJobHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
-        ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) executionEntity.getCurrentFlowElement();
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
         List<VariableInstanceEntity> jobVariables = variableService.findVariableInstanceBySubScopeIdAndScopeType(executionEntity.getId(), ScopeTypes.BPMN_EXTERNAL_WORKER);
-
-        List<IOParameter> outParameters = externalWorkerServiceTask.getOutParameters();
-
-        if (outParameters != null && !outParameters.isEmpty()) {
-            VariableContainerWrapper temporaryVariableContainer = new VariableContainerWrapper(new HashMap<>());
-            for (VariableInstanceEntity jobVariable : jobVariables) {
-                temporaryVariableContainer.setVariable(jobVariable.getName(), jobVariable.getValue());
-                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
-                variableService.deleteVariableInstance(jobVariable);
-            }
-
-            for (IOParameter outParameter : outParameters) {
-                Object variableValue;
-                if (StringUtils.isNotEmpty(outParameter.getSource())) {
-                    variableValue = temporaryVariableContainer.getVariable(outParameter.getSource());
-                } else {
-                    Expression categoryExpression = processEngineConfiguration.getExpressionManager()
-                            .createExpression(outParameter.getSourceExpression());
-                    variableValue = categoryExpression.getValue(temporaryVariableContainer);
-                }
-                if (outParameter.isTransient()) {
-                    executionEntity.setTransientVariable(outParameter.getTarget(), variableValue);
-                } else {
-                    executionEntity.setVariable(outParameter.getTarget(), variableValue);
-                }
-            }
-
-        } else {
-            for (VariableInstanceEntity jobVariable : jobVariables) {
-                executionEntity.setVariable(jobVariable.getName(), jobVariable.getValue());
-                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
-                variableService.deleteVariableInstance(jobVariable);
-            }
+        for (VariableInstanceEntity jobVariable : jobVariables) {
+            executionEntity.setVariable(jobVariable.getName(), jobVariable.getValue());
+            CountingEntityUtil.handleDeleteVariableInstanceEntityCount(jobVariable, false);
+            variableService.deleteVariableInstance(jobVariable);
         }
 
         if (configuration != null && configuration.startsWith("error:")) {
