@@ -19,10 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -36,9 +34,6 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
