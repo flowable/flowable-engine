@@ -1271,7 +1271,10 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
         assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
 
-        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
+                .variable("theResult", "some result")
+                .variable("theSecretResult", "secret result")
+                .complete();
 
         assertThat(taskService.createTaskQuery().list()).isEmpty();
         assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
@@ -1290,6 +1293,96 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(5000, 300);
 
         assertThat(taskService.createTaskQuery().list()).hasSize(1);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "result")).isEqualTo("some result");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "theResult")).isNull();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "theSecretResult")).isNull();
+    }
+
+    @Test
+    @Deployment
+    void testWithMultipleAndTransientVariableMapping() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .variable("description", "kermit is king")
+                .variable("anotherVar", "secretContent")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getCorrelationId()).isNotNull();
+        assertThat(externalWorkerJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
+        assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
+        assertThat(externalWorkerJob.getLockOwner()).isNull();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(externalWorkerJob.getLockExpirationTime()).isNotNull();
+        assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("theName", "kermit"),
+                        entry("theDescription", "kermit is king")
+                );
+
+        assertThat(acquiredJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(acquiredJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(acquiredJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
+
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker")
+                .variable("theResult1", "r1")
+                .variable("theResult2", "transient_r2")
+                .variable("theResult3", "r3")
+                .variable("theSecretResult", "secret result")
+                .complete();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
+
+        Job executableJob = managementService.createJobQuery().singleResult();
+
+        assertThat(executableJob).isNotNull();
+        assertThat(executableJob.getJobType()).isEqualTo(Job.JOB_TYPE_MESSAGE);
+        assertThat(executableJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(executableJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(executableJob.getJobHandlerConfiguration()).isNull();
+        assertThat(executableJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(((JobEntity) executableJob).getLockExpirationTime()).isNull();
+        assertThat(((JobEntity) executableJob).getLockOwner()).isNull();
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
+
+        assertThat(taskService.createTaskQuery().list()).hasSize(1);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "result1")).isEqualTo("r1");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "result2")).isNull(); // because it's transient
+        assertThat(runtimeService.getVariable(processInstance.getId(), "copyResult2")).isEqualTo("transient_r2");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "result3")).isEqualTo("r3");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "theSecretResult")).isNull();
     }
 
     protected void addUserIdentityLinkToJob(Job job, String userId) {

@@ -29,7 +29,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd implements Command<Void>{
+public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd implements Command<Void> {
 
     protected Map<String, Object> variables;
 
