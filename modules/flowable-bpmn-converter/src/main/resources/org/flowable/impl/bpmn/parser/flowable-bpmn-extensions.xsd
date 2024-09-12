@@ -386,10 +386,10 @@
     </annotation>
   </attribute>
 
-  <attribute name="explicitIOParameters" type="string">
+  <attribute name="noInputParameter" type="string">
     <annotation>
       <documentation>
-        The topic that should be used for external worker tasks.
+        Mark an external worker task to explicit not provide any input parameters.
       </documentation>
     </annotation>
   </attribute>

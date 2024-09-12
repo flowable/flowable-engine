@@ -130,23 +130,6 @@ public class ExternalWorkerTaskActivityBehavior extends TaskActivityBehavior {
 
             jobService.insertExternalWorkerJob(job);
 
-            if (externalWorkerServiceTask.isExplicitIOParameters()) {
-                List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();
-                VariableService variableService = processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-                for (IOParameter inParameter : inParameters) {
-                    VariableInstance sourceVariable = execution.getVariableInstance(inParameter.getSource());
-                    if (sourceVariable instanceof VariableInstanceEntity sourceVariableEntity) {
-                        VariableInstanceEntity variableInstance = variableService.createVariableInstance(inParameter.getTarget());
-                        variableInstance.setScopeId(job.getId());
-                        variableInstance.setScopeType(ScopeTypes.EXTERNAL_WORKER);
-
-                        variableInstance.setType(sourceVariableEntity.getType());
-                        variableInstance.setValue(sourceVariable.getValue());
-                        variableService.insertVariableInstance(variableInstance);
-                    }
-                }
-            }
-
             if (interceptor != null) {
                 interceptor.afterCreateExternalWorkerJob(new CreateExternalWorkerJobAfterContext(
                         (ExternalWorkerServiceTask) currentFlowElement,

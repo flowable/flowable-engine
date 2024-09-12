@@ -21,7 +21,7 @@ import java.util.List;
 public class ExternalWorkerServiceTask extends ServiceTask implements HasOutParameters, HasInParameters {
 
     protected String topic;
-    protected boolean explicitIOParameters = false;
+    protected boolean noInputParameter = false;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
 
@@ -33,12 +33,12 @@ public class ExternalWorkerServiceTask extends ServiceTask implements HasOutPara
         this.topic = topic;
     }
 
-    public boolean isExplicitIOParameters() {
-        return explicitIOParameters;
+    public boolean isNoInputParameter() {
+        return noInputParameter;
     }
 
-    public void setExplicitIOParameters(boolean explicitIOParameters) {
-        this.explicitIOParameters = explicitIOParameters;
+    public void setNoInputParameter(boolean noInputParameter) {
+        this.noInputParameter = noInputParameter;
     }
 
     @Override

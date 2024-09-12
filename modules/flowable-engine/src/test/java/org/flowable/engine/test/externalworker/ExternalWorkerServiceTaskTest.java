@@ -1385,6 +1385,81 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.getVariable(processInstance.getId(), "theSecretResult")).isNull();
     }
 
+    @Test
+    @Deployment
+    void testWithChangingVariables() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .variable("anotherVar", "secretContent")
+                .start();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+
+        ExternalWorkerJob externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getCorrelationId()).isNotNull();
+        assertThat(externalWorkerJob.getJobType()).isEqualTo(Job.JOB_TYPE_EXTERNAL_WORKER);
+        assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(externalWorkerJob.getLockExpirationTime()).isNull();
+        assertThat(externalWorkerJob.getLockOwner()).isNull();
+
+        runtimeService.setVariable(processInstance.getId(), "name", "ernie");
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofMinutes(30))
+                .acquireAndLock(4, "testWorker");
+
+        externalWorkerJob = managementService.createExternalWorkerJobQuery().singleResult();
+
+        assertThat(externalWorkerJob).isNotNull();
+        assertThat(externalWorkerJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(externalWorkerJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(externalWorkerJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(externalWorkerJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(externalWorkerJob.getLockExpirationTime()).isNotNull();
+        assertThat(externalWorkerJob.getLockOwner()).isEqualTo("testWorker");
+
+        assertThat(acquiredJobs).hasSize(1);
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+        assertThat(acquiredJob.getVariables())
+                .containsOnly(
+                        entry("theName", "ernie")
+                );
+
+        assertThat(acquiredJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(acquiredJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(acquiredJob.getJobHandlerConfiguration()).isEqualTo("simple");
+        assertThat(acquiredJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("testWorker");
+
+        managementService.createExternalWorkerCompletionBuilder(externalWorkerJob.getId(), "testWorker").complete();
+
+        assertThat(taskService.createTaskQuery().list()).isEmpty();
+        assertThat(managementService.createExternalWorkerJobQuery().singleResult()).isNull();
+
+        Job executableJob = managementService.createJobQuery().singleResult();
+
+        assertThat(executableJob).isNotNull();
+        assertThat(executableJob.getJobType()).isEqualTo(Job.JOB_TYPE_MESSAGE);
+        assertThat(executableJob.getElementId()).isEqualTo("externalWorkerTask");
+        assertThat(executableJob.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(executableJob.getJobHandlerConfiguration()).isNull();
+        assertThat(executableJob.getRetries()).isEqualTo(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
+        assertThat(((JobEntity) executableJob).getLockExpirationTime()).isNull();
+        assertThat(((JobEntity) executableJob).getLockOwner()).isNull();
+
+        waitForJobExecutorToProcessAllJobs(5000, 300);
+
+        assertThat(taskService.createTaskQuery().list()).hasSize(1);
+    }
+
     protected void addUserIdentityLinkToJob(Job job, String userId) {
         managementService.executeCommand(commandContext -> {
                     processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService()

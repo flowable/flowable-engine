@@ -15,14 +15,19 @@ package org.flowable.engine.impl.cfg;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOParameter;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -39,6 +44,7 @@ import org.flowable.engine.impl.util.BpmnLoggingSessionUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -49,7 +55,6 @@ import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.variable.service.VariableService;
 
 /**
  * @author Tijs Rademakers
@@ -66,6 +71,36 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     protected VariableScope resolveVariableScopeInternal(Job job) {
         if (job.getExecutionId() != null) {
             return getExecutionEntityManager().findById(job.getExecutionId());
+        }
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job) {
+        String executionId = job.getExecutionId();
+        if (executionId != null) {
+            ExecutionEntity executionEntity = getExecutionEntityManager().findById(executionId);
+            FlowElement currentFlowElement = executionEntity.getCurrentFlowElement();
+            if (currentFlowElement instanceof ExternalWorkerServiceTask externalWorkerServiceTask) {
+                List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();
+                if (inParameters != null && !inParameters.isEmpty()) {
+                    Map<String, Object> variables = new HashMap<>();
+                    for (IOParameter inParameter : inParameters) {
+                        if (inParameter.getSource() != null) {
+                            variables.put(inParameter.getTarget(), executionEntity.getVariable(inParameter.getSource()));
+                        } else {
+                            Expression sourceExpression = processEngineConfiguration.getExpressionManager()
+                                    .createExpression(inParameter.getSourceExpression());
+                            Object value = sourceExpression.getValue(executionEntity);
+                            variables.put(inParameter.getTarget(), value);
+                        }
+                    }
+                    return variables;
+                } else if (externalWorkerServiceTask.isNoInputParameter()) {
+                    return Collections.emptyMap();
+                }
+            }
+            return executionEntity.getVariables();
         }
         return null;
     }
@@ -297,8 +332,4 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         return processEngineConfiguration.getExecutionEntityManager();
     }
 
-    @Override
-    public VariableService getVariableService(Job job) {
-        return processEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-    }
 }

@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.variable.service.VariableService;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -261,9 +261,9 @@ class ScopeAwareInternalJobManagerTest {
         }
 
         @Override
-        public VariableService getVariableService(Job job) {
-            invokedMethods.add("getVariableService");
-            return null;
+        public Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job) {
+            invokedMethods.add("resolveVariableScopeForExternalWorkerJob");
+            return Map.of();
         }
     }
 

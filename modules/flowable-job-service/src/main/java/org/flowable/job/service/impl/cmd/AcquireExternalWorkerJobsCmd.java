@@ -15,13 +15,11 @@ package org.flowable.job.service.impl.cmd;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
@@ -32,9 +30,6 @@ import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
-import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.variable.service.VariableService;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Filip Hrisafov
@@ -82,23 +77,7 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
             lockJob(commandContext, job, lockTimeInMillis);
             Map<String, Object> variables = null;
             if (internalJobManager != null) {
-                VariableService variableService = internalJobManager.getVariableService(job);
-                if (variableService != null) {
-                    List<VariableInstanceEntity> variableInstances = variableService
-                            .findVariableInstanceByScopeIdAndScopeType(job.getId(), ScopeTypes.EXTERNAL_WORKER);
-                    if (!variableInstances.isEmpty()) {
-                        variables = new HashMap<>();
-                        for (VariableInstanceEntity variableInstance : variableInstances) {
-                            variables.put(variableInstance.getName(), variableInstance.getValue());
-                        }
-                    }
-                }
-                if (variables == null) {
-                    VariableScope variableScope = internalJobManager.resolveVariableScope(job);
-                    if (variableScope != null) {
-                        variables = variableScope.getVariables();
-                    }
-                }
+                variables = internalJobManager.resolveVariableScopeForExternalWorkerJob(job);
 
                 if (job.isExclusive()) {
                     internalJobManager.lockJobScope(job);

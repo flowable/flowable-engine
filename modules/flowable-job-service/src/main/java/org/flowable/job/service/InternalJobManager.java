@@ -13,11 +13,13 @@
 
 package org.flowable.job.service;
 
+import java.util.Map;
+
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.flowable.variable.service.VariableService;
 
 /**
  * @author Tijs Rademakers
@@ -28,7 +30,7 @@ public interface InternalJobManager {
 
     VariableScope resolveVariableScope(Job job);
 
-    VariableService getVariableService(Job job);
+    Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job);
     
     boolean handleJobInsert(Job job);
     
