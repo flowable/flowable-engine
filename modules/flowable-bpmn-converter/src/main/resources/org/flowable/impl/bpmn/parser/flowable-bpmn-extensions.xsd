@@ -386,10 +386,10 @@
     </annotation>
   </attribute>
 
-  <attribute name="noInputParameter" type="string">
+  <attribute name="doNotIncludeVariables" type="string">
     <annotation>
       <documentation>
-        Mark an external worker task to explicit not provide any input parameters.
+        Mark an external worker task to explicit not include the variables.
       </documentation>
     </annotation>
   </attribute>

@@ -21,7 +21,7 @@ import java.util.List;
 public class ExternalWorkerServiceTask extends ServiceTask implements HasOutParameters, HasInParameters {
 
     protected String topic;
-    protected boolean noInputParameter = false;
+    protected boolean doNotIncludeVariables = false;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
 
@@ -33,12 +33,12 @@ public class ExternalWorkerServiceTask extends ServiceTask implements HasOutPara
         this.topic = topic;
     }
 
-    public boolean isNoInputParameter() {
-        return noInputParameter;
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
     }
 
-    public void setNoInputParameter(boolean noInputParameter) {
-        this.noInputParameter = noInputParameter;
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
     }
 
     @Override

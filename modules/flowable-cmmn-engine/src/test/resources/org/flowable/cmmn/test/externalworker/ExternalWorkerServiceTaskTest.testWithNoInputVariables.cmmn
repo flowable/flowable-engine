@@ -22,7 +22,7 @@
                 </planItemOnPart>
             </sentry>
             <task id="externalWorkerTask" name="External Worker" flowable:type="external-worker" flowable:exclusive="true" flowable:topic="simple"
-                  flowable:noInputParameter="true"/>
+                  flowable:doNotIncludeVariables="true"/>
             <humanTask id="afterExternalWorkerCompleteTask" name="After External Worker Complete"/>
             <humanTask id="afterExternalWorkerTerminateTask" name="After External Worker Terminate"/>
         </casePlanModel>

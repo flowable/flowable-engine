@@ -217,7 +217,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC = "topic";
-    public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_NO_INPUT_PARAMETER = "noInputParameter";
+    public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
     public static final String ELEMENT_EXTERNAL_WORKER_IN_PARAMETER = "externalWorkerInParameter";
     public static final String ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER = "externalWorkerOutParameter";
 

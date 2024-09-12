@@ -84,7 +84,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
                         }
                     }
                     return variables;
-                } else if (externalWorkerServiceTask.isNoInputParameter()) {
+                } else if (externalWorkerServiceTask.isDoNotIncludeVariables()) {
                     return Collections.emptyMap();
                 }
             }

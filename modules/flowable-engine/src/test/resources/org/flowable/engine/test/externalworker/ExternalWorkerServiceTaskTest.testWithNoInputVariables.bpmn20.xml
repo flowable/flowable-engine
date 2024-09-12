@@ -11,7 +11,7 @@
 
         <sequenceFlow sourceRef="theStart" targetRef="externalWorkerTask"/>
 
-        <serviceTask id="externalWorkerTask" flowable:type="external-worker" flowable:topic="simple" flowable:noInputParameter="true"/>
+        <serviceTask id="externalWorkerTask" flowable:type="external-worker" flowable:topic="simple" flowable:doNotIncludeVariables="true"/>
 
         <sequenceFlow sourceRef="externalWorkerTask" targetRef="taskAfter"/>
 

@@ -24,7 +24,7 @@ public class ExternalWorkerServiceTask extends Task implements HasInParameters, 
 
     protected String type;
     protected String topic;
-    protected boolean noInputParameter = false;
+    protected boolean doNotIncludeVariables = false;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
 
@@ -48,12 +48,12 @@ public class ExternalWorkerServiceTask extends Task implements HasInParameters, 
         this.topic = topic;
     }
 
-    public boolean isNoInputParameter() {
-        return noInputParameter;
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
     }
 
-    public void setNoInputParameter(boolean noInputParameter) {
-        this.noInputParameter = noInputParameter;
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ExternalWorkerServiceTask extends Task implements HasInParameters, 
         super.setValues(otherElement);
         setType(otherElement.getType());
         setTopic(otherElement.getTopic());
-        setNoInputParameter(otherElement.isNoInputParameter());
+        setDoNotIncludeVariables(otherElement.isDoNotIncludeVariables());
         setInParameters(new ArrayList<>(otherElement.getInParameters()));
         setOutParameters(new ArrayList<>(otherElement.getInParameters()));
     }

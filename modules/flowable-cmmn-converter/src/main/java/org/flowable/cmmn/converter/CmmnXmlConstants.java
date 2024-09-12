@@ -123,7 +123,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
-    String ATTRIBUTE_EXTERNAL_WORKER_NO_INPUT_PARAMETER = "noInputParameter";
+    String ATTRIBUTE_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
     String ELEMENT_EXTERNAL_WORKER_IN_PARAMETER = "externalWorkerInParameter";
     String ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER = "externalWorkerOutParameter";
 

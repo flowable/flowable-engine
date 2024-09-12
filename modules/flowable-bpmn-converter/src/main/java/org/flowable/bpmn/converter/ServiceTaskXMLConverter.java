@@ -258,8 +258,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, externalWorkerTask.getSkipExpression(), xtw);
         }
 
-        if (externalWorkerTask.isNoInputParameter()) {
-            writeQualifiedAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_NO_INPUT_PARAMETER, String.valueOf(externalWorkerTask.isNoInputParameter()), xtw);
+        if (externalWorkerTask.isDoNotIncludeVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES, String.valueOf(externalWorkerTask.isDoNotIncludeVariables()), xtw);
         }
     }
 
@@ -454,8 +454,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected void convertExternalWorkerTaskXMLProperties(ExternalWorkerServiceTask externalWorkerServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
         externalWorkerServiceTask.setTopic(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, xtr));
-        externalWorkerServiceTask.setNoInputParameter(
-                Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_NO_INPUT_PARAMETER, xtr))
+        externalWorkerServiceTask.setDoNotIncludeVariables(
+                Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES, xtr))
         );
 
         parseChildElements(getXMLElementName(), externalWorkerServiceTask, externalWorkerTaskChildParserMap, bpmnModel, xtr);
