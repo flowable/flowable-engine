@@ -213,6 +213,7 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
                             // It is still possible that there are multiple entries with the same DATEEXECUTED value and the order might not be correct.
                             // e.g. MySQL 8.0 sometimes does not return the correct order.
                             changeLogVersion = changeLogVersionId;
+                            latestChangeLogVersionOrder = changeLogVersionOrder;
                         }
                     }
                 }
