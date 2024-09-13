@@ -31,7 +31,7 @@
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
     <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
-    <discriminator javaType="string" column="EVENT_TYPE_">
+    <discriminator javaType="string" column="EVENT_TYPE_" jdbcType="NVARCHAR">
       <case value="message" resultMap="messageResultMap"/> 
       <case value="signal" resultMap="signalResultMap"/> 
       <case value="compensate" resultMap="compensateResultMap"/>
