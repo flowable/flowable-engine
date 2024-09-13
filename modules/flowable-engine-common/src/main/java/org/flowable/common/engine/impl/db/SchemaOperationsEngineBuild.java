@@ -54,7 +54,6 @@ public class SchemaOperationsEngineBuild implements Command<Void> {
 
         String databaseSchemaUpdate = schemaOperation == null ? engineConfiguration.getDatabaseSchemaUpdate() : schemaOperation;
         List<SchemaManager> schemaManagers = new ArrayList<>();
-        schemaManagers.add(engineConfiguration.getCommonSchemaManager());
         if (engineConfiguration.getCommonSchemaManager() != null) {
         	schemaManagers.add(engineConfiguration.getCommonSchemaManager());
         }
