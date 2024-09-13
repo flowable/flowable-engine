@@ -376,8 +376,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected boolean writeExternalWorkerTaskExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         ExternalWorkerServiceTask externalWorkerTask = (ExternalWorkerServiceTask) element;
-        BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_IN_PARAMETER, externalWorkerTask.getInParameters(), didWriteExtensionStartElement, xtw);
-        BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER, externalWorkerTask.getOutParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_IN_PARAMETER, externalWorkerTask.getInParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER, externalWorkerTask.getOutParameters(), didWriteExtensionStartElement, xtw);
 
         return didWriteExtensionStartElement;
     }
