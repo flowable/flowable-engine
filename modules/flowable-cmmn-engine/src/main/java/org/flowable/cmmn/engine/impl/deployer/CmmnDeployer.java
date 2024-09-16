@@ -86,7 +86,7 @@ public class CmmnDeployer implements EngineDeployer {
         for (EngineResource resource : deployment.getResources().values()) {
             if (isCmmnResource(resource.getName())) {
                 LOGGER.debug("Processing CMMN resource {}", resource.getName());
-                parseResult.merge(cmmnParser.parse(new CmmnParseContextImpl(resource)));
+                parseResult.merge(cmmnParser.parse(new CmmnParseContextImpl(resource, deployment.isNew())));
             }
         }
 
@@ -407,9 +407,11 @@ public class CmmnDeployer implements EngineDeployer {
     protected class CmmnParseContextImpl implements CmmnParseContext {
 
         protected final EngineResource resource;
+        protected final boolean newDeployment;
 
-        public CmmnParseContextImpl(EngineResource resource) {
+        public CmmnParseContextImpl(EngineResource resource, boolean newDeployment) {
             this.resource = resource;
+            this.newDeployment = newDeployment;
         }
 
         @Override
@@ -434,7 +436,8 @@ public class CmmnDeployer implements EngineDeployer {
 
         @Override
         public boolean validateCmmnModel() {
-            return validateXml();
+            // On redeploy, we assume it is validated at the first deploy
+            return newDeployment && validateXml();
         }
 
         @Override
