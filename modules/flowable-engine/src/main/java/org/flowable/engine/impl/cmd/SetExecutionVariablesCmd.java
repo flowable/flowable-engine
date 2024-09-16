@@ -66,10 +66,12 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         // variable. If not, duplicate variables may occur since optimistic
         // locking doesn't work on inserts
         execution.forceUpdate();
-        
-        if (VariableListenerUtil.hasVariableListenerEventDefinitions(execution.getProcessDefinitionId())) {
-            CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
-                    execution.getProcessDefinitionId(), execution.getProcessInstanceId());
+
+        for (String variableName : variables.keySet()) {
+            if (VariableListenerUtil.containsVariableListenerForVariableName(execution.getProcessDefinitionId(), variableName)) {
+                CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
+                        execution.getProcessDefinitionId(), execution.getProcessInstanceId());
+            }
         }
         
         return null;

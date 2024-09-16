@@ -20,8 +20,13 @@ public class VariableListenerUtil {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableListenerUtil.class);
 
-    public static boolean hasVariableListenerEventDefinitions(String processDefinitionId) {
+    public static boolean hasVariableListenerEventDefinitions(String processDefinitionId, String variableName) {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
-        return bpmnModel.hasVariableListeners();
+        return bpmnModel.hasVariableListeners() && bpmnModel.containsVariableListenerForVariableName(variableName);
+    }
+
+    public static boolean containsVariableListenerForVariableName(String processDefinitionId, String variableName) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        return bpmnModel.containsVariableListenerForVariableName(variableName);
     }
 }
