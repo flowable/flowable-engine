@@ -13,6 +13,7 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -77,6 +78,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndType(String processInstanceId, String type);
+
+    List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndTypeAndNames(String processInstanceId, String type, Set<String> eventNames);
     
     List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(String subScopeId);
 

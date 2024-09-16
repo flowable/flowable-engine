@@ -65,7 +65,7 @@ public class EvaluateVariableListenerEventDefinitionsOperation extends AbstractO
         }
         
         List<EventSubscriptionEntity> eventSubscriptionEntities = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionEntityManager()
-                .findEventSubscriptionsByProcessInstanceAndType(processInstanceId, "variable");
+                .findEventSubscriptionsByProcessInstanceAndTypeAndNames(processInstanceId, "variable", variableSessionData.keySet());
         
         for (EventSubscriptionEntity eventSubscription : eventSubscriptionEntities) {
             

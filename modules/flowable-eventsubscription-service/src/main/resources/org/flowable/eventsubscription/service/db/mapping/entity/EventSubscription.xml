@@ -299,8 +299,20 @@
     where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
     	and (PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR})
   </select>
-  
-  <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+
+  <select id="selectEventSubscriptionsByProcessInstanceTypeAndNames" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (EVENT_NAME_ IN
+        <foreach item="item" collection="parameter.eventNames" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ) and (PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR})
+  </select>
+
+
+    <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
