@@ -33,23 +33,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.AbstractEventSubscriptionDataManager;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.EventSubscriptionDataManager;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionAndTypeMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionIdMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByNameMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcInstTypeAndActivityMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessInstanceAndTypeMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndScopeStartEventMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeIdAndTypeMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsBySubScopeIdMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.MessageEventSubscriptionsByProcInstAndEventNameMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByEventNameMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByNameAndExecutionMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByProcInstAndEventNameMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByScopeAndEventNameMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.SignalEventSubscriptionByScopeIdAndTypeMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.*;
 
 /**
  * @author Joram Barrez
@@ -76,6 +60,8 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByExecutionAndTypeMatcher = new EventSubscriptionsByExecutionAndTypeMatcher();
     
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcessInstanceAndTypeMatcher = new EventSubscriptionsByProcessInstanceAndTypeMatcher();
+
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcessInstanceAndTypeAndNamesMatcher = new EventSubscriptionsByProcInstTypeAndNameMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeMatcher();
 
@@ -224,7 +210,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
         params.put("processInstanceId", processInstanceId);
         params.put("eventType", type);
         params.put("eventNames", eventNames);
-        return getList("selectEventSubscriptionsByProcessInstanceTypeAndNames", params, eventSubscriptionsByProcInstTypeAndActivityMatcher, true);
+        return getList("selectEventSubscriptionsByProcessInstanceTypeAndNames", params, eventSubscriptionsByProcessInstanceAndTypeAndNamesMatcher, true);
     }
     
     @Override
