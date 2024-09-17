@@ -67,6 +67,7 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         // locking doesn't work on inserts
         execution.forceUpdate();
 
+        //only query for event subscriptions, if there is a variable listener associated to the variable that is created/updated
         for (String variableName : variables.keySet()) {
             if (VariableListenerUtil.containsVariableListenerForVariableName(execution.getProcessDefinitionId(), variableName)) {
                 CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
