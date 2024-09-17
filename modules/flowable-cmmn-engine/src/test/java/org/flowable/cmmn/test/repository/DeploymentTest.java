@@ -26,6 +26,8 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.CaseValidatorImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
@@ -189,6 +191,39 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         ;
 
         assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list()).isEmpty();
+    }
+
+    @Test
+    public void alreadyDeployedCaseModelWithErrorsShouldNotFail() {
+        CaseValidator originalValidator = cmmnEngineConfiguration.getCaseValidator();
+
+        try {
+            // We disable all the validations so we can test this
+            cmmnEngineConfiguration.setCaseValidator(new CaseValidatorImpl());
+
+            org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithErrors.cmmn")
+                    .deploy();
+            autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+            CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                    .caseDefinitionKey("myCase")
+                    .singleResult();
+            assertThat(caseDefinition).isNotNull();
+
+            cmmnEngineConfiguration.setCaseValidator(originalValidator);
+
+            // remove it from the cache to force parsing it again
+            cmmnEngineConfiguration.getDeploymentManager()
+                    .getCaseDefinitionCache()
+                    .clear();
+
+            CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
+
+            assertThat(cmmnModel).isNotNull();
+
+        } finally {
+            cmmnEngineConfiguration.setCaseValidator(originalValidator);
+        }
     }
 
     @Test
