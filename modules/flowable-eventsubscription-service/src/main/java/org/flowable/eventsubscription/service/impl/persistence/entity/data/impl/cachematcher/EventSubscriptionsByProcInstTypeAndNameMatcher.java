@@ -12,11 +12,11 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher;
 
-import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
-import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
-
 import java.util.Map;
 import java.util.Set;
+
+import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
 /**
  * @author José Carlos Mendoza
