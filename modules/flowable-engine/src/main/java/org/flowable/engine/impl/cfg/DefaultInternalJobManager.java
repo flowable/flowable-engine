@@ -76,7 +76,7 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     }
 
     @Override
-    public Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job) {
+    public Map<String, Object> resolveVariableScopeForExternalWorkerJobInternal(ExternalWorkerJob job) {
         String executionId = job.getExecutionId();
         if (executionId != null) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(executionId);

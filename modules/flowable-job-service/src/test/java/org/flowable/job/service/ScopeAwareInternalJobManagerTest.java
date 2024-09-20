@@ -39,6 +39,7 @@ class ScopeAwareInternalJobManagerTest {
         TestScopeAwareInternalJobManager manager = new TestScopeAwareInternalJobManager();
 
         Job scopeJob = mock(Job.class, "scopeJob");
+        ExternalWorkerJob externalWorkerJob = mock(ExternalWorkerJob.class, "externalWorkerJob");
         Job insertJob = mock(Job.class, "insertJob");
         Job deleteJob = mock(Job.class, "deleteJob");
         Job lockJob = mock(Job.class, "lockJob");
@@ -47,10 +48,12 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mock(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
+        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 
         manager.variableScopeByJob.put(scopeJob, resolveJobScope);
+        manager.variableByExternalWorkerJob.put(externalWorkerJob, resolveVariableMap);
         manager.insertJobInternalByJob.put(insertJob, Boolean.TRUE);
 
         InternalJobManager underTest = manager;
@@ -62,6 +65,7 @@ class ScopeAwareInternalJobManagerTest {
         underTest.clearJobScopeLock(clearLockJob);
         underTest.preTimerJobDelete(timerDeleteJob, timerDeleteJobScope);
         underTest.preRepeatedTimerSchedule(repeatedTimerSchedule, repeatedTimerScheduleScope);
+        assertThat(underTest.resolveVariableScopeForExternalWorkerJob(externalWorkerJob)).isEqualTo(resolveVariableMap);
 
         assertThat(manager.invokedMethods)
                 .containsExactly(
@@ -71,7 +75,8 @@ class ScopeAwareInternalJobManagerTest {
                         "lockJobScopeInternal",
                         "clearJobScopeLockInternal",
                         "preTimerJobDeleteInternal",
-                        "preRepeatedTimerScheduleInternal"
+                        "preRepeatedTimerScheduleInternal",
+                        "resolveVariableScopeForExternalWorkerJobInternal"
                 );
 
         assertThat(manager.jobDeleteInternal).isEqualTo(deleteJob);
@@ -89,6 +94,7 @@ class ScopeAwareInternalJobManagerTest {
         TestScopeAwareInternalJobManager bpmnManager = new TestScopeAwareInternalJobManager();
 
         Job scopeJob = mockBpmnJob(Job.class, "scopeJob");
+        ExternalWorkerJob externalWorkerJob = mockBpmnJob(ExternalWorkerJob.class, "externalWorkerJob");
         Job insertJob = mockBpmnJob(Job.class, "insertJob");
         Job deleteJob = mockBpmnJob(Job.class, "deleteJob");
         Job lockJob = mockBpmnJob(Job.class, "lockJob");
@@ -97,10 +103,12 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mockBpmnJob(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
+        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 
         bpmnManager.variableScopeByJob.put(scopeJob, resolveJobScope);
+        bpmnManager.variableByExternalWorkerJob.put(externalWorkerJob, resolveVariableMap);
         bpmnManager.insertJobInternalByJob.put(insertJob, Boolean.TRUE);
 
         defaultManager.registerScopedInternalJobManager(ScopeTypes.BPMN, bpmnManager);
@@ -114,6 +122,7 @@ class ScopeAwareInternalJobManagerTest {
         underTest.clearJobScopeLock(clearLockJob);
         underTest.preTimerJobDelete(timerDeleteJob, timerDeleteJobScope);
         underTest.preRepeatedTimerSchedule(repeatedTimerSchedule, repeatedTimerScheduleScope);
+        assertThat(underTest.resolveVariableScopeForExternalWorkerJob(externalWorkerJob)).isEqualTo(resolveVariableMap);
 
         assertThat(bpmnManager.invokedMethods)
                 .containsExactly(
@@ -123,7 +132,8 @@ class ScopeAwareInternalJobManagerTest {
                         "lockJobScopeInternal",
                         "clearJobScopeLockInternal",
                         "preTimerJobDeleteInternal",
-                        "preRepeatedTimerScheduleInternal"
+                        "preRepeatedTimerScheduleInternal",
+                        "resolveVariableScopeForExternalWorkerJobInternal"
                 );
 
         assertThat(bpmnManager.jobDeleteInternal).isEqualTo(deleteJob);
@@ -143,6 +153,7 @@ class ScopeAwareInternalJobManagerTest {
         TestScopeAwareInternalJobManager cmmnManager = new TestScopeAwareInternalJobManager();
 
         Job scopeJob = mockCmmnJob(Job.class, "scopeJob");
+        ExternalWorkerJob externalWorkerJob = mockCmmnJob(ExternalWorkerJob.class, "externalWorkerJob");
         Job insertJob = mockCmmnJob(Job.class, "insertJob");
         Job deleteJob = mockCmmnJob(Job.class, "deleteJob");
         Job lockJob = mockCmmnJob(Job.class, "lockJob");
@@ -151,10 +162,12 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mockCmmnJob(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
+        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 
         cmmnManager.variableScopeByJob.put(scopeJob, resolveJobScope);
+        cmmnManager.variableByExternalWorkerJob.put(externalWorkerJob, resolveVariableMap);
         cmmnManager.insertJobInternalByJob.put(insertJob, Boolean.TRUE);
 
         defaultManager.registerScopedInternalJobManager(ScopeTypes.CMMN, cmmnManager);
@@ -168,6 +181,7 @@ class ScopeAwareInternalJobManagerTest {
         underTest.clearJobScopeLock(clearLockJob);
         underTest.preTimerJobDelete(timerDeleteJob, timerDeleteJobScope);
         underTest.preRepeatedTimerSchedule(repeatedTimerSchedule, repeatedTimerScheduleScope);
+        assertThat(underTest.resolveVariableScopeForExternalWorkerJob(externalWorkerJob)).isEqualTo(resolveVariableMap);
 
         assertThat(cmmnManager.invokedMethods)
                 .containsExactly(
@@ -177,7 +191,8 @@ class ScopeAwareInternalJobManagerTest {
                         "lockJobScopeInternal",
                         "clearJobScopeLockInternal",
                         "preTimerJobDeleteInternal",
-                        "preRepeatedTimerScheduleInternal"
+                        "preRepeatedTimerScheduleInternal",
+                        "resolveVariableScopeForExternalWorkerJobInternal"
                 );
 
         assertThat(cmmnManager.jobDeleteInternal).isEqualTo(deleteJob);
@@ -206,6 +221,7 @@ class ScopeAwareInternalJobManagerTest {
     private static class TestScopeAwareInternalJobManager extends ScopeAwareInternalJobManager {
 
         protected Map<Job, VariableScope> variableScopeByJob = new HashMap<>();
+        protected Map<ExternalWorkerJob, Map<String, Object>> variableByExternalWorkerJob = new HashMap<>();
         protected Map<Job, Boolean> insertJobInternalByJob = new HashMap<>();
         protected Job jobDeleteInternal;
         protected Job lockJobScopeInternal;
@@ -261,9 +277,9 @@ class ScopeAwareInternalJobManagerTest {
         }
 
         @Override
-        public Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job) {
-            invokedMethods.add("resolveVariableScopeForExternalWorkerJob");
-            return Map.of();
+        public Map<String, Object> resolveVariableScopeForExternalWorkerJobInternal(ExternalWorkerJob job) {
+            invokedMethods.add("resolveVariableScopeForExternalWorkerJobInternal");
+            return variableByExternalWorkerJob.get(job);
         }
     }
 
