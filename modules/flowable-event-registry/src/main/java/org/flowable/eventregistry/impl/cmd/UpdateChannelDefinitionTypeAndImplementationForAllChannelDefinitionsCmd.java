@@ -19,6 +19,8 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.DbUpgradeStep;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.ChannelDefinition;
@@ -31,7 +33,12 @@ import org.flowable.eventregistry.model.ChannelModel;
 /**
  * @author Filip Hrisafov
  */
-public class UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd implements Command<Void> {
+public class UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd implements Command<Void>, DbUpgradeStep {
+
+    @Override
+    public void execute() throws Exception {
+        execute(Context.getCommandContext());
+    }
 
     @Override
     public Void execute(CommandContext commandContext) {

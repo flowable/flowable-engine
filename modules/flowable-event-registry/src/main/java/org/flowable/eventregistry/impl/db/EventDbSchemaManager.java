@@ -15,11 +15,9 @@ package org.flowable.eventregistry.impl.db;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
 import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
-import org.flowable.eventregistry.impl.cmd.UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
 
 public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
@@ -69,18 +67,6 @@ public class EventDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
             return changeLogVersionMap.get(changeLogVersion);
         }
         return "6.5.0.0";
-    }
-
-    protected AbstractEngineConfiguration getEngineConfiguration() {
-        return CommandContextUtil.getEventRegistryConfiguration();
-    }
-    
-    @Override
-    protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
-        String version = changeLogVersion.version();
-        if ("1".equals(version) || "2".equals(version)) {
-            getEngineConfiguration().getCommandExecutor().execute(new UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd());
-        }
     }
 
     @Override
