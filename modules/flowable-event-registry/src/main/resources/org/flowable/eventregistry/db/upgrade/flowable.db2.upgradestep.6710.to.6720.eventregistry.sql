@@ -6,4 +6,5 @@ ALTER TABLE FLW_CHANNEL_DEFINITION ADD IMPLEMENTATION_ VARCHAR(255);
 
 CALL SYSPROC.ADMIN_CMD ('REORG TABLE FLW_CHANNEL_DEFINITION');
 
+execute java org.flowable.eventregistry.impl.cmd.UpdateChannelDefinitionTypeAndImplementationForAllChannelDefinitionsCmd
 
