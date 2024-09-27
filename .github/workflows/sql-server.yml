@@ -19,9 +19,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mssql: [2017-latest-ubuntu, 2019-latest]
+        mssql: [2017-latest, 2019-latest]
         include:
-          - mssql: 2017-latest-ubuntu
+          - mssql: 2017-latest
             healthRunnable: /opt/mssql-tools/bin/sqlcmd
           - mssql: 2019-latest
             healthRunnable: /opt/mssql-tools18/bin/sqlcmd -C
