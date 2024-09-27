@@ -15,4 +15,4 @@ CREATE INDEX ACT_IDX_APP_DEF_DPLY ON ACT_APP_APPDEF(DEPLOYMENT_ID_);
 CREATE UNIQUE INDEX ACT_IDX_APP_DEF_UNIQ ON ACT_APP_APPDEF(KEY_, VERSION_, TENANT_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('app.schema.version', '7.1.0.1', 1);
+values ('app.schema.version', '7.2.0.0', 1);

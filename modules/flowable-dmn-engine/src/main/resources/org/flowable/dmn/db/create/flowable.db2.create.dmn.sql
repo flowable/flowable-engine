@@ -31,4 +31,4 @@ CALL SYSPROC.ADMIN_CMD ('REORG TABLE ACT_DMN_DECISION');
 CREATE INDEX ACT_IDX_DMN_INSTANCE_ID ON ACT_DMN_HI_DECISION_EXECUTION(INSTANCE_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('dmn.schema.version', '7.1.0.1', 1);
+values ('dmn.schema.version', '7.2.0.0', 1);
