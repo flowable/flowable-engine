@@ -335,6 +335,8 @@ public class VariableEventListenerTest extends FlowableCmmnTestCase {
         
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
 
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "nonExistingVar", "test");
+        
         // create variable triggers the variable event listener
         cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
         

@@ -34,6 +34,7 @@ import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.VariableListenerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +98,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                         }
                         
                         if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
-                            processInstanceIds.add(variableListenerData.getScopeId());
-                            agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                            if (VariableListenerUtil.hasVariableListenerEventDefinitionsForVariableName(variableListenerData.getScopeDefinitionId(), variableName)) {
+                                processInstanceIds.add(variableListenerData.getScopeId());
+                                agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                            }
                         }
                     }
                 }
