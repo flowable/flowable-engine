@@ -67,7 +67,7 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         // locking doesn't work on inserts
         execution.forceUpdate();
         
-        if (VariableListenerUtil.hasVariableListenerEventDefinitions(execution.getProcessDefinitionId())) {
+        if (VariableListenerUtil.hasVariableListenerEventDefinitionsForVariableNames(execution.getProcessDefinitionId(), variables.keySet())) {
             CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
                     execution.getProcessDefinitionId(), execution.getProcessInstanceId());
         }
