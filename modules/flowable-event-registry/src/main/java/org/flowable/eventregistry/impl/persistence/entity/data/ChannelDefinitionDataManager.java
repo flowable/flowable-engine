@@ -50,5 +50,4 @@ public interface ChannelDefinitionDataManager extends DataManager<ChannelDefinit
 
     void updateChannelDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
 
-    void updateChannelDefinitionTypeAndImplementation(String channelDefinitionId, String type, String implementation);
 }

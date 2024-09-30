@@ -41,8 +41,6 @@ public interface ChannelDefinitionEntityManager extends EntityManager<ChannelDef
 
     void updateChannelDefinitionTenantIdForDeployment(String deploymentId, String newTenantId);
 
-    void updateChannelDefinitionTypeAndImplementation(String channelDefinitionId, String type, String implementation);
-
     void deleteChannelDefinitionsByDeploymentId(String deploymentId);
 
 }
