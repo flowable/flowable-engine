@@ -19,4 +19,4 @@ ALTER TABLE FLW_CHANNEL_DEFINITION ADD IMPLEMENTATION_ VARCHAR(255);
 CALL SYSPROC.ADMIN_CMD ('REORG TABLE FLW_CHANNEL_DEFINITION');
 
 insert into ACT_GE_PROPERTY
-values ('eventregistry.schema.version', '7.2.0.0', 1);
+values ('eventregistry.schema.version', '7.1.0.2', 1);
