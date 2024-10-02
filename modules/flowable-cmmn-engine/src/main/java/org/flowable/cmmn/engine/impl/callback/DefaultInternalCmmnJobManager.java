@@ -55,6 +55,11 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     }
 
     @Override
+    protected String resolveJobLockIdInternal(Job job) {
+        return job.getScopeId();
+    }
+
+    @Override
     protected boolean handleJobInsertInternal(Job job) {
         // Currently, nothing extra needed (but counting relationships can be added later here).
         return true;
