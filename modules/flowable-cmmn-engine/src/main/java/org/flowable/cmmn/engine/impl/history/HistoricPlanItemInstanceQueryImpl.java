@@ -520,7 +520,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
         List<HistoricPlanItemInstance> historicPlanItems;
-        if(includeLocalVariables){
+        if (includeLocalVariables){
             historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
         } else {
              historicPlanItems =CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
