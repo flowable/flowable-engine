@@ -89,6 +89,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected boolean withoutTenantId;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean includeLocalVariables;
 
     protected List<PlanItemInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected PlanItemInstanceQueryImpl currentOrQueryObject;
@@ -1079,6 +1080,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery includeLocalVariables() {
+        this.includeLocalVariables = true;
+        return this;
+    }
+
+    @Override
     public PlanItemInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;
@@ -1099,8 +1106,14 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
-        List<PlanItemInstance> planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
-      
+        List<PlanItemInstance> planItems = null;
+        if (includeLocalVariables) {
+            planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findWithVariablesByCriteria(this);
+
+        } else {
+            planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
+        }
+
         if (cmmnEngineConfiguration.getPlanItemLocalizationManager() != null) {
             for (PlanItemInstance planItemInstance : planItems) {
                 cmmnEngineConfiguration.getPlanItemLocalizationManager().localize(planItemInstance, locale, withLocalizationFallback);
@@ -1283,6 +1296,9 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         return withoutTenantId;
     }
 
+    public boolean isIncludeLocalVariables() {
+        return includeLocalVariables;
+    }
     public List<List<String>> getSafeInvolvedGroups() {
         return safeInvolvedGroups;
     }
