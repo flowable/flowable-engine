@@ -386,6 +386,14 @@
     </annotation>
   </attribute>
 
+  <attribute name="doNotIncludeVariables" type="boolean">
+    <annotation>
+      <documentation>
+        Mark an external worker task to explicit not include the variables.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <element name="field">
     <annotation>
       <documentation>
