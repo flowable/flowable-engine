@@ -33,13 +33,13 @@ public class ConditionalEventDefinitionParseHandler extends AbstractBpmnParseHan
         if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
             IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchConditionalEventActivityBehavior(
-                            intermediateCatchEvent, eventDefinition, eventDefinition.getConditionExpression()));
+                            intermediateCatchEvent, eventDefinition, eventDefinition.getConditionExpression(), eventDefinition.getConditionLanguage()));
             
         } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
             BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
             
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryConditionalEventActivityBehavior(boundaryEvent, 
-                                eventDefinition, eventDefinition.getConditionExpression(), boundaryEvent.isCancelActivity()));
+                                eventDefinition, eventDefinition.getConditionExpression(), eventDefinition.getConditionLanguage(), boundaryEvent.isCancelActivity()));
         }
     }
 }

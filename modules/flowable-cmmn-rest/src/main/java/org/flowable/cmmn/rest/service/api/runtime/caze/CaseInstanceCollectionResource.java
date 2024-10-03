@@ -278,10 +278,12 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "Start a case instance", tags = { "Case Instances" },
             notes = "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
-            + "Only one of *caseDefinitionId* or *caseDefinitionKey* an be used in the request body. \n\n"
-            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n "
-            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section.\n\n "
-            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.\n\n",
+            + "Only one of *caseDefinitionId* or *caseDefinitionKey* an be used in the request body.\n\n"
+            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n"
+            + "If tenantId is omitted, the default tenant will be used.\n\n "
+            + "It is possible to send variables, transientVariables and startFormVariables in one request.\n\n"
+            + "More information about the variable format can be found in the REST variables section.\n\n "
+            + "Note that the variable-scope that is supplied is ignored, case-variables are always local.\n\n",
             code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the case instance was created."),
@@ -319,26 +321,26 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
                 }
                 startFormVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-            
-        } else {
-            if (request.getVariables() != null) {
-                startVariables = new HashMap<>();
-                for (RestVariable variable : request.getVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+
+        }
+
+        if (request.getVariables() != null) {
+            startVariables = new HashMap<>();
+            for (RestVariable variable : request.getVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-    
-            if (request.getTransientVariables() != null) {
-                transientVariables = new HashMap<>();
-                for (RestVariable variable : request.getTransientVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+        }
+
+        if (request.getTransientVariables() != null) {
+            transientVariables = new HashMap<>();
+            for (RestVariable variable : request.getTransientVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
         }
 

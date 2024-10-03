@@ -227,7 +227,7 @@ public interface ActivityBehaviorFactory {
             MessageEventDefinition messageEventDefinition);
     
     IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent,
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression);
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage);
 
     IntermediateCatchTimerEventActivityBehavior createIntermediateCatchTimerEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, TimerEventDefinition timerEventDefinition);
 
@@ -268,7 +268,7 @@ public interface ActivityBehaviorFactory {
     BoundaryMessageEventActivityBehavior createBoundaryMessageEventActivityBehavior(BoundaryEvent boundaryEvent, MessageEventDefinition messageEventDefinition, boolean interrupting);
     
     BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent, ConditionalEventDefinition conditionalEventDefinition,
-            String conditionExpression, boolean interrupting);
+            String conditionExpression, String conditionLanguage, boolean interrupting);
     
     BoundaryEscalationEventActivityBehavior createBoundaryEscalationEventActivityBehavior(BoundaryEvent boundaryEvent, EscalationEventDefinition escalationEventDefinition, Escalation escalation, boolean interrupting);
 

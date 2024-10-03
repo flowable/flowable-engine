@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -1064,5 +1065,93 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                         + "    { id: '" + secondLevelCallActivity2.getCalledProcessInstanceId() + "' }"
                         + "  ]"
                         + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-with-form-and-service-task.bpmn20.xml" })
+    public void testAllVariablesAreApplied() throws Exception {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processOne").singleResult();
+
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId("formDefId");
+        formInfo.setKey("formDefKey");
+        formInfo.setName("Form Definition Name");
+
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", processDefinition.getDeploymentId(), processDefinition.getTenantId(),
+                processEngineConfiguration.isFallbackToDefaultTenant()))
+                .thenReturn(formInfo);
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_START_FORM, processDefinition.getId());
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + " id: 'formDefId',"
+                        + " key: 'formDefKey',"
+                        + " name: 'Form Definition Name',"
+                        + " type: 'startForm',"
+                        + " definitionKey: 'processOne'"
+                        + "}");
+
+        ArrayNode formVariablesNode = objectMapper.createArrayNode();
+
+        // String variable
+        ObjectNode stringVarNode = formVariablesNode.addObject();
+        stringVarNode.put("name", "user");
+        stringVarNode.put("value", "simple string value");
+        stringVarNode.put("type", "string");
+
+        ObjectNode integerVarNode = formVariablesNode.addObject();
+        integerVarNode.put("name", "number");
+        integerVarNode.put("value", 1234);
+        integerVarNode.put("type", "integer");
+
+        ArrayNode variablesNode = objectMapper.createArrayNode();
+        stringVarNode = variablesNode.addObject();
+        stringVarNode.put("name", "userVariable");
+        stringVarNode.put("value", "simple string value");
+        stringVarNode.put("type", "string");
+
+        ArrayNode transientVariablesNode = objectMapper.createArrayNode();
+        stringVarNode = transientVariablesNode.addObject();
+        stringVarNode.put("name", "userTransient");
+        stringVarNode.put("value", "simple transient value");
+        stringVarNode.put("type", "string");
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.set("startFormVariables", formVariablesNode);
+        requestNode.set("variables", variablesNode);
+        requestNode.set("transientVariables", transientVariablesNode);
+        requestNode.put("processDefinitionKey", "processOne");
+
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", processDefinition.getDeploymentId()))
+                .thenReturn(formInfo);
+        when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+        when(formEngineFormService.getVariablesFromFormSubmission("theStart", "startEvent", null,
+                processDefinition.getId(), ScopeTypes.BPMN, formInfo, Map.of("user", "simple string value", "number", 1234), null))
+                .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "   ended: false"
+                        + "}");
+
+        String processInstanceId = responseNode.get("id").asText();
+        assertThat(runtimeService.getVariables(processInstanceId).entrySet()).extracting(Map.Entry::getKey, Map.Entry::getValue).containsExactlyInAnyOrder(
+                tuple("user", "simple string value return"),
+                tuple("number", 1234L),
+                tuple("userVariable", "simple string value"),
+                tuple("userTransient", "simple transient value")
+        );
     }
 }
