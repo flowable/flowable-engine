@@ -33,7 +33,7 @@ public class ScriptCondition implements Condition {
     }
 
     @Override
-    public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
+    public boolean evaluate(String elementId, DelegateExecution execution) {
         ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
 
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()

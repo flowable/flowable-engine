@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	targetNamespace="Examples"
+	xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL https://www.omg.org/spec/BPMN/20100501/BPMN20.xsd">
+	
+	<process id="process">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="task1" />
+		<sequenceFlow id="flow2" sourceRef="task1" targetRef="task1" />
+        <sequenceFlow id="flow3" sourceRef="boundaryEvent" targetRef="boundaryTask" />
+		<sequenceFlow id="flow4" sourceRef="boundaryTask" targetRef="theEnd" />
+		<endEvent id="theEnd" />
+
+		<userTask id="task1" />
+		<boundaryEvent id="boundaryEvent" attachedToRef="task1">
+			<outgoing>flow3</outgoing>
+			<conditionalEventDefinition>
+				<condition xsi:type="tFormalExpression" language="groovy">myVar == 'test'</condition>
+            </conditionalEventDefinition>
+		</boundaryEvent>
+		<userTask id="boundaryTask" />
+		
+
+	</process>
+
+</definitions>

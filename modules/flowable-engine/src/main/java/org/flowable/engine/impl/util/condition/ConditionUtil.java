@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.util.condition;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -20,6 +22,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.el.UelExpressionCondition;
+import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -41,15 +44,24 @@ public class ConditionUtil {
         }
 
         if (StringUtils.isNotEmpty(conditionExpression)) {
-
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
-            Condition condition = new UelExpressionCondition(expression);
-            return condition.evaluate(sequenceFlow.getId(), execution);
+	        String conditionLanguage = sequenceFlow.getConditionLanguage();
+	        return hasTrueCondition(sequenceFlow.getId(), conditionExpression, conditionLanguage, execution);
         } else {
             return true;
         }
 
     }
+
+	public static boolean hasTrueCondition(String elementId, String conditionExpression, String conditionLanguage, DelegateExecution execution) {
+		Condition condition;
+		if (conditionLanguage == null) {
+			Expression expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(conditionExpression);
+			condition = new UelExpressionCondition(expression);
+		} else {
+			condition = new ScriptCondition(conditionExpression, conditionLanguage);
+		}
+		return condition.evaluate(elementId, execution);
+	}
 
     protected static String getActiveValue(String originalValue, String propertyName, ObjectNode elementProperties) {
         String activeValue = originalValue;
