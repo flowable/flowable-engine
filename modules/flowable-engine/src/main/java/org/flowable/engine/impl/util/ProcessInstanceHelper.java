@@ -452,9 +452,8 @@ public class ProcessInstanceHelper {
         
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-        Signal signal = null;
-        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        if (signal != null) {
             signalEventDefinition.setSignalRef(signal.getName());
         }
 
