@@ -20,7 +20,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
@@ -471,7 +473,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     }
 
     @Override
-    public Map<String, Object> getLocalPlanItemInstanceVariables() {
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstance variableInstance : queryVariables) {
@@ -482,6 +484,20 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         }
         return variables;
     }
+
+    @Override
+    public List<HistoricVariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new HistoricVariableInitializingList();
+        }
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
+    }
+
+
 
     @Override
     public String toString() {

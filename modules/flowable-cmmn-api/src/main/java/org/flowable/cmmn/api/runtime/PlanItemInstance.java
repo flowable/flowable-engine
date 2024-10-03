@@ -59,7 +59,7 @@ public interface PlanItemInstance {
     String getFormKey();
     String getExtraValue();
     String getTenantId();
-    Map<String, Object> getLocalPlanItemInstanceVariables();
+    Map<String, Object> getPlanItemInstanceLocalVariables();
 
     /** Sets an optional localized name for the plan item */
     void setLocalizedName(String localizedName);

@@ -35,8 +35,10 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -459,19 +461,6 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    public Map<String, Object> getLocalPlanItemInstanceVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        if (queryVariables != null) {
-            for (VariableInstance variableInstance : queryVariables) {
-                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
-                    variables.put(variableInstance.getName(), variableInstance.getValue());
-                }
-            }
-        }
-        return variables;
-    }
-
-    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
@@ -681,6 +670,31 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setStateChangeUnprocessed(boolean stateChangeUnprocessed) {
         this.stateChangeUnprocessed = stateChangeUnprocessed;
+    }
+
+    @Override
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (VariableInstance variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public List<VariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new VariableInitializingList();
+        }
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
     }
 
     @Override

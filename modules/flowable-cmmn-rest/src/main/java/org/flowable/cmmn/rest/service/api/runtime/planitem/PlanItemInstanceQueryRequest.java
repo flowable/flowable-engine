@@ -191,12 +191,12 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
         return includeEnded;
     }
 
-    public Boolean getIncludeLocalVariables() {
-        return includeLocalVariables;
-    }
-
     public void setIncludeEnded(Boolean includeEnded) {
         this.includeEnded = includeEnded;
+    }
+
+    public Boolean getIncludeLocalVariables() {
+        return includeLocalVariables;
     }
 
     public void setIncludeLocalVariables(boolean includeLocalVariables) {

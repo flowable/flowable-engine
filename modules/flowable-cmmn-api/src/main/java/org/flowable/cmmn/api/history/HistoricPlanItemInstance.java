@@ -90,5 +90,5 @@ public interface HistoricPlanItemInstance {
     /** Sets an optional localized name for the plan item */
     void setLocalizedName(String localizedName);
 
-    Map<String, Object> getLocalPlanItemInstanceVariables();
+    Map<String, Object> getPlanItemInstanceLocalVariables();
 }

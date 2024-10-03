@@ -267,13 +267,13 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(task.getId());
         HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceId(planItemInstances.get(0).getId()).singleResult();
-        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).isEmpty();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
 
         planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(0).getId()).includeLocalVariables()
                 .singleResult();
-        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).isNotNull();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isNotNull();
 
-        assertThat(planItemInstance.getLocalPlanItemInstanceVariables()).containsOnly(
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).containsOnly(
                 entry("localVar", "someValue")
         );
     }

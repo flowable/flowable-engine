@@ -95,7 +95,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.formKey = planItemInstance.getFormKey();
         this.extraValue = planItemInstance.getExtraValue();
         this.variables = new HashMap<>(planItemInstance.getVariables());
-        this.localVariables = new HashMap<>(planItemInstance.getLocalPlanItemInstanceVariables());
+        this.localVariables = new HashMap<>(planItemInstance.getPlanItemInstanceLocalVariables());
         this.tenantId = planItemInstance.getTenantId();
         this.planItem = planItemInstance.getPlanItem();
     }
@@ -271,7 +271,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     }
 
     @Override
-    public Map<String, Object> getLocalPlanItemInstanceVariables() {
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
         return localVariables;
     }
 
