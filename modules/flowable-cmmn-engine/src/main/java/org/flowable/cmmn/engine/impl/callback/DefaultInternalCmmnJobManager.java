@@ -64,10 +64,13 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     }
 
     @Override
-    public Map<String, Object> resolveVariableScopeForExternalWorkerJobInternal(ExternalWorkerJob job) {
+    public Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job) {
         String subScopeId = job.getSubScopeId();
         if (subScopeId != null) {
             PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(subScopeId);
+            if (planItemInstanceEntity == null) {
+                return null;
+            }
             PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
             if (planItemDefinition instanceof ExternalWorkerServiceTask externalWorkerServiceTask) {
                 List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();

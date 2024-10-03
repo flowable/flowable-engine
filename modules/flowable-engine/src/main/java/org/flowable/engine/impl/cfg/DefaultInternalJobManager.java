@@ -76,10 +76,13 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     }
 
     @Override
-    public Map<String, Object> resolveVariableScopeForExternalWorkerJobInternal(ExternalWorkerJob job) {
+    public Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job) {
         String executionId = job.getExecutionId();
         if (executionId != null) {
             ExecutionEntity executionEntity = getExecutionEntityManager().findById(executionId);
+            if (executionEntity == null) {
+                return null;
+            }
             FlowElement currentFlowElement = executionEntity.getCurrentFlowElement();
             if (currentFlowElement instanceof ExternalWorkerServiceTask externalWorkerServiceTask) {
                 List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();

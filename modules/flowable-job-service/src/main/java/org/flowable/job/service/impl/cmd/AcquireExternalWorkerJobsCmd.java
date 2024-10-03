@@ -77,7 +77,7 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
             lockJob(commandContext, job, lockTimeInMillis);
             Map<String, Object> variables = null;
             if (internalJobManager != null) {
-                variables = internalJobManager.resolveVariableScopeForExternalWorkerJob(job);
+                variables = internalJobManager.resolveVariablesForExternalWorkerJob(job);
 
                 if (job.isExclusive()) {
                     internalJobManager.lockJobScope(job);

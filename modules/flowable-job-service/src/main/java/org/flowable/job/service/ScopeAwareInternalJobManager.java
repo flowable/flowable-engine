@@ -51,16 +51,16 @@ public abstract class ScopeAwareInternalJobManager implements InternalJobManager
     protected abstract VariableScope resolveVariableScopeInternal(Job job);
 
     @Override
-    public Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job) {
+    public Map<String, Object> resolveVariablesForExternalWorkerJob(ExternalWorkerJob job) {
         InternalJobManager internalJobManager = findInternalJobManager(job);
         if (internalJobManager == null) {
-            return resolveVariableScopeForExternalWorkerJobInternal(job);
+            return resolveVariablesForExternalWorkerJobInternal(job);
         }
 
-        return internalJobManager.resolveVariableScopeForExternalWorkerJob(job);
+        return internalJobManager.resolveVariablesForExternalWorkerJob(job);
     }
 
-    protected abstract Map<String, Object> resolveVariableScopeForExternalWorkerJobInternal(ExternalWorkerJob job);
+    protected abstract Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job);
 
     @Override
     public final boolean handleJobInsert(Job job) {

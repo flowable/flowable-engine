@@ -30,7 +30,7 @@ public interface InternalJobManager {
 
     VariableScope resolveVariableScope(Job job);
 
-    Map<String, Object> resolveVariableScopeForExternalWorkerJob(ExternalWorkerJob job);
+    Map<String, Object> resolveVariablesForExternalWorkerJob(ExternalWorkerJob job);
     
     boolean handleJobInsert(Job job);
     
