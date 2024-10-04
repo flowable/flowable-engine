@@ -364,7 +364,6 @@
   </select>
 
     <select id="selectPlanItemInstancesWithLocalVariablesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMapWithVariables">
-        <if test="needsPaging">${limitBefore}</if>
         SELECT RES.*
         <if test="includeLocalVariables">,
             VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
@@ -375,13 +374,15 @@
             VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
         </if>
         FROM (
+        <!-- top 100 percent is only needed when doing order by in a subselect -->
         <if test="needsPaging">${limitBefore}</if>
-        SELECT RES.* <if test="needsPaging">${limitBetween}</if>
+        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>
         <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
         ) RES
         left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SUB_SCOPE_ID_ and VAR.SCOPE_TYPE_= 'cmmn'
+        ${outerJoinOrderBy}
     </select>
 
   <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
