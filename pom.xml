@@ -14,35 +14,35 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.2.2</spring.boot.version>
-		<spring.framework.version>6.1.3</spring.framework.version>
-		<spring.security.version>6.2.1</spring.security.version>
-		<spring.amqp.version>3.1.1</spring.amqp.version>
-		<spring.kafka.version>3.1.1</spring.kafka.version>
-		<spring.ldap.version>3.2.1</spring.ldap.version>
-		<reactor-netty.version>1.1.15</reactor-netty.version>
-		<jackson.version>2.15.3</jackson.version>
+		<spring.boot.version>3.3.4</spring.boot.version>
+		<spring.framework.version>6.1.13</spring.framework.version>
+		<spring.security.version>6.3.3</spring.security.version>
+		<spring.amqp.version>3.1.7</spring.amqp.version>
+		<spring.kafka.version>3.2.4</spring.kafka.version>
+		<spring.ldap.version>3.2.6</spring.ldap.version>
+		<reactor-netty.version>1.1.22</reactor-netty.version>
+		<jackson.version>2.17.2</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
-        <camel.version>4.0.0</camel.version>
-		<cxf.version>4.0.2</cxf.version>
-		<slf4j.version>2.0.11</slf4j.version>
-		<groovy.version>4.0.17</groovy.version>
-		<jib-maven-plugin.version>3.4.0</jib-maven-plugin.version>
-		<native-build-tools-plugin.version>0.10.1</native-build-tools-plugin.version>
+        <camel.version>4.8.0</camel.version>
+		<cxf.version>4.0.5</cxf.version>
+		<slf4j.version>2.0.16</slf4j.version>
+		<groovy.version>4.0.23</groovy.version>
+		<jib-maven-plugin.version>3.4.3</jib-maven-plugin.version>
+		<native-build-tools-plugin.version>0.10.3</native-build-tools-plugin.version>
 
 		<junit.version>4.13.2</junit.version>
-		<junit.jupiter.version>5.10.1</junit.jupiter.version>
-		<hikari.version>5.0.1</hikari.version>
-		<maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
+		<junit.jupiter.version>5.10.3</junit.jupiter.version>
+		<hikari.version>5.1.0</hikari.version>
+		<maven.deploy.plugin.version>3.1.3</maven.deploy.plugin.version>
 		<maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-		<mockito.version>5.7.0</mockito.version>
+		<mockito.version>5.11.0</mockito.version>
 		<!--
 		 	AssertJ 3.24.2 is pulling older byte buddy not compatible with Java 21.
 			Therefore, we are fixing it like this.
 		-->
-		<byte-buddy.version>1.14.11</byte-buddy.version>
-		<testcontainers.version>1.19.3</testcontainers.version>
-		<artemis.version>2.31.2</artemis.version>
+		<byte-buddy.version>1.14.19</byte-buddy.version>
+		<testcontainers.version>1.19.8</testcontainers.version>
+		<artemis.version>2.33.0</artemis.version>
 
 		<oracle.jdbc.version>21.9.0.0</oracle.jdbc.version>
 		<oracle.jdbc.artifact>ojdbc8</oracle.jdbc.artifact>
@@ -121,17 +121,17 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.12.0</version>
+				<version>3.17.0</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.11.0</version>
+				<version>2.17.0</version>
 			</dependency>
 			<dependency>
 			    <groupId>commons-codec</groupId>
 			    <artifactId>commons-codec</artifactId>
-			    <version>1.15</version>
+			    <version>1.17.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -151,7 +151,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents.client5</groupId>
 				<artifactId>httpclient5</artifactId>
-				<version>5.2.3</version>
+				<version>5.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.database.jdbc</groupId>
@@ -162,17 +162,17 @@
 			<dependency>
 				<groupId>jakarta.xml.bind</groupId>
 				<artifactId>jakarta.xml.bind-api</artifactId>
-				<version>4.0.1</version>
+				<version>4.0.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
 				<artifactId>jaxb-runtime</artifactId>
-				<version>4.0.4</version>
+				<version>4.0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jaxb</groupId>
 				<artifactId>jaxb-xjc</artifactId>
-				<version>4.0.4</version>
+				<version>4.0.5</version>
 			</dependency>
 			<dependency>
 				<groupId>jakarta.servlet</groupId>
@@ -187,7 +187,7 @@
 			<dependency>
 				<groupId>org.eclipse.angus</groupId>
 				<artifactId>angus-mail</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>jakarta.persistence</groupId>
@@ -243,12 +243,12 @@
 			<dependency>
 				<groupId>com.mysql</groupId>
 				<artifactId>mysql-connector-j</artifactId>
-				<version>8.0.32</version>
+				<version>8.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mariadb.jdbc</groupId>
 				<artifactId>mariadb-java-client</artifactId>
-				<version>2.7.5</version>
+				<version>3.3.3</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.db2</groupId>
@@ -271,7 +271,7 @@
 			<dependency>
 				<groupId>org.hibernate.orm</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>6.4.1.Final</version>
+				<version>6.5.3.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.groovy</groupId>
@@ -286,20 +286,15 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-bom</artifactId>
-				<version>8.44.0.Final</version>
+				<version>9.44.0.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.15</version>
+				<version>3.5.16</version>
 			</dependency>
-			<dependency>
-              <groupId>org.mybatis</groupId>
-              <artifactId>mybatis-spring</artifactId>
-              <version>3.0.3</version>
-            </dependency>
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
@@ -367,7 +362,7 @@
 			<dependency>
 				<groupId>com.github.davidmoten</groupId>
 				<artifactId>subethasmtp</artifactId>
-				<version>6.0.6</version>
+				<version>7.1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.liquibase</groupId>
@@ -405,22 +400,12 @@
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.7.2</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.12.2</version>
+				<version>42.7.4</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.11.1</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>32.0.0-jre</version>
+				<version>2.13.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson</groupId>
@@ -462,7 +447,7 @@
 			<dependency>
 				<groupId>com.fasterxml.uuid</groupId>
 				<artifactId>java-uuid-generator</artifactId>
-				<version>3.3.0</version>
+				<version>5.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>net.sourceforge.jtds</groupId>
@@ -472,18 +457,18 @@
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>12.4.2.jre11</version>
+				<version>12.6.4.jre11</version>
 			</dependency>
 			<dependency>
 				<groupId>org.assertj</groupId>
 				<artifactId>assertj-core</artifactId>
-				<version>3.24.2</version>
+				<version>3.25.3</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>
-				<version>2.35.0</version>
+				<version>3.4.1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -494,7 +479,7 @@
 			<dependency>
 				<groupId>com.github.h-thurow</groupId>
 				<artifactId>simple-jndi</artifactId>
-				<version>0.23.0</version>
+				<version>0.24.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -559,10 +544,11 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.12.1</version>
+				<version>3.13.0</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
+					<release>${jdk.version}</release>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 					<parameters>true</parameters>
@@ -570,7 +556,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.3</version>
+				<version>3.5.0</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
@@ -624,7 +610,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.4.2</version>
 					<configuration>
 						<archive>
 							<manifest>
@@ -636,7 +622,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.6.3</version>
+					<version>3.10.1</version>
 					<configuration>
 						<source>${jdk.version}</source>
 					</configuration>
@@ -644,7 +630,12 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>3.1.3</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -654,7 +645,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.3.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -698,7 +689,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-release-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.1.1</version>
 					<configuration>
 						<mavenExecutorId>forked-path</mavenExecutorId>
 						<useReleaseProfile>false</useReleaseProfile>
@@ -736,7 +727,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.4.1</version>
 				</plugin>
 				<plugin>
 					<groupId>com.google.cloud.tools</groupId>
@@ -965,7 +956,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.8</version>
+                        <version>0.8.12</version>
                         <executions>
                             <execution>
                                 <goals>
