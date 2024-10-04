@@ -397,7 +397,12 @@ public class PlanItemInstanceEntityManagerImpl
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery) {
         return dataManager.findByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
     }
-    
+
+    @Override
+    public List<PlanItemInstance> findWithVariablesByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        return dataManager.findWithVariablesByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
+    }
+
     @Override
     public List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId) {
         return dataManager.findByCaseInstanceId(caseInstanceId);

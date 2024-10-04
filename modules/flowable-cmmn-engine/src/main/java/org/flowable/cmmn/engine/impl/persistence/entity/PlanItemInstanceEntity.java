@@ -12,10 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.common.engine.impl.db.HasRevision;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -32,4 +35,6 @@ public interface PlanItemInstanceEntity extends Entity, HasRevision, DelegatePla
     boolean isStateChangeUnprocessed();
     void setStateChangeUnprocessed(boolean stateChangeUnprocessed);
 
+
+    List<VariableInstanceEntity> getQueryVariables();
 }

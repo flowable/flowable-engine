@@ -32,6 +32,7 @@ import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.ExtensionAttribute;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.IOParameter;
 
 public class CmmnXmlUtil implements CmmnXmlConstants {
 
@@ -316,5 +317,37 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
 
     public static boolean containsNewLine(String str) {
         return str != null && str.contains("\n");
+    }
+
+    public static boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteParameterStartElement, XMLStreamWriter xtw) throws Exception {
+
+        if (parameterList == null || parameterList.isEmpty()) {
+            return didWriteParameterStartElement;
+        }
+
+        for (IOParameter ioParameter : parameterList) {
+            if (!didWriteParameterStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSION_ELEMENTS);
+                didWriteParameterStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, elementName, FLOWABLE_EXTENSIONS_NAMESPACE);
+            if (StringUtils.isNotEmpty(ioParameter.getSource())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression());
+            }
+
+            xtw.writeEndElement();
+        }
+
+        return didWriteParameterStartElement;
     }
 }

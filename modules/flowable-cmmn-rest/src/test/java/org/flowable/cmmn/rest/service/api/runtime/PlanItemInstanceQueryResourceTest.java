@@ -13,12 +13,16 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -26,8 +30,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to the plan item instance query resource.
@@ -73,7 +80,7 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
-     * Test querying plan item instance based on variables. POST query/case-instances
+     * Test querying plan item instance based on variables. POST query/planitem-instances
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryPlanItemInstancesWithVariables() throws Exception {
@@ -163,4 +170,57 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInPostDataResponse(url, requestNode);
     }
 
+    /**
+     * Test querying plan item instance and return local variables. POST query/planitem-instances
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testQueryPlanItemInstancesWithLocalVariables() throws Exception {
+        HashMap<String, Object> caseVariables = new HashMap<>();
+        caseVariables.put("stringVar", "Azerty");
+        caseVariables.put("intVar", 67890);
+        caseVariables.put("booleanVar", false);
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+
+        PlanItemInstance planItem = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        runtimeService.setLocalVariable(planItem.getId(), "someLocalVariable", "someLocalValue");
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("id", planItem.getId());
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(post, 200);
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + planItem.getId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         localVariables:["
+                + "         ]"
+                + "     }"
+                + "]");
+
+        requestNode.put("includeLocalVariables", true);
+        post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(post, 200);
+        dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + planItem.getId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         localVariables:[{"
+                + "             name:'someLocalVariable',"
+                + "             value:'someLocalValue',"
+                + "             scope:'local'"
+                + "         }]"
+                + "     }"
+                + "]");
+    }
 }

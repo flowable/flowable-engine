@@ -308,7 +308,30 @@
     <!-- Do not forget to update selectCaseInstanceAndAllPlanItemInstances select when adding/changing columns of planItemInstance -->
   </resultMap>
 
-  <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
+    <resultMap id="planItemInstanceResultMapWithVariables" type="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl" extends="planItemInstanceResultMap">
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+                    ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
+            <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
+            <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR"/>
+            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR"/>
+            <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
+            <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR"/>
+            <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR"/>
+            <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR"/>
+            <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
+            <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+            <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+            <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
+            <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
+            <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
+            <result property="textValue" column="VAR_TEXT_" jdbcType="NVARCHAR"/>
+            <result property="textValue2" column="VAR_TEXT2_" jdbcType="NVARCHAR"/>
+            <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
@@ -339,6 +362,28 @@
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
   </select>
+
+    <select id="selectPlanItemInstancesWithLocalVariablesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMapWithVariables">
+        SELECT RES.*
+        <if test="includeLocalVariables">,
+            VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+            VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
+            VAR_TASK_ID_, VAR.SCOPE_ID_ as VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_, VAR.SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
+            VAR.META_INFO_ as VAR_META_INFO_,
+            VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+            VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+        </if>
+        FROM (
+        <!-- top 100 percent is only needed when doing order by in a subselect -->
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+        ) RES
+        left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SUB_SCOPE_ID_ and VAR.SCOPE_TYPE_= 'cmmn'
+        ${outerJoinOrderBy}
+    </select>
 
   <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
         select count(RES.ID_)

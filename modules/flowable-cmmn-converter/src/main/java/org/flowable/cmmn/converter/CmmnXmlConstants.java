@@ -123,6 +123,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     String ATTRIBUTE_EXTERNAL_WORKER_TOPIC = "topic";
+    String ATTRIBUTE_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
+    String ELEMENT_EXTERNAL_WORKER_IN_PARAMETER = "externalWorkerInParameter";
+    String ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER = "externalWorkerOutParameter";
 
     String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
     String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
@@ -157,6 +160,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
     String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";

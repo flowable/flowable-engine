@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 
@@ -1540,6 +1541,33 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(activeStages)
                 .extracting(PlanItemInstance::getPlanItemDefinitionId)
                 .containsExactly("expandedStage2");
+    }
+
+    @Test
+    public void testIncludeLocalVariables() {
+        CaseInstance caseWithStringValue = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemInstanceQuery")
+                .variable("caseVar","caseVarValur")
+                .name("With string value")
+                .start();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().list();
+
+        cmmnRuntimeService.setLocalVariable(planItemInstances.get(0).getId(), "localVar", "someValue");
+
+        Task task = cmmnTaskService.createTaskQuery()
+                .includeCaseVariables()
+                .includeTaskLocalVariables()
+                .singleResult();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(0).getId()).singleResult();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
+
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(0).getId()).includeLocalVariables().singleResult();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isNotNull();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).containsOnly(
+                entry("localVar", "someValue")
+        );
     }
 
     private List<String> startInstances(int numberOfInstances) {

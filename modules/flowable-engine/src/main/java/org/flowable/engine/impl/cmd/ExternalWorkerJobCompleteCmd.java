@@ -12,12 +12,19 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.model.ExternalWorkerServiceTask;
+import org.flowable.bpmn.model.IOParameter;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.job.service.JobServiceConfiguration;
@@ -29,7 +36,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd implements Command<Void>{
+public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd implements Command<Void> {
 
     protected Map<String, Object> variables;
 
@@ -43,25 +50,48 @@ public class ExternalWorkerJobCompleteCmd extends AbstractExternalWorkerJobCmd i
         // We need to remove the job handler configuration
         externalWorkerJob.setJobHandlerConfiguration(null);
 
-        if (variables != null && !variables.isEmpty()) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
-            VariableService variableService = variableServiceConfiguration.getVariableService();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+        VariableService variableService = variableServiceConfiguration.getVariableService();
+
+        ExecutionEntity executionEntity = processEngineConfiguration.getExecutionEntityManager().findById(externalWorkerJob.getExecutionId());
+        ExternalWorkerServiceTask externalWorkerServiceTask = (ExternalWorkerServiceTask) executionEntity.getCurrentFlowElement();
+        List<IOParameter> outParameters = externalWorkerServiceTask.getOutParameters();
+
+        if (outParameters != null && !outParameters.isEmpty()) {
+            VariableContainerWrapper temporaryVariableContainer = new VariableContainerWrapper(variables);
+            for (IOParameter outParameter : outParameters) {
+                Object variableValue;
+                if (StringUtils.isNotEmpty(outParameter.getSource())) {
+                    variableValue = temporaryVariableContainer.getVariable(outParameter.getSource());
+                } else {
+                    Expression outParameterExpression = processEngineConfiguration.getExpressionManager()
+                            .createExpression(outParameter.getSourceExpression());
+                    variableValue = outParameterExpression.getValue(temporaryVariableContainer);
+                }
+                addVariable(externalWorkerJob, variableService, outParameter.getTarget(), variableValue);
+            }
+
+        } else if (variables != null && !variables.isEmpty()) {
             for (Map.Entry<String, Object> variableEntry : variables.entrySet()) {
                 String varName = variableEntry.getKey();
                 Object varValue = variableEntry.getValue();
 
-                VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName);
-                variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
-                variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
-                variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);
-
-                variableService.insertVariableInstanceWithValue(variableInstance, varValue, externalWorkerJob.getTenantId());
-
-                CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
+                addVariable(externalWorkerJob, variableService, varName, varValue);
             }
         }
 
         moveExternalWorkerJobToExecutableJob(externalWorkerJob, commandContext);
+    }
+
+    protected void addVariable(ExternalWorkerJobEntity externalWorkerJob, VariableService variableService, String varName, Object varValue) {
+        VariableInstanceEntity variableInstance = variableService.createVariableInstance(varName);
+        variableInstance.setScopeId(externalWorkerJob.getProcessInstanceId());
+        variableInstance.setSubScopeId(externalWorkerJob.getExecutionId());
+        variableInstance.setScopeType(ScopeTypes.BPMN_EXTERNAL_WORKER);
+
+        variableService.insertVariableInstanceWithValue(variableInstance, varValue, externalWorkerJob.getTenantId());
+
+        CountingEntityUtil.handleInsertVariableInstanceEntityCount(variableInstance);
     }
 }

@@ -12,15 +12,21 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerServiceTask extends Task {
+public class ExternalWorkerServiceTask extends Task implements HasInParameters, HasOutParameters {
 
     public static final String TYPE = "external-worker";
 
     protected String type;
     protected String topic;
+    protected boolean doNotIncludeVariables = false;
+    protected List<IOParameter> inParameters = new ArrayList<>();
+    protected List<IOParameter> outParameters = new ArrayList<>();
 
     public ExternalWorkerServiceTask() {
         this.type = TYPE;
@@ -42,6 +48,44 @@ public class ExternalWorkerServiceTask extends Task {
         this.topic = topic;
     }
 
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
+    }
+
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
+    }
+
+    @Override
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        inParameters.add(inParameter);
+    }
+
+    @Override
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
+    @Override
+    public List<IOParameter> getOutParameters() {
+        return outParameters;
+    }
+
+    @Override
+    public void addOutParameter(IOParameter outParameter) {
+        outParameters.add(outParameter);
+    }
+
+    @Override
+    public void setOutParameters(List<IOParameter> outParameters) {
+        this.outParameters = outParameters;
+    }
+
     @Override
     public ExternalWorkerServiceTask clone() {
         ExternalWorkerServiceTask clone = new ExternalWorkerServiceTask();
@@ -53,6 +97,9 @@ public class ExternalWorkerServiceTask extends Task {
         super.setValues(otherElement);
         setType(otherElement.getType());
         setTopic(otherElement.getTopic());
+        setDoNotIncludeVariables(otherElement.isDoNotIncludeVariables());
+        setInParameters(new ArrayList<>(otherElement.getInParameters()));
+        setOutParameters(new ArrayList<>(otherElement.getInParameters()));
     }
 
 }
