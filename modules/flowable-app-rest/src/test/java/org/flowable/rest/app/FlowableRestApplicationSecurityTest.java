@@ -72,7 +72,9 @@ public class FlowableRestApplicationSecurityTest {
             "caches",
             "caches-cache",
             "health-path",
-            "configprops-prefix"
+            "configprops-prefix",
+            "sbom",
+            "sbom-id"
         )
     );
 

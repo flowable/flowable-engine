@@ -68,69 +68,59 @@ Quartz
 
 This software includes unchanged copies of the following libraries:
 
-aopalliance                     aopalliance                 1.0             Public Domain
-com.fasterxml.jackson.core      jackson-annotations         2.15.3          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-core                2.15.3          The Apache Software License, Version 2.0
-com.fasterxml.jackson.core      jackson-databind            2.15.3          The Apache Software License, Version 2.0
-com.fasterxml.jackson.datatype  jackson-datatype-joda       2.15.3          The Apache Software License, Version 2.0
-com.google.guava                guava                       31.0.1-jre      The Apache Software License, Version 2.0
-com.h2database                  h2                          2.1.214         The H2 License, Version 1.0
-com.fasterxml.uuid              java-uuid-generator         3.3.0           The Apache Software License, Version 2.0
-commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
-commons-codec                   commons-codec               1.15            Apache License, Version 2.0
-commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
-commons-collections             commons-collections         3.2.2           The Apache Software License, Version 2.0
-commons-io                      commons-io                  2.8.0           The Apache Software License, Version 2.0
-commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
-commons-validator               commons-validator           1.4.0           The Apache Software License, Version 2.0
-de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
-de.odysseus.juel                juel-impl                   2.2.7           The Apache Software License, Version 2.0
-de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
-io.swagger                      swagger-annotations         1.6.2           Apache License 2.0
-io.swagger                      swagger-models              1.6.2           Apache License 2.0
-jakarta.activation              jakarta.activation-api      2.1.2           EDL 1.0
-jakarta.mail                    jakarta.mail.api            2.1.2           EDL 1.0
-joda-time                       joda-time                   2.10.13         Apache 2
-log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
-org.apache.commons              commons-lang3               3.12.0          The Apache Software License, Version 2.0
-org.apache.httpcomponents       httpclient                  4.5.13          Apache License, Version 2.0
-org.apache.httpcomponents       httpcore                    4.4.15          Apache License, Version 2.0
-org.apache.httpcomponents       httpmime                    4.5.13          Apache License, Version 2.0
-org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
-org.apache.groovy               groovy                      4.0.17          The Apache Software License, Version 2.0
-org.apache.groovy               groovy-jsr223               4.0.17          The Apache Software License, Version 2.0
-org.eclipse.angus               angus-mail                  2.0.2           EDL 1.0 / EPL 2.0
-org.mybatis                     mybatis                     3.5.13          The Apache Software License, Version 2.0
-org.mybatis                     mybatis-spring              3.0.3           The Apache Software License, Version 2.0
-org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
-org.slf4j                       jcl-over-slf4j              2.0.11          MIT License
-org.slf4j                       slf4j-api                   2.0.11          MIT License
-org.slf4j                       slf4j-log4j12               2.0.11          MIT License
-org.springframework             spring-beans                6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-context              6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-context-support      6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-jdbc                 6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-tx                   6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-web                  6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-webmvc               6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-aop                  6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-core                 6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-expression           6.1.3           The Apache Software License, Version 2.0
-org.springframework             spring-orm                  6.1.3           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-config      6.2.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-core        6.2.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-crypto      6.2.1           The Apache Software License, Version 2.0
-org.springframework.security    spring-security-web         6.2.1           The Apache Software License, Version 2.0
-org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
-org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
-xerces                          xercesImpl                  2.12.1          The Apache Software License, Version 2.0
-xml-apis                        xml-apis                    1.4.01          The Apache Software License, Version 2.0-The SAX License-The W3C License
+com.fasterxml.jackson.core        jackson-annotations         2.17.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core        jackson-core                2.17.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.core        jackson-databind            2.17.2          The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype    jackson-datatype-joda       2.17.2          The Apache Software License, Version 2.0
+com.github.vlsi.mxgraph           jgraphx                     4.2.2           JGraph Ltd - 3 clause BSD license
+com.h2database                    h2                          2.2.224         The H2 License, Version 1.0
+com.fasterxml.uuid                java-uuid-generator         5.1.0           The Apache Software License, Version 2.0
+commons-beanutils                 commons-beanutils           1.9.4           The Apache Software License, Version 2.0
+commons-codec                     commons-codec               1.17.1          Apache License, Version 2.0
+commons-collections               commons-collections         3.2.2           The Apache Software License, Version 2.0
+commons-io                        commons-io                  2.17.0          The Apache Software License, Version 2.0
+de.odysseus.juel                  juel-api                    2.2.7           The Apache Software License, Version 2.0
+de.odysseus.juel                  juel-impl                   2.2.7           The Apache Software License, Version 2.0
+de.odysseus.juel                  juel-spi                    2.2.7           The Apache Software License, Version 2.0
+io.swagger                        swagger-annotations         1.6.2           Apache License 2.0
+io.swagger                        swagger-models              1.6.2           Apache License 2.0
+jakarta.activation                jakarta.activation-api      2.1.3           EDL 1.0
+jakarta.mail                      jakarta.mail.api            2.1.3           EDL 1.0
+joda-time                         joda-time                   2.13.0          Apache 2
+org.apache.commons                commons-lang3               3.17.0          The Apache Software License, Version 2.0
+org.apache.httpcomponents.client5 httpclient5               5.2.5           Apache License, Version 2.0
+org.apache.httpcomponents.core5   httpcore5                 5.2.5           Apache License, Version 2.0
+org.apache.httpcomponents.core5   httpcore5-h2              5.2.5           Apache License, Version 2.0
+org.apache.groovy                 groovy                      4.0.23          The Apache Software License, Version 2.0
+org.apache.groovy                 groovy-jsr223               4.0.23          The Apache Software License, Version 2.0
+org.eclipse.angus                 angus-activation            2.0.2           EDL 1.0 / EPL 2.0
+org.eclipse.angus                 angus-mail                  2.0.3           EDL 1.0 / EPL 2.0
+org.mybatis                       mybatis                     3.5.16          The Apache Software License, Version 2.0
+org.slf4j                         jcl-over-slf4j              2.0.16          MIT License
+org.slf4j                         slf4j-api                   2.0.16          MIT License
+org.slf4j                         slf4j-log4j12               2.0.16          MIT License
+org.springframework               spring-beans                6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-core                 6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-context              6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-jdbc                 6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-tx                   6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-web                  6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-webmvc               6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-aop                  6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-core                 6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-expression           6.1.13          The Apache Software License, Version 2.0
+org.springframework               spring-orm                  6.1.13          The Apache Software License, Version 2.0
+org.springframework.security      spring-security-config      6.3.3           The Apache Software License, Version 2.0
+org.springframework.security      spring-security-core        6.3.3           The Apache Software License, Version 2.0
+org.springframework.security      spring-security-crypto      6.3.3           The Apache Software License, Version 2.0
+org.springframework.security      spring-security-web         6.3.3           The Apache Software License, Version 2.0
+org.springframework.security      spring-security-ldap        6.3.3           The Apache Software License, Version 2.0
+org.yaml                          snakeyaml                   2.2             The Apache Software License, Version 2.0
 
 When using the Flowable Rest app, there are a number of additional libraries included, which are otherwise not a dependency of Flowable:
 
-org.eclipse.angus               angus-mail                  2.0.2            EPL 2.0, GPL with classpath exception
-jakarta.annotation              jakarta.annotation-api      2.1.1            EPL 2.0, GPL with classpath exception
-jakarta.jms                     jakarta.jms-api             3.1.0            EPL 2.0, GPL with classpath exception
-jakarta.mail                    jakarta.mail-api            2.1.2            EPL 2.0, GPL with classpath exception
-org.openjdk.nashorn             nashorn-core                15.4             GPL with classpath exception
+com.zaxxer                        HikariCP                    5.1.0            The Apache Software License, Version 2.0
+jakarta.annotation                jakarta.annotation-api      2.1.1            EPL 2.0, GPL with classpath exception
+jakarta.jms                       jakarta.jms-api             3.1.0            EPL 2.0, GPL with classpath exception
+jakarta.mail                      jakarta.mail-api            2.1.3            EPL 2.0, GPL with classpath exception
+org.openjdk.nashorn               nashorn-core                15.4             GPL with classpath exception
