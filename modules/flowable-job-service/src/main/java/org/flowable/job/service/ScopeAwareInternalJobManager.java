@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -48,6 +49,18 @@ public abstract class ScopeAwareInternalJobManager implements InternalJobManager
     }
 
     protected abstract VariableScope resolveVariableScopeInternal(Job job);
+
+    @Override
+    public Map<String, Object> resolveVariablesForExternalWorkerJob(ExternalWorkerJob job) {
+        InternalJobManager internalJobManager = findInternalJobManager(job);
+        if (internalJobManager == null) {
+            return resolveVariablesForExternalWorkerJobInternal(job);
+        }
+
+        return internalJobManager.resolveVariablesForExternalWorkerJob(job);
+    }
+
+    protected abstract Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job);
 
     @Override
     public final boolean handleJobInsert(Job job) {

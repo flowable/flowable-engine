@@ -85,6 +85,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
      */
     HistoricPlanItemInstanceQuery withLocalizationFallback();
 
+    HistoricPlanItemInstanceQuery includeLocalVariables();
+
     HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
     HistoricPlanItemInstanceQuery orderByLastAvailableTime();

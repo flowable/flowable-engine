@@ -39,4 +39,4 @@ ALTER TABLE ACT_DMN_DECISION ALTER COLUMN RESOURCE_NAME_ nvarchar(255);
 ALTER TABLE ACT_DMN_DECISION ALTER COLUMN DESCRIPTION_ nvarchar(255);
 
 insert into ACT_GE_PROPERTY
-values ('dmn.schema.version', '7.1.0.1', 1);
+values ('dmn.schema.version', '7.1.0.2', 1);

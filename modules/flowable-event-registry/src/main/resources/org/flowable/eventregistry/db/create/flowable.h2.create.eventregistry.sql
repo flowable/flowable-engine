@@ -15,4 +15,4 @@ ALTER TABLE FLW_CHANNEL_DEFINITION ADD TYPE_ VARCHAR(255);
 ALTER TABLE FLW_CHANNEL_DEFINITION ADD IMPLEMENTATION_ VARCHAR(255);
 
 insert into ACT_GE_PROPERTY
-values ('eventregistry.schema.version', '7.1.0.1', 1);
+values ('eventregistry.schema.version', '7.1.0.2', 1);

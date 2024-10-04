@@ -205,6 +205,11 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         if (topic != null) {
             externalWorkerTask.setTopic(topic);
         }
+        String doNotIncludeVariables = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES);
+        if (doNotIncludeVariables != null) {
+            externalWorkerTask.setDoNotIncludeVariables(Boolean.parseBoolean(doNotIncludeVariables));
+        }
 
         return externalWorkerTask;
     }

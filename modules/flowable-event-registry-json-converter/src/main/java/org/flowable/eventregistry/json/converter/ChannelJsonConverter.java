@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.eventregistry.model.CamelInboundChannelModel;
+import org.flowable.eventregistry.model.CamelOutboundChannelModel;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionInboundChannelModel;
 import org.flowable.eventregistry.model.DelegateExpressionOutboundChannelModel;
@@ -58,11 +60,13 @@ public class ChannelJsonConverter {
         addInboundChannelModelClass("jms", JmsInboundChannelModel.class);
         addInboundChannelModelClass("rabbit", RabbitInboundChannelModel.class);
         addInboundChannelModelClass("kafka", KafkaInboundChannelModel.class);
+        addInboundChannelModelClass("camel", CamelInboundChannelModel.class);
         addInboundChannelModelClass("expression", DelegateExpressionInboundChannelModel.class);
 
         addOutboundChannelModelClass("jms", JmsOutboundChannelModel.class);
         addOutboundChannelModelClass("rabbit", RabbitOutboundChannelModel.class);
         addOutboundChannelModelClass("kafka", KafkaOutboundChannelModel.class);
+        addOutboundChannelModelClass("camel", CamelOutboundChannelModel.class);
         addOutboundChannelModelClass("expression", DelegateExpressionOutboundChannelModel.class);
     }
 

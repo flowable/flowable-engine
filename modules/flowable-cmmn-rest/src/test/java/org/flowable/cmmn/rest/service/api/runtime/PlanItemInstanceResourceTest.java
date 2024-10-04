@@ -97,7 +97,8 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
                         + "  exitCriterionId: null,"
                         + "  formKey: null,"
                         + "  extraValue: null,"
-                        + "  tenantId: ''"
+                        + "  tenantId: '',"
+                        + "  localVariables :[]"
                         + "}");
     }
 

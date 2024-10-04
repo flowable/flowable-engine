@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-work-case-palette">
+
+    <case id="caseWithStartFormAndServiceTask" name="Case With Start Form">
+        <documentation>A human task case</documentation>
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="testFormKey">
+            <planItem id="planItemcmmnTask_1" name="Human task" definitionRef="cmmnTask_1">
+                <entryCriterion id="cmmnEntrySentry_1" sentryRef="sentrycmmnEntrySentry_1"></entryCriterion>
+            </planItem>
+            <planItem id="planItemcmmnTask_2" name="Service task" definitionRef="cmmnTask_2"></planItem>
+            <sentry id="sentrycmmnEntrySentry_1">
+                <extensionElements>
+                    <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+                </extensionElements>
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_1" sourceRef="planItemcmmnTask_2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="cmmnTask_1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                <extensionElements>
+                    <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                    <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </humanTask>
+            <task id="cmmnTask_2" name="Service task" flowable:type="java" flowable:class="org.flowable.cmmn.rest.service.api.runtime.TransientVariableServiceTask">
+                <extensionElements>
+                    <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </task>
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -33,14 +33,14 @@ public class UelExpressionCondition implements Condition {
     }
 
     @Override
-    public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
+    public boolean evaluate(String elementId, DelegateExecution execution) {
         Object result = expression.getValue(execution);
 
         if (result == null) {
-            throw new FlowableException("condition expression returns null (sequenceFlowId: " + sequenceFlowId + ") for " + execution);
+            throw new FlowableException("condition expression returns null (elementId: " + elementId + ") for " + execution);
         }
         if (!(result instanceof Boolean)) {
-            throw new FlowableException("condition expression returns non-Boolean (sequenceFlowId: " + sequenceFlowId + "): " + result + " (" + result.getClass().getName() + ") for " + execution);
+            throw new FlowableException("condition expression returns non-Boolean (elementId: " + elementId + "): " + result + " (" + result.getClass().getName() + ") for " + execution);
         }
         return (Boolean) result;
     }

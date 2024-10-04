@@ -30,11 +30,12 @@ public class ConditionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof ConditionalEventDefinition)) {
+        if (!(parentElement instanceof ConditionalEventDefinition conditionalEventDefinition)) {
             return;
         }
 
-        ((ConditionalEventDefinition) parentElement).setConditionExpression(xtr.getElementText().trim());
+        conditionalEventDefinition.setConditionLanguage(xtr.getAttributeValue(null, ATTRIBUTE_SCRIPT_LANGUAGE));
+        conditionalEventDefinition.setConditionExpression(xtr.getElementText().trim());
     }
 
     @Override

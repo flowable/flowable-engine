@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples"
+             xmlns:tns="Examples">
+
+    <process id="simpleExternalWorker">
+
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart" targetRef="externalWorkerTask"/>
+
+        <serviceTask id="externalWorkerTask" flowable:type="external-worker" flowable:topic="simple" flowable:doNotIncludeVariables="true">
+            <extensionElements>
+                <flowable:externalWorkerInParameter sourceExpression="${anotherVar + anotherVar2}" target="theSum"/>
+                <flowable:externalWorkerInParameter sourceExpression="${anotherVar * anotherVar2}" target="theProduct"/>
+                <flowable:externalWorkerOutParameter sourceExpression="${resultVar1 + resultVar2}" target="sum"/>
+                <flowable:externalWorkerOutParameter sourceExpression="${resultVar1 * resultVar2}" target="product"/>
+            </extensionElements>
+        </serviceTask>
+
+        <sequenceFlow sourceRef="externalWorkerTask" targetRef="taskAfter"/>
+
+        <userTask id="taskAfter"/>
+
+        <sequenceFlow sourceRef="taskAfter" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

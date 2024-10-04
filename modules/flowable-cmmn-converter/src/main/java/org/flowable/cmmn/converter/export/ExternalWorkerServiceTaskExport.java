@@ -15,6 +15,8 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 
 public class ExternalWorkerServiceTaskExport extends AbstractPlanItemDefinitionExport<ExternalWorkerServiceTask> {
@@ -41,6 +43,14 @@ public class ExternalWorkerServiceTaskExport extends AbstractPlanItemDefinitionE
                     externalWorkerServiceTask.getTopic());
         }
 
+    }
+
+    @Override
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ExternalWorkerServiceTask planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+        boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, planItemDefinition, didWriteExtensionElement, xtw);
+        extensionElementWritten = CmmnXmlUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_IN_PARAMETER, planItemDefinition.getInParameters(), extensionElementWritten, xtw);
+        extensionElementWritten = CmmnXmlUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER, planItemDefinition.getOutParameters(), extensionElementWritten, xtw);
+        return extensionElementWritten;
     }
 
     @Override

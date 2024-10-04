@@ -79,16 +79,6 @@
       DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
   </update>
 
-  <update id="updateChannelDefinitionTypeAndImplementationById" parameterType="java.util.Map">
-    update ${prefix}FLW_CHANNEL_DEFINITION
-    <set>
-      TYPE_ = #{type, jdbcType=VARCHAR},
-      IMPLEMENTATION_ = #{implementation, jdbcType=VARCHAR},
-    </set>
-    where
-      ID_ = #{id, jdbcType=VARCHAR}
-  </update>
-
   <!-- DEFINITION DELETE -->
 
   <delete id="deleteChannelDefinitionsByDeploymentId" parameterType="string">

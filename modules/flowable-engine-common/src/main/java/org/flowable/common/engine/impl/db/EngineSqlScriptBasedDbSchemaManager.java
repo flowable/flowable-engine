@@ -136,13 +136,11 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
 
         boolean isEngineTablePresent = isEngineTablePresent();
 
-        ChangeLogVersion changeLogVersion = null;
         String dbVersion = null;
         if (isEngineTablePresent) {
             dbVersion = getDbVersion();
             if (dbVersion == null) {
-                changeLogVersion = getChangeLogVersion();
-                dbVersion = changeLogVersion.dbVersion();
+                dbVersion = getChangeLogVersion().dbVersion();
             }
         }
 
@@ -154,8 +152,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
         if (isUpgradeNeeded) {
             // Engine upgrade
             dbSchemaUpgrade(context, matchingVersionIndex, dbVersion);
-            dbSchemaUpgraded(changeLogVersion);
-
             feedback = "upgraded Flowable from " + dbVersion + " to " + getEngineVersion();
 
         } else if (!isEngineTablePresent) {
@@ -168,10 +164,6 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     @Override
     public String getContext() {
         return context;
-    }
-
-    protected void dbSchemaUpgraded(ChangeLogVersion changeLogVersion) {
-
     }
 
     public boolean isEngineTablePresent() {

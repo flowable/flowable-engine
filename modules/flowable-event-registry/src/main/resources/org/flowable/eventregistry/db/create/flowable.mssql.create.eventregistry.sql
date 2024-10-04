@@ -35,4 +35,4 @@ ALTER TABLE FLW_CHANNEL_DEFINITION ALTER COLUMN DESCRIPTION_ nvarchar(255);
 ALTER TABLE FLW_EVENT_DEFINITION ALTER COLUMN DESCRIPTION_ nvarchar(255);
 
 insert into ACT_GE_PROPERTY
-values ('eventregistry.schema.version', '7.1.0.1', 1);
+values ('eventregistry.schema.version', '7.1.0.2', 1);

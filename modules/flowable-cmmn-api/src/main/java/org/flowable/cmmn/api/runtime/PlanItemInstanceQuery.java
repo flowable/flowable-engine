@@ -382,6 +382,12 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery caseVariableNotExists(String name);
 
     /**
+     *
+     * Include local plan item instance variables in the query result
+     */
+    PlanItemInstanceQuery includeLocalVariables();
+
+    /**
      * Localize plan item name to specified locale.
      */
     PlanItemInstanceQuery locale(String locale);
