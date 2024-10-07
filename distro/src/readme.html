@@ -28,6 +28,143 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 7.1.0</h3>
+
+<ul>
+	<li>Removed Liquibase from the App, CMMN, DMN and event registry engines and changed it to manual SQL files like it was already done for the BPMN, Common and IDM engines.</li>
+    <li>Improve support for Microsoft SQL Server nvarchar type and making sure that queries can use the correct index type.</li>
+    <li>Added support to reschedule a CMMN timer job or timer event listener in the CmmnManagementService.</li>
+    <li>Added support for multiple variable event listeners in BPMN and CMMN.</li>
+    <li>Fixed issue with event subscriptions using multiple correlation parameters not working with event listeners mapping different correlation parameters.</li>
+    <li>Added support for enabling event sub process start events in the process instance migration logic.</li>
+    <li>Added support for direct migration of async service tasks inh the process migration.</li>
+    <li>Added support for pre and post expressions in the case instance migration builder.</li>
+    <li>Fixed issue with task properties not getting updated in the case instance migration.</li>
+    <li>Added support to terminate sub case instances in the case migration.</li>
+    <li>Fixed issue with repetition counter variables in the case instance migration logic.</li>
+    <li>Added option to change the plan item and definition id in the case migration.</li>
+    <li>Added support for LocalDate and LocalDateTime for time expressions.</li>
+    <li>Added support for UUID variable types in the REST API.</li>
+    <li>Upgrade to Spring Boot 3.3.4</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.1</h3>
+
+<ul>
+    <li>This is a minor release including support for Spring Boot 3.1.6.</li>
+    <li>Add support to dynamically create an event subscription to start a case or process instance.</li>
+    <li>Add support to register a filter class in the inbound channel pipeline that is invoked for all events that are being received through that channel.</li>
+    <li>Added an option to query for parent and root scope ids for (historic) case, process and task instances.</li>
+    <li>Added an option to not create a repetition counter variable for repetition elements in CMMN.</li>
+    <li>Fixed issue with incorrect stages getting activated on case instance migration.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.0</h3>
+
+<ul>
+    <li>This is the first stable release for version 7 of the Flowable Engines focusing on the Spring Boot 3, Spring 6 and Java 17 upgrade.</li>
+    <li>The REST application requires a servlet container / application server that supports Jakarta 9.</li>
+    <li>This release focuses on the main Flowable Engines and REST APIs for the BPMN, CMMN, DMN and event registry engines. This means that there are no UI applications, no content and form engines and the modules for Mule and some others are removed.</li>
+    <li>Blog post with more information about the <a href="https://www.flowable.com/blog/engineering/flowable-open-source-7-0-0-release">Flowable 7 release</a>.</li>
+    <li>Support batch migration for CMMN.</li>
+    <li>Repetition support for case reactivation.</li>
+    <li>Support for stopping housekeeping batch.</li>
+    <li>Support for HTTP HEAD and OPTIONS for the Http Tasks.</li>
+    <li>Remove relocated Spring Boot Starters
+        <ul>
+            <li>flowable-spring-boot-starter-basic - flowable-spring-boot-starter-process should be used instead.</li>
+            <li>flowable-spring-boot-starter-rest-api - flowable-spring-boot-starter-process-rest should be used instead.</li>
+        </ul>
+    </li>
+    <li>Add flowable-bom with all the Flowable artifacts
+    <li>Support for dynamic Kafka message key
+    <li>Add TaskCompletionBuilder to CmmnTaskService
+    <li>Add support for handling custom input parameters for error start and boundary events and for passing additional data in error end events
+    <li>Add ability to store completer of human and user tasks in a variable
+    <li>Support collection of string or json array as mail recipients in Mail Tasks
+    <li>Upgrade to Spring Boot 3.1
+    <li>Upgrade to Camel 4
+    <li>Upgrade to CXF 4
+    <li>Provide an abstraction for sending emails through a FlowableMailClient
+    <li>Use Jakarta Mail instead of Javax Mail and replace Apache Commons Email with Eclipse Angus Mail
+    <li>Remove message based executor
+    <li>Remove some Flowable deprecated code
+        <ul>
+            <li>CmmnRepositoryService#getDecisionTablesForCaseDefinition - use CmmnRepositoryService#getDecisionsForCaseDefinition instead.</li>
+            <li>RepositoryService#getDecisionTablesForProcessDefinition - use RepositoryService#getDecisionsForProcessDefinition instead.</li>
+            <li>HistoricCaseInstanceQuery#limitCaseVariables - no replacement it was a noop.</li>
+            <li>CaseInstanceQuery#limitCaseInstanceVariables - no replacement it was a noop.</li>
+            <li>HistoricProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>ProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>TaskInfoQuery#limitTaskVariables - no replacement it was a noop.</li>
+            <li>Removed query limit configurations from CmmnEngineConfiguration and ProcessEngineConfigurationImpl.</li>
+            <li>Removed HistoryManager#recordActivityEnd - no replacement, Flowable was never calling that method.</li>
+            <li>Removed org.flowable.engine.FlowableTaskAlreadyClaimedException - use org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException instead.</li>
+            <li>Removed org.flowable.engine.cfg.MailServerInfo - use org.flowable.common.engine.impl.cfg.mail.MailServerInfo instead.</li>
+            <li>Removed org.flowable.http.HttpRequest - use org.flowable.http.common.api.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.HttpResponse - use org.flowable.http.common.api.HttpResponse instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpRequestHandler - use org.flowable.http.common.api.delegate.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpResponseHandler - use org.flowable.http.common.api.delegate.HttpResponse instead.</li>
+            <li>Removed org.flowable.identitylink.service.IdentityLinkType - use org.flowable.identitylink.api.IdentityLinkType instead.</li>
+            <li>Removed ManagedAsyncJobExecutor - configure the thread factory in the engine configuration.</li>
+            <li>Removed org.flowable.spring.SpringCallerRunsRejectedJobsHandler - use org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler instead.</li>
+            <li>Removed org.flowable.spring.SpringRejectedJobsHandler - use org.flowable.spring.job.service.SpringRejectedJobsHandler instead.</li>
+        </ul>
+    </li>
+    <li>Remove async history support. In case you were using async history, make sure that you have no async history jobs before starting the new version.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.0.M2</h3>
+
+<ul>
+    <li>Support batch migration for CMMN.</li>
+    <li>Repetition support for case reactivation.</li>
+    <li>Support for stopping housekeeping batch.</li>
+    <li>Support for HTTP HEAD and OPTIONS for the Http Tasks.</li>
+    <li>Remove relocated Spring Boot Starters
+        <ul>
+            <li>flowable-spring-boot-starter-basic - flowable-spring-boot-starter-process should be used instead.</li>
+            <li>flowable-spring-boot-starter-rest-api - flowable-spring-boot-starter-process-rest should be used instead.</li>
+        </ul>
+    </li>
+    <li>Add flowable-bom with all the Flowable artifacts
+    <li>Support for dynamic Kafka message key
+    <li>Add TaskCompletionBuilder to CmmnTaskService
+    <li>Add support for handling custom input parameters for error start and boundary events and for passing additional data in error end events
+    <li>Add ability to store completer of human and user tasks in a variable
+    <li>Support collection of string or json array as mail recipients in Mail Tasks
+    <li>Upgrade to Spring Boot 3.1
+    <li>Upgrade to Camel 4
+    <li>Upgrade to CXF 4
+    <li>Provide an abstraction for sending emails through a FlowableMailClient
+    <li>Use Jakarta Mail instead of Javax Mail and replace Apache Commons Email with Eclipse Angus Mail
+    <li>Remove message based executor
+    <li>Remove some Flowable deprecated code
+        <ul>
+            <li>CmmnRepositoryService#getDecisionTablesForCaseDefinition - use CmmnRepositoryService#getDecisionsForCaseDefinition instead.</li>
+            <li>RepositoryService#getDecisionTablesForProcessDefinition - use RepositoryService#getDecisionsForProcessDefinition instead.</li>
+            <li>HistoricCaseInstanceQuery#limitCaseVariables - no replacement it was a noop.</li>
+            <li>CaseInstanceQuery#limitCaseInstanceVariables - no replacement it was a noop.</li>
+            <li>HistoricProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>ProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>TaskInfoQuery#limitTaskVariables - no replacement it was a noop.</li>
+            <li>Removed query limit configurations from CmmnEngineConfiguration and ProcessEngineConfigurationImpl.</li>
+            <li>Removed HistoryManager#recordActivityEnd - no replacement, Flowable was never calling that method.</li>
+            <li>Removed org.flowable.engine.FlowableTaskAlreadyClaimedException - use org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException instead.</li>
+            <li>Removed org.flowable.engine.cfg.MailServerInfo - use org.flowable.common.engine.impl.cfg.mail.MailServerInfo instead.</li>
+            <li>Removed org.flowable.http.HttpRequest - use org.flowable.http.common.api.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.HttpResponse - use org.flowable.http.common.api.HttpResponse instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpRequestHandler - use org.flowable.http.common.api.delegate.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpResponseHandler - use org.flowable.http.common.api.delegate.HttpResponse instead.</li>
+            <li>Removed org.flowable.identitylink.service.IdentityLinkType - use org.flowable.identitylink.api.IdentityLinkType instead.</li>
+            <li>Removed ManagedAsyncJobExecutor - configure the thread factory in the engine configuration.</li>
+            <li>Removed org.flowable.spring.SpringCallerRunsRejectedJobsHandler - use org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler instead.</li>
+            <li>Removed org.flowable.spring.SpringRejectedJobsHandler - use org.flowable.spring.job.service.SpringRejectedJobsHandler instead.</li>
+        </ul>
+    </li>
+    <li>Remove async history support. In case you were using async history, make sure that you have no async history jobs before starting the new version.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 7.0.0.M1</h3>
 
 <ul>
