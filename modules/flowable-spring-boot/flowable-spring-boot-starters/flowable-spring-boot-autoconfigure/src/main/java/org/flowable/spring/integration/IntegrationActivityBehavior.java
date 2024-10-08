@@ -19,7 +19,8 @@ public class IntegrationActivityBehavior extends ReceiveTaskActivityBehavior {
 
     private final FlowableInboundGateway gateway;
 
-    public IntegrationActivityBehavior(FlowableInboundGateway gateway) {
+    public IntegrationActivityBehavior(FlowableInboundGateway gateway, String activityId, String skipExpression) {
+        super(activityId, skipExpression);
         this.gateway = gateway;
     }
 

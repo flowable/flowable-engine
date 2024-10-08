@@ -363,7 +363,35 @@ public class BpmnEventRegistryConsumerTest extends AbstractBpmnEventRegistryCons
         inboundEventChannelAdapter.triggerTestEvent("kermit");
         assertThat(taskService.createTaskQuery().processInstanceId(kermitProcessInstance.getId()).count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().processInstanceId(gonzoProcessInstance.getId()).count()).isEqualTo(1);
+    }
+    
+    @Test
+    @Deployment
+    public void testReceiveEventTaskSkipExpression() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("skipExpression", true);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
 
+        assertThat(runtimeService.createEventSubscriptionQuery().activityId("task").singleResult()).isNull();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+        
+        processInstance = runtimeService.startProcessInstanceByKey("process");
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().activityId("task").singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        inboundEventChannelAdapter.triggerTestEvent();
+        Task afterTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(afterTask.getTaskDefinitionKey()).isEqualTo("taskAfterTask");
+
+        assertThat(runtimeService.createEventSubscriptionQuery().activityId("task").singleResult()).isNull();
     }
 
     @Test

@@ -16,6 +16,8 @@ package org.flowable.bpmn.model;
  * @author Tijs Rademakers
  */
 public class ReceiveTask extends Task {
+    
+    protected String skipExpression;
 
     @Override
     public ReceiveTask clone() {
@@ -23,8 +25,17 @@ public class ReceiveTask extends Task {
         clone.setValues(this);
         return clone;
     }
+    
+    public String getSkipExpression() {
+        return skipExpression;
+    }
+
+    public void setSkipExpression(String skipExpression) {
+        this.skipExpression = skipExpression;
+    }
 
     public void setValues(ReceiveTask otherElement) {
         super.setValues(otherElement);
+        setSkipExpression(otherElement.getSkipExpression());
     }
 }
