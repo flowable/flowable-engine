@@ -38,7 +38,7 @@ public class Application {
 
     @Bean
     IntegrationActivityBehavior flowableDelegate(FlowableInboundGateway flowableInboundGateway) {
-        return new IntegrationActivityBehavior(flowableInboundGateway);
+        return new IntegrationActivityBehavior(flowableInboundGateway, null, null);
     }
 
     @Bean

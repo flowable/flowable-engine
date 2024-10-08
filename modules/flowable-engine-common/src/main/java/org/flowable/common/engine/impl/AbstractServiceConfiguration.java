@@ -12,11 +12,11 @@
  */
 package org.flowable.common.engine.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
@@ -87,7 +87,7 @@ public abstract class AbstractServiceConfiguration<S> {
 
     protected void initConfigurators() {
         if (this.configurators == null) {
-            this.configurators = new TreeSet<>(Comparator.comparingInt(ServiceConfigurator::getPriority));
+            this.configurators = new ArrayList<>();
         }
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractServiceConfiguration<S> {
             return;
         }
         final S service = getService();
-        this.configurators.stream().forEach(c -> {
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
             logger.info("Executing beforeInit() of {} (priority: {})", c.getClass(), c.getPriority());
             c.beforeInit(service);
         });
@@ -107,7 +107,7 @@ public abstract class AbstractServiceConfiguration<S> {
             return;
         }
         final S service = getService();
-        this.configurators.stream().forEach(c -> {
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
             logger.info("Executing afterInit() of {} (priority: {})", c.getClass(), c.getPriority());
             c.afterInit(service);
         });

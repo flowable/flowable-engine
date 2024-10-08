@@ -16,6 +16,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -283,6 +284,34 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   nameProperty: 'someName',"
                         + "   numberProperty: 123"
                         + " }");
+    }
+    
+    @Test
+    @Deployment
+    public void testSendEventSkipExpression() throws Exception {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("skipExpression", true);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNull();
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
     }
     
     @Test
