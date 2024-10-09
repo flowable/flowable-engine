@@ -10,11 +10,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Get current project meta
         id: meta
@@ -23,15 +23,13 @@ jobs:
       - name: Build Docker images with Maven
         run: |
           mvn clean package -B -Dstyle.color=always \
-          -P dockerDeps,dockerPublishWithLatest \
+          -P swagger,dockerDeps,dockerPublishWithLatest \
           -pl :flowable-app-rest \
           -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} \
           -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Install cosign
-        uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
-        with:
-          cosign-release: 'v1.7.1'
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
 
       - name: Write signing key to disk
         run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
