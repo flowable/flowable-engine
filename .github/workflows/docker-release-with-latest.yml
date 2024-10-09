@@ -26,7 +26,8 @@ jobs:
           -P swagger,dockerDeps,dockerPublishWithLatest \
           -pl :flowable-app-rest \
           -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} \
-          -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
+          -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }} \
+          -B -V --no-transfer-progress
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.7.0
