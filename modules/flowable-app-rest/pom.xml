@@ -531,7 +531,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:17.0.9</image>
+                                <image>flowable/flowable-jre:21</image>
                             </from>
                             <to>
                                 <image>flowable-rest</image>
@@ -573,7 +573,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:17.0.9</image>
+                                <image>flowable/flowable-jre:21</image>
                                 <platforms>
                                     <platform>
                                         <architecture>amd64</architecture>
@@ -629,7 +629,7 @@
                         <artifactId>jib-maven-plugin</artifactId>
                         <configuration>
                             <from>
-                                <image>flowable/flowable-jre:17.0.9</image>
+                                <image>flowable/flowable-jre:21</image>
                                 <platforms>
                                     <platform>
                                         <architecture>amd64</architecture>
