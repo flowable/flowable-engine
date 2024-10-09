@@ -48,7 +48,8 @@ jobs:
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            flowable/flowable-rest:${{ steps.meta.outputs.version }} 
+            flowable/flowable-rest:${{ steps.meta.outputs.version }} \
+            -y
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
