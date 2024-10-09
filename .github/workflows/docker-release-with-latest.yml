@@ -51,4 +51,5 @@ jobs:
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            flowable/flowable-rest:latest
+            flowable/flowable-rest:latest \
+            -y

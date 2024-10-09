@@ -28,10 +28,8 @@ jobs:
           -D docker.publisher.user=${{ secrets.DOCKER_USER }} \
           -D docker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Install cosign
-        uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
-        with:
-          cosign-release: 'v1.7.1'
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
 
       - name: Write signing key to disk
         run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
@@ -49,4 +47,5 @@ jobs:
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            flowable/flowable-rest:${{ steps.meta.outputs.version }} 
+            flowable/flowable-rest:${{ steps.meta.outputs.version }} \
+            -y
