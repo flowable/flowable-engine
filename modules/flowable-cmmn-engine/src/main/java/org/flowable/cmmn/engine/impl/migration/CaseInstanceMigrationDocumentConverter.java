@@ -140,6 +140,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
             mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getNewAssignee());
             mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
+            Map<String, Object> localVariables = mapping.getWithLocalVariables();
+            if (localVariables != null && !localVariables.isEmpty()) {
+                mappingNode.set(LOCAL_VARIABLES_JSON_SECTION, objectMapper.valueToTree(localVariables));
+            }
+
             mappingsArray.add(mappingNode);
         }
 
@@ -166,6 +171,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
             mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
+            Map<String, Object> localVariables = mapping.getWithLocalVariables();
+            if (localVariables != null && !localVariables.isEmpty()) {
+                mappingNode.set(LOCAL_VARIABLES_JSON_SECTION, objectMapper.valueToTree(localVariables));
+            }
+
             mappingsArray.add(mappingNode);
         }
 
@@ -261,6 +271,10 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     activateDefinitionMapping.setNewAssignee(newAssginee);
                     String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
                     activateDefinitionMapping.setCondition(condition);
+                    Map<String, Object> localVariables = getLocalVariablesFromJson(mappingNode, objectMapper);
+                    if (localVariables != null) {
+                        activateDefinitionMapping.setWithLocalVariables(localVariables);
+                    }
                     
                     documentBuilder.addActivatePlanItemDefinitionMapping(activateDefinitionMapping);
                 }
@@ -285,6 +299,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
                     moveToAvailableDefinitionMapping.setCondition(condition);
                     documentBuilder.addMoveToAvailablePlanItemDefinitionMapping(moveToAvailableDefinitionMapping);
+                    Map<String, Object> localVariables = getLocalVariablesFromJson(mappingNode, objectMapper);
+                    if (localVariables != null) {
+                        moveToAvailableDefinitionMapping.setWithLocalVariables(localVariables);
+                    }
+
                 }
             }
             
@@ -388,6 +407,14 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             return jsonNode.get(propertyName).asInt();
         }
         
+        return null;
+    }
+
+    protected static <V> V getLocalVariablesFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
+        JsonNode localVariablesNode = jsonNode.get(LOCAL_VARIABLES_JSON_SECTION);
+        if (localVariablesNode != null) {
+            return convertFromJsonNodeToObject(localVariablesNode, objectMapper);
+        }
         return null;
     }
 }
