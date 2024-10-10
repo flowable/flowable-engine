@@ -3404,22 +3404,22 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("processTask");
-        
+
         runtimeService.signalEventReceived("mySignal");
-        
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("eventSubProcessTask");
-        
+
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getId())
                 .enableEventSubProcessStartEvent("messageEventSubProcessStart")
                 .changeState();
-        
+
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
-        
+
         runtimeService.messageEventReceived("myMessage", messageEventSubscription.getExecutionId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -3427,6 +3427,36 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/boundaryEventStateChange.bpmn20.xml", "org/flowable/engine/test/api/runtime/changestate/boundaryEventSubproceess.bpmn20.xml"})
+    public void testSkipEventListener() {
+        // Set up: One user task, a parallel gateway leading to a task and a call activity.
+        // Once we reach the call activity, we want to return to the parent execution's first task.
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundary_event_state_change");
+        // Complete first task
+        Task task1 = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task1.getId());
+
+        ProcessInstance newProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceIdWithChildren(newProcessInstance.getId()).taskDefinitionKey("task_in_call_activity").singleResult();
+
+        //
+        List<Task> tasks = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks).element(0).extracting(Task::getTaskDefinitionKey).isEqualTo("another_task");
+        assertThat(tasks).element(1).extracting(Task::getTaskDefinitionKey).isEqualTo("task_in_call_activity");
+
+
+        // Move back to the first task in parent execution AND set variable
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(newProcessInstance.getId())
+                .moveActivityIdToParentActivityId(task2.getTaskDefinitionKey(), task1.getTaskDefinitionKey())
+                .processVariable("myVariable", "test")
+                .changeState();
+
     }
 }
 
