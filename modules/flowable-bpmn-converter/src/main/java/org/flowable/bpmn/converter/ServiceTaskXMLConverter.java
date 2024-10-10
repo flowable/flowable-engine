@@ -467,7 +467,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             }
             xtw.writeCharacters(customProperty.getSimpleValue());
             xtw.writeEndElement();
+            xtw.writeEndElement();   
             xtw.writeEndElement();
+
+            
         }
         
         return didWriteExtensionStartElement;
