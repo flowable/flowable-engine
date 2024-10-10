@@ -20,11 +20,13 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
@@ -3404,22 +3406,22 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("processTask");
-        
+
         runtimeService.signalEventReceived("mySignal");
-        
+
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getTaskDefinitionKey()).isEqualTo("eventSubProcessTask");
-        
+
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(0);
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstance.getId())
                 .enableEventSubProcessStartEvent("messageEventSubProcessStart")
                 .changeState();
-        
+
         assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         EventSubscription messageEventSubscription = runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).singleResult();
-        
+
         runtimeService.messageEventReceived("myMessage", messageEventSubscription.getExecutionId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -3427,6 +3429,237 @@ public class ChangeStateTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/changestate/boundaryEventStateChange.bpmn20.xml", "org/flowable/engine/test/api/runtime/changestate/boundaryEventSubproceess.bpmn20.xml"})
+    public void testSkipEventListener() {
+        // Set up: One user task, a parallel gateway leading to a task and a call activity.
+        // Once we reach the call activity, we want to return to the parent execution's first task.
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundary_event_state_change");
+        // Complete first task
+        Task task1 = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task1.getId());
+
+        ProcessInstance newProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        Task task2 = taskService.createTaskQuery().processInstanceIdWithChildren(newProcessInstance.getId()).taskDefinitionKey("task_in_call_activity").singleResult();
+
+        //
+        List<Task> tasks = taskService.createTaskQuery().processInstanceIdWithChildren(processInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        assertThat(tasks).element(0).extracting(Task::getTaskDefinitionKey).isEqualTo("another_task");
+        assertThat(tasks).element(1).extracting(Task::getTaskDefinitionKey).isEqualTo("task_in_call_activity");
+
+
+        // Move back to the first task in parent execution AND set variable
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(newProcessInstance.getId())
+                .moveActivityIdToParentActivityId(task2.getTaskDefinitionKey(), task1.getTaskDefinitionKey())
+                .processVariable("myVariable", "test")
+                .changeState();
+
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.testTerminateExecution.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.terminateExecutionSubprocess.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.terminateExecutionSubprocessMI.bpmn20.xml",
+    })
+    public void testTerminateExecution() {
+        //////////////////////////////////////////
+        // Single executions / user tasks
+        //////////////////////////////////////////
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateExecution");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateExecution(executions.get(0).getId())
+                .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(2);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateExecutions(List.of(executions.get(0).getId(), executions.get(1).getId()))
+                .changeState();
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        assertThat(executions).hasSize(0);
+
+        // Subprocess (no MI), terminate subprocess and check that the user task within is no longer available
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocess");
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        // check that one is called subprocess, one is called task_1 and the other one task_2
+        assertThat(executions).hasSize(3);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).containsExactlyInAnyOrder("subprocess", "subprocess_task", "user_task");
+
+        String subprocessExecutionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subprocess").onlyChildExecutions().singleResult().getId();
+
+        // Terminate the subprocess, the user task within should no longer be available as well then
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateExecution(subprocessExecutionId)
+                .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(1);
+        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("user_task");
+
+        //////////////////////////////////////////
+        // Subprocess (no MI), terminate user task within subprocess and check that the subprocess within is no longer available
+        //////////////////////////////////////////
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocess");
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        // check that one is called subprocess, one is called task_1 and the other one task_2
+        assertThat(executions).hasSize(3);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).containsExactlyInAnyOrder("subprocess", "subprocess_task", "user_task");
+
+        String subprocessTaskExecutionId = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subprocess_task").onlyChildExecutions().singleResult().getId();
+
+        // Terminate the subprocess, the user task within should no longer be available as well then
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateExecution(subprocessTaskExecutionId)
+                .changeState();
+
+        // TODO: This does not yet work, subprocess is not closed
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+//        assertThat(executions).hasSize(1);
+//        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("user_task");
+
+        //////////////////////////////////////////
+        // Subprocess (parallel MI), terminate subprocess and check that the 5 tasks are no longer available
+        //////////////////////////////////////////
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocessMI");
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        // check that we have:
+        // 1 root execution for mi subprocesses
+        // 5 executions for the subprocess (cardinality 5)
+        // 5 tasks
+        // 1 task outside of the process
+        assertThat(executions).hasSize(12);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).contains("parallel_mi_subprocess", "task_1", "subprocess_task");
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        String rootSubprocessExecutionId = executions.stream().filter(e -> ((ExecutionEntityImpl)e).isMultiInstanceRoot()).findFirst().get().getId();
+
+        // Terminate the root of the multi-instance subprocess
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateExecution(rootSubprocessExecutionId)
+                .changeState();
+
+        // There should be just 1 execution left
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(1);
+        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("task_1");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.testTerminateExecution.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.terminateExecutionSubprocess.bpmn20.xml",
+            "org/flowable/engine/test/api/runtime/changestate/RuntimeServiceChangeStateTest.terminateExecutionSubprocessMI.bpmn20.xml",
+    })
+    public void testTerminateActitivies() {
+        //////////////////////////////////////////
+        // Single activities / user tasks
+        //////////////////////////////////////////
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("terminateExecution");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateActivity("task_1")
+                .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(2);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateActivities(List.of("task_2", "task_3"))
+                .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(0);
+
+        // Subprocess (no MI), terminate subprocess and check that the user task within is no longer available
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocess");
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        // check that one is called subprocess, one is called task_1 and the other one task_2
+        assertThat(executions).hasSize(3);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).containsExactlyInAnyOrder("subprocess", "subprocess_task", "user_task");
+
+        // Terminate the subprocess, the user task within should no longer be available as well then
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateActivity("subprocess")
+                .changeState();
+
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(1);
+        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("user_task");
+
+        //////////////////////////////////////////
+        // Subprocess (no MI), terminate user task within subprocess and check that the subprocess within is no longer available
+        //////////////////////////////////////////
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocess");
+
+        // check that one is called subprocess, one is called task_1 and the other one task_2
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(3);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).containsExactlyInAnyOrder("subprocess", "subprocess_task", "user_task");
+        
+        // Terminate the subprocess, the user task within should no longer be available as well then
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateActivity("subprocess_task")
+                .changeState();
+
+        // TODO: This does not yet work, subprocess is not closed
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+//        assertThat(executions).hasSize(1);
+//        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("user_task");
+
+        //////////////////////////////////////////
+        // Subprocess (parallel MI), terminate subprocess and check that the 5 tasks are no longer available
+        //////////////////////////////////////////
+        processInstance = runtimeService.startProcessInstanceByKey("terminateExecutionSubprocessMI");
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+
+        // check that we have:
+        // 1 root execution for mi subprocesses
+        // 5 executions for the subprocess (cardinality 5)
+        // 5 tasks
+        // 1 task outside of the process
+        assertThat(executions).hasSize(12);
+        assertThat(executions.stream().map(Execution::getActivityId).collect(Collectors.toList())).contains("parallel_mi_subprocess", "task_1", "subprocess_task");
+
+        // Terminate the root of the multi-instance subprocess
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .terminateActivity("parallel_mi_subprocess")
+                .changeState();
+
+        // There should be just 1 activity left
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(1);
+        assertThat(executions).singleElement().extracting(Execution::getActivityId).isEqualTo("task_1");
+
+        // TODO: terminateParentProcessInstanceActivity, terminateParentProcessInstanceActivities
     }
 }
 
