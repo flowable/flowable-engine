@@ -79,9 +79,13 @@ import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessKeyCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceBusinessStatusCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceNameCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetCaseInstanceOwnerCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetVariableAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetVariablesAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceAsyncCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
@@ -286,6 +290,26 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public void setLocalVariables(String planItemInstanceId, Map<String, Object> variables) {
         commandExecutor.execute(new SetLocalVariablesCmd(planItemInstanceId, variables));
+    }
+    
+    @Override
+    public void setVariableAsync(String caseInstanceId, String variableName, Object variableValue) {
+        commandExecutor.execute(new SetVariableAsyncCmd(caseInstanceId, variableName, variableValue));
+    }
+
+    @Override
+    public void setVariablesAsync(String caseInstanceId, Map<String, Object> variables) {
+        commandExecutor.execute(new SetVariablesAsyncCmd(caseInstanceId, variables));
+    }
+    
+    @Override
+    public void setLocalVariableAsync(String planItemInstanceId, String variableName, Object variableValue) {
+        commandExecutor.execute(new SetLocalVariableAsyncCmd(planItemInstanceId, variableName, variableValue));
+    }
+    
+    @Override
+    public void setLocalVariablesAsync(String planItemInstanceId, Map<String, Object> variables) {
+        commandExecutor.execute(new SetLocalVariablesAsyncCmd(planItemInstanceId, variables));
     }
 
     @Override

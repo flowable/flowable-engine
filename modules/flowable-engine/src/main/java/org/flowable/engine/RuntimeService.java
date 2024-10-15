@@ -864,6 +864,59 @@ public interface RuntimeService {
      *     when no execution is found for the given executionId.
      */
     void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
+    
+    /**
+     * Update or create a variable for an execution asynchronously.
+     *
+     * @param executionId
+     *     id of execution to set variable in, cannot be null.
+     * @param variableName
+     *     name of variable to set, cannot be null.
+     * @param value
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariableAsync(String executionId, String variableName, Object value);
+
+    /**
+     * Update or create a variable for an execution (not considering parent scopes) asynchronously. If the variable is not already existing, it will be created in the given execution.
+     *
+     * @param executionId
+     *     id of execution to set variable in, cannot be null.
+     * @param variableName
+     *     name of variable to set, cannot be null.
+     * @param value
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariableLocalAsync(String executionId, String variableName, Object value);
+
+    /**
+     * Update or create given variables for an execution (including parent scopes) asynchronously.
+     *
+     * @param executionId
+     *     id of the execution, cannot be null.
+     * @param variables
+     *     map containing name (key) and value of variables, can be null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
+     */
+    void setVariablesAsync(String executionId, Map<String, ?> variables);
+
+    /**
+     * Update or create given variables for an execution (not considering parent scopes) asynchronously. If the variables are not already existing, it will be created in the given execution.
+     *
+     * @param executionId
+     *     id of the execution, cannot be null.
+     * @param variables
+     *     map containing name (key) and value of variables, can be null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariablesLocalAsync(String executionId, Map<String, ?> variables);
 
     /**
      * Removes a variable for an execution.

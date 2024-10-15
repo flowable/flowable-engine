@@ -216,6 +216,14 @@ public interface CmmnRuntimeService {
     
     void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
     
+    void setVariablesAsync(String caseInstanceId, Map<String, Object> variables);
+    
+    void setVariableAsync(String caseInstanceId, String variableName, Object variableValue);
+    
+    void setLocalVariablesAsync(String planItemInstanceId, Map<String, Object> variables);
+    
+    void setLocalVariableAsync(String planItemInstanceId, String variableName, Object variableValue);
+    
     void removeVariable(String caseInstanceId, String variableName);
     
     void removeVariables(String caseInstanceId, Collection<String> variableNames);
