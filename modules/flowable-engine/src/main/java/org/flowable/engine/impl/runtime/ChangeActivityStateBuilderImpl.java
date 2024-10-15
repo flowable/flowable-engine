@@ -32,6 +32,8 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
     protected List<MoveExecutionIdContainer> moveExecutionIdList = new ArrayList<>();
     protected List<MoveActivityIdContainer> moveActivityIdList = new ArrayList<>();
     protected List<EnableActivityIdContainer> enableActivityIdList = new ArrayList<>();
+    protected List<TerminateActivityContainer> terminateActivityContainers = new ArrayList<>();
+    protected List<TerminateExecutionContainer> terminateExecutionContainers = new ArrayList<>();
     protected Map<String, Object> processVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
 
@@ -171,11 +173,58 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         moveActivityIdList.add(moveActivityIdsContainer);
         return this;
     }
-    
+
     @Override
     public ChangeActivityStateBuilder enableEventSubProcessStartEvent(String eventSubProcessStartEventId) {
         EnableActivityIdContainer enableActivityIdContainer = new EnableActivityIdContainer(eventSubProcessStartEventId);
         enableActivityIdList.add(enableActivityIdContainer);
+        return this;
+    }
+
+    @Override
+    public ChangeActivityStateBuilder terminateActivity(String activityId) {
+        TerminateActivityContainer terminateActivityContainer = new TerminateActivityContainer(activityId);
+        terminateActivityContainers.add(terminateActivityContainer);
+        return this;
+    }
+
+    @Override
+    public ChangeActivityStateBuilder terminateActivities(List<String> activityIds) {
+        TerminateActivityContainer terminateActivityContainer = new TerminateActivityContainer(activityIds);
+        terminateActivityContainers.add(terminateActivityContainer);
+        return this;
+    }
+
+    @Override
+    public ChangeActivityStateBuilder terminateParentProcessInstanceActivity(String activityId) {
+        TerminateActivityContainer terminateActivityContainer = new TerminateActivityContainer(activityId);
+        terminateActivityContainer.setTerminateInParentProcess(true);
+        terminateActivityContainers.add(terminateActivityContainer);
+        return this;
+    }
+
+
+    @Override
+    public ChangeActivityStateBuilder terminateParentProcessInstanceActivities(List<String> activityIds) {
+        TerminateActivityContainer terminateActivityContainer = new TerminateActivityContainer(activityIds);
+        terminateActivityContainer.setTerminateInParentProcess(true);
+        terminateActivityContainers.add(terminateActivityContainer);
+        return this;
+    }
+
+
+
+    @Override
+    public ChangeActivityStateBuilder terminateExecution(String executionId) {
+        TerminateExecutionContainer terminateExecutionContainer = new TerminateExecutionContainer(executionId);
+        terminateExecutionContainers.add(terminateExecutionContainer);
+        return this;
+    }
+
+    @Override
+    public ChangeActivityStateBuilder terminateExecutions(List<String> executionIds) {
+        TerminateExecutionContainer terminateExecutionContainer = new TerminateExecutionContainer(executionIds);
+        terminateExecutionContainers.add(terminateExecutionContainer);
         return this;
     }
 
@@ -248,6 +297,14 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     public List<EnableActivityIdContainer> getEnableActivityIdList() {
         return enableActivityIdList;
+    }
+
+    public List<TerminateActivityContainer> getTerminateActivityIdList() {
+        return terminateActivityContainers;
+    }
+
+    public List<TerminateExecutionContainer> getTerminateExecutionIdList() {
+        return terminateExecutionContainers;
     }
 
     public Map<String, Object> getProcessInstanceVariables() {

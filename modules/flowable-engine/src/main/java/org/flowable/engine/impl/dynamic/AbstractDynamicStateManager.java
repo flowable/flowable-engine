@@ -81,6 +81,8 @@ import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.EnableActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveActivityIdContainer;
 import org.flowable.engine.impl.runtime.MoveExecutionIdContainer;
+import org.flowable.engine.impl.runtime.TerminateActivityContainer;
+import org.flowable.engine.impl.runtime.TerminateExecutionContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
@@ -248,7 +250,66 @@ public abstract class AbstractDynamicStateManager {
 
         return moveExecutionEntityContainerList;
     }
-    
+
+    public List<TerminateActivityContainer> resolveTerminateActivityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
+        List<TerminateActivityContainer> terminateActivityContainerList = new ArrayList<>();
+//        if (!changeActivityStateBuilder.getTerminateActivityIdList().isEmpty()) {
+//            for (TerminateActivityContainer terminateActivityIdContainer : changeActivityStateBuilder.getTerminateActivityIdList()) {
+//                TerminateActivityContainer terminateActivityContainer = new TerminateActivityContainer(terminateActivityIdContainer.getActivityIds());
+//                terminateActivityContainerList.add(terminateActivityContainer);
+//                resolveActiveExecution(executionId, commandContext)
+//                terminateActivityContainer.setExecution(terminateActivityIdContainer.getExecution());
+//            }
+//        }
+
+        return terminateActivityContainerList;
+    }
+
+    public List<TerminateExecutionContainer> resolveTerminateExecutionContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
+        List<TerminateExecutionContainer> terminateExecutionContainerList = new ArrayList<>();
+        if (!changeActivityStateBuilder.getTerminateExecutionIdList().isEmpty()) {
+            for (TerminateExecutionContainer terminateExecutionIdContainer : changeActivityStateBuilder.getTerminateExecutionIdList()) {
+                TerminateExecutionContainer terminateExecutionContainer = new TerminateExecutionContainer(terminateExecutionIdContainer.getExecutionIds());
+                for (String executionId : terminateExecutionIdContainer.getExecutionIds()) {
+                    terminateExecutionContainer.getExecutions().add(resolveActiveExecution(executionId, commandContext));
+                }
+                terminateExecutionContainerList.add(terminateExecutionContainer);
+            }
+        }
+
+        return terminateExecutionContainerList;
+    }
+
+    public List<TerminateExecutionContainer> resolveExecutionsFromTerminateActivitiesContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
+        List<TerminateExecutionContainer> terminateExecutionContainerList = new ArrayList<>();
+        if(changeActivityStateBuilder.getTerminateActivityIdList().isEmpty()) {
+            return terminateExecutionContainerList;
+        }
+
+        String processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
+        ExecutionEntity execution = resolveActiveExecution(processInstanceId, commandContext);
+        ExecutionEntity finalExecution;
+        if (!changeActivityStateBuilder.getTerminateActivityIdList().isEmpty()) {
+            for (TerminateActivityContainer terminateActivityIdContainer : changeActivityStateBuilder.getTerminateActivityIdList()) {
+                if(terminateActivityIdContainer.isTerminateInParentProcess()) {
+                    ExecutionEntity processInstanceExecution = execution.getProcessInstance();
+                    finalExecution = processInstanceExecution.getSuperExecution();
+                    if (finalExecution == null) {
+                        throw new FlowableException("No parent process found for execution with activity id " + execution.getCurrentActivityId());
+                    }
+                }
+
+                TerminateExecutionContainer terminateExecutionContainer = new TerminateExecutionContainer();
+                for (String activityId : terminateActivityIdContainer.getActivityIds()) {
+                    terminateExecutionContainer.getExecutions().addAll(resolveActiveExecutions(processInstanceId, activityId, commandContext));
+                }
+                terminateExecutionContainerList.add(terminateExecutionContainer);
+            }
+        }
+
+        return terminateExecutionContainerList;
+    }
+
     public List<EnableActivityContainer> resolveEnableActivityContainers(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         List<EnableActivityContainer> enableActivityContainerList = new ArrayList<>();
         if (!changeActivityStateBuilder.getEnableActivityIdList().isEmpty()) {
@@ -651,6 +712,21 @@ public abstract class AbstractDynamicStateManager {
                 }
             }
         }
+
+
+        // Terminate executions
+        for(TerminateExecutionContainer terminateExecutionContainer : processInstanceChangeState.getTerminateExecutionContainers()) {
+            if (terminateExecutionContainer.getExecutions() != null  && !terminateExecutionContainer.getExecutions().isEmpty()) {
+                for (ExecutionEntity execution : terminateExecutionContainer.getExecutions()) {
+                    if(execution == null) {
+                        throw new FlowableException("Execution cannot be terminate because it is null");
+                    }
+                    executionEntityManager.deleteChildExecutions(execution, Collections.emptyList(), null, "Terminate execution " + execution.getId() + " with activity id " + execution.getActivityId(), true, null);
+                    executionEntityManager.deleteExecutionAndRelatedData(execution, "Terminate execution " + execution.getId() + " with activity id " + execution.getActivityId(), false, false, true, execution.getCurrentFlowElement());
+                }
+            }
+        }
+
     }
 
     protected void processPendingEventSubProcessesStartEvents(ProcessInstanceChangeState processInstanceChangeState, CommandContext commandContext) {
@@ -686,6 +762,7 @@ public abstract class AbstractDynamicStateManager {
 
         //Confirm that all the subProcessExecutions are in the executionsPool
         List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
+        subProcessExecutions = subProcessExecutions.stream().filter(e -> !(e.getCurrentFlowElement() instanceof BoundaryEvent)).collect(Collectors.toList());
         HashSet<String> executionIdsToMove = executionsPool.stream().map(ExecutionEntity::getId).collect(Collectors.toCollection(HashSet::new));
         Optional<ExecutionEntity> notIncludedExecution = subProcessExecutions.stream().filter(e -> !executionIdsToMove.contains(e.getId())).findAny();
         if (notIncludedExecution.isPresent()) {
