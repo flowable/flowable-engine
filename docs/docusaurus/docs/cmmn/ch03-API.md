@@ -326,7 +326,7 @@ Also note that in none of the functions above the *planItemInstance* or *caseIns
 
 The use of these variable functions is especially useful in CMMN, for example when it comes to writing the condition of an if-part of sentry. Take the following CMMN case definition:
 
-![cmmn.expression functions](assets/cmmn/cmmn.expression-functions.png)
+![cmmn.expression functions](../assets/cmmn/cmmn.expression-functions.png)
 
 Assume the sentry has an if-part besides the completion event. Right after a case instance is started, this if-part condition will be evaluated (as the stage becomes available). If the condition is of the form *${someVariable == someValue}*, this means the variable needs to be available when starting the case instance. In many cases, this is not possible or the variable comes later (e.g., from a form), which leads to a low-level *PropertyNotFoundException*. Taking the potential nullability into account, the correct expression would have to be:
 
