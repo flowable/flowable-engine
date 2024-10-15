@@ -105,6 +105,7 @@ import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationStatusJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.impl.job.HistoricCaseInstanceMigrationJobHandler;
+import org.flowable.cmmn.engine.impl.job.SetAsyncVariablesJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerFactory;
 import org.flowable.cmmn.engine.impl.listener.CmmnListenerNotificationHelper;
@@ -1219,6 +1220,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         this.dependentScopeTypes.add(ScopeTypes.CMMN);
         this.dependentScopeTypes.add(ScopeTypes.CMMN_VARIABLE_AGGREGATION);
         this.dependentScopeTypes.add(ScopeTypes.CMMN_EXTERNAL_WORKER);
+        this.dependentScopeTypes.add(ScopeTypes.CMMN_ASYNC_VARIABLES);
     }
 
     public void initHistoryConfigurationSettings() {
@@ -1575,6 +1577,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncLeaveActivePlanItemInstanceJobHandler.TYPE, new AsyncLeaveActivePlanItemInstanceJobHandler());
         jobHandlers.put(AsyncInitializePlanModelJobHandler.TYPE, new AsyncInitializePlanModelJobHandler());
+        jobHandlers.put(SetAsyncVariablesJobHandler.TYPE, new SetAsyncVariablesJobHandler(this));
         jobHandlers.put(CmmnHistoryCleanupJobHandler.TYPE, new CmmnHistoryCleanupJobHandler());
         jobHandlers.put(ExternalWorkerTaskCompleteJobHandler.TYPE, new ExternalWorkerTaskCompleteJobHandler(this));
         addJobHandler(new CaseInstanceMigrationJobHandler());

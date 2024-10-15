@@ -272,6 +272,7 @@ import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceWithNoWaitState
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
+import org.flowable.engine.impl.jobexecutor.SetAsyncVariablesJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
@@ -1189,6 +1190,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initDependentScopeTypes() {
         this.dependentScopeTypes.add(ScopeTypes.BPMN_VARIABLE_AGGREGATION);
         this.dependentScopeTypes.add(ScopeTypes.BPMN_EXTERNAL_WORKER);
+        this.dependentScopeTypes.add(ScopeTypes.BPMN_ASYNC_VARIABLES);
     }
 
     // History manager ///////////////////////////////////////////////////////////
@@ -1921,6 +1923,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         ProcessInstanceMigrationStatusJobHandler processInstanceMigrationStatusJobHandler = new ProcessInstanceMigrationStatusJobHandler();
         jobHandlers.put(processInstanceMigrationStatusJobHandler.getType(), processInstanceMigrationStatusJobHandler);
+        
+        SetAsyncVariablesJobHandler setAsyncVariablesJobHandler = new SetAsyncVariablesJobHandler();
+        jobHandlers.put(setAsyncVariablesJobHandler.getType(), setAsyncVariablesJobHandler);
 
         ExternalWorkerTaskCompleteJobHandler externalWorkerTaskCompleteJobHandler = new ExternalWorkerTaskCompleteJobHandler();
         jobHandlers.put(externalWorkerTaskCompleteJobHandler.getType(), externalWorkerTaskCompleteJobHandler);
