@@ -478,6 +478,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .searchKey2(caseDefinition.getId())
                 .status(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
                 .batchDocumentJson(document.asJsonString())
+                .tenantId(caseDefinition.getTenantId())
                 .create();
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
@@ -487,6 +488,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
             JobEntity job = jobService.createJob();
             job.setJobHandlerType(CaseInstanceMigrationJobHandler.TYPE);
+            job.setTenantId(caseInstance.getTenantId());
             job.setScopeId(caseInstance.getId());
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
@@ -499,6 +501,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             TimerJobService timerJobService = engineConfiguration.getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+            timerJob.setTenantId(batch.getTenantId());
             timerJob.setRevision(1);
             timerJob.setRetries(0);
             timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
@@ -530,6 +533,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .searchKey2(caseDefinition.getId())
                 .status(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
                 .batchDocumentJson(document.asJsonString())
+                .tenantId(caseDefinition.getTenantId())
                 .create();
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
@@ -542,6 +546,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             job.setScopeId(historicCaseInstance.getId());
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(HistoricCaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
+            job.setTenantId(historicCaseInstance.getTenantId());
             jobService.createAsyncJob(job, false);
             jobService.scheduleAsyncJob(job);
         }
@@ -554,6 +559,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(HistoricCaseInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             timerJob.setScopeType(ScopeTypes.CMMN);
+            timerJob.setTenantId(batch.getTenantId());
 
             BusinessCalendar businessCalendar = engineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(engineConfiguration.getBatchStatusTimeCycleConfig()));
