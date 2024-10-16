@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
+import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.PlanItemDefinitionMappingBuilder;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -6310,18 +6311,26 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
 
     @Test
     void testCaseInstanceMigrationDocument() {
+        Map<String, Object> localVariables = new HashMap<>();
+        localVariables.put("myStr", "abc");
+        localVariables.put("myInt", 2);
+
+        ActivatePlanItemDefinitionMapping activatePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("activateId", "${activateCondition}");
+        activatePlanItemDefinitionMapping.setWithLocalVariables(localVariables);
+
+        MoveToAvailablePlanItemDefinitionMapping moveToAvailablePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("availableId", "${availableCondition}");
+        moveToAvailablePlanItemDefinitionMapping.setWithLocalVariables(localVariables);
+
         String documentAsJson = this.cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .addTerminatePlanItemDefinitionMapping(
                         PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("terminateId", "${terminateCondition}"))
-                .addMoveToAvailablePlanItemDefinitionMapping(
-                        PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("availableId", "${availableCondition}"))
+                .addMoveToAvailablePlanItemDefinitionMapping(moveToAvailablePlanItemDefinitionMapping)
                 .addWaitingForRepetitionPlanItemDefinitionMapping(
                         PlanItemDefinitionMappingBuilder.createWaitingForRepetitionPlanItemDefinitionMappingFor("repetitionId", "${repetitionCondition}"))
                 .removeWaitingForRepetitionPlanItemDefinitionMapping(
                         PlanItemDefinitionMappingBuilder.createRemoveWaitingForRepetitionPlanItemDefinitionMappingFor("removeRepetitionId",
                                 "${removeRepetitionCondition}"))
-                .addActivatePlanItemDefinitionMapping(
-                        PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("activateId", "${activateCondition}"))
+                .addActivatePlanItemDefinitionMapping(activatePlanItemDefinitionMapping)
                 .addChangePlanItemIdMapping(new ChangePlanItemIdMapping("oldPlanItemId", "newPlanItemId"))
                 .addChangePlanItemIdWithDefinitionIdMapping(new ChangePlanItemIdWithDefinitionIdMapping("oldPlanItemDefinitionId", "newPlanItemDefinitionId"))
                 .withPreUpgradeExpression("${preExpression}")
@@ -6334,6 +6343,83 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .getCaseInstanceMigrationDocument()
                 .asJsonString();
         assertThatJson(documentAsJsonConverted).isEqualTo(documentAsJson);
+    }
+
+    @Test
+    void testMigrationWithMappingsWithLocalVariables() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/three-tasks-with-sentry.cmmn.xml");
+
+        Map<String, Object> taskTwoLocalVariables = new HashMap<>();
+        taskTwoLocalVariables.put("myStr", "abc");
+        taskTwoLocalVariables.put("myInt", 2);
+        Map<String, Object> taskThreeLocalVariables = new HashMap<>();
+        taskThreeLocalVariables.put("myStr", "def");
+        taskThreeLocalVariables.put("myInt", 3);
+
+        ActivatePlanItemDefinitionMapping activatePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2");
+        activatePlanItemDefinitionMapping.setWithLocalVariables(taskTwoLocalVariables);
+
+        MoveToAvailablePlanItemDefinitionMapping moveToAvailablePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("humanTask3");
+        moveToAvailablePlanItemDefinitionMapping.setWithLocalVariables(taskThreeLocalVariables);
+
+        List<PlanItemInstance> planItemInstances2 = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(activatePlanItemDefinitionMapping)
+                .addMoveToAvailablePlanItemDefinitionMapping(moveToAvailablePlanItemDefinitionMapping)
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionKey()).isEqualTo("testCase");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionName()).isEqualTo("threeTasks");
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionVersion()).isEqualTo(2);
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionDeploymentId()).isEqualTo(destinationDefinition.getDeploymentId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getCaseDefinitionId)
+                .containsOnly(destinationDefinition.getId());
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName)
+                .containsExactlyInAnyOrder("Task 1", "Task 2", "Task 3");
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsOnly(PlanItemInstanceState.ACTIVE, PlanItemInstanceState.AVAILABLE);
+
+        PlanItemInstance planItemInstanceTaskTwo = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("humanTask2").singleResult();
+        Map<String, Object> localVarMapTaskTwo = cmmnRuntimeService.getLocalVariables(planItemInstanceTaskTwo.getId());
+        assertThat(localVarMapTaskTwo.get("myStr")).isEqualTo("abc");
+        assertThat(localVarMapTaskTwo.get("myInt")).isEqualTo(2);
+
+        PlanItemInstance planItemInstanceTaskThree = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("humanTask3").singleResult();
+        Map<String, Object> localVarMapTaskThree = cmmnRuntimeService.getLocalVariables(planItemInstanceTaskThree.getId());
+        assertThat(localVarMapTaskThree.get("myStr")).isEqualTo("def");
+        assertThat(localVarMapTaskThree.get("myInt")).isEqualTo(3);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).hasSize(2);
+        for (Task task : tasks) {
+            assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            cmmnTaskService.complete(task.getId());
+        }
+
+        Task thirdTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(thirdTask.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
     protected class CustomTenantProvider implements DefaultTenantProvider {

@@ -55,7 +55,7 @@ public class ReceiveTaskXMLConverter extends BaseBpmnXMLConverter {
 
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
-        ReceiveTask receiveTask = new ReceiveTask();
+        ReceiveTask receiveTask = (ReceiveTask) element;
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, receiveTask.getSkipExpression(), xtw);
     }
 
