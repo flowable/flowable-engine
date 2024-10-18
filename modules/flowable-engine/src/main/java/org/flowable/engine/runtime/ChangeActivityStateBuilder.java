@@ -88,6 +88,36 @@ public interface ChangeActivityStateBuilder {
     ChangeActivityStateBuilder enableEventSubProcessStartEvent(String eventSubProcessStartEventId);
 
     /**
+     * Terminates a specific activity.
+     */
+    ChangeActivityStateBuilder terminateActivity(String activityId);
+
+    /**
+     * Terminates a list of activities.
+     */
+    ChangeActivityStateBuilder terminateActivities(List<String> activityIds);
+
+    /**
+     * Terminates a specific activity in the parent process instance.
+     */
+    ChangeActivityStateBuilder terminateParentProcessInstanceActivity(String activityId);
+
+    /**
+     * Terminate a list of activities in the parent process instance.
+     */
+    ChangeActivityStateBuilder terminateParentProcessInstanceActivities(List<String> activityIds);
+
+    /**
+     * Terminates a specific activity in the parent process instance.
+     */
+    ChangeActivityStateBuilder terminateExecution(String executionId);
+
+    /**
+     * Terminates a list of executions.
+     */
+    ChangeActivityStateBuilder terminateExecutions(List<String> executionIds);
+
+    /**
      * Sets a process scope variable
      */
     ChangeActivityStateBuilder processVariable(String processVariableName, Object processVariableValue);

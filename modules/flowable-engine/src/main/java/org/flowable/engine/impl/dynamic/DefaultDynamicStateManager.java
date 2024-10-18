@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.dynamic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.runtime.TerminateExecutionContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -47,14 +49,19 @@ public class DefaultDynamicStateManager extends AbstractDynamicStateManager impl
         } else {
             processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
         }
-        
+
+        List<TerminateExecutionContainer> terminateExecutionContainerList = new ArrayList<>();
+        terminateExecutionContainerList.addAll(resolveTerminateExecutionContainers(changeActivityStateBuilder, commandContext));
+        terminateExecutionContainerList.addAll(resolveExecutionsFromTerminateActivitiesContainers(changeActivityStateBuilder, commandContext));
+
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
             .setProcessInstanceId(processInstanceId)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
             .setEnableActivityContainers(enableActivityContainerList)
+            .setTerminateExecutionContainers(terminateExecutionContainerList)
             .setLocalVariables(changeActivityStateBuilder.getLocalVariables())
             .setProcessInstanceVariables(changeActivityStateBuilder.getProcessInstanceVariables());
-        
+
         doMoveExecutionState(processInstanceChangeState, commandContext);
     }
 
