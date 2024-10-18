@@ -15,7 +15,7 @@ BPMN is a widely accepted and supported standard notation for representing proce
 
 Create a new XML file (*right-click on any project and select New→Other→XML-XML File*) and give it a name. Make sure that the file **ends with .bpmn20.xml or .bpmn**, otherwise the engine won’t pick it up for deployment.
 
-![new.bpmn.procdef](assets/bpmn/new.bpmn.procdef.png)
+![new.bpmn.procdef](../assets/bpmn/new.bpmn.procdef.png)
 
 The root element of the BPMN 2.0 schema is the definitions element. Within this element, multiple process definitions can be given (although our advice is to have only one process definition in each file, as this simplifies maintenance later in the development process). An empty process definition looks like the one shown below. Note that the minimal definitions element only needs the xmlns and targetNamespace declaration. The targetNamespace can be anything and is useful for categorizing process definitions.
 
@@ -68,7 +68,7 @@ The use case is straightforward: we have a company, let’s call it BPMCorp. In 
 
 The business process as described above can be defined graphically using the [Flowable Designer](bpmn/ch13-Designer.md#eclipse-designer). However, for this tutorial, we’ll type the XML ourselves, as we’ll learn the most this way at this stage. The graphical BPMN 2.0 notation of our process looks like this:
 
-![financial.report.example.diagram](assets/bpmn/financial.report.example.diagram.png)
+![financial.report.example.diagram](../assets/bpmn/financial.report.example.diagram.png)
 
 What we see is a [none Start Event](bpmn/ch07b-BPMN-Constructs.md#None-start-event) (circle on the left), followed by two [User Tasks](bpmn/ch07b-BPMN-Constructs.md#user-task): *'Write monthly financial report'* and *'Verify monthly financial report'*, ending in a [none end event](bpmn/ch07b-BPMN-Constructs.md#None-end-event) (circle with thick border on the right).
 
@@ -158,7 +158,7 @@ After the task is created, the startProcessInstanceByKey method will return beca
 
 We can now throw this all together and create a simple Java program. Create a new Eclipse project and add the Flowable JARs and dependencies to its classpath (these can be found in the *libs* folder of the Flowable distribution). Before we can call the Flowable services, we must first construct a ProcessEngine that gives us access to the services. Here we use the *'standalone'* configuration, which constructs a ProcessEngine that uses the database also used in the demo setup.
 
-You can download the process definition XML [here](assets/bpmn/FinancialReportProcess.bpmn20.xml). This file contains the XML shown above, but also contains the necessary BPMN [diagram interchange information](bpmn/ch06-Deployment.md#generating-a-process-diagram) to visualize the process in the Flowable tools.
+You can download the process definition XML [here](../assets/bpmn/FinancialReportProcess.bpmn20.xml). This file contains the XML shown above, but also contains the necessary BPMN [diagram interchange information](bpmn/ch06-Deployment.md#generating-a-process-diagram) to visualize the process in the Flowable tools.
 
     public static void main(String[] args) {
 
@@ -202,11 +202,11 @@ We could also use the task query API to get the same results using the name of t
 As we’ve configured our ProcessEngine to use the same database that the demo setup is using, we can now log into the [Flowable IDM](http://localhost:8080/flowable-idm/). Login as admin/test and create 2 new users *kermit* and *fozzie*, and give both of them the *Access the workflow application* privilege. Then create 2 new organization groups named *accountancy* and *management*, and add fozzie to the new accountancy group and add kermit to the management group.
 Now login with fozzie to the [Flowable task](http://localhost:8080/flowable-task/) application, and we will find that we can start our business process by selecting the Task App, then its *Processes* page and selecting the *'Monthly financial report'* process.
 
-![bpmn.financial.report.example.start.process](assets/bpmn/bpmn.financial.report.example.start.process.png)
+![bpmn.financial.report.example.start.process](../assets/bpmn/bpmn.financial.report.example.start.process.png)
 
 As explained, the process will execute until reaching the first user task. As we’re logged in as fozzie, we can see that there is a new candidate task available for him after we’ve started a process instance. Select the *Tasks* page to view this new task. Note that even if the process was started by someone else, the task would still be visible as a candidate task to everyone in the accountancy group.
 
-![bpmn.financial.report.example.task.assigned](assets/bpmn/bpmn.financial.report.example.task.assigned.png)
+![bpmn.financial.report.example.task.assigned](../assets/bpmn/bpmn.financial.report.example.task.assigned.png)
 
 ### Claiming the task
 
@@ -220,7 +220,7 @@ The task is now in the **personal task list of the user that claimed the task**.
 
 In the Flowable Task app, clicking the *claim* button will call the same operation. The task will now move to the personal task list of the logged on user. You’ll also see that the assignee of the task changed to the current logged in user.
 
-![bpmn.financial.report.example.claim.task](assets/bpmn/bpmn.financial.report.example.claim.task.png)
+![bpmn.financial.report.example.claim.task](../assets/bpmn/bpmn.financial.report.example.claim.task.png)
 
 ### Completing the task
 

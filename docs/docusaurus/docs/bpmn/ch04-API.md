@@ -7,7 +7,7 @@ title: The Flowable API
 
 The engine API is the most common way of interacting with Flowable. The main starting point is the ProcessEngine, which can be created in several ways as described in the [configuration section](bpmn/ch03-Configuration.md#creating-a-processengine). From the ProcessEngine, you can obtain the various services that contain the workflow/BPM methods. ProcessEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
 
-![api.services](assets/bpmn/api.services.png)
+![api.services](../assets/bpmn/api.services.png)
 
     ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
 
@@ -211,7 +211,7 @@ The methods follow the naming convention of the regular process variables:
 
 The following BPMN diagram shows a typical example:
 
-![api.transient.variable.example](assets/bpmn/api.transient.variable.example.png)
+![api.transient.variable.example](../assets/bpmn/api.transient.variable.example.png)
 
 Let’s assume the 'Fetch Data' service task calls some remote service (for example, using REST). Let’s also assume some configuration parameters are needed and need to be provided when starting the process instance. Also, these configuration parameters are not important for historical audit purposes, so we pass them as transient variables:
 
@@ -475,27 +475,27 @@ When using the in-memory H2 database for unit tests, the following instructions 
 
 Suppose we have put a *breakpoint* somewhere in our unit test (in Eclipse this is done by double-clicking in the left border next to the code):
 
-![api.test.debug.breakpoint](assets/bpmn/api.test.debug.breakpoint.png)
+![api.test.debug.breakpoint](../assets/bpmn/api.test.debug.breakpoint.png)
 
 If we now run the unit test in *debug* mode (right-click in test class, select 'Run as' and then 'JUnit test'), the test execution halts at our breakpoint, where we can now inspect the variables of our test as shown in the right upper panel.
 
-![api.test.debug.view](assets/bpmn/api.test.debug.view.png)
+![api.test.debug.view](../assets/bpmn/api.test.debug.view.png)
 
 To inspect the Flowable data, open up the *'Display'* window (if this window isn’t there, open Window→Show View→Other and select *Display*.) and type (code completion is available) org.h2.tools.Server.createWebServer("-web").start()
 
-![api.test.debug.start.h2.server](assets/bpmn/api.test.debug.start.h2.server.png)
+![api.test.debug.start.h2.server](../assets/bpmn/api.test.debug.start.h2.server.png)
 
 Select the line you’ve just typed and right-click on it. Now select 'Display' (or execute the shortcut instead of right-clicking)
 
-![api.test.debug.start.h2.server.2](assets/bpmn/api.test.debug.start.h2.server.2.png)
+![api.test.debug.start.h2.server.2](../assets/bpmn/api.test.debug.start.h2.server.2.png)
 
 Now open up a browser and go to [<http://localhost:8082>](http://localhost:8082), and fill in the JDBC URL to the in-memory database (by default this is jdbc:h2:mem:flowable), and hit the connect button.
 
-![api.test.debug.h2.login](assets/bpmn/api.test.debug.h2.login.png)
+![api.test.debug.h2.login](../assets/bpmn/api.test.debug.h2.login.png)
 
 You can now see the Flowable data and use it to understand how and why your unit test is executing your process in a certain way.
 
-![api.test.debug.h2.tables](assets/bpmn/api.test.debug.h2.tables.png)
+![api.test.debug.h2.tables](../assets/bpmn/api.test.debug.h2.tables.png)
 
 ## The process engine in a web application
 
