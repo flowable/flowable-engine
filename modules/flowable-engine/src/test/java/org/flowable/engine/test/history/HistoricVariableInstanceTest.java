@@ -14,6 +14,7 @@
 package org.flowable.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -344,6 +346,40 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         assertThat(historicVariableInstances.get(0).getVariableName()).isEqualTo("taskVar1");
 
     }
+
+    @Test
+    public void testHistoricVariableQueryByProcessInstanceIds() {
+        deployTwoTasksTestProcess();
+
+        Set<String> processInstanceIds = new HashSet<>();
+        ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("twoTasksProcess")
+                .variable("startVar", "hello")
+                .start();
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("twoTasksProcess")
+                .variable("startVar2", "hello2")
+                .start();
+        ProcessInstance instance3 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("twoTasksProcess")
+                .variable("startVar3", "hello3")
+                .start();
+        processInstanceIds.add(instance1.getId());
+        processInstanceIds.add(instance3.getId());
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceIds(processInstanceIds).count()).isEqualTo(2);
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceIds(processInstanceIds).list()).hasSize(2);
+
+        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceIds(processInstanceIds).list())
+                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                .containsExactlyInAnyOrder(
+                        tuple("startVar", "hello"),
+                        tuple("startVar3", "hello3")
+                );
+    }
+
 
     @Test
     public void testHistoricVariableQueryByExecutionIds() {

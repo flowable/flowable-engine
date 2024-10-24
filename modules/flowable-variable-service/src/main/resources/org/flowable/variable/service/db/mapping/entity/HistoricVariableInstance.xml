@@ -368,6 +368,16 @@
             <if test="processInstanceId != null">
                 and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
             </if>
+            <if test="processInstanceIds != null and !processInstanceIds.empty">
+                and (
+                <foreach item="listItem" collection="safeProcessInstanceIds" separator="OR">
+                    RES.PROC_INST_ID_ in
+                    <foreach item="processInstanceId" collection="listItem" open="(" separator="," close=")">
+                        #{processInstanceId, jdbcType=NVARCHAR}
+                    </foreach>
+                </foreach>
+                )
+            </if>
             <if test="executionId != null">
                 and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
@@ -381,10 +391,14 @@
                 and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
             </if>
             <if test="taskIds != null and !taskIds.empty">
-                and RES.TASK_ID_ in
-                <foreach item="taskId" index="index" collection="taskIds" open="(" separator="," close=")">
-                    #{taskId, jdbcType=NVARCHAR}
+                and (
+                <foreach item="listItem" collection="safeTaskIds" separator="OR">
+                    RES.TASK_ID_ in
+                    <foreach item="taskId" collection="listItem" open="(" separator="," close=")">
+                        #{taskId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
@@ -396,6 +410,16 @@
             </if>
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
+            </if>
+            <if test="scopeIds != null and !scopeIds.empty">
+                and (
+                    <foreach item="listItem" collection="safeScopeIds" separator="OR">
+                        RES.SCOPE_ID_ in
+                        <foreach item="scopeId" collection="listItem" open="(" separator="," close=")">
+                            #{scopeId, jdbcType=NVARCHAR}
+                        </foreach>
+                    </foreach>
+                )
             </if>
             <if test="subScopeId != null">
                 and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}

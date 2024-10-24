@@ -16,6 +16,7 @@ import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -355,6 +356,38 @@ public class VariablesTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult()).isNull();
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult()).isNotNull();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testVariableInstanceQueryByCaseInstanceIds() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test2")
+                .start();
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test3")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            Set<String> ids = new HashSet<>();
+            ids.add(caseInstance1.getId());
+            ids.add(caseInstance3.getId());
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceIds(ids).count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceIds(ids).list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("myVar", "test1"),
+                            tuple("myVar", "test3")
+                    );
         }
     }
 
