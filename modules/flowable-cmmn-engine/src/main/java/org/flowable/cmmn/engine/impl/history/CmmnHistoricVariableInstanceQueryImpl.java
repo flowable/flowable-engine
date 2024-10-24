@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +52,13 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
         return this;
     }
     
+    @Override
+    public HistoricVariableInstanceQuery caseInstanceIds(Collection<String> caseInstanceIds) {
+        wrappedHistoricVariableInstanceQuery.scopeIds(caseInstanceIds);
+        wrappedHistoricVariableInstanceQuery.scopeType(ScopeTypes.CMMN);
+        return this;
+    }
+
     @Override
     public HistoricVariableInstanceQuery planItemInstanceId(String planItemInstanceId) {
         wrappedHistoricVariableInstanceQuery.subScopeId(planItemInstanceId);
