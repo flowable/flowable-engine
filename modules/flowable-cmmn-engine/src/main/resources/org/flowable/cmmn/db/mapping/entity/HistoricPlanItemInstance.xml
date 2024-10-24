@@ -35,8 +35,8 @@
             #{endedTime, jdbcType=TIMESTAMP},
             #{lastUpdatedTime, jdbcType=TIMESTAMP},
             #{startUserId, jdbcType=VARCHAR},
-            #{assignee, jdbcType=VARCHAR},
-            #{completedBy, jdbcType=VARCHAR},
+            #{assignee, jdbcType=NVARCHAR},
+            #{completedBy, jdbcType=NVARCHAR},
             #{referenceId, jdbcType=VARCHAR},
             #{referenceType, jdbcType=VARCHAR},
             #{entryCriterionId, jdbcType=VARCHAR},
@@ -80,8 +80,8 @@
             #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.startUserId, jdbcType=VARCHAR},
-            #{historicPlanItemInstance.assignee, jdbcType=VARCHAR},
-            #{historicPlanItemInstance.completedBy, jdbcType=VARCHAR},
+            #{historicPlanItemInstance.assignee, jdbcType=NVARCHAR},
+            #{historicPlanItemInstance.completedBy, jdbcType=NVARCHAR},
             #{historicPlanItemInstance.referenceId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.referenceType, jdbcType=VARCHAR},
             #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
@@ -126,8 +126,8 @@
                 #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.startUserId, jdbcType=VARCHAR},
-                #{historicPlanItemInstance.assignee, jdbcType=VARCHAR},
-                #{historicPlanItemInstance.completedBy, jdbcType=VARCHAR},
+                #{historicPlanItemInstance.assignee, jdbcType=NVARCHAR},
+                #{historicPlanItemInstance.completedBy, jdbcType=NVARCHAR},
                 #{historicPlanItemInstance.referenceId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.referenceType, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
@@ -218,10 +218,10 @@
                 START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.assignee != assignee">
-                ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+                ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.completedBy != completedBy">
-                COMPLETED_BY_ = #{completedBy, jdbcType=VARCHAR},
+                COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.referenceId != referenceId">
                 REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
@@ -312,8 +312,8 @@
         <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastUpdatedTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
-        <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR"/>
-        <result property="completedBy" column="COMPLETED_BY_" jdbcType="VARCHAR"/>
+        <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR"/>
+        <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR"/>
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR"/>
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR"/>
         <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
@@ -506,10 +506,10 @@
                 and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
             </if>
             <if test="assignee != null">
-                and RES.ASSIGNEE_ = #{assignee, jdbcType=VARCHAR}
+                and RES.ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR}
             </if>
             <if test="completedBy != null">
-                and RES.COMPLETED_BY_ = #{completedBy, jdbcType=VARCHAR}
+                and RES.COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
             </if>
             <if test="referenceId != null">
                 and RES.REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR}

@@ -118,7 +118,7 @@
           ACT_NAME_,
           ACT_TYPE_,
           ASSIGNEE_,
-          COMPLETED_BY_
+          COMPLETED_BY_,
           START_TIME_,
           END_TIME_,
           TRANSACTION_ORDER_,

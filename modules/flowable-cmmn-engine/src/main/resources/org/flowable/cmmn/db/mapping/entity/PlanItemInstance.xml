@@ -35,8 +35,8 @@
             #{exitTime, jdbcType=TIMESTAMP},
             #{endedTime, jdbcType=TIMESTAMP},
             #{startUserId, jdbcType=VARCHAR},
-            #{assignee, jdbcType=VARCHAR},
-            #{completedBy, jdbcType=VARCHAR},
+            #{assignee, jdbcType=NVARCHAR},
+            #{completedBy, jdbcType=NVARCHAR},
             #{referenceId, jdbcType=VARCHAR},
             #{referenceType, jdbcType=VARCHAR},
             #{completable, jdbcType=BOOLEAN},
@@ -83,8 +83,8 @@
             #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
             #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
             #{planItemInstance.startUserId, jdbcType=VARCHAR},
-            #{planItemInstance.assignee, jdbcType=VARCHAR},
-            #{planItemInstance.completedBy, jdbcType=VARCHAR},
+            #{planItemInstance.assignee, jdbcType=NVARCHAR},
+            #{planItemInstance.completedBy, jdbcType=NVARCHAR},
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.completable, jdbcType=BOOLEAN},
@@ -132,8 +132,8 @@
                 #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.startUserId, jdbcType=VARCHAR},
-                #{planItemInstance.assignee, jdbcType=VARCHAR},
-                #{planItemInstance.completedBy, jdbcType=VARCHAR},
+                #{planItemInstance.assignee, jdbcType=NVARCHAR},
+                #{planItemInstance.completedBy, jdbcType=NVARCHAR},
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
                 #{planItemInstance.completable, jdbcType=BOOLEAN},
@@ -223,10 +223,10 @@
             START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.assignee != assignee">
-            ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
+            ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.completedBy != completedBy">
-            COMPLETED_BY_ = #{completedBy, jdbcType=VARCHAR},
+            COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.referenceId != referenceId">
             REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
@@ -525,10 +525,10 @@
             and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
         </if>
         <if test="assignee != null">
-            and RES.ASSIGNEE_ = #{assignee, jdbcType=VARCHAR}
+            and RES.ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR}
         </if>
         <if test="completedBy != null">
-            and RES.COMPLETED_BY_ = #{completedBy, jdbcType=VARCHAR}
+            and RES.COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
         </if>
         <if test="referenceId != null">
             and RES.REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR}
@@ -817,10 +817,10 @@
                     or RES.START_USER_ID_ = #{orQueryObject.startUserId, jdbcType=VARCHAR}
                 </if>
                 <if test="orQueryObject.assignee != null">
-                    or RES.ASSIGNEE_ = #{orQueryObject.assignee, jdbcType=VARCHAR}
+                    or RES.ASSIGNEE_ = #{orQueryObject.assignee, jdbcType=NVARCHAR}
                 </if>
                 <if test="orQueryObject.completedBy != null">
-                    or RES.COMPLETED_BY_ = #{orQueryObject.completedBy, jdbcType=VARCHAR}
+                    or RES.COMPLETED_BY_ = #{orQueryObject.completedBy, jdbcType=NVARCHAR}
                 </if>
                 <if test="orQueryObject.referenceId != null">
                     or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=VARCHAR}
