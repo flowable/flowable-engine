@@ -760,6 +760,66 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void testByAssignee() {
+        startInstances(2);
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertThat(planItemInstances).hasSize(4);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+        }
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
+
+    }
+
+    @Test
+    public void testByCompletedBy() {
+        startInstances(3);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+            cmmnTaskService.complete(task.getId(), "kermit");
+        }
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .includeEnded()
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .includeEnded()
+                .planItemInstanceCompletedBy("kermit")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceCompletedBy("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
+
+    }
+
+    @Test
     public void testCompletedBeforeAndAfter() {
         startInstances(5);
         Date now = new Date();

@@ -36,6 +36,7 @@ create table ACT_HI_ACTINST (
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
     ASSIGNEE_ nvarchar(255),
+    COMPLETED_BY_ nvarchar(255),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     TRANSACTION_ORDER_ int,

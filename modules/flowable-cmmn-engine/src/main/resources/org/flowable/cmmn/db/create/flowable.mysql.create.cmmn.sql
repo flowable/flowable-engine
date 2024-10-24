@@ -94,6 +94,8 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     STATE_                  VARCHAR(255)            NULL,
     CREATE_TIME_            datetime(3)             NULL,
     START_USER_ID_          VARCHAR(255)            NULL,
+    ASSIGNEE_               VARCHAR(255)            NULL,
+    COMPLETED_BY_           VARCHAR(255)            NULL,
     REFERENCE_ID_           VARCHAR(255)            NULL,
     REFERENCE_TYPE_         VARCHAR(255)            NULL,
     ITEM_DEFINITION_ID_     VARCHAR(255)            NULL,
@@ -240,6 +242,8 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
     ENDED_TIME_            datetime(3)             NULL,
     LAST_UPDATED_TIME_     datetime(3)             NULL,
     START_USER_ID_         VARCHAR(255)            NULL,
+    ASSIGNEE_              VARCHAR(255)            NULL,
+    COMPLETED_BY_          VARCHAR(255)            NULL,
     REFERENCE_ID_          VARCHAR(255)            NULL,
     REFERENCE_TYPE_        VARCHAR(255)            NULL,
     ENTRY_CRITERION_ID_    VARCHAR(255)            NULL,
@@ -255,4 +259,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST (CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '7.1.0.2', 1);
+values ('cmmn.schema.version', '7.2.0.0', 1);

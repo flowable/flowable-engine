@@ -36,6 +36,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionTypes(List<String> planItemDefinitionTypes);
     HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee);
+    HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);

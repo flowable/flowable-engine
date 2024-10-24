@@ -51,6 +51,8 @@ public interface PlanItemInstance {
     Date getExitTime();
     Date getEndedTime();
     String getStartUserId();
+    String getAssignee();
+    String getCompletedBy();
     String getReferenceId();
     String getReferenceType();
     boolean isCompletable();

@@ -339,10 +339,12 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
                 @Override
                 public void onEvent(FlowableEvent event) {
-                    Object entity = ((FlowableEntityEvent) event).getEntity();
-                    if (event instanceof FlowableCaseStartedEvent) {
-                        CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) entity;
-                        cmmnRuntimeService.setVariable(caseInstanceEntity.getId(), "testVariable", 123);
+                    if (event instanceof FlowableEntityEvent) {
+                        Object entity = ((FlowableEntityEvent) event).getEntity();
+                        if (event instanceof FlowableCaseStartedEvent) {
+                            CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) entity;
+                            cmmnRuntimeService.setVariable(caseInstanceEntity.getId(), "testVariable", 123);
+                        }
                     }
                 }
 

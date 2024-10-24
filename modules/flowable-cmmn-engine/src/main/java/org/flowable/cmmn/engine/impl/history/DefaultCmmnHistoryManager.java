@@ -312,6 +312,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                 historicPlanItemInstanceEntity.setFormKey(planItemInstanceEntity.getFormKey());
                 historicPlanItemInstanceEntity.setElementId(planItemInstanceEntity.getElementId());
                 historicPlanItemInstanceEntity.setPlanItemDefinitionId(planItemInstanceEntity.getPlanItemDefinitionId());
+                historicPlanItemInstanceEntity.setAssignee(planItemInstanceEntity.getAssignee());
+                historicPlanItemInstanceEntity.setCompletedBy(planItemInstanceEntity.getCompletedBy());
             }
         }
     }

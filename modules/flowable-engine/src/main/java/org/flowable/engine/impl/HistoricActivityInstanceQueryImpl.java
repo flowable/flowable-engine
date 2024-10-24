@@ -43,6 +43,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected String activityType;
     protected Set<String> activityTypes;
     protected String assignee;
+    protected String completedBy;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -142,6 +143,12 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public HistoricActivityInstanceQueryImpl taskAssignee(String assignee) {
         this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQuery taskCompletedBy(String userId) {
+        this.completedBy = userId;
         return this;
     }
 
@@ -336,6 +343,10 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
 
     public String getAssignee() {
         return assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
     }
 
     public boolean isFinished() {

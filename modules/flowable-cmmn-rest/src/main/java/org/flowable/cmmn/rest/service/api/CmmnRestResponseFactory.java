@@ -567,6 +567,8 @@ public class CmmnRestResponseFactory {
         result.setExitTime(planItemInstance.getExitTime());
         result.setEndedTime(planItemInstance.getEndedTime());
         result.setStartUserId(planItemInstance.getStartUserId());
+        result.setAssignee(planItemInstance.getAssignee());
+        result.setCompletedBy(planItemInstance.getCompletedBy());
         result.setStage(planItemInstance.isStage());
         result.setCompletable(planItemInstance.isCompletable());
         result.setEntryCriterionId(planItemInstance.getEntryCriterionId());
@@ -909,6 +911,8 @@ public class CmmnRestResponseFactory {
         result.setEndedTime(historicPlanItemInstance.getEndedTime());
         result.setLastUpdatedTime(historicPlanItemInstance.getLastUpdatedTime());
         result.setStartUserId(historicPlanItemInstance.getStartUserId());
+        result.setAssignee(historicPlanItemInstance.getAssignee());
+        result.setCompletedBy(historicPlanItemInstance.getCompletedBy());
         result.setReferenceId(historicPlanItemInstance.getReferenceId());
         result.setReferenceType(historicPlanItemInstance.getReferenceType());
         result.setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());

@@ -33,6 +33,7 @@
         ACT_NAME_,
         ACT_TYPE_,
         ASSIGNEE_,
+        COMPLETED_BY_,
         START_TIME_,
         END_TIME_,
         TRANSACTION_ORDER_,
@@ -50,6 +51,7 @@
         #{activityName, jdbcType=NVARCHAR},
         #{activityType, jdbcType=NVARCHAR},
         #{assignee, jdbcType=NVARCHAR},
+        #{completedBy, jdbcType=NVARCHAR},
         #{startTime, jdbcType=TIMESTAMP},
         #{endTime, jdbcType=TIMESTAMP},
         #{transactionOrder, jdbcType=INTEGER},
@@ -72,6 +74,7 @@
         ACT_NAME_,
         ACT_TYPE_,
         ASSIGNEE_,
+        COMPLETED_BY_,
         START_TIME_,
         END_TIME_,
         TRANSACTION_ORDER_,
@@ -90,6 +93,7 @@
           #{activityInstance.activityName, jdbcType=NVARCHAR},
           #{activityInstance.activityType, jdbcType=NVARCHAR},
           #{activityInstance.assignee, jdbcType=NVARCHAR},
+          #{activityInstance.completedBy, jdbcType=NVARCHAR},
           #{activityInstance.startTime, jdbcType=TIMESTAMP},
           #{activityInstance.endTime, jdbcType=TIMESTAMP},
           #{activityInstance.transactionOrder, jdbcType=INTEGER},
@@ -114,6 +118,7 @@
           ACT_NAME_,
           ACT_TYPE_,
           ASSIGNEE_,
+          COMPLETED_BY_
           START_TIME_,
           END_TIME_,
           TRANSACTION_ORDER_,
@@ -131,6 +136,7 @@
             #{activityInstance.activityName, jdbcType=NVARCHAR},
             #{activityInstance.activityType, jdbcType=NVARCHAR},
             #{activityInstance.assignee, jdbcType=NVARCHAR},
+            #{activityInstance.completedBy, jdbcType=NVARCHAR},
             #{activityInstance.startTime, jdbcType=TIMESTAMP},
             #{activityInstance.endTime, jdbcType=TIMESTAMP},
             #{activityInstance.transactionOrder, jdbcType=INTEGER},
@@ -158,6 +164,9 @@
         </if>
         <if test="originalPersistentState.assignee != assignee">
             ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
+        </if>
+        <if test="originalPersistentState.completedBy != completedBy">
+            COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.endTime != endTime">
             END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
@@ -220,6 +229,7 @@
     <result property="activityName" column="ACT_NAME_" jdbcType="NVARCHAR" />
     <result property="activityType" column="ACT_TYPE_" jdbcType="NVARCHAR" />
     <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR" />
+    <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="transactionOrder" column="TRANSACTION_ORDER_" jdbcType="INTEGER" />
@@ -273,6 +283,9 @@
       </if>
       <if test="assignee != null">
         and RES.ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR}
+      </if>
+       <if test="completedBy != null">
+        and RES.COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}

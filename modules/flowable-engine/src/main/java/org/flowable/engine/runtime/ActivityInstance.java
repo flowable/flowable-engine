@@ -55,6 +55,9 @@ public interface ActivityInstance extends HistoricData {
     /** Assignee in case of user task activity */
     String getAssignee();
 
+    /** The id of the user that completed the task, in case of a completed user task activity */
+    String getCompletedBy();
+
     /** Time when the activity instance started */
     Date getStartTime();
 

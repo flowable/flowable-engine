@@ -71,6 +71,10 @@ public interface HistoricPlanItemInstance {
 
     String getStartUserId();
 
+    String getAssignee();
+
+    String getCompletedBy();
+
     String getReferenceId();
 
     String getReferenceType();

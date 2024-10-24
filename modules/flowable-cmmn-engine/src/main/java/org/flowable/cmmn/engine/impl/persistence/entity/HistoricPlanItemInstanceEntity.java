@@ -77,6 +77,10 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setStartUserId(String startUserId);
 
+    void setAssignee(String assignee);
+
+    void setCompletedBy(String completedBy);
+
     void setReferenceId(String referenceId);
 
     void setReferenceType(String referenceType);

@@ -63,6 +63,7 @@ public class TaskHelper {
     }
     
     public static void completeTask(TaskEntity task, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.getPlanItemInstanceEntityManager().updateHumanTaskPlanItemInstanceCompletedBy(task, userId);
         internalDeleteTask(task, userId, null, false, true, cmmnEngineConfiguration);
     }
 
@@ -143,6 +144,7 @@ public class TaskHelper {
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskAssignee(taskEntity, assignee);
+            cmmnEngineConfiguration.getPlanItemInstanceEntityManager().updateHumanTaskPlanItemInstanceAssignee(taskEntity, assignee);
             fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
 
             if (taskEntity.getId() != null) {

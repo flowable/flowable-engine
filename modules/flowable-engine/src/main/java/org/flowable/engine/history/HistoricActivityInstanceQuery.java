@@ -70,6 +70,11 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
      */
     HistoricActivityInstanceQuery taskAssignee(String userId);
 
+    /**
+     * Only select historic activity instances for userTask activities completed by the given user
+     */
+    HistoricActivityInstanceQuery taskCompletedBy(String userId);
+
     /** Only select historic activity instances that are finished. */
     HistoricActivityInstanceQuery finished();
 
