@@ -1,6 +1,9 @@
 name: Flowable Windows Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 env:
   MAVEN_ARGS: >-
