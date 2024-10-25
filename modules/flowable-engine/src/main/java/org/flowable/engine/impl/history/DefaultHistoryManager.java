@@ -505,6 +505,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 if (historicActivityInstance != null) {
                     historicActivityInstance.setTaskId(activityInstance.getTaskId());
                     historicActivityInstance.setAssignee(activityInstance.getAssignee());
+                    historicActivityInstance.setCompletedBy(activityInstance.getCompletedBy());
                     historicActivityInstance.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
                 }
             }

@@ -126,6 +126,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TRANSACTION_ORDER_", "transactionOrder", PARAMETER_TYPE_INTEGER);
@@ -402,6 +403,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("OWNER_", "owner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
@@ -1092,6 +1094,8 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LAST_UPDATED_TIME_", "lastUpdatedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);
@@ -1212,6 +1216,8 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);

@@ -69,6 +69,8 @@ public class PlanItemInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -352,6 +354,22 @@ public class PlanItemInstanceResponse {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
     }
 
     public String getExtraValue() {

@@ -54,6 +54,8 @@ public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScop
     void setExitTime(Date exitTime);
     void setEndedTime(Date endedTime);
     void setStartUserId(String startUserId);
+    void setAssignee(String assignee);
+    void setCompletedBy(String completedBy);
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);
     void setCompletable(boolean completable);

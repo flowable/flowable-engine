@@ -72,6 +72,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected Date exitTime;
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -126,6 +128,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         setExitTime(historicPlanItemInstance.getExitTime());
         setEndedTime(historicPlanItemInstance.getEndedTime());
         setStartUserId(historicPlanItemInstance.getStartUserId());
+        setAssignee(historicPlanItemInstance.getAssignee());
+        setCompletedBy(historicPlanItemInstance.getCompletedBy());
         setReferenceId(historicPlanItemInstance.getReferenceId());
         setReferenceType(historicPlanItemInstance.getReferenceType());
         setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
@@ -161,6 +165,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("assignee", assignee);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completable);
@@ -398,6 +404,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+    @Override
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
     @Override
     public String getReferenceId() {

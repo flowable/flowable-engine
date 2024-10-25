@@ -38,6 +38,7 @@ create table ACT_HI_ACTINST (
     ACT_TYPE_ varchar(255) not null,
     OWNER_ varchar(64),
     ASSIGNEE_ varchar(255),
+    COMPLETED_BY_ varchar(255),
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
     TRANSACTION_ORDER_ integer,

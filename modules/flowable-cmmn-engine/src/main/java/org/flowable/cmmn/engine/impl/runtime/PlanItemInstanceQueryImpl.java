@@ -74,6 +74,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected boolean ended;
     protected boolean includeEnded;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -650,7 +652,33 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         }
         return this;
     }
-    
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
+        if (assignee == null) {
+            throw new FlowableIllegalArgumentException("assignee is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.assignee = assignee;
+        } else {
+            this.assignee = assignee;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
+        if (completedBy == null) {
+            throw new FlowableIllegalArgumentException("completedBy is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedBy = completedBy;
+        } else {
+            this.completedBy = completedBy;
+        }
+        return this;
+    }
+
     @Override
     public PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId) {
         if (inOrStatement) {
@@ -1258,6 +1286,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public String getStartUserId() {
         return startUserId;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public String getCompletedBy() {
+        return completedBy;
     }
     public String getReferenceId() {
         return referenceId;

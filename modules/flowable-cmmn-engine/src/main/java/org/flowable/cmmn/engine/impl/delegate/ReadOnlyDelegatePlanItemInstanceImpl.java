@@ -50,6 +50,8 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     protected final Date exitTime;
     protected final Date endedTime;
     protected final String startUserId;
+    protected final String assignee;
+    protected final String completedBy;
     protected final String referenceId;
     protected final String referenceType;
     protected final boolean completable;
@@ -87,6 +89,8 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.exitTime = planItemInstance.getExitTime();
         this.endedTime = planItemInstance.getEndedTime();
         this.startUserId = planItemInstance.getStartUserId();
+        this.assignee = planItemInstance.getAssignee();
+        this.completedBy = planItemInstance.getCompletedBy();
         this.referenceId = planItemInstance.getReferenceId();
         this.referenceType = planItemInstance.getReferenceType();
         this.completable = planItemInstance.isCompletable();
@@ -218,6 +222,16 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public String getStartUserId() {
         return startUserId;
+    }
+
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
     }
 
     @Override

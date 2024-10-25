@@ -160,6 +160,24 @@ public class ActivityInstanceEntityManagerImpl
     }
 
     @Override
+    public void recordActivityTaskEnd(TaskEntity task, ExecutionEntity execution, String completerUserId, String deleteReason, Date endTime) {
+        if (execution != null) { // only when there's an execution, there will be an activity instance. Otherwise, it's a standalone task.
+            ActivityInstanceEntity activityInstanceEntity = internalFindOrCreateActivityInstance(task, execution);
+            if (activityInstanceEntity != null) {
+                if (StringUtils.isNotEmpty(completerUserId)) {
+                    activityInstanceEntity.setCompletedBy(completerUserId);
+                } else {
+                    activityInstanceEntity.setCompletedBy(task.getAssignee());
+                }
+
+                getHistoryManager().updateHistoricActivityInstance(activityInstanceEntity);
+            }
+        }
+
+        getHistoryManager().recordTaskEnd(task, execution, completerUserId, deleteReason, endTime);
+    }
+
+    @Override
     public void recordTaskInfoChange(TaskEntity taskEntity, Date changeTime) {
         ActivityInstanceEntity activityInstanceEntity = recordActivityTaskInfoChange(taskEntity);
         getHistoryManager().recordTaskInfoChange(taskEntity, activityInstanceEntity != null ? activityInstanceEntity.getId() : null, changeTime);
@@ -201,13 +219,7 @@ public class ActivityInstanceEntityManagerImpl
         ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
         if (executionEntity != null) {
             if (!Objects.equals(getOriginalAssignee(taskEntity), taskEntity.getAssignee())) {
-                activityInstance = findActivityInstanceByTaskId(taskEntity.getId());
-                if (activityInstance == null) {
-                    HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
-                    if (historicActivityInstance != null) {
-                        activityInstance = createActivityInstance(historicActivityInstance);
-                    }
-                }
+                activityInstance = internalFindOrCreateActivityInstance(taskEntity, executionEntity);
                 if (activityInstance != null) {
                     activityInstance.setAssignee(taskEntity.getAssignee());
                     getHistoryManager().updateHistoricActivityInstance(activityInstance);
@@ -215,6 +227,17 @@ public class ActivityInstanceEntityManagerImpl
             }
         }
 
+        return activityInstance;
+    }
+
+    protected ActivityInstanceEntity internalFindOrCreateActivityInstance(TaskEntity taskEntity, ExecutionEntity executionEntity) {
+        ActivityInstanceEntity activityInstance = findActivityInstanceByTaskId(taskEntity.getId());
+        if (activityInstance == null) {
+            HistoricActivityInstanceEntity historicActivityInstance = getHistoryManager().findHistoricActivityInstance(executionEntity, true);
+            if (historicActivityInstance != null) {
+                activityInstance = createActivityInstance(historicActivityInstance);
+            }
+        }
         return activityInstance;
     }
 

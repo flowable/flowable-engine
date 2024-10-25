@@ -19,6 +19,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -48,6 +49,10 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
 
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+
+    PlanItemInstanceEntity updateHumanTaskPlanItemInstanceAssignee(TaskEntity taskEntity, String assignee);
+
+    PlanItemInstanceEntity updateHumanTaskPlanItemInstanceCompletedBy(TaskEntity taskEntity, String assignee);
     
     void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 

@@ -71,6 +71,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date endedBefore;
     protected Date endedAfter;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean ended;
@@ -176,6 +178,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
         this.startUserId = startUserId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
+        this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
         return this;
     }
 
@@ -646,6 +660,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getStartUserId() {
         return startUserId;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public String getCompletedBy() {
+        return completedBy;
     }
     public String getReferenceId() {
         return referenceId;
