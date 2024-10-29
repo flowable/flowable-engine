@@ -24,9 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -47,6 +44,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -180,21 +180,22 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         return result;
     }
 
-    protected Object createVariable(CaseInstance caseInstance, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, request, response, RestVariableScope.GLOBAL,
+    protected Object createVariable(CaseInstance caseInstance, boolean async, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE, async, request, response, RestVariableScope.GLOBAL,
                 createVariableInterceptor(caseInstance));
     }
 
-    protected Object createVariable(PlanItemInstance planItemInstance, HttpServletRequest request, HttpServletResponse response) {
-        return createVariable(planItemInstance.getId(), CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, request, response, RestVariableScope.LOCAL,
+    protected Object createVariable(PlanItemInstance planItemInstance, boolean async, HttpServletRequest request, HttpServletResponse response) {
+        return createVariable(planItemInstance.getId(), CmmnRestResponseFactory.VARIABLE_PLAN_ITEM, async, request, response, RestVariableScope.LOCAL,
                 createVariableInterceptor(planItemInstance));
     }
 
-    protected Object createVariable(String instanceId, int variableType, HttpServletRequest request, HttpServletResponse response, RestVariableScope scope,
-            VariableInterceptor variableInterceptor) {
+    protected Object createVariable(String instanceId, int variableType, boolean async, HttpServletRequest request, HttpServletResponse response, 
+            RestVariableScope scope, VariableInterceptor variableInterceptor) {
+        
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, instanceId, variableType, true, scope, variableInterceptor);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, instanceId, variableType, true, async, scope, variableInterceptor);
         } else {
 
             List<RestVariable> inputVariables = new ArrayList<>();
@@ -229,19 +230,32 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
 
             if (!variablesToSet.isEmpty()) {
                 variableInterceptor.createVariables(variablesToSet);
-                Map<String, Object> setVariables;
+                Map<String, Object> setVariables = null;
                 if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM || scope == RestVariableScope.LOCAL) {
-                    runtimeService.setLocalVariables(instanceId, variablesToSet);
-                    setVariables = runtimeService.getLocalVariables(instanceId, variablesToSet.keySet());
+                    if (async) {
+                        runtimeService.setLocalVariablesAsync(instanceId, variablesToSet);
+                        
+                    } else {
+                        runtimeService.setLocalVariables(instanceId, variablesToSet);
+                        setVariables = runtimeService.getLocalVariables(instanceId, variablesToSet.keySet());
+                    }
+                    
                 } else {
-                    runtimeService.setVariables(instanceId, variablesToSet);
-                    setVariables = runtimeService.getVariables(instanceId, variablesToSet.keySet());
+                    if (async) {
+                        runtimeService.setVariablesAsync(instanceId, variablesToSet);
+                        
+                    } else {
+                        runtimeService.setVariables(instanceId, variablesToSet);
+                        setVariables = runtimeService.getVariables(instanceId, variablesToSet.keySet());
+                    }
                 }
 
-                for (RestVariable inputVariable : inputVariables) {
-                    String variableName = inputVariable.getName();
-                    Object variableValue = setVariables.get(variableName);
-                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, scope, instanceId, variableType, false));
+                if (!async) {
+                    for (RestVariable inputVariable : inputVariables) {
+                        String variableName = inputVariable.getName();
+                        Object variableValue = setVariables.get(variableName);
+                        resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, scope, instanceId, variableType, false));
+                    }
                 }
             }
         }
@@ -265,23 +279,29 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         runtimeService.removeVariables(caseInstance.getId(), currentVariables);
     }
     
-    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, RestVariableScope scope, int variableType, VariableInterceptor variableInterceptor) {
+    protected RestVariable setSimpleVariable(RestVariable restVariable, String instanceId, boolean isNew, boolean async, RestVariableScope scope, int variableType, VariableInterceptor variableInterceptor) {
         if (restVariable.getName() == null) {
             throw new FlowableIllegalArgumentException("Variable name is required");
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
 
-        setVariable(instanceId, restVariable.getName(), actualVariableValue, scope, isNew, variableInterceptor);
+        setVariable(instanceId, restVariable.getName(), actualVariableValue, scope, isNew, async, variableInterceptor);
 
-        RestVariable variable = getVariableFromRequestWithoutAccessCheck(instanceId, restVariable.getName(), variableType, false);
-        // We are setting the scope because the fetched variable does not have it
-        variable.setVariableScope(scope);
+        RestVariable variable = null;
+        
+        if (!async) {
+            variable = getVariableFromRequestWithoutAccessCheck(instanceId, restVariable.getName(), variableType, false);
+            
+            // We are setting the scope because the fetched variable does not have it
+            variable.setVariableScope(scope);
+        }
+        
         return variable;
     }
 
     protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, String instanceId, int responseVariableType, boolean isNew,
-            RestVariableScope scope, VariableInterceptor variableInterceptor) {
+            boolean async, RestVariableScope scope, VariableInterceptor variableInterceptor) {
 
         // Validate input and set defaults
         if (request.getFileMap().size() == 0) {
@@ -338,31 +358,39 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
             if (variableType.equals(CmmnRestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
                 // Use raw bytes as variable value
                 byte[] variableBytes = IOUtils.toByteArray(file.getInputStream());
-                setVariable(instanceId, variableName, variableBytes, scope, isNew, variableInterceptor);
+                setVariable(instanceId, variableName, variableBytes, scope, isNew, async, variableInterceptor);
 
             } else if (isSerializableVariableAllowed) {
                 // Try deserializing the object
                 ObjectInputStream stream = new ObjectInputStream(file.getInputStream());
                 Object value = stream.readObject();
-                setVariable(instanceId, variableName, value, scope, isNew, variableInterceptor);
+                setVariable(instanceId, variableName, value, scope, isNew, async, variableInterceptor);
                 stream.close();
             } else {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            RestVariable restVariable = getVariableFromRequestWithoutAccessCheck(instanceId, variableName, responseVariableType, false);
-            // We are setting the scope because the fetched variable does not have it
-            restVariable.setVariableScope(scope);
+            RestVariable restVariable = null;
+            
+            if (!async) {
+                restVariable = getVariableFromRequestWithoutAccessCheck(instanceId, variableName, responseVariableType, false);
+                
+                // We are setting the scope because the fetched variable does not have it
+                restVariable.setVariableScope(scope);
+            }
+            
             return restVariable;
+            
         } catch (IOException ioe) {
             throw new FlowableIllegalArgumentException("Could not process multipart content", ioe);
+            
         } catch (ClassNotFoundException ioe) {
             throw new FlowableContentNotSupportedException(
                     "The provided body contains a serialized object for which the class was not found: " + ioe.getMessage());
         }
     }
 
-    protected void setVariable(String instanceId, String name, Object value, RestVariableScope scope, boolean isNew, VariableInterceptor variableInterceptor) {
+    protected void setVariable(String instanceId, String name, Object value, RestVariableScope scope, boolean isNew, boolean async, VariableInterceptor variableInterceptor) {
         if (isNew) {
             variableInterceptor.createVariables(Collections.singletonMap(name, value));
         } else {
@@ -374,9 +402,19 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
             if (isNew && runtimeService.hasLocalVariable(instanceId, name)) {
                 throw new FlowableConflictException("Local variable '" + name + "' is already present on plan item instance '" + instanceId + "'.");
             }
-            runtimeService.setLocalVariable(instanceId, name, value);
+            
+            if (async) {
+                runtimeService.setLocalVariableAsync(instanceId, name, value);
+            } else {
+                runtimeService.setLocalVariable(instanceId, name, value);
+            }
+            
         } else {
-            runtimeService.setVariable(instanceId, name, value);
+            if (async) {
+                runtimeService.setVariableAsync(instanceId, name, value);
+            } else {
+                runtimeService.setVariable(instanceId, name, value);
+            }
         }
     }
 

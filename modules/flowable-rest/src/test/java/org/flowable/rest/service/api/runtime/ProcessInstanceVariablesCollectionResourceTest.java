@@ -34,6 +34,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
@@ -418,6 +419,148 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
                 .containsOnly(
                         entry("stringVariable", "simple string value"),
                         entry("stringVariable2", "another string value")
+                );
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
+    public void testCreateSingleProcessInstanceVariableAsync() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        ArrayNode requestNode = objectMapper.createArrayNode();
+        ObjectNode variableNode = requestNode.addObject();
+        variableNode.put("name", "myVariable");
+        variableNode.put("value", "simple string value");
+        variableNode.put("type", "string");
+
+        // Create a new local variable
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_ASYNC_COLLECTION, processInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "myVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "myVariable")).isTrue();
+        assertThat(runtimeService.getVariableLocal(processInstance.getId(), "myVariable")).isEqualTo("simple string value");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
+    public void testCreateSingleBinaryProcessVariableAsync() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+
+        // Add name, type and scope
+        Map<String, String> additionalFields = new HashMap<>();
+        additionalFields.put("name", "binaryVariable");
+        additionalFields.put("type", "binary");
+
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_ASYNC_COLLECTION, processInstance.getId()));
+        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
+        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "binaryVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        // Check actual value of variable in engine
+        Object variableValue = runtimeService.getVariable(processInstance.getId(), "binaryVariable");
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
+    public void testCreateMultipleProcessVariablesAsync() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        ArrayNode requestNode = objectMapper.createArrayNode();
+
+        // String variable
+        ObjectNode stringVarNode = requestNode.addObject();
+        stringVarNode.put("name", "stringVariable");
+        stringVarNode.put("value", "simple string value");
+        stringVarNode.put("type", "string");
+
+        // Integer
+        ObjectNode integerVarNode = requestNode.addObject();
+        integerVarNode.put("name", "integerVariable");
+        integerVarNode.put("value", 1234);
+        integerVarNode.put("type", "integer");
+
+        // Short
+        ObjectNode shortVarNode = requestNode.addObject();
+        shortVarNode.put("name", "shortVariable");
+        shortVarNode.put("value", 123);
+        shortVarNode.put("type", "short");
+
+        // Long
+        ObjectNode longVarNode = requestNode.addObject();
+        longVarNode.put("name", "longVariable");
+        longVarNode.put("value", 4567890L);
+        longVarNode.put("type", "long");
+
+        // Double
+        ObjectNode doubleVarNode = requestNode.addObject();
+        doubleVarNode.put("name", "doubleVariable");
+        doubleVarNode.put("value", 123.456);
+        doubleVarNode.put("type", "double");
+
+        // Boolean
+        ObjectNode booleanVarNode = requestNode.addObject();
+        booleanVarNode.put("name", "booleanVariable");
+        booleanVarNode.put("value", Boolean.TRUE);
+        booleanVarNode.put("type", "boolean");
+
+        // Date
+        Calendar varCal = Calendar.getInstance();
+        String isoString = getISODateString(varCal.getTime());
+
+        ObjectNode dateVarNode = requestNode.addObject();
+        dateVarNode.put("name", "dateVariable");
+        dateVarNode.put("value", isoString);
+        dateVarNode.put("type", "date");
+
+        // Create local variables with a single request
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_ASYNC_COLLECTION, processInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "stringVariable")).isFalse();
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "integerVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+
+        // Check if engine has correct variables set
+        Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+        assertThat(variables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", true),
+                        entry("dateVariable", dateFormat.parse(isoString))
                 );
     }
 

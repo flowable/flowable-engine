@@ -37,6 +37,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -83,7 +84,6 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
 
         // Check resulting instance
         assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
-
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
@@ -107,6 +107,39 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdatePlanItemInstanceVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        runtimeService.setLocalVariable(planItem.getId(), "testLocalVar", "testVarValue");
+
+        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_ASYNC, planItem.getId(), "testLocalVar");
+        ObjectNode body = objectMapper.createObjectNode();
+
+        body.put("name", "testLocalVar");
+        body.put("value", "newTestValue");
+        body.put("type", "string");
+
+        HttpPut putRequest = new HttpPut(url);
+        putRequest.setEntity(new StringEntity(body.toString()));
+        CloseableHttpResponse response = executeRequest(putRequest, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("testVarValue");
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+
+        // Check resulting instance
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
