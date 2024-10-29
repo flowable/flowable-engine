@@ -40,6 +40,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_CASE_INSTANCE_RESOURCE = "case-instances";
     public static final String SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE = "plan-item-instances";
     public static final String SEGMENT_VARIABLES = "variables";
+    public static final String SEGMENT_VARIABLES_ASYNC = "variables-async";
     public static final String SEGMENT_VARIABLE_INSTANCE_RESOURCE = "variable-instances";
     public static final String SEGMENT_EVENT_SUBSCRIPTIONS = "event-subscriptions";
     public static final String SEGMENT_SUBTASKS = "subtasks";
@@ -242,11 +243,21 @@ public final class CmmnRestUrls {
      * URL template for case instance variable collection: <i>cmmn-runtime/case-instances/{0:processInstanceId}/variables</i>
      */
     public static final String[] URL_CASE_INSTANCE_VARIABLE_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES };
+    
+    /**
+     * URL template for case instance variable collection: <i>cmmn-runtime/case-instances/{0:processInstanceId}/variables-async</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_VARIABLE_ASYNC_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC };
 
     /**
      * URL template for a single case instance variable: <i>cmmn-runtime/case-instances /{0:caseInstanceId}/variables/{1:variableName}</i>
      */
     public static final String[] URL_CASE_INSTANCE_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}" };
+    
+    /**
+     * URL template for a single case instance variable: <i>cmmn-runtime/case-instances /{0:caseInstanceId}/variables-async/{1:variableName}</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_VARIABLE_ASYNC = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC, "{1}" };
 
     /**
      * URL template for a single case instance variable data: <i>cmmn-runtime/case-instances/{0:processInstanceId}/variables/{1:variableName}/data</i>
@@ -289,17 +300,25 @@ public final class CmmnRestUrls {
      */
     public static final String[] URL_PLAN_ITEM_INSTANCE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}" };
     
-
     /**
      * URL template for plan item instance variables: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables</i>
      */
-    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLES = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}",
-            SEGMENT_VARIABLES };
+    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLES = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES };
+    
+    /**
+     * URL template for plan item instance variables: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables-async</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLES_ASYNC = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC };
+    
     /**
      * URL template for a single plan item instance variable: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables/{1:variableName}</i>
      */
-    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES,
-            "{1}" };
+    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}" };
+    
+    /**
+     * URL template for a single plan item instance variable: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables-async/{1:variableName}</i>
+     */
+    public static final String[] URL_PLAN_ITEM_INSTANCE_VARIABLE_ASYNC = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PLAN_ITEM_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC, "{1}" };
 
     /**
      * URL template for a single case instance: <i>cmmn-runtime/plan-item-instances/{0:planItemInstanceId}/variables/{1:variableName}/data</i>
