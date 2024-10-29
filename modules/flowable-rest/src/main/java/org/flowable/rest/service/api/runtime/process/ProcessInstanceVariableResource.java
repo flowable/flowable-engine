@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.Collections;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -46,6 +44,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Frederik Heremans
@@ -74,7 +73,6 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
         return getVariableFromRequest(execution, variableName, scope, false);
     }
 
-    // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instance Variables" }, nickname = "updateProcessInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
@@ -102,7 +100,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
 
         RestVariable result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, false);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, false, false);
 
             if (!result.getName().equals(variableName)) {
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
@@ -123,9 +121,57 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
                 throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
             }
 
-            result = setSimpleVariable(restVariable, execution, false);
+            result = setSimpleVariable(restVariable, execution, false, false);
         }
         return result;
+    }
+    
+    @ApiOperation(value = "Update a single variable on a process instance asynchronously", tags = { "Process Instance Variables" }, nickname = "updateProcessInstanceVariableAsync",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Note that scope is ignored, only local variables can be set in a process instance.\n"
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the job to update the variable has been created."),
+            @ApiResponse(code = 404, message = "Indicates the process instance does not have a variable with the given name. Status description contains additional information about the error.")
+    })
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables-async/{variableName}", consumes = {"application/json", "multipart/form-data"})
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateVariableAsync(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
+            HttpServletRequest request) {
+
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
+
+        if (request instanceof MultipartHttpServletRequest) {
+            setBinaryVariable((MultipartHttpServletRequest) request, execution, false, true);
+
+        } else {
+            RestVariable restVariable = null;
+            try {
+                restVariable = objectMapper.readValue(request.getInputStream(), RestVariable.class);
+            } catch (Exception e) {
+                throw new FlowableIllegalArgumentException("request body could not be transformed to a RestVariable instance.", e);
+            }
+
+            if (restVariable == null) {
+                throw new FlowableException("Invalid body was supplied");
+            }
+            if (!restVariable.getName().equals(variableName)) {
+                throw new FlowableIllegalArgumentException("Variable name in the body should be equal to the name used in the requested URL.");
+            }
+
+            setSimpleVariable(restVariable, execution, false, true);
+        }
     }
 
     // FIXME Documentation
