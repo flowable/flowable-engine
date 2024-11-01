@@ -1440,7 +1440,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER, EntityDependencyOrder.IMMUTABLE_ENTITIES);
 
         // Oracle doesn't support bulk inserting for historic task log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
