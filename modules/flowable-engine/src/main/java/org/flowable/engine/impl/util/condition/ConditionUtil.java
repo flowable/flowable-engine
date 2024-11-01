@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.util.condition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.api.delegate.Expression;
