@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.db;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +56,7 @@ public class DbSqlSessionFactory implements SessionFactory {
 
     protected List<Class<? extends Entity>> insertionOrder = new ArrayList<>();
     protected List<Class<? extends Entity>> deletionOrder = new ArrayList<>();
+    protected Collection<Class<? extends Entity>> immutableEntities = new HashSet<>();
 
     protected boolean isDbHistoryUsed = true;
 
@@ -327,6 +329,15 @@ public class DbSqlSessionFactory implements SessionFactory {
     public void setDeletionOrder(List<Class<? extends Entity>> deletionOrder) {
         this.deletionOrder = deletionOrder;
     }
+
+    public Collection<Class<? extends Entity>> getImmutableEntities() {
+        return immutableEntities;
+    }
+
+    public void setImmutableEntities(Collection<Class<? extends Entity>> immutableEntities) {
+        this.immutableEntities = immutableEntities;
+    }
+
     public void addLogicalEntityClassMapping(String logicalName, Class<?> entityClass) {
         logicalNameToClassMapping.put(logicalName, entityClass);
     }

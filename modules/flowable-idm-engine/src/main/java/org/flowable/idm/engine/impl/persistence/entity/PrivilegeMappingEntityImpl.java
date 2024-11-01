@@ -23,12 +23,8 @@ public class PrivilegeMappingEntityImpl extends AbstractIdmEngineEntity implemen
 
     @Override
     public Object getPersistentState() {
-        Map<String, String> state = new HashMap<>();
-        state.put("id", id);
-        state.put("privilegeId", privilegeId);
-        state.put("userId", userId);
-        state.put("groupId", groupId);
-        return state;
+        // Privilege mapping is immutable
+        return PrivilegeMappingEntityImpl.class;
     }
 
     @Override
