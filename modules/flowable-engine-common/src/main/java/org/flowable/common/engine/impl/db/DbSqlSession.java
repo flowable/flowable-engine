@@ -405,7 +405,15 @@ public class DbSqlSession implements Session {
     public void determineUpdatedObjects() {
         updatedObjects = new ArrayList<>();
         Map<Class<?>, Map<String, CachedEntity>> cachedObjects = entityCache.getAllCachedEntities();
+        if (cachedObjects.isEmpty()) {
+            return;
+        }
+
+        Collection<Class<? extends Entity>> immutableEntities = dbSqlSessionFactory.getImmutableEntities();
         for (Class<?> clazz : cachedObjects.keySet()) {
+            if (immutableEntities.contains(clazz)) {
+                continue;
+            }
 
             Map<String, CachedEntity> classCache = cachedObjects.get(clazz);
             for (CachedEntity cachedObject : classCache.values()) {

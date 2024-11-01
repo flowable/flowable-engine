@@ -802,6 +802,10 @@ public abstract class AbstractEngineConfiguration {
     protected abstract void initDbSqlSessionFactoryEntitySettings();
 
     protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
+        defaultInitDbSqlSessionFactoryEntitySettings(insertOrder, deleteOrder, Collections.emptyList());
+    }
+
+    protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder, Collection<Class<? extends Entity>> immutableEntities) {
         if (insertOrder != null) {
             for (Class<? extends Entity> clazz : insertOrder) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -816,6 +820,10 @@ public abstract class AbstractEngineConfiguration {
             for (Class<? extends Entity> clazz : deleteOrder) {
                 dbSqlSessionFactory.getDeletionOrder().add(clazz);
             }
+        }
+
+        if (immutableEntities != null && !immutableEntities.isEmpty()) {
+            dbSqlSessionFactory.getImmutableEntities().addAll(immutableEntities);
         }
     }
 
