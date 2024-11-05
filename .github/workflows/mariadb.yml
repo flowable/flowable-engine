@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mariadb: [10.6]
+        mariadb: [10.6, 11.4]
     services:
       mariadb:
         image: mariadb:${{ matrix.mariadb }}
@@ -35,7 +35,7 @@ jobs:
         options: --health-cmd="mariadb-admin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mariadb:rw
     steps:
       - name: "Set MariaDB collation"
-        run: docker exec ${{ job.services.mariadb.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
+        run: docker exec ${{ job.services.mariadb.id }} sh -c 'mariadb --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:

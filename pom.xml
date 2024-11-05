@@ -1090,6 +1090,8 @@
 									<username>${jdbc.username}</username>
 									<password>${jdbc.password}</password>
 									<driver>${jdbc.driver}</driver>
+									<showBanner>false</showBanner>
+									<force>true</force>
 								</configuration>
 							</execution>
 						</executions>

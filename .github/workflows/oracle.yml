@@ -18,19 +18,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "18-slim", "21-slim" ]
+        oracle: [ "18-slim-faststart", "21-slim-faststart", "23-slim-faststart" ]
         include:
-          - oracle: 18-slim
+          - oracle: 18-slim-faststart
             driverVersion: 18.3.0.0
             driverArtifact: ojdbc8
             serviceName: XEPDB1
-          - oracle: 21-slim
+            type: xe
+          - oracle: 21-slim-faststart
             driverVersion: 21.6.0.0.1
             driverArtifact: ojdbc8
             serviceName: XEPDB1
+            type: xe
+          - oracle: 23-slim-faststart
+            driverVersion: 23.5.0.24.07
+            driverArtifact: ojdbc11
+            serviceName: FREEPDB1
+            type: free
     services:
       oracle:
-        image: gvenzl/oracle-xe:${{ matrix.oracle }}
+        image: gvenzl/oracle-${{ matrix.type }}:${{ matrix.oracle }}
         env:
           ORACLE_PASSWORD: flowable
           APP_USER: flowable

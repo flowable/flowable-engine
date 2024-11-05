@@ -18,10 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db2: ["11.5.0.0a"]
+        db2: ["11.5.9.0"]
     services:
       db2:
-        image: ibmcom/db2:${{ matrix.db2 }}
+        image: icr.io/db2_community/db2:${{ matrix.db2 }}
         env:
           DB2INST1_PASSWORD: flowable
           DBNAME: flowable
@@ -33,7 +33,7 @@ jobs:
         # needed because the db2 container does not provide a health check
         options: >-
           --privileged=true
-          --health-cmd="su - db2inst1 -c \"~/sqllib/bin/db2 connect to flowable && ~/sqllib/bin/db2 connect reset\""
+          --health-cmd="su - db2inst1 -c \"~/sqllib/bin/db2gcf -s\""
           --health-interval 30s
           --health-timeout 40s
           --health-retries 10
