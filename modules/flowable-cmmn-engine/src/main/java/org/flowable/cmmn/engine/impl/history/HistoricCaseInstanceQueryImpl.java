@@ -114,6 +114,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean inOrStatement;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean withoutSorting;
+    protected boolean returnIdsOnly;
 
     public HistoricCaseInstanceQueryImpl() {
     }
@@ -824,8 +826,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public List<HistoricCaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        
+        if (withoutSorting) {
+            setIgnoreOrderBy();
+        }
+        
         List<HistoricCaseInstance> results;
-        if (includeCaseVariables) {
+        if (returnIdsOnly) {
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findIdsByCriteria(this);
+            
+        } else if (includeCaseVariables) {
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
 
             if (caseInstanceId != null) {
@@ -1173,6 +1183,18 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public HistoricCaseInstanceQuery withLocalizationFallback() {
         this.withLocalizationFallback = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery withoutSorting() {
+        this.withoutSorting = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
         return this;
     }
 

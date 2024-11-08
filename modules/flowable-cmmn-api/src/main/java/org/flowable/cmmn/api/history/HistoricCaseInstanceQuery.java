@@ -450,6 +450,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     HistoricCaseInstanceQuery withLocalizationFallback();
+    
+    /**
+     * Perform the query without applying sorting parameters. By default sorting will be applied.
+     */
+    HistoricCaseInstanceQuery withoutSorting();
+    
+    /**
+     * Return only the id value of the case instances, to reduce any additional instance data to be returned.
+     */
+    HistoricCaseInstanceQuery returnIdsOnly();
 
     HistoricCaseInstanceQuery orderByCaseInstanceId();
     HistoricCaseInstanceQuery orderByCaseInstanceName();

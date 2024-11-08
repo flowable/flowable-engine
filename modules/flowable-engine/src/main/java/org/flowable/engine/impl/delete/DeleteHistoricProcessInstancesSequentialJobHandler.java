@@ -69,7 +69,7 @@ public class DeleteHistoricProcessInstancesSequentialJobHandler implements JobHa
 
         HistoricProcessInstanceQuery query = config.getQuery();
         // In the synchronous deletion, we are always deleting the first elements
-        List<HistoricProcessInstance> historicProcessInstances = query.listPage(0, batchSize);
+        List<HistoricProcessInstance> historicProcessInstances = query.withoutSorting().returnIdsOnly().listPage(0, batchSize);
         ObjectNode resultNode = engineConfiguration.getObjectMapper().createObjectNode();
         Set<String> processInstanceIdsToDelete = new HashSet<>();
         for (HistoricProcessInstance historicProcessInstance : historicProcessInstances) {

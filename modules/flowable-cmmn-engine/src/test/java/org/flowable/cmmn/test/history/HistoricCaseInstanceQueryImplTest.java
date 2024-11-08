@@ -2025,4 +2025,42 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 );
     }
 
+    @Test
+    public void getCaseInstanceIdByCaseDefinitionKey() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").withoutSorting().returnIdsOnly().singleResult();
+            assertThat(historicCaseInstance.getId()).isEqualTo(caseInstance.getId());
+            assertThat(historicCaseInstance.getCaseDefinitionId()).isNull();
+            
+            historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseDefinitionKey("oneTaskCase").withoutSorting().singleResult();
+            assertThat(historicCaseInstance.getId()).isEqualTo(caseInstance.getId());
+            assertThat(historicCaseInstance.getCaseDefinitionId()).isNotNull();
+
+            historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseDefinitionKey("oneTaskCase")
+                    .caseInstanceId("undefined")
+                    .endOr()
+                    .withoutSorting()
+                    .returnIdsOnly()
+                    .singleResult();
+            assertThat(historicCaseInstance.getId()).isEqualTo(caseInstance.getId());
+            assertThat(historicCaseInstance.getCaseDefinitionId()).isNull();
+            
+            historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseDefinitionKey("oneTaskCase")
+                    .caseInstanceId("undefined")
+                    .endOr()
+                    .withoutSorting()
+                    .singleResult();
+            
+            assertThat(historicCaseInstance.getId()).isEqualTo(caseInstance.getId());
+            assertThat(historicCaseInstance.getCaseDefinitionId()).isNotNull();
+        }
+    }
 }

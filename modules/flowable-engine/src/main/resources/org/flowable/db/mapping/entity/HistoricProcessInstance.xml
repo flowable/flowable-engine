@@ -279,6 +279,10 @@
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
   </resultMap>
   
+  <resultMap id="historicProcessInstanceIdResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+  </resultMap>
+  
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
     <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
@@ -382,6 +386,13 @@
         select count(distinct RES.ID_)
         <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
     </select>
+    
+    <select id="selectHistoricProcessInstanceIdsByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceIdResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
 
     <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
         from ${prefix}ACT_HI_PROCINST RES
@@ -389,7 +400,7 @@
                 Doing a join on the definition table is OK, since it is a 1:1 relationship.
                 This has to be an outer join because historic data might exists, but definitions might have been deleted
         -->
-    left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+        left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     <include refid="commonSelectHistoricProcessInstancesByQueryCriteriaSql"/>
   </sql>
   

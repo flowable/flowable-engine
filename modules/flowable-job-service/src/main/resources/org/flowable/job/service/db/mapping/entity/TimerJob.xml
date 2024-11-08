@@ -191,7 +191,6 @@
                 #{category, jdbcType=VARCHAR}
             </foreach>
         </if>
-        ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
     </select>
 
@@ -215,7 +214,6 @@
                 </foreach>
             </if>
         </where>
-        ${orderBy}
         <if test="needsPaging">${limitAfter}</if>
     </select>
 

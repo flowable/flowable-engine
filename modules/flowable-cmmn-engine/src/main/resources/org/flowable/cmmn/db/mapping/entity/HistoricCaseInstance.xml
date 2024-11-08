@@ -182,6 +182,10 @@
         <result property="caseDefinitionVersion" column="CaseDefinitionVersion" jdbcType="INTEGER" />
         <result property="caseDefinitionDeploymentId" column="CaseDefinitionDeploymentId" jdbcType="VARCHAR" />
     </resultMap>
+    
+    <resultMap id="historicCaseInstanceIdResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+    </resultMap>
 
     <resultMap id="historicCaseInstanceResultMapWithVariables"
                type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl"
@@ -246,6 +250,13 @@
     <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultType="long">
         select count(distinct RES.ID_)
         <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+    </select>
+    
+    <select id="selectHistoricCaseInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceIdResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        select RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        <if test="needsPaging">${limitAfter}</if>
     </select>
 
     <select id="selectHistoricCaseInstancesWithVariablesByQueryCriteria"

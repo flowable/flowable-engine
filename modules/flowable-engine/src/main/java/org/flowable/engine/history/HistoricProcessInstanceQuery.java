@@ -582,4 +582,14 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     HistoricProcessInstanceQuery withLocalizationFallback();
+    
+    /**
+     * Perform the query without applying sorting parameters. By default sorting will be applied.
+     */
+    HistoricProcessInstanceQuery withoutSorting();
+    
+    /**
+     * Return only the id value of the process instances, to reduce any additional instance data to be returned.
+     */
+    HistoricProcessInstanceQuery returnIdsOnly();
 }
