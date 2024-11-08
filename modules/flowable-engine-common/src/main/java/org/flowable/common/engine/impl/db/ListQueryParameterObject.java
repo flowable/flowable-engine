@@ -153,7 +153,11 @@ public class ListQueryParameterObject {
 
     protected String buildOrderBy() {
         if (ignoreOrderBy) {
-            return "";
+            if (AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                return "order by (select 1)";
+            } else {
+                return "";
+            }
         }
         
         Collection<OrderBy> orderBy = getOrderByCollectionSafe();
