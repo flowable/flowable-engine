@@ -29,7 +29,7 @@ public class MultiValuePart {
         this.mimeType = null;
     }
 
-    public MultiValuePart(String name, Object body, String filename, String mimeType) {
+    protected MultiValuePart(String name, Object body, String filename, String mimeType) {
         this.name = name;
         this.body = body;
         this.filename = filename;
@@ -54,10 +54,6 @@ public class MultiValuePart {
 
     public static MultiValuePart fromText(String name, String value) {
         return new MultiValuePart(name, value, null);
-    }
-
-    public static MultiValuePart fromText(String name, String value, String mimeType) {
-        return new MultiValuePart(name, value, null, mimeType);
     }
 
     public static MultiValuePart fromFile(String name, byte[] value, String filename) {
