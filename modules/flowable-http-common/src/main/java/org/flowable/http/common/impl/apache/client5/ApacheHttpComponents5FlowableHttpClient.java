@@ -223,7 +223,11 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                 String name = part.getName();
                 Object value = part.getBody();
                 if (value instanceof byte[]) {
-                    entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                    if (StringUtils.isNotBlank(part.getMimeType())) {
+                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.create(part.getMimeType()), part.getFilename());
+                    } else {
+                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                    }
                 } else if (value instanceof String) {
                     entityBuilder.addTextBody(name, (String) value);
                 } else if (value != null) {
