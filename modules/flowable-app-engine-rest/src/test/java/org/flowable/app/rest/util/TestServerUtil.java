@@ -15,8 +15,8 @@ package org.flowable.app.rest.util;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.flowable.app.rest.WebConfigurer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
