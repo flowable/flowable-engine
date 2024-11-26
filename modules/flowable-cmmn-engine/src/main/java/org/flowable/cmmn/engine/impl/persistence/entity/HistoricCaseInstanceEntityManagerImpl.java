@@ -65,6 +65,11 @@ public class HistoricCaseInstanceEntityManagerImpl
     public List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query) {
         return dataManager.findWithVariablesByQueryCriteria((HistoricCaseInstanceQueryImpl) query);
     }
+    
+    @Override
+    public List<HistoricCaseInstance> findIdsByCriteria(HistoricCaseInstanceQuery query) {
+        return dataManager.findIdsByCriteria((HistoricCaseInstanceQueryImpl) query);
+    }
 
     @Override
     public long countByCriteria(HistoricCaseInstanceQuery query) {

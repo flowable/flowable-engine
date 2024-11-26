@@ -46,15 +46,18 @@ public class HistoricProcessInstanceEntityManagerImpl
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
         return dataManager.findHistoricProcessInstancesByQueryCriteria(historicProcessInstanceQuery);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<HistoricProcessInstance> findHistoricProcessInstancesAndVariablesByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
         return dataManager.findHistoricProcessInstancesAndVariablesByQueryCriteria(historicProcessInstanceQuery);
+    }
+    
+    @Override
+    public List<HistoricProcessInstance> findHistoricProcessInstanceIdsByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        return dataManager.findHistoricProcessInstanceIdsByQueryCriteria(historicProcessInstanceQuery);
     }
 
     @Override

@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mysql: [5.7, 8.0]
+        mysql: [8.0, 8.4]
     services:
       mysql:
         image: mysql:${{ matrix.mysql }}

@@ -557,4 +557,58 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                 );
     }
 
+    @Test
+    public void testIdQueryByDeploymentId() {
+        deployOneTaskTestProcess();
+        String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).withoutSorting().returnIdsOnly().singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getId()).isNotNull();
+            assertThat(historicProcessInstance.getDeploymentId()).isNull();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNull();
+            
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).withoutSorting().singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getId()).isNotNull();
+            assertThat(historicProcessInstance.getDeploymentId()).isNotNull();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNotNull();
+            
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().deploymentId(deploymentId).returnIdsOnly().singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getId()).isNotNull();
+            
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().deploymentId("nonexisting").returnIdsOnly().singleResult();
+            assertThat(historicProcessInstance).isNull();
+        }
+    }
+    
+    @Test
+    public void testIdQueryByInvolvedUser() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "specialLink");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().involvedUser("kermit", "specialLink").withoutSorting().returnIdsOnly().singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNull();
+            
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().involvedUser("kermit", "specialLink").withoutSorting().singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNotNull();
+
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().withoutSorting().returnIdsOnly().singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNull();
+            
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().or().involvedUser("kermit", "specialLink").processDefinitionKey("undefined").endOr().withoutSorting().singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isNotNull();
+        }
+    }
 }

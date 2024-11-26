@@ -198,8 +198,12 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 if (value instanceof byte[]) {
                     value = new ByteArrayResourceWithFileName((byte[]) value, part.getFilename());
                 }
-
-                MultipartBodyBuilder.PartBuilder partBuilder = multipartBodyBuilder.part(name, value);
+                MultipartBodyBuilder.PartBuilder partBuilder;
+                if (StringUtils.isNotBlank(part.getMimeType())) {
+                    partBuilder = multipartBodyBuilder.part(name, value, MediaType.parseMediaType(part.getMimeType()));
+                } else {
+                    partBuilder = multipartBodyBuilder.part(name, value);
+                }
                 if (StringUtils.isNotEmpty(part.getFilename())) {
                     partBuilder.filename(part.getFilename());
                 }

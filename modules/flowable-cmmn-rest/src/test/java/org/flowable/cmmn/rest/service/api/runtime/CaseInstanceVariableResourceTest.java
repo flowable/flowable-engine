@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -484,5 +485,38 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "  scope: 'global',"
                         + "  value: 'b2233abf-f84f-426f-b978-0d249b90cc45'"
                         + "}");
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateCaseVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
+                .variables(Collections.singletonMap("overlappingVariable", (Object) "processValue")).start();
+        runtimeService.setVariable(caseInstance.getId(), "myVar", "value");
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "updatedValue");
+        requestNode.put("type", "string");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_ASYNC, caseInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo("value");
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo("updatedValue");
+
+        // Try updating with mismatch between URL and body variableName
+        requestNode.put("name", "unexistingVariable");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST));
     }
 }

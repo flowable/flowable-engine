@@ -14,7 +14,6 @@
 package org.flowable.variable.api.history;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;

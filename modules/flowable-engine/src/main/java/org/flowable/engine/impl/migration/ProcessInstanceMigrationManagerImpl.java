@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchBuilder;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.bpmn.model.Activity;
@@ -332,13 +333,16 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(sourceProcDefId));
 
         BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
-        Batch batch = batchService.createBatchBuilder().batchType(Batch.PROCESS_MIGRATION_TYPE)
+        BatchBuilder batchBuilder = batchService.createBatchBuilder().batchType(Batch.PROCESS_MIGRATION_TYPE)
             .searchKey(sourceProcDefId)
             .searchKey2(targetProcessDefinition.getId())
             .status(ProcessInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
-            .batchDocumentJson(document.asJsonString())
-            .create();
-        
+            .batchDocumentJson(document.asJsonString());
+        if (targetProcessDefinition.getTenantId() != null) {
+            batchBuilder.tenantId(targetProcessDefinition.getTenantId());
+        }
+        Batch batch = batchBuilder.create();
+
         JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
         for (ProcessInstance processInstance : processInstances) {
             BatchPart batchPart = batchService.createBatchPart(batch, ProcessInstanceBatchMigrationResult.STATUS_WAITING, 
@@ -348,6 +352,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             job.setJobHandlerType(ProcessInstanceMigrationJobHandler.TYPE);
             job.setProcessInstanceId(processInstance.getId());
             job.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
+            job.setTenantId(processInstance.getTenantId());
             jobService.createAsyncJob(job, false);
             job.setRetries(0);
             jobService.scheduleAsyncJob(job);
@@ -361,6 +366,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             timerJob.setRetries(0);
             timerJob.setJobHandlerType(ProcessInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(ProcessInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
+            timerJob.setTenantId(batch.getTenantId());
             
             BusinessCalendar businessCalendar = processEngineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(processEngineConfiguration.getBatchStatusTimeCycleConfig()));

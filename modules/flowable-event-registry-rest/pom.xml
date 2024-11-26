@@ -16,7 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>11.0.16</jetty.version>
+        <jetty.version>12.0.15</jetty.version>
         <flowable.artifact>
             org.flowable.eventregistry.rest
         </flowable.artifact>
@@ -203,10 +203,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-            <scope>test</scope>
+        	<groupId>org.eclipse.jetty.ee10</groupId>
+        	<artifactId>jetty-ee10-servlet</artifactId>
+        	<version>${jetty.version}</version>
+        	<scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
@@ -215,8 +215,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
             <version>${jetty.version}</version>
             <scope>test</scope>
         </dependency>

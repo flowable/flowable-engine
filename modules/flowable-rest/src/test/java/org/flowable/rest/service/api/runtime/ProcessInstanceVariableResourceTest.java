@@ -38,6 +38,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
@@ -515,5 +516,46 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "binaryVariable");
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateProcessVariableAsync() throws Exception {
+        ProcessInstance processInstance = runtimeService
+                .startProcessInstanceByKey("oneTaskProcess", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "myVar", "value");
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "updatedValue");
+        requestNode.put("type", "string");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_ASYNC, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar").equals("value"));
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar").equals("updatedValue"));
+
+        // Try updating with mismatch between URL and body variableName
+        requestNode.put("name", "unexistingVariable");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST));
+
+        // Try updating unexisting property
+        requestNode.put("name", "unexistingVariable");
+        httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_ASYNC, processInstance.getId(), "unexistingVariable"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_NOT_FOUND));
     }
 }

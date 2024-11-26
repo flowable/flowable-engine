@@ -902,6 +902,8 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         methodsToIgnore.add("includeCaseVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("returnIdsOnly");
+        methodsToIgnore.add("withoutSorting");
         methodsToIgnore.add("asc");
         methodsToIgnore.add("desc");
         methodsToIgnore.add("or");

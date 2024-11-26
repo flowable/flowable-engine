@@ -180,6 +180,52 @@ class FlowableHttpClientTest {
 
     @ParameterizedTest
     @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithMultiPartWithMimeType(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartValueWithMimeType");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromFile("document", "kermit;gonzo".getBytes(StandardCharsets.UTF_8), "kermit.csv", "text/csv"));
+        request.addMultiValuePart(MultiValuePart.fromFile("myJson", "{'value':'kermit'}".getBytes(StandardCharsets.UTF_8), "kermit.json", "application/json"));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Value With MimeType");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test-multi',"
+                        + "  args: {"
+                        + "    testArg: [ 'testMultiPartValueWithMimeType' ]"
+                        + "  },"
+                        + "  headers: {"
+                        + "    X-Test: [ 'Test MultiPart Value With MimeType' ]"
+                        + "  },"
+                        + "  parts: {"
+                        + "    myJson: ["
+                        + "      {"
+                        + "        content: \"{'value':'kermit'}\","
+                        + "        filename: 'kermit.json',"
+                        + "        contentType: 'application/json'"
+                        + "      }"
+                        + "    ],"
+                        + "    document: ["
+                        + "      {"
+                        + "        content: 'kermit;gonzo',"
+                        + "        filename: 'kermit.csv',"
+                        + "        contentType: 'text/csv'"
+                        + "      }"
+                        + "    ]"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
     void deleteWithoutBody(FlowableHttpClient httpClient) {
         HttpRequest request = new HttpRequest();
         request.setUrl("http://localhost:9798/api/test");

@@ -68,6 +68,8 @@ public class ListQueryParameterObject {
     protected Collection<OrderBy> orderByCollection;
     protected OrderBy defaultOrderBy = DEFAULT_ORDER_BY;
     protected QueryProperty orderProperty;
+    // Only needed for DB2 and MSSQL queries for the over statement
+    protected boolean ignoreOrderBy;
     protected String nullHandlingColumn;
     protected NullHandlingOnOrder nullHandlingOnOrder;
     protected ResultType resultType;
@@ -138,6 +140,10 @@ public class ListQueryParameterObject {
 
         return defaultOrderBy != null;
     }
+    
+    public void setIgnoreOrderBy() {
+        this.ignoreOrderBy = true;
+    }
 
     // This is used for the SQL Server and DB2 order by in a window function / over
     @SuppressWarnings("unused")
@@ -146,6 +152,14 @@ public class ListQueryParameterObject {
     }
 
     protected String buildOrderBy() {
+        if (ignoreOrderBy) {
+            if (AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)) {
+                return "order by (select 1)";
+            } else {
+                return "";
+            }
+        }
+        
         Collection<OrderBy> orderBy = getOrderByCollectionSafe();
 
         if (orderBy.isEmpty()) {

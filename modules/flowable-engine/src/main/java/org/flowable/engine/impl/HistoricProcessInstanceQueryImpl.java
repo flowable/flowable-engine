@@ -113,6 +113,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String referenceType;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean withoutSorting;
+    protected boolean returnIdsOnly;
     protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricProcessInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
@@ -990,7 +992,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public HistoricProcessInstanceQuery withLocalizationFallback() {
-        withLocalizationFallback = true;
+        this.withLocalizationFallback = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery withoutSorting() {
+        this.withoutSorting = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
         return this;
     }
 
@@ -1070,13 +1084,21 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public List<HistoricProcessInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        
+        if (withoutSorting) {
+            setIgnoreOrderBy();
+        }
+        
         List<HistoricProcessInstance> results = null;
         
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
         
-        if (includeProcessVariables) {
+        if (returnIdsOnly) {
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByQueryCriteria(this);
+            
+        } else if (includeProcessVariables) {
             results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
 
             if (processInstanceId != null) {

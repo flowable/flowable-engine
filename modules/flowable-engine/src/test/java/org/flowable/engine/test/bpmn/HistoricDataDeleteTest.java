@@ -1202,6 +1202,8 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodsToIgnore.add("includeProcessVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("withoutSorting");
+        methodsToIgnore.add("returnIdsOnly");
         methodsToIgnore.add("asc");
         methodsToIgnore.add("desc");
         methodsToIgnore.add("or");

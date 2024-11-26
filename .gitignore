@@ -3,6 +3,7 @@ target
 *.ipr
 *.iws
 .idea
+!.idea/icon.png
 .classpath
 .project
 .settings

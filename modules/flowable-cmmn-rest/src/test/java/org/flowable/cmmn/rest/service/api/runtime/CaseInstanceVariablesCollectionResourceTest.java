@@ -37,6 +37,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -87,7 +88,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
      * Test creating a single case variable. POST cmmn-runtime/case-instance/{caseInstanceId}/variables
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateSingleProcessInstanceVariable() throws Exception {
+    public void testCreateSingleCaseInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         ArrayNode requestNode = objectMapper.createArrayNode();
@@ -121,7 +122,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
      * Test creating a single case variable using a binary stream. POST cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateSingleBinaryProcessVariable() throws Exception {
+    public void testCreateSingleBinaryCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
@@ -159,7 +160,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
      * Test creating a single process variable using a binary stream containing a serializable. POST runtime/process-instances/{processInstanceId}/variables
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateSingleSerializableProcessVariable() throws Exception {
+    public void testCreateSingleSerializableCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         TestSerializableVariable serializable = new TestSerializableVariable();
@@ -256,7 +257,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
      * Test creating a single case variable, testing default types when omitted. POST cmmn-runtime/case-instances/{caseInstanceId}/variables
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateSingleProcessVariableDefaultTypes() throws Exception {
+    public void testCreateSingleCaseVariableDefaultTypes() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         // String type detection
@@ -304,7 +305,7 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
      * Test creating multiple case variables in a single call. POST cmmn-runtime/case-instance/{caseInstanceId}/variables
      */
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateMultipleProcessVariables() throws Exception {
+    public void testCreateMultipleCaseVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         ArrayNode requestNode = objectMapper.createArrayNode();
@@ -418,6 +419,145 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
                 .containsOnly(
                         entry("stringVariable", "simple string value"),
                         entry("stringVariable2", "another string value")
+                );
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testCreateSingleCaseInstanceVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        ArrayNode requestNode = objectMapper.createArrayNode();
+        ObjectNode variableNode = requestNode.addObject();
+        variableNode.put("name", "myVariable");
+        variableNode.put("value", "simple string value");
+        variableNode.put("type", "string");
+
+        // Create a new local variable
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_ASYNC_COLLECTION, caseInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasVariable(caseInstance.getId(), "myVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        assertThat(runtimeService.hasVariable(caseInstance.getId(), "myVariable")).isTrue();
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVariable")).isEqualTo("simple string value");
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testCreateSingleBinaryCaseVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+
+        // Add name, type and scope
+        Map<String, String> additionalFields = new HashMap<>();
+        additionalFields.put("name", "binaryVariable");
+        additionalFields.put("type", "binary");
+
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_ASYNC_COLLECTION, caseInstance.getId()));
+        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/octet-stream", binaryContent, additionalFields));
+        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasVariable(caseInstance.getId(), "binaryVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        // Check actual value of variable in engine
+        Object variableValue = runtimeService.getVariable(caseInstance.getId(), "binaryVariable");
+        assertThat(variableValue).isInstanceOf(byte[].class);
+        assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
+    
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testCreateMultipleCaseVariablesAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        ArrayNode requestNode = objectMapper.createArrayNode();
+
+        // String variable
+        ObjectNode stringVarNode = requestNode.addObject();
+        stringVarNode.put("name", "stringVariable");
+        stringVarNode.put("value", "simple string value");
+        stringVarNode.put("type", "string");
+
+        // Integer
+        ObjectNode integerVarNode = requestNode.addObject();
+        integerVarNode.put("name", "integerVariable");
+        integerVarNode.put("value", 1234);
+        integerVarNode.put("type", "integer");
+
+        // Short
+        ObjectNode shortVarNode = requestNode.addObject();
+        shortVarNode.put("name", "shortVariable");
+        shortVarNode.put("value", 123);
+        shortVarNode.put("type", "short");
+
+        // Long
+        ObjectNode longVarNode = requestNode.addObject();
+        longVarNode.put("name", "longVariable");
+        longVarNode.put("value", 4567890L);
+        longVarNode.put("type", "long");
+
+        // Double
+        ObjectNode doubleVarNode = requestNode.addObject();
+        doubleVarNode.put("name", "doubleVariable");
+        doubleVarNode.put("value", 123.456);
+        doubleVarNode.put("type", "double");
+
+        // Boolean
+        ObjectNode booleanVarNode = requestNode.addObject();
+        booleanVarNode.put("name", "booleanVariable");
+        booleanVarNode.put("value", Boolean.TRUE);
+        booleanVarNode.put("type", "boolean");
+
+        // Date
+        Calendar varCal = Calendar.getInstance();
+        String isoString = getISODateString(varCal.getTime());
+
+        ObjectNode dateVarNode = requestNode.addObject();
+        dateVarNode.put("name", "dateVariable");
+        dateVarNode.put("value", isoString);
+        dateVarNode.put("type", "date");
+
+        // Create local variables with a single request
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_ASYNC_COLLECTION, caseInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasVariable(caseInstance.getId(), "stringVariable")).isFalse();
+        assertThat(runtimeService.hasVariable(caseInstance.getId(), "integerVariable")).isFalse();
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+
+        // Check if engine has correct variables set
+        Map<String, Object> variables = runtimeService.getVariables(caseInstance.getId());
+
+        assertThat(variables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234),
+                        entry("shortVariable", (short) 123),
+                        entry("longVariable", 4567890L),
+                        entry("doubleVariable", 123.456),
+                        entry("booleanVariable", Boolean.TRUE),
+                        entry("dateVariable", longDateFormat.parse(isoString))
                 );
     }
 

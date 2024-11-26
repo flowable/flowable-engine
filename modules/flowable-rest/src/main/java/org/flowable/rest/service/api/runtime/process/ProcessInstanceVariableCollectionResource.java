@@ -16,9 +16,6 @@ package org.flowable.rest.service.api.runtime.process;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.engine.runtime.Execution;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -41,6 +38,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -66,7 +65,6 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
         return processVariables(execution, scope);
     }
 
-    // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Update a multiple/single (non)binary variable on a process instance", tags = { "Process Instance Variables" }, nickname = "createOrUpdateProcessVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
@@ -94,10 +92,37 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        return createExecutionVariable(execution, true, request, response);
+        return createExecutionVariable(execution, true, false, request, response);
+    }
+    
+    @ApiOperation(value = "Update multiple/single (non)binary variables on a process instance asynchronously", tags = { "Process Instance Variables" }, nickname = "createOrUpdateProcessVariableAsync",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Any number of variables can be passed into the request body array.\n"
+                    + "Note that scope is ignored, only local variables can be set in a process instance.\n"
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the job to create or update the variables was created."),
+            @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
+            @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
+
+    })
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables-async", consumes = {"application/json", "multipart/form-data"})
+    public void createOrUpdateExecutionVariableAsync(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
+        createExecutionVariable(execution, true, true, request, response);
     }
 
-    // FIXME OASv3 to solve Multiple Endpoint issue
     @ApiOperation(value = "Create variables or new binary variable on a process instance", tags = { "Process Instance Variables" }, nickname = "createProcessInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
@@ -125,7 +150,35 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     public Object createExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
-        return createExecutionVariable(execution, false, request, response);
+        return createExecutionVariable(execution, false, false, request, response);
+    }
+    
+    @ApiOperation(value = "Create variables or new binary variable on a process instance asynchronously", tags = { "Process Instance Variables" }, nickname = "createProcessInstanceVariableAsync",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Any number of variables can be passed into the request body array.\n"
+                    + "Note that scope is ignored, only local variables can be set in a process instance.\n"
+                    + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the job to create the variables was created."),
+            @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
+            @ApiResponse(code = 409, message = "Indicates the process instance was found but already contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
+
+    })
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/variables-async", consumes = {"application/json", "multipart/form-data"})
+    public void createExecutionVariableAsync(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
+        createExecutionVariable(execution, false, true, request, response);
     }
 
     // FIXME Documentation
