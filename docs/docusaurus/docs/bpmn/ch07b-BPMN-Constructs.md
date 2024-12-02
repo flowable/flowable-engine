@@ -172,15 +172,15 @@ The default value for this is attribute is *"global"*.
 
 The following is an example of two separate processes communicating using signals. The first process is started if an insurance policy is updated or changed. After the changes have been reviewed by a human participant, a signal event is thrown, signaling that a policy has changed:
 
-![bpmn.signal.event.throw](assets/bpmn/bpmn.signal.event.throw.png)
+![bpmn.signal.event.throw](../assets/bpmn/bpmn.signal.event.throw.png)
 
 This event can now be caught by all process instances that are interested. The following is an example of a process subscribing to the event.
 
-![bpmn.signal.event.catch](assets/bpmn/bpmn.signal.event.catch.png)
+![bpmn.signal.event.catch](../assets/bpmn/bpmn.signal.event.catch.png)
 
 **Note:** it’s important to understand that a signal event is broadcast to **all** active handlers. This means, in the case of the example given above, that all instances of the process catching the signal will receive the event. In this scenario, this is what we want. However, there are also situations where the broadcast behavior is unintended. Consider the following process:
 
-![bpmn.signal.event.warning.1](assets/bpmn/bpmn.signal.event.warning.1.png)
+![bpmn.signal.event.warning.1](../assets/bpmn/bpmn.signal.event.warning.1.png)
 
 The pattern described in the process above is not supported by BPMN. The idea is that the error thrown while performing the "do something" task is caught by the boundary error event, propagated to the parallel path of execution using the signal throw event and then interrupt the "do something in parallel" task. So far, Flowable would perform as expected. The signal would be propagated to the catching boundary event and interrupt the task. **However, due to the broadcast semantics of the signal, it would also be propagated to all other process instances that have subscribed to the signal event.** In this case, this might not be what we want.
 
@@ -264,7 +264,7 @@ Such queries are called correlation queries and usually require knowledge about 
 
 The following is an example of a process that can be started using two different messages:
 
-![bpmn.start.message.event.example.1](assets/bpmn/bpmn.start.message.event.example.1.png)
+![bpmn.start.message.event.example.1](../assets/bpmn/bpmn.start.message.event.example.1.png)
 
 This is useful if the process needs alternative ways to react to different start events, but eventually continues in a uniform way.
 
@@ -307,7 +307,7 @@ A 'none' start event technically means that the trigger for starting the process
 
 A none start event is visualized as a circle with no inner icon (in other words, no trigger type).
 
-![bpmn.none.start.event](assets/bpmn/bpmn.none.start.event.png)
+![bpmn.none.start.event](../assets/bpmn/bpmn.none.start.event.png)
 
 #### XML representation
 
@@ -337,7 +337,7 @@ A timer start event is used to create process instances at given time. It can be
 
 A timer start event is visualized as a circle with clock inner icon.
 
-![bpmn.clock.start.event](assets/bpmn/bpmn.clock.start.event.png)
+![bpmn.clock.start.event](../assets/bpmn/bpmn.clock.start.event.png)
 
 #### XML representation
 
@@ -402,7 +402,7 @@ The messageName is the name given in the name attribute of the message element r
 
 A message start event is visualized as a circle with a message event symbol. The symbol is unfilled, to represent the catching (receiving) behavior.
 
-![bpmn.start.message.event](assets/bpmn/bpmn.start.message.event.png)
+![bpmn.start.message.event](../assets/bpmn/bpmn.start.message.event.png)
 
 #### XML representation
 
@@ -440,7 +440,7 @@ The signalName that must be passed in the API is the name given in the name attr
 
 A signal start event is visualized as a circle with a signal event symbol. The symbol is unfilled, to represent the catching (receiving) behavior.
 
-![bpmn.start.signal.event](assets/bpmn/bpmn.start.signal.event.png)
+![bpmn.start.signal.event](../assets/bpmn/bpmn.start.signal.event.png)
 
 #### XML representation
 
@@ -470,7 +470,7 @@ An error start event is always interrupting.
 
 An error start event is visualized as a circle with an error event symbol. The symbol is unfilled, to represent the catching (receiving) behavior.
 
-![bpmn.start.error.event](assets/bpmn/bpmn.start.error.event.png)
+![bpmn.start.error.event](../assets/bpmn/bpmn.start.error.event.png)
 
 #### XML representation
 
@@ -494,7 +494,7 @@ A 'none' end event means that the *result* thrown when the event is reached is u
 
 A none end event is visualized as a circle with a thick border with no inner icon (no result type).
 
-![bpmn.none.end.event](assets/bpmn/bpmn.none.end.event.png)
+![bpmn.none.end.event](../assets/bpmn/bpmn.none.end.event.png)
 
 #### XML representation
 
@@ -512,7 +512,7 @@ When process execution arrives at an **error end event**, the current path of ex
 
 An error end event is visualized as a typical end event (circle with thick border), with the error icon inside. The error icon is completely black, to indicate its throwing semantics.
 
-![bpmn.error.end.event](assets/bpmn/bpmn.error.end.event.png)
+![bpmn.error.end.event](../assets/bpmn/bpmn.error.end.event.png)
 
 #### XML representation
 
@@ -560,7 +560,7 @@ There is an optional attribute *terminateAll* that can be added. When *true*, re
 
 A cancel end event visualized as a typical end event (circle with thick outline), with a full black circle inside.
 
-![bpmn.terminate.end.event](assets/bpmn/bpmn.terminate.end.event.png)
+![bpmn.terminate.end.event](../assets/bpmn/bpmn.terminate.end.event.png)
 
 #### XML representation
 
@@ -582,7 +582,7 @@ The cancel end event can only be used in combination with a BPMN transaction sub
 
 A cancel end event is visualized as a typical end event (circle with thick outline), with the cancel icon inside. The cancel icon is completely black, to indicate its throwing semantics.
 
-![bpmn.cancel.end.event](assets/bpmn/bpmn.cancel.end.event.png)
+![bpmn.cancel.end.event](../assets/bpmn/bpmn.cancel.end.event.png)
 
 #### XML representation
 
@@ -621,7 +621,7 @@ A timer boundary event acts as a stopwatch and alarm clock. When an execution ar
 
 A timer boundary event is visualized as a typical boundary event (circle on the border), with the timer icon on the inside.
 
-![bpmn.boundary.timer.event](assets/bpmn/bpmn.boundary.timer.event.png)
+![bpmn.boundary.timer.event](../assets/bpmn/bpmn.boundary.timer.event.png)
 
 #### XML Representation
 
@@ -637,7 +637,7 @@ Please refer to [timer event definition](bpmn/ch07b-BPMN-Constructs.md#timer-eve
 
 In the graphical representation, the line of the circle is dotted as you can see in the example above:
 
-![bpmn.non.interrupting.boundary.timer.event](assets/bpmn/bpmn.non.interrupting.boundary.timer.event.png)
+![bpmn.non.interrupting.boundary.timer.event](../assets/bpmn/bpmn.non.interrupting.boundary.timer.event.png)
 
 A typical use case is sending an escalation email after a period of time, but without affecting the normal process flow.
 
@@ -651,7 +651,7 @@ There is a key difference between the interrupting and non interrupting timer ev
 
 There is a known issue regarding concurrency when using boundary events of any type. Currently, it is not possible to have multiple outgoing sequence flows attached to a boundary event. A solution to this problem is to use one outgoing sequence flow that goes to a parallel gateway.
 
-![bpmn.known.issue.boundary.event](assets/bpmn/bpmn.known.issue.boundary.event.png)
+![bpmn.known.issue.boundary.event](../assets/bpmn/bpmn.known.issue.boundary.event.png)
 
 ### Error Boundary Event
 
@@ -667,7 +667,7 @@ When an error event is caught, the activity on which the boundary event is defin
 
 A boundary error event is visualized as a typical intermediate event (circle with smaller circle inside) on the boundary, with the error icon inside. The error icon is white, to indicate its *catch* semantics.
 
-![bpmn.boundary.error.event](assets/bpmn/bpmn.boundary.error.event.png)
+![bpmn.boundary.error.event](../assets/bpmn/bpmn.boundary.error.event.png)
 
 #### XML representation
 
@@ -696,7 +696,7 @@ The **errorCode** is used to match the errors that are caught:
 
 The following example process shows how an error end event can be used. When the *'Review profitability'* user task is completed by saying that not enough information is provided, an error is thrown. When this error is caught on the boundary of the sub-process, all active activities within the *'Review sales lead'* sub-process are destroyed (even if *'Review customer rating'* had not yet been completed), and the *'Provide additional details'* user task is created.
 
-![bpmn.boundary.error.example](assets/bpmn/bpmn.boundary.error.example.png)
+![bpmn.boundary.error.example](../assets/bpmn/bpmn.boundary.error.example.png)
 
 This process is shipped as example in the demo setup. The process XML and unit test can be found in the *org.flowable.examples.bpmn.event.error* package.
 
@@ -714,7 +714,7 @@ An attached intermediate *catching* [signal](bpmn/ch07b-BPMN-Constructs.md#signa
 
 A boundary signal event is visualized as a typical intermediate event (circle with smaller circle inside) on the boundary, with the signal icon inside. The signal icon is white (unfilled), to indicate its *catch* semantics.
 
-![bpmn.boundary.signal.event](assets/bpmn/bpmn.boundary.signal.event.png)
+![bpmn.boundary.signal.event](../assets/bpmn/bpmn.boundary.signal.event.png)
 
 #### XML representation
 
@@ -738,7 +738,7 @@ An attached intermediate *catching* [message](bpmn/ch07b-BPMN-Constructs.md#mess
 
 A boundary message event is visualized as a typical intermediate event (circle with smaller circle inside) on the boundary, with the message icon inside. The message icon is white (unfilled), to indicate its *catch* semantics.
 
-![bpmn.boundary.message.event](assets/bpmn/bpmn.boundary.message.event.png)
+![bpmn.boundary.message.event](../assets/bpmn/bpmn.boundary.message.event.png)
 
 Note that boundary message event can be both interrupting (right-hand side) and non-interrupting (left-hand side).
 
@@ -770,7 +770,7 @@ An attached intermediate *catching* cancel event on the boundary of a transactio
 
 A cancel boundary event is visualized as a typical intermediate event (circle with smaller circle inside) on the boundary, with the cancel icon inside. The cancel icon is white (unfilled), to indicate its *catching* semantics.
 
-![bpmn.boundary.cancel.event](assets/bpmn/bpmn.boundary.cancel.event.png)
+![bpmn.boundary.cancel.event](../assets/bpmn/bpmn.boundary.cancel.event.png)
 
 #### XML representation
 
@@ -806,7 +806,7 @@ A compensation boundary event has a different activation policy from other bound
 
 A compensation boundary event is visualized as a typical intermediate event (circle with smaller circle inside) on the boundary, with the compensation icon inside. The compensation icon is white (unfilled), to indicate its *catching* semantics. In addition to a compensation boundary event, the following figure shows a compensation handler associated with the boundary event using a unidirectional association:
 
-![bpmn.boundary.compensation.event](assets/bpmn/bpmn.boundary.compensation.event.png)
+![bpmn.boundary.compensation.event](../assets/bpmn/bpmn.boundary.compensation.event.png)
 
 #### XML representation
 
@@ -847,7 +847,7 @@ A timer intermediate event acts as a stopwatch. When an execution arrives at a c
 
 A timer intermediate event is visualized as an intermediate catching event, with the timer icon on the inside.
 
-![bpmn.intermediate.timer.event](assets/bpmn/bpmn.intermediate.timer.event.png)
+![bpmn.intermediate.timer.event](../assets/bpmn/bpmn.intermediate.timer.event.png)
 
 #### XML Representation
 
@@ -873,7 +873,7 @@ An intermediate *catching* [signal](bpmn/ch07b-BPMN-Constructs.md#signal-event-d
 
 An intermediate signal catch event is visualized as a typical intermediate event (circle with smaller circle inside), with the signal icon inside. The signal icon is white (unfilled), to indicate its *catch* semantics.
 
-![bpmn.intermediate.signal.catch.event](assets/bpmn/bpmn.intermediate.signal.catch.event.png)
+![bpmn.intermediate.signal.catch.event](../assets/bpmn/bpmn.intermediate.signal.catch.event.png)
 
 #### XML representation
 
@@ -897,7 +897,7 @@ An intermediate *catching* [message](bpmn/ch07b-BPMN-Constructs.md#message-event
 
 An intermediate catching message event is visualized as a typical intermediate event (circle with smaller circle inside), with the message icon inside. The message icon is white (unfilled), to indicate its *catch* semantics.
 
-![bpmn.intermediate.message.catch.event](assets/bpmn/bpmn.intermediate.message.catch.event.png)
+![bpmn.intermediate.message.catch.event](../assets/bpmn/bpmn.intermediate.message.catch.event.png)
 
 #### XML representation
 
@@ -929,7 +929,7 @@ An intermediate throwing event is defined with:
 
 The following process diagram shows a simple example of an intermediate none event, which is often used to indicate some state achieved in the process.
 
-![bpmn.intermediate.none.event](assets/bpmn/bpmn.intermediate.none.event.png)
+![bpmn.intermediate.none.event](../assets/bpmn/bpmn.intermediate.none.event.png)
 
 This can be a good hook to monitor some KPIs, by adding an [execution listener](bpmn/ch07b-BPMN-Constructs.md#execution-listener).
 
@@ -957,7 +957,7 @@ In Flowable, the signal is broadcast to all active handlers (in other words, all
 
 An intermediate signal throw event is visualized as a typical intermediate event (circle with smaller circle inside), with the signal icon inside. The signal icon is black (filled), to indicate its *throw* semantics.
 
-![bpmn.intermediate.signal.throw.event](assets/bpmn/bpmn.intermediate.signal.throw.event.png)
+![bpmn.intermediate.signal.throw.event](../assets/bpmn/bpmn.intermediate.signal.throw.event.png)
 
 #### XML representation
 
@@ -997,7 +997,7 @@ An intermediate *throwing* compensation event can be used to trigger compensatio
 
 **Note:** If compensation is thrown within a scope that contains a sub-process, and the sub-process contains activities with compensation handlers, compensation is only propagated to the sub-process if it has completed successfully when compensation is thrown. If some of the activities nested inside the sub-process have completed and have attached compensation handlers, the compensation handlers are not executed if the sub-process containing these activities is not completed yet. Consider the following example:
 
-![bpmn.throw.compensation.example1](assets/bpmn/bpmn.throw.compensation.example1.png)
+![bpmn.throw.compensation.example1](../assets/bpmn/bpmn.throw.compensation.example1.png)
 
 In this process we have two concurrent executions: one executing the embedded sub-process and one executing the "charge credit card" activity. Let’s assume both executions are started and the first concurrent execution is waiting for a user to complete the "review bookings" task. The second execution performs the "charge credit card" activity and an error is thrown, which causes the "cancel reservations" event to trigger compensation. At this point the parallel sub-process is not yet completed which means that the compensation event is not propagated to the sub-process and consequently the "cancel hotel reservation" compensation handler is not executed. If the user task (and therefore the embedded sub-process) completes before the "cancel reservations" is performed, compensation is propagated to the embedded sub-process.
 
@@ -1021,7 +1021,7 @@ In this process we have two concurrent executions: one executing the embedded su
 
 An intermediate compensation throw event is visualized as a typical intermediate event (circle with smaller circle inside), with the compensation icon inside. The compensation icon is black (filled), to indicate its *throw* semantics.
 
-![bpmn.intermediate.compensation.throw.event](assets/bpmn/bpmn.intermediate.compensation.throw.event.png)
+![bpmn.intermediate.compensation.throw.event](../assets/bpmn/bpmn.intermediate.compensation.throw.event.png)
 
 #### XML representation
 
@@ -1047,7 +1047,7 @@ A sequence flow is the connector between two elements of a process. After an ele
 
 A sequence flow is visualized as an arrow going from the source element towards the target element. The arrow always points towards the target.
 
-![bpmn.sequence.flow](assets/bpmn/bpmn.sequence.flow.png)
+![bpmn.sequence.flow](../assets/bpmn/bpmn.sequence.flow.png)
 
 ### XML representation
 
@@ -1067,7 +1067,7 @@ A sequence flow can have a condition defined on it. When a BPMN 2.0 activity is 
 
 A conditional sequence flow is visualized as a regular sequence flow, with a small diamond at the beginning. The condition expression is shown next to the sequence flow.
 
-![bpmn.conditional.sequence.flow](assets/bpmn/bpmn.conditional.sequence.flow.png)
+![bpmn.conditional.sequence.flow](../assets/bpmn/bpmn.conditional.sequence.flow.png)
 
 #### XML representation
 
@@ -1099,7 +1099,7 @@ Currently, conditionalExpressions can **only be used with UEL**. Detailed inform
 
 The Flowable distribution contains the following example process using value and method expressions (see *org.flowable.examples.bpmn.expression)*:
 
-![bpmn.uel expression.on.seq.flow](assets/bpmn/bpmn.uel-expression.on.seq.flow.png)
+![bpmn.uel expression.on.seq.flow](../assets/bpmn/bpmn.uel-expression.on.seq.flow.png)
 
 ### Default sequence flow
 
@@ -1111,7 +1111,7 @@ All BPMN 2.0 tasks and gateways can have a **default sequence flow**. This seque
 
 A default sequence flow is visualized as a regular sequence flow, with a 'slash' marker at the beginning.
 
-![bpmn.default.sequence.flow](assets/bpmn/bpmn.default.sequence.flow.png)
+![bpmn.default.sequence.flow](../assets/bpmn/bpmn.default.sequence.flow.png)
 
 #### XML representation
 
@@ -1137,7 +1137,7 @@ A gateway is used to control the flow of execution (or as the BPMN 2.0 describes
 
 A gateway is graphically visualized as a diamond shape, with an icon inside. The icon shows the type of gateway.
 
-![bpmn.gateway](assets/bpmn/bpmn.gateway.png)
+![bpmn.gateway](../assets/bpmn/bpmn.gateway.png)
 
 ### Exclusive Gateway
 
@@ -1151,7 +1151,7 @@ An exclusive gateway (also called the *XOR gateway* or more technical the *exclu
 
 An exclusive gateway is visualized as a typical gateway (a diamond shape) with an 'X' icon inside, referring to the *XOR* semantics. Note that a gateway without an icon inside defaults to an exclusive gateway. The BPMN 2.0 specification does not permit use of both the diamond with and without an X in the same process definition.
 
-![bpmn.exclusive.gateway.notation](assets/bpmn/bpmn.exclusive.gateway.notation.png)
+![bpmn.exclusive.gateway.notation](../assets/bpmn/bpmn.exclusive.gateway.notation.png)
 
 #### XML representation
 
@@ -1159,7 +1159,7 @@ The XML representation of an exclusive gateway is straight-forward: one line def
 
 Take, for example, the following model:
 
-![bpmn.exclusive.gateway](assets/bpmn/bpmn.exclusive.gateway.png)
+![bpmn.exclusive.gateway](../assets/bpmn/bpmn.exclusive.gateway.png)
 
 Which is represented in XML as follows:
 
@@ -1197,7 +1197,7 @@ Note that a parallel gateway can have **both fork and join behavior**, if there 
 
 A parallel gateway is visualized as a gateway (diamond shape) with the 'plus' symbol inside, referring to the 'AND' semantics.
 
-![bpmn.parallel.gateway](assets/bpmn/bpmn.parallel.gateway.png)
+![bpmn.parallel.gateway](../assets/bpmn/bpmn.parallel.gateway.png)
 
 #### XML representation
 
@@ -1250,7 +1250,7 @@ When these two tasks are completed, the second parallel gateway will join the tw
 
 Note that a parallel gateway does not need to be 'balanced' (a matching number of incoming/outgoing sequence flow for corresponding parallel gateways). A parallel gateway will simply wait for all incoming sequence flows and create a concurrent path of execution for each outgoing sequence flow, not influenced by other constructs in the process model. So, the following process is legal in BPMN 2.0:
 
-![bpmn.unbalanced.parallel.gateway](assets/bpmn/bpmn.unbalanced.parallel.gateway.png)
+![bpmn.unbalanced.parallel.gateway](../assets/bpmn/bpmn.unbalanced.parallel.gateway.png)
 
 ### Inclusive Gateway
 
@@ -1270,7 +1270,7 @@ Note that an inclusive gateway can have **both fork and join behavior**, if ther
 
 An inclusive gateway is visualized as a gateway (diamond shape) with the 'circle' symbol inside.
 
-![bpmn.inclusive.gateway](assets/bpmn/bpmn.inclusive.gateway.png)
+![bpmn.inclusive.gateway](../assets/bpmn/bpmn.inclusive.gateway.png)
 
 #### XML representation
 
@@ -1348,7 +1348,7 @@ Note the sequence flows running out of an Event-based Gateway are different from
 
 An Event-based Gateway is visualized as a diamond shape like other BPMN gateways with a special icon inside.
 
-![bpmn.event.based.gateway.notation](assets/bpmn/bpmn.event.based.gateway.notation.png)
+![bpmn.event.based.gateway.notation](../assets/bpmn/bpmn.event.based.gateway.notation.png)
 
 #### XML representation
 
@@ -1358,7 +1358,7 @@ The XML element used to define an Event-based Gateway is eventBasedGateway.
 
 The following process is an example of a process with an Event-based Gateway. When the execution arrives at the Event-based Gateway, process execution is suspended. In addition, the process instance subscribes to the alert signal event and creates a timer that fires after 10 minutes. This effectively causes the process engine to wait for ten minutes for a signal event. If the signal occurs within 10 minutes, the timer is cancelled and execution continues after the signal. If the signal is not fired, execution continues after the timer and the signal subscription is canceled.
 
-![bpmn.event.based.gateway.example](assets/bpmn/bpmn.event.based.gateway.example.png)
+![bpmn.event.based.gateway.example](../assets/bpmn/bpmn.event.based.gateway.example.png)
 
     <definitions id="definitions"
         xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -1414,7 +1414,7 @@ A 'user task' is used to model work that needs to be done by a human. When the p
 
 A user task is visualized as a typical task (rounded rectangle), with a small user icon in the left upper corner.
 
-![bpmn.user.task](assets/bpmn/bpmn.user.task.png)
+![bpmn.user.task](../assets/bpmn/bpmn.user.task.png)
 
 #### XML representation
 
@@ -1662,7 +1662,7 @@ Properties:
 
 A script task is visualized as a typical BPMN 2.0 task (rounded rectangle), with a small 'script' icon in the top-left corner of the rectangle.
 
-![bpmn.scripttask](assets/bpmn/bpmn.scripttask.png)
+![bpmn.scripttask](../assets/bpmn/bpmn.scripttask.png)
 
 #### XML representation
 
@@ -1737,7 +1737,7 @@ A Java service task is used to invoke an external Java class.
 
 A service task is visualized as a rounded rectangle with a small gear icon in the top-left corner.
 
-![bpmn.java.service.task](assets/bpmn/bpmn.java.service.task.png)
+![bpmn.java.service.task](../assets/bpmn/bpmn.java.service.task.png)
 
 #### XML representation
 
@@ -2328,7 +2328,7 @@ A Web Service task is used to synchronously invoke an external Web service.
 
 A Web Service task is visualized in the same way as a Java service task.
 
-![bpmn.web.service.task](assets/bpmn/bpmn.web.service.task.png)
+![bpmn.web.service.task](../assets/bpmn/bpmn.web.service.task.png)
 
 #### XML representation
 
@@ -2446,7 +2446,7 @@ If you want to plug in your own implementation of the rule task, for example, be
 
 A Business Rule task is visualized the with a table icon.
 
-![bpmn.business.rule.task](assets/bpmn/bpmn.business.rule.task.png)
+![bpmn.business.rule.task](../assets/bpmn/bpmn.business.rule.task.png)
 
 #### XML representation
 
@@ -3310,7 +3310,7 @@ A *Manual Task* defines a task that is external to the BPM engine. It’s used t
 
 A manual task is visualized as a rounded rectangle, with a little 'hand' icon in the upper left corner
 
-![bpmn.manual.task](assets/bpmn/bpmn.manual.task.png)
+![bpmn.manual.task](../assets/bpmn/bpmn.manual.task.png)
 
 #### XML representation
 
@@ -3326,7 +3326,7 @@ A Receive Task is a simple task that waits for the arrival of a certain message.
 
 A Receive Task is visualized as a task (rounded rectangle) with a message icon in the top left corner. The message is white (a black message icon would have send semantics)
 
-![bpmn.receive.task](assets/bpmn/bpmn.receive.task.png)
+![bpmn.receive.task](../assets/bpmn/bpmn.receive.task.png)
 
 #### XML representation
 
@@ -3738,7 +3738,7 @@ examples and further description.
 It is important to note, that BPMN Errors thrown in Execution Listeners are only caught on _parent scoped_ error boundary events, not on the boundary event of the activity.
 
 The following image illustrates that: 
-![bpmn.executionlistener.bpmnerror](assets/bpmn/bpmn.executionlistener.bpmnerror.png)
+![bpmn.executionlistener.bpmnerror](../assets/bpmn/bpmn.executionlistener.bpmnerror.png)
 
 Given that _A Task_ has an execution listener defined, which throws a BpmnError at some point: 
 The error is only caught if the error boundary event on the _Subprocess_ matches (the red one in the image). 
@@ -3879,7 +3879,7 @@ Additionally, each of the created executions will have an execution-local variab
 
 If an activity is multi-instance, this is indicated by three short lines at the bottom of the activity. Three *vertical* lines indicates that the instances will be executed in parallel, while three *horizontal* lines indicate sequential execution.
 
-![bpmn.multi.instance](assets/bpmn/bpmn.multi.instance.png)
+![bpmn.multi.instance](../assets/bpmn/bpmn.multi.instance.png)
 
 #### XML representation
 
@@ -3955,7 +3955,7 @@ In this example, there will be parallel instances created for each element of th
 
 Since a multi-instance is a regular activity, it is possible to define a [boundary event](bpmn/ch07b-BPMN-Constructs.md#boundary-events) on its boundary. In the case of an interrupting boundary event, when the event is caught, **all instances** that are still active will be destroyed. Take, for example, the following multi-instance sub-process:
 
-![bpmn.multi.instance.boundary.event](assets/bpmn/bpmn.multi.instance.boundary.event.png)
+![bpmn.multi.instance.boundary.event](../assets/bpmn/bpmn.multi.instance.boundary.event.png)
 
 Here, all instances of the sub-process will be destroyed when the timer fires, regardless of how many instances there are or which inner activities haven’t yet completed.
 
@@ -4022,7 +4022,7 @@ A compensation handler must be associated with a compensation boundary event usi
 
 If an activity is a compensation handler, the compensation event icon is displayed in the center bottom area. The following excerpt from a process diagram shows a service task with an attached compensation boundary event, which is associated to a compensation handler. Notice the compensation handler icon in the bottom canter area of the "cancel hotel reservation" service task.
 
-![bpmn.boundary.compensation.event](assets/bpmn/bpmn.boundary.compensation.event.png)
+![bpmn.boundary.compensation.event](../assets/bpmn/bpmn.boundary.compensation.event.png)
 
 #### XML representation
 
@@ -4055,15 +4055,15 @@ Using a Sub-Process does impose some constraints:
 
 A Sub-Process is visualized as a typical activity (a rounded rectangle). If the Sub-Process is *collapsed*, only the name and a plus-sign are displayed, giving a high-level overview of the process:
 
-![bpmn.collapsed.subprocess](assets/bpmn/bpmn.collapsed.subprocess.png)
+![bpmn.collapsed.subprocess](../assets/bpmn/bpmn.collapsed.subprocess.png)
 
 If the Sub-Process is *expanded*, the steps of the Sub-Process are displayed within the Sub-Process boundaries:
 
-![bpmn.expanded.subprocess](assets/bpmn/bpmn.expanded.subprocess.png)
+![bpmn.expanded.subprocess](../assets/bpmn/bpmn.expanded.subprocess.png)
 
 One of the main reasons to use a Sub-Process is to define a scope for a certain event. The following process model shows this: both the *investigate software/investigate hardware* tasks need to be done in parallel, but both tasks need to be done within a certain time, before *Level 2 support* is consulted. Here, the scope of the timer (in which activities must be done in time) is constrained by the Sub-Process.
 
-![bpmn.subprocess.with.boundary.timer](assets/bpmn/bpmn.subprocess.with.boundary.timer.png)
+![bpmn.subprocess.with.boundary.timer](../assets/bpmn/bpmn.subprocess.with.boundary.timer.png)
 
 #### XML representation
 
@@ -4097,7 +4097,7 @@ An Event Sub-Process must not have any incoming or outgoing sequence flows. As a
 
 An Event Sub-Process can be visualized as an [embedded sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation) with a dotted outline.
 
-![bpmn.subprocess.eventSubprocess](assets/bpmn/bpmn.subprocess.eventSubprocess.png)
+![bpmn.subprocess.eventSubprocess](../assets/bpmn/bpmn.subprocess.eventSubprocess.png)
 
 #### XML representation
 
@@ -4111,7 +4111,7 @@ An Event Sub-Process is represented using XML in the same way as an embedded sub
 
 The following is an example of an Event Sub-Process triggered using an Error Start Event. The Event Sub-Process is located at the "process level", in other words, is scoped to the process instance:
 
-![bpmn.subprocess.eventSubprocess.example.1](assets/bpmn/bpmn.subprocess.eventSubprocess.example.1.png)
+![bpmn.subprocess.eventSubprocess.example.1](../assets/bpmn/bpmn.subprocess.eventSubprocess.example.1.png)
 
 This is how the Event Sub-Process would look in XML:
 
@@ -4125,11 +4125,11 @@ This is how the Event Sub-Process would look in XML:
 
 As already stated, an Event Sub-Process can also be added to an embedded sub-process. If it’s added to an embedded sub-process, it becomes an alternative to a boundary event. Consider the two following process diagrams. In both cases the embedded sub-process throws an error event. Both times the error is caught and handled using a user task.
 
-![bpmn.subprocess.eventSubprocess.example.2a](assets/bpmn/bpmn.subprocess.eventSubprocess.example.2a.png)
+![bpmn.subprocess.eventSubprocess.example.2a](../assets/bpmn/bpmn.subprocess.eventSubprocess.example.2a.png)
 
 As opposed to:
 
-![bpmn.subprocess.eventSubprocess.example.2b](assets/bpmn/bpmn.subprocess.eventSubprocess.example.2b.png)
+![bpmn.subprocess.eventSubprocess.example.2b](../assets/bpmn/bpmn.subprocess.eventSubprocess.example.2b.png)
 
 In both cases the same tasks are executed. However, there are differences between both modeling alternatives:
 
@@ -4155,7 +4155,7 @@ A transaction sub-process is an embedded sub-process that can be used to group m
 
 The following diagram illustrates the three different outcomes:
 
-![bpmn.transaction.subprocess.example.1](assets/bpmn/bpmn.transaction.subprocess.example.1.png)
+![bpmn.transaction.subprocess.example.1](../assets/bpmn/bpmn.transaction.subprocess.example.1.png)
 
 **Relation to ACID transactions:** it is important not to confuse the BPMN transaction sub-process with technical (ACID) transactions. The BPMN transaction sub-process is not a way to scope technical transactions. In order to understand transaction management in Flowable, read the section on [concurrency and transactions](bpmn/ch07b-BPMN-Constructs.md#transactions-and-concurrency). A BPMN transaction is different from a technical transaction in the following ways:
 
@@ -4187,7 +4187,7 @@ To sum it up: while ACID transactions offer a generic solution to such problems 
 
 A transaction sub-process is visualized as a an [embedded sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation) with a double outline.
 
-![bpmn.transaction.subprocess](assets/bpmn/bpmn.transaction.subprocess.png)
+![bpmn.transaction.subprocess](../assets/bpmn/bpmn.transaction.subprocess.png)
 
 #### XML representation
 
@@ -4201,7 +4201,7 @@ A transaction sub-process is represented in XML using the transaction tag:
 
 The following is an example of a transaction sub-process:
 
-![bpmn.transaction.subprocess.example.2](assets/bpmn/bpmn.transaction.subprocess.example.2.png)
+![bpmn.transaction.subprocess.example.2](../assets/bpmn/bpmn.transaction.subprocess.example.2.png)
 
 ### Call activity (sub-process)
 
@@ -4217,7 +4217,7 @@ When process execution arrives at the *call activity*, a new execution is create
 
 A call activity is visualized in the same way as a [sub-process](bpmn/ch07b-BPMN-Constructs.md#graphical-notation), but with a thick border (collapsed and expanded). Depending on the modeling tool, a call activity can also be expanded, but the default visualization is the collapsed sub-process representation.
 
-![bpmn.collapsed.call.activity](assets/bpmn/bpmn.collapsed.call.activity.png)
+![bpmn.collapsed.call.activity](../assets/bpmn/bpmn.collapsed.call.activity.png)
 
 #### XML representation
 
@@ -4311,7 +4311,7 @@ By default the `flowable:calledElementType` attribute is set to `key`.
 
 The following process diagram shows a simple handling of an order. As the checking of the customer’s credit could be common to many other processes, the *check credit step* is modeled here as a call activity.
 
-![bpmn.call.activity.super.process](assets/bpmn/bpmn.call.activity.super.process.png)
+![bpmn.call.activity.super.process](../assets/bpmn/bpmn.call.activity.super.process.png)
 
 The process looks as follows:
 
@@ -4331,7 +4331,7 @@ The process looks as follows:
 
 The sub-process looks as follows:
 
-![bpmn.call.activity.sub.process](assets/bpmn/bpmn.call.activity.sub.process.png)
+![bpmn.call.activity.sub.process](../assets/bpmn/bpmn.call.activity.sub.process.png)
 
 There is nothing special about the process definition of the sub-process. It could as well be used without being called from another process.
 
@@ -4343,7 +4343,7 @@ Take the following process definition. Let’s assume the called process definit
 All the steps of these sub process instances will be executed asynchronously. When the last asynchronous service task is executed, the end event will be visited.
 At that point, the control will be passed back to the parent process instance.
 
-![bpmn.call.activity.async.complete](assets/bpmn/bpmn.call.activity.async.complete.png)
+![bpmn.call.activity.async.complete](../assets/bpmn/bpmn.call.activity.async.complete.png)
 
 The problem is that asynchronous locking happens on the process instance level. In this cases, the child process instances will be locked when the last service task and event event are visited.
 This means that when the control is passed back to the parent process instance, and thus when the call activity *completes*, the parent process instance is not locked. When multi-instance is used, this means that x number of instances try to complete the call activity. Even when using exclusive on all steps, this still would mean every child process instance concurrently will try to update the parent process instance, potentially leading to *FlowableOptimisticLockingExceptions* as the 'wrong' process instance is used for the exclusive lock.
@@ -4357,13 +4357,13 @@ When the exclusive lock is created, it will be held for parent process instance 
 
 Flowable executes processes in a transactional way that can be configured to suite your needs. Let’s start by looking at how Flowable scopes transactions normally. If you trigger Flowable (start a process, complete a task, signal an execution), Flowable is going to advance in the process until it reaches wait states on each active path of execution. More concretely speaking, it performs a depth-first search through the process graph and returns if it has reached wait states on every branch of execution. A wait state is a task that is performed "later", which means that Flowable persists the current execution and waits to be triggered again. The trigger can either come from an external source, for example, if we have a user task or a receive message task, or from Flowable itself if we have a timer event. This is illustrated in the following picture:
 
-![async.example.no.async](assets/bpmn/async.example.no.async.PNG)
+![async.example.no.async](../assets/bpmn/async.example.no.async.PNG)
 
 We see a segment of a BPMN process with a user task, a service task and a timer event. Completing the user task and validating the address is part of the same unit of work, so it should succeed or fail atomically. That means that if the service task throws an exception, we want to rollback the current transaction, such that the execution tracks back to the user task and the user task is still present in the database. This is also the default behavior of Flowable. In (1) an application or client thread completes the task. In that same thread, Flowable is now executing the service and advances until it reaches a wait state, in this case, the timer event (2). Then it returns the control to the caller (3), potentially committing the transaction (if it was started by Flowable).
 
 In some cases this is not what we want. Sometimes we need custom control over transaction boundaries in a process, in order to be able to scope logical units of work. This is where asynchronous continuations come into play. Consider the following process (fragment):
 
-![async.example.async](assets/bpmn/async.example.async.PNG)
+![async.example.async](../assets/bpmn/async.example.async.PNG)
 
 This time we are completing the user task, generating an invoice and then sending that invoice to the customer. This time the generation of the invoice is not part of the same unit of work, so we do not want to rollback the completion of the user task if generating an invoice fails. What we want Flowable to do is complete the user task (1), commit the transaction and return the control to the calling application. Then we want to generate the invoice asynchronously, in a background thread. This background thread is the Flowable job executor (actually a thread pool) that periodically polls the database for jobs. Behind the scenes, when we reach the "generate invoice" task, we are creating a job "message" for Flowable to continue the process later and persisting it into the database. This job is then picked up by the job executor and executed. We are also giving the local job executor a little hint that there is a new job, to improve performance.
 
@@ -4405,7 +4405,7 @@ In recent releases, the JobExecutor makes sure that jobs from a single process i
 
 Consider the following process definition:
 
-![bpmn.why.exclusive.jobs](assets/bpmn/bpmn.why.exclusive.jobs.png)
+![bpmn.why.exclusive.jobs](../assets/bpmn/bpmn.why.exclusive.jobs.png)
 
 We have a parallel gateway followed by three service tasks that all perform an asynchronous continuation. As a result of this, three jobs are added to the database. Once such a job is present in the database it can be processed by the JobExecutor. The JobExecutor acquires the jobs and delegates them to a thread pool of worker threads that actually process the jobs. This means that by using an asynchronous continuation, you can distribute the work to this thread pool (and in a clustered scenario even across multiple thread pools in the cluster). This is usually a good thing. However, it also has an inherent problem: consistency. Consider the parallel join after the service tasks. When execution of a service task is completed, we arrive at the parallel join and need to decide whether to wait for the other executions or whether we can move forward. That means, for each branch arriving at the parallel join, we need to take a decision whether we can continue or whether we need to wait for one or more other executions on the other branches.
 

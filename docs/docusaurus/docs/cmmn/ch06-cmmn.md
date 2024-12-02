@@ -19,7 +19,7 @@ Flowable contains:
 
 The following figure shows a simple CMMN 1.1 diagram:
 
-![cmmn basic concepts](assets/cmmn/cmmn-basic-concepts.png)
+![cmmn basic concepts](../assets/cmmn/cmmn-basic-concepts.png)
 
 A **case model** is always visualized as some sort of *folder* that contains all the case elements. Every case model contains a **plan model** onto which items will be *planned*.
 
@@ -104,7 +104,7 @@ The case model we’ll build is a simplified *employee onboarding* case with two
 
 Note that only stages and human tasks are used. In a real case model, there will most likely other plan item types too, such as milestones, nested stages, automated tasks, and so on.
 
-![cmmn.programmatic.example](assets/cmmn/cmmn.programmatic.example.png)
+![cmmn.programmatic.example](../assets/cmmn/cmmn.programmatic.example.png)
 
 The XML for this case model is the following:
 
@@ -426,7 +426,7 @@ A stage is a plan item itself, and thus can have entry and exit criteria. Plan i
 
 A stage is visualized as a rectangle with angled corners:
 
-![cmmn.stage](assets/cmmn/cmmn.stage.png)
+![cmmn.stage](../assets/cmmn/cmmn.stage.png)
 
 ### Task
 
@@ -444,7 +444,7 @@ If a task is non-blocking, the engine will simply complete it automatically when
 
 A task is visualized as a rounded rectangle:
 
-![cmmn.task](assets/cmmn/cmmn.task.png)
+![cmmn.task](../assets/cmmn/cmmn.task.png)
 
 ### Human task
 
@@ -478,7 +478,7 @@ Properties:
 
 A human task is visualized as a rounded rectangle with a user icon in the top left corner:
 
-![cmmn.humantask](assets/cmmn/cmmn.humantask.png)
+![cmmn.humantask](../assets/cmmn/cmmn.humantask.png)
 
 ### Java Service task
 
@@ -509,7 +509,7 @@ Properties:
 
 A service task is visualized as a rounded rectangle with a cog icon in the top left corner:
 
-![cmmn.servicetask](assets/cmmn/cmmn.servicetask.png)
+![cmmn.servicetask](../assets/cmmn/cmmn.servicetask.png)
 
 ### External Worker Task
 
@@ -626,7 +626,7 @@ It is also possible to throw an error when no rule is hit during the evaluation 
 
 A decision task is visualized as a *task* with a table icon in the top left corner:
 
-![cmmn.decisiontask](assets/cmmn/cmmn.decisiontask.png)
+![cmmn.decisiontask](../assets/cmmn/cmmn.decisiontask.png)
 
 ### Http Task
 
@@ -636,7 +636,7 @@ The Http task has various options to customize the request and response. See the
 
 A http task is visualized as a *task* with a rocket icon in the top left corner:
 
-![cmmn.httptask](assets/cmmn/cmmn.httptask.png)
+![cmmn.httptask](../assets/cmmn/cmmn.httptask.png)
 
 ### Script Task
 
@@ -658,7 +658,7 @@ Properties:
 
 A script task is visualized as a *task* with a script icon in the top left corner:
 
-![cmmn.scripttask](assets/cmmn/cmmn.scripttask.png)
+![cmmn.scripttask](../assets/cmmn/cmmn.scripttask.png)
 
     <planItem id="scriptPlanItem" name="Script Plan Item" definitionRef="myScriptTask" />
     <task name="My Script Task Item" flowable:type="script" flowable:scriptFormat="JavaScript">
@@ -735,7 +735,7 @@ Properties:
 
 A milestone is visualized as a rounded rectangle (more rounded than a task):
 
-![cmmn.milestone](assets/cmmn/cmmn.milestone.png)
+![cmmn.milestone](../assets/cmmn/cmmn.milestone.png)
 
 ### Case task
 
@@ -755,7 +755,7 @@ Properties:
 
 A case task is visualized as a rounded rectangle with a case icon in the top left corner:
 
-![cmmn.casetask](assets/cmmn/cmmn.casetask.png)
+![cmmn.casetask](../assets/cmmn/cmmn.casetask.png)
 
 ### Process task
 
@@ -775,7 +775,7 @@ Properties:
 
 A process task is visualized as a rounded rectangle with an arrow icon in the top left corner:
 
-![cmmn.processtask](assets/cmmn/cmmn.processtask.png)
+![cmmn.processtask](../assets/cmmn/cmmn.processtask.png)
 
 A process task can be configured to have in- and out parameters, which take the form of *source/sourceExpression* and *target/targetExpression*.
 
@@ -816,7 +816,7 @@ See [the section on sentry evaluation](cmmn/ch06-cmmn.md#sentry-evaluation) for 
 
 An entry criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
-![cmmn.entrycriteria](assets/cmmn/cmmn.entrycriteria.png)
+![cmmn.entrycriteria](../assets/cmmn/cmmn.entrycriteria.png)
 
 #### Exit criterion (exit sentry)
 
@@ -833,7 +833,7 @@ See [the section on sentry evaluation](cmmn/ch06-cmmn.md#sentry-evaluation) for 
 
 An exit criterion is visualized as a diamond shape (white color inside) on the border of a plan item:
 
-![cmmn.exitcriteria](assets/cmmn/cmmn.exitcriteria.png)
+![cmmn.exitcriteria](../assets/cmmn/cmmn.exitcriteria.png)
 
 Beyond the specification, Flowable supports additional attributes on an exit sentry which adds more flexibility and options on how a plan item is terminated when the exit sentry triggers.
 
@@ -877,7 +877,7 @@ Full example on how to use the exit event type attribute in combination with a u
 It contains two important parts: the *flowable:exitEventType="complete"* attribute on the exit criterion and the *flowable:availableCondition="${cmmn:isStageCompletable()}"* on the user event listener which makes the listener only available, if the stage is currently completable, otherwise it is unavailable.
 Once the user listener triggers, the exit sentry is executed and will complete the stage, not terminate it and leave it in *completed* state, triggering the *complete* event, not the *exit* event.
 
-![cmmn exit sentry on stage](assets/cmmn/cmmn-exit-sentry-on-stage.png)
+![cmmn exit sentry on stage](../assets/cmmn/cmmn-exit-sentry-on-stage.png)
 
 Here you find the CMMN model in XML:
 
@@ -945,7 +945,7 @@ Note that setting a *start trigger* for the timer event listener does not have a
 
 A timer event listener is visualized as circle with a clock icon inside:
 
-![cmmn.timereventlistener](assets/cmmn/cmmn.timereventlistener.png)
+![cmmn.timereventlistener](../assets/cmmn/cmmn.timereventlistener.png)
 
 #### User Event Listener
 
@@ -955,7 +955,7 @@ A typical use case for a user event listener are buttons in a UI that a user can
 When the event is triggered an *Occur* event is thrown to which sentries can listener to.
 Like timer event listeners, it has a much simpler lifecycle that a *task*.
 
-![cmmn.usereventlistener](assets/cmmn/cmmn.usereventlistener.png)
+![cmmn.usereventlistener](../assets/cmmn/cmmn.usereventlistener.png)
 
 User event listeners can be queried using the *org.flowable.cmmn.api.runtime.UserEventListenerInstanceQuery*. Such a query can be created by calling the *cmmnRuntimeService.createUserEventListenerInstanceQuery()* method. Note that a user event listener is also a plan item instance, which means it can also be queried through the *org.flowable.cmmn.api.runtime.PlanItemInstanceQuery* API.
 
@@ -965,7 +965,7 @@ A user event listener can be completed by calling the *cmmnRuntimeService.comple
 
 A generic event listener is used to typically model a programmatic interaction (e.g. a external system that calls out to change something in a case instance).
 
-![cmmn.generic event listener](assets/cmmn/cmmn.generic-event-listener.png)
+![cmmn.generic event listener](../assets/cmmn/cmmn.generic-event-listener.png)
 
 The API to retrieve and complete these event listeners is on the *CmmnRuntimeService*:
 
@@ -981,7 +981,7 @@ Note that generic event listeners are not part of the CMMN specification, but ar
 The engine will automatically detect when event listeners (user or timer) are not useful anymore.
 Take for example the following case definition:
 
-![cmmn.user event listener removal 1](assets/cmmn/cmmn.user-event-listener-removal-1.png)
+![cmmn.user event listener removal 1](../assets/cmmn/cmmn.user-event-listener-removal-1.png)
 
 Here, the *First stage* contains two human tasks (A and B) and it can be exited by a user when the *Stop first stage* user event is triggered.
 However, when both tasks A and B are completed, the stage will also complete. If now the user event listener would be triggered, there is nothing that listens to this event anymore.
@@ -989,19 +989,19 @@ The engine will detect this and terminate the user event automatically.
 
 The same mechanism also works for event listeners that are referenced by entry sentries:
 
-![cmmn.user event listener removal 2](assets/cmmn/cmmn.user-event-listener-removal-2.png)
+![cmmn.user event listener removal 2](../assets/cmmn/cmmn.user-event-listener-removal-2.png)
 
 In this case, in the case that *EventListenerA* would be triggered, *EventListenerB* is terminated (as nothing is listening to its occurrence anymore).
 
 Or, when timer and user event listeners are mixed, the one that is triggered first will also cause the removal of others (when they are not referenced somewhere else):
 
-![cmmn.user event listener removal 3](assets/cmmn/cmmn.user-event-listener-removal-3.png)
+![cmmn.user event listener removal 3](../assets/cmmn/cmmn.user-event-listener-removal-3.png)
 
 Here, the timer will be removed in case the user event is triggered first (and vice versa).
 
 The detection also takes in account plan items that have not yet been created. Take for example the following case definition:
 
-![cmmn.user event listener removal 4](assets/cmmn/cmmn.user-event-listener-removal-4.png)
+![cmmn.user event listener removal 4](../assets/cmmn/cmmn.user-event-listener-removal-4.png)
 
 Here, human task *C* is not yet created when a case instance is started for this case definition. The user event listener will not be removed as long that *C* has a parent stage that is in a non-terminal state, as this means that the event could still be listened to in the future.
 
@@ -1009,7 +1009,7 @@ Here, human task *C* is not yet created when a case instance is started for this
 
 All types of event listeners can be configured to have a **available condition**: an expressions that will guard the available state of the event listener. To explain the use case, take the following case definition:
 
-![cmmn.create condition](assets/cmmn/cmmn.create-condition.png)
+![cmmn.create condition](../assets/cmmn/cmmn.create-condition.png)
 
 When the case instance is started, Stage 1 (as it has no entry criteria) will be moving immediately from *available* to *active*. Similar story for human task A. Human task B will move from *available* to *enabled* as it’s manually activated.
 
@@ -1037,7 +1037,7 @@ If the plan item has entry criteria, the behavior is different. The repetition r
 
 Take, for example, the following timer event listener followed by a human task. The sentry has one entry criterion for the *occur* event of the timer event listener. Note that enabling and setting the repetition rule on the task has a visual indicator at the bottom of the rectangle.
 
-![cmmn.repeatingtimereventlistener](assets/cmmn/cmmn.repeatingtimereventlistener.png)
+![cmmn.repeatingtimereventlistener](../assets/cmmn/cmmn.repeatingtimereventlistener.png)
 
 If the timer event listener is repeating (for example, *R/PT1H*), the *occur* event will be fired every hour. When the repetition rule expression of the human task evaluates to true, a new human task instance will be created each hour.
 
@@ -1120,7 +1120,7 @@ When no expression is set, but the manual activation is enabled (for example, th
 
 Stages and all task types can be marked for manual activation. Visually, the task or stage will get a 'play' icon (small triangle pointing to the right) to indicate an end-user will have to manually activate it:
 
-![cmmn.manual activation](assets/cmmn/cmmn.manual-activation.png)
+![cmmn.manual activation](../assets/cmmn/cmmn.manual-activation.png)
 
 Normally, when a sentry for a plan item is satisfied (or the plan item doesn’t have any sentries) the plan item instance is automatically moved to the *ACTIVE* state. When a manual activation is set though, and it evaluates to true, the plan item instance now becomes *ENABLED* instead of *ACTIVE*. As the name implies, the idea behind this is that end-users manually have to activate the plan item instance. A typical use case is showing a list of buttons of potential plan item instances that can currently be started by the end user.
 
@@ -1162,13 +1162,13 @@ The *required rule* works in conjunction with the *autoComplete* attribute on th
 A *stage plan item instance* has a **completable** property that can be used to see whether or not the conditions for completion are satisfied.
 Take, for example, the following simple stage and assume that the sentry for the *required task* evaluates to true and the other one to false. This means that the left plan item instance will be active while the right one will be in the *available* state.
 
-![cmmn.completeable stage](assets/cmmn/cmmn.completeable-stage.png)
+![cmmn.completeable stage](../assets/cmmn/cmmn.completeable-stage.png)
 
 Calling *cmmnRuntimeService.completeStagePlanItemInstance(String stagePlanItemInstanceId)* will not be possible for the stage (an exception will be thrown) as it has one active child plan item instance. When this user task on the left is completed, the *completeStagePlanItemInstance* can now be called, as no child plan item instances are currently active. However, by itself, the stage will not automatically complete as the right user task is in the available state.
 
 If the previous stage is changed to be **autocompletable** (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
 
-![cmmn.completeable stage02](assets/cmmn/cmmn.completeable-stage02.png)
+![cmmn.completeable stage02](../assets/cmmn/cmmn.completeable-stage02.png)
 
 -   If the left plan item instance is active (sentry is true) and the right is not (sentry is false). In this case, when the left user task is completed, the stage instance will auto complete as it has no active child plan item instances and all required plan item instances are in an end state
 
@@ -1182,7 +1182,7 @@ If the previous stage is changed to be **autocompletable** (this is visualised b
 
 Note that the manual activation rule works independently of the required rule. For example, given the following stage:
 
-![cmmn.completeable stage03](assets/cmmn/cmmn.completeable-stage03.png)
+![cmmn.completeable stage03](../assets/cmmn/cmmn.completeable-stage03.png)
 
 Here, user task D is required and user task B is manually activated.
 
@@ -1290,7 +1290,7 @@ Sentries consist of two parts:
 
 Take for example the following case definition:
 
-![cmmn.sentry eval 01](assets/cmmn/cmmn.sentry-eval-01.png)
+![cmmn.sentry eval 01](../assets/cmmn/cmmn.sentry-eval-01.png)
 
 Assume (not shown in the diagram here)
 
@@ -1343,7 +1343,7 @@ The default behavior (see previous section) will remember which parts have been 
 
 There is an alternative mode of sentry triggering that is called **"onEvent"**. In this mode, the engine will have memory with regards to parts of the sentry and will **not remember** any part that was satisfied in the past. This is sometimes needed in advanced use cases. Take for example the following example:
 
-![cmmn.sentry eval 02](assets/cmmn/cmmn.sentry-eval-02.png)
+![cmmn.sentry eval 02](../assets/cmmn/cmmn.sentry-eval-02.png)
 
 Here, the case model has a stage with with three substages. All substage are repeating. Substage B and C have an entry sentry for the completion of stage B. Also (not visually shown), both sentries have a condition that depends on a variable.
 
@@ -1353,7 +1353,7 @@ Concretely, in the example here, the condition of the entry sentries will be eva
 
 Do note that the engine deems all events to happen simultaneously when it comes to evaluating sentries. Take the following case definition:
 
-![cmmn.sentry eval 03](assets/cmmn/cmmn.sentry-eval-03.png)
+![cmmn.sentry eval 03](../assets/cmmn/cmmn.sentry-eval-03.png)
 
 Assume that all sentries use the *triggerMode onEvent* setting. If task A is completed, this exits task B. Task C will now exit too. So, even though there are two distinct lifecycle events (A being completed and B being exited) and one might assume that *onEvent* literally means that there are two distinct evaluations happening where the memory of the other part of the exit sentry on task C is forgotten, the engine is smart enough to see that they are part of the same evaluation cycle and task C will be exited too.
 

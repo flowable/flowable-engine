@@ -211,7 +211,7 @@ If no image is provided in the deployment, as described in the [previous section
 
 The resource can be retrieved in exactly the same way as when [an image is provided](bpmn/ch06-Deployment.md#providing-a-process-diagram) in the deployment.
 
-![deployment.image.generation](assets/bpmn/deployment.image.generation.png)
+![deployment.image.generation](../assets/bpmn/deployment.image.generation.png)
 
 If, for some reason, it’s not necessary or desirable to generate a diagram during deployment, the isCreateDiagramOnDeploy property can be set on the process engine configuration:
 
