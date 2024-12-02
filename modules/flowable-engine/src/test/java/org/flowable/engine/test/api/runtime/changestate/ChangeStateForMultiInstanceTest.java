@@ -380,6 +380,95 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/multiInstanceTwoParallelTasks.bpmn20.xml")
+    public void testSetCurrentActivityToOtherParallelMultiInstanceTask() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("parallelMultiInstance")
+                .variable("nrOfLoops", 3)
+                .start();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("beforeMultiInstance");
+        taskService.complete(task.getId());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions).hasSize(4);
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks).hasSize(3);
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdTo("parallelTasks1", "parallelTasks2")
+                .changeState();
+
+        // First in the loop
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        // One MI root and 3 parallel Executions
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelTasks2", "parallelTasks2", "parallelTasks2", "parallelTasks2");
+
+        Execution miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        Map<String, Object> miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances", "nrOfLoops")
+                .containsExactly(3, 0, 3);
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("parallelTasks2", "parallelTasks2", "parallelTasks2");
+        assertThat(tasks)
+                .extracting(taskEntity -> taskService.getVariable(taskEntity.getId(), "loopCounter"))
+                .isNotNull();
+
+        // Complete one execution
+        taskService.complete(tasks.get(0).getId());
+
+        // Confirm new state
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("parallelTasks2", "parallelTasks2", "parallelTasks2", "parallelTasks2");
+
+        miRoot = executions.stream().filter(e -> ((ExecutionEntity) e).isMultiInstanceRoot()).findFirst().get();
+        miRootVars = runtimeService.getVariables(miRoot.getId());
+        assertThat(miRootVars)
+                .extracting("nrOfActiveInstances", "nrOfCompletedInstances", "nrOfLoops")
+                .containsExactly(2, 1, 3);
+
+        // Two executions are inactive, the completed before and the MI root
+        assertThat(executions)
+                .haveExactly(2, new Condition<>((Execution execution) -> !((ExecutionEntity) execution).isActive(), "inactive"));
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
+        assertThat(tasks)
+                .extracting(Task::getTaskDefinitionKey)
+                .containsExactly("parallelTasks2", "parallelTasks2");
+        assertThat(taskService.getVariable(tasks.get(0).getId(), "loopCounter")).isEqualTo(1);
+
+        // Complete the rest of the Tasks
+        tasks.forEach(this::completeTask);
+
+        // After the MI
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("nextTask");
+        assertThat((ExecutionEntity) executions.get(0))
+                .extracting(ExecutionEntity::isMultiInstanceRoot).isEqualTo(false);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().singleResult();
+        assertThat(task)
+                .extracting(Task::getTaskDefinitionKey)
+                .isEqualTo("nextTask");
+        assertThat(taskService.getVariable(task.getId(), "loopCounter")).isNull();
+
+        //Complete the process
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+    }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")

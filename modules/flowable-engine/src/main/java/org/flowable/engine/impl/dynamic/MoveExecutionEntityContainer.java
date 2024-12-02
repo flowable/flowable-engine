@@ -39,6 +39,7 @@ public class MoveExecutionEntityContainer {
     protected BpmnModel subProcessModel;
     protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
+    protected boolean isMultiInstanceExecutionWithChildExecutions;
     protected String newAssigneeId;
     protected String newOwnerId;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
@@ -142,6 +143,14 @@ public class MoveExecutionEntityContainer {
 
     public ExecutionEntity getSuperExecution() {
         return superExecution;
+    }
+
+    public boolean isMultiInstanceExecutionWithChildExecutions() {
+        return isMultiInstanceExecutionWithChildExecutions;
+    }
+
+    public void setMultiInstanceExecutionWithChildExecutions(boolean isMultiInstanceExecutionWithChildExecutions) {
+        this.isMultiInstanceExecutionWithChildExecutions = isMultiInstanceExecutionWithChildExecutions;
     }
 
     public void setNewAssigneeId(String newAssigneeId) {
