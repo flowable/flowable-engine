@@ -222,7 +222,7 @@ class Util {
 
         if (!candidates.isEmpty()) {
             String errorMsg = "Unable to find unambiguous method: " + clazz + "." + name + "(" + paramString(paramTypes) + ")";
-            return findMostSpecificWrapper(candidates, paramTypes, candidatesType == CandidatesType.ASSIGNABLE, errorMsg);
+            return findMostSpecificWrapper(candidates, paramTypes, candidatesType == CandidatesType.ASSIGNABLE || candidatesType == CandidatesType.COERCIBLE, errorMsg);
         }
 
         throw new MethodNotFoundException("Method not found: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
