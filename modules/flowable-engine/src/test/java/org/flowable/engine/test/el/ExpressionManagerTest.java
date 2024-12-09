@@ -15,6 +15,7 @@ package org.flowable.engine.test.el;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -273,6 +275,60 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         });
 
         assertThat(value).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testInvokeOnArrayNode() {
+        Map<String, Object> vars = new HashMap<>();
+        ArrayNode arrayNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+        arrayNode.add("firstValue");
+        arrayNode.add("secondValue");
+        arrayNode.add(42);
+
+        vars.put("array", arrayNode);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        assertEquals(getExpressionValue("${array.get(0).isTextual()}", processInstance), true);
+        assertEquals(getExpressionValue("${array.get(0).textValue()}", processInstance), "firstValue");
+        assertEquals(getExpressionValue("${array.get(0).isNumber()}", processInstance), false);
+
+        assertEquals(getExpressionValue("${array.get(2).isNumber()}", processInstance), true);
+        assertEquals(getExpressionValue("${array.get(2).asInt()}", processInstance), 42);
+        assertEquals(getExpressionValue("${array.get(2).asLong()}", processInstance), 42L);
+
+        assertEquals(getExpressionValue("${array.get(1).textValue()}", processInstance), "secondValue");
+        assertEquals(getExpressionValue("${array.get(1).asLong(123)}", processInstance), 123L);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testInvokeOnObjectNode() {
+        Map<String, Object> vars = new HashMap<>();
+        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        objectNode.put("firstAttribute", "foo");
+        objectNode.put("secondAttribute", "bar");
+        objectNode.put("thirdAttribute", 42);
+
+        vars.put("object", objectNode);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").isTextual()}", processInstance), true);
+        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").textValue()}", processInstance), "foo");
+        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").isNumber()}", processInstance), false);
+
+        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").isNumber()}", processInstance), true);
+        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").asInt()}", processInstance), 42);
+        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").asLong()}", processInstance), 42L);
+
+        assertEquals(getExpressionValue("${object.get(\"secondAttribute\").textValue()}", processInstance), "bar");
+        assertEquals(getExpressionValue("${object.get(\"secondAttribute\").asLong(123)}", processInstance), 123L);
+    }
+  
+    private Object getExpressionValue(String expressionStr, ProcessInstance processInstance) {
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression(expressionStr);
+        return managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
     }
 
     @ParameterizedTest

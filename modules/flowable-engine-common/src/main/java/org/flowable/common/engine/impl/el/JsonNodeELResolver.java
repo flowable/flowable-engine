@@ -14,9 +14,11 @@ package org.flowable.common.engine.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
@@ -37,19 +39,21 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JsonNodeELResolver extends ELResolver {
 
     private final boolean readOnly;
+    private final BeanELResolver beanELResolver;
 
     /**
-     * Creates a new read/write BeanELResolver.
+     * Creates a new read/write JsonNodeELResolver.
      */
     public JsonNodeELResolver() {
         this(false);
     }
 
     /**
-     * Creates a new BeanELResolver whose read-only status is determined by the given parameter.
+     * Creates a new JsonNodeELResolver whose read-only status is determined by the given parameter.
      */
     public JsonNodeELResolver(boolean readOnly) {
         this.readOnly = readOnly;
+        this.beanELResolver = new BeanELResolver(readOnly);
     }
 
     /**
@@ -257,6 +261,36 @@ public class JsonNodeELResolver extends ELResolver {
         }
         return readOnly;
     }
+    
+    @Override
+	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+        if (context == null) {
+            throw new NullPointerException("context is null");
+        }
+
+        Object result = null;
+        if (isResolvable(base)) {
+            // Use BeanELResolver to invoke the method.
+            // If a JsonNode method has a number as a parameter (e.g. an index) it is always an int (with the exception of methods like asLong, asDouble etc.).
+            // In JUEL expressions, literal numbers are treated as Long. Therefore, we are converting them to int here.
+            Object[] convertedParams;
+            if (params == null || method.toString().startsWith("as")) {
+                convertedParams = params;
+            } else {
+                convertedParams = Arrays.asList(params).stream().<Object>map(param -> {
+                    if (param instanceof Number) {
+                        return ((Number) param).intValue();
+                    } else {
+                        return param;
+                    }
+                }).toArray();
+            }
+            result = beanELResolver.invoke(context, base, method, paramTypes, convertedParams);
+            context.setPropertyResolved(true);
+        }
+
+        return result;
+	}
 
     /**
      * If the base object is a map, attempts to set the value associated with the given key, as specified by the property argument. If the base is a Map, the propertyResolved property of the ELContext
