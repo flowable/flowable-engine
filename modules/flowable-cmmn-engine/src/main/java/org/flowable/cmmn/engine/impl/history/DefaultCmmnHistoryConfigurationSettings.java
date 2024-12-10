@@ -246,7 +246,7 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         String caseDefinitionId = getCaseDefinitionId(entityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+        return isHistoryEnabled(caseDefinitionId);
     }
 
     @Override

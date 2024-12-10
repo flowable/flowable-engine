@@ -141,6 +141,10 @@ public abstract class AbstractDynamicStateManager {
                 
                 miExecutionsByParent.values().forEach(executions -> {
                     MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds());
+                    if (executionsByParent.containsKey(executions.get(0).getId())) {
+                        moveExecutionEntityContainer.setMultiInstanceExecutionWithChildExecutions(true);
+                    }
+                    
                     if (executions.get(0).getVariablesLocal() != null && !executions.get(0).getVariablesLocal().isEmpty()) {
                         moveExecutionEntityContainer.addLocalVariableMap(executions.get(0).getActivityId(), executions.get(0).getVariablesLocal());
                     }
@@ -150,6 +154,7 @@ public abstract class AbstractDynamicStateManager {
                     if (executionContainer.getNewOwnerId() != null) {
                         moveExecutionEntityContainer.setNewOwnerId(executionContainer.getNewOwnerId());
                     }
+                    
                     moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
                 });
                 
@@ -604,7 +609,9 @@ public abstract class AbstractDynamicStateManager {
                         CommandContextUtil.getAgenda(commandContext).planContinueProcessWithMigrationContextOperation(newChildExecution, migrationContext);
 
                     } else {
-                        if (newChildExecution.isMultiInstanceRoot() && (newChildExecution.getCurrentFlowElement() instanceof Task || newChildExecution.getCurrentFlowElement() instanceof CallActivity)) {
+                        if (newChildExecution.isMultiInstanceRoot() && moveExecutionContainer.isMultiInstanceExecutionWithChildExecutions() && 
+                                (newChildExecution.getCurrentFlowElement() instanceof Task || newChildExecution.getCurrentFlowElement() instanceof CallActivity)) {
+                            
                             continue;
                         }
                         
@@ -684,12 +691,25 @@ public abstract class AbstractDynamicStateManager {
     protected void safeDeleteSubProcessInstance(String processInstanceId, List<ExecutionEntity> executionsPool, String deleteReason, CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
-        //Confirm that all the subProcessExecutions are in the executionsPool
+        //Confirm that all the subProcessExecutions are in the executions pool
         List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
-        HashSet<String> executionIdsToMove = executionsPool.stream().map(ExecutionEntity::getId).collect(Collectors.toCollection(HashSet::new));
-        Optional<ExecutionEntity> notIncludedExecution = subProcessExecutions.stream().filter(e -> !executionIdsToMove.contains(e.getId())).findAny();
-        if (notIncludedExecution.isPresent()) {
-            throw new FlowableException("Execution of sub process instance is not moved " + notIncludedExecution.get().getId());
+        
+        Set<String> executionIdsToMove = new HashSet<String>();
+        for (ExecutionEntity executionPoolItem : executionsPool) {
+            executionIdsToMove.add(executionPoolItem.getId());
+        }
+
+        for (ExecutionEntity subProcessExecution : subProcessExecutions) {
+            FlowElement currentFlowElement = subProcessExecution.getCurrentFlowElement();
+            if (currentFlowElement != null && currentFlowElement instanceof BoundaryEvent) {
+                String parentExecutionId = subProcessExecution.getParentId();
+                if (!StringUtils.isNotEmpty(parentExecutionId) || !executionIdsToMove.contains(parentExecutionId)) {
+                    throw new FlowableException("Unbound boundary event execution prevents the sub process instance to be moved " + subProcessExecution.getId());
+                }
+            
+            } else if (!executionIdsToMove.contains(subProcessExecution.getId())) {
+                throw new FlowableException("Following execution of sub process instance is not moved " + subProcessExecution.getId());
+            }
         }
 
         // delete the sub process instance
