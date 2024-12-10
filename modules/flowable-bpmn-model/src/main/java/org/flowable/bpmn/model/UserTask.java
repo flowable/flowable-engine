@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * @author Tijs Rademakers
  */
-public class UserTask extends Task {
+public class UserTask extends Task implements HasValidateFormFields {
 
     protected String assignee;
     protected String owner;
@@ -209,10 +209,11 @@ public class UserTask extends Task {
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public String getValidateFormFields() {
         return validateFormFields;
     }
-
+    @Override
     public void setValidateFormFields(String validateFormFields) {
         this.validateFormFields = validateFormFields;
     }
