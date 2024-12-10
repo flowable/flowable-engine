@@ -312,7 +312,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         String processDefinitionId = getProcessDefinitionId(entityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+        return isHistoryEnabled(processDefinitionId);
     }
 
     @Override
