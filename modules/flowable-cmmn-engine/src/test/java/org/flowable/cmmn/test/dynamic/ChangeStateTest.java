@@ -139,4 +139,57 @@ public class ChangeStateTest extends FlowableCmmnTestCase {
 
         assertCaseInstanceEnded(caseInstance);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testChangeHumanTaskRepetition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task One");
+
+        cmmnTaskService.complete(task.getId());
+
+        cmmnRuntimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstance.getId())
+                .addWaitingForRepetitionPlanItemDefinitionId("task2")
+                .changeState();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task Two");
+
+        cmmnRuntimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstance.getId())
+                .activatePlanItemDefinitionId("task1")
+                .changeState();
+
+        cmmnTaskService.complete(task.getId());
+
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.COMPLETED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.WAITING_FOR_REPETITION);
+
+        cmmnRuntimeService.createChangePlanItemStateBuilder()
+                .caseInstanceId(caseInstance.getId())
+                .addRemoveWaitingForRepetitionPlanItemDefinitionId("task2")
+                .changeState();
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).includeEnded().list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(PlanItemInstanceState.COMPLETED, PlanItemInstanceState.COMPLETED, PlanItemInstanceState.ACTIVE);
+
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Task One");
+
+        cmmnTaskService.complete(task.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+    }
 }
