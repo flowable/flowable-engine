@@ -14,14 +14,14 @@
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.3.4</spring.boot.version>
-		<spring.framework.version>6.1.13</spring.framework.version>
-		<spring.security.version>6.3.3</spring.security.version>
-		<spring.amqp.version>3.1.7</spring.amqp.version>
-		<spring.kafka.version>3.2.5</spring.kafka.version>
+		<spring.boot.version>3.4.0</spring.boot.version>
+		<spring.framework.version>6.2.0</spring.framework.version>
+		<spring.security.version>6.4.1</spring.security.version>
+		<spring.amqp.version>3.2.0</spring.amqp.version>
+		<spring.kafka.version>3.3.0</spring.kafka.version>
 		<spring.ldap.version>3.2.8</spring.ldap.version>
-		<reactor-netty.version>1.1.22</reactor-netty.version>
-		<jackson.version>2.17.2</jackson.version>
+		<reactor-netty.version>1.2.0</reactor-netty.version>
+		<jackson.version>2.18.1</jackson.version>
 		<jakarta-jms.version>3.1.0</jakarta-jms.version>
         <camel.version>4.8.0</camel.version>
 		<cxf.version>4.0.5</cxf.version>
@@ -153,7 +153,7 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents.client5</groupId>
 				<artifactId>httpclient5</artifactId>
-				<version>5.3.1</version>
+				<version>5.4.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.oracle.database.jdbc</groupId>

@@ -62,6 +62,7 @@ public class FlowableRestApplicationWithEnabledJmsKafkaAndRabbitTest {
                 "class path resource [engine.properties]",
                 "Config resource 'class path resource [application.properties]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
+                "applicationInfo",
                 "Management Server"
             );
 
