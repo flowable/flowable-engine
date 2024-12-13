@@ -161,7 +161,7 @@ public class ErrorPropagation {
                             String refActivityId = refId.substring(0, refId.indexOf('#'));
                             String refProcessDefinitionId = refId.substring(refId.indexOf('#') + 1);
                             if (parentExecution.getProcessDefinitionId().equals(refProcessDefinitionId) &&
-                                            currentContainer.getFlowElement(refActivityId) != null) {
+                                            currentContainer.getFlowElement(refActivityId, false) != null) {
 
                                 matchingEvent = getCatchEventFromList(events, parentExecution);
                                 String errorCode = getErrorCodeFromErrorEventDefinition(matchingEvent);
