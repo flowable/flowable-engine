@@ -7,7 +7,7 @@ This chapter gives a short introduction to the internals of the CMMN engine from
 
 The CMMN engine, as shown in the diagram below, is one of the engines that is part of the Flowable engines eco-system and is designed in a similar way as the other engines. The CMMN engine builds upon CMMN specific services and the shared services: the task, variable, identity and job services, which are independent from the engines. On a lower level the entity- and datamanager layer takes care of the low-level persistence, equivalent to the other engines.
 
-![cmmn.architecture](assets/cmmn/cmmn.architecture.png)
+![cmmn.architecture](../assets/cmmn/cmmn.architecture.png)
 
 By using the shared services, this also means that for example tasks from both the BPMN and the CMMN engine will end up together and can be queried and managed through the same API. Similarly for the async executor: timers and async jobs use the same logic and even can be managed by a central executor.
 
@@ -15,7 +15,7 @@ The shared services architecture has a second benefit. When the engines are used
 
 The CMMN engine is designed with the same principles as the other engines of the Flowable project. The diagram below gives a high-level overview of the different components involved when working with the CMMN Engine:
 
-![cmmn.api call flow](assets/cmmn/cmmn.api-call-flow.png)
+![cmmn.api call flow](../assets/cmmn/cmmn.api-call-flow.png)
 
 From a high level point of view:
 
