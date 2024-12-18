@@ -16,8 +16,6 @@ package org.flowable.common.engine.impl.scripting;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.script.Bindings;
-
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 
 /**
@@ -34,12 +32,7 @@ public class ScriptBindingsFactory {
         this.resolverFactories = resolverFactories;
     }
 
-    public Bindings createBindings(ScriptEngineRequest request) {
-        return new ScriptBindings(createResolvers(request), request.getVariableContainer(),
-                request.isStoreScriptVariables());
-    }
-
-    protected List<Resolver> createResolvers(ScriptEngineRequest request) {
+    public Resolver createResolver(ScriptEngineRequest request) {
         List<Resolver> scriptResolvers = new ArrayList<>();
         scriptResolvers.addAll(request.getAdditionalResolvers());
         for (ResolverFactory scriptResolverFactory : resolverFactories) {
@@ -48,7 +41,7 @@ public class ScriptBindingsFactory {
                 scriptResolvers.add(resolver);
             }
         }
-        return scriptResolvers;
+        return new CompositeResolver(scriptResolvers);
     }
 
     public List<ResolverFactory> getResolverFactories() {

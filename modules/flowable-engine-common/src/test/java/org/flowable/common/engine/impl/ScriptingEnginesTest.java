@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.scripting.CompositeScriptTraceListener;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
 import org.flowable.common.engine.impl.scripting.MapResolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
@@ -45,7 +46,7 @@ public class ScriptingEnginesTest {
         resolverFactories = new ArrayList<>();
         ScriptBindingsFactory factory = new ScriptBindingsFactory(null, resolverFactories);
 
-        engines = new ScriptingEngines(factory);
+        engines = new ScriptingEngines(new JSR223FlowableScriptEngine(), factory);
     }
 
     @AfterEach

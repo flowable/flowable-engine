@@ -12,26 +12,22 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
+
 /**
  * @author Filip Hrisafov
  */
-public class ScriptEvaluationImpl implements ScriptEvaluation {
+public interface FlowableScriptEvaluationRequest {
 
-    protected final Resolver resolver;
-    protected final Object result;
+    FlowableScriptEvaluationRequest language(String language);
 
-    public ScriptEvaluationImpl(Resolver resolver, Object result) {
-        this.resolver = resolver;
-        this.result = result;
-    }
+    FlowableScriptEvaluationRequest script(String script);
 
-    @Override
-    public Object getEvaluationAttribute(String key) {
-        return resolver.get(key);
-    }
+    FlowableScriptEvaluationRequest resolver(Resolver resolver);
 
-    @Override
-    public Object getResult() {
-        return result;
-    }
+    FlowableScriptEvaluationRequest variableContainer(VariableContainer variableContainer);
+
+    FlowableScriptEvaluationRequest storeScriptVariables();
+
+    ScriptEvaluation evaluate() throws FlowableScriptException;
 }

@@ -15,23 +15,8 @@ package org.flowable.common.engine.impl.scripting;
 /**
  * @author Filip Hrisafov
  */
-public class ScriptEvaluationImpl implements ScriptEvaluation {
+public interface FlowableScriptEngine {
 
-    protected final Resolver resolver;
-    protected final Object result;
+    FlowableScriptEvaluationRequest createEvaluationRequest();
 
-    public ScriptEvaluationImpl(Resolver resolver, Object result) {
-        this.resolver = resolver;
-        this.result = result;
-    }
-
-    @Override
-    public Object getEvaluationAttribute(String key) {
-        return resolver.get(key);
-    }
-
-    @Override
-    public Object getResult() {
-        return result;
-    }
 }

@@ -15,23 +15,13 @@ package org.flowable.common.engine.impl.scripting;
 /**
  * @author Filip Hrisafov
  */
-public class ScriptEvaluationImpl implements ScriptEvaluation {
+public class FlowableScriptException extends Exception {
 
-    protected final Resolver resolver;
-    protected final Object result;
-
-    public ScriptEvaluationImpl(Resolver resolver, Object result) {
-        this.resolver = resolver;
-        this.result = result;
+    public FlowableScriptException(String message) {
+        super(message);
     }
 
-    @Override
-    public Object getEvaluationAttribute(String key) {
-        return resolver.get(key);
-    }
-
-    @Override
-    public Object getResult() {
-        return result;
+    public FlowableScriptException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
