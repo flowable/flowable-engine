@@ -16,6 +16,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -621,6 +622,19 @@ public class ErrorPropagation {
         @Override
         public String getTenantId() {
             return tenantId;
+        }
+
+        @Override
+        public Set<String> getVariableNames() {
+            if (additionalDataContainer == null) {
+                return Set.of(ERROR_CODE_VARIABLE_NAME, ERROR_VARIABLE_NAME, ERROR_MESSAGE_VARIABLE_NAME);
+            }
+
+            Set<String> variableKeys = new LinkedHashSet<>(additionalDataContainer.getVariableNames());
+            variableKeys.add(ERROR_CODE_VARIABLE_NAME);
+            variableKeys.add(ERROR_VARIABLE_NAME);
+            variableKeys.add(ERROR_MESSAGE_VARIABLE_NAME);
+            return variableKeys;
         }
 
         @Override
