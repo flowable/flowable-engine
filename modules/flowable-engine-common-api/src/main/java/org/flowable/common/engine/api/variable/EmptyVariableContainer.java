@@ -12,6 +12,9 @@
  */
 package org.flowable.common.engine.api.variable;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * @author Arthur Hupka-Merle
  */
@@ -42,5 +45,10 @@ class EmptyVariableContainer implements VariableContainer {
     @Override
     public String getTenantId() {
         return null;
+    }
+
+    @Override
+    public Set<String> getVariableNames() {
+        return Collections.emptySet();
     }
 }
