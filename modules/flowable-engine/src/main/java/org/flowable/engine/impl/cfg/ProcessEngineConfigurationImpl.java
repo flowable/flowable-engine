@@ -107,6 +107,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataMana
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEngine;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
@@ -730,6 +732,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected Collection<ELResolver> postDefaultELResolvers;
     // SCRIPTING ///////////////////////////////////////////////////////
     protected List<String> customScriptingEngineClasses;
+    protected FlowableScriptEngine scriptEngine;
     protected ScriptingEngines scriptingEngines;
     protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
@@ -2269,9 +2272,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initScriptingEngines() {
+        initScriptEngine();
         if (scriptingEngines == null) {
-            scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
+            scriptingEngines = new ScriptingEngines(scriptEngine, scriptBindingsFactory);
             scriptingEngines.setDefaultTraceEnhancer(new ProcessEngineScriptTraceEnhancer());
+        }
+    }
+
+    protected void initScriptEngine() {
+        if (scriptEngine == null) {
+            scriptEngine = new JSR223FlowableScriptEngine();
         }
     }
 
@@ -2956,6 +2966,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFormTypes(FormTypes formTypes) {
         this.formTypes = formTypes;
+        return this;
+    }
+
+    @Override
+    public FlowableScriptEngine getScriptEngine() {
+        return scriptEngine;
+    }
+
+    @Override
+    public ProcessEngineConfigurationImpl setScriptEngine(FlowableScriptEngine scriptEngine) {
+        this.scriptEngine = scriptEngine;
         return this;
     }
 
