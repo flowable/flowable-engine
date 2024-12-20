@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.HasValidateFormFields;
-import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
