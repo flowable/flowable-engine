@@ -246,7 +246,7 @@ public abstract class AbstractFlowableCmmnTestCase {
                 assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
             }
 
-            assertEquals(historyMap.size(), 0);
+            assertEquals(0, historyMap.size());
         }
     }
 
