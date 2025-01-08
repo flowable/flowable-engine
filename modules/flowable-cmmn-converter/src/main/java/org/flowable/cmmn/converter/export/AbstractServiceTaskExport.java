@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.FormAwareServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -118,4 +119,26 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
             return ScriptServiceTask.class;
         }
     }
+
+    public static class FormAwareServiceTaskExport extends AbstractServiceTaskExport<FormAwareServiceTask> {
+
+        @Override
+        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+            return FormAwareServiceTask.class;
+        }
+
+        @Override
+        public void writePlanItemDefinitionSpecificAttributes(ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
+            super.writePlanItemDefinitionSpecificAttributes(serviceTask, xtw);
+            FormAwareServiceTask formAwareServiceTask = (FormAwareServiceTask) serviceTask;
+            if (StringUtils.isNotBlank(formAwareServiceTask.getFormKey())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, formAwareServiceTask.getFormKey());
+            }
+            if (StringUtils.isNotBlank(formAwareServiceTask.getValidateFormFields())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_FIELD_VALIDATION,
+                        formAwareServiceTask.getValidateFormFields());
+            }
+        }
+    }
+
 }
