@@ -81,6 +81,8 @@ public class CaseDefinitionService {
             try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
                 XMLInputFactory xif = XMLInputFactory.newInstance();
+                xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+                xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
                 InputStreamReader in = new InputStreamReader(responseContent, StandardCharsets.UTF_8);
                 XMLStreamReader xtr = xif.createXMLStreamReader(in);
                 CmmnModel cmmmnModel = new CmmnXmlConverter().convertToCmmnModel(xtr);
