@@ -14,12 +14,14 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.FormAwareServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
@@ -33,7 +35,7 @@ public class ServiceTaskParseHandler extends AbstractPlanItemParseHandler<Servic
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Collections.singletonList(ServiceTask.class);
+        return Set.of(ServiceTask.class, FormAwareServiceTask.class);
     }
 
     @Override
