@@ -190,6 +190,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandle
 import org.flowable.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExternalWorkerServiceTaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.FormAwareServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.HttpServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.InclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.IntermediateCatchEventParseHandler;
@@ -1830,6 +1831,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new SendTaskParseHandler());
         bpmnParserHandlers.add(new SequenceFlowParseHandler());
         bpmnParserHandlers.add(new ServiceTaskParseHandler());
+        bpmnParserHandlers.add(new FormAwareServiceTaskParseHandler());
         bpmnParserHandlers.add(new HttpServiceTaskParseHandler());
         bpmnParserHandlers.add(new SignalEventDefinitionParseHandler());
         bpmnParserHandlers.add(new StartEventParseHandler());

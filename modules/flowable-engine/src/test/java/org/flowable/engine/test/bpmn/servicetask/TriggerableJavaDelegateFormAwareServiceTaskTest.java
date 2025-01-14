@@ -29,13 +29,14 @@ import org.flowable.job.api.Job;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TriggerableJavaDelegateServiceTaskTest extends PluggableFlowableTestCase {
+public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFlowableTestCase {
 
     @BeforeEach
     public void setUp() throws Exception {
         NotLeavingFutureJavaDelegateServiceTask.count = 0;
         LeavingFutureJavaDelegateServiceTask.count = 0;
     }
+
 
     @Test
     @Deployment
@@ -57,7 +58,7 @@ public class TriggerableJavaDelegateServiceTaskTest extends PluggableFlowableTes
     }
 
     @Test
-    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableJavaDelegateServiceTaskTest.testClassDelegateTriggerException.bpmn20.xml")
+    @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableJavaDelegateFormAwareServiceTaskTest.testClassDelegateTriggerException.bpmn20.xml")
     public void classDelegateTriggerBpmnException() {
         String processId = runtimeService.startProcessInstanceByKey("process").getProcessInstanceId();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();

@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.parser.handler;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,12 +28,12 @@ import org.flowable.cmmn.model.SendEventServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 
 /**
- * @author Joram Barrez
+ * @author Christopher Welsch
  */
-public class ServiceTaskParseHandler extends AbstractServiceTaskParseHandler<ServiceTask> {
+public class FormAwareServiceTaskParseHandler extends AbstractServiceTaskParseHandler<FormAwareServiceTask> {
 
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
-        return Set.of(ServiceTask.class);
+        return Set.of(FormAwareServiceTask.class);
     }
 }

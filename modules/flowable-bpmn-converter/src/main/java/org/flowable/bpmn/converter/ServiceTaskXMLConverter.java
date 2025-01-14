@@ -41,6 +41,7 @@ import org.flowable.bpmn.model.CustomProperty;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
+import org.flowable.bpmn.model.FormAwareServiceTask;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SendEventServiceTask;
@@ -130,7 +131,19 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask = new ExternalWorkerServiceTask();
             
         } else {
-            serviceTask = new ServiceTask();
+            String formKey = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FORMKEY, xtr);
+            if (StringUtils.isNotEmpty(formKey)) {
+                FormAwareServiceTask formAwareServiceTask = new FormAwareServiceTask();
+                formAwareServiceTask.setFormKey(formKey);
+
+                String formFieldValidation = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FIELD_VALIDATION, xtr);
+                if (StringUtils.isNotEmpty(formFieldValidation)) {
+                    formAwareServiceTask.setValidateFormFields(formFieldValidation);
+                }
+                serviceTask = formAwareServiceTask;
+            } else {
+                serviceTask = new ServiceTask();
+            }
         }
         
         BpmnXMLUtil.addXMLLocation(serviceTask, xtr);
@@ -179,7 +192,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else {
             parseChildElements(getXMLElementName(), serviceTask, model, xtr);
         }
-
         return serviceTask;
     }
 
@@ -198,6 +210,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             writeHttpServiceTaskAdditionalAttributes((HttpServiceTask) element, model, xtw);
             
         } else {
+            if (element instanceof FormAwareServiceTask formAwareServiceTask) {
+                writeFormAwareServiceTaskAdditionalAttributes(formAwareServiceTask, xtw);
+            }
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
         }
     }
@@ -271,6 +286,16 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
 
         writeServiceTaskAdditionalAttributes(httpServiceTask, xtw);
+    }
+
+    protected void writeFormAwareServiceTaskAdditionalAttributes(FormAwareServiceTask formAwareServiceTask, XMLStreamWriter xtw) throws Exception {
+        if (StringUtils.isNotEmpty(formAwareServiceTask.getFormKey())) {
+            writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, formAwareServiceTask.getFormKey(), xtw);
+        }
+
+        if (StringUtils.isNotEmpty(formAwareServiceTask.getValidateFormFields())) {
+            writeQualifiedAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION, formAwareServiceTask.getValidateFormFields(), xtw);
+        }
     }
 
     protected void writeServiceTaskAdditionalAttributes(ServiceTask element, XMLStreamWriter xtw) throws Exception {
