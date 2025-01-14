@@ -146,17 +146,23 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         } else if (planItem.getPlanItemDefinition() instanceof Stage) {
 
             if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity, null);
-                if (criteriaChangeOrActiveChildrenForStage) {
-                    evaluationResult.markCriteriaChanged();
-                    planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
-                } else {
-                    Stage stage = (Stage) planItem.getPlanItemDefinition();
-                    if (isStageCompletable(planItemInstanceEntity, stage)) {
+
+                if (!planItemInstanceEntity.isStateChangeUnprocessed()) { // when the stage plan item instance state is not stable yet, don't evaluate yet
+                    boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity, null);
+                    if (criteriaChangeOrActiveChildrenForStage) {
                         evaluationResult.markCriteriaChanged();
-                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
+                    } else {
+                        Stage stage = (Stage) planItem.getPlanItemDefinition();
+                        if (isStageCompletable(planItemInstanceEntity, stage)) {
+                            evaluationResult.markCriteriaChanged();
+                            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        }
                     }
+                } else {
+                    planItemInstanceEntity.setCompletable(false);
                 }
+
             }
         } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
             // check, if the plan item can be ignored for further processing and if so, immediately return

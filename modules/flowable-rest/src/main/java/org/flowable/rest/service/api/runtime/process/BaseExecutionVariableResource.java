@@ -20,8 +20,6 @@ import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -39,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -99,7 +99,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
         }
     }
 
-    protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, Execution execution, boolean isNew) {
+    protected RestVariable setBinaryVariable(MultipartHttpServletRequest request, Execution execution, boolean isNew, boolean async) {
 
         // Validate input and set defaults
         if (request.getFileMap().size() == 0) {
@@ -157,21 +157,28 @@ public class BaseExecutionVariableResource implements InitializingBean {
             if (variableType.equals(RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE)) {
                 // Use raw bytes as variable value
                 byte[] variableBytes = IOUtils.toByteArray(file.getInputStream());
-                setVariable(execution, variableName, variableBytes, scope, isNew);
+                setVariable(execution, variableName, variableBytes, scope, isNew, async);
 
             } else if (isSerializableVariableAllowed) {
                 // Try deserializing the object
                 ObjectInputStream stream = new ObjectInputStream(file.getInputStream());
                 Object value = stream.readObject();
-                setVariable(execution, variableName, value, scope, isNew);
+                setVariable(execution, variableName, value, scope, isNew, async);
                 stream.close();
+                
             } else {
                 throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
             }
 
-            RestVariable variable = getVariableFromRequestWithoutAccessCheck(execution, variableName, scope, false);
-            // We are setting the scope because the fetched variable does not have it
-            variable.setVariableScope(scope);
+            RestVariable variable = null;
+            
+            if (!async) {
+                variable = getVariableFromRequestWithoutAccessCheck(execution, variableName, scope, false);
+                
+                // We are setting the scope because the fetched variable does not have it
+                variable.setVariableScope(scope);
+            }
+            
             return variable;
 
         } catch (IOException ioe) {
@@ -182,24 +189,29 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     }
 
-    protected RestVariable setSimpleVariable(RestVariable restVariable, Execution execution, boolean isNew) {
+    protected RestVariable setSimpleVariable(RestVariable restVariable, Execution execution, boolean isNew, boolean async) {
         if (restVariable.getName() == null) {
             throw new FlowableIllegalArgumentException("Variable name is required");
         }
 
-        // Figure out scope, revert to local is omitted
+        // Figure out scope, revert to local if omitted
         RestVariableScope scope = restVariable.getVariableScope();
         if (scope == null) {
             scope = RestVariableScope.LOCAL;
         }
 
         Object actualVariableValue = restResponseFactory.getVariableValue(restVariable);
-        setVariable(execution, restVariable.getName(), actualVariableValue, scope, isNew);
+        setVariable(execution, restVariable.getName(), actualVariableValue, scope, isNew, async);
 
-        return getVariableFromRequestWithoutAccessCheck(execution, restVariable.getName(), scope, false);
+        RestVariable newRestVariable = null;
+        if (!async) {
+            newRestVariable = getVariableFromRequestWithoutAccessCheck(execution, restVariable.getName(), scope, false);
+        }
+        
+        return newRestVariable;
     }
 
-    protected void setVariable(Execution execution, String name, Object value, RestVariableScope scope, boolean isNew) {
+    protected void setVariable(Execution execution, String name, Object value, RestVariableScope scope, boolean isNew, boolean async) {
         // Create can only be done on new variables. Existing variables should
         // be updated using PUT
         boolean hasVariable = hasVariableOnScope(execution, name, scope);
@@ -220,12 +232,24 @@ public class BaseExecutionVariableResource implements InitializingBean {
         }
 
         if (scope == RestVariableScope.LOCAL) {
-            runtimeService.setVariableLocal(execution.getId(), name, value);
-        } else {
-            if (execution.getParentId() != null) {
-                runtimeService.setVariable(execution.getParentId(), name, value);
+            if (async) {
+                runtimeService.setVariableLocalAsync(execution.getId(), name, value);
             } else {
-                runtimeService.setVariable(execution.getId(), name, value);
+                runtimeService.setVariableLocal(execution.getId(), name, value);
+            }
+        } else {
+            String executionId = null;
+            if (execution.getParentId() != null) {
+                executionId = execution.getParentId();
+                
+            } else {
+                executionId = execution.getId();
+            }
+            
+            if (async) {
+                runtimeService.setVariableAsync(executionId, name, value);
+            } else {
+                runtimeService.setVariable(executionId, name, value);
             }
         }
     }

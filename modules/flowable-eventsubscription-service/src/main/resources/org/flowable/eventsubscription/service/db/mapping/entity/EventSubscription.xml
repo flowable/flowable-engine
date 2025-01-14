@@ -13,25 +13,25 @@
     when none of the values in the discriminator match.
   -->
   <resultMap id="eventSubscriptionResultMap" type="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="eventType" column="EVENT_TYPE_" jdbcType="VARCHAR" />
-    <result property="eventName" column="EVENT_NAME_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="eventType" column="EVENT_TYPE_" jdbcType="NVARCHAR" />
+    <result property="eventName" column="EVENT_NAME_" jdbcType="NVARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="activityId" column="ACTIVITY_ID_" jdbcType="NVARCHAR" />
+    <result property="configuration" column="CONFIGURATION_" jdbcType="NVARCHAR" />
     <result property="created" column="CREATED_" jdbcType="TIMESTAMP" />   
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR" />
-    <result property="scopeDefinitionKey" column="SCOPE_DEFINITION_KEY_" jdbcType="VARCHAR" />
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR" />
+    <result property="scopeDefinitionKey" column="SCOPE_DEFINITION_KEY_" jdbcType="NVARCHAR" />
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
-    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <discriminator javaType="string" column="EVENT_TYPE_">
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <discriminator javaType="string" column="EVENT_TYPE_" jdbcType="NVARCHAR">
       <case value="message" resultMap="messageResultMap"/> 
       <case value="signal" resultMap="signalResultMap"/> 
       <case value="compensate" resultMap="compensateResultMap"/>
@@ -45,7 +45,7 @@
   <!-- SELECT -->  
 
   <select id="selectEventSubscription" parameterType="string" resultMap="eventSubscriptionResultMap">
-    select * from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectEventSubscriptionByQueryCriteria" parameterType="org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl" resultMap="eventSubscriptionResultMap">
@@ -65,78 +65,78 @@
     from ${prefix}ACT_RU_EVENT_SUBSCR RES
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="eventType != null">
-        and RES.EVENT_TYPE_ = #{eventType}
+        and RES.EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR}
       </if>
       <if test="eventName != null">
-        and RES.EVENT_NAME_ = #{eventName}
+        and RES.EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+        and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
+        and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="withoutProcessInstanceId">
         and RES.PROC_INST_ID_ IS NULL
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and RES.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="withoutProcessDefinitionId">
         and RES.PROC_DEF_ID_ IS NULL
       </if>
       <if test="activityId != null">
-        and RES.ACTIVITY_ID_ = #{activityId}
+        and RES.ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR}
       </if>
       <if test="subScopeId != null">
-        and RES.SUB_SCOPE_ID_ = #{subScopeId}
+        and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
       </if>
       <if test="scopeId != null">
-        and RES.SCOPE_ID_ = #{scopeId}
+        and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
       </if>
       <if test="withoutScopeId">
         and RES.SCOPE_ID_ IS NULL
       </if>
       <if test="scopeDefinitionId != null">
-        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="withoutScopeDefinitionId">
         and RES.SCOPE_DEFINITION_ID_ IS NULL
       </if>
       <if test="scopeDefinitionKey != null">
-        and RES.SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey}
+        and RES.SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR}
       </if>
       <if test="scopeType != null">
-        and RES.SCOPE_TYPE_ = #{scopeType}
+        and RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
       </if>
       <if test="createdBefore != null">
-		and RES.CREATED_ &lt; #{createdBefore}
+		and RES.CREATED_ &lt; #{createdBefore, jdbcType=TIMESTAMP}
 	  </if>
 	  <if test="createdAfter != null">
-		and RES.CREATED_ &gt; #{createdAfter}
+		and RES.CREATED_ &gt; #{createdAfter, jdbcType=TIMESTAMP}
 	  </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="tenantIds != null and !tenantIds.empty">
         and RES.TENANT_ID_ in
-        <foreach item="item" index="index" collection="tenantIds" open="(" separator="," close=")">
-            #{item}
+        <foreach item="tenantId" index="index" collection="tenantIds" open="(" separator="," close=")">
+            #{tenantId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>        
       <if test="configuration != null">
-          and RES.CONFIGURATION_ = #{configuration}
+          and RES.CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR}
       </if>
       <if test="configurations != null and !configurations.empty">
           and RES.CONFIGURATION_ in
-          <foreach item="item" index="index" collection="configurations" open="(" separator="," close=")">
-              #{item}
+          <foreach item="configuration" index="index" collection="configurations" open="(" separator="," close=")">
+              #{configuration, jdbcType=NVARCHAR}
           </foreach>
       </if>
       <if test="withoutConfiguration">
@@ -146,78 +146,78 @@
           and
           <trim prefix="(" prefixOverrides="OR" suffix=")">
               <if test="orQueryObject.id != null">
-                  RES.ID_ = #{orQueryObject.id}
+                  RES.ID_ = #{orQueryObject.id, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.eventType != null">
-                  or RES.EVENT_TYPE_ = #{orQueryObject.eventType}
+                  or RES.EVENT_TYPE_ = #{orQueryObject.eventType, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.eventName != null">
-                  or RES.EVENT_NAME_ = #{orQueryObject.eventName}
+                  or RES.EVENT_NAME_ = #{orQueryObject.eventName, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.executionId != null">
-                  or RES.EXECUTION_ID_ = #{orQueryObject.executionId}
+                  or RES.EXECUTION_ID_ = #{orQueryObject.executionId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.processInstanceId != null">
-                  or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
+                  or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.withoutProcessInstanceId">
                   or RES.PROC_INST_ID_ IS NULL
               </if>
               <if test="orQueryObject.processDefinitionId != null">
-                  or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId}
+                  or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.withoutProcessDefinitionId">
                   or RES.PROC_DEF_ID_ IS NULL
               </if>
               <if test="orQueryObject.activityId != null">
-                  or RES.ACTIVITY_ID_ = #{orQueryObject.activityId}
+                  or RES.ACTIVITY_ID_ = #{orQueryObject.activityId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.subScopeId != null">
-                  or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+                  or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.scopeId != null">
-                  or RES.SCOPE_ID_ = #{orQueryObject.scopeId}
+                  or RES.SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.withoutScopeId">
                   or RES.SCOPE_ID_ IS NULL
               </if>
               <if test="orQueryObject.scopeDefinitionId != null">
-                  or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
+                  or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.withoutScopeDefinitionId">
                   or RES.SCOPE_DEFINITION_ID_ IS NULL
               </if>
               <if test="orQueryObject.scopeDefinitionKey != null">
-                  or RES.SCOPE_DEFINITION_KEY_ = #{orQueryObject.scopeDefinitionKey}
+                  or RES.SCOPE_DEFINITION_KEY_ = #{orQueryObject.scopeDefinitionKey, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.scopeType != null">
-                  or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
+                  or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.createdBefore != null">
-                  or RES.CREATED_ &lt; #{orQueryObject.createdBefore}
+                  or RES.CREATED_ &lt; #{orQueryObject.createdBefore, jdbcType=TIMESTAMP}
               </if>
               <if test="orQueryObject.createdAfter != null">
-                  or RES.CREATED_ &gt; #{orQueryObject.createdAfter}
+                  or RES.CREATED_ &gt; #{orQueryObject.createdAfter, jdbcType=TIMESTAMP}
               </if>
               <if test="orQueryObject.tenantId != null">
-                  or RES.TENANT_ID_ = #{orQueryObject.tenantId}
+                  or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.tenantIds != null and !orQueryObject.tenantIds.empty">
                   or RES.TENANT_ID_ in
-                  <foreach item="item" index="index" collection="orQueryObject.tenantIds" open="(" separator="," close=")">
-                      #{item}
+                  <foreach item="tenantId" index="index" collection="orQueryObject.tenantIds" open="(" separator="," close=")">
+                      #{tenantId, jdbcType=NVARCHAR}
                   </foreach>
               </if>
               <if test="orQueryObject.withoutTenantId">
                   or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
               </if>
               <if test="orQueryObject.configuration != null">
-                  or RES.CONFIGURATION_ = #{orQueryObject.configuration}
+                  or RES.CONFIGURATION_ = #{orQueryObject.configuration, jdbcType=NVARCHAR}
               </if>
               <if test="orQueryObject.configurations != null and !orQueryObject.configurations.empty">
                   or RES.CONFIGURATION_ in
-                  <foreach item="item" index="index" collection="orQueryObject.configurations" open="(" separator="," close=")">
-                      #{item}
+                  <foreach item="configuration" index="index" collection="orQueryObject.configurations" open="(" separator="," close=")">
+                      #{configuration, jdbcType=NVARCHAR}
                   </foreach>
               </if>
               <if test="orQueryObject.withoutConfiguration">
@@ -232,8 +232,8 @@
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'message')
-        and EVENT_NAME_ = #{parameter.eventName}  
-        and PROC_INST_ID_ = #{parameter.processInstanceId}
+        and EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR}  
+        and PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectSignalEventSubscriptionsByEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
@@ -241,14 +241,14 @@
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     left outer join ${prefix}ACT_RU_EXECUTION EXC on EVT.EXECUTION_ID_ = EXC.ID_
     where EVENT_TYPE_ = 'signal'
-      and EVENT_NAME_ = #{parameter.eventName}
+      and EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR}
       and (
        (EVT.EXECUTION_ID_ is null) 
        or 
        (EVT.EXECUTION_ID_ is not null AND EXC.SUSPENSION_STATE_ = 1) 
       )
     <if test="parameter.tenantId != null">
-        and EVT.TENANT_ID_ = #{parameter.tenantId}
+        and EVT.TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
     </if>  
     <if test="parameter.tenantId == null">
         and (EVT.TENANT_ID_ = '' or EVT.TENANT_ID_ is null)
@@ -259,67 +259,67 @@
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'signal')
-        and EVENT_NAME_ = #{parameter.eventName}  
-        and PROC_INST_ID_ = #{parameter.processInstanceId}
+        and EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR}  
+        and PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectSignalEventSubscriptionsByScopeAndEventName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR EVT
     where (EVENT_TYPE_ = 'signal')
-        and EVENT_NAME_ = #{parameter.eventName}  
-        and SCOPE_ID_ = #{parameter.scopeId}
-        and SCOPE_TYPE_ = #{parameter.scopeType}
+        and EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR}  
+        and SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR}
+        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
   </select> 
   
   <select id="selectSignalEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'signal')
-    	and (EXECUTION_ID_ = #{parameter.executionId})
-    	and (EVENT_NAME_ = #{parameter.eventName})
+    	and (EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR})
+    	and (EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EXECUTION_ID_ = #{parameter})
+    where (EXECUTION_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
       
   <select id="selectEventSubscriptionsByExecutionAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (EXECUTION_ID_ = #{parameter.executionId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByProcessInstanceAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (PROC_INST_ID_ = #{parameter.processInstanceId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByExecutionTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (EXECUTION_ID_ = #{parameter.executionId})
-    	and (ACTIVITY_ID_ = #{parameter.activityId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR})
+    	and (ACTIVITY_ID_ = #{parameter.activityId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByProcessInstanceTypeAndActivity" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (PROC_INST_ID_ = #{parameter.processInstanceId})
-    	and (ACTIVITY_ID_ = #{parameter.activityId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR})
+    	and (ACTIVITY_ID_ = #{parameter.activityId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsBySubScopeId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (SUB_SCOPE_ID_ = #{parameter})
+    where (SUB_SCOPE_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
@@ -327,13 +327,13 @@
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>
       <if test="parameter.eventType != null">
-        (EVENT_TYPE_ = #{parameter.eventType})
+        (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
       </if>
-        and PROC_DEF_ID_ = #{parameter.processDefinitionId}
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=NVARCHAR}
         and EXECUTION_ID_ is null 
         and PROC_INST_ID_ is null
        <if test="parameter.tenantId != null">
-          and TENANT_ID_ = #{parameter.tenantId}
+          and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
       </if>  
       <if test="parameter.tenantId == null">
           and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -344,17 +344,17 @@
   <select id="selectEventSubscriptionsByScopeIdAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (SCOPE_ID_ = #{parameter.scopeId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectEventSubscriptionsByName" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (EVENT_NAME_ = #{parameter.eventName})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR})
     <if test="parameter.tenantId != null">
-        and TENANT_ID_ = #{parameter.tenantId}
+        and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
     </if>  
     <if test="parameter.tenantId == null">
         and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -364,19 +364,19 @@
   <select id="selectEventSubscriptionsByNameAndExecution" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
-    where (EVENT_TYPE_ = #{parameter.eventType})
-    	and (EVENT_NAME_ = #{parameter.eventName})
-    	and (EXECUTION_ID_ = #{parameter.executionId})
+    where (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
+    	and (EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR})
+    	and (EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR})
   </select>
   
    <select id="selectMessageStartEventSubscriptionByName" resultMap="eventSubscriptionResultMap" parameterType="map">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     where (EVENT_TYPE_ = 'message')
-    	and (EVENT_NAME_ = #{eventName})
+    	and (EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR})
     	and EXECUTION_ID_ is null
     <if test="tenantId != null">
-        and TENANT_ID_ = #{tenantId}
+        and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
     </if>  
     <if test="tenantId == null">
         and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -404,21 +404,21 @@
             SCOPE_TYPE_,
            	TENANT_ID_
     )
-    values (#{id, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
             1, 'message',
-            #{eventName, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{activityId, jdbcType=VARCHAR},
-            #{configuration, jdbcType=VARCHAR},
+            #{eventName, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{activityId, jdbcType=NVARCHAR},
+            #{configuration, jdbcType=NVARCHAR},
             #{created, jdbcType=TIMESTAMP},
-            #{processDefinitionId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{scopeDefinitionKey, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}
+            #{processDefinitionId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
+            #{scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{tenantId, jdbcType=NVARCHAR}
     )
   </insert>
   
@@ -443,21 +443,21 @@
     )
     values 
       <foreach collection="list" item="messageEventSubscription" index="index" separator=",">
-          (#{messageEventSubscription.id, jdbcType=VARCHAR},
-           1, #{messageEventSubscription.eventType, jdbcType=VARCHAR},
-           #{messageEventSubscription.eventName, jdbcType=VARCHAR},
-           #{messageEventSubscription.executionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.processInstanceId, jdbcType=VARCHAR},
-           #{messageEventSubscription.activityId, jdbcType=VARCHAR},
-           #{messageEventSubscription.configuration, jdbcType=VARCHAR},
+          (#{messageEventSubscription.id, jdbcType=NVARCHAR},
+           1, #{messageEventSubscription.eventType, jdbcType=NVARCHAR},
+           #{messageEventSubscription.eventName, jdbcType=NVARCHAR},
+           #{messageEventSubscription.executionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.activityId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.configuration, jdbcType=NVARCHAR},
            #{messageEventSubscription.created, jdbcType=TIMESTAMP},
-           #{messageEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
-           #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
+           #{messageEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.subScopeId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeType, jdbcType=NVARCHAR},
+           #{messageEventSubscription.tenantId, jdbcType=NVARCHAR})
       </foreach>
   </insert>
   
@@ -482,21 +482,21 @@
             SCOPE_TYPE_,
             TENANT_ID_
           ) VALUES 
-          (#{messageEventSubscription.id, jdbcType=VARCHAR},
-           1, #{messageEventSubscription.eventType, jdbcType=VARCHAR},
-           #{messageEventSubscription.eventName, jdbcType=VARCHAR},
-           #{messageEventSubscription.executionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.processInstanceId, jdbcType=VARCHAR},
-           #{messageEventSubscription.activityId, jdbcType=VARCHAR},
-           #{messageEventSubscription.configuration, jdbcType=VARCHAR},
+          (#{messageEventSubscription.id, jdbcType=NVARCHAR},
+           1, #{messageEventSubscription.eventType, jdbcType=NVARCHAR},
+           #{messageEventSubscription.eventName, jdbcType=NVARCHAR},
+           #{messageEventSubscription.executionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.activityId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.configuration, jdbcType=NVARCHAR},
            #{messageEventSubscription.created, jdbcType=TIMESTAMP},
-           #{messageEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.subScopeId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-           #{messageEventSubscription.scopeType, jdbcType=VARCHAR},
-           #{messageEventSubscription.tenantId, jdbcType=VARCHAR})
+           #{messageEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.subScopeId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+           #{messageEventSubscription.scopeType, jdbcType=NVARCHAR},
+           #{messageEventSubscription.tenantId, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -508,52 +508,52 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
+           EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+           EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+           ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
-           CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
+           CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR},  
       </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.processDefinitionId != processDefinitionId">
-           PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+           PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.subScopeId != subScopeId">
-           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeId != scopeId">
-           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+           SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
-           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
-           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+           SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.lockOwner != lockOwner">
-           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+           LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.lockTime != lockTime">
            LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-           TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+           TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
       </if>
     </set>
-    where ID_= #{id, jdbcType=VARCHAR}
+    where ID_= #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
@@ -578,21 +578,21 @@
             SCOPE_TYPE_,
            	TENANT_ID_
     )
-    values (#{id, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
             1, 'signal',
-            #{eventName, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{activityId, jdbcType=VARCHAR},
-            #{configuration, jdbcType=VARCHAR},
+            #{eventName, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{activityId, jdbcType=NVARCHAR},
+            #{configuration, jdbcType=NVARCHAR},
             #{created, jdbcType=TIMESTAMP},
-            #{processDefinitionId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{scopeDefinitionKey, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}         
+            #{processDefinitionId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
+            #{scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{tenantId, jdbcType=NVARCHAR}         
     )
   </insert>
   
@@ -617,21 +617,21 @@
     )
     values 
       <foreach collection="list" item="signalEventSubscription" index="index" separator=",">
-        (#{signalEventSubscription.id, jdbcType=VARCHAR},
-         1, #{signalEventSubscription.eventType, jdbcType=VARCHAR},
-         #{signalEventSubscription.eventName, jdbcType=VARCHAR},
-         #{signalEventSubscription.executionId, jdbcType=VARCHAR},
-         #{signalEventSubscription.processInstanceId, jdbcType=VARCHAR},
-         #{signalEventSubscription.activityId, jdbcType=VARCHAR},
-         #{signalEventSubscription.configuration, jdbcType=VARCHAR},
+        (#{signalEventSubscription.id, jdbcType=NVARCHAR},
+         1, #{signalEventSubscription.eventType, jdbcType=NVARCHAR},
+         #{signalEventSubscription.eventName, jdbcType=NVARCHAR},
+         #{signalEventSubscription.executionId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.activityId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.configuration, jdbcType=NVARCHAR},
          #{signalEventSubscription.created, jdbcType=TIMESTAMP},
-         #{signalEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-         #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
-         #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
-         #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-         #{signalEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-         #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
-         #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
+         #{signalEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.subScopeId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.scopeId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+         #{signalEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+         #{signalEventSubscription.scopeType, jdbcType=NVARCHAR},
+         #{signalEventSubscription.tenantId, jdbcType=NVARCHAR})
      </foreach>
   </insert>
 
@@ -657,21 +657,21 @@
           TENANT_ID_
           )
           VALUES 
-          (#{signalEventSubscription.id, jdbcType=VARCHAR},
-           1, #{signalEventSubscription.eventType, jdbcType=VARCHAR},
-           #{signalEventSubscription.eventName, jdbcType=VARCHAR},
-           #{signalEventSubscription.executionId, jdbcType=VARCHAR},
-           #{signalEventSubscription.processInstanceId, jdbcType=VARCHAR},
-           #{signalEventSubscription.activityId, jdbcType=VARCHAR},
-           #{signalEventSubscription.configuration, jdbcType=VARCHAR},
+          (#{signalEventSubscription.id, jdbcType=NVARCHAR},
+           1, #{signalEventSubscription.eventType, jdbcType=NVARCHAR},
+           #{signalEventSubscription.eventName, jdbcType=NVARCHAR},
+           #{signalEventSubscription.executionId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.activityId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.configuration, jdbcType=NVARCHAR},
            #{signalEventSubscription.created, jdbcType=TIMESTAMP},
-           #{signalEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-           #{signalEventSubscription.subScopeId, jdbcType=VARCHAR},
-           #{signalEventSubscription.scopeId, jdbcType=VARCHAR},
-           #{signalEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-           #{signalEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-           #{signalEventSubscription.scopeType, jdbcType=VARCHAR},
-           #{signalEventSubscription.tenantId, jdbcType=VARCHAR})
+           #{signalEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.subScopeId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.scopeId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+           #{signalEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+           #{signalEventSubscription.scopeType, jdbcType=NVARCHAR},
+           #{signalEventSubscription.tenantId, jdbcType=NVARCHAR})
      </foreach>
     SELECT * FROM dual
   </insert>
@@ -683,49 +683,49 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
+           EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+           EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+           ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
-           CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
+           CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR},  
       </if>
       <if test="originalPersistentState.subScopeId != subScopeId">
-           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeId != scopeId">
-           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+           SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
-           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
-           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+           SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.lockOwner != lockOwner">
-           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+           LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.lockTime != lockTime">
            LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-           TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+           TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
     </set>
-    where ID_= #{id, jdbcType=VARCHAR}
+    where ID_= #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
@@ -750,21 +750,21 @@
             SCOPE_TYPE_,
            	TENANT_ID_
     )
-    values (#{id, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
             1, 'compensate',
-            #{eventName, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{activityId, jdbcType=VARCHAR},
-            #{configuration, jdbcType=VARCHAR},
+            #{eventName, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{activityId, jdbcType=NVARCHAR},
+            #{configuration, jdbcType=NVARCHAR},
             #{created, jdbcType=TIMESTAMP},
-            #{processDefinitionId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{scopeDefinitionKey, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}
+            #{processDefinitionId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
+            #{scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{tenantId, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -789,21 +789,21 @@
     )
     values 
       <foreach collection="list" item="compensateEventSubscription" index="index" separator=",">
-        (#{compensateEventSubscription.id, jdbcType=VARCHAR},
-         1, #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
-         #{compensateEventSubscription.eventName, jdbcType=VARCHAR},
-         #{compensateEventSubscription.executionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.processInstanceId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.activityId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.configuration, jdbcType=VARCHAR},
+        (#{compensateEventSubscription.id, jdbcType=NVARCHAR},
+         1, #{compensateEventSubscription.eventType, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.eventName, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.executionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.activityId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.configuration, jdbcType=NVARCHAR},
          #{compensateEventSubscription.created, jdbcType=TIMESTAMP},
-         #{compensateEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
-         #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
+         #{compensateEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.subScopeId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeType, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.tenantId, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -829,21 +829,21 @@
           TENANT_ID_
         )
         VALUES
-        (#{compensateEventSubscription.id, jdbcType=VARCHAR},
-         1, #{compensateEventSubscription.eventType, jdbcType=VARCHAR},
-         #{compensateEventSubscription.eventName, jdbcType=VARCHAR},
-         #{compensateEventSubscription.executionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.processInstanceId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.activityId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.configuration, jdbcType=VARCHAR},
+        (#{compensateEventSubscription.id, jdbcType=NVARCHAR},
+         1, #{compensateEventSubscription.eventType, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.eventName, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.executionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.processInstanceId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.activityId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.configuration, jdbcType=NVARCHAR},
          #{compensateEventSubscription.created, jdbcType=TIMESTAMP},
-         #{compensateEventSubscription.processDefinitionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.subScopeId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-         #{compensateEventSubscription.scopeType, jdbcType=VARCHAR},
-         #{compensateEventSubscription.tenantId, jdbcType=VARCHAR})
+         #{compensateEventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.subScopeId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.scopeType, jdbcType=NVARCHAR},
+         #{compensateEventSubscription.tenantId, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -855,49 +855,49 @@
     <set>
        REV_ =  #{revisionNext, jdbcType=INTEGER},
        <if test="originalPersistentState.eventName != eventName">
-           EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
+           EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.executionId != executionId">
-           EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+           EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.processInstanceId != processInstanceId">
-           PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+           PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.activityId != activityId">
-           ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+           ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.configuration != configuration">
-           CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},  
+           CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR},  
       </if>
       <if test="originalPersistentState.subScopeId != subScopeId">
-           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+           SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeId != scopeId">
-           SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+           SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
-           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+           SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.scopeType != scopeType">
-           SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+           SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.created != created">
            CREATED_ = #{created, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.lockOwner != lockOwner">
-           LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+           LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.lockTime != lockTime">
            LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-           TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+           TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
     </set>
-    where ID_= #{id, jdbcType=VARCHAR}
+    where ID_= #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
@@ -922,21 +922,21 @@
             SCOPE_TYPE_,
            	TENANT_ID_
     )
-    values (#{id, jdbcType=VARCHAR},
-            1, #{eventType, jdbcType=VARCHAR},
-            #{eventName, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{activityId, jdbcType=VARCHAR},
-            #{configuration, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
+            1, #{eventType, jdbcType=NVARCHAR},
+            #{eventName, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{activityId, jdbcType=NVARCHAR},
+            #{configuration, jdbcType=NVARCHAR},
             #{created, jdbcType=TIMESTAMP},
-            #{processDefinitionId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{scopeDefinitionKey, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{tenantId, jdbcType=VARCHAR}
+            #{processDefinitionId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
+            #{scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{tenantId, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -961,21 +961,21 @@
         )
         values
         <foreach collection="list" item="eventSubscription" index="index" separator=",">
-            (#{eventSubscription.id, jdbcType=VARCHAR},
-            1, #{eventSubscription.eventType, jdbcType=VARCHAR},
-            #{eventSubscription.eventName, jdbcType=VARCHAR},
-            #{eventSubscription.executionId, jdbcType=VARCHAR},
-            #{eventSubscription.processInstanceId, jdbcType=VARCHAR},
-            #{eventSubscription.activityId, jdbcType=VARCHAR},
-            #{eventSubscription.configuration, jdbcType=VARCHAR},
+            (#{eventSubscription.id, jdbcType=NVARCHAR},
+            1, #{eventSubscription.eventType, jdbcType=NVARCHAR},
+            #{eventSubscription.eventName, jdbcType=NVARCHAR},
+            #{eventSubscription.executionId, jdbcType=NVARCHAR},
+            #{eventSubscription.processInstanceId, jdbcType=NVARCHAR},
+            #{eventSubscription.activityId, jdbcType=NVARCHAR},
+            #{eventSubscription.configuration, jdbcType=NVARCHAR},
             #{eventSubscription.created, jdbcType=TIMESTAMP},
-            #{eventSubscription.processDefinitionId, jdbcType=VARCHAR},
-            #{eventSubscription.subScopeId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-            #{eventSubscription.scopeType, jdbcType=VARCHAR},
-            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+            #{eventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+            #{eventSubscription.subScopeId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeType, jdbcType=NVARCHAR},
+            #{eventSubscription.tenantId, jdbcType=NVARCHAR})
         </foreach>
     </insert>
 
@@ -1001,21 +1001,21 @@
             TENANT_ID_
             )
             VALUES
-            (#{eventSubscription.id, jdbcType=VARCHAR},
-            1, #{eventSubscription.eventType, jdbcType=VARCHAR},
-            #{eventSubscription.eventName, jdbcType=VARCHAR},
-            #{eventSubscription.executionId, jdbcType=VARCHAR},
-            #{eventSubscription.processInstanceId, jdbcType=VARCHAR},
-            #{eventSubscription.activityId, jdbcType=VARCHAR},
-            #{eventSubscription.configuration, jdbcType=VARCHAR},
+            (#{eventSubscription.id, jdbcType=NVARCHAR},
+            1, #{eventSubscription.eventType, jdbcType=NVARCHAR},
+            #{eventSubscription.eventName, jdbcType=NVARCHAR},
+            #{eventSubscription.executionId, jdbcType=NVARCHAR},
+            #{eventSubscription.processInstanceId, jdbcType=NVARCHAR},
+            #{eventSubscription.activityId, jdbcType=NVARCHAR},
+            #{eventSubscription.configuration, jdbcType=NVARCHAR},
             #{eventSubscription.created, jdbcType=TIMESTAMP},
-            #{eventSubscription.processDefinitionId, jdbcType=VARCHAR},
-            #{eventSubscription.subScopeId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeDefinitionId, jdbcType=VARCHAR},
-            #{eventSubscription.scopeDefinitionKey, jdbcType=VARCHAR},
-            #{eventSubscription.scopeType, jdbcType=VARCHAR},
-            #{eventSubscription.tenantId, jdbcType=VARCHAR})
+            #{eventSubscription.processDefinitionId, jdbcType=NVARCHAR},
+            #{eventSubscription.subScopeId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeDefinitionId, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeDefinitionKey, jdbcType=NVARCHAR},
+            #{eventSubscription.scopeType, jdbcType=NVARCHAR},
+            #{eventSubscription.tenantId, jdbcType=NVARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -1027,52 +1027,52 @@
         <set>
             REV_ =  #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.eventName != eventName">
-                EVENT_NAME_ = #{eventName, jdbcType=VARCHAR},
+                EVENT_NAME_ = #{eventName, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.eventType != eventType">
-                EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR},
+                EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.executionId != executionId">
-                EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+                EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.processInstanceId != processInstanceId">
-                PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR},
+                PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.activityId != activityId">
-                ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR},
+                ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.configuration != configuration">
-                CONFIGURATION_ = #{configuration, jdbcType=VARCHAR},
+                CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.subScopeId != subScopeId">
-                SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+                SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeId != scopeId">
-                SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+                SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
-                SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR},
+                SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeDefinitionKey != scopeDefinitionKey">
-                SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR},
+                SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeType != scopeType">
-                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+                SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.created != created">
                 CREATED_ = #{created, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.lockOwner != lockOwner">
-                LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+                LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.lockTime != lockTime">
                 LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+                TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
             </if>
         </set>
-        where ID_= #{id, jdbcType=VARCHAR}
+        where ID_= #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
@@ -1080,36 +1080,36 @@
    <update id="updateTenantIdOfEventSubscriptions" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
     <set>
-      TENANT_ID_ = #{newTenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{newTenantId, jdbcType=NVARCHAR}
     </set>
-    where TENANT_ID_ = #{oldTenantId, jdbcType=VARCHAR}
+    where TENANT_ID_ = #{oldTenantId, jdbcType=NVARCHAR}
   </update>
 
  <!-- process definition id update -->
    <update id="updateManualProcessStartEventSubscriptionWithProcessDefinitionId" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
-    set PROC_DEF_ID_ = #{newProcessDefinitionId, jdbcType=VARCHAR}
-    where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=VARCHAR}
-    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
-    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    set PROC_DEF_ID_ = #{newProcessDefinitionId, jdbcType=NVARCHAR}
+    where PROC_DEF_ID_ = #{oldProcessDefinitionId, jdbcType=NVARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR}
     <if test="scopeDefinitionKey != null">
-        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR}
+        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR}
     </if>
     <if test="configuration != null">
-        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+        and CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR}
     </if>
    </update> <!-- process definition id update -->
 
    <update id="updateManualScopeStartEventSubscriptionWithScopeDefinitionId" parameterType="map">
     update ${prefix}ACT_RU_EVENT_SUBSCR
-    set SCOPE_DEFINITION_ID_ = #{newScopeDefinitionId, jdbcType=VARCHAR}
-    where SCOPE_DEFINITION_ID_ = #{oldScopeDefinitionId, jdbcType=VARCHAR}
-    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    set SCOPE_DEFINITION_ID_ = #{newScopeDefinitionId, jdbcType=NVARCHAR}
+    where SCOPE_DEFINITION_ID_ = #{oldScopeDefinitionId, jdbcType=NVARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR}
     <if test="scopeDefinitionKey != null">
-        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=VARCHAR}
+        and SCOPE_DEFINITION_KEY_ = #{scopeDefinitionKey, jdbcType=NVARCHAR}
     </if>
     <if test="configuration != null">
-        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+        and CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR}
     </if>
    </update>
 
@@ -1117,9 +1117,9 @@
     update ${prefix}ACT_RU_EVENT_SUBSCR
     set
         LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
-        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
-    where ID_ = #{id}
-    and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{currentTime})
+        LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
+    and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{currentTime, jdbcType=TIMESTAMP})
   </update>
 
   <update id="clearEventSubscriptionLockTime" parameterType="java.util.Map">
@@ -1127,70 +1127,70 @@
     set
         LOCK_TIME_ = null,
         LOCK_OWNER_ = null
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
   </update>
 
   <!-- DELETE -->
 
   <delete id="deleteSignalEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <delete id="deleteCompensateEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <delete id="deleteMessageEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <delete id="deleteGenericEventSubscription" parameterType="org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntityImpl">
-    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_RU_EVENT_SUBSCR where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <delete id="deleteEventSubscriptionsForProcessDefinition" parameterType="string">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR 
-    where PROC_DEF_ID_ = #{processDefinitionId} 
+    where PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR} 
     and EXECUTION_ID_ is null
     and PROC_INST_ID_ is null
   </delete>
   
   <delete id="deleteEventSubscriptionsByExecutionId" parameterType="string">
-     delete from ${prefix}ACT_RU_EVENT_SUBSCR where EXECUTION_ID_ = #{id}
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="deleteEventSubscriptionsForScopeIdAndType" parameterType="map">
-     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndType" parameterType="map">
-     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId} and SCOPE_TYPE_ = #{scopeType}
+     delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId" parameterType="map">
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where
-     SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
-     and SCOPE_TYPE_ = #{scopeType}
+     SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
+     and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
      and SCOPE_ID_ is null
   </delete>
 
  <!-- delete manual subscriptions for process start -->
   <delete id="deleteManualProcessStartEventSubscriptions" parameterType="map">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where
-    PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
-    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
-    and ACTIVITY_ID_ = #{activityId, jdbcType=VARCHAR}
+    PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR}
+    and ACTIVITY_ID_ = #{activityId, jdbcType=NVARCHAR}
     <if test="configuration != null">
-        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+        and CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR}
     </if>
   </delete>
 
   <delete id="deleteManualScopeStartEventSubscriptions" parameterType="map">
     delete from ${prefix}ACT_RU_EVENT_SUBSCR where
-    SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
-    and EVENT_TYPE_ = #{eventType, jdbcType=VARCHAR}
+    SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
+    and EVENT_TYPE_ = #{eventType, jdbcType=NVARCHAR}
     <if test="configuration != null">
-        and CONFIGURATION_ = #{configuration, jdbcType=VARCHAR}
+        and CONFIGURATION_ = #{configuration, jdbcType=NVARCHAR}
     </if>
   </delete>
 

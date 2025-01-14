@@ -1,1 +1,0 @@
-drop table if exists ACT_RU_EVENT_SUBSCR cascade;

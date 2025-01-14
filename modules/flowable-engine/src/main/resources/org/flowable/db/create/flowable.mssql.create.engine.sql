@@ -130,6 +130,7 @@ create table ACT_RU_ACTINST (
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
     ASSIGNEE_ nvarchar(255),
+    COMPLETED_BY_ nvarchar(255),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
@@ -337,7 +338,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.0.1.1', 1);
+values ('schema.version', '7.2.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.0.1.1)', 1);
+values ('schema.history', 'create(7.2.0.0)', 1);

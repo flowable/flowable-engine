@@ -116,6 +116,8 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
     protected List<String> userTaskFormTypes;
     protected List<String> startEventFormTypes;
 
+    protected BpmnXMLConverterOptions options = new BpmnXMLConverterOptions();
+
     protected BpmnEdgeParser bpmnEdgeParser = new BpmnEdgeParser();
     protected BpmnShapeParser bpmnShapeParser = new BpmnShapeParser();
     protected DefinitionsParser definitionsParser = new DefinitionsParser();
@@ -150,6 +152,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         addConverter(new ServiceTaskXMLConverter());
         addConverter(new HttpServiceTaskXMLConverter());
         addConverter(new CaseServiceTaskXMLConverter());
+        addConverter(new FormAwareServiceTaskXMLConverter());
         addConverter(new SendEventServiceTaskXMLConverter());
         addConverter(new ExternalWorkerServiceTaskXMLConverter());
         addConverter(new SendTaskXMLConverter());
@@ -202,6 +205,14 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
     public static void addConverter(BaseBpmnXMLConverter converter, Class<? extends BaseElement> elementType) {
         convertersToBpmnMap.put(converter.getXMLElementName(), converter);
         convertersToXMLMap.put(elementType, converter);
+    }
+
+    public BpmnXMLConverterOptions getBpmnXmlConverterOptions() {
+        return options;
+    }
+
+    public void setBpmnXmlConverterOptions(BpmnXMLConverterOptions options) {
+        this.options = options;
     }
 
     public void setClassloader(ClassLoader classloader) {
@@ -581,7 +592,9 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             xtw.writeAttribute(ATTRIBUTE_ID, subProcess.getId());
             if (StringUtils.isNotEmpty(subProcess.getName())) {
-                xtw.writeAttribute(ATTRIBUTE_NAME, subProcess.getName());
+                if (!(options.isSaveElementNameWithNewLineInExtensionElement() && BpmnXMLUtil.containsNewLine(subProcess.getName()))) {
+                    xtw.writeAttribute(ATTRIBUTE_NAME, subProcess.getName());
+                }
             } else {
                 xtw.writeAttribute(ATTRIBUTE_NAME, "subProcess");
             }
@@ -619,6 +632,10 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
             boolean didWriteExtensionStartElement = FlowableListenerExport.writeListeners(subProcess, false, xtw);
 
+            if (options.isSaveElementNameWithNewLineInExtensionElement()) {
+                didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(subProcess, didWriteExtensionStartElement, xtw);
+            }
+
             didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(subProcess, didWriteExtensionStartElement, model.getNamespaces(), xtw);
             if (didWriteExtensionStartElement) {
                 // closing extensions element
@@ -654,7 +671,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 throw new XMLException("No converter for " + flowElement.getClass() + " found");
             }
 
-            converter.convertToXML(xtw, flowElement, model);
+            converter.convertToXML(xtw, flowElement, model, options);
         }
     }
 
@@ -666,6 +683,6 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             throw new XMLException("No converter for " + artifact.getClass() + " found");
         }
 
-        converter.convertToXML(xtw, artifact, model);
+        converter.convertToXML(xtw, artifact, model, options);
     }
 }

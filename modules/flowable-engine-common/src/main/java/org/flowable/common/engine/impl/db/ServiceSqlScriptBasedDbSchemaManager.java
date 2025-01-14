@@ -23,13 +23,11 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     
     protected String table;
     protected String schemaComponent;
-    protected String schemaComponentHistory;
     protected String schemaVersionProperty;
     
-    public ServiceSqlScriptBasedDbSchemaManager(String table, String schemaComponent, String schemaComponentHistory, String schemaVersionProperty) {
+    public ServiceSqlScriptBasedDbSchemaManager(String table, String schemaComponent, String schemaVersionProperty) {
         this.table = table;
         this.schemaComponent = schemaComponent;
-        this.schemaComponentHistory = schemaComponentHistory;
         this.schemaVersionProperty = schemaVersionProperty;
     }
     
@@ -47,16 +45,14 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
 
     protected void internalDbSchemaCreate() {
         executeMandatorySchemaResource("create", schemaComponent);
-        if (isHistoryUsed()) {
-            executeMandatorySchemaResource("create", schemaComponentHistory);
-        }
     }
 
     @Override
     public void schemaDrop() {
-        executeMandatorySchemaResource("drop", schemaComponent);
-        if (isHistoryUsed()) {
-            executeMandatorySchemaResource("drop", schemaComponentHistory);
+        try {
+            executeMandatorySchemaResource("drop", schemaComponent);
+        } catch (Exception e) {
+            logger.info("Error dropping {} tables", schemaComponent, e);
         }
     }
 
@@ -81,9 +77,6 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
                 dbSchemaUpgrade(schemaComponent, matchingVersionIndex, engineDbVersion);
-                if (isHistoryUsed()) {
-                    dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex, engineDbVersion);
-                }
             }
             
             feedback = "upgraded from " + compareWithVersion + " to " + FlowableVersions.CURRENT_VERSION;
@@ -103,10 +96,6 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
 
     protected boolean isUpdateNeeded() {
         return isTablePresent(table);
-    }
-    
-    protected boolean isHistoryUsed() {
-        return getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed() && schemaComponentHistory != null;
     }
 
     protected String getSchemaVersion() {

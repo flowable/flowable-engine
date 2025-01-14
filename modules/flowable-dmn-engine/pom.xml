@@ -10,16 +10,23 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>7.1.0-SNAPSHOT</version>
+		<version>7.1.1-SNAPSHOT</version>
 	</parent>
 
 	<properties>
 		<flowable.artifact>
 			org.flowable.dmn.engine
 		</flowable.artifact>
+		<flowable.osgi.export.additional>
+            org.flowable.dmn.db.create,
+            org.flowable.dmn.db.upgrade,
+            org.flowable.dmn.db.mapping,
+            org.flowable.dmn.db.mapping.entity,
+        </flowable.osgi.export.additional>
 		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
 		</flowable.osgi.import.additional>
+		<skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 
     <dependencies>
@@ -82,11 +89,6 @@
       	</dependency>
 
         <!-- DATABASE -->
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -236,282 +238,6 @@
                 </plugins>
             </build>
         </profile>
-		<profile>
-			<id>cleanDb</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>drop-idm-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>java</goal>
-								</goals>
-								<configuration>
-									<mainClass>org.flowable.dmn.engine.impl.db.DbSchemaDrop</mainClass>
-									<classpathScope>test</classpathScope>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<!-- database qa profile -->
-		<profile>
-			<id>databasedmn</id>
-			<activation>
-				<property>
-					<name>databasedmn</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="updating flowable dmn configuration to db ${databasedmn}" />
-										<copy file="${basedir}/../../qa/db/flowable.dmn.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasedmn}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${databasedmn}" />
-										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-        
-        <profile>
-            <id>databasemssqldmn</id>
-            <activation>
-                <property>
-                    <name>databasemssqldmn</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>database-test-create-schema</id>
-                                <phase>process-test-classes</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <echo message="updating flowable dmn configuration to db ${databasemssqldmn}" />
-                                        <copy file="${basedir}/../../qa/db/flowable.mssql.dmn.cfg.xml"
-                                            tofile="target/test-classes/flowable.dmn.cfg.xml" overwrite="true">
-                                            <filterset
-                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqldmn}.properties" />
-                                        </copy>
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>database-test-drop-schema</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <echo message="dropping schema in ${databasemssqldmn}" />
-                                        <java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
-                                            classpathref="maven.test.classpath" />
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-		<profile>
-			<id>databasewithschemadmn</id>
-			<activation>
-				<property>
-					<name>databasewithschemadmn</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>database-test-create-schema</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="updating dmn configuration to db ${databasewithschemadmn}" />
-										<copy file="${basedir}/../../qa/db/schema/flowable.dmn.cfg.xml"
-											todir="target/test-classes" overwrite="true">
-											<filterset
-												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemadmn}.properties" />
-										</copy>
-									</tasks>
-								</configuration>
-							</execution>
-							<execution>
-								<id>database-test-drop-schema</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<tasks>
-										<echo message="dropping schema in ${databasewithschemadmn}" />
-										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
-											classpathref="maven.test.classpath" />
-									</tasks>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<profile>
-			<id>oracle</id>
-			<activation>
-				<property>
-					<name>databasedmn</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle.database.jdbc</groupId>
-					<artifactId>${oracle.jdbc.artifact}</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<profile>
-			<id>oraclewithschema</id>
-			<activation>
-				<property>
-					<name>databasewithschemadmn</name>
-					<value>oracle</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.oracle.database.jdbc</groupId>
-					<artifactId>${oracle.jdbc.artifact}</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<profile>
-			<id>db2</id>
-			<activation>
-				<property>
-					<name>databasedmn</name>
-					<value>db2</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-                    <groupId>com.ibm.db2</groupId>
-                    <artifactId>jcc</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<profile>
-			<id>mssql</id>
-			<activation>
-				<property>
-					<name>databasemssqldmn</name>
-					<value>mssql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>net.sourceforge.jtds</groupId>
-					<artifactId>jtds</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<profile>
-			<id>mysql</id>
-			<activation>
-				<property>
-					<name>databasedmn</name>
-					<value>mysql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>com.mysql</groupId>
-					<artifactId>mysql-connector-j</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-
-		<profile>
-			<id>hsql</id>
-			<activation>
-				<property>
-					<name>databasedmn</name>
-					<value>hsql</value>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.hsqldb</groupId>
-					<artifactId>hsqldb</artifactId>
-					<scope>test</scope>
-				</dependency>
-			</dependencies>
-		</profile>
 	</profiles>
 
 </project>

@@ -10,21 +10,21 @@
         insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_)
         values (
-            #{id, jdbcType=VARCHAR},
-            1, #{type, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{taskId, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
+            #{id, jdbcType=NVARCHAR},
+            1, #{type, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{taskId, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
             #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             #{doubleValue, jdbcType=DOUBLE},
             #{longValue, jdbcType=BIGINT},
-            #{textValue, jdbcType=VARCHAR},
-            #{textValue2, jdbcType=VARCHAR},
-            #{metaInfo, jdbcType=VARCHAR}
+            #{textValue, jdbcType=NVARCHAR},
+            #{textValue2, jdbcType=NVARCHAR},
+            #{metaInfo, jdbcType=NVARCHAR}
         )
     </insert>
 
@@ -33,21 +33,21 @@
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_) VALUES
         <foreach collection="list" item="variable" index="index" separator=",">
             (
-                #{variable.id, jdbcType=VARCHAR},
-                1, #{variable.typeName, jdbcType=VARCHAR },
-                #{variable.name, jdbcType=VARCHAR},
-                #{variable.processInstanceId, jdbcType=VARCHAR},
-                #{variable.executionId, jdbcType=VARCHAR},
-                #{variable.taskId, jdbcType=VARCHAR},
-                #{variable.scopeId, jdbcType=VARCHAR},
-                #{variable.subScopeId, jdbcType=VARCHAR},
-                #{variable.scopeType, jdbcType=VARCHAR},
+                #{variable.id, jdbcType=NVARCHAR},
+                1, #{variable.typeName, jdbcType=NVARCHAR },
+                #{variable.name, jdbcType=NVARCHAR},
+                #{variable.processInstanceId, jdbcType=NVARCHAR},
+                #{variable.executionId, jdbcType=NVARCHAR},
+                #{variable.taskId, jdbcType=NVARCHAR},
+                #{variable.scopeId, jdbcType=NVARCHAR},
+                #{variable.subScopeId, jdbcType=NVARCHAR},
+                #{variable.scopeType, jdbcType=NVARCHAR},
                 #{variable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{variable.doubleValue, jdbcType=DOUBLE},
                 #{variable.longValue, jdbcType=BIGINT},
-                #{variable.textValue, jdbcType=VARCHAR},
-                #{variable.textValue2, jdbcType=VARCHAR},
-                #{variable.metaInfo, jdbcType=VARCHAR}
+                #{variable.textValue, jdbcType=NVARCHAR},
+                #{variable.textValue2, jdbcType=NVARCHAR},
+                #{variable.metaInfo, jdbcType=NVARCHAR}
             )
         </foreach>
     </insert>
@@ -58,21 +58,21 @@
             INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_) VALUES
             (
-                #{variable.id, jdbcType=VARCHAR},
-                1, #{variable.typeName, jdbcType=VARCHAR },
-                #{variable.name, jdbcType=VARCHAR},
-                #{variable.processInstanceId, jdbcType=VARCHAR},
-                #{variable.executionId, jdbcType=VARCHAR},
-                #{variable.taskId, jdbcType=VARCHAR},
-                #{variable.scopeId, jdbcType=VARCHAR},
-                #{variable.subScopeId, jdbcType=VARCHAR},
-                #{variable.scopeType, jdbcType=VARCHAR},
+                #{variable.id, jdbcType=NVARCHAR},
+                1, #{variable.typeName, jdbcType=NVARCHAR },
+                #{variable.name, jdbcType=NVARCHAR},
+                #{variable.processInstanceId, jdbcType=NVARCHAR},
+                #{variable.executionId, jdbcType=NVARCHAR},
+                #{variable.taskId, jdbcType=NVARCHAR},
+                #{variable.scopeId, jdbcType=NVARCHAR},
+                #{variable.subScopeId, jdbcType=NVARCHAR},
+                #{variable.scopeType, jdbcType=NVARCHAR},
                 #{variable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{variable.doubleValue, jdbcType=DOUBLE},
                 #{variable.longValue, jdbcType=BIGINT},
-                #{variable.textValue, jdbcType=VARCHAR},
-                #{variable.textValue2, jdbcType=VARCHAR},
-                #{variable.metaInfo, jdbcType=VARCHAR}
+                #{variable.textValue, jdbcType=NVARCHAR},
+                #{variable.textValue2, jdbcType=NVARCHAR},
+                #{variable.metaInfo, jdbcType=NVARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -85,25 +85,25 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.executionId != executionId">
-                EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
+                EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeId != scopeId">
-                SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+                SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.subScopeId != subScopeId">
-                SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
+                SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.scopeType != scopeType">
-                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
+                SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR},
             </if>
             <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef != null and  originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>
             <if test="(originalPersistentState.typeName == null and type != null) or (originalPersistentState.typeName != null and type == null) or (originalPersistentState.typeName != type.typeName)">
-                TYPE_ = #{type, jdbcType=VARCHAR},
+                TYPE_ = #{type, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.doubleValue != doubleValue">
                 DOUBLE_ = #{doubleValue, jdbcType=DOUBLE},
@@ -112,78 +112,78 @@
                 LONG_ = #{longValue, jdbcType=BIGINT},
             </if>
             <if test="originalPersistentState.textValue != textValue">
-                TEXT_ = #{textValue, jdbcType=VARCHAR},
+                TEXT_ = #{textValue, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.textValue2 != textValue2">
-                TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+                TEXT2_ = #{textValue2, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.metaInfo != metaInfo">
-                META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
+                META_INFO_ = #{metaInfo, jdbcType=NVARCHAR},
             </if>
         </set>
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
     <!-- VARIABLE INSTANCE DELETE -->
 
     <delete id="deleteVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
-        delete from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
+        delete from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </delete>
     
     <delete id="deleteVariableInstancesByTaskId" parameterType="string">
-        delete from ${prefix}ACT_RU_VARIABLE where TASK_ID_ = #{id, jdbcType=VARCHAR}
+        delete from ${prefix}ACT_RU_VARIABLE where TASK_ID_ = #{id, jdbcType=NVARCHAR}
     </delete>
     
     <delete id="deleteVariableInstancesByExecutionId" parameterType="string">
-        delete from ${prefix}ACT_RU_VARIABLE where EXECUTION_ID_ = #{id, jdbcType=VARCHAR}
+        delete from ${prefix}ACT_RU_VARIABLE where EXECUTION_ID_ = #{id, jdbcType=NVARCHAR}
     </delete>
 
     <delete id="deleteVariablesByScopeIdAndScopeType" parameterType="java.util.Map">
-        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
     </delete>
 
     <delete id="deleteVariablesByScopeIdAndScopeTypes" parameterType="java.util.Map">
-        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
          and SCOPE_TYPE_ in
         <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
-            #{scopeType}
+            #{scopeType, jdbcType=NVARCHAR}
         </foreach>
     </delete>
 
     <delete id="deleteVariablesBySubScopeIdAndScopeTypes" parameterType="java.util.Map">
         delete from ${prefix}ACT_RU_VARIABLE
-        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
          and SCOPE_TYPE_ in
         <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
-            #{scopeType}
+            #{scopeType, jdbcType=NVARCHAR}
         </foreach>
     </delete>
 
     <!-- VARIABLE INSTANCE RESULTMAP -->
     <resultMap id="variableInstanceResultMap" type="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
-        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <id property="id" column="ID_" jdbcType="NVARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
-        <result property="type" column="TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
-        <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
-        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-        <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-        <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
-        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
-        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+        <result property="type" column="TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
+        <result property="name" column="NAME_" javaType="String" jdbcType="NVARCHAR" />
+        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+        <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+        <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR" />
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR" />
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR" />
         <result property="byteArrayRef" column="BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler" />
         <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
-        <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
-        <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
+        <result property="textValue" column="TEXT_" jdbcType="NVARCHAR" />
+        <result property="textValue2" column="TEXT2_" jdbcType="NVARCHAR" />
         <result property="longValue" column="LONG_" jdbcType="BIGINT" />
-        <result property="metaInfo" column="META_INFO_" jdbcType="VARCHAR" />
+        <result property="metaInfo" column="META_INFO_" jdbcType="NVARCHAR" />
     </resultMap>
 
     <!-- VARIABLE INSTANCE SELECT -->
 
     <select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
-        select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR}
+        select * from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectVariablesByQuery" parameterType="org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl" resultMap="variableInstanceResultMap">
@@ -191,69 +191,69 @@
         from ${prefix}ACT_RU_VARIABLE
         <where>
             <if test="parameter.id != null">
-                AND ID_ = #{parameter.id, jdbcType=VARCHAR}
+                AND ID_ = #{parameter.id, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.taskId != null">
-                AND TASK_ID_ = #{parameter.taskId, jdbcType=VARCHAR}
+                AND TASK_ID_ = #{parameter.taskId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.taskIds != null">
                 AND TASK_ID_ in
-                <foreach collection="parameter.taskIds" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.taskIds" item="taskId" open="(" separator="," close=")">
+                    #{taskId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="parameter.processInstanceId != null">
-                AND PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=VARCHAR}
+                AND PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.executionId != null">
-                AND EXECUTION_ID_ = #{parameter.executionId, jdbcType=VARCHAR}
+                AND EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.executionIds != null">
                 AND EXECUTION_ID_ in
-                <foreach collection="parameter.executionIds" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.executionIds" item="executionId" open="(" separator="," close=")">
+                    #{executionId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="parameter.withoutTaskId">
                 AND TASK_ID_ is null
             </if>
             <if test="parameter.scopeId != null">
-                AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR}
+                AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.scopeIds != null and !parameter.scopeIds.empty">
                 AND SCOPE_ID_ in
-                <foreach collection="parameter.scopeIds" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.scopeIds" item="scopeId" open="(" separator="," close=")">
+                    #{scopeId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="parameter.subScopeId != null">
-                AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR}
+                AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.subScopeIds != null and !parameter.subScopeIds.empty">
                 AND SUB_SCOPE_ID_ in
-                <foreach collection="parameter.subScopeIds" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.subScopeIds" item="subScopeId" open="(" separator="," close=")">
+                    #{subScopeId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="parameter.withoutSubScopeId">
                 AND SUB_SCOPE_ID_ is null
             </if>
             <if test="parameter.scopeType != null">
-                AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+                AND SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.scopeTypes != null and !parameter.scopeTypes.empty">
                 AND SCOPE_TYPE_ in
-                <foreach collection="parameter.scopeTypes" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.scopeTypes" item="scopeType" open="(" separator="," close=")">
+                    #{scopeType, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="parameter.name != null">
-                AND NAME_ = #{parameter.name, jdbcType=VARCHAR}
+                AND NAME_ = #{parameter.name, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.names != null and !parameter.names.empty">
                 AND (
-                <foreach collection="parameter.names" item="item" separator=" or ">
-                    NAME_= #{item, jdbcType=VARCHAR}
+                <foreach collection="parameter.names" item="name" separator=" or ">
+                    NAME_= #{name, jdbcType=NVARCHAR}
                 </foreach>
                 )
             </if>
@@ -278,27 +278,27 @@
         from ${prefix}ACT_RU_VARIABLE RES
         <where>
             <if test="id != null">
-                RES.ID_ = #{id}
+                RES.ID_ = #{id, jdbcType=NVARCHAR}
             </if>
             <if test="processInstanceId != null">
-                and RES.PROC_INST_ID_ = #{processInstanceId}
+                and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
             </if>
             <if test="executionId != null">
-                and RES.EXECUTION_ID_ = #{executionId}
+                and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="executionIds != null and !executionIds.empty">
                 and RES.EXECUTION_ID_ in
-                <foreach item="item" index="index" collection="executionIds" open="(" separator="," close=")">
-                    #{item}
+                <foreach item="executionId" index="index" collection="executionIds" open="(" separator="," close=")">
+                    #{executionId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="taskId != null">
-                and RES.TASK_ID_ = #{taskId}
+                and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
             </if>
             <if test="taskIds != null and !taskIds.empty">
                 and RES.TASK_ID_ in
-                <foreach item="item" index="index" collection="taskIds" open="(" separator="," close=")">
-                    #{item}
+                <foreach item="taskId" index="index" collection="taskIds" open="(" separator="," close=")">
+                    #{taskId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="excludeTaskRelated">
@@ -310,25 +310,25 @@
                 and RES.SUB_SCOPE_ID_ is NULL
             </if>
             <if test="scopeId != null">
-                and RES.SCOPE_ID_ = #{scopeId}
+                and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
             </if>
             <if test="subScopeId != null">
-                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+                and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="scopeType != null">
-                and RES.SCOPE_TYPE_ = #{scopeType}
+                and RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
             </if>
             <if test="variableName != null">
-                and RES.NAME_ = #{variableName}
+                and RES.NAME_ = #{variableName, jdbcType=NVARCHAR}
             </if>
             <if test="variableNameLike != null">
-                and RES.NAME_ like #{variableNameLike}${wildcardEscapeClause}
+                and RES.NAME_ like #{variableNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
 
             <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
             <if test="queryVariableValue != null">
                 <if test="queryVariableValue.needsTypeCheck()">
-                    and RES.TYPE_ = #{queryVariableValue.type}
+                    and RES.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
                 </if>
                 <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                     and (RES.TEXT_
@@ -338,7 +338,7 @@
                             <include refid="executionVariableOperator" />
                         </otherwise>
                     </choose>
-                    #{queryVariableValue.textValue}
+                    #{queryVariableValue.textValue, jdbcType=NVARCHAR}
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -355,7 +355,7 @@
                             <include refid="executionVariableOperator" />
                         </otherwise>
                     </choose>
-                    #{queryVariableValue.textValue2}
+                    #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -363,7 +363,7 @@
                 <if test="queryVariableValue.longValue != null">
                     and (RES.LONG_
                     <include refid="executionVariableOperator" />
-                    #{queryVariableValue.longValue}
+                    #{queryVariableValue.longValue, jdbcType=BIGINT}
                     <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                         or RES.LONG_ is null
                     </if>
@@ -372,7 +372,7 @@
                 <if test="queryVariableValue.doubleValue != null">
                     and (RES.DOUBLE_
                     <include refid="executionVariableOperator" />
-                    #{queryVariableValue.doubleValue}
+                    #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
                     <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                         or RES.DOUBLE_ is null
                     </if>

@@ -27,6 +27,7 @@ public class ActivityInstanceQueryRequest extends PaginateRequest {
     private String executionId;
     private Boolean finished;
     private String taskAssignee;
+    private String taskCompletedBy;
     private String processInstanceId;
     private String processDefinitionId;
     private String tenantId;
@@ -87,6 +88,14 @@ public class ActivityInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskAssignee(String taskAssignee) {
         this.taskAssignee = taskAssignee;
+    }
+
+    public String getTaskCompletedBy() {
+        return taskCompletedBy;
+    }
+
+    public void setTaskCompletedBy(String taskCompletedBy) {
+        this.taskCompletedBy = taskCompletedBy;
     }
 
     public String getProcessInstanceId() {

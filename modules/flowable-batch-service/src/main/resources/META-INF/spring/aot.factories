@@ -1,2 +1,0 @@
-org.springframework.aot.hint.RuntimeHintsRegistrar=\
-org.flowable.batch.service.impl.aot.FlowableBatchServiceRuntimeHints

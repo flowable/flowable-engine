@@ -141,7 +141,8 @@ public class IdmEngineAutoConfigurationTest {
                 assertThatThrownBy(() -> flowablePasswordEncoder.isMatches("test", "test", null))
                     .as("encoder matches password")
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("There is no PasswordEncoder mapped for the id \"null\"");
+                    .hasMessage("Given that there is no default password encoder configured, each password must have a password encoding prefix."
+                            + " Please either prefix this password with '{noop}' or set a default password encoder in `DelegatingPasswordEncoder`.");
             });
     }
 

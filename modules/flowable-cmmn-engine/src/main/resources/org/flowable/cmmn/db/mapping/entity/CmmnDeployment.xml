@@ -10,7 +10,7 @@
     insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
         #{id, jdbcType=VARCHAR},
-        #{name, jdbcType=VARCHAR},
+        #{name, jdbcType=NVARCHAR},
         #{category, jdbcType=VARCHAR},
         #{key, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
@@ -22,31 +22,31 @@
   <insert id="bulkInsertCmmnDeployment" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
         values
-        <foreach collection="list" item="deployment" index="index" separator=",">
+        <foreach collection="list" item="cmmnDeployment" index="index" separator=",">
             (
-                #{deployment.id, jdbcType=VARCHAR},
-                #{deployment.name, jdbcType=VARCHAR},
-                #{deployment.category, jdbcType=VARCHAR},
-                #{deployment.key, jdbcType=VARCHAR},
-                #{deployment.tenantId, jdbcType=VARCHAR},
-                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+                #{cmmnDeployment.id, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=NVARCHAR},
+                #{cmmnDeployment.category, jdbcType=VARCHAR},
+                #{cmmnDeployment.key, jdbcType=VARCHAR},
+                #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
+                #{cmmnDeployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{cmmnDeployment.parentDeploymentId, jdbcType=VARCHAR}
             )
         </foreach>
   </insert>
   
   <insert id="bulkInsertCmmnDeployment" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="deployment" index="index">
+        <foreach collection="list" item="cmmnDeployment" index="index">
             into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) values
             (
-                #{deployment.id, jdbcType=VARCHAR},
-                #{deployment.name, jdbcType=VARCHAR},
-                #{deployment.category, jdbcType=VARCHAR},
-                #{deployment.key, jdbcType=VARCHAR},
-                #{deployment.tenantId, jdbcType=VARCHAR},
-                #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-                #{deployment.parentDeploymentId, jdbcType=VARCHAR}
+                #{cmmnDeployment.id, jdbcType=VARCHAR},
+                #{cmmnDeployment.name, jdbcType=NVARCHAR},
+                #{cmmnDeployment.category, jdbcType=VARCHAR},
+                #{cmmnDeployment.key, jdbcType=VARCHAR},
+                #{cmmnDeployment.tenantId, jdbcType=VARCHAR},
+                #{cmmnDeployment.deploymentTime, jdbcType=TIMESTAMP},
+                #{cmmnDeployment.parentDeploymentId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -76,14 +76,14 @@
   <!-- DEPLOYMENT DELETE -->
   
   <delete id="deleteCmmnDeployment" parameterType="string">
-    delete from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id}
+    delete from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </delete>
 
   <!-- DEPLOYMENT RESULTMAP -->
   
   <resultMap id="cmmnDeploymentResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
@@ -94,7 +94,7 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
-    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_= #{parameter, jdbcType=VARCHAR} order by D.DEPLOY_TIME_ desc
   </select>
   
   <select id="selectCmmnDeployment" parameterType="string" resultMap="cmmnDeploymentResultMap">
@@ -118,59 +118,59 @@
     from ${prefix}ACT_CMMN_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
-        RES.ID_ = #{deploymentId}
+        RES.ID_ = #{deploymentId, jdbcType=VARCHAR}
       </if>
       <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and RES.ID_ IN
         <foreach item="deploymentId" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
-          #{deploymentId}
+          #{deploymentId, jdbcType=VARCHAR}
         </foreach>
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )  
       </if>
       <if test="key != null">
-        and RES.KEY_ = #{key}
+        and RES.KEY_ = #{key, jdbcType=VARCHAR}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="parentDeploymentId != null">
-        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
       </if>
       <if test="parentDeploymentIdLike != null">
-        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike, jdbcType=VARCHAR}
       </if>
       <if test="parentDeploymentIds != null &amp;&amp; !parentDeploymentIds.empty">
         and RES.PARENT_DEPLOYMENT_ID_ IN
         <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
                  open="(" separator="," close=")">
-          #{parentDeploymentId}
+          #{parentDeploymentId, jdbcType=VARCHAR}
         </foreach>
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}
       </if>
       <if test="latest">
         and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_CMMN_DEPLOYMENT where KEY_ = RES.KEY_ 
              <if test="tenantId != null">
-               and TENANT_ID_ = #{tenantId}
+               and TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
              </if>
              <if test="tenantIdLike != null">
-               and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+               and TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}${wildcardEscapeClause}
              </if>
         )
       </if>

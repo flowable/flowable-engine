@@ -62,16 +62,26 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return case instances like given case definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like given case definition key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return case instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionCategory", dataType = "string", value = "Only return case instances with the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLike", dataType = "string", value = "Only return case instances like the given case definition category.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionCategoryLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given case definition category, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionName", dataType = "string", value = "Only return case instances with the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLike", dataType = "string", value = "Only return case instances like the given case definition name.", paramType = "query"),
+            @ApiImplicitParam(name = "caseDefinitionNameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given case definition name, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return case instances with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return case instances like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return case instances with the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return case instances like the given business key.", paramType = "query"),
+            @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given business key, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return case instances with the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLike", dataType = "string", value = "Only return case instances like the given business status.", paramType = "query"),
+            @ApiImplicitParam(name = "businessStatusLikeIgnoreCase", dataType = "string", value = "Only return case instances like the given business status, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceParentId", dataType = "string", value = "Only return case instances with the given parent id.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return case instances started by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return case instances started before the given date.", paramType = "query"),
@@ -81,13 +91,14 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return case instances which have the given callback type.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return case instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return case instances which have the given reference type.", paramType = "query"),
-            @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return case instances last reactived by the given user.", paramType = "query"),
+            @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return case instances last reactivated by the given user.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedBefore", dataType = "string", format = "date-time", value = "Only return case instances last reactivated before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "Indication to include case variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return case instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return case instances with a tenantId like the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return case instances with a tenantId like the given value, ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns case instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,caseDefinitionId,tenantId,caseDefinitionKey", paramType = "query"),
     })
@@ -107,6 +118,14 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("caseDefinitionKey")) {
             queryRequest.setCaseDefinitionKey(allRequestParams.get("caseDefinitionKey"));
         }
+        
+        if (allRequestParams.containsKey("caseDefinitionKeyLike")) {
+            queryRequest.setCaseDefinitionKeyLike(allRequestParams.get("caseDefinitionKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionKeyLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionKeyLikeIgnoreCase(allRequestParams.get("caseDefinitionKeyLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("caseDefinitionId")) {
             queryRequest.setCaseDefinitionId(allRequestParams.get("caseDefinitionId"));
@@ -116,8 +135,24 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseDefinitionCategory(allRequestParams.get("caseDefinitionCategory"));
         }
         
+        if (allRequestParams.containsKey("caseDefinitionCategoryLike")) {
+            queryRequest.setCaseDefinitionCategoryLike(allRequestParams.get("caseDefinitionCategoryLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionCategoryLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionCategoryLikeIgnoreCase(allRequestParams.get("caseDefinitionCategoryLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.containsKey("caseDefinitionName")) {
             queryRequest.setCaseDefinitionName(allRequestParams.get("caseDefinitionName"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionNameLike")) {
+            queryRequest.setCaseDefinitionNameLike(allRequestParams.get("caseDefinitionNameLike"));
+        }
+        
+        if (allRequestParams.containsKey("caseDefinitionNameLikeIgnoreCase")) {
+            queryRequest.setCaseDefinitionNameLikeIgnoreCase(allRequestParams.get("caseDefinitionNameLikeIgnoreCase"));
         }
         
         if (allRequestParams.containsKey("name")) {
@@ -144,8 +179,24 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseInstanceBusinessKey(allRequestParams.get("businessKey"));
         }
         
+        if (allRequestParams.containsKey("businessKeyLike")) {
+            queryRequest.setCaseInstanceBusinessKeyLike(allRequestParams.get("businessKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessKeyLikeIgnoreCase")) {
+            queryRequest.setCaseInstanceBusinessKeyLikeIgnoreCase(allRequestParams.get("businessKeyLikeIgnoreCase"));
+        }
+        
         if (allRequestParams.containsKey("businessStatus")) {
             queryRequest.setCaseInstanceBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLike")) {
+            queryRequest.setCaseInstanceBusinessStatusLike(allRequestParams.get("businessStatusLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLikeIgnoreCase")) {
+            queryRequest.setCaseInstanceBusinessStatusLikeIgnoreCase(allRequestParams.get("businessStatusLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("caseInstanceParentId")) {
@@ -211,6 +262,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("tenantIdLike")) {
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
+        
+        if (allRequestParams.containsKey("tenantIdLikeIgnoreCase")) {
+            queryRequest.setTenantIdLikeIgnoreCase(allRequestParams.get("tenantIdLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
             if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
@@ -223,10 +278,12 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "Start a case instance", tags = { "Case Instances" },
             notes = "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
-            + "Only one of *caseDefinitionId* or *caseDefinitionKey* an be used in the request body. \n\n"
-            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n "
-            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section.\n\n "
-            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.\n\n",
+            + "Only one of *caseDefinitionId* or *caseDefinitionKey* an be used in the request body.\n\n"
+            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n"
+            + "If tenantId is omitted, the default tenant will be used.\n\n "
+            + "It is possible to send variables, transientVariables and startFormVariables in one request.\n\n"
+            + "More information about the variable format can be found in the REST variables section.\n\n "
+            + "Note that the variable-scope that is supplied is ignored, case-variables are always local.\n\n",
             code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the case instance was created."),
@@ -264,26 +321,26 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
                 }
                 startFormVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-            
-        } else {
-            if (request.getVariables() != null) {
-                startVariables = new HashMap<>();
-                for (RestVariable variable : request.getVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+
+        }
+
+        if (request.getVariables() != null) {
+            startVariables = new HashMap<>();
+            for (RestVariable variable : request.getVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-    
-            if (request.getTransientVariables() != null) {
-                transientVariables = new HashMap<>();
-                for (RestVariable variable : request.getTransientVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+        }
+
+        if (request.getTransientVariables() != null) {
+            transientVariables = new HashMap<>();
+            for (RestVariable variable : request.getTransientVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
         }
 

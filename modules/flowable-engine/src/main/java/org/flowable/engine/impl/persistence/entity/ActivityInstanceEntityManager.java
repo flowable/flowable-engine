@@ -77,6 +77,15 @@ public interface ActivityInstanceEntityManager extends EntityManager<ActivityIns
     void recordTaskCreated(TaskEntity task, ExecutionEntity execution);
 
     /**
+     * Record a user task was completed
+     *
+     * @param task the task which was completed
+     * @param execution execution which related to the task
+     * @param completerUserId the id of the user completion the task, which not necessarily the same as the assignee
+     */
+    void recordActivityTaskEnd(TaskEntity task, ExecutionEntity execution, String completerUserId, String deleteReason, Date endTime);
+
+    /**
      * Record task information change
      *
      * @param taskEntity task entity which was changed

@@ -20,15 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
-import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,15 +168,7 @@ public abstract class DmnTestHelper {
                 dmnEngine.getDmnEngineConfiguration(),
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 true,
-                new Command<>() {
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getDmnEngineConfiguration().getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                dmnEngine.getDmnEngineConfiguration().getSchemaManagementCmd()
         );
     }
 

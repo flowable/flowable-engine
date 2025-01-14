@@ -58,6 +58,7 @@ public class DbSqlSession implements Session {
     protected Map<Class<? extends Entity>, Map<String, Entity>> deletedObjects = new HashMap<>();
     protected Map<Class<? extends Entity>, List<BulkDeleteOperation>> bulkDeleteOperations = new HashMap<>();
     protected List<Entity> updatedObjects = new ArrayList<>();
+    protected List<BulkUpdateOperation> bulkUpdateOperations = new ArrayList<>();
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache) {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
@@ -105,6 +106,13 @@ public class DbSqlSession implements Session {
     public void update(Entity entity) {
         entityCache.put(entity, false); // false -> we don't store state, meaning it will always be seen as changed
         entity.setUpdated(true);
+    }
+
+    /**
+     * Executes a {@link BulkUpdateOperation}, with the sql in the statement parameter.
+     */
+    public void update(String statement, Object parameter) {
+       bulkUpdateOperations.add(new BulkUpdateOperation(statement, parameter));
     }
 
     public int directUpdate(String statement, Object parameters) {
@@ -405,7 +413,15 @@ public class DbSqlSession implements Session {
     public void determineUpdatedObjects() {
         updatedObjects = new ArrayList<>();
         Map<Class<?>, Map<String, CachedEntity>> cachedObjects = entityCache.getAllCachedEntities();
+        if (cachedObjects.isEmpty()) {
+            return;
+        }
+
+        Collection<Class<? extends Entity>> immutableEntities = dbSqlSessionFactory.getImmutableEntities();
         for (Class<?> clazz : cachedObjects.keySet()) {
+            if (immutableEntities.contains(clazz)) {
+                continue;
+            }
 
             Map<String, CachedEntity> classCache = cachedObjects.get(clazz);
             for (CachedEntity cachedObject : classCache.values()) {
@@ -441,6 +457,12 @@ public class DbSqlSession implements Session {
             LOGGER.debug("update {}", updatedObject);
             nrOfUpdates++;
         }
+
+        for (BulkUpdateOperation bulkUpdateOperation : bulkUpdateOperations) {
+            LOGGER.debug("{}", bulkUpdateOperation);
+            nrOfUpdates++;
+        }
+
         for (Map<String, Entity> deletedObjectMap : deletedObjects.values()) {
             for (Entity deletedObject : deletedObjectMap.values()) {
                 LOGGER.debug("delete {} with id {}", deletedObject, deletedObject.getId());
@@ -567,28 +589,49 @@ public class DbSqlSession implements Session {
     }
 
     protected void flushUpdates() {
-        for (Entity updatedObject : updatedObjects) {
-            String updateStatement = dbSqlSessionFactory.getUpdateStatement(updatedObject);
-            updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
-
-            if (updateStatement == null) {
-                throw new FlowableException("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files");
-            }
-
-            LOGGER.debug("updating: {}", updatedObject);
-
-            int updatedRecords = sqlSession.update(updateStatement, updatedObject);
-            if (updatedRecords == 0) {
-                throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
-            }
-
-            // See https://activiti.atlassian.net/browse/ACT-1290
-            if (updatedObject instanceof HasRevision) {
-                ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
-            }
-
+        if (updatedObjects.isEmpty() && bulkUpdateOperations.isEmpty()) {
+            return;
         }
+
+        // Unlike bulk deletes, bulk updates are executed before the regular updates.
+        // The reason for that, is due to the fact that regular updates might change something that would lead to an invalid bulk update.
+        
+        if (!bulkUpdateOperations.isEmpty()) {
+            bulkUpdateOperations.forEach(this::flushBulkUpdate);
+        }
+
+        if (!updatedObjects.isEmpty()) {
+            updatedObjects.forEach(this::flushUpdateEntity);
+        }
+
         updatedObjects.clear();
+        bulkUpdateOperations.clear();
+    }
+
+    protected void flushUpdateEntity(Entity updatedObject) {
+        String updateStatement = dbSqlSessionFactory.getUpdateStatement(updatedObject);
+        updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
+
+        if (updateStatement == null) {
+            throw new FlowableException("no update statement for " + updatedObject.getClass() + " in the ibatis mapping files");
+        }
+
+        LOGGER.debug("updating: {}", updatedObject);
+
+        int updatedRecords = sqlSession.update(updateStatement, updatedObject);
+        if (updatedRecords == 0) {
+            throw new FlowableOptimisticLockingException(updatedObject + " was updated by another transaction concurrently");
+        }
+
+        // See https://activiti.atlassian.net/browse/ACT-1290
+        if (updatedObject instanceof HasRevision) {
+            ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+        }
+    }
+
+    protected void flushBulkUpdate(BulkUpdateOperation bulkUpdateOperation) {
+        // Bulk update
+        bulkUpdateOperation.execute(sqlSession);
     }
 
     protected void flushDeletes() {

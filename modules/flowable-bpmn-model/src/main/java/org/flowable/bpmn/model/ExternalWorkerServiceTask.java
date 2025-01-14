@@ -12,12 +12,18 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Filip Hrisafov
  */
-public class ExternalWorkerServiceTask extends ServiceTask {
+public class ExternalWorkerServiceTask extends ServiceTask implements HasOutParameters, HasInParameters {
 
     protected String topic;
+    protected boolean doNotIncludeVariables = false;
+    protected List<IOParameter> inParameters = new ArrayList<>();
+    protected List<IOParameter> outParameters = new ArrayList<>();
 
     public String getTopic() {
         return topic;
@@ -25,6 +31,44 @@ public class ExternalWorkerServiceTask extends ServiceTask {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
+    }
+
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
+    }
+
+    @Override
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    @Override
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        this.inParameters.add(inParameter);
+    }
+
+    @Override
+    public List<IOParameter> getOutParameters() {
+        return outParameters;
+    }
+
+    @Override
+    public void setOutParameters(List<IOParameter> outParameters) {
+        this.outParameters = outParameters;
+    }
+
+    @Override
+    public void addOutParameter(IOParameter outParameter) {
+        this.outParameters.add(outParameter);
     }
 
     @Override

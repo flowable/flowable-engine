@@ -15,7 +15,7 @@ package org.flowable.engine.impl.cmd;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.UserTask;
+import org.flowable.bpmn.model.HasValidateFormFields;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -171,9 +171,10 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
     protected boolean isFormFieldValidationEnabled(TaskEntity task, ProcessEngineConfigurationImpl processEngineConfiguration, String processDefinitionId,
         String taskDefinitionKey) {
         if (processEngineConfiguration.isFormFieldValidationEnabled()) {
-            UserTask userTask = (UserTask) ProcessDefinitionUtil.getBpmnModel(processDefinitionId).getFlowElement(taskDefinitionKey);
-            String formFieldValidationExpression = userTask.getValidateFormFields();
-            return TaskHelper.isFormFieldValidationEnabled(task, processEngineConfiguration, formFieldValidationExpression);
+            if (ProcessDefinitionUtil.getBpmnModel(processDefinitionId).getFlowElement(taskDefinitionKey) instanceof HasValidateFormFields validateFormFields){
+                String formFieldValidationExpression = validateFormFields.getValidateFormFields();
+                return TaskHelper.isFormFieldValidationEnabled(task, processEngineConfiguration, formFieldValidationExpression);
+            }
         }
         return false;
     }

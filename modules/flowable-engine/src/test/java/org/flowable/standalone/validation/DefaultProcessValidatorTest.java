@@ -422,6 +422,26 @@ public class DefaultProcessValidatorTest {
                         tuple(Problems.MAIL_TASK_NO_RECIPIENT, "No recipient is defined on the mail activity", "sendMailWithoutanything", false)
                 );
     }
+    
+    @Test
+    public void testEventSubProcessWithoutVariableName() throws Exception {
+
+        InputStream xmlStream = this.getClass().getClassLoader()
+                .getResourceAsStream("org/flowable/engine/test/validation/missingVariableEventListenerVariableName.xml");
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
+        assertThat(bpmnModel).isNotNull();
+
+        List<ValidationError> allErrors = processValidator.validate(bpmnModel);
+        assertThat(allErrors).hasSize(1);
+        ValidationError error = allErrors.get(0);
+        assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME);
+        assertThat(error.getDefaultDescription()).isEqualTo("variable name is required for variable listener with activity id variableListenerStartEvent");
+
+    }
+
 
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);

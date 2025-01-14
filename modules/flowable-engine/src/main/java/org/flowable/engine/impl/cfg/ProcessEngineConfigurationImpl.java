@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,7 +42,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
-import org.flowable.batch.service.impl.db.BatchDbSchemaManager;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -88,9 +88,7 @@ import org.flowable.common.engine.impl.el.function.VariableLowerThanExpressionFu
 import org.flowable.common.engine.impl.el.function.VariableLowerThanOrEqualsExpressionFunction;
 import org.flowable.common.engine.impl.el.function.VariableNotEqualsExpressionFunction;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
@@ -155,7 +153,6 @@ import org.flowable.engine.impl.ProcessMigrationServiceImpl;
 import org.flowable.engine.impl.RepositoryServiceImpl;
 import org.flowable.engine.impl.RuntimeServiceImpl;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.SchemaOperationsProcessEngineBuild;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
@@ -193,6 +190,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandle
 import org.flowable.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExternalWorkerServiceTaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.FormAwareServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.HttpServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.InclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.IntermediateCatchEventParseHandler;
@@ -275,6 +273,7 @@ import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceWithNoWaitState
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
+import org.flowable.engine.impl.jobexecutor.SetAsyncVariablesJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
@@ -358,15 +357,12 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
-import org.flowable.entitylink.service.impl.db.EntityLinkDbSchemaManager;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventsubscription.service.EventSubscriptionServiceConfiguration;
-import org.flowable.eventsubscription.service.impl.db.EventSubscriptionDbSchemaManager;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkEventHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -386,7 +382,6 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -395,7 +390,6 @@ import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.DefaultTaskPostProcessor;
-import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskLogEntryEntityImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
@@ -405,7 +399,6 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
-import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -838,14 +831,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected FlowableEngineAgendaFactory agendaFactory;
     protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
-    protected SchemaManager identityLinkSchemaManager;
-    protected SchemaManager entityLinkSchemaManager;
-    protected SchemaManager eventSubscriptionSchemaManager;
-    protected SchemaManager variableSchemaManager;
-    protected SchemaManager taskSchemaManager;
-    protected SchemaManager jobSchemaManager;
-    protected SchemaManager batchSchemaManager;
-
     protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
@@ -874,34 +859,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // ///////////////////////////////////////////////////////
 
     @Override
-    public ProcessEngine buildProcessEngine() {
-        init();
-        ProcessEngineImpl processEngine = new ProcessEngineImpl(this);
+    protected ProcessEngine createEngine() {
+        return new ProcessEngineImpl(this);
+    }
 
-        if (handleProcessEngineExecutorsAfterEngineCreate) {
-            processEngine.startExecutors();
-        }
-
-        // trigger build of Flowable 5 Engine
-        if (flowable5CompatibilityEnabled && flowable5CompatibilityHandler != null) {
-            commandExecutor.execute(new Command<Void>() {
-
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    flowable5CompatibilityHandler.getRawProcessEngine();
-                    return null;
-                }
-            });
-        }
-
-        postProcessEngineInitialisation();
-
-        return processEngine;
+    @Override
+    protected Consumer<ProcessEngine> createPostEngineBuildConsumer() {
+        return new ProcessEnginePostEngineBuildConsumer();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     public void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -1068,78 +1038,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initService(processInstanceMigrationService);
     }
 
-    @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-
-        initProcessSchemaManager();
-        initIdentityLinkSchemaManager();
-        initEntityLinkSchemaManager();
-        initEventSubscriptionSchemaManager();
-        initVariableSchemaManager();
-        initTaskSchemaManager();
-        initJobSchemaManager();
-        initBatchSchemaManager();
-    }
-
     public void initNonRelationalDataSource() {
         // for subclassing
     }
 
-    protected void initProcessSchemaManager() {
-        if (this.schemaManager == null) {
-            this.schemaManager = new ProcessDbSchemaManager();
-        }
-    }
-
-    protected void initVariableSchemaManager() {
-        if (this.variableSchemaManager == null) {
-            this.variableSchemaManager = new VariableDbSchemaManager();
-        }
-    }
-
-    protected void initTaskSchemaManager() {
-        if (this.taskSchemaManager == null) {
-            this.taskSchemaManager = new TaskDbSchemaManager();
-        }
-    }
-
-    protected void initIdentityLinkSchemaManager() {
-        if (this.identityLinkSchemaManager == null) {
-            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
-        }
-    }
-
-    protected void initEntityLinkSchemaManager() {
-        if (this.entityLinkSchemaManager == null) {
-            this.entityLinkSchemaManager = new EntityLinkDbSchemaManager();
-        }
-    }
-    
-    protected void initEventSubscriptionSchemaManager() {
-        if (this.eventSubscriptionSchemaManager == null) {
-            this.eventSubscriptionSchemaManager = new EventSubscriptionDbSchemaManager();
-        }
-    }
-
-    protected void initJobSchemaManager() {
-        if (this.jobSchemaManager == null) {
-            this.jobSchemaManager = new JobDbSchemaManager();
-        }
-    }
-    
-    protected void initBatchSchemaManager() {
-        if (this.batchSchemaManager == null) {
-            this.batchSchemaManager = new BatchDbSchemaManager();
-        }
-    }
-
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsProcessEngineBuild();
-            }
-        }
+    @Override
+    protected SchemaManager createEngineSchemaManager() {
+        return new ProcessDbSchemaManager();
     }
 
     @Override
@@ -1286,6 +1191,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initDependentScopeTypes() {
         this.dependentScopeTypes.add(ScopeTypes.BPMN_VARIABLE_AGGREGATION);
         this.dependentScopeTypes.add(ScopeTypes.BPMN_EXTERNAL_WORKER);
+        this.dependentScopeTypes.add(ScopeTypes.BPMN_ASYNC_VARIABLES);
     }
 
     // History manager ///////////////////////////////////////////////////////////
@@ -1349,6 +1255,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
+                initSchemaManagerDatabaseConfigurationSessionFactory();
             }
 
             if (agendaFactory != null) {
@@ -1395,7 +1302,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER, EntityDependencyOrder.IMMUTABLE_ENTITIES);
 
         // Oracle doesn't support bulk inserting for event log entries and historic task log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
@@ -1406,7 +1313,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void configureVariableServiceConfiguration() {
         this.variableServiceConfiguration = instantiateVariableServiceConfiguration();
-        this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setIdGenerator(this.idGenerator);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1439,7 +1345,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = instantiateIdentityLinkServiceConfiguration();
-        this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1459,7 +1364,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEntityLinkServiceConfiguration() {
         if (this.enableEntityLinks) {
             this.entityLinkServiceConfiguration = instantiateEntityLinkServiceConfiguration();
-            this.entityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.entityLinkServiceConfiguration.setClock(this.clock);
             this.entityLinkServiceConfiguration.setIdGenerator(this.idGenerator);
             this.entityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1496,7 +1400,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initTaskServiceConfiguration() {
         this.taskServiceConfiguration = instantiateTaskServiceConfiguration();
-        this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setIdGenerator(this.idGenerator);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1555,7 +1458,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void configureJobServiceConfiguration() {
         if (jobServiceConfiguration == null) {
             this.jobServiceConfiguration = instantiateJobServiceConfiguration();
-            this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
             this.jobServiceConfiguration.setClock(this.clock);
             this.jobServiceConfiguration.setIdGenerator(this.idGenerator);
             this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
@@ -1929,6 +1831,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new SendTaskParseHandler());
         bpmnParserHandlers.add(new SequenceFlowParseHandler());
         bpmnParserHandlers.add(new ServiceTaskParseHandler());
+        bpmnParserHandlers.add(new FormAwareServiceTaskParseHandler());
         bpmnParserHandlers.add(new HttpServiceTaskParseHandler());
         bpmnParserHandlers.add(new SignalEventDefinitionParseHandler());
         bpmnParserHandlers.add(new StartEventParseHandler());
@@ -2022,6 +1925,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         ProcessInstanceMigrationStatusJobHandler processInstanceMigrationStatusJobHandler = new ProcessInstanceMigrationStatusJobHandler();
         jobHandlers.put(processInstanceMigrationStatusJobHandler.getType(), processInstanceMigrationStatusJobHandler);
+        
+        SetAsyncVariablesJobHandler setAsyncVariablesJobHandler = new SetAsyncVariablesJobHandler();
+        jobHandlers.put(setAsyncVariablesJobHandler.getType(), setAsyncVariablesJobHandler);
 
         ExternalWorkerTaskCompleteJobHandler externalWorkerTaskCompleteJobHandler = new ExternalWorkerTaskCompleteJobHandler();
         jobHandlers.put(externalWorkerTaskCompleteJobHandler.getType(), externalWorkerTaskCompleteJobHandler);
@@ -4554,69 +4460,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceMigrationCallbacks(List<ProcessInstanceMigrationCallback> processInstanceMigrationCallbacks) {
         this.processInstanceMigrationCallbacks = processInstanceMigrationCallbacks;
-        return this;
-    }
-
-    public SchemaManager getVariableSchemaManager() {
-        return variableSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setVariableSchemaManager(SchemaManager variableSchemaManager) {
-        this.variableSchemaManager = variableSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getTaskSchemaManager() {
-        return taskSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTaskSchemaManager(SchemaManager taskSchemaManager) {
-        this.taskSchemaManager = taskSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getIdentityLinkSchemaManager() {
-        return identityLinkSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
-        this.identityLinkSchemaManager = identityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getEntityLinkSchemaManager() {
-        return entityLinkSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEntityLinkSchemaManager(SchemaManager entityLinkSchemaManager) {
-        this.entityLinkSchemaManager = entityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getEventSubscriptionSchemaManager() {
-        return eventSubscriptionSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setEventSubscriptionSchemaManager(SchemaManager eventSubscriptionSchemaManager) {
-        this.eventSubscriptionSchemaManager = eventSubscriptionSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getJobSchemaManager() {
-        return jobSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setJobSchemaManager(SchemaManager jobSchemaManager) {
-        this.jobSchemaManager = jobSchemaManager;
-        return this;
-    }
-    
-    public SchemaManager getBatchSchemaManager() {
-        return batchSchemaManager;
-    }
-
-    public ProcessEngineConfigurationImpl setBatchSchemaManager(SchemaManager batchSchemaManager) {
-        this.batchSchemaManager = batchSchemaManager;
         return this;
     }
 

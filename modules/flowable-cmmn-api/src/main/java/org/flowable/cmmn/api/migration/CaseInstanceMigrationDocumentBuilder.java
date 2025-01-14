@@ -48,9 +48,17 @@ public interface CaseInstanceMigrationDocumentBuilder {
     CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping);
 
     CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMapping(ChangePlanItemIdMapping mapping);
-    
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMappings(List<ChangePlanItemIdMapping> mappings);
+
     CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> mappings);
     
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMapping(ChangePlanItemDefinitionWithNewTargetIdsMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> mappings);
+
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariable(String variableName, Object variableValue);
 
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariables(Map<String, Object> caseInstanceVariables);

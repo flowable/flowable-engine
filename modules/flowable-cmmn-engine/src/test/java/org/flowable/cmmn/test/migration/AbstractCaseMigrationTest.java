@@ -73,4 +73,17 @@ public class AbstractCaseMigrationTest {
                 .singleResult();
     }
 
+    protected CaseDefinition deployCaseDefinition(String name, String path, String tenantId) {
+        CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                .name(name)
+                .addClasspathResource(path)
+                .tenantId(tenantId)
+                .deploy();
+
+        return cmmnRepositoryService.createCaseDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .caseDefinitionTenantId(tenantId)
+                .singleResult();
+    }
+
 }

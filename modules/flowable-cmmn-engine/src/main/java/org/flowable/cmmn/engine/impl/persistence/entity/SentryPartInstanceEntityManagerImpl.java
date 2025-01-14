@@ -46,6 +46,17 @@ public class SentryPartInstanceEntityManagerImpl
     }
     
     @Override
+    public void updateSentryPartInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId) {
+        List<SentryPartInstanceEntity> sentryPartInstances = findSentryPartInstancesByCaseInstanceId(caseInstanceId);
+        if (sentryPartInstances != null && !sentryPartInstances.isEmpty()) {
+            for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstances) {
+                sentryPartInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+                update(sentryPartInstanceEntity);
+            }
+        }
+    }
+
+    @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
         dataManager.deleteByCaseInstanceId(caseInstanceId);
     }

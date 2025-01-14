@@ -79,6 +79,8 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore);
     PlanItemInstanceQuery planItemInstanceEndedAfter(Date endedAfter);
     PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    PlanItemInstanceQuery planItemInstanceAssignee(String assignee);
+    PlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy);
     PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
@@ -95,6 +97,16 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemDefinitionId(String planItemDefinitionId);
     PlanItemInstanceQuery planItemDefinitionType(String planItemDefinitionType);
     PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionType);
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    PlanItemInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    PlanItemInstanceQuery endOr();
 
     /**
      * @return The query will only return ended (completed/terminated/occurred/exited) plan item instances.
@@ -370,6 +382,12 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      *            cannot be null.
      */
     PlanItemInstanceQuery caseVariableNotExists(String name);
+
+    /**
+     *
+     * Include local plan item instance variables in the query result
+     */
+    PlanItemInstanceQuery includeLocalVariables();
 
     /**
      * Localize plan item name to specified locale.

@@ -13,25 +13,25 @@
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      1, #{processInstanceId, jdbcType=VARCHAR},
-      #{businessKey, jdbcType=VARCHAR},
-      #{processDefinitionId ,jdbcType=VARCHAR},
-      #{activityId ,jdbcType=VARCHAR},
-      #{isActive ,jdbcType=BOOLEAN},
-      #{isConcurrent ,jdbcType=BOOLEAN},
-      #{isScope ,jdbcType=BOOLEAN},
-      #{isEventScope ,jdbcType=BOOLEAN},
+      #{id, jdbcType=NVARCHAR},
+      1, #{processInstanceId, jdbcType=NVARCHAR},
+      #{businessKey, jdbcType=NVARCHAR},
+      #{processDefinitionId, jdbcType=NVARCHAR},
+      #{activityId, jdbcType=NVARCHAR},
+      #{isActive, jdbcType=BOOLEAN},
+      #{isConcurrent, jdbcType=BOOLEAN},
+      #{isScope, jdbcType=BOOLEAN},
+      #{isEventScope, jdbcType=BOOLEAN},
       #{isMultiInstanceRoot, jdbcType=BOOLEAN},
-      #{parentId, jdbcType=VARCHAR},
-      #{superExecutionId, jdbcType=VARCHAR},
-      #{rootProcessInstanceId, jdbcType=VARCHAR},
+      #{parentId, jdbcType=NVARCHAR},
+      #{superExecutionId, jdbcType=NVARCHAR},
+      #{rootProcessInstanceId, jdbcType=NVARCHAR},
       #{suspensionState, jdbcType=INTEGER},
-      #{tenantId, jdbcType=VARCHAR},
-      #{name, jdbcType=VARCHAR},
-      #{startActivityId, jdbcType=VARCHAR},
+      #{tenantId, jdbcType=NVARCHAR},
+      #{name, jdbcType=NVARCHAR},
+      #{startActivityId, jdbcType=NVARCHAR},
       #{startTime, jdbcType=TIMESTAMP},
-      #{startUserId, jdbcType=VARCHAR},
+      #{startUserId, jdbcType=NVARCHAR},
       #{isCountEnabled, jdbcType=BOOLEAN},
       #{eventSubscriptionCount, jdbcType=INTEGER},
       #{taskCount, jdbcType=INTEGER},
@@ -42,12 +42,12 @@
       #{externalWorkerJobCount, jdbcType=INTEGER},
       #{variableCount, jdbcType=INTEGER},
       #{identityLinkCount, jdbcType=INTEGER},
-      #{callbackId, jdbcType=VARCHAR},
-      #{callbackType, jdbcType=VARCHAR},
-      #{referenceId, jdbcType=VARCHAR},
-      #{referenceType, jdbcType=VARCHAR},
-      #{propagatedStageInstanceId, jdbcType=VARCHAR},
-      #{businessStatus, jdbcType=VARCHAR}
+      #{callbackId, jdbcType=NVARCHAR},
+      #{callbackType, jdbcType=NVARCHAR},
+      #{referenceId, jdbcType=NVARCHAR},
+      #{referenceType, jdbcType=NVARCHAR},
+      #{propagatedStageInstanceId, jdbcType=NVARCHAR},
+      #{businessStatus, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -59,25 +59,25 @@
                                            CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
-        (#{execution.id ,jdbcType=VARCHAR},
-         1, #{execution.processInstanceId, jdbcType=VARCHAR},
-         #{execution.businessKey, jdbcType=VARCHAR},
-         #{execution.processDefinitionId ,jdbcType=VARCHAR},
-         #{execution.activityId ,jdbcType=VARCHAR},
-         #{execution.isActive ,jdbcType=BOOLEAN},
-         #{execution.isConcurrent ,jdbcType=BOOLEAN},
-         #{execution.isScope ,jdbcType=BOOLEAN},
-         #{execution.isEventScope ,jdbcType=BOOLEAN},
+        (#{execution.id, jdbcType=NVARCHAR},
+         1, #{execution.processInstanceId, jdbcType=NVARCHAR},
+         #{execution.businessKey, jdbcType=NVARCHAR},
+         #{execution.processDefinitionId, jdbcType=NVARCHAR},
+         #{execution.activityId, jdbcType=NVARCHAR},
+         #{execution.isActive, jdbcType=BOOLEAN},
+         #{execution.isConcurrent, jdbcType=BOOLEAN},
+         #{execution.isScope, jdbcType=BOOLEAN},
+         #{execution.isEventScope, jdbcType=BOOLEAN},
          #{execution.isMultiInstanceRoot, jdbcType=BOOLEAN},
-         #{execution.parentId, jdbcType=VARCHAR},
-         #{execution.superExecutionId, jdbcType=VARCHAR},
-         #{execution.rootProcessInstanceId, jdbcType=VARCHAR},
+         #{execution.parentId, jdbcType=NVARCHAR},
+         #{execution.superExecutionId, jdbcType=NVARCHAR},
+         #{execution.rootProcessInstanceId, jdbcType=NVARCHAR},
          #{execution.suspensionState, jdbcType=INTEGER},
-         #{execution.tenantId, jdbcType=VARCHAR},
-         #{execution.name, jdbcType=VARCHAR},
-         #{execution.startActivityId, jdbcType=VARCHAR},
+         #{execution.tenantId, jdbcType=NVARCHAR},
+         #{execution.name, jdbcType=NVARCHAR},
+         #{execution.startActivityId, jdbcType=NVARCHAR},
          #{execution.startTime, jdbcType=TIMESTAMP},
-         #{execution.startUserId, jdbcType=VARCHAR},
+         #{execution.startUserId, jdbcType=NVARCHAR},
          #{execution.isCountEnabled, jdbcType=BOOLEAN},
          #{execution.eventSubscriptionCount, jdbcType=INTEGER},
          #{execution.taskCount, jdbcType=INTEGER},
@@ -88,12 +88,12 @@
          #{execution.externalWorkerJobCount, jdbcType=INTEGER},
          #{execution.variableCount, jdbcType=INTEGER},
          #{execution.identityLinkCount, jdbcType=INTEGER},
-         #{execution.callbackId, jdbcType=VARCHAR},
-         #{execution.callbackType, jdbcType=VARCHAR},
-         #{execution.referenceId, jdbcType=VARCHAR},
-         #{execution.referenceType, jdbcType=VARCHAR},
-         #{execution.propagatedStageInstanceId, jdbcType=VARCHAR},
-         #{execution.businessStatus, jdbcType=VARCHAR}
+         #{execution.callbackId, jdbcType=NVARCHAR},
+         #{execution.callbackType, jdbcType=NVARCHAR},
+         #{execution.referenceId, jdbcType=NVARCHAR},
+         #{execution.referenceType, jdbcType=NVARCHAR},
+         #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
+         #{execution.businessStatus, jdbcType=NVARCHAR}
         )
       </foreach>
   </insert>
@@ -107,25 +107,25 @@
                                         TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
                                         CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_) VALUES
             (
-             #{execution.id ,jdbcType=VARCHAR},
-             1, #{execution.processInstanceId, jdbcType=VARCHAR},
-             #{execution.businessKey, jdbcType=VARCHAR},
-             #{execution.processDefinitionId ,jdbcType=VARCHAR},
-             #{execution.activityId ,jdbcType=VARCHAR},
-             #{execution.isActive ,jdbcType=BOOLEAN},
-             #{execution.isConcurrent ,jdbcType=BOOLEAN},
-             #{execution.isScope ,jdbcType=BOOLEAN},
-             #{execution.isEventScope ,jdbcType=BOOLEAN},
+             #{execution.id, jdbcType=NVARCHAR},
+             1, #{execution.processInstanceId, jdbcType=NVARCHAR},
+             #{execution.businessKey, jdbcType=NVARCHAR},
+             #{execution.processDefinitionId, jdbcType=NVARCHAR},
+             #{execution.activityId, jdbcType=NVARCHAR},
+             #{execution.isActive, jdbcType=BOOLEAN},
+             #{execution.isConcurrent, jdbcType=BOOLEAN},
+             #{execution.isScope, jdbcType=BOOLEAN},
+             #{execution.isEventScope, jdbcType=BOOLEAN},
              #{execution.isMultiInstanceRoot, jdbcType=BOOLEAN},
-             #{execution.parentId, jdbcType=VARCHAR},
-             #{execution.superExecutionId, jdbcType=VARCHAR},
-             #{execution.rootProcessInstanceId, jdbcType=VARCHAR},
+             #{execution.parentId, jdbcType=NVARCHAR},
+             #{execution.superExecutionId, jdbcType=NVARCHAR},
+             #{execution.rootProcessInstanceId, jdbcType=NVARCHAR},
              #{execution.suspensionState, jdbcType=INTEGER},
-             #{execution.tenantId, jdbcType=VARCHAR},
-             #{execution.name, jdbcType=VARCHAR},
-             #{execution.startActivityId, jdbcType=VARCHAR},
+             #{execution.tenantId, jdbcType=NVARCHAR},
+             #{execution.name, jdbcType=NVARCHAR},
+             #{execution.startActivityId, jdbcType=NVARCHAR},
              #{execution.startTime, jdbcType=TIMESTAMP},
-             #{execution.startUserId, jdbcType=VARCHAR},
+             #{execution.startUserId, jdbcType=NVARCHAR},
              #{execution.isCountEnabled, jdbcType=BOOLEAN},
              #{execution.eventSubscriptionCount, jdbcType=INTEGER},
              #{execution.taskCount, jdbcType=INTEGER},
@@ -136,12 +136,12 @@
              #{execution.externalWorkerJobCount, jdbcType=INTEGER},
              #{execution.variableCount, jdbcType=INTEGER},
              #{execution.identityLinkCount, jdbcType=INTEGER},
-             #{execution.callbackId, jdbcType=VARCHAR},
-             #{execution.callbackType, jdbcType=VARCHAR},
-             #{execution.referenceId, jdbcType=VARCHAR},
-             #{execution.referenceType, jdbcType=VARCHAR},
-             #{execution.propagatedStageInstanceId, jdbcType=VARCHAR},
-             #{execution.businessStatus, jdbcType=VARCHAR}
+             #{execution.callbackId, jdbcType=NVARCHAR},
+             #{execution.callbackType, jdbcType=NVARCHAR},
+             #{execution.referenceId, jdbcType=NVARCHAR},
+             #{execution.referenceType, jdbcType=NVARCHAR},
+             #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
+             #{execution.businessStatus, jdbcType=NVARCHAR}
             )
       </foreach>
     SELECT * FROM dual
@@ -154,13 +154,13 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.businessKey != businessKey">
-                BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+                BUSINESS_KEY_ = #{businessKey, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
-                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.activityId != activityId">
-                ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+                ACT_ID_ = #{activityId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.isActive != isActive">
                 IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
@@ -178,19 +178,19 @@
                 IS_MI_ROOT_ = #{isMultiInstanceRoot, jdbcType=BOOLEAN},
             </if>
             <if test="originalPersistentState.parentId != parentId">
-                PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
+                PARENT_ID_ = #{parentId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.superExecutionId != superExecutionId">
-                SUPER_EXEC_ = #{superExecutionId, jdbcType=VARCHAR},
+                SUPER_EXEC_ = #{superExecutionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.rootProcessInstanceId != rootProcessInstanceId">
-                ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=VARCHAR},
+                ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.suspensionState != suspensionState">
                 SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
             </if>
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.isCountEnabled != isCountEnabled">
                 IS_COUNT_ENABLED_ = #{isCountEnabled, jdbcType=BOOLEAN},
@@ -223,37 +223,37 @@
                 ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER},
             </if>
             <if test="originalPersistentState.callbackId != callbackId">
-                CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+                CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.callbackType != callbackType">
-                CALLBACK_ID_ = #{callbackType, jdbcType=VARCHAR},
+                CALLBACK_ID_ = #{callbackType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.referenceId != referenceId">
-                REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+                REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.referenceType != referenceType">
-                REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
+                REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.propagatedStageInstanceId != propagatedStageInstanceId">
-                PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=VARCHAR},
+                PROPAGATED_STAGE_INST_ID_ = #{propagatedStageInstanceId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.businessStatus != businessStatus">
-                BUSINESS_STATUS_ = #{businessStatus, jdbcType=VARCHAR},
+                BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
         </set>
-    where ID_ = #{id, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <update id="updateExecutionTenantIdForDeployment" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION set
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
     where
       ID_ in (
         SELECT E.ID_ from ${prefix}ACT_RU_EXECUTION E
         inner join ${prefix}ACT_RE_PROCDEF P on E.PROC_DEF_ID_  = P.ID_
         inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-        where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
+        where D.ID_ = #{deploymentId, jdbcType=NVARCHAR}
       )
   </update>
 
@@ -261,7 +261,7 @@
        Tested this on MySQL 5.6: does NOT use a temporary table (so good, performance) -->
   <update id="updateExecutionTenantIdForDeployment" databaseId="mysql" parameterType="java.util.Map">
     update ${prefix}ACT_RU_EXECUTION set
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
     where
       ID_ in (
 
@@ -271,7 +271,7 @@
                 FROM  ${prefix}ACT_RU_EXECUTION E
                 inner join ${prefix}ACT_RE_PROCDEF P on E.PROC_DEF_ID_  = P.ID_
                 inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-                where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
+                where D.ID_ = #{deploymentId, jdbcType=NVARCHAR}
 
         ) AS tempExecution
 
@@ -282,8 +282,8 @@
     update ${prefix}ACT_RU_EXECUTION
     set
       LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP},
-      LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
-    where ID_ = #{id}
+      LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
   </update>
 
@@ -292,7 +292,7 @@
     set
       LOCK_TIME_ = null,
       LOCK_OWNER_ = null
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
   </update>
 
   <update id="clearAllProcessInstanceLockTimes" parameterType="java.util.Map">
@@ -300,7 +300,7 @@
     set
       LOCK_TIME_ = null,
       LOCK_OWNER_ = null
-    where LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}
+    where LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR}
   </update>
 
   <update id="updateExecutionRelatedEntityCountEnabled" parameterType="boolean">
@@ -311,40 +311,40 @@
   <!-- EXECUTION DELETE -->
 
   <delete id="deleteExecution" parameterType="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    delete from ${prefix}ACT_RU_EXECUTION where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_RU_EXECUTION where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <delete id="bulkDeleteExecution" parameterType="java.util.Collection">
     delete from ${prefix}ACT_RU_EXECUTION where
      <foreach item="execution" collection="list" index="index" separator=" or ">
-        ID_ = #{execution.id, jdbcType=VARCHAR}
+        ID_ = #{execution.id, jdbcType=NVARCHAR}
     </foreach>
   </delete>
 
   <!-- EXECUTION RESULTMAP -->
 
   <resultMap id="executionResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="NVARCHAR" />
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="NVARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
     <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
     <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isMultiInstanceRoot" column="IS_MI_ROOT_" jdbcType="BOOLEAN" />
-    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
-    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="NVARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="NVARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="NVARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="NVARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="startUserId" column="START_USER_ID_" jdbcType="NVARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="eventSubscriptionCount" column="EVT_SUBSCR_COUNT_" jdbcType="INTEGER" />
     <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
@@ -355,45 +355,45 @@
     <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
-    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
-    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
-    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="NVARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="NVARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="processInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="NVARCHAR" />
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
 
     <!-- Lowercase 'columns', as they are filled in during a query and are not mapped directly to a table column -->
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="VARCHAR" />
-    <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="NVARCHAR" />
+    <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="NVARCHAR" />
     <result property="processDefinitionVersion" column="ProcessDefinitionVersion" jdbcType="INTEGER" />
-    <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="VARCHAR"/>
-    <result property="deploymentId" column="DeploymentId" jdbcType="VARCHAR" />
+    <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="NVARCHAR"/>
+    <result property="deploymentId" column="DeploymentId" jdbcType="NVARCHAR" />
 
-    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="NVARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
     <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
     <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isMultiInstanceRoot" column="IS_MI_ROOT_" jdbcType="BOOLEAN" />
-    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
-    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="NVARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="NVARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="NVARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
-    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="NVARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="startUserId" column="START_USER_ID_" jdbcType="NVARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="eventSubscriptionCount" column="EVT_SUBSCR_COUNT_" jdbcType="INTEGER" />
     <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
@@ -404,35 +404,35 @@
     <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
-    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
-    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
-    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="NVARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="NVARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="NVARCHAR" />
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="NVARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
     <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
     <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isMultiInstanceRoot" column="IS_MI_ROOT_" jdbcType="BOOLEAN" />
-    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
-    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="NVARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="NVARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="NVARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="NVARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="startUserId" column="START_USER_ID_" jdbcType="NVARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="eventSubscriptionCount" column="EVT_SUBSCR_COUNT_" jdbcType="INTEGER" />
     <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
@@ -443,57 +443,57 @@
     <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
-    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
-    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
-    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="NVARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="NVARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
-      <id property="id" column="VAR_ID_"/>
-      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
+      <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
+      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
-      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
-      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
-      <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR" />
+      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR" />
+      <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR" />
+      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
       <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
-      <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
-      <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
+      <result property="textValue" column="VAR_TEXT_" jdbcType="NVARCHAR" />
+      <result property="textValue2" column="VAR_TEXT2_" jdbcType="NVARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
     </collection>
   </resultMap>
 
   <resultMap id="processInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
-    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="VARCHAR" />
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="VARCHAR" />
-    <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="NVARCHAR" />
+    <result property="businessStatus" column="BUSINESS_STATUS_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    <result property="processDefinitionName" column="ProcessDefinitionName" jdbcType="NVARCHAR" />
+    <result property="processDefinitionKey" column="ProcessDefinitionKey" jdbcType="NVARCHAR" />
     <result property="processDefinitionVersion" column="ProcessDefinitionVersion" jdbcType="INTEGER" />
-      <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="VARCHAR"/>
-    <result property="deploymentId" column="DeploymentId" jdbcType="VARCHAR" />
-    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+      <result property="processDefinitionCategory" column="ProcessDefinitionCategory" jdbcType="NVARCHAR"/>
+    <result property="deploymentId" column="DeploymentId" jdbcType="NVARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="NVARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
     <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
     <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isEventScope" column="IS_EVENT_SCOPE_" jdbcType="BOOLEAN" />
     <result property="isMultiInstanceRoot" column="IS_MI_ROOT_" jdbcType="BOOLEAN" />
-    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
-    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
-    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="parentId" column="PARENT_ID_" jdbcType="NVARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="NVARCHAR" />
+    <result property="rootProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="NVARCHAR" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
-    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
-    <result property="startActivityId" column="START_ACT_ID_" jdbcType="VARCHAR" />
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
+    <result property="startActivityId" column="START_ACT_ID_" jdbcType="NVARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
-    <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="startUserId" column="START_USER_ID_" jdbcType="NVARCHAR" />
     <result property="isCountEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
     <result property="eventSubscriptionCount" column="EVT_SUBSCR_COUNT_" jdbcType="INTEGER" />
     <result property="taskCount" column="TASK_COUNT_" jdbcType="INTEGER" />
@@ -504,24 +504,24 @@
     <result property="externalWorkerJobCount" column="EXTERNAL_WORKER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
-    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
-    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
-    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
-    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="NVARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="NVARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
+    <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
-      <id property="id" column="VAR_ID_"/>
-      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
+      <id property="id" column="VAR_ID_" jdbcType="NVARCHAR" />
+      <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
-      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
-      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
-      <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR" />
+      <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR" />
+      <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR" />
+      <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
       <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
-      <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
-      <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
+      <result property="textValue" column="VAR_TEXT_" jdbcType="NVARCHAR" />
+      <result property="textValue2" column="VAR_TEXT2_" jdbcType="NVARCHAR" />
       <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT" />
     </collection>
   </resultMap>
@@ -530,67 +530,67 @@
 
   <select id="selectExecutionsWithSameRootProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
-    where ROOT_PROC_INST_ID_ = (select ROOT_PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{parameter})
+    where ROOT_PROC_INST_ID_ = (select ROOT_PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
 
   <select id="selectExecution" parameterType="string" resultMap="executionResultMap">
-    select * from ${prefix}ACT_RU_EXECUTION where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_RU_EXECUTION where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectExecutionsByParentExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
-    where PARENT_ID_ = #{parameter}
+    where PARENT_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
 
   <select id="countActiveExecutionsByParentId" parameterType="java.util.Map" resultType="long">
     select count(ID_) from ${prefix}ACT_RU_EXECUTION
-    where PARENT_ID_ = #{parentId} and IS_ACTIVE_ = #{isActive}
+    where PARENT_ID_ = #{parentId, jdbcType=NVARCHAR} and IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN}
   </select>
 
   <select id="selectExecutionsByRootProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
-    where ROOT_PROC_INST_ID_ = #{parameter}
+    where ROOT_PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectChildExecutionsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
-    where PROC_INST_ID_ = #{parameter} and PARENT_ID_ is not null
+    where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR} and PARENT_ID_ is not null
   </select>
 
   <select id="selectExecutionsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
     select * from ${prefix}ACT_RU_EXECUTION
-    where PROC_INST_ID_ = #{parameter}
+    where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_EXECUTION
-    where PROC_DEF_ID_ = #{parameter} and PARENT_ID_ is null
+    where PROC_DEF_ID_ = #{parameter, jdbcType=NVARCHAR} and PARENT_ID_ is null
   </select>
 
   <select id="selectInactiveExecutionsForProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
   	select *
   	from ${prefix}ACT_RU_EXECUTION
-  	where PROC_INST_ID_ = #{parameter.processInstanceId}
-  	and IS_ACTIVE_ = #{parameter.isActive}
+  	where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
+  	and IS_ACTIVE_ = #{parameter.isActive, jdbcType=BOOLEAN}
   </select>
 
   <select id="selectInactiveExecutionsInActivityAndProcessInstance" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
   	select *
   	from ${prefix}ACT_RU_EXECUTION
-  	where ACT_ID_ = #{parameter.activityId}
-  	and PROC_INST_ID_ = #{parameter.processInstanceId}
-  	and IS_ACTIVE_ = #{parameter.isActive}
+  	where ACT_ID_ = #{parameter.activityId, jdbcType=NVARCHAR}
+  	and PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
+  	and IS_ACTIVE_ = #{parameter.isActive, jdbcType=BOOLEAN}
   </select>
 
     <select id="selectExecutionsByParentExecutionAndActivityIds" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject"
             resultMap="executionResultMap">
         select *
         from ${prefix}ACT_RU_EXECUTION
-        where PARENT_ID_ = #{parameter.parentExecutionId}
+        where PARENT_ID_ = #{parameter.parentExecutionId, jdbcType=NVARCHAR}
         and ACT_ID_ in
         <foreach item="activityId" collection="parameter.activityIds" open="(" separator="," close=")">
-            #{activityId}
+            #{activityId, jdbcType=NVARCHAR}
         </foreach>
     </select>
 
@@ -668,51 +668,69 @@
         RES.PARENT_ID_ is null
       </if>
       <if test="processDefinitionId != null">
-        and P.ID_ = #{processDefinitionId}
+        and P.ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
       </if>
       <if test="processDefinitionIds != null and !processDefinitionIds.empty">
         and P.ID_ in
-        <foreach item="item" index="index" collection="processDefinitionIds" open="(" separator="," close=")">
-          #{item}
+        <foreach item="processDefinitionId" index="index" collection="processDefinitionIds" open="(" separator="," close=")">
+          #{processDefinitionId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="processDefinitionKey != null">
-        and P.KEY_ = #{processDefinitionKey}
+        and P.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
+      </if>
+      <if test="processDefinitionKeyLike != null">
+        and P.KEY_ like #{processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionKeyLikeIgnoreCase != null">
+        and lower(P.KEY_) like lower(#{processDefinitionKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="processDefinitionKeys != null and !processDefinitionKeys.empty">
         and P.KEY_ in
-        <foreach item="item" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
-          #{item}
+        <foreach item="processDefinitionKey" index="index" collection="processDefinitionKeys" open="(" separator="," close=")">
+          #{processDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="processDefinitionCategory != null">
-        and P.CATEGORY_ = #{processDefinitionCategory}
+        and P.CATEGORY_ = #{processDefinitionCategory, jdbcType=NVARCHAR}
+      </if>
+      <if test="processDefinitionCategoryLike != null">
+        and P.CATEGORY_ like #{processDefinitionCategoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionCategoryLikeIgnoreCase != null">
+        and lower(P.CATEGORY_) like lower(#{processDefinitionCategoryLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="processDefinitionName != null">
-        and P.NAME_ = #{processDefinitionName}
+        and P.NAME_ = #{processDefinitionName, jdbcType=NVARCHAR}
+      </if>
+      <if test="processDefinitionNameLike != null">
+        and P.NAME_ like #{processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="processDefinitionNameLikeIgnoreCase != null">
+        and lower(P.NAME_) like lower(#{processDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="processDefinitionVersion != null">
-        and P.VERSION_ = #{processDefinitionVersion}
+        and P.VERSION_ = #{processDefinitionVersion, jdbcType=INTEGER}
       </if>
       <if test="processDefinitionEngineVersion != null">
-        and P.ENGINE_VERSION_ = #{processDefinitionEngineVersion}
+        and P.ENGINE_VERSION_ = #{processDefinitionEngineVersion, jdbcType=NVARCHAR}
       </if>
       <if test="executionId != null">
-        and RES.ID_ = #{executionId}
+        and RES.ID_ = #{executionId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
+        and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="rootProcessInstanceId != null">
-        and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId}
+        and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.empty">
         and RES.PROC_INST_ID_ in
-        <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{item}
+        <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
+          #{processInstanceId, jdbcType=NVARCHAR}
         </foreach>
       </if>
-      <if test="businessKey != null or businessKeyLike != null">
+      <if test="businessKey != null or businessKeyLike != null or businessKeyLikeIgnoreCase != null">
           <choose>
               <when test="includeChildExecutionsWithBusinessKeyQuery">
                 and exists (
@@ -721,35 +739,44 @@
                   <where>
                       RES.PROC_INST_ID_ = INST.ID_
                       <if test="businessKey != null">
-                        and INST.BUSINESS_KEY_ = #{businessKey}
+                        and INST.BUSINESS_KEY_ = #{businessKey, jdbcType=NVARCHAR}
                       </if>
                       <if test="businessKeyLike != null">
-                        and INST.BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
+                        and INST.BUSINESS_KEY_ like #{businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                      </if>
+                      <if test="businessKeyLikeIgnoreCase != null">
+                        and lower(INST.BUSINESS_KEY_) like lower(#{businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
                       </if>
                   </where>
                 )
               </when>
               <otherwise>
                   <if test="businessKey != null">
-                      and RES.BUSINESS_KEY_ = #{businessKey}
+                      and RES.BUSINESS_KEY_ = #{businessKey, jdbcType=NVARCHAR}
                   </if>
                   <if test="businessKeyLike != null">
-                      and RES.BUSINESS_KEY_ like #{businessKeyLike}${wildcardEscapeClause}
+                      and RES.BUSINESS_KEY_ like #{businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                  </if>
+                  <if test="businessKeyLikeIgnoreCase != null">
+                      and lower(RES.BUSINESS_KEY_) like lower(#{businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
                   </if>
               </otherwise>
           </choose>
       </if>
       <if test="businessStatus != null">
-        and RES.BUSINESS_STATUS_ = #{businessStatus}
+        and RES.BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR}
       </if>
       <if test="businessStatusLike != null">
-        and RES.BUSINESS_STATUS_ like #{businessStatusLike}${wildcardEscapeClause}
+        and RES.BUSINESS_STATUS_ like #{businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="businessStatusLikeIgnoreCase != null">
+        and lower(RES.BUSINESS_STATUS_) like lower(#{businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId} and RES.IS_ACTIVE_ = #{isActive}
+        and RES.ACT_ID_ = #{activityId, jdbcType=NVARCHAR} and RES.IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN}
       </if>
       <if test="parentId != null">
-        and RES.PARENT_ID_ = #{parentId}
+        and RES.PARENT_ID_ = #{parentId, jdbcType=NVARCHAR}
       </if>
       <if test="onlyChildExecutions">
       	and RES.PARENT_ID_ is not null
@@ -761,22 +788,22 @@
         and RES.PARENT_ID_ is null
       </if>
       <if test="deploymentId != null">
-        and P.DEPLOYMENT_ID_ = #{deploymentId}
+        and P.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
       </if>
       <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and P.DEPLOYMENT_ID_ IN
-        <foreach item="deployment" index="index" collection="deploymentIds"
+        <foreach item="deploymentId" index="index" collection="deploymentIds"
                  open="(" separator="," close=")">
-          #{deployment}
+          #{deploymentId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="superProcessInstanceId != null">
         <!-- A sub process instance is stored under a certain *execution*, potentially nested.
              A sub process instance is NOT stored under the process instanc, hence the following: -->
-        and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
+        and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId, jdbcType=NVARCHAR})
       </if>
       <if test="subProcessInstanceId != null">
-        and RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{subProcessInstanceId}))
+        and RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{subProcessInstanceId, jdbcType=NVARCHAR}))
       </if>
       <if test="excludeSubprocesses">
         and RES.SUPER_EXEC_ is null
@@ -790,38 +817,41 @@
         </if>
       </if>
       <if test="callbackId != null">
-            and CALLBACK_ID_ = #{callbackId}
+           and CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
       </if>
       <if test="callbackType != null">
-           and CALLBACK_TYPE_ = #{callbackType}
+           and CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
       </if>
       <if test="referenceId != null">
-            and REFERENCE_ID_ = #{referenceId}
+           and REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
       </if>
       <if test="referenceType != null">
-           and REFERENCE_TYPE_ = #{referenceType}
+           and REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+      </if>
+      <if test="tenantIdLikeIgnoreCase != null">
+        and lower(RES.TENANT_ID_) like lower(#{tenantIdLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase})${wildcardEscapeClause}
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
       </if>
       <if test="parentScopeId != null">
           and EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
-            LINK.SCOPE_ID_ = #{parentScopeId}
+            LINK.SCOPE_ID_ = #{parentScopeId, jdbcType=NVARCHAR}
             and LINK.REF_SCOPE_ID_ = RES.ID_
             and LINK.HIERARCHY_TYPE_ = 'parent'
           )
@@ -829,25 +859,25 @@
       <if test="rootScopeId != null">
           and exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
             LINK.REF_SCOPE_ID_ = RES.ID_
-            and LINK.ROOT_SCOPE_ID_ = #{rootScopeId}
+            and LINK.ROOT_SCOPE_ID_ = #{rootScopeId, jdbcType=NVARCHAR}
             )
       </if>
       <if test="activeActivityId != null">
-        and EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId} and A.END_TIME_ is null)
+        and EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{activeActivityId, jdbcType=NVARCHAR} and A.END_TIME_ is null)
       </if>
       <if test="activeActivityIds != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ in 
         <foreach item="activeActivityId" index="index" collection="activeActivityIds" open="(" separator="," close=")">
-            #{activeActivityId}
+            #{activeActivityId, jdbcType=NVARCHAR}
         </foreach>
         and A.END_TIME_ is null)
       </if>
       <if test="involvedUser != null">
-        and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{involvedUser})
+        and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{involvedUser, jdbcType=NVARCHAR})
       </if>
       <if test="involvedUserIdentityLink != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
-        I.USER_ID_ = #{involvedUserIdentityLink.userId} and I.TYPE_ = #{involvedUserIdentityLink.type})
+        I.USER_ID_ = #{involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{involvedUserIdentityLink.type, jdbcType=NVARCHAR})
       </if>
       <if test="involvedGroups != null">
         and EXISTS(
@@ -858,9 +888,9 @@
                 or
                 </if>
                 I.GROUP_ID_ IN
-                <foreach item="group" index="index" collection="involvedGroupListItem"
+                <foreach item="groupId" index="index" collection="involvedGroupListItem"
                       open="(" separator="," close=")">
-                  #{group}
+                  #{groupId, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>
             )
@@ -868,14 +898,14 @@
       </if>
       <if test="involvedGroupIdentityLink != null">
         and EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
-        I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId} and I.TYPE_ = #{involvedGroupIdentityLink.type})
+        I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
       </if>
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         <choose>
             <when test="queryVariableValue.operator.equals('EXISTS')">
               and EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                 <if test="!queryVariableValue.local">
                     and RES.PROC_INST_ID_ = EXECUTION_ID_
                 </if>
@@ -886,7 +916,7 @@
             </when>
             <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
               and NOT EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                 <if test="!queryVariableValue.local">
                     and RES.PROC_INST_ID_ = EXECUTION_ID_
                 </if>
@@ -908,10 +938,10 @@
                         </if>
                         <if test="queryVariableValue.name != null">
                             <!-- Match-all variable-names when name is null -->
-                            and V.NAME_= #{queryVariableValue.name}
+                            and V.NAME_= #{queryVariableValue.name, jdbcType=NVARCHAR}
                         </if>
                         <if test="queryVariableValue.needsTypeCheck()">
-                            and V.TYPE_ = #{queryVariableValue.type}
+                            and V.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
                         </if>
                         <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                             <choose>
@@ -926,7 +956,7 @@
                                 <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                                 <otherwise><include refid="executionVariableOperator" /></otherwise>
                             </choose>
-                            #{queryVariableValue.textValue}
+                            #{queryVariableValue.textValue, jdbcType=NVARCHAR}
                             <choose>
                                 <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                             </choose>
@@ -941,7 +971,7 @@
                                 <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
                                 <otherwise><include refid="executionVariableOperator" /></otherwise>
                             </choose>
-                            #{queryVariableValue.textValue2}
+                            #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
                             <choose>
                                 <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
                             </choose>
@@ -949,7 +979,7 @@
                         <if test="queryVariableValue.longValue != null">
                             and (V.LONG_
                             <include refid="executionVariableOperator" />
-                            #{queryVariableValue.longValue}
+                            #{queryVariableValue.longValue, jdbcType=BIGINT}
                             <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                 or V.LONG_ is null
                             </if>
@@ -958,7 +988,7 @@
                         <if test="queryVariableValue.doubleValue != null">
                             and (V.DOUBLE_
                             <include refid="executionVariableOperator" />
-                            #{queryVariableValue.doubleValue}
+                            #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
                             <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                 or V.DOUBLE_ is null
                             </if>
@@ -988,8 +1018,8 @@
                 from ${prefix}ACT_RU_EVENT_SUBSCR EVT
                 <where>
                     RES.ID_ = EVT.EXECUTION_ID_
-                    and EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType}
-                    and EVT.EVENT_NAME_ = #{eventSubscriptionValue.eventName}
+                    and EVT.EVENT_TYPE_ = #{eventSubscriptionValue.eventType, jdbcType=NVARCHAR}
+                    and EVT.EVENT_NAME_ = #{eventSubscriptionValue.eventName, jdbcType=NVARCHAR}
                 </where>
             )
 	      </foreach>
@@ -998,79 +1028,106 @@
         and
         <trim prefix="(" prefixOverrides="OR" suffix=")">
           <if test="orQueryObject.processDefinitionId != null">
-            P.ID_ = #{orQueryObject.processDefinitionId}
+            P.ID_ = #{orQueryObject.processDefinitionId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.processDefinitionIds != null and !orQueryObject.processDefinitionIds.empty">
             or P.ID_ in
-            <foreach item="item" index="index" collection="orQueryObject.processDefinitionIds" open="(" separator="," close=")">
-              #{item}
+            <foreach item="processDefinitionId" index="index" collection="orQueryObject.processDefinitionIds" open="(" separator="," close=")">
+              #{processDefinitionId, jdbcType=NVARCHAR}
             </foreach>
           </if>
           <if test="orQueryObject.processDefinitionKey != null">
-            or P.KEY_ = #{orQueryObject.processDefinitionKey}
+            or P.KEY_ = #{orQueryObject.processDefinitionKey, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.processDefinitionKeyLike != null">
+            or P.KEY_ like #{orQueryObject.processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionKeyLike != null">
+            or lower(P.KEY_) like lower(#{orQueryObject.processDefinitionKeyLike, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.processDefinitionKeys != null and !orQueryObject.processDefinitionKeys.empty">
             or P.KEY_ in
-            <foreach item="item" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
-              #{item}
+            <foreach item="processDefinitionKey" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
+              #{processDefinitionKey, jdbcType=NVARCHAR}
             </foreach>
           </if>
           <if test="orQueryObject.processDefinitionCategory != null">
-            or P.CATEGORY_ = #{orQueryObject.processDefinitionCategory}
+            or P.CATEGORY_ = #{orQueryObject.processDefinitionCategory, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.processDefinitionCategoryLike != null">
+            or P.CATEGORY_ like #{orQueryObject.processDefinitionCategoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionCategoryLikeIgnoreCase != null">
+            or lower(P.CATEGORY_) like lower(#{orQueryObject.processDefinitionCategoryLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.processDefinitionName != null">
-            or P.NAME_ = #{orQueryObject.processDefinitionName}
+            or P.NAME_ = #{orQueryObject.processDefinitionName, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.processDefinitionNameLike != null">
+            or P.NAME_ like #{orQueryObject.processDefinitionNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.processDefinitionNameLikeIgnoreCase != null">
+            or lower(P.NAME_) like lower(#{orQueryObject.processDefinitionNameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.processDefinitionVersion != null">
-            or P.VERSION_ = #{orQueryObject.processDefinitionVersion}
+            or P.VERSION_ = #{orQueryObject.processDefinitionVersion, jdbcType=INTEGER}
           </if>
           <if test="orQueryObject.processDefinitionEngineVersion != null">
-            or P.ENGINE_VERSION_ = #{orQueryObject.processDefinitionEngineVersion}
+            or P.ENGINE_VERSION_ = #{orQueryObject.processDefinitionEngineVersion, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.executionId != null">
-            or RES.ID_ = #{orQueryObject.executionId}
+            or RES.ID_ = #{orQueryObject.executionId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.processInstanceId != null">
-            or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
+            or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.empty">
             or RES.PROC_INST_ID_ in
-            <foreach item="item" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
-              #{item}
+            <foreach item="processInstanceId" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
+              #{processInstanceId, jdbcType=NVARCHAR}
             </foreach>
           </if>
           <if test="orQueryObject.businessKey != null">
-            or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey}
+            or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.businessKeyLike != null">
+            or RES.BUSINESS_KEY_ like #{orQueryObject.businessKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.businessKeyLikeIgnoreCase != null">
+            or lower(RES.BUSINESS_KEY_) like lower(#{orQueryObject.businessKeyLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.businessStatus != null">
-            or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus}
+            or RES.BUSINESS_STATUS_ = #{orQueryObject.businessStatus, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.businessStatusLike != null">
-            or RES.BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike}${wildcardEscapeClause}
+            or RES.BUSINESS_STATUS_ like #{orQueryObject.businessStatusLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.businessStatusLikeIgnoreCase != null">
+            or lower(RES.BUSINESS_STATUS_) like lower(#{orQueryObject.businessStatusLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.activityId != null">
-            or (RES.ACT_ID_ = #{orQueryObject.activityId} and RES.IS_ACTIVE_ = #{isActive})
+            or (RES.ACT_ID_ = #{orQueryObject.activityId, jdbcType=NVARCHAR} and RES.IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN})
           </if>
           <if test="orQueryObject.parentId != null">
-            or RES.PARENT_ID_ = #{orQueryObject.parentId}
+            or RES.PARENT_ID_ = #{orQueryObject.parentId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.deploymentId != null">
-            or P.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId}
+            or P.DEPLOYMENT_ID_ = #{orQueryObject.deploymentId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.deploymentIds != null &amp;&amp; !orQueryObject.deploymentIds.empty">
             or P.DEPLOYMENT_ID_ IN
-            <foreach item="deployment" index="index" collection="orQueryObject.deploymentIds"
+            <foreach item="deploymentId" index="index" collection="orQueryObject.deploymentIds"
                      open="(" separator="," close=")">
-              #{deployment}
+              #{deploymentId, jdbcType=NVARCHAR}
             </foreach>
           </if>
           <if test="orQueryObject.superProcessInstanceId != null">
             <!-- A sub process instance is stored under a certain *execution*, potentially nested.
                  A sub process instance is NOT stored under the process instanc, hence the following: -->
-            or RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{orQueryObject.superProcessInstanceId})
+            or RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{orQueryObject.superProcessInstanceId, jdbcType=NVARCHAR})
           </if>
           <if test="orQueryObject.subProcessInstanceId != null">
-            or RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{orQueryObject.subProcessInstanceId}))
+            or RES.ID_ = (select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION where ID_ = (select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{orQueryObject.subProcessInstanceId, jdbcType=NVARCHAR}))
           </if>
           <if test="orQueryObject.excludeSubprocesses">
             or RES.SUPER_EXEC_ is null
@@ -1084,38 +1141,41 @@
             </if>
           </if>
           <if test="orQueryObject.callbackId != null">
-              or CALLBACK_ID_ = #{orQueryObject.callbackId}
+              or CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.callbackType != null">
-              or CALLBACK_TYPE_ = #{orQueryObject.callbackType}
+              or CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.referenceId != null">
-              or REFERENCE_ID_ = #{orQueryObject.referenceId}
+              or REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.referenceType != null">
-              or REFERENCE_TYPE_ = #{orQueryObject.referenceType}
+              or REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.tenantId != null">
-            or RES.TENANT_ID_ = #{orQueryObject.tenantId}
+            or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.tenantIdLike != null">
-            or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike}${wildcardEscapeClause}
+            or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+          </if>
+          <if test="orQueryObject.tenantIdLikeIgnoreCase != null">
+            or lower(RES.TENANT_ID_) like lower(#{orQueryObject.tenantIdLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.withoutTenantId">
             or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
           </if>
           <if test="orQueryObject.name != null">
-            or RES.NAME_ = #{orQueryObject.name}
+            or RES.NAME_ = #{orQueryObject.name, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.nameLike != null">
-            or RES.NAME_ like #{orQueryObject.nameLike}${wildcardEscapeClause}
+            or RES.NAME_ like #{orQueryObject.nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.nameLikeIgnoreCase != null">
-            or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase})${wildcardEscapeClause}
+            or lower(RES.NAME_) like lower(#{orQueryObject.nameLikeIgnoreCase, jdbcType=NVARCHAR})${wildcardEscapeClause}
           </if>
           <if test="orQueryObject.parentScopeId != null">
               or EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
-              LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId}
+              LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId, jdbcType=NVARCHAR}
               and LINK.REF_SCOPE_ID_ = RES.ID_
               and LINK.HIERARCHY_TYPE_ = 'parent'
               )
@@ -1123,25 +1183,25 @@
           <if test="orQueryObject.rootScopeId != null">
               or exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
               LINK.REF_SCOPE_ID_ = RES.ID_
-              and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId}
+              and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId, jdbcType=NVARCHAR}
               )
           </if>
           <if test="orQueryObject.activeActivityId != null">
-	        or EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{orQueryObject.activeActivityId} and A.END_TIME_ is null)
+	        or EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ = #{orQueryObject.activeActivityId, jdbcType=NVARCHAR} and A.END_TIME_ is null)
 	      </if>
 	      <if test="orQueryObject.activeActivityIds != null">
 	        or EXISTS(select ID_ from ${prefix}ACT_RU_ACTINST A where A.PROC_INST_ID_ = RES.ID_ and A.ACT_ID_ in 
 	        <foreach item="activeActivityId" index="index" collection="orQueryObject.activeActivityIds" open="(" separator="," close=")">
-	            #{activeActivityId}
+	            #{activeActivityId, jdbcType=NVARCHAR}
 	        </foreach>
 	        and A.END_TIME_ is null)
 	      </if>
           <if test="orQueryObject.involvedUser != null">
-            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{orQueryObject.involvedUser})
+            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR})
           </if>
           <if test="orQueryObject.involvedUserIdentityLink != null">
 	        or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
-	        I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type})
+	        I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
 	      </if>
           <if test="orQueryObject.involvedGroups != null">
             or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
@@ -1151,9 +1211,9 @@
                     or
                     </if>
                     I.GROUP_ID_ IN
-                    <foreach item="group" index="index" collection="involvedGroupListItem"
+                    <foreach item="groupId" index="index" collection="involvedGroupListItem"
                           open="(" separator="," close=")">
-                      #{group}
+                      #{groupId, jdbcType=NVARCHAR}
                     </foreach>
                 </foreach>
                 )
@@ -1161,7 +1221,7 @@
           </if>
           <if test="orQueryObject.involvedGroupIdentityLink != null">
 	        or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.PROC_INST_ID_ = RES.ID_ and 
-	        I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type})
+	        I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
 	      </if>
           <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
           <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
@@ -1170,7 +1230,7 @@
               <choose>
                 <when test="queryVariableValue.operator.equals('EXISTS')">
                     and EXISTS (
-                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                     <if test="!queryVariableValue.local">
                         and RES.PROC_INST_ID_ = EXECUTION_ID_
                     </if>
@@ -1181,7 +1241,7 @@
                 </when>
                 <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
                     and NOT EXISTS (
-                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                        select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                     <if test="!queryVariableValue.local">
                         and RES.PROC_INST_ID_ = EXECUTION_ID_
                     </if>
@@ -1203,10 +1263,10 @@
                             </if>
                             <if test="queryVariableValue.name != null">
                                 <!-- Match-all variable-names when name is null -->
-                                and V.NAME_= #{queryVariableValue.name}
+                                and V.NAME_= #{queryVariableValue.name, jdbcType=NVARCHAR}
                             </if>
                             <if test="queryVariableValue.needsTypeCheck()">
-                                and V.TYPE_ = #{queryVariableValue.type}
+                                and V.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
                             </if>
                             <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                                 <choose>
@@ -1221,7 +1281,7 @@
                                     <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                                     <otherwise><include refid="executionVariableOperator" /></otherwise>
                                 </choose>
-                                #{queryVariableValue.textValue}
+                                #{queryVariableValue.textValue, jdbcType=NVARCHAR}
                                 <choose>
                                     <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                                 </choose>
@@ -1236,7 +1296,7 @@
                                     <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
                                     <otherwise><include refid="executionVariableOperator" /></otherwise>
                                 </choose>
-                                #{queryVariableValue.textValue2}
+                                #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
                                 <choose>
                                     <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
                                 </choose>
@@ -1244,7 +1304,7 @@
                             <if test="queryVariableValue.longValue != null">
                                 and (V.LONG_
                                 <include refid="executionVariableOperator" />
-                                #{queryVariableValue.longValue}
+                                #{queryVariableValue.longValue, jdbcType=BIGINT}
                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                     or V.LONG_ is null
                                 </if>
@@ -1253,7 +1313,7 @@
                             <if test="queryVariableValue.doubleValue != null">
                                 and (V.DOUBLE_
                                 <include refid="executionVariableOperator" />
-                                #{queryVariableValue.doubleValue}
+                                #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
                                 <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                     or V.DOUBLE_ is null
                                 </if>
@@ -1289,13 +1349,13 @@
           )
       </if>
       <if test="startedBefore != null">
-        and RES.START_TIME_ &lt;= #{startedBefore}
+        and RES.START_TIME_ &lt;= #{startedBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="startedAfter != null">
-        and RES.START_TIME_ &gt;= #{startedAfter}
+        and RES.START_TIME_ &gt;= #{startedAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="startedBy != null">
-        and RES.START_USER_ID_ = #{startedBy}
+        and RES.START_USER_ID_ = #{startedBy, jdbcType=NVARCHAR}
       </if>
     </where>
   </sql>
@@ -1316,7 +1376,7 @@
   <select id="selectSubProcessInstanceBySuperExecutionId" parameterType="string" resultMap="executionResultMap">
     select *
     from ${prefix}ACT_RU_EXECUTION
-    where SUPER_EXEC_ = #{parameter}
+    where SUPER_EXEC_ = #{parameter, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectExecutionByNativeQuery" parameterType="java.util.Map" resultMap="executionResultMap">

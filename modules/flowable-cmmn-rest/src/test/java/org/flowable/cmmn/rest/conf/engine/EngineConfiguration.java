@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.rest.conf.engine;
 
-import java.sql.Driver;
-
 import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -29,14 +27,15 @@ import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -45,7 +44,7 @@ public class EngineConfiguration {
     protected String jdbcUrl;
 
     @Value("${jdbc.driver:org.h2.Driver}")
-    protected Class<? extends Driver> jdbcDriver;
+    protected String jdbcDriver;
 
     @Value("${jdbc.username:sa}")
     protected String jdbcUsername;
@@ -55,15 +54,12 @@ public class EngineConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        SimpleDriverDataSource ds = new SimpleDriverDataSource();
-        ds.setDriverClass(jdbcDriver);
-
-        // Connection settings
-        ds.setUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
-        ds.setUsername(jdbcUsername);
-        ds.setPassword(jdbcPassword);
-
-        return ds;
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setJdbcUrl(jdbcUrl);
+        dataSource.setDriverClassName(jdbcDriver);
+        dataSource.setUsername(jdbcUsername);
+        dataSource.setPassword(jdbcPassword);
+        return dataSource;
     }
 
     @Bean(name = "transactionManager")
@@ -81,7 +77,8 @@ public class EngineConfiguration {
     }
 
     @Bean(name = "cmmnEngineConfiguration")
-    public CmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+    public CmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+            SpringIdmEngineConfigurator springIdmEngineConfigurator) {
         SpringCmmnEngineConfiguration cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
         cmmnEngineConfiguration.setDataSource(dataSource);
         cmmnEngineConfiguration.setDatabaseSchemaUpdate(CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -89,7 +86,15 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
+
+        cmmnEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
         return cmmnEngineConfiguration;
+    }
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
     }
     
     @Bean

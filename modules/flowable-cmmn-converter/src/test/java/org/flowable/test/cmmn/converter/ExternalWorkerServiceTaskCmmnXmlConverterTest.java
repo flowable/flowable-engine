@@ -21,6 +21,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
@@ -68,6 +69,14 @@ public class ExternalWorkerServiceTaskCmmnXmlConverterTest{
                 .containsOnly(
                         tuple("flowable", "customValue", "test")
                 );
+        assertThat(taskA.getInParameters()).hasSize(1);
+        IOParameter inParameter = taskA.getInParameters().get(0);
+        assertThat(inParameter.getSource()).isEqualTo("description");
+        assertThat(inParameter.getTarget()).isEqualTo("theDescription");
+        assertThat(taskA.getOutParameters()).hasSize(1);
+        IOParameter outParameter = taskA.getOutParameters().get(0);
+        assertThat(outParameter.getSource()).isEqualTo("theResult");
+        assertThat(outParameter.getTarget()).isEqualTo("result");
 
         PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
         planItemDefinition = planItemTaskB.getPlanItemDefinition();

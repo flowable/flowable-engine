@@ -39,8 +39,8 @@ import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
-import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceStartEventSubscriptionCmd;
+import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
 import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
@@ -72,6 +72,7 @@ import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.RemoveProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.RemoveProcessInstanceOwnerCmd;
+import org.flowable.engine.impl.cmd.SetAsyncExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
@@ -359,6 +360,36 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void setVariablesLocal(String executionId, Map<String, ?> variables) {
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+    }
+    
+    @Override
+    public void setVariableAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariableLocalAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
+    }
+
+    @Override
+    public void setVariablesAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariablesLocalAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
     }
 
     @Override

@@ -19,18 +19,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import javax.sql.DataSource;
 
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Tom Baeyens
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringTransactionIntegrationTest-context.xml")
+@DirtiesContext
 public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
     @Autowired
@@ -58,7 +61,11 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
 
         // Create a table that the userBean is supposed to fill with some data
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute("create table MY_TABLE (MY_TEXT varchar);");
+        if (processEngineConfiguration.getDatabaseType().equals(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE)) {
+            jdbcTemplate.execute("create table MY_TABLE (MY_TEXT INTEGER)");
+        } else {
+            jdbcTemplate.execute("create table MY_TABLE (MY_COLUMN int);");
+        }
 
         // The hello() method will start the process. The process will wait in a
         // user task
@@ -76,7 +83,7 @@ public class SpringTransactionIntegrationTest extends SpringFlowableTestCase {
         assertThat(jdbcTemplate.queryForObject("select count(*) from MY_TABLE", Long.class)).isZero();
 
         // Cleanup
-        jdbcTemplate.execute("drop table MY_TABLE if exists;");
+        jdbcTemplate.execute("drop table MY_TABLE");
     }
 
     @Test

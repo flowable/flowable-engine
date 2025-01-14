@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 import java.net.URISyntaxException;
-import java.sql.Driver;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,8 +27,11 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.flowable.bpmn.exceptions.XMLException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.test.AbstractTestCase;
@@ -37,6 +39,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.junit.jupiter.api.AfterEach;
@@ -49,8 +52,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Tom Baeyens
@@ -69,6 +73,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
     protected ConfigurableApplicationContext applicationContext;
     protected RepositoryService repositoryService;
+    protected ManagementService managementService;
 
     protected void createAppContextWithCreateDropDb() {
         Map<String, Object> properties = new HashMap<>();
@@ -113,16 +118,24 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         applicationContext.refresh();
         this.applicationContext = applicationContext;
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
+        this.managementService = applicationContext.getBean(ManagementService.class);
     }
 
     @AfterEach
     protected void tearDown() throws Exception {
         removeAllDeployments();
+
+        // Make sure the schema is always dropped
+        if (managementService != null) {
+            this.managementService.executeCommand(new SchemaOperationsEngineDropDbCmd(ScopeTypes.BPMN));
+        }
+
         if (this.applicationContext != null) {
             this.applicationContext.close();
             this.applicationContext = null;
         }
         this.repositoryService = null;
+        this.managementService = null;
     }
 
     @Test
@@ -342,18 +355,17 @@ public class SpringAutoDeployTest extends AbstractTestCase {
     static class SpringAutoDeployTestConfiguration {
 
         @Bean
-        public SimpleDriverDataSource dataSource(
-                @Value("${jdbc.driver:org.h2.Driver}") Class<? extends Driver> driverClass,
+        public DataSource dataSource(
+                @Value("${jdbc.driver:org.h2.Driver}") String driverClass,
                 @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}") String url,
                 @Value("${jdbc.username:sa}") String username,
                 @Value("${jdbc.password:}") String password
         ) {
-            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-            dataSource.setDriverClass(driverClass);
-            dataSource.setUrl(url);
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(url);
+            dataSource.setDriverClassName(driverClass);
             dataSource.setUsername(username);
             dataSource.setPassword(password);
-
             return dataSource;
         }
 
@@ -364,6 +376,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
 
         @Bean
         public SpringProcessEngineConfiguration processEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+                SpringIdmEngineConfigurator springIdmEngineConfigurator,
                 @Value("${databaseSchemaUpdate:true}") String databaseSchemaUpdate,
                 @Value("${deploymentMode:#{null}}") String deploymentMode,
                 @Value("${deploymentResources}") Resource[] deploymentResources,
@@ -390,7 +403,14 @@ public class SpringAutoDeployTest extends AbstractTestCase {
                         });
             }
 
+            processEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
+
             return processEngineConfiguration;
+        }
+
+        @Bean(name = "springIdmEngineConfigurator")
+        public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+            return new SpringIdmEngineConfigurator();
         }
 
         @Bean
@@ -403,6 +423,11 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         @Bean
         public RepositoryService repositoryService(ProcessEngine processEngine) {
             return processEngine.getRepositoryService();
+        }
+
+        @Bean
+        public ManagementService managementService(ProcessEngine processEngine) {
+            return processEngine.getManagementService();
         }
     }
 

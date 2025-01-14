@@ -882,7 +882,11 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         // If this test fails verify that the properties that are missing are added to DeleteHistoricCaseInstancesUsingBatchesCmd and BatchDeleteCaseConfig
         Map<String, String> methodNameToExpectedQueryPropertyName = new HashMap<>();
         methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessKey", "businessKey");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessKeyLike", "businessKeyLike");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessKeyLikeIgnoreCase", "businessKeyLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessStatus", "businessStatus");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessStatusLike", "businessStatusLike");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("caseInstanceCallbackType", "callbackType");
         methodNameToExpectedQueryPropertyName.put("caseInstanceCallbackId", "callbackId");
         methodNameToExpectedQueryPropertyName.put("withoutCaseInstanceCallbackId", "withoutCallbackId");
@@ -890,12 +894,16 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         methodNameToExpectedQueryPropertyName.put("caseInstanceReferenceId", "referenceId");
         methodNameToExpectedQueryPropertyName.put("caseInstanceWithoutTenantId", "withoutTenantId");
         methodNameToExpectedQueryPropertyName.put("caseInstanceTenantId", "tenantId");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceTenantIdLike", "tenantIdLike");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceTenantIdLikeIgnoreCase", "tenantIdLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("withoutCaseInstanceParent", "withoutCaseInstanceParentId");
         Set<String> methodsToIgnore = new HashSet<>();
         methodsToIgnore.add("limitCaseVariables");
         methodsToIgnore.add("includeCaseVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("returnIdsOnly");
+        methodsToIgnore.add("withoutSorting");
         methodsToIgnore.add("asc");
         methodsToIgnore.add("desc");
         methodsToIgnore.add("or");

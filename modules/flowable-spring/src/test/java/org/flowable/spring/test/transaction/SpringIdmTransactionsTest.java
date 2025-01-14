@@ -36,6 +36,7 @@ import org.flowable.task.service.delegate.DelegateTask;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -46,6 +47,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringIdmTransactionsTest-context.xml")
+@DirtiesContext
 public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
     @Autowired

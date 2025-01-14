@@ -13,7 +13,6 @@
 package org.flowable.identitylink.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
@@ -51,8 +50,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     /** IdentityLink event handler */
     protected IdentityLinkEventHandler identityLinkEventHandler;
     
-    protected HistoryLevel historyLevel;
-    
     protected ObjectMapper objectMapper;
     
     public IdentityLinkServiceConfiguration(String engineName) {
@@ -74,23 +71,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
         initEntityManagers();
 
         configuratorsAfterInit();
-    }
-    
-    @Override
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
-
-    @Override
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
     }
 
     // Data managers
@@ -172,17 +152,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     public IdentityLinkServiceConfiguration setHistoricIdentityLinkEntityManager(HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager) {
         this.historicIdentityLinkEntityManager = historicIdentityLinkEntityManager;
-        return this;
-    }
-    
-    @Override
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-    
-    @Override
-    public IdentityLinkServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
         return this;
     }
     

@@ -43,6 +43,7 @@ public final class RestUrls {
     public static final String SEGMENT_ACTIVITY_INSTANCE_RESOURCE = "activity-instances";
     public static final String SEGMENT_PROCESS_INSTANCE_RESOURCE = "process-instances";
     public static final String SEGMENT_VARIABLES = "variables";
+    public static final String SEGMENT_VARIABLES_ASYNC = "variables-async";
     public static final String SEGMENT_VARIABLE_INSTANCE_RESOURCE = "variable-instances";
     public static final String SEGMENT_EVENT_SUBSCRIPTIONS = "event-subscriptions";
     public static final String SEGMENT_SUBTASKS = "subtasks";
@@ -295,6 +296,11 @@ public final class RestUrls {
      * URL template for a single variables for an execution: <i>runtime/executions/{0:executionId}/variables/{1:variableName}</i>
      */
     public static final String[] URL_EXECUTION_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}" };
+    
+    /**
+     * URL template for a single variables for an execution: <i>runtime/executions/{0:executionId}/variables-async/{1:variableName}</i>
+     */
+    public static final String[] URL_EXECUTION_VARIABLE_ASYNC = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_EXECUTION_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC, "{1}" };
 
     /**
      * URL template for a single variables for an execution: <i>runtime/executions/{0:executionId}/variables/{1:variableName}/data</i>
@@ -345,11 +351,21 @@ public final class RestUrls {
      * URL template for process instance variable collection: <i>runtime/process-instances/{0:processInstanceId}/variables</i>
      */
     public static final String[] URL_PROCESS_INSTANCE_VARIABLE_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES };
+    
+    /**
+     * URL template for process instance variable collection: <i>runtime/process-instances/{0:processInstanceId}/variables-async</i>
+     */
+    public static final String[] URL_PROCESS_INSTANCE_VARIABLE_ASYNC_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC };
 
     /**
      * URL template for a single process instance variable: <i>runtime/process-instances /{0:processInstanceId}/variables/{1:variableName}</i>
      */
     public static final String[] URL_PROCESS_INSTANCE_VARIABLE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES, "{1}" };
+    
+    /**
+     * URL template for a single process instance variable: <i>runtime/process-instances /{0:processInstanceId}/variables-async/{1:variableName}</i>
+     */
+    public static final String[] URL_PROCESS_INSTANCE_VARIABLE_ASYNC = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_VARIABLES_ASYNC, "{1}" };
 
     /**
      * URL template for a single process instance variable data: <i>runtime/process -instances/{0:processInstanceId}/variables/{1:variableName}/data</i>
@@ -606,7 +622,7 @@ public final class RestUrls {
     /**
      * URL template for the collection of batches: <i>management/batches/{0:batchId}/batch-parts</i>
      */
-    public static final String[] URL_BATCH_PART_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCH_PARTS, "{0}", SEGMENT_BATCH_PARTS };
+    public static final String[] URL_BATCH_PART_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCHES, "{0}", SEGMENT_BATCH_PARTS };
 
     /**
      * URL template for a single event subscription: <i>runtime/event-subscriptions/{0:eventSubscriptionId}</i>

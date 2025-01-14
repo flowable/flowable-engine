@@ -318,12 +318,7 @@ public abstract class BaseSpringRestTestCase extends TestCase {
                 eventRegistryEngineConfiguration,
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 exception == null,
-                commandContext -> {
-                    SchemaManager schemaManager = CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
+                eventRegistryEngineConfiguration.getSchemaManagementCmd()
         );
     }
 

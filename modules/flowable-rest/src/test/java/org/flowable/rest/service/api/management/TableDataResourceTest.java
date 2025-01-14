@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
@@ -42,6 +43,11 @@ public class TableDataResourceTest extends BaseSpringRestTestCase {
      */
     @Test
     public void testGetTableColumns() throws Exception {
+        // This test only works on H2
+        if (!processEngineConfiguration.getDatabaseType().equalsIgnoreCase(AbstractEngineConfiguration.DATABASE_TYPE_H2)) {
+             return;
+        }
+
         try {
 
             Task task = taskService.newTask();

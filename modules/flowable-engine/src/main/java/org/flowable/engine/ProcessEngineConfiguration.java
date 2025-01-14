@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -81,7 +81,7 @@ import org.flowable.task.service.TaskPostProcessor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractBuildableEngineConfiguration<ProcessEngine> {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -160,7 +160,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessEngineConfiguration() {
     }
 
-    public abstract ProcessEngine buildProcessEngine();
+    public ProcessEngine buildProcessEngine() {
+        return buildEngine();
+    }
 
     public static ProcessEngineConfiguration createProcessEngineConfigurationFromResourceDefault() {
         return createProcessEngineConfigurationFromResource("flowable.cfg.xml", "processEngineConfiguration");

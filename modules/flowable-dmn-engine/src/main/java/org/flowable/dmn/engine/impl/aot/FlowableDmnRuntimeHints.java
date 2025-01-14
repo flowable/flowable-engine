@@ -13,6 +13,7 @@
 package org.flowable.dmn.engine.impl.aot;
 
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
+import org.flowable.common.engine.impl.aot.FlowableSqlResourceHintsRegistrar;
 import org.springframework.aot.hint.ResourceHints;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -26,7 +27,7 @@ public class FlowableDmnRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/dmn/db/mapping", hints, classLoader);
-        resourceHints.registerPattern("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml");
+        FlowableSqlResourceHintsRegistrar.registerSqlResources("org/flowable/dmn/db", resourceHints);
         resourceHints.registerPattern("org/flowable/impl/dmn/parser/*.xsd");
     }
 }

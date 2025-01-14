@@ -24,22 +24,22 @@
         insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values (
-            #{id, jdbcType=VARCHAR},
-            #{processInstanceId, jdbcType=VARCHAR},
-            #{executionId, jdbcType=VARCHAR},
-            #{taskId, jdbcType=VARCHAR},
-            #{variableName, jdbcType=VARCHAR},
-            #{revision, jdbcType=VARCHAR},
-            #{variableType, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
+            #{id, jdbcType=NVARCHAR},
+            #{processInstanceId, jdbcType=NVARCHAR},
+            #{executionId, jdbcType=NVARCHAR},
+            #{taskId, jdbcType=NVARCHAR},
+            #{variableName, jdbcType=NVARCHAR},
+            #{revision, jdbcType=INTEGER},
+            #{variableType, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
             #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             #{doubleValue, jdbcType=DOUBLE},
             #{longValue, jdbcType=BIGINT},
-            #{textValue, jdbcType=VARCHAR},
-            #{textValue2, jdbcType=VARCHAR},
-            #{metaInfo, jdbcType=VARCHAR},
+            #{textValue, jdbcType=NVARCHAR},
+            #{textValue2, jdbcType=NVARCHAR},
+            #{metaInfo, jdbcType=NVARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{lastUpdatedTime, jdbcType=TIMESTAMP}
         )
@@ -49,54 +49,54 @@
         insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values
-        <foreach collection="list" item="historicVariable" index="index" separator=",">
+        <foreach collection="list" item="historicVariableInstance" index="index" separator=",">
             (
-                #{historicVariable.id, jdbcType=VARCHAR},
-                #{historicVariable.processInstanceId, jdbcType=VARCHAR},
-                #{historicVariable.executionId, jdbcType=VARCHAR},
-                #{historicVariable.taskId, jdbcType=VARCHAR},
-                #{historicVariable.variableName, jdbcType=VARCHAR},
-                #{historicVariable.revision, jdbcType=VARCHAR},
-                #{historicVariable.variableType, jdbcType=VARCHAR},
-                #{historicVariable.scopeId, jdbcType=VARCHAR},
-                #{historicVariable.subScopeId, jdbcType=VARCHAR},
-                #{historicVariable.scopeType, jdbcType=VARCHAR},
-                #{historicVariable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
-                #{historicVariable.doubleValue, jdbcType=DOUBLE},
-                #{historicVariable.longValue, jdbcType=BIGINT},
-                #{historicVariable.textValue, jdbcType=VARCHAR},
-                #{historicVariable.textValue2, jdbcType=VARCHAR},
-                #{historicVariable.metaInfo, jdbcType=VARCHAR},
-                #{historicVariable.createTime, jdbcType=TIMESTAMP},
-                #{historicVariable.lastUpdatedTime, jdbcType=TIMESTAMP}
+                #{historicVariableInstance.id, jdbcType=NVARCHAR},
+                #{historicVariableInstance.processInstanceId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.executionId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.taskId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.variableName, jdbcType=NVARCHAR},
+                #{historicVariableInstance.revision, jdbcType=INTEGER},
+                #{historicVariableInstance.variableType, jdbcType=NVARCHAR},
+                #{historicVariableInstance.scopeId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.subScopeId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.scopeType, jdbcType=NVARCHAR},
+                #{historicVariableInstance.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
+                #{historicVariableInstance.doubleValue, jdbcType=DOUBLE},
+                #{historicVariableInstance.longValue, jdbcType=BIGINT},
+                #{historicVariableInstance.textValue, jdbcType=NVARCHAR},
+                #{historicVariableInstance.textValue2, jdbcType=NVARCHAR},
+                #{historicVariableInstance.metaInfo, jdbcType=NVARCHAR},
+                #{historicVariableInstance.createTime, jdbcType=TIMESTAMP},
+                #{historicVariableInstance.lastUpdatedTime, jdbcType=TIMESTAMP}
             )
         </foreach>
     </insert>
 
     <insert id="bulkInsertHistoricVariableInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="historicVariable" index="index">
+        <foreach collection="list" item="historicVariableInstance" index="index">
             INTO ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, META_INFO_, CREATE_TIME_, LAST_UPDATED_TIME_) VALUES
             (
-                #{historicVariable.id, jdbcType=VARCHAR},
-                #{historicVariable.processInstanceId, jdbcType=VARCHAR},
-                #{historicVariable.executionId, jdbcType=VARCHAR},
-                #{historicVariable.taskId, jdbcType=VARCHAR},
-                #{historicVariable.variableName, jdbcType=VARCHAR},
-                #{historicVariable.revision, jdbcType=VARCHAR},
-                #{historicVariable.variableType, jdbcType=VARCHAR},
-                #{historicVariable.scopeId, jdbcType=VARCHAR},
-                #{historicVariable.subScopeId, jdbcType=VARCHAR},
-                #{historicVariable.scopeType, jdbcType=VARCHAR},
-                #{historicVariable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
-                #{historicVariable.doubleValue, jdbcType=DOUBLE},
-                #{historicVariable.longValue, jdbcType=BIGINT},
-                #{historicVariable.textValue, jdbcType=VARCHAR},
-                #{historicVariable.textValue2, jdbcType=VARCHAR},
-                #{historicVariable.metaInfo, jdbcType=VARCHAR},
-                #{historicVariable.createTime, jdbcType=TIMESTAMP},
-                #{historicVariable.lastUpdatedTime, jdbcType=TIMESTAMP}
+                #{historicVariableInstance.id, jdbcType=NVARCHAR},
+                #{historicVariableInstance.processInstanceId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.executionId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.taskId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.variableName, jdbcType=NVARCHAR},
+                #{historicVariableInstance.revision, jdbcType=INTEGER},
+                #{historicVariableInstance.variableType, jdbcType=NVARCHAR},
+                #{historicVariableInstance.scopeId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.subScopeId, jdbcType=NVARCHAR},
+                #{historicVariableInstance.scopeType, jdbcType=NVARCHAR},
+                #{historicVariableInstance.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
+                #{historicVariableInstance.doubleValue, jdbcType=DOUBLE},
+                #{historicVariableInstance.longValue, jdbcType=BIGINT},
+                #{historicVariableInstance.textValue, jdbcType=NVARCHAR},
+                #{historicVariableInstance.textValue2, jdbcType=NVARCHAR},
+                #{historicVariableInstance.metaInfo, jdbcType=NVARCHAR},
+                #{historicVariableInstance.createTime, jdbcType=TIMESTAMP},
+                #{historicVariableInstance.lastUpdatedTime, jdbcType=TIMESTAMP}
             )
         </foreach>
         SELECT * FROM dual
@@ -109,7 +109,7 @@
         <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (byteArrayRef != null and originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
@@ -121,35 +121,35 @@
                 LONG_ = #{longValue, jdbcType=BIGINT},
             </if>
             <if test="originalPersistentState.textValue != textValue">
-                TEXT_ = #{textValue, jdbcType=VARCHAR},
+                TEXT_ = #{textValue, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.textValue2 != textValue2">
-                TEXT2_ = #{textValue2, jdbcType=VARCHAR},
+                TEXT2_ = #{textValue2, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.metaInfo != metaInfo">
-                META_INFO_ = #{metaInfo, jdbcType=VARCHAR},
+                META_INFO_ = #{metaInfo, jdbcType=NVARCHAR},
             </if>
             <if test="(originalPersistentState.typeName == null and variableType != null) or (originalPersistentState.typeName != null and variableType == null) or (originalPersistentState.typeName != variableType.typeName)">
-                VAR_TYPE_ = #{variableType, jdbcType=VARCHAR},
+                VAR_TYPE_ = #{variableType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.lastUpdatedTime != lastUpdatedTime">
                 LAST_UPDATED_TIME_ = #{lastUpdatedTime, jdbcType=TIMESTAMP},
             </if>
         </set>
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
     <!-- HISTORIC PROCESS VARIABLE DELETE -->
 
     <delete id="deleteHistoricVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
-        delete from ${prefix}ACT_HI_VARINST where ID_ = #{id} and REV_ = #{revision}
+        delete from ${prefix}ACT_HI_VARINST where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </delete>
 
     <delete id="bulkDeleteHistoricVariableInstance" parameterType="java.util.Collection">
         delete from ${prefix}ACT_HI_VARINST where
         <foreach item="variable" collection="list" index="index" separator=" or ">
-            ID_ = #{variable.id, jdbcType=VARCHAR}
+            ID_ = #{variable.id, jdbcType=NVARCHAR}
         </foreach>
     </delete>
     
@@ -164,8 +164,8 @@
                 or
                 </if>
                 VARINST.PROC_INST_ID_ in 
-                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                  #{item}
+                <foreach item="processInstanceId" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{processInstanceId, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>
         )
@@ -178,8 +178,8 @@
             or
             </if>
             PROC_INST_ID_ in 
-            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-              #{item}
+            <foreach item="processInstanceId" index="index" collection="listItem" open="(" separator="," close=")">
+              #{processInstanceId, jdbcType=NVARCHAR}
             </foreach>
         </foreach>
     </delete>
@@ -195,8 +195,8 @@
                 or
                 </if>
                 VARINST.TASK_ID_ in 
-                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                  #{item}
+                <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{taskId, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>
         )
@@ -209,8 +209,8 @@
             or
             </if>
             TASK_ID_ in 
-            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-              #{item}
+            <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+              #{taskId, jdbcType=NVARCHAR}
             </foreach>
         </foreach>
     </delete>
@@ -226,11 +226,11 @@
                 or
                 </if>
                 VARINST.SCOPE_ID_ in 
-                <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-                  #{item}
+                <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{scopeId, jdbcType=NVARCHAR}
                 </foreach>
             </foreach>)
-            and VARINST.SCOPE_TYPE_ = #{scopeType}
+            and VARINST.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
         )
     </delete>
     
@@ -241,11 +241,11 @@
             or
             </if>
             SCOPE_ID_ in 
-            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-              #{item}
+            <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+              #{scopeId, jdbcType=NVARCHAR}
             </foreach>
         </foreach>)
-        and SCOPE_TYPE_ = #{scopeType}
+        and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
     </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
@@ -323,21 +323,21 @@
 
     <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
     <resultMap id="historicProcessVariableResultMap" type="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
-        <id property="id" column="ID_" jdbcType="VARCHAR" />
-        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-        <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-        <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-        <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+        <id property="id" column="ID_" jdbcType="NVARCHAR" />
+        <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+        <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+        <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR" />
+        <result property="name" column="NAME_" javaType="String" jdbcType="NVARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
-        <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="VARCHAR" />
-        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
-        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
-        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
+        <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR" />
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR" />
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR" />
         <result property="byteArrayRef" column="BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler" />
         <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
-        <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
-        <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
-        <result property="metaInfo" column="META_INFO_" jdbcType="VARCHAR" />
+        <result property="textValue" column="TEXT_" jdbcType="NVARCHAR" />
+        <result property="textValue2" column="TEXT2_" jdbcType="NVARCHAR" />
+        <result property="metaInfo" column="META_INFO_" jdbcType="NVARCHAR" />
         <result property="longValue" column="LONG_" jdbcType="BIGINT" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="lastUpdatedTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP" />
@@ -363,28 +363,42 @@
         from ${prefix}ACT_HI_VARINST RES
         <where>
             <if test="id != null">
-                RES.ID_ = #{id}
+                RES.ID_ = #{id, jdbcType=NVARCHAR}
             </if>
             <if test="processInstanceId != null">
-                and RES.PROC_INST_ID_ = #{processInstanceId}
+                and RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
+            </if>
+            <if test="processInstanceIds != null and !processInstanceIds.empty">
+                and (
+                <foreach item="listItem" collection="safeProcessInstanceIds" separator="OR">
+                    RES.PROC_INST_ID_ in
+                    <foreach item="processInstanceId" collection="listItem" open="(" separator="," close=")">
+                        #{processInstanceId, jdbcType=NVARCHAR}
+                    </foreach>
+                </foreach>
+                )
             </if>
             <if test="executionId != null">
-                and RES.EXECUTION_ID_ = #{executionId}
+                and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="executionIds != null and !executionIds.empty">
                 and RES.EXECUTION_ID_ in
-                <foreach item="item" index="index" collection="executionIds" open="(" separator="," close=")">
-                    #{item}
+                <foreach item="executionId" index="index" collection="executionIds" open="(" separator="," close=")">
+                    #{executionId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="taskId != null">
-                and RES.TASK_ID_ = #{taskId}
+                and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
             </if>
             <if test="taskIds != null and !taskIds.empty">
-                and RES.TASK_ID_ in
-                <foreach item="item" index="index" collection="taskIds" open="(" separator="," close=")">
-                    #{item}
+                and (
+                <foreach item="listItem" collection="safeTaskIds" separator="OR">
+                    RES.TASK_ID_ in
+                    <foreach item="taskId" collection="listItem" open="(" separator="," close=")">
+                        #{taskId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
@@ -395,25 +409,35 @@
                 and RES.SUB_SCOPE_ID_ is NULL
             </if>
             <if test="scopeId != null">
-                and RES.SCOPE_ID_ = #{scopeId}
+                and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
+            </if>
+            <if test="scopeIds != null and !scopeIds.empty">
+                and (
+                    <foreach item="listItem" collection="safeScopeIds" separator="OR">
+                        RES.SCOPE_ID_ in
+                        <foreach item="scopeId" collection="listItem" open="(" separator="," close=")">
+                            #{scopeId, jdbcType=NVARCHAR}
+                        </foreach>
+                    </foreach>
+                )
             </if>
             <if test="subScopeId != null">
-                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+                and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="scopeType != null">
-                and RES.SCOPE_TYPE_ = #{scopeType}
+                and RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
             </if>
             <if test="variableName != null">
-                and RES.NAME_ = #{variableName}
+                and RES.NAME_ = #{variableName, jdbcType=NVARCHAR}
             </if>
             <if test="variableNameLike != null">
-                and RES.NAME_ like #{variableNameLike}${wildcardEscapeClause}
+                and RES.NAME_ like #{variableNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
 
             <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
             <if test="queryVariableValue != null">
                 <if test="queryVariableValue.needsTypeCheck()">
-                    and RES.VAR_TYPE_ = #{queryVariableValue.type}
+                    and RES.VAR_TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
                 </if>
                 <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                     and (RES.TEXT_
@@ -423,7 +447,7 @@
                             <include refid="executionVariableOperator" />
                         </otherwise>
                     </choose>
-                    #{queryVariableValue.textValue}
+                    #{queryVariableValue.textValue, jdbcType=NVARCHAR}
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -440,7 +464,7 @@
                             <include refid="executionVariableOperator" />
                         </otherwise>
                     </choose>
-                    #{queryVariableValue.textValue2}
+                    #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
                     <choose>
                         <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                     </choose>
@@ -448,7 +472,7 @@
                 <if test="queryVariableValue.longValue != null">
                     and (RES.LONG_
                     <include refid="executionVariableOperator" />
-                    #{queryVariableValue.longValue}
+                    #{queryVariableValue.longValue, jdbcType=BIGINT}
                     <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                         or RES.LONG_ is null
                     </if>
@@ -457,7 +481,7 @@
                 <if test="queryVariableValue.doubleValue != null">
                     and (RES.DOUBLE_
                     <include refid="executionVariableOperator" />
-                    #{queryVariableValue.doubleValue}
+                    #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
                     <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                         or RES.DOUBLE_ is null
                     </if>
@@ -491,27 +515,27 @@
     </sql>
 
     <select id="selectHistoricVariableInstance" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
+        select * from ${prefix}ACT_HI_VARINST where ID_ = #{id, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectHistoricVariableInstanceByVariableInstanceId" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where ID_ = #{variableInstanceId}
+        select * from ${prefix}ACT_HI_VARINST where ID_ = #{id, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectHistoricVariableInstanceByProcessInstanceId" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ = #{parameter}
+        select * from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectHistoricVariableInstanceByTaskId" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where TASK_ID_ = #{parameter}
+        select * from ${prefix}ACT_HI_VARINST where TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectHistoricVariableInstanceByScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+        select * from ${prefix}ACT_HI_VARINST where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectHistoricVariableInstanceBySubScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+        select * from ${prefix}ACT_HI_VARINST where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectHistoricVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessVariableResultMap">

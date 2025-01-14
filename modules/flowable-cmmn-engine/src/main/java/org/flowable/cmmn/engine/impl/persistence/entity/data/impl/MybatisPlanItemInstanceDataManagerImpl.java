@@ -119,7 +119,14 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         setSafeInValueLists(planItemInstanceQuery);
         return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
     }
-    
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<PlanItemInstance> findWithVariablesByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
+        setSafeInValueLists(planItemInstanceQuery);
+        return getDbSqlSession().selectList("selectPlanItemInstancesWithLocalVariablesByQueryCriteria", planItemInstanceQuery, getManagedEntityClass());
+    }
+
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deletePlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
@@ -188,6 +195,12 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     protected void setSafeInValueLists(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
+        }
+
+        if (planItemInstanceQuery.getOrQueryObjects() != null && !planItemInstanceQuery.getOrQueryObjects().isEmpty()) {
+            for (PlanItemInstanceQueryImpl oInstanceQuery : planItemInstanceQuery.getOrQueryObjects()) {
+                setSafeInValueLists(oInstanceQuery);
+            }
         }
     }
 }

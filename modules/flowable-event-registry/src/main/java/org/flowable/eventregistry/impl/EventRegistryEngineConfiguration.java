@@ -21,10 +21,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -48,7 +50,6 @@ import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExe
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
@@ -91,16 +92,10 @@ import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.exception.DatabaseException;
-
-public class EventRegistryEngineConfiguration extends AbstractEngineConfiguration
+public class EventRegistryEngineConfiguration extends AbstractBuildableEngineConfiguration<EventRegistryEngine>
         implements EventRegistryConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/eventregistry/db/mapping/mappings.xml";
-
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "FLW_EV_";
 
     protected String eventRegistryEngineName = EventRegistryEngines.NAME_DEFAULT;
 
@@ -205,25 +200,24 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     // buildEventRegistryEngine
     // ///////////////////////////////////////////////////////
 
+    @Override
+    protected EventRegistryEngine createEngine() {
+        return new EventRegistryEngineImpl(this);
+    }
+
+    @Override
+    protected Consumer<EventRegistryEngine> createPostEngineBuildConsumer() {
+        return new EventRegistryEnginePostEngineBuildConsumer();
+    }
+
     public EventRegistryEngine buildEventRegistryEngine() {
-        init();
-        EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
-
-        if (enableEventRegistryChangeDetectionAfterEngineCreate) {
-
-            eventRegistryEngine.handleDeployedChannelDefinitions();
-
-            if (enableEventRegistryChangeDetection) {
-                eventRegistryChangeDetectionExecutor.initialize();
-            }
-        }
-
-        return eventRegistryEngine;
+        return buildEngine();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     protected void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -341,32 +335,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     // data model ///////////////////////////////////////////////////////////////
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        if (this.schemaManager == null) {
-            this.schemaManager = new EventDbSchemaManager();
-        }
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsEventRegistryEngineBuild();
-            }
-        }
-    }
-
-    private void closeDatabase(Liquibase liquibase) {
-        if (liquibase != null) {
-            Database database = liquibase.getDatabase();
-            if (database != null) {
-                try {
-                    database.close();
-                } catch (DatabaseException e) {
-                    logger.warn("Error closing database", e);
-                }
-            }
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new EventDbSchemaManager();
     }
 
     // session factories ////////////////////////////////////////////////////////

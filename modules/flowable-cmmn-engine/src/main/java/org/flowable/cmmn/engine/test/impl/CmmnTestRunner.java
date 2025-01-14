@@ -21,12 +21,8 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -207,17 +203,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
             cmmnEngineConfiguration,
             TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
             true,
-            new Command<>() {
-
-                @Override
-                public Void execute(CommandContext commandContext) {
-                    SchemaManager schemaManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getSchemaManager();
-                    schemaManager.schemaDrop();
-                    schemaManager.schemaCreate();
-                    return null;
-                }
-            }
-
+            cmmnEngineConfiguration.getSchemaManagementCmd()
         );
     }
 

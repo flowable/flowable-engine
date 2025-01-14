@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
+ * @author Joram Barrez
  */
 public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
@@ -178,6 +180,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createActivityInstanceQuery().activityName("No operation").list()).hasSize(1);
 
         assertThat(runtimeService.createActivityInstanceQuery().taskAssignee("nonExistingAssignee").list()).isEmpty();
+        assertThat(runtimeService.createActivityInstanceQuery().taskCompletedBy("nonExistingUserId").list()).isEmpty();
 
         assertThat(runtimeService.createActivityInstanceQuery().executionId("nonExistingExecutionId").list()).isEmpty();
 
@@ -229,7 +232,7 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/history/HistoricActivityInstanceTest.testHistoricActivityInstanceProperties.bpmn20.xml")
-    public void testActivityInstanceProperties() {
+    public void testActivityInstanceAssignee() {
         // Start process instance
         runtimeService.startProcessInstanceByKey("taskAssigneeProcess");
 
@@ -239,6 +242,103 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(activityInstance.getTaskId()).isEqualTo(task.getId());
         assertThat(activityInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(activityInstance.getCompletedBy()).isEqualTo(null);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml")
+    public void testAssigneeChange() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+
+        taskService.claim(task.getId(), "kermit");
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getAssignee()).isEqualTo("kermit");
+
+        taskService.setAssignee(task.getId(), "gonzo");
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getAssignee()).isEqualTo("gonzo");
+
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("firstTask")
+                .singleResult();
+        assertThat(activityInstance.getAssignee()).isEqualTo("gonzo");
+
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("firstTask").taskAssignee("gonzo").count()).isOne();
+
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .activityId("firstTask")
+                    .singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
+
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("firstTask").taskAssignee("gonzo").count()).isOne();
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml")
+    public void testCompletedBy() {
+        runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        taskService.claim(task.getId(), "kermit");
+        taskService.complete(task.getId());
+
+        ActivityInstance activityInstance = runtimeService.createActivityInstanceQuery().activityId("firstTask").singleResult();
+
+        assertThat(activityInstance.getTaskId()).isEqualTo(task.getId());
+        assertThat(activityInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(activityInstance.getCompletedBy()).isEqualTo("kermit");
+
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("firstTask").taskAssignee("kermit").count()).isOne();
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("firstTask").taskCompletedBy("kermit").count()).isOne();
+        assertThat(runtimeService.createActivityInstanceQuery().activityId("firstTask").taskAssignee("kermit").taskCompletedBy("kermit").count()).isOne();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("firstTask").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
+
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("firstTask").taskAssignee("kermit").count()).isOne();
+            assertThat(historyService.createHistoricActivityInstanceQuery().activityId("firstTask").taskCompletedBy("kermit").count()).isOne();
+        }
+
+        // Option 2: completer is different from assignee
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.claim(task.getId(), "kermit");
+
+        Authentication.setAuthenticatedUserId("gonzo");
+        taskService.complete(task.getId(), "gonzo");
+        Authentication.setAuthenticatedUserId(null);
+
+        activityInstance = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("firstTask").singleResult();
+
+        assertThat(activityInstance.getTaskId()).isEqualTo(task.getId());
+        assertThat(activityInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(activityInstance.getCompletedBy()).isEqualTo("gonzo");
+
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskAssignee("kermit").count()).isOne();
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskCompletedBy("gonzo").count()).isOne();
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskAssignee("kermit").taskCompletedBy("gonzo").count()).isOne();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId()).activityId("firstTask").singleResult();
+            assertActivityInstancesAreSame(historicActivityInstance, activityInstance);
+
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskAssignee("kermit").count()).isOne();
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskCompletedBy("gonzo").count()).isOne();
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("firstTask").taskAssignee("kermit").taskCompletedBy("gonzo").count()).isOne();
+
+        }
     }
 
     @Test

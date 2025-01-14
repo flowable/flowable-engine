@@ -179,12 +179,27 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyLike("oneTask%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("onetask%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Collections.singletonList("oneTaskProcess")).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined", "oneTaskProcess")).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count()).isZero();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKeyLike("businessKey%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLike("businessKey%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("businesskey%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("businesskey%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatus("businessStatus123").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatus("businessStatus123").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatusLike("businessStatus%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatusLike("businessStatus%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatusLikeIgnoreCase("businessstatus%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatusLikeIgnoreCase("businessstatus%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
 
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");

@@ -8,46 +8,46 @@
 
   <insert id="insertProcessDefinition" parameterType="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
     insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
-    values (#{id, jdbcType=VARCHAR},
-    		1, #{category, jdbcType=VARCHAR},
-            #{name, jdbcType=VARCHAR},
-            #{key, jdbcType=VARCHAR}, 
+    values (#{id, jdbcType=NVARCHAR},
+    		1, #{category, jdbcType=NVARCHAR},
+            #{name, jdbcType=NVARCHAR},
+            #{key, jdbcType=NVARCHAR}, 
             #{version, jdbcType=INTEGER},
-            #{deploymentId, jdbcType=VARCHAR},
-            #{resourceName, jdbcType=VARCHAR},
-            #{diagramResourceName, jdbcType=VARCHAR},
-            #{description, jdbcType=VARCHAR},
+            #{deploymentId, jdbcType=NVARCHAR},
+            #{resourceName, jdbcType=NVARCHAR},
+            #{diagramResourceName, jdbcType=NVARCHAR},
+            #{description, jdbcType=NVARCHAR},
             #{hasStartFormKey, jdbcType=BOOLEAN},
             #{isGraphicalNotationDefined, jdbcType=BOOLEAN},
             #{suspensionState, jdbcType=INTEGER},
-            #{derivedFrom, jdbcType=VARCHAR},
-            #{derivedFromRoot, jdbcType=VARCHAR},
+            #{derivedFrom, jdbcType=NVARCHAR},
+            #{derivedFromRoot, jdbcType=NVARCHAR},
             #{derivedVersion, jdbcType=INTEGER},
-            #{tenantId, jdbcType=VARCHAR},
-            #{engineVersion, jdbcType=VARCHAR})
+            #{tenantId, jdbcType=NVARCHAR},
+            #{engineVersion, jdbcType=NVARCHAR})
   </insert>
 
   <insert id="bulkInsertProcessDefinition" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_)
     VALUES 
       <foreach collection="list" item="processDefinition" index="index" separator=","> 
-        (#{processDefinition.id, jdbcType=VARCHAR},
-         1, #{processDefinition.category, jdbcType=VARCHAR},
-         #{processDefinition.name, jdbcType=VARCHAR},
-         #{processDefinition.key, jdbcType=VARCHAR}, 
+        (#{processDefinition.id, jdbcType=NVARCHAR},
+         1, #{processDefinition.category, jdbcType=NVARCHAR},
+         #{processDefinition.name, jdbcType=NVARCHAR},
+         #{processDefinition.key, jdbcType=NVARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
-         #{processDefinition.deploymentId, jdbcType=VARCHAR},
-         #{processDefinition.resourceName, jdbcType=VARCHAR},
-         #{processDefinition.diagramResourceName, jdbcType=VARCHAR},
-         #{processDefinition.description, jdbcType=VARCHAR},
+         #{processDefinition.deploymentId, jdbcType=NVARCHAR},
+         #{processDefinition.resourceName, jdbcType=NVARCHAR},
+         #{processDefinition.diagramResourceName, jdbcType=NVARCHAR},
+         #{processDefinition.description, jdbcType=NVARCHAR},
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
-         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
-         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedFrom, jdbcType=NVARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=NVARCHAR},
          #{processDefinition.derivedVersion, jdbcType=INTEGER},
-         #{processDefinition.tenantId, jdbcType=VARCHAR},
-         #{processDefinition.engineVersion, jdbcType=VARCHAR})
+         #{processDefinition.tenantId, jdbcType=NVARCHAR},
+         #{processDefinition.engineVersion, jdbcType=NVARCHAR})
     </foreach>
   </insert>
 
@@ -56,23 +56,23 @@
     <foreach collection="list" item="processDefinition" index="index"> 
       INTO ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_,
       DGRM_RESOURCE_NAME_, DESCRIPTION_, HAS_START_FORM_KEY_, HAS_GRAPHICAL_NOTATION_ , SUSPENSION_STATE_, DERIVED_FROM_, DERIVED_FROM_ROOT_, DERIVED_VERSION_, TENANT_ID_, ENGINE_VERSION_) VALUES 
-        (#{processDefinition.id, jdbcType=VARCHAR},
-         1, #{processDefinition.category, jdbcType=VARCHAR},
-         #{processDefinition.name, jdbcType=VARCHAR},
-         #{processDefinition.key, jdbcType=VARCHAR}, 
+        (#{processDefinition.id, jdbcType=NVARCHAR},
+         1, #{processDefinition.category, jdbcType=NVARCHAR},
+         #{processDefinition.name, jdbcType=NVARCHAR},
+         #{processDefinition.key, jdbcType=NVARCHAR}, 
          #{processDefinition.version, jdbcType=INTEGER},
-         #{processDefinition.deploymentId, jdbcType=VARCHAR},
-         #{processDefinition.resourceName, jdbcType=VARCHAR},
-         #{processDefinition.diagramResourceName, jdbcType=VARCHAR},
-         #{processDefinition.description, jdbcType=VARCHAR},
+         #{processDefinition.deploymentId, jdbcType=NVARCHAR},
+         #{processDefinition.resourceName, jdbcType=NVARCHAR},
+         #{processDefinition.diagramResourceName, jdbcType=NVARCHAR},
+         #{processDefinition.description, jdbcType=NVARCHAR},
          #{processDefinition.hasStartFormKey, jdbcType=BOOLEAN},
          #{processDefinition.isGraphicalNotationDefined, jdbcType=BOOLEAN},
          #{processDefinition.suspensionState, jdbcType=INTEGER},
-         #{processDefinition.derivedFrom, jdbcType=VARCHAR},
-         #{processDefinition.derivedFromRoot, jdbcType=VARCHAR},
+         #{processDefinition.derivedFrom, jdbcType=NVARCHAR},
+         #{processDefinition.derivedFromRoot, jdbcType=NVARCHAR},
          #{processDefinition.derivedVersion, jdbcType=INTEGER},
-         #{processDefinition.tenantId, jdbcType=VARCHAR},
-         #{processDefinition.engineVersion, jdbcType=VARCHAR})
+         #{processDefinition.tenantId, jdbcType=NVARCHAR},
+         #{processDefinition.engineVersion, jdbcType=NVARCHAR})
     </foreach>
     SELECT * FROM dual
   </insert>
@@ -87,64 +87,64 @@
               SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER},
           </if>
           <if test="originalPersistentState.category != category">
-              CATEGORY_ = #{category, jdbcType=VARCHAR},
+              CATEGORY_ = #{category, jdbcType=NVARCHAR},
           </if>
       </set>
-    where ID_ = #{id, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
   <update id="updateProcessDefinitionTenantIdForDeploymentId" parameterType="java.util.Map">
     update ${prefix}ACT_RE_PROCDEF set
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
     where
-      DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+      DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
   </update>
 
   <update id="updateProcessDefinitionVersionForProcessDefinitionId" parameterType="java.util.Map">
     update ${prefix}ACT_RE_PROCDEF set
       VERSION_ = #{version, jdbcType=INTEGER}
     where
-      ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
   </update>
 
   <!-- PROCESSDEFINITION DELETE -->
 
   <delete id="deleteProcessDefinitionsByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_RE_PROCDEF where DEPLOYMENT_ID_ = #{deploymenId} 
+    delete from ${prefix}ACT_RE_PROCDEF where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
   </delete>
   
   <!-- PROCESSDEFINITION RESULTMAP -->
 
   <resultMap id="processDefinitionResultMap" type="org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="revision" column="REV_" />
-    <result property="category" column="CATEGORY_" />
-    <result property="name" column="NAME_" />
-    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER"/>
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="key" column="KEY_" jdbcType="NVARCHAR" />
     <result property="version" column="VERSION_" jdbcType="INTEGER"/>
-    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
-    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="NVARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="NVARCHAR"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="NVARCHAR"/>
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="isGraphicalNotationDefined" column="HAS_GRAPHICAL_NOTATION_" jdbcType="BOOLEAN" />
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
-    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="VARCHAR" />
-    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="VARCHAR" />
+    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="NVARCHAR" />
+    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="NVARCHAR" />
     <result property="derivedVersion" column="DERIVED_VERSION_" jdbcType="INTEGER" />
-    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
+    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- PROCESSDEFINITION SELECT -->
 
   <select id="selectProcessDefinition" parameterType="string" resultMap="processDefinitionResultMap">
-    select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectProcessDefinitionById" parameterType="string" resultMap="processDefinitionResultMap">
-    select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId}
+    select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
@@ -164,78 +164,82 @@
     from ${prefix}ACT_RE_PROCDEF RES
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="ids != null and ids">
-        and RES.ID_ in
-        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
-          #{item}
-        </foreach>
+          and (
+              <foreach item="listItem" collection="safeIds" separator="OR">
+                  RES.ID_ in
+                  <foreach item="id" collection="listItem" open="(" separator="," close=")">
+                      #{id, jdbcType=NVARCHAR}
+                  </foreach>
+              </foreach>
+          )
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=NVARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase}${wildcardEscapeClause})
+        and lower(RES.NAME_) like lower(#{nameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="key != null">
-        and RES.KEY_ = #{key}
+        and RES.KEY_ = #{key, jdbcType=NVARCHAR}
       </if>
       <if test="keyLike != null">
-        and RES.KEY_ like #{keyLike}${wildcardEscapeClause}
+        and RES.KEY_ like #{keyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="resourceName != null">
-        and RES.RESOURCE_NAME_ = #{resourceName}
+        and RES.RESOURCE_NAME_ = #{resourceName, jdbcType=NVARCHAR}
       </if>
       <if test="resourceNameLike != null">
-        and RES.RESOURCE_NAME_ like #{resourceNameLike}${wildcardEscapeClause}
+        and RES.RESOURCE_NAME_ like #{resourceNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="version != null">
-        and RES.VERSION_ = #{version}
+        and RES.VERSION_ = #{version, jdbcType=INTEGER}
       </if>
       <if test="versionGt != null">
-        and RES.VERSION_ &gt; #{versionGt}
+        and RES.VERSION_ &gt; #{versionGt, jdbcType=INTEGER}
       </if>
       <if test="versionGte != null">
-        and RES.VERSION_ &gt;= #{versionGte}
+        and RES.VERSION_ &gt;= #{versionGte, jdbcType=INTEGER}
       </if>
       <if test="versionLt != null">
-        and RES.VERSION_ &lt; #{versionLt}
+        and RES.VERSION_ &lt; #{versionLt, jdbcType=INTEGER}
       </if>
       <if test="versionLte != null">
-        and RES.VERSION_ &lt;= #{versionLte}
+        and RES.VERSION_ &lt;= #{versionLte, jdbcType=INTEGER}
       </if>
       <if test="deploymentId != null">
-        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+        and RES.DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
       </if>
       <if test="deploymentIds != null and !deploymentIds.empty">
         and RES.DEPLOYMENT_ID_ in
-        <foreach item="item" index="index" collection="deploymentIds" open="(" separator="," close=")">
-          #{item}
+        <foreach item="deploymentId" index="index" collection="deploymentIds" open="(" separator="," close=")">
+          #{deploymentId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="parentDeploymentId != null">
-          and EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = RES.DEPLOYMENT_ID_)
+          and EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=NVARCHAR} and D.ID_ = RES.DEPLOYMENT_ID_)
       </if>
       <if test="latest">
         and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = RES.KEY_ 
              <if test="tenantId != null">
-	           and TENANT_ID_ = #{tenantId}
+	           and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
 	         </if>
 	         <if test="tenantIdLike != null">
-	           and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+	           and TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
 	         </if>
 	         <if test="withoutTenantId">
 	           and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -246,28 +250,28 @@
         )
       </if>
       <if test="suspensionState != null">
-        and (RES.SUSPENSION_STATE_ = #{suspensionState.stateCode})
+        and (RES.SUSPENSION_STATE_ = #{suspensionState.stateCode, jdbcType=INTEGER})
       </if>
        <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="engineVersion != null">
-      	and RES.ENGINE_VERSION_ = #{engineVersion}
+      	and RES.ENGINE_VERSION_ = #{engineVersion, jdbcType=NVARCHAR}
       </if> 
       <if test="eventSubscriptionType != null">
-        and exists(select 1 from ${prefix}ACT_RU_EVENT_SUBSCR EVT where RES.ID_ = EVT.CONFIGURATION_ and EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
+        and exists(select 1 from ${prefix}ACT_RU_EVENT_SUBSCR EVT where RES.ID_ = EVT.CONFIGURATION_ and EVT.EVENT_TYPE_ = #{eventSubscriptionType, jdbcType=NVARCHAR} and EVT.EVENT_NAME_ = #{eventSubscriptionName, jdbcType=NVARCHAR})
       </if>
       <if test="includeAuthorization">
           AND
           <trim prefix="(" prefixOverrides="OR" suffix=")">
               <if test="authorizationUserId != null">
-                  exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
+                  exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId, jdbcType=NVARCHAR})
               </if>
               <if test="authorizationGroups != null &amp;&amp; !authorizationGroups.empty">
                   OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and 
@@ -277,9 +281,9 @@
                         or
                         </if>
                         IDN.GROUP_ID_ IN
-                        <foreach item="group" index="index" collection="authorizationGroupListItem"
+                        <foreach item="groupId" index="index" collection="authorizationGroupListItem"
                               open="(" separator="," close=")">
-                          #{group}
+                          #{groupId, jdbcType=NVARCHAR}
                         </foreach>
                     </foreach>
                     )
@@ -293,81 +297,81 @@
   <select id="selectProcessDefinitionByDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
     select * 
     from ${prefix}ACT_RE_PROCDEF 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-      and KEY_ = #{processDefinitionKey}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
+      and KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
       and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
   
    <select id="selectProcessDefinitionByDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select * 
     from ${prefix}ACT_RE_PROCDEF 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-      and KEY_ = #{processDefinitionKey}
-      and TENANT_ID_ = #{tenantId}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=NVARCHAR}
+      and KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
+      and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
   </select>
 
     <!-- TODO when deploying cmmn from the Process engine then the BPMN resources do not have a parent deployment, they are the parent deployment   -->
     <select id="selectProcessDefinitionByParentDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF DEF
-    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
-      and KEY_ = #{processDefinitionKey}
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=NVARCHAR} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
       and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
 
     <select id="selectProcessDefinitionByParentDeploymentAndKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF DEF
-    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId} and D.ID_ = DEF.DEPLOYMENT_ID_)
-      and KEY_ = #{processDefinitionKey}
-      and TENANT_ID_ = #{tenantId}
+    where EXISTS (select 1 from ${prefix}ACT_RE_DEPLOYMENT D where D.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=NVARCHAR} and D.ID_ = DEF.DEPLOYMENT_ID_)
+      and KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
+      and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectProcessDefinitionsByKeyAndVersion" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{parameter.processDefinitionKey} and VERSION_ = #{parameter.processDefinitionVersion} and (TENANT_ID_ = '' or TENANT_ID_ is null)
+    where KEY_ = #{parameter.processDefinitionKey, jdbcType=NVARCHAR} and VERSION_ = #{parameter.processDefinitionVersion, jdbcType=INTEGER} and (TENANT_ID_ = '' or TENANT_ID_ is null)
   </select>
     
   
    <select id="selectProcessDefinitionsByKeyAndVersionAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{parameter.processDefinitionKey} and VERSION_ = #{parameter.processDefinitionVersion} and TENANT_ID_ = #{parameter.tenantId}
+    where KEY_ = #{parameter.processDefinitionKey, jdbcType=NVARCHAR} and VERSION_ = #{parameter.processDefinitionVersion, jdbcType=INTEGER} and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
   </select>
     
   <select id="selectLatestProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{key} and
+    where KEY_ = #{key, jdbcType=NVARCHAR} and
           (TENANT_ID_ = ''  or TENANT_ID_ is null) and
           DERIVED_FROM_ is null and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
   
   <select id="selectLatestProcessDefinitionByKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{processDefinitionKey} and
-          TENANT_ID_ = #{tenantId} and
+    where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and
+          TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR} and
           DERIVED_FROM_ is null and
-          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR})
   </select>
   
   <select id="selectLatestDerivedProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{key} and
+    where KEY_ = #{key, jdbcType=NVARCHAR} and
     (TENANT_ID_ = ''  or TENANT_ID_ is null) and
-    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and (TENANT_ID_ = '' or TENANT_ID_ is null))
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and (TENANT_ID_ = '' or TENANT_ID_ is null))
   </select>
 
   <select id="selectLatestDerivedProcessDefinitionByKeyAndTenantId" parameterType="map" resultMap="processDefinitionResultMap">
     select *
     from ${prefix}ACT_RE_PROCDEF 
-    where KEY_ = #{processDefinitionKey} and
-    TENANT_ID_ = #{tenantId} and
-    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey} and TENANT_ID_ = #{tenantId})
+    where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and
+    TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR} and
+    DERIVED_VERSION_ > 0 and DERIVED_VERSION_ = (select max(DERIVED_VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR} and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR})
   </select>
 
   <select id="selectProcessDefinitionByNativeQuery" parameterType="java.util.Map" resultMap="processDefinitionResultMap">

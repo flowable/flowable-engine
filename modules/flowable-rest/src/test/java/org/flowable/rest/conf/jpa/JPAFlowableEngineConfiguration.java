@@ -14,8 +14,6 @@ package org.flowable.rest.conf.jpa;
 
 import javax.sql.DataSource;
 
-import jakarta.persistence.EntityManagerFactory;
-
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.DynamicBpmnService;
@@ -32,12 +30,15 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import jakarta.persistence.EntityManagerFactory;
 
 @Configuration(proxyBeanMethods = false)
 public class JPAFlowableEngineConfiguration {
@@ -59,7 +60,7 @@ public class JPAFlowableEngineConfiguration {
     }
 
     @Bean(name = "processEngineConfiguration")
-    public ProcessEngineConfigurationImpl processEngineConfiguration() {
+    public ProcessEngineConfigurationImpl processEngineConfiguration(SpringIdmEngineConfigurator springIdmEngineConfigurator) {
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
         processEngineConfiguration.setDataSource(dataSource);
         processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -67,9 +68,14 @@ public class JPAFlowableEngineConfiguration {
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setJpaEntityManagerFactory(entityManagerFactory);
         processEngineConfiguration.setJpaHandleTransaction(false);
-        processEngineConfiguration.setJpaHandleTransaction(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+        processEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
         return processEngineConfiguration;
+    }
+
+    @Bean(name = "springIdmEngineConfigurator")
+    public SpringIdmEngineConfigurator springIdmEngineConfigurator() {
+        return new SpringIdmEngineConfigurator();
     }
     
     @Bean

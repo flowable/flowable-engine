@@ -112,7 +112,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
     }
 
     @Override
-    public ProcessEngine buildProcessEngine() {
+    public ProcessEngine buildEngine() {
 
         // Disable schema creation/validation by setting it to null.
         // We'll do it manually, see buildProcessEngine() method (hence why it's copied first)
@@ -123,7 +123,7 @@ public class MultiSchemaMultiTenantProcessEngineConfiguration extends ProcessEng
         boolean originalIsAutoActivateAsyncExecutor = this.asyncExecutorActivate;
         this.asyncExecutorActivate = false;
 
-        ProcessEngine processEngine = super.buildProcessEngine();
+        ProcessEngine processEngine = super.buildEngine();
 
         // Reset to original values
         this.databaseSchemaUpdate = originalDatabaseSchemaUpdate;

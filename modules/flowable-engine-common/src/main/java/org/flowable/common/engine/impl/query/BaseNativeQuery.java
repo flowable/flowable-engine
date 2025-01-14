@@ -56,15 +56,13 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
         parameterMap.put("needsPaging", firstResult >= 0);
         String orderBy = (String) parameterMap.get("orderBy");
         if (orderBy != null && !"".equals(orderBy)) {
-            String columns = "RES." + orderBy;
-            parameterMap.put("orderBy", columns);
-            parameterMap.put("orderByColumns", columns);
-            parameterMap.put("orderByForWindow", columns);
+            orderBy = "RES." + orderBy;
         } else {
-            parameterMap.put("orderBy", "order by RES.ID_ asc");
-            parameterMap.put("orderByForWindow", "order by RES.ID_ asc");
-            parameterMap.put("orderByColumns", "RES.ID_ asc");
+            orderBy = "RES.ID_ asc";
         }
+        parameterMap.put("orderBy", "order by " + orderBy);
+        parameterMap.put("orderByForWindow", "order by " + orderBy);
+        parameterMap.put("orderByColumns", orderBy);
 
         int firstRow = firstResult + 1;
         parameterMap.put("firstRow", firstRow);

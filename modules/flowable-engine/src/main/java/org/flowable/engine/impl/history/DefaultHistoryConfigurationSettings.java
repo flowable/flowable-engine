@@ -19,7 +19,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -284,8 +283,8 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
-    public boolean isHistoryEnabledForVariables(HistoricProcessInstance historicProcessInstance) {
-        return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
+    public boolean isHistoryEnabledForVariables(String processDefinitionId) {
+        return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId);
     }
 
     @Override
@@ -313,7 +312,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         String processDefinitionId = getProcessDefinitionId(entityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+        return isHistoryEnabled(processDefinitionId);
     }
 
     @Override

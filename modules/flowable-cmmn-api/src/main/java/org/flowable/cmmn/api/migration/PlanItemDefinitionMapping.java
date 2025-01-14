@@ -15,9 +15,15 @@ package org.flowable.cmmn.api.migration;
 public abstract class PlanItemDefinitionMapping {
 
     protected String planItemDefinitionId;
+    protected String condition;
 
     public PlanItemDefinitionMapping(String planItemDefinitionId) {
         this.planItemDefinitionId = planItemDefinitionId;
+    }
+
+    public PlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
+        this.planItemDefinitionId = planItemDefinitionId;
+        this.condition = condition;
     }
 
     public String getPlanItemDefinitionId() {
@@ -26,5 +32,13 @@ public abstract class PlanItemDefinitionMapping {
 
     public void setPlanItemDefinitionId(String planItemDefinitionId) {
         this.planItemDefinitionId = planItemDefinitionId;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 }

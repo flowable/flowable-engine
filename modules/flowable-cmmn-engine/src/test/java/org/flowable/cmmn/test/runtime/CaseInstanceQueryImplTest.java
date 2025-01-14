@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,6 +90,50 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKey("oneTaskCase").caseInstanceId("Undefined").endOr().singleResult().getId())
                 .isEqualTo(caseInstance.getId());
     }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionKeyLike() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLike("oneTask%").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLike("oneTask%").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLike("oneTask%").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLike("oneTask%").caseInstanceId("Undefined").endOr().count())
+                .isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLike("oneTask%").caseInstanceId("Undefined").endOr().list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(
+                cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLike("oneTask%").caseInstanceId("Undefined").endOr().singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLike("none%").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLike("none%").caseInstanceId("Undefined").endOr().list()).hasSize(0);
+    }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionKeyLikeIgnoreCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLikeIgnoreCase("onetask%").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLikeIgnoreCase("onetask%").caseInstanceId("Undefined").endOr().count())
+                .isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLikeIgnoreCase("onetask%").caseInstanceId("Undefined").endOr().list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(
+                cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLikeIgnoreCase("onetask%").caseInstanceId("Undefined").endOr().singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKeyLikeIgnoreCase("none%").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionKeyLikeIgnoreCase("none%").caseInstanceId("Undefined").endOr().list()).hasSize(0);
+    }
 
     @Test
     public void getCaseInstanceByCaseDefinitionKeys() {
@@ -142,6 +187,58 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .endOr()
                 .list()).hasSize(2);
     }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionCategoryLike() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLike("%cmmn").count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLike("%cmmn").list()).hasSize(2);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionCategoryLike("%cmmn")
+                .caseInstanceId("undefined")
+                .endOr()
+                .count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionCategoryLike("%cmmn")
+                .caseInstanceId("undefined")
+                .endOr()
+                .list()).hasSize(2);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLike("%none").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionCategoryLike("%none").caseInstanceId("undefined").endOr().list()).hasSize(0);
+    }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionCategoryLikeIgnoreCase() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLikeIgnoreCase("%cmmn").count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLikeIgnoreCase("%cmmn").list()).hasSize(2);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionCategoryLikeIgnoreCase("%cmmn")
+                .caseInstanceId("undefined")
+                .endOr()
+                .count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionCategoryLikeIgnoreCase("%cmmn")
+                .caseInstanceId("undefined")
+                .endOr()
+                .list()).hasSize(2);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionCategoryLikeIgnoreCase("%none").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionCategoryLikeIgnoreCase("%none").caseInstanceId("undefined").endOr().list()).hasSize(0);
+    }
 
     @Test
     public void getCaseInstanceByCaseDefinitionName() {
@@ -171,6 +268,60 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseInstanceId("undefined")
                 .endOr()
                 .singleResult().getId()).isEqualTo(caseInstance.getId());
+    }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionNameLike() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLike("oneTask%").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLike("oneTask%").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLike("oneTask%").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionNameLike("oneTask%")
+                .caseInstanceId("undefined")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionNameLike("oneTask%")
+                .caseInstanceId("undefined")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLike("none%").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionNameLike("none%").caseInstanceId("undefined").endOr().list()).hasSize(0);
+    }
+    
+    @Test
+    public void getCaseInstanceByCaseDefinitionNameLikeIgnoreCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLikeIgnoreCase("onetask%").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLikeIgnoreCase("onetask%").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLikeIgnoreCase("onetask%").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionNameLikeIgnoreCase("onetask%")
+                .caseInstanceId("undefined")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseDefinitionNameLikeIgnoreCase("onetask%")
+                .caseInstanceId("undefined")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionNameLikeIgnoreCase("none%").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseDefinitionNameLikeIgnoreCase("none%").caseInstanceId("undefined").endOr().list()).hasSize(0);
     }
 
     @Test
@@ -326,6 +477,62 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
     
     @Test
+    public void getCaseInstanceByBusinessKeyLike() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessKey("businessKey")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLike("business%").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLike("business%").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLike("business%").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessKeyLike("business%")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessKeyLike("business%")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLike("none%").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceBusinessKeyLike("none%").caseDefinitionName("undefinedId").endOr().list()).hasSize(0);
+    }
+    
+    @Test
+    public void getCaseInstanceByBusinessKeyLikeIgnoreCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessKey("businessKey")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLikeIgnoreCase("%key").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLikeIgnoreCase("%key").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLikeIgnoreCase("%key").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessKeyLikeIgnoreCase("%key")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessKeyLikeIgnoreCase("%key")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKeyLikeIgnoreCase("%none").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceBusinessKeyLikeIgnoreCase("%none").caseDefinitionName("undefinedId").endOr().list()).hasSize(0);
+    }
+    
+    @Test
     public void getCaseInstanceByBusinessStatus() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
@@ -355,6 +562,64 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionId("undefined")
                 .endOr()
                 .singleResult()).isNull();
+    }
+    
+    @Test
+    public void getCaseInstanceByBusinessStatusLike() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        
+        cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "businessStatus");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLike("%Status").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLike("%Status").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLike("%Status").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatusLike("%Status")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatusLike("%Status")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLike("%none").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceBusinessStatusLike("%none").caseDefinitionName("undefinedId").endOr().list()).hasSize(0);
+    }
+    
+    @Test
+    public void getCaseInstanceByBusinessStatusLikeIgnoreCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+        
+        cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "businessStatus");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLikeIgnoreCase("%status").count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLikeIgnoreCase("%status").list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLikeIgnoreCase("%status").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatusLikeIgnoreCase("%status")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessStatusLikeIgnoreCase("%status")
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list()).hasSize(1);
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessStatusLikeIgnoreCase("%none").list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceBusinessStatusLikeIgnoreCase("%none").caseDefinitionName("undefinedId").endOr().list()).hasSize(0);
     }
 
     @Test
@@ -722,6 +987,51 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .caseDefinitionId("undefined")
                     .endOr()
                     .singleResult().getId()).isEqualTo(caseInstance.getId());
+        } finally {
+            cmmnRepositoryService.deleteDeployment(tempDeploymentId, true);
+        }
+    }
+    
+    @Test
+    public void getCaseInstanceByTenantIdLikeIgnoreCase() {
+        String tempDeploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .tenantId("tenantId")
+                .deploy()
+                .getId();
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .tenantId("tenantId")
+                    .start();
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantIdLikeIgnoreCase("%id").count()).isEqualTo(1);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantIdLikeIgnoreCase("%id").list().get(0).getId()).isEqualTo(caseInstance.getId());
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantIdLikeIgnoreCase("%id").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .or()
+                    .caseInstanceTenantIdLikeIgnoreCase("%id")
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .count()).isEqualTo(1);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .or()
+                    .caseInstanceTenantIdLikeIgnoreCase("%id")
+                    .caseDefinitionName("undefinedId")
+                    .endOr()
+                    .list().get(0).getId()).isEqualTo(caseInstance.getId());
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .or()
+                    .caseInstanceTenantIdLikeIgnoreCase("%id")
+                    .caseDefinitionId("undefined")
+                    .endOr()
+                    .singleResult().getId()).isEqualTo(caseInstance.getId());
+            
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceTenantIdLikeIgnoreCase("%none").list()).hasSize(0);
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().or().caseInstanceTenantIdLikeIgnoreCase("%none").caseDefinitionId("undefined").endOr().list()).hasSize(0);
+            
         } finally {
             cmmnRepositoryService.deleteDeployment(tempDeploymentId, true);
         }
@@ -1414,6 +1724,73 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 );
 
         caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(twoYearsLater).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+    }
+
+    @Test
+    public void testQueryUUIDVariable() throws Exception {
+        Map<String, Object> vars = new HashMap<>();
+        UUID someUUID = UUID.randomUUID();
+        vars.put("uuidVar", someUUID);
+
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        UUID someUUID2 = UUID.randomUUID();
+        vars = new HashMap<>();
+        vars.put("uuidVar", someUUID);
+        vars.put("uuidVar2", someUUID2);
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        UUID someUUID3 = UUID.randomUUID();
+        vars = new HashMap<>();
+        vars.put("uuidVar", someUUID3);
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variables(vars)
+                .start();
+
+        // Query on single uuid variable, should result in 2 matches
+        CaseInstanceQuery query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", someUUID);
+        List<CaseInstance> caseInstances = query.list();
+        Assertions.assertThat(caseInstances).hasSize(2);
+
+        // Query on two uuid variables, should result in single value
+        query = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", someUUID)
+                .variableValueEquals("uuidVar2", someUUID2);
+        CaseInstance caseInstance = query.singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+
+        UUID unexistingUUID = UUID.randomUUID();
+        // Query with unexisting variable value
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("uuidVar", unexistingUUID).singleResult();
+        Assertions.assertThat(caseInstance).isNull();
+
+        // Test NOT_EQUALS
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueNotEquals("uuidVar", someUUID).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        // Test value-only matching
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(someUUID3).singleResult();
+        Assertions.assertThat(caseInstance).isNotNull();
+        Assertions.assertThat(caseInstance.getId()).isEqualTo(caseInstance3.getId());
+
+        caseInstances = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(someUUID).list();
+        Assertions.assertThat(caseInstances)
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(
+                        caseInstance1.getId(),
+                        caseInstance2.getId()
+                );
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals(unexistingUUID).singleResult();
         Assertions.assertThat(caseInstance).isNull();
     }
 

@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.springframework.http.HttpStatus;
@@ -37,6 +34,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -46,7 +45,7 @@ import io.swagger.annotations.Authorization;
 public class CaseInstanceVariableCollectionResource extends BaseVariableResource {
 
     @ApiOperation(value = "List variables for a case instance", nickname="listCaseInstanceVariables", tags = {"Case Instance Variables" },
-            notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
+            notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for case-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and variables are returned."),
             @ApiResponse(code = 400, message = "Indicates the requested case instance was not found.")
@@ -60,12 +59,12 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
 
     @ApiOperation(value = "Update a multiple/single (non)binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createOrUpdateCaseVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "Note that scope is ignored, only local variables can be set in a case instance.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
                     "    \"name\":\"intProcVar\"\n" +
                     "    \"type\":\"integer\"\n" +
                     "    \"value\":123,\n" +
@@ -85,14 +84,42 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
-        return createVariable(caseInstance, request, response);
+        return createVariable(caseInstance, false, request, response);
+    }
+    
+    @ApiOperation(value = "Update a multiple/single (non)binary variable on a case instance asynchronously", tags = { "Case Instance Variables" }, nickname = "createOrUpdateCaseVariableAsync",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
+                    + "Any number of variables can be passed into the request body array.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
+                    + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the job to update the variables has been created."),
+            @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
+            @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
+
+    })
+    @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables-async", consumes = {"application/json", "multipart/form-data"})
+    public void createOrUpdateExecutionVariableAsync(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        createVariable(caseInstance, true, request, response);
     }
 
     @ApiOperation(value = "Create variables or new binary variable on a case instance", tags = { "Case Instance Variables" }, nickname = "createCaseInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
-                    + "Note that scope is ignored, only local variables can be set in a case instance.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
@@ -111,11 +138,38 @@ public class CaseInstanceVariableCollectionResource extends BaseVariableResource
             @ApiResponse(code = 409, message = "Indicates the case instance was found but already contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
 
     })
-    
-    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data", "text/plain"})
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables", consumes = {"application/json", "multipart/form-data", "text/plain"})
     public Object createExecutionVariable(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
-        return createVariable(caseInstance, request, response);
+        return createVariable(caseInstance, false, request, response);
+    }
+    
+    @ApiOperation(value = "Create variables or new binary variable on a case instance asynchronously", tags = { "Case Instance Variables" }, nickname = "createCaseInstanceVariableAsync",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the case-instance and existing ones are overridden without any error.\n"
+                    + "Any number of variables can be passed into the request body array.\n"
+                    + "Note that scope is ignored, only global variables can be set in a case instance.\n"
+                    + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.cmmn.service.api.engine.variable.RestVariable", value = "Create a variable on a case instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Indicates the job to create the variables has been created."),
+            @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
+            @ApiResponse(code = 409, message = "Indicates the case instance contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
+
+    })
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables-async", produces = "application/json", consumes = {"application/json", "multipart/form-data", "text/plain"})
+    public void createExecutionVariableAsync(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request, HttpServletResponse response) {
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        createVariable(caseInstance, true, request, response);
     }
 
     @ApiOperation(value = "Delete all variables", tags = { "Case Instance Variables" }, nickname = "deleteCaseVariable", code = 204)

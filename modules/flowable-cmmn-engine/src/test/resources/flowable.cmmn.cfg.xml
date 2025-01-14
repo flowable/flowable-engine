@@ -59,6 +59,7 @@
                 </entry>
             </map>
         </property>
+
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />
@@ -70,5 +71,7 @@
     <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
     
     <bean id="assignmentBean" class="org.flowable.cmmn.test.delegate.AssignmentBean" />
-    
+
+    <bean id="setVariableBean" class="org.flowable.cmmn.test.delegate.TestSetVariableBean" />
+
 </beans>

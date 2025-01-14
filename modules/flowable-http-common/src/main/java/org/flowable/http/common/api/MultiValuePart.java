@@ -20,11 +20,20 @@ public class MultiValuePart {
     protected final String name;
     protected final Object body;
     protected final String filename;
+    protected final String mimeType;
 
     protected MultiValuePart(String name, Object body, String filename) {
         this.name = name;
         this.body = body;
         this.filename = filename;
+        this.mimeType = null;
+    }
+
+    protected MultiValuePart(String name, Object body, String filename, String mimeType) {
+        this.name = name;
+        this.body = body;
+        this.filename = filename;
+        this.mimeType = mimeType;
     }
 
     public String getName() {
@@ -39,11 +48,19 @@ public class MultiValuePart {
         return filename;
     }
 
+    public String getMimeType() {
+        return mimeType;
+    }
+
     public static MultiValuePart fromText(String name, String value) {
         return new MultiValuePart(name, value, null);
     }
 
     public static MultiValuePart fromFile(String name, byte[] value, String filename) {
         return new MultiValuePart(name, value, filename);
+    }
+
+    public static MultiValuePart fromFile(String name, byte[] value, String filename, String mimeType) {
+        return new MultiValuePart(name, value, filename, mimeType);
     }
 }

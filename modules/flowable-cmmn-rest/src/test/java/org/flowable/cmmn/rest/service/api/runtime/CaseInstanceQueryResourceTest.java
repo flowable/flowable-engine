@@ -207,6 +207,8 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         Authentication.setAuthenticatedUserId("queryCaseUser");
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
+        caseInstance1 = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance1.getId()).singleResult();
+        caseInstance2 = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance2.getId()).singleResult();
 
         // Create request node
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -474,5 +476,70 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
         assertThatJson(dataNode)
             .isEqualTo("[]");
+    }
+
+    /**
+     * Test querying case instance sort by businessKey. POST query/case-instances
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testSortByBusinessKey() throws Exception {
+        Authentication.setAuthenticatedUserId("queryCaseUser");
+        runtimeService.createCaseInstanceBuilder().businessKey("businessKey3").caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.createCaseInstanceBuilder().businessKey("businessKey1").caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.createCaseInstanceBuilder().businessKey("businessKey2").caseDefinitionKey("oneHumanTaskCase").start();
+
+        // Create request node
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("order", "asc");
+        requestNode.put("sort", "businessKey");
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        // Check order
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "  {"
+                        + "    businessKey: 'businessKey1'"
+                        + "  },"
+                        + "  {"
+                        + "    businessKey: 'businessKey2'"
+                        + "  },"
+                        + "  {"
+                        + "    businessKey: 'businessKey3'"
+                        + "  }"
+                        + "]");
+
+        requestNode.put("order", "desc");
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        // Check order
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "  {"
+                        + "    businessKey: 'businessKey3'"
+                        + "  },"
+                        + "  {"
+                        + "    businessKey: 'businessKey2'"
+                        + "  },"
+                        + "  {"
+                        + "    businessKey: 'businessKey1'"
+                        + "  }"
+                        + "]");
+
     }
 }

@@ -12,17 +12,16 @@
  */
 package org.flowable.common.engine.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,6 @@ public abstract class AbstractServiceConfiguration<S> {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
-    protected HistoryLevel historyLevel;
-
     protected ObjectMapper objectMapper;
 
     protected Clock clock;
@@ -61,21 +58,6 @@ public abstract class AbstractServiceConfiguration<S> {
     }
 
     protected abstract S getService();
-
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
-
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
-    }
 
     public String getEngineName() {
         return engineName;
@@ -105,7 +87,7 @@ public abstract class AbstractServiceConfiguration<S> {
 
     protected void initConfigurators() {
         if (this.configurators == null) {
-            this.configurators = new TreeSet<>(Comparator.comparingInt(ServiceConfigurator::getPriority));
+            this.configurators = new ArrayList<>();
         }
     }
 
@@ -114,7 +96,7 @@ public abstract class AbstractServiceConfiguration<S> {
             return;
         }
         final S service = getService();
-        this.configurators.stream().forEach(c -> {
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
             logger.info("Executing beforeInit() of {} (priority: {})", c.getClass(), c.getPriority());
             c.beforeInit(service);
         });
@@ -125,7 +107,7 @@ public abstract class AbstractServiceConfiguration<S> {
             return;
         }
         final S service = getService();
-        this.configurators.stream().forEach(c -> {
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
             logger.info("Executing afterInit() of {} (priority: {})", c.getClass(), c.getPriority());
             c.afterInit(service);
         });
@@ -177,15 +159,6 @@ public abstract class AbstractServiceConfiguration<S> {
 
     public AbstractServiceConfiguration<S> setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
-        return this;
-    }
-
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-
-    public AbstractServiceConfiguration<S> setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
         return this;
     }
 

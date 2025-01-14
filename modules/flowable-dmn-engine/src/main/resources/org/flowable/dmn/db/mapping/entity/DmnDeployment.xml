@@ -10,7 +10,7 @@
     insert into ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
     	#{id, jdbcType=VARCHAR}, 
-    	#{name, jdbcType=VARCHAR}, 
+    	#{name, jdbcType=NVARCHAR}, 
     	#{category, jdbcType=VARCHAR}, 
     	#{tenantId, jdbcType=VARCHAR}, 
     	#{deploymentTime, jdbcType=TIMESTAMP},
@@ -24,7 +24,7 @@
     <foreach collection="list" item="deployment" index="index" separator=",">
     (
         #{deployment.id, jdbcType=VARCHAR}, 
-        #{deployment.name, jdbcType=VARCHAR}, 
+        #{deployment.name, jdbcType=NVARCHAR}, 
         #{deployment.category, jdbcType=VARCHAR}, 
         #{deployment.tenantId, jdbcType=VARCHAR}, 
         #{deployment.deploymentTime, jdbcType=TIMESTAMP},
@@ -39,7 +39,7 @@
         INTO ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
         (
             #{deployment.id, jdbcType=VARCHAR}, 
-            #{deployment.name, jdbcType=VARCHAR}, 
+            #{deployment.name, jdbcType=NVARCHAR}, 
             #{deployment.category, jdbcType=VARCHAR}, 
             #{deployment.tenantId, jdbcType=VARCHAR}, 
             #{deployment.deploymentTime, jdbcType=TIMESTAMP},
@@ -64,14 +64,14 @@
   <!-- DEPLOYMENT DELETE -->
   
   <delete id="deleteDmnDeployment" parameterType="string">
-    delete from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id}
+    delete from ${prefix}ACT_DMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </delete>
 
   <!-- DEPLOYMENT RESULTMAP -->
   
   <resultMap id="deploymentResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
@@ -97,42 +97,42 @@
     from ${prefix}ACT_DMN_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
-        RES.ID_ = #{deploymentId}
+        RES.ID_ = #{deploymentId, jdbcType=VARCHAR}
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=VARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="parentDeploymentId != null">
-        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId}
+        and RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR}
       </if>
       <if test="parentDeploymentIdLike != null">
-        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike, jdbcType=VARCHAR}
       </if>
       <if test="decisionKey != null || decisionKeyLike != null">
         and exists(select 1 from ${prefix}ACT_DMN_DECISION DECISION where RES.ID_ = DECISION.DEPLOYMENT_ID_
         <if test="decisionKey != null">
-          and DECISION.KEY_ = #{decisionKey}
+          and DECISION.KEY_ = #{decisionKey, jdbcType=VARCHAR}
         </if>
         <if test="decisionKeyLike != null">
-          and DECISION.KEY_ like #{decisionKeyLike}
+          and DECISION.KEY_ like #{decisionKeyLike, jdbcType=VARCHAR}
         </if>
         )
       </if>

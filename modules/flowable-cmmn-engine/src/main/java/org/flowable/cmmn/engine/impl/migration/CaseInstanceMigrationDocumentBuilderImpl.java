@@ -21,6 +21,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocumentBuilder;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
@@ -43,9 +44,10 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     protected List<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<ChangePlanItemIdMapping> changePlanItemIdMappings = new ArrayList<>();
+    protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
+    protected List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings = new ArrayList<>();
     protected String preUpgradeExpression;
     protected String postUpgradeExpression;
-    protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
 
     @Override
@@ -132,10 +134,34 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         this.changePlanItemIdMappings.add(mapping);
         return this;
     }
-    
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMappings(List<ChangePlanItemIdMapping> mappings) {
+        this.changePlanItemIdMappings.addAll(mappings);
+        return this;
+    }
+
     @Override
     public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping) {
         this.changePlanItemIdWithDefinitionIdMappings.add(mapping);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> mappings) {
+        this.changePlanItemIdWithDefinitionIdMappings.addAll(mappings);
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMapping(ChangePlanItemDefinitionWithNewTargetIdsMapping mapping) {
+        this.changePlanItemDefinitionWithNewTargetIdsMappings.add(mapping);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> mappings) {
+        this.changePlanItemDefinitionWithNewTargetIdsMappings.addAll(mappings);
         return this;
     }
 
@@ -175,6 +201,7 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         caseInstanceMigrationDocument.setRemoveWaitingForRepetitionPlanItemDefinitionMappings(this.removeWaitingForRepetitionPlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setChangePlanItemIdMappings(this.changePlanItemIdMappings);
         caseInstanceMigrationDocument.setChangePlanItemIdWithDefinitionIdMappings(this.changePlanItemIdWithDefinitionIdMappings);
+        caseInstanceMigrationDocument.setChangePlanItemDefinitionWithNewTargetIdsMappings(this.changePlanItemDefinitionWithNewTargetIdsMappings);
         caseInstanceMigrationDocument.setCaseInstanceVariables(this.caseInstanceVariables);
         caseInstanceMigrationDocument.setPreUpgradeExpression(this.preUpgradeExpression);
         caseInstanceMigrationDocument.setPostUpgradeExpression(this.postUpgradeExpression);

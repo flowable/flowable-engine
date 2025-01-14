@@ -87,6 +87,10 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             query.setTaskAssignee(allRequestParams.get("taskAssignee"));
         }
 
+        if (allRequestParams.get("taskCompletedBy") != null) {
+            query.setTaskCompletedBy(allRequestParams.get("taskCompletedBy"));
+        }
+
         if (allRequestParams.get("processInstanceId") != null) {
             query.setProcessInstanceId(allRequestParams.get("processInstanceId"));
         }

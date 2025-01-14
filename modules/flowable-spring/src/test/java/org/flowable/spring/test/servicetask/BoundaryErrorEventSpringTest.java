@@ -19,6 +19,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @see <a href="https://activiti.atlassian.net/browse/ACT-1166">https://activiti.atlassian.net/browse/ACT-1166</a>
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/servicetask/serviceraskSpringTestCatchError-context.xml")
+@DirtiesContext
 public class BoundaryErrorEventSpringTest extends SpringFlowableTestCase {
 
     @Test

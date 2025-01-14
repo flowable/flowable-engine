@@ -58,6 +58,11 @@ public interface ActivityInstanceQuery extends Query<ActivityInstanceQuery, Acti
      */
     ActivityInstanceQuery taskAssignee(String userId);
 
+    /**
+     * Only select activity instances for userTask activities completed by the given user
+     */
+    ActivityInstanceQuery taskCompletedBy(String userId);
+
     /** Only select activity instances that are finished. */
     ActivityInstanceQuery finished();
 

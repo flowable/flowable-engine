@@ -82,6 +82,12 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         return getDbSqlSession().selectList("selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery, getManagedEntityClass());
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricCaseInstance> findIdsByCriteria(HistoricCaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectList("selectHistoricCaseInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
 
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {

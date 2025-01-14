@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +39,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -160,6 +162,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  endedTime: null,"
                         + "  lastUpdatedTime: '${json-unit.any-string}',"
                         + "  startUserId: null,"
+                        + "  assignee: null,"
+                        + "  completedBy: null,"
                         + "  referenceId: null,"
                         + "  referenceType: null,"
                         + "  entryCriterionId: null,"
@@ -167,7 +171,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  formKey: null,"
                         + "  extraValue: null,"
                         + "  showInOverview: false,"
-                        + "  tenantId: ''"
+                        + "  tenantId: '',"
+                        + "  localVariables: []"
                         + "}");
 
         HistoricPlanItemInstance stageOne = historyService.createHistoricPlanItemInstanceQuery()
@@ -210,6 +215,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  endedTime: null,"
                         + "  lastUpdatedTime: '${json-unit.any-string}',"
                         + "  startUserId: null,"
+                        + "  assignee: null,"
+                        + "  completedBy: null,"
                         + "  referenceId: null,"
                         + "  referenceType: null,"
                         + "  entryCriterionId: null,"
@@ -217,7 +224,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  formKey: null,"
                         + "  extraValue: null,"
                         + "  showInOverview: true,"
-                        + "  tenantId: ''"
+                        + "  tenantId: '',"
+                        + "  localVariables: []"
                         + "}");
 
         HistoricPlanItemInstance manualTask = historyService.createHistoricPlanItemInstanceQuery()
@@ -260,6 +268,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  endedTime: null,"
                         + "  lastUpdatedTime: '${json-unit.any-string}',"
                         + "  startUserId: null,"
+                        + "  assignee: null,"
+                        + "  completedBy: null,"
                         + "  referenceId: '${json-unit.any-string}',"
                         + "  referenceType: 'cmmn-1.1-to-cmmn-1.1-child-human-task',"
                         + "  entryCriterionId: null,"
@@ -267,7 +277,8 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "  formKey: null,"
                         + "  extraValue: null,"
                         + "  showInOverview: false,"
-                        + "  tenantId: ''"
+                        + "  tenantId: '',"
+                        + "  localVariables: []"
                         + "}");
 
         //Complete the task
@@ -460,6 +471,62 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
+    }
+
+    /**
+     * Test querying plan item instance and return local variables. POST query/planitem-instances
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testQueryHistoricPlanItemInstancesWithLocalVariables() throws Exception {
+        HashMap<String, Object> caseVariables = new HashMap<>();
+        caseVariables.put("stringVar", "Azerty");
+        caseVariables.put("intVar", 67890);
+        caseVariables.put("booleanVar", false);
+
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").variables(caseVariables).start();
+
+        PlanItemInstance planItem = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        runtimeService.setLocalVariable(planItem.getId(), "someLocalVariable", "someLocalValue");
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("planItemInstanceId", planItem.getId());
+        HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(post, 200);
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + planItem.getId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         localVariables:["
+                + "         ]"
+                + "     }"
+                + "]");
+
+        requestNode.put("includeLocalVariables", true);
+        post = new HttpPost(SERVER_URL_PREFIX + url);
+        post.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(post, 200);
+        dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + planItem.getId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         localVariables:[{"
+                + "             name:'someLocalVariable',"
+                + "             value:'someLocalValue',"
+                + "             scope:'local'"
+                + "         }]"
+                + "     }"
+                + "]");
     }
 
     //Same as the previous test, but using query post

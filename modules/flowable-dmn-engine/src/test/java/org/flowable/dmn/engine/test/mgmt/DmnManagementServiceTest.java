@@ -51,7 +51,7 @@ public class DmnManagementServiceTest extends AbstractFlowableDmnTest {
 
         String tablePrefix = dmnEngineConfiguration.getDatabaseTablePrefix();
 
-        assertThat(tableCount).containsEntry(tablePrefix + "ACT_GE_PROPERTY", 2L);
+        assertThat(tableCount).containsEntry(tablePrefix + "ACT_GE_PROPERTY", 3L);
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DECISION")).isZero();
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DEPLOYMENT")).isZero();
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DEPLOYMENT_RESOURCE")).isZero();

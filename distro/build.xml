@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="7.1.0-SNAPSHOT" />
+	<property name="flowable.version" value="7.1.1-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="target.docs.root" value="${target.distro.root}/docs" />
 	<property name="target.newsite.root" value="target/website" />
@@ -329,7 +329,7 @@
 		</exec>
 		<mkdir dir="${target.docs.root}/bpmn-model-javadocs" />
 		<copy todir="${target.docs.root}/bpmn-model-javadocs">
-			<fileset dir="../modules/flowable-bpmn-model/target/site/apidocs" />
+			<fileset dir="../modules/flowable-bpmn-model/target/reports/apidocs" />
 		</copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-engine">
@@ -337,7 +337,7 @@
 		</exec>
 		<mkdir dir="${target.docs.root}/javadocs" />
 		<copy todir="${target.docs.root}/javadocs">
-			<fileset dir="../modules/flowable-engine/target/site/apidocs" />
+			<fileset dir="../modules/flowable-engine/target/reports/apidocs" />
 		</copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-cmmn-api">
@@ -345,7 +345,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/cmmn-javadocs" />
         <copy todir="${target.docs.root}/cmmn-javadocs">
-            <fileset dir="../modules/flowable-cmmn-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-cmmn-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-dmn-api">
@@ -353,7 +353,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/dmn-javadocs" />
         <copy todir="${target.docs.root}/dmn-javadocs">
-            <fileset dir="../modules/flowable-dmn-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-dmn-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-event-registry-api">
@@ -361,7 +361,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/eventregistry-javadocs" />
         <copy todir="${target.docs.root}/eventregistry-javadocs">
-            <fileset dir="../modules/flowable-event-registry-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-event-registry-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-task-service-api">
@@ -369,7 +369,7 @@
 		</exec>
         <mkdir dir="${target.docs.root}/task-javadocs" />
         <copy todir="${target.docs.root}/task-javadocs">
-            <fileset dir="../modules/flowable-task-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-task-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-variable-service-api">
@@ -377,7 +377,7 @@
 	    </exec>
         <mkdir dir="${target.docs.root}/variable-javadocs" />
         <copy todir="${target.docs.root}/variable-javadocs">
-            <fileset dir="../modules/flowable-variable-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-variable-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-job-service-api">
@@ -385,7 +385,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/job-javadocs" />
         <copy todir="${target.docs.root}/job-javadocs">
-            <fileset dir="../modules/flowable-job-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-job-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-identitylink-service-api">
@@ -393,7 +393,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/identitylink-javadocs" />
         <copy todir="${target.docs.root}/identitylink-javadocs">
-            <fileset dir="../modules/flowable-identitylink-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-identitylink-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-entitylink-service-api">
@@ -401,7 +401,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/entitylink-javadocs" />
         <copy todir="${target.docs.root}/entitylink-javadocs">
-            <fileset dir="../modules/flowable-entitylink-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-entitylink-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-eventsubscription-service-api">
@@ -409,7 +409,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/eventsubscription-javadocs" />
         <copy todir="${target.docs.root}/eventsubscription-javadocs">
-            <fileset dir="../modules/flowable-eventsubscription-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-eventsubscription-service-api/target/reports/apidocs" />
         </copy>
 		
 		<exec executable="${mvn.executable}" dir="../modules/flowable-batch-service-api">
@@ -417,7 +417,7 @@
         </exec>
         <mkdir dir="${target.docs.root}/batch-javadocs" />
         <copy todir="${target.docs.root}/batch-javadocs">
-            <fileset dir="../modules/flowable-batch-service-api/target/site/apidocs" />
+            <fileset dir="../modules/flowable-batch-service-api/target/reports/apidocs" />
         </copy>
 	</target>
 

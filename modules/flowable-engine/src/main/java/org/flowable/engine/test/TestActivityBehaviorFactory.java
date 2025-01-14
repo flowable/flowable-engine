@@ -402,10 +402,10 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     
     @Override
     public IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage) {
         
         return wrappedActivityBehaviorFactory.createIntermediateCatchConditionalEventActivityBehavior(intermediateCatchEvent, 
-                        conditionalEventDefinition, conditionExpression);
+                        conditionalEventDefinition, conditionExpression, conditionLanguage);
     }
 
     @Override
@@ -498,10 +498,10 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     
     @Override
     public BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent,
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage, boolean interrupting) {
 
         return wrappedActivityBehaviorFactory.createBoundaryConditionalEventActivityBehavior(boundaryEvent, 
-                        conditionalEventDefinition, conditionExpression, interrupting);
+                        conditionalEventDefinition, conditionExpression, conditionLanguage, interrupting);
     }
 
     @Override

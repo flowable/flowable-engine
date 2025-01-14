@@ -50,6 +50,8 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     protected final Date exitTime;
     protected final Date endedTime;
     protected final String startUserId;
+    protected final String assignee;
+    protected final String completedBy;
     protected final String referenceId;
     protected final String referenceType;
     protected final boolean completable;
@@ -58,6 +60,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     protected final String formKey;
     protected final String extraValue;
     protected final Map<String, Object> variables;
+    protected final Map<String, Object> localVariables;
     protected final String tenantId;
     protected final PlanItem planItem;
 
@@ -86,6 +89,8 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.exitTime = planItemInstance.getExitTime();
         this.endedTime = planItemInstance.getEndedTime();
         this.startUserId = planItemInstance.getStartUserId();
+        this.assignee = planItemInstance.getAssignee();
+        this.completedBy = planItemInstance.getCompletedBy();
         this.referenceId = planItemInstance.getReferenceId();
         this.referenceType = planItemInstance.getReferenceType();
         this.completable = planItemInstance.isCompletable();
@@ -94,6 +99,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.formKey = planItemInstance.getFormKey();
         this.extraValue = planItemInstance.getExtraValue();
         this.variables = new HashMap<>(planItemInstance.getVariables());
+        this.localVariables = new HashMap<>(planItemInstance.getPlanItemInstanceLocalVariables());
         this.tenantId = planItemInstance.getTenantId();
         this.planItem = planItemInstance.getPlanItem();
     }
@@ -219,6 +225,16 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     }
 
     @Override
+    public String getAssignee() {
+        return assignee;
+    }
+
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    @Override
     public String getReferenceId() {
         return referenceId;
     }
@@ -266,6 +282,11 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public String getTenantId() {
         return tenantId;
+    }
+
+    @Override
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
+        return localVariables;
     }
 
     @Override

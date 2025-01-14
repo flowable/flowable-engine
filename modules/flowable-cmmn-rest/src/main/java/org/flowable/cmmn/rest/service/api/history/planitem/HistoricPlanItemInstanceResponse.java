@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -63,6 +66,8 @@ public class HistoricPlanItemInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date lastUpdatedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected String entryCriterionId;
@@ -76,6 +81,7 @@ public class HistoricPlanItemInstanceResponse {
     protected String caseDefinitionUrl;
     protected String derivedCaseDefinitionUrl;
     protected String stageInstanceUrl;
+    protected List<RestVariable> localVariables = new ArrayList<>();
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -291,6 +297,22 @@ public class HistoricPlanItemInstanceResponse {
         this.startUserId = startUserId;
     }
 
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+
     @ApiModelProperty(example = "referenceId")
     public String getReferenceId() {
         return referenceId;
@@ -399,5 +421,17 @@ public class HistoricPlanItemInstanceResponse {
 
     public void setStageInstanceUrl(String stageInstanceUrl) {
         this.stageInstanceUrl = stageInstanceUrl;
+    }
+
+    public void setLocalVariables(List<RestVariable> localVariables){
+        this.localVariables = localVariables;
+    }
+
+    public List<RestVariable> getLocalVariables() {
+        return localVariables;
+    }
+
+    public void addLocalVariable(RestVariable restVariable) {
+        localVariables.add(restVariable);
     }
 }

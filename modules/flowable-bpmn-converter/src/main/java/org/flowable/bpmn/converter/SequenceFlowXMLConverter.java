@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
@@ -42,7 +43,6 @@ public class SequenceFlowXMLConverter extends BaseBpmnXMLConverter {
         BpmnXMLUtil.addXMLLocation(sequenceFlow, xtr);
         sequenceFlow.setSourceRef(xtr.getAttributeValue(null, ATTRIBUTE_FLOW_SOURCE_REF));
         sequenceFlow.setTargetRef(xtr.getAttributeValue(null, ATTRIBUTE_FLOW_TARGET_REF));
-        sequenceFlow.setName(xtr.getAttributeValue(null, ATTRIBUTE_NAME));
         sequenceFlow.setSkipExpression(xtr.getAttributeValue(null, ATTRIBUTE_FLOW_SKIP_EXPRESSION));
 
         parseChildElements(getXMLElementName(), sequenceFlow, model, xtr);
@@ -67,6 +67,9 @@ public class SequenceFlowXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(sequenceFlow.getConditionExpression())) {
             xtw.writeStartElement(ELEMENT_FLOW_CONDITION);
             xtw.writeAttribute(XSI_PREFIX, XSI_NAMESPACE, "type", "tFormalExpression");
+            if (sequenceFlow.getConditionLanguage() != null) {
+                BpmnXMLUtil.writeDefaultAttribute(BpmnXMLConstants.ATTRIBUTE_SCRIPT_LANGUAGE, sequenceFlow.getConditionLanguage(), xtw);
+            }
             xtw.writeCData(sequenceFlow.getConditionExpression());
             xtw.writeEndElement();
         }

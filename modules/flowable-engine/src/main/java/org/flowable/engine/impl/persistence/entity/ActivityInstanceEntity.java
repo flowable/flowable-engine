@@ -69,6 +69,8 @@ public interface ActivityInstanceEntity extends ActivityInstance, Entity, HasRev
 
     void setAssignee(String assignee);
 
+    void setCompletedBy(String completedBy);
+
     void setTaskId(String taskId);
 
     void setCalledProcessInstanceId(String calledProcessInstanceId);

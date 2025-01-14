@@ -384,10 +384,9 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
 
-        waitForJobExecutorToProcessAllJobs(2000, 500);
-
         assertThat(managementService.createDeadLetterJobQuery().list()).hasSize(2);
         assertThat(managementService.createJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -395,16 +394,11 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         assertThat(managementService.createJobQuery().list())
                 .hasSize(2)
                 .extracting(Job::getRetries)
                 .containsOnly(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
-
-        waitForJobExecutorToProcessAllJobs(5000, 500);
-
-        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
-        assertThat(managementService.createJobQuery().list()).isEmpty();
-
     }
 
     @Test
@@ -426,8 +420,6 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
-
-        waitForJobExecutorToProcessAllJobs(2000, 500);
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));

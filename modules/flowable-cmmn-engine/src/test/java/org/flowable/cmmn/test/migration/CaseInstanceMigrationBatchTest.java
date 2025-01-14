@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationJobHandler;
 import org.flowable.cmmn.engine.impl.job.CaseInstanceMigrationStatusJobHandler;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentBuilderImpl;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -75,8 +76,10 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
         }
 
         // WHEN
-        // Start async executor to process the batches
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllAsyncJobs(cmmnEngineConfiguration, 5000L, 500L, true);
+        // We are manually executing because on SQL Server on our CI there is a deadlock exception from SQL Server when multiple threads run
+        for (Job job : cmmnManagementService.createJobQuery().handlerType(CaseInstanceMigrationJobHandler.TYPE).list()) {
+            cmmnManagementService.executeJob(job.getId());
+        }
         assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isFalse();
         executeMigrationJobStatusHandlerTimerJob();
 
@@ -95,10 +98,92 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
 
         for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
             assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
         }
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+
+        assertAfterMigrationState(caseInstance1, destinationDefinition, caseInstance1AfterMigration, 2);
+        assertAfterMigrationState(caseInstance2, destinationDefinition, caseInstance2AfterMigration, 2);
+
+        cmmnManagementService.deleteBatch(batch.getId());
+    }
+
+    @Test
+    void testCaseInstanceBatchMigrationWithTenant() {
+        // GIVEN
+        CaseDefinition sourceCaseDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml", "acme");
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").tenantId("acme").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").tenantId("acme").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml", "acme");
+
+        CaseInstanceMigrationDocumentBuilder migrationDoc = new CaseInstanceMigrationDocumentBuilderImpl()
+                .setCaseDefinitionToMigrateTo(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"));
+
+        Batch batch = cmmnMigrationService.createCaseInstanceMigrationBuilderFromCaseInstanceMigrationDocument(migrationDoc.build())
+                .batchMigrateCaseInstances(sourceCaseDefinition.getId());
+
+        assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isTrue();
+
+        CaseInstanceBatchMigrationResult migrationResultPriorProcessing = cmmnMigrationService.getResultsOfBatchCaseInstanceMigration(batch.getId());
+
+        // assert created migration result and parts
+        assertThat(migrationResultPriorProcessing).isNotNull();
+        assertThat(migrationResultPriorProcessing.getBatchId()).isEqualTo(batch.getId());
+        assertThat(migrationResultPriorProcessing.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResultPriorProcessing.getCompleteTime()).isNull();
+        assertThat(migrationResultPriorProcessing.getAllMigrationParts()).hasSize(2);
+        assertThat(migrationResultPriorProcessing.getWaitingMigrationParts()).hasSize(2);
+        assertThat(migrationResultPriorProcessing.getSuccessfulMigrationParts()).isEmpty();
+        assertThat(migrationResultPriorProcessing.getFailedMigrationParts()).isEmpty();
+
+        for (CaseInstanceBatchMigrationPartResult part : migrationResultPriorProcessing.getAllMigrationParts()) {
+            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_WAITING);
+            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_WAITING);
+        }
+
+        // WHEN
+        // We are manually executing because on SQL Server on our CI there is a deadlock exception from SQL Server when multiple threads run
+        for (Job job : cmmnManagementService.createJobQuery().handlerType(CaseInstanceMigrationJobHandler.TYPE).jobTenantId("acme").list()) {
+            cmmnManagementService.executeJob(job.getId());
+        }
+        assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isFalse();
+        executeMigrationJobStatusHandlerTimerJob();
+
+        // THEN
+        CaseInstanceBatchMigrationResult migrationResult = cmmnMigrationService.getResultsOfBatchCaseInstanceMigration(batch.getId());
+        assertThat(migrationResult).isNotNull();
+        assertThat(migrationResult.getBatchId()).isEqualTo(batch.getId());
+        assertThat(migrationResult.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
+
+        CaseInstance caseInstance1AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance1.getId())
+                .caseInstanceTenantId("acme")
+                .singleResult();
+        CaseInstance caseInstance2AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance2.getId())
+                .caseInstanceTenantId("acme")
+                .singleResult();
+
+        for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
+            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
+            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_SUCCESS);
+        }
+
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance1.getId()).jobTenantId("acme").list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance1.getId()).jobTenantId("acme").list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance1.getId()).jobTenantId("acme").list()).hasSize(0);
+
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance2.getId()).jobTenantId("acme").list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance2.getId()).jobTenantId("acme").list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance2.getId()).jobTenantId("acme").list()).hasSize(0);
 
         assertAfterMigrationState(caseInstance1, destinationDefinition, caseInstance1AfterMigration, 2);
         assertAfterMigrationState(caseInstance2, destinationDefinition, caseInstance2AfterMigration, 2);
@@ -177,10 +262,100 @@ public class CaseInstanceMigrationBatchTest extends AbstractCaseMigrationTest {
 
         for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
             assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
-            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_FAIL);
             assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_FAIL);
         }
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+
+        assertAfterMigrationState(caseInstance1, caseDefinitionVersion1, caseInstance1AfterMigration, 1);
+        assertAfterMigrationState(caseInstance2, caseDefinitionVersion1, caseInstance2AfterMigration, 1);
+
+        cmmnManagementService.deleteBatch(batch.getId());
+    }
+    
+    @Test
+    void testCaseInstanceBatchMigrationWithWrongMapping() {
+        // GIVEN
+        CaseDefinition caseDefinitionVersion1 = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+
+        CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                .name("test1")
+                .addClasspathResource("org/flowable/cmmn/test/migration/two-task.cmmn.xml")
+                .deploy();
+        
+        CaseDefinition caseDefinitionVersion2 = cmmnRepositoryService.createCaseDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .singleResult();
+
+        CaseInstanceMigrationDocumentBuilder migrationDoc = new CaseInstanceMigrationDocumentBuilderImpl()
+                .setCaseDefinitionToMigrateTo(caseDefinitionVersion2.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("nonExisting"));
+
+        Batch batch = cmmnMigrationService.createCaseInstanceMigrationBuilderFromCaseInstanceMigrationDocument(migrationDoc.build())
+                .batchMigrateCaseInstances(caseDefinitionVersion1.getId());
+
+        // assert created migration result and parts
+        assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isTrue();
+        CaseInstanceBatchMigrationResult migrationResultPriorProcessing = cmmnMigrationService.getResultsOfBatchCaseInstanceMigration(batch.getId());
+        assertThat(migrationResultPriorProcessing).isNotNull();
+        assertThat(migrationResultPriorProcessing.getBatchId()).isEqualTo(batch.getId());
+        assertThat(migrationResultPriorProcessing.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS);
+        assertThat(migrationResultPriorProcessing.getCompleteTime()).isNull();
+        assertThat(migrationResultPriorProcessing.getAllMigrationParts()).hasSize(2);
+        assertThat(migrationResultPriorProcessing.getWaitingMigrationParts()).hasSize(2);
+        assertThat(migrationResultPriorProcessing.getSuccessfulMigrationParts()).isEmpty();
+        assertThat(migrationResultPriorProcessing.getFailedMigrationParts()).isEmpty();
+        
+        assertThat(cmmnManagementService.createJobQuery().handlerType(CaseInstanceMigrationJobHandler.TYPE).list()).hasSize(2);
+
+        // WHEN
+        // Start async executor to process the batches
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllAsyncJobs(cmmnEngineConfiguration, 5000L, 500L, true);
+        assertThat(CmmnJobTestHelper.areJobsAvailable(cmmnManagementService)).isFalse();
+
+        CaseInstance caseInstance1AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance1.getId())
+                .singleResult();
+        CaseInstance caseInstance2AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance2.getId())
+                .singleResult();
+
+        executeMigrationJobStatusHandlerTimerJob();
+
+        // THEN
+        CaseInstanceBatchMigrationResult migrationResult = cmmnMigrationService.getResultsOfBatchCaseInstanceMigration(batch.getId());
+        assertThat(migrationResult.getBatchId()).isEqualTo(batch.getId());
+        assertThat(migrationResult.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
+        assertThat(migrationResult.getCompleteTime()).isNotNull();
+        assertThat(migrationResult.getAllMigrationParts()).hasSize(2);
+        assertThat(migrationResult.getWaitingMigrationParts()).isEmpty();
+        assertThat(migrationResult.getSuccessfulMigrationParts()).hasSize(0);
+        assertThat(migrationResult.getFailedMigrationParts()).hasSize(2);
+
+        for (CaseInstanceBatchMigrationPartResult part : migrationResult.getAllMigrationParts()) {
+            assertThat(part.getStatus()).isEqualTo(CaseInstanceBatchMigrationResult.STATUS_COMPLETED);
+            assertThat(part.getResult()).isEqualTo(CaseInstanceBatchMigrationResult.RESULT_FAIL);
+            assertThat(part.getMigrationMessage()).contains("Cannot find plan item with definition id 'nonExisting'");
+            assertThat(part.getMigrationStacktrace()).contains("Cannot find plan item with definition id 'nonExisting'");
+        }
+        
+        assertThat(cmmnManagementService.createJobQuery().handlerType(CaseInstanceMigrationJobHandler.TYPE).list()).hasSize(0);
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance1.getId()).list()).hasSize(0);
+        
+        assertThat(cmmnManagementService.createJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
+        assertThat(cmmnManagementService.createDeadLetterJobQuery().scopeId(caseInstance2.getId()).list()).hasSize(0);
 
         assertAfterMigrationState(caseInstance1, caseDefinitionVersion1, caseInstance1AfterMigration, 1);
         assertAfterMigrationState(caseInstance2, caseDefinitionVersion1, caseInstance2AfterMigration, 1);

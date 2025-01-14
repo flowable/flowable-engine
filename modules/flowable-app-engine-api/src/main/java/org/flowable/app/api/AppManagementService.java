@@ -15,6 +15,8 @@ package org.flowable.app.api;
 import java.util.Collection;
 import java.util.Map;
 
+import org.flowable.common.engine.api.lock.LockManager;
+
 /**
  * @author Tijs Rademakers
  */
@@ -30,4 +32,15 @@ public interface AppManagementService {
      */
     Collection<String> getTableNames();
 
+    /**
+     * Acquire a lock manager for the requested lock.
+     * This is a stateless call, this means that every time a lock manager
+     * is requested a new one would be created. Make sure that you release the lock
+     * once you are done.
+     *
+     * @param lockName the name of the lock that is being requested
+     *
+     * @return the lock manager for the given lock
+     */
+    LockManager getLockManager(String lockName);
 }

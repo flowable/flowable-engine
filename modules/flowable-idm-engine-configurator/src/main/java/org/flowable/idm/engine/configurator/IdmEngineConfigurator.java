@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
+import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
@@ -27,7 +28,7 @@ import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class IdmEngineConfigurator extends AbstractEngineConfigurator {
+public class IdmEngineConfigurator extends AbstractEngineConfigurator<IdmEngine> {
 
     protected IdmEngineConfiguration idmEngineConfiguration;
 
@@ -54,9 +55,14 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, idmEngineConfiguration);
 
-        idmEngineConfiguration.buildIdmEngine();
+        initEngine();
 
         initServiceConfigurations(engineConfiguration, idmEngineConfiguration);
+    }
+
+    @Override
+    protected IdmEngine buildEngine() {
+        return idmEngineConfiguration.buildEngine();
     }
 
     @Override

@@ -42,6 +42,8 @@ public interface CaseInstanceMigrationDocument {
     List<ChangePlanItemIdMapping> getChangePlanItemIdMappings();
     
     List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings();
+    
+    List<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIdsMappings();
 
     String getPreUpgradeExpression();
 

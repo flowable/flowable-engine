@@ -44,10 +44,16 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
+    protected String caseDefinitionKeyLike;
+    protected String caseDefinitionKeyLikeIgnoreCase;
     protected Set<String> caseDefinitionKeys;
     protected Set<String> caseDefinitionIds;
     protected String caseDefinitionCategory;
+    protected String caseDefinitionCategoryLike;
+    protected String caseDefinitionCategoryLikeIgnoreCase;
     protected String caseDefinitionName;
+    protected String caseDefinitionNameLike;
+    protected String caseDefinitionNameLikeIgnoreCase;
     protected Integer caseDefinitionVersion;
     protected String name;
     protected String nameLike;
@@ -55,7 +61,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String rootScopeId;
     protected String parentScopeId;
     protected String businessKey;
+    protected String businessKeyLike;
+    protected String businessKeyLikeIgnoreCase;
     protected String businessStatus;
+    protected String businessStatusLike;
+    protected String businessStatusLikeIgnoreCase;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
     protected String caseInstanceParentId;
@@ -74,6 +84,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected boolean completeable;
     protected String tenantId;
     protected String tenantIdLike;
+    protected String tenantIdLikeIgnoreCase;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
     protected String activePlanItemDefinitionId;
@@ -153,6 +164,32 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         }
         return this;
     }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionKeyLike(String caseDefinitionKeyLike) {
+        if (caseDefinitionKeyLike == null) {
+            throw new FlowableIllegalArgumentException("Case definition key is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        } else {
+            this.caseDefinitionKeyLike = caseDefinitionKeyLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase) {
+        if (caseDefinitionKeyLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Case definition key is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        } else {
+            this.caseDefinitionKeyLikeIgnoreCase = caseDefinitionKeyLikeIgnoreCase;
+        }
+        return this;
+    }
 
     @Override
     public CaseInstanceQueryImpl caseDefinitionCategory(String caseDefinitionCategory) {
@@ -167,6 +204,34 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         }
         return this;
     }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionCategoryLike(String caseDefinitionCategoryLike) {
+        if (caseDefinitionCategoryLike == null) {
+            throw new FlowableIllegalArgumentException("Case definition category is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionCategoryLike = caseDefinitionCategoryLike;
+        } else {
+            this.caseDefinitionCategoryLike = caseDefinitionCategoryLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionCategoryLikeIgnoreCase(String caseDefinitionCategoryLikeIgnoreCase) {
+        if (caseDefinitionCategoryLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Case definition category is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionCategoryLikeIgnoreCase = caseDefinitionCategoryLikeIgnoreCase;
+        } else {
+            this.caseDefinitionCategoryLikeIgnoreCase = caseDefinitionCategoryLikeIgnoreCase;
+        }
+        return this;
+    }
 
     @Override
     public CaseInstanceQueryImpl caseDefinitionName(String caseDefinitionName) {
@@ -178,6 +243,34 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.caseDefinitionName = caseDefinitionName;
         } else {
             this.caseDefinitionName = caseDefinitionName;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionNameLike(String caseDefinitionNameLike) {
+        if (caseDefinitionNameLike == null) {
+            throw new FlowableIllegalArgumentException("Case definition name is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionNameLike = caseDefinitionNameLike;
+        } else {
+            this.caseDefinitionNameLike = caseDefinitionNameLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseDefinitionNameLikeIgnoreCase(String caseDefinitionNameLikeIgnoreCase) {
+        if (caseDefinitionNameLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Case definition name is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionNameLikeIgnoreCase = caseDefinitionNameLikeIgnoreCase;
+        } else {
+            this.caseDefinitionNameLikeIgnoreCase = caseDefinitionNameLikeIgnoreCase;
         }
         return this;
     }
@@ -302,6 +395,32 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
     
     @Override
+    public CaseInstanceQueryImpl caseInstanceBusinessKeyLike(String businessKeyLike) {
+        if (businessKeyLike == null) {
+            throw new FlowableIllegalArgumentException("Business key is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKeyLike = businessKeyLike;
+        } else {
+            this.businessKeyLike = businessKeyLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceBusinessKeyLikeIgnoreCase(String businessKeyLikeIgnoreCase) {
+        if (businessKeyLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Business key is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKeyLikeIgnoreCase = businessKeyLikeIgnoreCase;
+        } else {
+            this.businessKeyLikeIgnoreCase = businessKeyLikeIgnoreCase;
+        }
+        return this;
+    }
+    
+    @Override
     public CaseInstanceQueryImpl caseInstanceBusinessStatus(String businessStatus) {
         if (businessStatus == null) {
             throw new FlowableIllegalArgumentException("Business status is null");
@@ -310,6 +429,32 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.businessStatus = businessStatus;
         } else {
             this.businessStatus = businessStatus;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceBusinessStatusLike(String businessStatusLike) {
+        if (businessStatusLike == null) {
+            throw new FlowableIllegalArgumentException("Business status is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatusLike = businessStatusLike;
+        } else {
+            this.businessStatusLike = businessStatusLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceBusinessStatusLikeIgnoreCase(String businessStatusLikeIgnoreCase) {
+        if (businessStatusLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("Business status is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessStatusLikeIgnoreCase = businessStatusLikeIgnoreCase;
+        } else {
+            this.businessStatusLikeIgnoreCase = businessStatusLikeIgnoreCase;
         }
         return this;
     }
@@ -517,6 +662,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.tenantIdLike = tenantIdLike;
         } else {
             this.tenantIdLike = tenantIdLike;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
+        if (tenantIdLikeIgnoreCase == null) {
+            throw new FlowableIllegalArgumentException("tenant id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+        } else {
+            this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
         }
         return this;
     }
@@ -864,6 +1022,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getCaseDefinitionKey() {
         return caseDefinitionKey;
     }
+    
+    public String getCaseDefinitionKeyLike() {
+        return caseDefinitionKeyLike;
+    }
+    
+    public String getCaseDefinitionKeyLikeIgnoreCase() {
+        return caseDefinitionKeyLikeIgnoreCase;
+    }
 
     public String getCaseDefinitionId() {
         return caseDefinitionId;
@@ -872,9 +1038,25 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getCaseDefinitionCategory() {
         return caseDefinitionCategory;
     }
+    
+    public String getCaseDefinitionCategoryLike() {
+        return caseDefinitionCategoryLike;
+    }
+    
+    public String getCaseDefinitionCategoryLikeIgnoreCase() {
+        return caseDefinitionCategoryLikeIgnoreCase;
+    }
 
     public String getCaseDefinitionName() {
         return caseDefinitionName;
+    }
+    
+    public String getCaseDefinitionNameLike() {
+        return caseDefinitionNameLike;
+    }
+    
+    public String getCaseDefinitionNameLikeIgnoreCase() {
+        return caseDefinitionNameLikeIgnoreCase;
     }
 
     public Integer getCaseDefinitionVersion() {
@@ -897,9 +1079,25 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public String getBusinessKey() {
         return businessKey;
     }
+    
+    public String getBusinessKeyLike() {
+        return businessKeyLike;
+    }
+    
+    public String getBusinessKeyLikeIgnoreCase() {
+        return businessKeyLikeIgnoreCase;
+    }
 
     public String getBusinessStatus() {
         return businessStatus;
+    }
+    
+    public String getBusinessStatusLike() {
+        return businessStatusLike;
+    }
+    
+    public String getBusinessStatusLikeIgnoreCase() {
+        return businessStatusLikeIgnoreCase;
     }
 
     public Date getLastReactivatedBefore() {
@@ -980,6 +1178,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     
     public String getTenantIdLike() {
         return tenantIdLike;
+    }
+    
+    public String getTenantIdLikeIgnoreCase() {
+        return tenantIdLikeIgnoreCase;
     }
 
     public boolean isWithoutTenantId() {

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -143,12 +144,15 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         return eventRegistryEngineConfiguration.getEventRegistry();
     }
 
-    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys) {
+    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys, EventInstance eventInstance) {
         CorrelationKey result = null;
         for (CorrelationKey correlationKey : correlationKeys) {
             if (result == null || (correlationKey.getParameterInstances().size() >= result.getParameterInstances().size()) ) {
                 result = correlationKey;
             }
+        }
+        if (result == null) {
+            throw new FlowableIllegalStateException(String.format("Event definition %s does not contain correlation parameters. Cannot verify if instance already exists.", eventInstance.getEventKey()));
         }
         return result;
     }

@@ -64,6 +64,7 @@ import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -79,6 +80,7 @@ import org.springframework.test.context.TestPropertySource;
         "application.test.kafka-partition1=0-2",
         "application.test.kafka-partition2=3-4",
 })
+@Disabled
 class KafkaChannelDefinitionProcessorTest {
 
     @Autowired

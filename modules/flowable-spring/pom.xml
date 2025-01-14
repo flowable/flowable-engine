@@ -9,7 +9,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.1.1-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -20,6 +20,7 @@
         <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,
         </flowable.osgi.import.additional>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <build>
@@ -254,110 +255,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>check</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>delete-test-sources</id>
-                                <phase>generate-sources</phase>
-                                <configuration>
-                                    <tasks>
-                                        <delete dir="src/test/java/org/flowable/engine/test" />
-                                        <delete dir="src/test/resources/org/flowable/engine/test" />
-                                        <delete dir="src/test/java/org/flowable/examples" />
-                                        <delete dir="src/test/resources/org/flowable/examples" />
-                                        <delete dir="src/test/java/org/flowable/standalone" />
-                                        <delete dir="src/test/resources/org/flowable/standalone" />
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>checkspring</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-test-sources-from-engine</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <delete dir="src/test/java/org/flowable/engine/test" />
-                                        <delete dir="src/test/resources/org/flowable/engine/test" />
-                                        <delete dir="src/test/java/org/flowable/examples" />
-                                        <delete dir="src/test/resources/org/flowable/examples" />
-                                        <delete dir="src/test/java/org/flowable/standalone" />
-                                        <delete dir="src/test/resources/org/flowable/standalone" />
-                                        <copy todir="src/test/java" overwrite="true">
-                                            <fileset dir="../flowable-engine/src/test/java" />
-                                        </copy>
-                                        <copy todir="src/test/resources" overwrite="true">
-                                            <fileset dir="../flowable-engine/src/test/resources" />
-                                        </copy>
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>delete-test-sources-after</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <delete dir="src/test/java/org/flowable/engine/test" />
-                                        <delete dir="src/test/resources/org/flowable/engine/test" />
-                                        <delete dir="src/test/java/org/flowable/examples" />
-                                        <delete dir="src/test/resources/org/flowable/examples" />
-                                        <delete dir="src/test/java/org/flowable/standalone" />
-                                        <delete dir="src/test/resources/org/flowable/standalone" />
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <systemProperties>
-                                <property>
-                                    <name>process.engine.initializer</name>
-                                    <value>org.flowable.spring.SpringProcessEngineInitializer</value>
-                                </property>
-                            </systemProperties>
-                            <excludes>
-                                <exclude>org/flowable/standalone/**</exclude>
-                                <exclude>**/*TestCase.java</exclude>
-                                <exclude>**/FlowableRuleJunit4Test.java</exclude><!-- Can't run in
-									Spring since FlowableRule must be used different in Spring -->
-                                <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
-                                <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
-                                <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->
-                                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-485 -->
-                            </excludes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

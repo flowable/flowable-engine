@@ -41,7 +41,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
@@ -71,7 +70,6 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TextAnnotation;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableException;
@@ -90,6 +88,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseCmmnXmlConverter> elementConverters = new HashMap<>();
+
+    protected CmmnXmlConverterOptions options = new CmmnXmlConverterOptions();
 
     protected ClassLoader classloader;
 
@@ -295,7 +295,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
                 Stage planModel = caseModel.getPlanModel();
 
-                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw);
+                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw, options);
 
                 // end case element
                 xtw.writeEndElement();
@@ -473,6 +473,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     Association association = new Association();
                     association.setTargetElement(criterion);
                     association.setTargetRef(criterion.getId());
+                    criterion.addIncomingAssociation(association);
 
                     association.setSourceElement(source);
                     association.setSourceRef(source.getId());
@@ -525,20 +526,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
 
         if (!planItem.getExitCriteria().isEmpty()) {
-            boolean exitCriteriaAllowed = true;
-            if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
-                    exitCriteriaAllowed = false;
-                }
-            }
-
-            if (exitCriteriaAllowed) {
-                resolveExitCriteriaSentry(planItem);
-            } else {
-                LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
-                planItem.getExitCriteria().clear();
-            }
+            resolveExitCriteriaSentry(planItem);
         }
 
         if (planItemDefinition instanceof Stage) {
@@ -716,6 +704,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
         }
+    }
+
+    public CmmnXmlConverterOptions getCmmnXmlConverterOptions() {
+        return options;
+    }
+
+    public void setCmmnXmlConverterOptions(CmmnXmlConverterOptions options) {
+        this.options = options;
     }
 
     public void setClassloader(ClassLoader classloader) {

@@ -13,8 +13,11 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * A receive task is a wait state that waits to receive some message.
@@ -26,10 +29,24 @@ import org.flowable.engine.delegate.DelegateExecution;
 public class ReceiveTaskActivityBehavior extends TaskActivityBehavior {
 
     private static final long serialVersionUID = 1L;
+    
+    protected String receiveTaskId;
+    protected String skipExpression;
+    
+    public ReceiveTaskActivityBehavior(String receiveTaskId, String skipExpression) {
+        this.receiveTaskId = receiveTaskId;
+        this.skipExpression = skipExpression;
+    }
 
     @Override
     public void execute(DelegateExecution execution) {
-        // Do nothing: waitstate behavior
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpression, receiveTaskId, execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(skipExpression, receiveTaskId, execution, commandContext)) {
+            leave(execution);
+            return;
+        }
     }
 
     @Override

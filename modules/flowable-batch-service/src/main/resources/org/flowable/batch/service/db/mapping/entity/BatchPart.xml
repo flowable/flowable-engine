@@ -5,63 +5,63 @@
 <mapper namespace="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
 
     <resultMap id="batchPartMap" type="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
-        <id property="id" column="ID_" jdbcType="VARCHAR"/>
+        <id property="id" column="ID_" jdbcType="NVARCHAR"/>
         <result property="revision" column="REV_" jdbcType="INTEGER"/>
-        <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR"/>
-        <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
-        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-        <result property="searchKey" column="SEARCH_KEY_" jdbcType="VARCHAR"/>
-        <result property="searchKey2" column="SEARCH_KEY2_" jdbcType="VARCHAR"/>
-        <result property="status" column="STATUS_" jdbcType="VARCHAR"/>
+        <result property="batchId" column="BATCH_ID_" jdbcType="NVARCHAR"/>
+        <result property="type" column="TYPE_" jdbcType="NVARCHAR"/>
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+        <result property="searchKey" column="SEARCH_KEY_" jdbcType="NVARCHAR"/>
+        <result property="searchKey2" column="SEARCH_KEY2_" jdbcType="NVARCHAR"/>
+        <result property="status" column="STATUS_" jdbcType="NVARCHAR"/>
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="completeTime" column="COMPLETE_TIME_" jdbcType="TIMESTAMP"/>
         <result property="resultDocRefId" column="RESULT_DOC_ID_" typeHandler="BatchByteArrayRefTypeHandler"/>
-        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR"/>
+        <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR"/>
 
-        <result property="batchType" column="BATCH_TYPE_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey" column="BATCH_SEARCH_KEY_" jdbcType="VARCHAR"/>
-        <result property="batchSearchKey2" column="BATCH_SEARCH_KEY2_" jdbcType="VARCHAR"/>
+        <result property="batchType" column="BATCH_TYPE_" jdbcType="NVARCHAR"/>
+        <result property="batchSearchKey" column="BATCH_SEARCH_KEY_" jdbcType="NVARCHAR"/>
+        <result property="batchSearchKey2" column="BATCH_SEARCH_KEY2_" jdbcType="NVARCHAR"/>
     </resultMap>
 
     <!-- BatchPart INSERTS -->
     <insert id="insertBatchPart" parameterType="org.flowable.batch.service.impl.persistence.entity.BatchPartEntityImpl">
         INSERT INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, STATUS_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_)
-        VALUES (#{id, jdbcType=VARCHAR},
+        VALUES (#{id, jdbcType=NVARCHAR},
             #{revision, jdbcType=INTEGER},
-            #{batchId, jdbcType=VARCHAR},
-            #{type, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{searchKey, jdbcType=VARCHAR},
-            #{searchKey2, jdbcType=VARCHAR},
-            #{status, jdbcType=VARCHAR},
+            #{batchId, jdbcType=NVARCHAR},
+            #{type, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{searchKey, jdbcType=NVARCHAR},
+            #{searchKey2, jdbcType=NVARCHAR},
+            #{status, jdbcType=NVARCHAR},
             #{createTime, jdbcType=TIMESTAMP},
             #{completeTime, jdbcType=TIMESTAMP},
             #{resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-            #{tenantId, jdbcType=VARCHAR})
+            #{tenantId, jdbcType=NVARCHAR})
     </insert>
 
     <insert id="bulkInsertBatchPart" parameterType="java.util.List">
         INSERT INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, STATUS_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_)
         VALUES
         <foreach collection="list" item="batchPart" index="index" separator=",">
-            (#{batchPart.id, jdbcType=VARCHAR},
+            (#{batchPart.id, jdbcType=NVARCHAR},
             #{batchPart.revision, jdbcType=INTEGER},
-            #{batchPart.batchId, jdbcType=VARCHAR},
-            #{batchPart.type, jdbcType=VARCHAR},
-            #{batchPart.scopeId, jdbcType=VARCHAR},
-            #{batchPart.subScopeId, jdbcType=VARCHAR},
-            #{batchPart.scopeType, jdbcType=VARCHAR},
-            #{batchPart.searchKey, jdbcType=VARCHAR},
-            #{batchPart.searchKey2, jdbcType=VARCHAR},
-            #{batchPart.status, jdbcType=VARCHAR},
+            #{batchPart.batchId, jdbcType=NVARCHAR},
+            #{batchPart.type, jdbcType=NVARCHAR},
+            #{batchPart.scopeId, jdbcType=NVARCHAR},
+            #{batchPart.subScopeId, jdbcType=NVARCHAR},
+            #{batchPart.scopeType, jdbcType=NVARCHAR},
+            #{batchPart.searchKey, jdbcType=NVARCHAR},
+            #{batchPart.searchKey2, jdbcType=NVARCHAR},
+            #{batchPart.status, jdbcType=NVARCHAR},
             #{batchPart.createTime, jdbcType=TIMESTAMP},
             #{batchPart.completeTime, jdbcType=TIMESTAMP},
             #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-            #{batchPart.tenantId, jdbcType=VARCHAR})
+            #{batchPart.tenantId, jdbcType=NVARCHAR})
         </foreach>
     </insert>
 
@@ -69,20 +69,20 @@
         INSERT ALL
         <foreach collection="list" item="batchPart" index="index">
             INTO ${prefix}FLW_RU_BATCH_PART(ID_, REV_, BATCH_ID_, TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SEARCH_KEY_, SEARCH_KEY2_, STATUS_, CREATE_TIME_, COMPLETE_TIME_, RESULT_DOC_ID_, TENANT_ID_) VALUES
-            (#{batchPart.id, jdbcType=VARCHAR},
+            (#{batchPart.id, jdbcType=NVARCHAR},
             #{batchPart.revision, jdbcType=INTEGER},
-            #{batchPart.batchId, jdbcType=VARCHAR},
-            #{batchPart.type, jdbcType=VARCHAR},
-            #{batchPart.scopeId, jdbcType=VARCHAR},
-            #{batchPart.subScopeId, jdbcType=VARCHAR},
-            #{batchPart.scopeType, jdbcType=VARCHAR},
-            #{batchPart.searchKey, jdbcType=VARCHAR},
-            #{batchPart.searchKey2, jdbcType=VARCHAR},
-            #{batchPart.status, jdbcType=VARCHAR},
+            #{batchPart.batchId, jdbcType=NVARCHAR},
+            #{batchPart.type, jdbcType=NVARCHAR},
+            #{batchPart.scopeId, jdbcType=NVARCHAR},
+            #{batchPart.subScopeId, jdbcType=NVARCHAR},
+            #{batchPart.scopeType, jdbcType=NVARCHAR},
+            #{batchPart.searchKey, jdbcType=NVARCHAR},
+            #{batchPart.searchKey2, jdbcType=NVARCHAR},
+            #{batchPart.status, jdbcType=NVARCHAR},
             #{batchPart.createTime, jdbcType=TIMESTAMP},
             #{batchPart.completeTime, jdbcType=TIMESTAMP},
             #{batchPart.resultDocRefId, typeHandler=BatchByteArrayRefTypeHandler},
-            #{batchPart.tenantId, jdbcType=VARCHAR})
+            #{batchPart.tenantId, jdbcType=NVARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -99,44 +99,44 @@
                 COMPLETE_TIME_ = #{completeTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.status != status">
-                STATUS_ = #{status, jdbcType=VARCHAR},
+                STATUS_ = #{status, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+                TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
             </if>
         </set>
-        where ID_ = #{id, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
     <!-- BatchPart DELETE -->
     <delete id="deleteBatchPart" parameterType="string">
-      delete from ${prefix}FLW_RU_BATCH_PART where ID_ = #{id, jdbcType=VARCHAR}
+      delete from ${prefix}FLW_RU_BATCH_PART where ID_ = #{id, jdbcType=NVARCHAR}
     </delete>
     
     <delete id="deleteBatchPartByBatchId" parameterType="string">
-      delete from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{batchId, jdbcType=VARCHAR}
+      delete from ${prefix}FLW_RU_BATCH_PART where BATCH_ID_ = #{batchId, jdbcType=NVARCHAR}
     </delete>
 
     <!-- BatchPart SELECT -->
     <select id="selectBatchPart" parameterType="string" resultMap="batchPartMap">
         <include refid="selectBatchPartsWithBatchJoinSql"/>
-        where RES.ID_ = #{id, jdbcType=VARCHAR}
+        where RES.ID_ = #{id, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectBatchPartsByBatchId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
         <include refid="selectBatchPartsWithBatchJoinSql"/>
-        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR}
+        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectBatchPartsByBatchIdAndStatus" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
         <include refid="selectBatchPartsWithBatchJoinSql"/>
-        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=VARCHAR} and RES.STATUS_ = #{parameter.status, jdbcType=VARCHAR}
+        where RES.BATCH_ID_ = #{parameter.batchId, jdbcType=NVARCHAR} and RES.STATUS_ = #{parameter.status, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectBatchPartsByScopeIdAndScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="batchPartMap">
         <include refid="selectBatchPartsWithBatchJoinSql"/>
-        where RES.SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} or RES.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+        where RES.SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} or RES.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectBatchPartsByQueryCriteria" parameterType="org.flowable.batch.service.impl.BatchPartQueryImpl" resultMap="batchPartMap">
@@ -165,46 +165,46 @@
     <sql id="commonSelectBatchPartsByQueryCriteriaSql">
         <where>
             <if test="id != null">
-                AND RES.ID_ = #{id, jdbcType=VARCHAR}
+                AND RES.ID_ = #{id, jdbcType=NVARCHAR}
             </if>
             <if test="type != null">
-                AND RES.TYPE_ = #{type, jdbcType=VARCHAR}
+                AND RES.TYPE_ = #{type, jdbcType=NVARCHAR}
             </if>
             <if test="batchId != null">
-                AND RES.BATCH_ID_ = #{batchId, jdbcType=VARCHAR}
+                AND RES.BATCH_ID_ = #{batchId, jdbcType=NVARCHAR}
             </if>
             <if test="searchKey != null">
-                AND RES.SEARCH_KEY_ = #{searchKey, jdbcType=VARCHAR}
+                AND RES.SEARCH_KEY_ = #{searchKey, jdbcType=NVARCHAR}
             </if>
             <if test="searchKey2 != null">
-                AND RES.SEARCH_KEY2_ = #{searchKey2, jdbcType=VARCHAR}
+                AND RES.SEARCH_KEY2_ = #{searchKey2, jdbcType=NVARCHAR}
             </if>
             <if test="batchType != null">
-                AND BATCH_.TYPE_ = #{batchType, jdbcType=VARCHAR}
+                AND BATCH_.TYPE_ = #{batchType, jdbcType=NVARCHAR}
             </if>
             <if test="batchSearchKey != null">
-                AND BATCH_.SEARCH_KEY_ = #{batchSearchKey, jdbcType=VARCHAR}
+                AND BATCH_.SEARCH_KEY_ = #{batchSearchKey, jdbcType=NVARCHAR}
             </if>
             <if test="batchSearchKey2 != null">
-                AND BATCH_.SEARCH_KEY2_ = #{batchSearchKey2, jdbcType=VARCHAR}
+                AND BATCH_.SEARCH_KEY2_ = #{batchSearchKey2, jdbcType=NVARCHAR}
             </if>
             <if test="status != null">
-                AND RES.STATUS_ = #{status, jdbcType=VARCHAR}
+                AND RES.STATUS_ = #{status, jdbcType=NVARCHAR}
             </if>
             <if test="scopeId != null">
-                AND RES.SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+                AND RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
             </if>
             <if test="subScopeId != null">
-                AND RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+                AND RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="scopeType != null">
-                AND RES.SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+                AND RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
             </if>
             <if test="tenantId != null">
-                AND RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+                AND RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
             </if>
             <if test="tenantIdLike != null">
-                and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+                and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)

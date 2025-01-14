@@ -71,6 +71,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date endedBefore;
     protected Date endedAfter;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean ended;
@@ -88,6 +90,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean withoutTenantId;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean includeLocalVariables;
 
     public HistoricPlanItemInstanceQueryImpl() {
 
@@ -175,6 +178,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
         this.startUserId = startUserId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
+        this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
         return this;
     }
 
@@ -440,6 +455,13 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery includeLocalVariables() {
+        this.includeLocalVariables = true;
+        return this;
+    }
+
+
+    @Override
     public HistoricPlanItemInstanceQuery orderByCreateTime() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.CREATE_TIME);
     }
@@ -511,7 +533,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
-        List<HistoricPlanItemInstance> historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        List<HistoricPlanItemInstance> historicPlanItems;
+        if (includeLocalVariables){
+            historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+        } else {
+             historicPlanItems =CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
+        }
 
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         if (cmmnEngineConfiguration.getPlanItemLocalizationManager() != null) {
@@ -634,6 +661,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public String getStartUserId() {
         return startUserId;
     }
+    public String getAssignee() {
+        return assignee;
+    }
+    public String getCompletedBy() {
+        return completedBy;
+    }
     public String getReferenceId() {
         return referenceId;
     }
@@ -675,6 +708,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+    public boolean isIncludeLocalVariables() {
+        return includeLocalVariables;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

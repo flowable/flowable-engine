@@ -7,7 +7,7 @@
   <bean id="processEngineConfiguration"
     class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
 
-    <property name="jdbcUrl" value="${jdbc.url:jdbc:mysql://127.1.0-SNAPSHOT.1:3306/flowablecompatibility?characterEncoding=UTF-8}" />
+    <property name="jdbcUrl" value="${jdbc.url:jdbc:mysql://127.0.1.1:3306/flowablecompatibility?characterEncoding=UTF-8}" />
     <property name="jdbcDriver" value="${jdbc.driver:com.mysql.jdbc.Driver}" />
     <property name="jdbcUsername" value="${jdbc.username:flowable}" />
     <property name="jdbcPassword" value="${jdbc.password:flowable}" />

@@ -77,6 +77,14 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricPlanItemInstance> findWithVariablesByCriteria(HistoricPlanItemInstanceQueryImpl historicPlanItemInstanceQuery) {
+        setSafeInValueLists(historicPlanItemInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricPlanItemInstancesWithLocalVariablesByQueryCriteria", historicPlanItemInstanceQuery,
+                getManagedEntityClass());
+    }
+
+    @Override
     public Class<? extends HistoricPlanItemInstanceEntity> getManagedEntityClass() {
         return HistoricPlanItemInstanceEntityImpl.class;
     }

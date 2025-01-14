@@ -50,6 +50,7 @@ public class BaseProcessInstanceResource {
         allowedSortProperties.put("id", ProcessInstanceQueryProperty.PROCESS_INSTANCE_ID);
         allowedSortProperties.put("startTime", ProcessInstanceQueryProperty.PROCESS_START_TIME);
         allowedSortProperties.put("tenantId", ProcessInstanceQueryProperty.TENANT_ID);
+        allowedSortProperties.put("businessKey", ProcessInstanceQueryProperty.BUSINESS_KEY);
     }
 
     @Autowired
@@ -84,8 +85,23 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessInstanceNameLikeIgnoreCase() != null) {
             query.processInstanceNameLikeIgnoreCase(queryRequest.getProcessInstanceNameLikeIgnoreCase());
         }
+        if (queryRequest.getProcessDefinitionName() != null) {
+            query.processDefinitionName(queryRequest.getProcessDefinitionName());
+        }
+        if (queryRequest.getProcessDefinitionNameLike() != null) {
+            query.processDefinitionNameLike(queryRequest.getProcessDefinitionNameLike());
+        }
+        if (queryRequest.getProcessDefinitionNameLikeIgnoreCase() != null) {
+            query.processDefinitionNameLikeIgnoreCase(queryRequest.getProcessDefinitionNameLikeIgnoreCase());
+        }
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());
+        }
+        if (queryRequest.getProcessDefinitionKeyLike() != null) {
+            query.processDefinitionKeyLike(queryRequest.getProcessDefinitionKeyLike());
+        }
+        if (queryRequest.getProcessDefinitionKeyLikeIgnoreCase() != null) {
+            query.processDefinitionKeyLikeIgnoreCase(queryRequest.getProcessDefinitionKeyLikeIgnoreCase());
         }
         if (queryRequest.getProcessDefinitionKeys() != null) {
             query.processDefinitionKeys(queryRequest.getProcessDefinitionKeys());
@@ -99,8 +115,11 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessDefinitionCategory() != null) {
             query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());
         }
-        if (queryRequest.getProcessDefinitionName() != null) {
-            query.processDefinitionName(queryRequest.getProcessDefinitionName());
+        if (queryRequest.getProcessDefinitionCategoryLike() != null) {
+            query.processDefinitionCategoryLike(queryRequest.getProcessDefinitionCategoryLike());
+        }
+        if (queryRequest.getProcessDefinitionCategoryLikeIgnoreCase() != null) {
+            query.processDefinitionCategoryLikeIgnoreCase(queryRequest.getProcessDefinitionCategoryLikeIgnoreCase());
         }
         if (queryRequest.getProcessDefinitionVersion() != null) {
             query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
@@ -125,6 +144,18 @@ public class BaseProcessInstanceResource {
         }
         if (queryRequest.getProcessBusinessKeyLike() != null) {
             query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
+        if (queryRequest.getProcessBusinessKeyLikeIgnoreCase() != null) {
+            query.processInstanceBusinessKeyLikeIgnoreCase(queryRequest.getProcessBusinessKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getProcessBusinessStatus() != null) {
+            query.processInstanceBusinessStatus(queryRequest.getProcessBusinessStatus());
+        }
+        if (queryRequest.getProcessBusinessStatusLike() != null) {
+            query.processInstanceBusinessStatusLike(queryRequest.getProcessBusinessStatusLike());
+        }
+        if (queryRequest.getProcessBusinessStatusLikeIgnoreCase() != null) {
+            query.processInstanceBusinessStatusLikeIgnoreCase(queryRequest.getProcessBusinessStatusLikeIgnoreCase());
         }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
@@ -181,6 +212,9 @@ public class BaseProcessInstanceResource {
         }
         if (queryRequest.getTenantIdLike() != null) {
             query.processInstanceTenantIdLike(queryRequest.getTenantIdLike());
+        }
+        if (queryRequest.getTenantIdLikeIgnoreCase() != null) {
+            query.processInstanceTenantIdLikeIgnoreCase(queryRequest.getTenantIdLikeIgnoreCase());
         }
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {

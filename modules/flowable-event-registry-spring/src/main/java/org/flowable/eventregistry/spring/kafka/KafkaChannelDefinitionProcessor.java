@@ -306,7 +306,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                     configurations.add(
                             new Configuration(
                                     simpleEndpoint,
-                                    decorateFactory(destinationTopicProperties, factoryConfigurer, retryTopicConfiguration)
+                                    decorateFactory(factoryConfigurer)
                             )
                     );
                 }
@@ -432,14 +432,8 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return retryTopicTaskScheduler;
     }
 
-    protected KafkaListenerContainerFactory<?> decorateFactory(DestinationTopic.Properties destinationTopicProperties,
-            ListenerContainerFactoryConfigurer factoryConfigurer, RetryTopicConfiguration retryTopicConfiguration) {
-        // This is the same as it is done in the Spring Kata RetryTopicConfigurer
-        return destinationTopicProperties.isMainEndpoint() ?
-                factoryConfigurer.decorateFactoryWithoutSettingContainerProperties((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory,
-                        retryTopicConfiguration.forContainerFactoryConfigurer()) :
-                factoryConfigurer.decorateFactory((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory,
-                        retryTopicConfiguration.forContainerFactoryConfigurer());
+    protected KafkaListenerContainerFactory<?> decorateFactory(ListenerContainerFactoryConfigurer factoryConfigurer) {
+        return factoryConfigurer.decorateFactory((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory);
     }
 
     protected void processOutboundDefinition(KafkaOutboundChannelModel channelModel) {

@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.1.1-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -100,9 +100,9 @@
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.tinyjee.jgraphx</groupId>
+      <groupId>com.github.vlsi.mxgraph</groupId>
       <artifactId>jgraphx</artifactId>
-      <version>1.10.4.1</version>
+      <version>4.2.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

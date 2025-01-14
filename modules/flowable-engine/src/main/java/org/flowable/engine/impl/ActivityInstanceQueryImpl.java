@@ -37,6 +37,7 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     protected String activityName;
     protected String activityType;
     protected String assignee;
+    protected String completedBy;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -105,6 +106,12 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     @Override
     public ActivityInstanceQueryImpl taskAssignee(String assignee) {
         this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public ActivityInstanceQuery taskCompletedBy(String userId) {
+        this.completedBy = userId;
         return this;
     }
 
@@ -274,6 +281,10 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
 
     public String getAssignee() {
         return assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
     }
 
     public boolean isFinished() {

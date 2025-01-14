@@ -68,6 +68,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.common.rest.variable.UUIDRestVariableConverter;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.form.api.FormDefinition;
@@ -144,14 +145,15 @@ public class CmmnRestResponseFactory {
             response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, response.getCaseInstanceId()));
         }
 
-        if (task.getProcessVariables() != null) {
-            Map<String, Object> variableMap = task.getProcessVariables();
+        Map<String, Object> variableMap = task.getProcessVariables();
+        if (variableMap != null) {
             for (String name : variableMap.keySet()) {
                 response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
             }
         }
-        if (task.getTaskLocalVariables() != null) {
-            Map<String, Object> variableMap = task.getTaskLocalVariables();
+
+        variableMap = task.getTaskLocalVariables();
+        if (variableMap != null) {
             for (String name : variableMap.keySet()) {
                 response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
             }
@@ -565,6 +567,8 @@ public class CmmnRestResponseFactory {
         result.setExitTime(planItemInstance.getExitTime());
         result.setEndedTime(planItemInstance.getEndedTime());
         result.setStartUserId(planItemInstance.getStartUserId());
+        result.setAssignee(planItemInstance.getAssignee());
+        result.setCompletedBy(planItemInstance.getCompletedBy());
         result.setStage(planItemInstance.isStage());
         result.setCompletable(planItemInstance.isCompletable());
         result.setEntryCriterionId(planItemInstance.getEntryCriterionId());
@@ -572,6 +576,14 @@ public class CmmnRestResponseFactory {
         result.setFormKey(planItemInstance.getFormKey());
         result.setExtraValue(planItemInstance.getExtraValue());
         result.setTenantId(planItemInstance.getTenantId());
+
+        Map<String, Object> variableMap = planItemInstance.getPlanItemInstanceLocalVariables();
+        if (variableMap != null) {
+            for (String name : variableMap.keySet()) {
+                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
+                        planItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+            }
+        }
 
         return result;
     }
@@ -687,8 +699,8 @@ public class CmmnRestResponseFactory {
         result.setStartTime(caseInstance.getStartTime());
         result.setStartUserId(caseInstance.getStartUserId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
-        if (caseInstance.getCaseVariables() != null) {
-            Map<String, Object> variableMap = caseInstance.getCaseVariables();
+        Map<String, Object> variableMap = caseInstance.getCaseVariables();
+        if (variableMap != null) {
             for (String name : variableMap.keySet()) {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_HISTORY_CASE, false, urlBuilder));
             }
@@ -753,16 +765,17 @@ public class CmmnRestResponseFactory {
         result.setTaskDefinitionKey(taskInstance.getTaskDefinitionKey());
         result.setWorkTimeInMillis(taskInstance.getWorkTimeInMillis());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, taskInstance.getId()));
-        if (taskInstance.getProcessVariables() != null) {
-            Map<String, Object> variableMap = taskInstance.getProcessVariables();
+        Map<String, Object> variableMap = taskInstance.getProcessVariables();
+        if (variableMap != null) {
             for (String name : variableMap.keySet()) {
                 result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
             }
         }
-        if (taskInstance.getTaskLocalVariables() != null) {
-            Map<String, Object> variableMap = taskInstance.getTaskLocalVariables();
+        variableMap = taskInstance.getTaskLocalVariables();
+        if (variableMap != null) {
             for (String name : variableMap.keySet()) {
-                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
+                        urlBuilder));
             }
         }
         return result;
@@ -898,6 +911,8 @@ public class CmmnRestResponseFactory {
         result.setEndedTime(historicPlanItemInstance.getEndedTime());
         result.setLastUpdatedTime(historicPlanItemInstance.getLastUpdatedTime());
         result.setStartUserId(historicPlanItemInstance.getStartUserId());
+        result.setAssignee(historicPlanItemInstance.getAssignee());
+        result.setCompletedBy(historicPlanItemInstance.getCompletedBy());
         result.setReferenceId(historicPlanItemInstance.getReferenceId());
         result.setReferenceType(historicPlanItemInstance.getReferenceType());
         result.setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
@@ -915,6 +930,15 @@ public class CmmnRestResponseFactory {
         if (historicPlanItemInstance.getStageInstanceId() != null) {
             result.setStageInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, historicPlanItemInstance.getStageInstanceId()));
         }
+
+        Map<String, Object> variableMap = historicPlanItemInstance.getPlanItemInstanceLocalVariables();
+        if (variableMap != null) {
+            for (String name : variableMap.keySet()) {
+                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
+                        historicPlanItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+            }
+        }
+
         return result;
     }
 
@@ -1093,6 +1117,7 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new InstantRestVariableConverter());
         variableConverters.add(new LocalDateRestVariableConverter());
         variableConverters.add(new LocalDateTimeRestVariableConverter());
+        variableConverters.add(new UUIDRestVariableConverter());
         variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
     }
 

@@ -34,6 +34,7 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
 
     public static final String BATCH_RESULT_STATUS_LABEL = "resultStatus";
     public static final String BATCH_RESULT_MESSAGE_LABEL = "resultMessage";
+    public static final String BATCH_RESULT_STACKTRACE_LABEL = "resultStacktrace";
 
     protected String batchId;
 
@@ -96,6 +97,11 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
                 if (resultNode.has(BATCH_RESULT_MESSAGE_LABEL)) {
                     String resultMessage = resultNode.get(BATCH_RESULT_MESSAGE_LABEL).asText();
                     partResult.setMigrationMessage(resultMessage);
+                }
+                
+                if (resultNode.has(BATCH_RESULT_STACKTRACE_LABEL)) {
+                    String resultStacktrace = resultNode.get(BATCH_RESULT_STACKTRACE_LABEL).asText();
+                    partResult.setMigrationStacktrace(resultStacktrace);
                 }
                 
             } catch (IOException e) {

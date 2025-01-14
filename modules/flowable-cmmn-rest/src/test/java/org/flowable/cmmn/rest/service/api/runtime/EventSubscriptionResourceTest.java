@@ -91,7 +91,10 @@ public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/signalEventListener.cmmn" })
     public void testGetEventSubscription() throws Exception {
-        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleEnableTask").start();
+        runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testSimpleEnableTask")
+                .overrideCaseDefinitionTenantId("acme")
+                .start();
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
 
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_EVENT_SUBSCRIPTION, eventSubscription.getId());
@@ -108,7 +111,7 @@ public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
                         + "caseInstanceId: '" + eventSubscription.getScopeId() + "',"
                         + "caseDefinitionId: '" + eventSubscription.getScopeDefinitionId() + "',"
                         + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
-                        + "tenantId: ''"
+                        + "tenantId: 'acme'"
                         + "}");
     }
 }

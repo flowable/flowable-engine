@@ -37,22 +37,25 @@ import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
-import org.h2.Driver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 /**
  * @author Joram Barrez
  */
 @ContextConfiguration(classes = SpringTransactionAndExceptionsTest.TestConfiguration.class)
+@DirtiesContext
 public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
 
     @Autowired
@@ -167,12 +170,17 @@ public class SpringTransactionAndExceptionsTest extends SpringFlowableTestCase {
     static class TestConfiguration {
 
         @Bean
-        public DataSource dataSource() {
-            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-            dataSource.setDriverClass(Driver.class);
-            dataSource.setUrl("jdbc:h2:mem:flowable-spring-command-context-exception;DB_CLOSE_DELAY=1000");
-            dataSource.setUsername("sa");
-            dataSource.setPassword("");
+        public DataSource dataSource(
+                @Value("${jdbc.url:jdbc:h2:mem:flowable-spring-jms-test;DB_CLOSE_DELAY=1000}") String jdbcUrl,
+                @Value("${jdbc.driver:org.h2.Driver}") String jdbcDriverClass,
+                @Value("${jdbc.username:sa}") String jdbcUsername,
+                @Value("${jdbc.password:}") String jdbcPassword
+        ) {
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setJdbcUrl(jdbcUrl);
+            dataSource.setDriverClassName(jdbcDriverClass);
+            dataSource.setUsername(jdbcUsername);
+            dataSource.setPassword(jdbcPassword);
             return dataSource;
         }
 

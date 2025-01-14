@@ -336,52 +336,11 @@ public class ProcessInstanceHelper {
             if (!(subElement instanceof StartEvent)) {
                 continue;
             }
-
-            StartEvent startEvent = (StartEvent) subElement;
-            if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-                List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
-                if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
-                    String eventType = eventTypeElements.get(0).getElementText();
-                    if (StringUtils.isNotEmpty(eventType)) {
-                        ExecutionEntity eventRegistryExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
-                        eventRegistryExecution.setCurrentFlowElement(startEvent);
-                        eventRegistryExecution.setEventScope(true);
-                        eventRegistryExecution.setActive(false);
-
-                        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
-                                .getEventSubscriptionService().createEventSubscriptionBuilder()
-                                        .eventType(eventType)
-                                        .executionId(eventRegistryExecution.getId())
-                                        .processInstanceId(eventRegistryExecution.getProcessInstanceId())
-                                        .activityId(eventRegistryExecution.getCurrentActivityId())
-                                        .processDefinitionId(eventRegistryExecution.getProcessDefinitionId())
-                                        .scopeType(ScopeTypes.BPMN)
-                                        .tenantId(eventRegistryExecution.getTenantId())
-                                        .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, eventRegistryExecution))
-                                        .create();
-                        
-                        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-                    }
-                }
-                
-                continue;
-            }
-
-            EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-            if (eventDefinition instanceof MessageEventDefinition) {
-                handleMessageEventSubscription(eventDefinition, startEvent, parentExecution, messageEventSubscriptions, processEngineConfiguration, commandContext);
-
-            } else if (eventDefinition instanceof SignalEventDefinition) {
-                handleSignalEventSubscription(eventDefinition, startEvent, parentExecution, signalEventSubscriptions, processEngineConfiguration, commandContext);
-
-            } else if (eventDefinition instanceof TimerEventDefinition) {
-                handleTimerEvent(eventDefinition, startEvent, parentExecution, processEngineConfiguration);
             
-            } else if (eventDefinition instanceof VariableListenerEventDefinition) {
-                handleVariableListenerEventSubscription(eventDefinition, startEvent, parentExecution, processEngineConfiguration, commandContext);
-            }
+            processEventSubProcessStartEvent(subElement, parentExecution, messageEventSubscriptions, 
+                    signalEventSubscriptions, processEngineConfiguration, commandContext);
         }
-
+        
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             for (EventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
@@ -397,6 +356,61 @@ public class ProcessInstanceHelper {
                         signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()),
                         processEngineConfiguration.getEngineCfgKey());
             }
+        }
+    }
+    
+    public void processEventSubProcessStartEvent(FlowElement subElement, ExecutionEntity parentExecution, 
+            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+    
+        processEventSubProcessStartEvent(subElement, parentExecution, null, null, processEngineConfiguration, commandContext);
+    }
+    
+    public void processEventSubProcessStartEvent(FlowElement subElement, ExecutionEntity parentExecution, 
+            List<EventSubscriptionEntity> messageEventSubscriptions, List<EventSubscriptionEntity> signalEventSubscriptions,
+            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        
+        StartEvent startEvent = (StartEvent) subElement;
+        if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
+            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
+            if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
+                String eventType = eventTypeElements.get(0).getElementText();
+                if (StringUtils.isNotEmpty(eventType)) {
+                    ExecutionEntity eventRegistryExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+                    eventRegistryExecution.setCurrentFlowElement(startEvent);
+                    eventRegistryExecution.setEventScope(true);
+                    eventRegistryExecution.setActive(false);
+
+                    EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                            .getEventSubscriptionService().createEventSubscriptionBuilder()
+                                    .eventType(eventType)
+                                    .executionId(eventRegistryExecution.getId())
+                                    .processInstanceId(eventRegistryExecution.getProcessInstanceId())
+                                    .activityId(eventRegistryExecution.getCurrentActivityId())
+                                    .processDefinitionId(eventRegistryExecution.getProcessDefinitionId())
+                                    .scopeType(ScopeTypes.BPMN)
+                                    .tenantId(eventRegistryExecution.getTenantId())
+                                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, eventRegistryExecution))
+                                    .create();
+                    
+                    CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+                }
+            }
+            
+            return;
+        }
+
+        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+        if (eventDefinition instanceof MessageEventDefinition) {
+            handleMessageEventSubscription(eventDefinition, startEvent, parentExecution, messageEventSubscriptions, processEngineConfiguration, commandContext);
+
+        } else if (eventDefinition instanceof SignalEventDefinition) {
+            handleSignalEventSubscription(eventDefinition, startEvent, parentExecution, signalEventSubscriptions, processEngineConfiguration, commandContext);
+
+        } else if (eventDefinition instanceof TimerEventDefinition) {
+            handleTimerEvent(eventDefinition, startEvent, parentExecution, processEngineConfiguration);
+        
+        } else if (eventDefinition instanceof VariableListenerEventDefinition) {
+            handleVariableListenerEventSubscription(eventDefinition, startEvent, parentExecution, processEngineConfiguration, commandContext);
         }
     }
     
@@ -427,7 +441,9 @@ public class ProcessInstanceHelper {
                         .create();
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-        messageEventSubscriptions.add(eventSubscription);
+        if (messageEventSubscriptions != null) {
+            messageEventSubscriptions.add(eventSubscription);
+        }
         messageExecution.getEventSubscriptions().add(eventSubscription);
     }
     
@@ -436,9 +452,8 @@ public class ProcessInstanceHelper {
         
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-        Signal signal = null;
-        if (bpmnModel.containsSignalId(signalEventDefinition.getSignalRef())) {
-            signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+        if (signal != null) {
             signalEventDefinition.setSignalRef(signal.getName());
         }
 
@@ -462,7 +477,9 @@ public class ProcessInstanceHelper {
                         .create();
         
         CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-        signalEventSubscriptions.add(eventSubscription);
+        if (signalEventSubscriptions != null) {
+            signalEventSubscriptions.add(eventSubscription);
+        }
         signalExecution.getEventSubscriptions().add(eventSubscription);
     }
     

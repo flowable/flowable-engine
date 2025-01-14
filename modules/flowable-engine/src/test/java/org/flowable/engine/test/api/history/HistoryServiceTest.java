@@ -186,6 +186,14 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historicProcessInstance).isNotNull();
         assertThat(historicProcessInstance.getProcessDefinitionKey()).isEqualTo(processDefinitionKey);
         assertThat(historicProcessInstance.getStartActivityId()).isEqualTo("theStart");
+        
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike(processDefinitionKey).list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").list()).hasSize(1);
+        
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase(processDefinitionKey).list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").list()).hasSize(1);
 
         // now complete the task to end the process instance
         org.flowable.task.api.Task task = taskService.createTaskQuery().processDefinitionKey("checkCreditProcess").singleResult();
@@ -1078,6 +1086,24 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid")
                 .endOr().list()).hasSize(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategory(processDefinitionCategory).processDefinitionId("invalid")
+                .endOr().count()).isEqualTo(1);
+        
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLike("Examples%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLike("Examples%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLike("invalid").list()).isEmpty();
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLike("invalid").count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategoryLike("Examples%").processDefinitionId("invalid")
+                .endOr().list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategoryLike("Examples%").processDefinitionId("invalid")
+                .endOr().count()).isEqualTo(1);
+        
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLikeIgnoreCase("examples%").list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLikeIgnoreCase("examples%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLikeIgnoreCase("invalid").list()).isEmpty();
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionCategoryLikeIgnoreCase("invalid").count()).isZero();
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategoryLikeIgnoreCase("examples%").processDefinitionId("invalid")
+                .endOr().list()).hasSize(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionCategoryLikeIgnoreCase("examples%").processDefinitionId("invalid")
                 .endOr().count()).isEqualTo(1);
     }
 

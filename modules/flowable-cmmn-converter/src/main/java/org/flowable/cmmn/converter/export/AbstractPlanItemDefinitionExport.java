@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -35,20 +36,20 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    public void writePlanItemDefinition(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    public void writePlanItemDefinition(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
 
         writePlanItemDefinitionStartElement(planItemDefinition, xtw);
-        writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw);
+        writePlanItemDefinitionCommonAttributes(planItemDefinition, xtw, options);
         writePlanItemDefinitionSpecificAttributes(planItemDefinition, xtw);
 
-        boolean didWriteExtensionElement = writePlanItemDefinitionCommonElements(model, planItemDefinition, xtw);
+        boolean didWriteExtensionElement = writePlanItemDefinitionCommonElements(model, planItemDefinition, xtw, options);
         didWriteExtensionElement = writePlanItemDefinitionExtensionElements(model, planItemDefinition, didWriteExtensionElement, xtw);
         if (didWriteExtensionElement) {
             xtw.writeEndElement();
         }
 
         writePlanItemDefinitionDefaultItemControl(model, planItemDefinition, xtw);
-        writePlanItemDefinitionBody(model, planItemDefinition, xtw);
+        writePlanItemDefinitionBody(model, planItemDefinition, xtw, options);
         writePlanItemDefinitionEndElement(xtw);
     }
 
@@ -64,10 +65,11 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      */
     protected abstract String getPlanItemDefinitionXmlElementValue(T planItemDefinition);
 
-    protected void writePlanItemDefinitionCommonAttributes(T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionCommonAttributes(T planItemDefinition, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
         xtw.writeAttribute(ATTRIBUTE_ID, planItemDefinition.getId());
 
-        if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
+        if (StringUtils.isNotEmpty(planItemDefinition.getName()) &&
+                !(options.isSaveElementNameWithNewLineInExtensionElement() && CmmnXmlUtil.containsNewLine(planItemDefinition.getName()))) {
             xtw.writeAttribute(ATTRIBUTE_NAME, planItemDefinition.getName());
         }
     }
@@ -92,14 +94,19 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    protected boolean writePlanItemDefinitionCommonElements(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected boolean writePlanItemDefinitionCommonElements(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
         if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
             xtw.writeStartElement(ELEMENT_DOCUMENTATION);
             xtw.writeCharacters(planItemDefinition.getDocumentation());
             xtw.writeEndElement();
         }
+
+        boolean didWriteExtensionStartElement = false;
+        if (options.isSaveElementNameWithNewLineInExtensionElement()) {
+            didWriteExtensionStartElement = CmmnXmlUtil.writeElementNameExtensionElement(planItemDefinition, didWriteExtensionStartElement, xtw);
+        }
         
-        return CmmnXmlUtil.writeExtensionElements(planItemDefinition, false, model.getNamespaces(), xtw);
+        return CmmnXmlUtil.writeExtensionElements(planItemDefinition, didWriteExtensionStartElement, model.getNamespaces(), xtw);
     }
     
     protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T planItemDefinition, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
@@ -120,7 +127,7 @@ public abstract class AbstractPlanItemDefinitionExport<T extends PlanItemDefinit
      * @param xtw                the XML to write the definition to
      * @throws Exception in case of write exception
      */
-    protected void writePlanItemDefinitionBody(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw) throws Exception {
+    protected void writePlanItemDefinitionBody(CmmnModel model, T planItemDefinition, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
 
     }
 

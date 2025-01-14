@@ -7,57 +7,57 @@
     <!-- JOB RESULTMAP -->
 
     <resultMap id="externalWorkerJobResultMap" type="org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl">
-        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <id property="id" column="ID_" jdbcType="NVARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
         <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-        <result property="jobType" column="TYPE_" jdbcType="VARCHAR" />
-        <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
+        <result property="jobType" column="TYPE_" jdbcType="NVARCHAR" />
+        <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR" />
         <result property="lockExpirationTime" column="LOCK_EXP_TIME_" jdbcType="TIMESTAMP" />
         <result property="exclusive" column="EXCLUSIVE_" jdbcType="BOOLEAN" />
-        <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-        <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
-        <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
-        <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
-        <result property="elementName" column="ELEMENT_NAME_" jdbcType="VARCHAR" />
-        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-        <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-        <result property="correlationId" column="CORRELATION_ID_" jdbcType="VARCHAR"/>
+        <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR" />
+        <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="NVARCHAR" />
+        <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+        <result property="elementId" column="ELEMENT_ID_" jdbcType="NVARCHAR" />
+        <result property="elementName" column="ELEMENT_NAME_" jdbcType="NVARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+        <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+        <result property="correlationId" column="CORRELATION_ID_" jdbcType="NVARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
-        <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
-        <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
-        <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="NVARCHAR" />
+        <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="NVARCHAR" />
+        <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="NVARCHAR" />
         <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
-        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
-        <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
+        <result property="repeat" column="REPEAT_" jdbcType="NVARCHAR" />
     </resultMap>
 
     <!-- JOB SELECT -->
 
     <select id="selectExternalWorkerJob" parameterType="string" resultMap="externalWorkerJobResultMap">
-        select * from ${prefix}ACT_RU_EXTERNAL_JOB where ID_ = #{id, jdbcType=VARCHAR}
+        select * from ${prefix}ACT_RU_EXTERNAL_JOB where ID_ = #{id, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobByCorrelationId" parameterType="string" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB
-        where CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR}
+        where CORRELATION_ID_ = #{correlationId, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectExternalWorkerJobsByWorkerId" parameterType="string" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB
-        where LOCK_OWNER_ = #{parameter, jdbcType=VARCHAR}
+        where LOCK_OWNER_ = #{parameter, jdbcType=NVARCHAR}
     </select>
     
     <select id="selectExternalWorkerJobsByWorkerIdAndTenantId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB
-        where LOCK_OWNER_ = #{parameter.workerId, jdbcType=VARCHAR} and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+        where LOCK_OWNER_ = #{parameter.workerId, jdbcType=NVARCHAR} and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobsToExecute" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
@@ -65,21 +65,21 @@
         SELECT RES.* <if test="needsPaging">${limitBetween}</if>
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
-            and HANDLER_CFG_ = #{parameter.topic, jdbcType=VARCHAR}
+            and HANDLER_CFG_ = #{parameter.topic, jdbcType=NVARCHAR}
             <if test="parameter.scopeType != null">
                 <choose>
                     <when test="parameter.scopeType == 'bpmn'">
                         and PROCESS_INSTANCE_ID_ is not null
                     </when>
                     <otherwise>
-                        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+                        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
                     </otherwise>
                 </choose>
             </if>
             <if test="parameter.tenantId != null">
                 <choose>
                     <when test="parameter.tenantId != ''">
-                        and TENANT_ID_ = #{parameter.tenantId, jdbcType=VARCHAR}
+                        and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
                     </when>
                     <otherwise>
                         and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -88,13 +88,13 @@
             </if>
             <trim prefix="AND (" prefixOverrides="OR" suffix=")">
                 <if test="parameter.authorizedUser != null">
-                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{parameter.authorizedUser})
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{parameter.authorizedUser, jdbcType=NVARCHAR})
                 </if>
                 <if test="parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.empty">
                     OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
-                    <foreach item="group" index="index" collection="parameter.authorizedGroups"
+                    <foreach item="groupId" index="index" collection="parameter.authorizedGroups"
                              open="(" separator="," close=")">
-                        #{group}
+                        #{groupId, jdbcType=NVARCHAR}
                     </foreach>
                     )
                 </if>
@@ -114,14 +114,14 @@
                 SCOPE_TYPE_ is null
             </if>
             <if test="parameter.jobExecutionScope != null and parameter.jobExecutionScope != 'all'">
-                SCOPE_TYPE_ = #{parameter.jobExecutionScope}
+                SCOPE_TYPE_ = #{parameter.jobExecutionScope, jdbcType=NVARCHAR}
             </if>
             and LOCK_EXP_TIME_ is not null and LOCK_EXP_TIME_ &lt; #{parameter.now, jdbcType=TIMESTAMP}
 
             <if test="parameter.enabledCategories">
                 and CATEGORY_ in
-                <foreach item="item" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
-                    #{item}
+                <foreach item="category" index="index" collection="parameter.enabledCategories" open="(" separator="," close=")">
+                    #{category, jdbcType=VARCHAR}
                 </foreach>
             </if>
         </where>
@@ -131,32 +131,32 @@
     
     <select id="selectExternalWorkerJobsByTypeAndProcessDefinitionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select * from ${prefix}ACT_RU_EXTERNAL_JOB
-        where HANDLER_TYPE_ = #{parameter.handlerType}
-        and PROC_DEF_ID_ = #{parameter.processDefinitionId}
+        where HANDLER_TYPE_ = #{parameter.handlerType, jdbcType=NVARCHAR}
+        and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobsByConfiguration" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select * from ${prefix}ACT_RU_EXTERNAL_JOB
-        where HANDLER_TYPE_ = #{parameter.handlerType}
-        and HANDLER_CFG_ like #{parameter.handlerConfiguration}${wildcardEscapeClause}
+        where HANDLER_TYPE_ = #{parameter.handlerType, jdbcType=NVARCHAR}
+        and HANDLER_CFG_ like #{parameter.handlerConfiguration, jdbcType=NVARCHAR}${wildcardEscapeClause}
     </select>
 
     <select id="selectExternalWorkerJobsByExecutionId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB J
-        where J.EXECUTION_ID_ = #{parameter}
+        where J.EXECUTION_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB J
-        where J.PROCESS_INSTANCE_ID_ = #{parameter}
+        where J.PROCESS_INSTANCE_ID_ = #{parameter, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobsByScopeIdAndSubScopeId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="externalWorkerJobResultMap">
         select *
         from ${prefix}ACT_RU_EXTERNAL_JOB
-        where SCOPE_ID_ = #{parameter.scopeId} and SUB_SCOPE_ID_ = #{parameter.subScopeId}
+        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR}
     </select>
 
     <select id="selectExternalWorkerJobByQueryCriteria" parameterType="org.flowable.job.service.impl.ExternalWorkerJobQueryImpl" resultMap="externalWorkerJobResultMap">
@@ -176,91 +176,91 @@
         from ${prefix}ACT_RU_EXTERNAL_JOB RES
         <where>
             <if test="id != null">
-                RES.ID_ = #{id}
+                RES.ID_ = #{id, jdbcType=NVARCHAR}
             </if>
             <if test="jobIds != null and !jobIds.empty">
                 AND RES.ID_ IN
                 <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
-                    #{jobId}
+                    #{jobId, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="processInstanceId != null">
-                and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId}
+                and RES.PROCESS_INSTANCE_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
             </if>
             <if test="withoutProcessInstanceId">
                 and RES.PROCESS_INSTANCE_ID_ IS NULL
             </if>
             <if test="executionId != null">
-                and RES.EXECUTION_ID_ = #{executionId}
+                and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="handlerType != null">
-                and RES.HANDLER_TYPE_ = #{handlerType}
+                and RES.HANDLER_TYPE_ = #{handlerType, jdbcType=NVARCHAR}
             </if>
             <if test="handlerTypes != null">
                 and RES.HANDLER_TYPE_ in
-                <foreach item="item" index="index" collection="handlerTypes" open="(" separator="," close=")">
-                    #{item}
+                <foreach item="handlerType" index="index" collection="handlerTypes" open="(" separator="," close=")">
+                    #{handlerType, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="processDefinitionId != null">
-                and RES.PROC_DEF_ID_ = #{processDefinitionId}
+                and RES.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR}
             </if>
             <if test="processDefinitionKey != null">
-                and RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{processDefinitionKey})
+                and RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR})
             </if>
             <if test="category != null">
-                and RES.CATEGORY_ = #{category}
+                and RES.CATEGORY_ = #{category, jdbcType=VARCHAR}
             </if>
             <if test="categoryLike != null">
-                and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+                and RES.CATEGORY_ like #{categoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
             </if>
             <if test="elementId != null">
-                and RES.ELEMENT_ID_ = #{elementId}
+                and RES.ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR}
             </if>
             <if test="elementName != null">
-                and RES.ELEMENT_NAME_ = #{elementName}
+                and RES.ELEMENT_NAME_ = #{elementName, jdbcType=NVARCHAR}
             </if>
             <if test="scopeId != null">
-                and RES.SCOPE_ID_ = #{scopeId}
+                and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
             </if>
             <if test="withoutScopeId">
                 and RES.SCOPE_ID_ IS NULL
             </if>
             <if test="subScopeId != null">
-                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+                and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="scopeType != null">
-                and RES.SCOPE_TYPE_ = #{scopeType}
+                and RES.SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
             </if>
             <if test="scopeDefinitionId != null">
-                and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+                and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
             </if>
             <if test="caseDefinitionKey != null">
-                and RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{caseDefinitionKey})
+                and RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{caseDefinitionKey, jdbcType=NVARCHAR})
             </if>
             <if test="correlationId != null">
-                and RES.CORRELATION_ID_ = #{correlationId}
+                and RES.CORRELATION_ID_ = #{correlationId, jdbcType=NVARCHAR}
             </if>
             <if test="duedateHigherThan != null">
-                and RES.DUEDATE_ &gt; #{duedateHigherThan}
+                and RES.DUEDATE_ &gt; #{duedateHigherThan, jdbcType=TIMESTAMP}
             </if>
             <if test="duedateLowerThan != null">
-                and RES.DUEDATE_ &lt; #{duedateLowerThan}
+                and RES.DUEDATE_ &lt; #{duedateLowerThan, jdbcType=TIMESTAMP}
             </if>
             <if test="duedateHigherThanOrEqual != null">
-                and RES.DUEDATE_ &gt;= #{duedateHigherThanOrEqual}
+                and RES.DUEDATE_ &gt;= #{duedateHigherThanOrEqual, jdbcType=TIMESTAMP}
             </if>
             <if test="duedateLowerThanOrEqual != null">
-                and RES.DUEDATE_ &lt;= #{duedateLowerThanOrEqual}
+                and RES.DUEDATE_ &lt;= #{duedateLowerThanOrEqual, jdbcType=TIMESTAMP}
             </if>
             <if test="withException">
                 and (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
             </if>
             <if test="exceptionMessage">
-                and RES.EXCEPTION_MSG_ = #{exceptionMessage}
+                and RES.EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=NVARCHAR}
             </if>
             <if test="lockOwner != null">
-                and RES.LOCK_OWNER_ = #{lockOwner}
+                and RES.LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR}
             </if>
             <if test="onlyLocked">
                 and RES.LOCK_EXP_TIME_ is not null
@@ -269,10 +269,10 @@
                 and RES.LOCK_EXP_TIME_ is null
             </if>
             <if test="tenantId != null">
-                and RES.TENANT_ID_ = #{tenantId}
+                and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
             </if>
             <if test="tenantIdLike != null">
-                and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+                and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
@@ -282,13 +282,13 @@
             </if>
             <trim prefix="AND (" prefixOverrides="OR" suffix=")">
                 <if test="authorizedUser != null">
-                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser})
+                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser, jdbcType=NVARCHAR})
                 </if>
                 <if test="authorizedGroups != null &amp;&amp; !authorizedGroups.empty">
                     OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
-                    <foreach item="group" index="index" collection="authorizedGroups"
+                    <foreach item="groupId" index="index" collection="authorizedGroups"
                              open="(" separator="," close=")">
-                        #{group}
+                        #{groupId, jdbcType=NVARCHAR}
                     </foreach>
                     )
                 </if>
@@ -299,23 +299,23 @@
     <!-- JOB DELETE STATEMENTS -->
 
     <delete id="deleteExternalWorkerJob" parameterType="org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityImpl">
-        delete from ${prefix}ACT_RU_EXTERNAL_JOB where ID_ = #{id} and REV_ = #{revision}
+        delete from ${prefix}ACT_RU_EXTERNAL_JOB where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </delete>
 
     <delete id="deleteExternalWorkerJobsByExecutionId" parameterType="string">
-        delete from ${prefix}ACT_RU_EXTERNAL_JOB where PROCESS_INSTANCE_ID_ = #{id}
+        delete from ${prefix}ACT_RU_EXTERNAL_JOB where PROCESS_INSTANCE_ID_ = #{id, jdbcType=NVARCHAR}
     </delete>
 
     <!-- JOB UPDATE STATEMENTS -->
     <update id="updateExternalWorkerJobTenantIdForDeployment" parameterType="java.util.Map">
         update ${prefix}ACT_RU_EXTERNAL_JOB set
-        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
         where
         ID_ in (
         SELECT J.ID_ from ${prefix}ACT_RU_EXTERNAL_JOB J
         inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
         inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-        where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
+        where D.ID_ = #{deploymentId, jdbcType=NVARCHAR}
         )
     </update>
 
@@ -323,7 +323,7 @@
         table (so good, performance) -->
     <update id="updateExternalWorkerJobTenantIdForDeployment" databaseId="mysql" parameterType="java.util.Map">
         update ${prefix}ACT_RU_EXTERNAL_JOB set
-        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
         where
         ID_ in (
 
@@ -333,7 +333,7 @@
         FROM ${prefix}ACT_RU_EXTERNAL_JOB J
         inner join ${prefix}ACT_RE_PROCDEF P on J.PROC_DEF_ID_ = P.ID_
         inner join ${prefix}ACT_RE_DEPLOYMENT D on P.DEPLOYMENT_ID_ = D.ID_
-        where D.ID_ = #{deploymentId, jdbcType=VARCHAR}
+        where D.ID_ = #{deploymentId, jdbcType=NVARCHAR}
 
         ) AS tempTask
 
@@ -341,10 +341,10 @@
     </update>
 
     <update id="updateExternalWorkerJobLocks" parameterType="java.util.Map">
-        update ${prefix}ACT_RU_EXTERNAL_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
+        update ${prefix}ACT_RU_EXTERNAL_JOB set LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR}, LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP}
         where ID_ in
-        <foreach item="job" index="index" collection="externalWorkerJobs" open="(" separator="," close=")">
-            #{job.id}
+        <foreach item="externalWorkerJob" index="index" collection="externalWorkerJobs" open="(" separator="," close=")">
+            #{externalWorkerJob.id, jdbcType=NVARCHAR}
         </foreach>
     </update>
 
@@ -379,33 +379,33 @@
         CUSTOM_VALUES_ID_,
         CREATE_TIME_,
         TENANT_ID_)
-        values (#{id, jdbcType=VARCHAR},
+        values (#{id, jdbcType=NVARCHAR},
         #{revision, jdbcType=INTEGER},
         #{category, jdbcType=VARCHAR},
-        #{jobType, jdbcType=VARCHAR},
-        #{lockOwner, jdbcType=VARCHAR},
+        #{jobType, jdbcType=NVARCHAR},
+        #{lockOwner, jdbcType=NVARCHAR},
         #{lockExpirationTime, jdbcType=TIMESTAMP},
         #{exclusive, jdbcType=BOOLEAN},
-        #{executionId, jdbcType=VARCHAR},
-        #{processInstanceId, jdbcType=VARCHAR},
-        #{processDefinitionId, jdbcType=VARCHAR},
-        #{elementId, jdbcType=VARCHAR},
-        #{elementName, jdbcType=VARCHAR},
-        #{scopeId, jdbcType=VARCHAR},
-        #{subScopeId, jdbcType=VARCHAR},
-        #{scopeType, jdbcType=VARCHAR},
-        #{scopeDefinitionId, jdbcType=VARCHAR},
-        #{correlationId, jdbcType=VARCHAR},
+        #{executionId, jdbcType=NVARCHAR},
+        #{processInstanceId, jdbcType=NVARCHAR},
+        #{processDefinitionId, jdbcType=NVARCHAR},
+        #{elementId, jdbcType=NVARCHAR},
+        #{elementName, jdbcType=NVARCHAR},
+        #{scopeId, jdbcType=NVARCHAR},
+        #{subScopeId, jdbcType=NVARCHAR},
+        #{scopeType, jdbcType=NVARCHAR},
+        #{scopeDefinitionId, jdbcType=NVARCHAR},
+        #{correlationId, jdbcType=NVARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-        #{exceptionMessage, jdbcType=VARCHAR},
+        #{exceptionMessage, jdbcType=NVARCHAR},
         #{duedate, jdbcType=TIMESTAMP},
-        #{repeat, jdbcType=VARCHAR},
-        #{jobHandlerType, jdbcType=VARCHAR},
-        #{jobHandlerConfiguration, jdbcType=VARCHAR},
+        #{repeat, jdbcType=NVARCHAR},
+        #{jobHandlerType, jdbcType=NVARCHAR},
+        #{jobHandlerConfiguration, jdbcType=NVARCHAR},
         #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{createTime, jdbcType=TIMESTAMP},
-        #{tenantId, jdbcType=VARCHAR}
+        #{tenantId, jdbcType=NVARCHAR}
         )
     </insert>
 
@@ -438,40 +438,40 @@
         CUSTOM_VALUES_ID_,
         CREATE_TIME_,
         TENANT_ID_) VALUES
-        <foreach collection="list" item="job" index="index" separator=",">
-            (#{job.id, jdbcType=VARCHAR},
-            #{job.revision, jdbcType=INTEGER},
-            #{job.category, jdbcType=VARCHAR},
-            #{job.jobType, jdbcType=VARCHAR},
-            #{job.lockOwner, jdbcType=VARCHAR},
-            #{job.lockExpirationTime, jdbcType=TIMESTAMP},
-            #{job.exclusive, jdbcType=BOOLEAN},
-            #{job.executionId, jdbcType=VARCHAR},
-            #{job.processInstanceId, jdbcType=VARCHAR},
-            #{job.processDefinitionId, jdbcType=VARCHAR},
-            #{job.elementId, jdbcType=VARCHAR},
-            #{job.elementName, jdbcType=VARCHAR},
-            #{job.scopeId, jdbcType=VARCHAR},
-            #{job.subScopeId, jdbcType=VARCHAR},
-            #{job.scopeType, jdbcType=VARCHAR},
-            #{job.scopeDefinitionId, jdbcType=VARCHAR},
-            #{job.correlationId, jdbcType=VARCHAR},
-            #{job.retries, jdbcType=INTEGER},
-            #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.exceptionMessage, jdbcType=VARCHAR},
-            #{job.duedate, jdbcType=TIMESTAMP},
-            #{job.repeat, jdbcType=VARCHAR},
-            #{job.jobHandlerType, jdbcType=VARCHAR},
-            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
-            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.createTime, jdbcType=TIMESTAMP},
-            #{job.tenantId, jdbcType=VARCHAR})
+        <foreach collection="list" item="externalWorkerJob" index="index" separator=",">
+            (#{externalWorkerJob.id, jdbcType=NVARCHAR},
+            #{externalWorkerJob.revision, jdbcType=INTEGER},
+            #{externalWorkerJob.category, jdbcType=VARCHAR},
+            #{externalWorkerJob.jobType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.lockOwner, jdbcType=NVARCHAR},
+            #{externalWorkerJob.lockExpirationTime, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.exclusive, jdbcType=BOOLEAN},
+            #{externalWorkerJob.executionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.processInstanceId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.processDefinitionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.elementId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.elementName, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.subScopeId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeDefinitionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.correlationId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.retries, jdbcType=INTEGER},
+            #{externalWorkerJob.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{externalWorkerJob.exceptionMessage, jdbcType=NVARCHAR},
+            #{externalWorkerJob.duedate, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.repeat, jdbcType=NVARCHAR},
+            #{externalWorkerJob.jobHandlerType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.jobHandlerConfiguration, jdbcType=NVARCHAR},
+            #{externalWorkerJob.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{externalWorkerJob.createTime, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.tenantId, jdbcType=NVARCHAR})
         </foreach>
     </insert>
 
     <insert id="bulkInsertExternalWorkerJob" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="job" index="index">
+        <foreach collection="list" item="externalWorkerJob" index="index">
             INTO ${prefix}ACT_RU_EXTERNAL_JOB (
             ID_,
             REV_,
@@ -500,33 +500,33 @@
             CUSTOM_VALUES_ID_,
             CREATE_TIME_,
             TENANT_ID_) VALUES
-            (#{job.id, jdbcType=VARCHAR},
-            #{job.revision, jdbcType=INTEGER},
-            #{job.category, jdbcType=VARCHAR},
-            #{job.jobType, jdbcType=VARCHAR},
-            #{job.lockOwner, jdbcType=VARCHAR},
-            #{job.lockExpirationTime, jdbcType=TIMESTAMP},
-            #{job.exclusive, jdbcType=BOOLEAN},
-            #{job.executionId, jdbcType=VARCHAR},
-            #{job.processInstanceId, jdbcType=VARCHAR},
-            #{job.processDefinitionId, jdbcType=VARCHAR},
-            #{job.elementId, jdbcType=VARCHAR},
-            #{job.elementName, jdbcType=VARCHAR},
-            #{job.scopeId, jdbcType=VARCHAR},
-            #{job.subScopeId, jdbcType=VARCHAR},
-            #{job.scopeType, jdbcType=VARCHAR},
-            #{job.scopeDefinitionId, jdbcType=VARCHAR},
-            #{job.correlationId, jdbcType=VARCHAR},
-            #{job.retries, jdbcType=INTEGER},
-            #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.exceptionMessage, jdbcType=VARCHAR},
-            #{job.duedate, jdbcType=TIMESTAMP},
-            #{job.repeat, jdbcType=VARCHAR},
-            #{job.jobHandlerType, jdbcType=VARCHAR},
-            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
-            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
-            #{job.createTime, jdbcType=TIMESTAMP},
-            #{job.tenantId, jdbcType=VARCHAR})
+            (#{externalWorkerJob.id, jdbcType=NVARCHAR},
+            #{externalWorkerJob.revision, jdbcType=INTEGER},
+            #{externalWorkerJob.category, jdbcType=VARCHAR},
+            #{externalWorkerJob.jobType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.lockOwner, jdbcType=NVARCHAR},
+            #{externalWorkerJob.lockExpirationTime, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.exclusive, jdbcType=BOOLEAN},
+            #{externalWorkerJob.executionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.processInstanceId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.processDefinitionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.elementId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.elementName, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.subScopeId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.scopeDefinitionId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.correlationId, jdbcType=NVARCHAR},
+            #{externalWorkerJob.retries, jdbcType=INTEGER},
+            #{externalWorkerJob.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{externalWorkerJob.exceptionMessage, jdbcType=NVARCHAR},
+            #{externalWorkerJob.duedate, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.repeat, jdbcType=NVARCHAR},
+            #{externalWorkerJob.jobHandlerType, jdbcType=NVARCHAR},
+            #{externalWorkerJob.jobHandlerConfiguration, jdbcType=NVARCHAR},
+            #{externalWorkerJob.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{externalWorkerJob.createTime, jdbcType=TIMESTAMP},
+            #{externalWorkerJob.tenantId, jdbcType=NVARCHAR})
         </foreach>
         SELECT * FROM dual
     </insert>
@@ -541,50 +541,50 @@
                 LOCK_EXP_TIME_ = #{lockExpirationTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.lockOwner != lockOwner">
-                LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
+                LOCK_OWNER_ = #{lockOwner, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.category != category">
                 CATEGORY_ = #{category, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.jobHandlerType != jobHandlerType">
-                HANDLER_TYPE_ = #{jobHandlerType, jdbcType=VARCHAR},
+                HANDLER_TYPE_ = #{jobHandlerType, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.retries != retries">
                 RETRIES_ = #{retries, jdbcType=INTEGER},
             </if>
             <if test="originalPersistentState.processDefinitionId != processDefinitionId">
-                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+                PROC_DEF_ID_ = #{processDefinitionId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.elementId != elementId">
-                ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+                ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.elementName != elementName">
-                ELEMENT_NAME_ = #{elementName, jdbcType=VARCHAR},
+                ELEMENT_NAME_ = #{elementName, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.createTime != createTime">
                 CREATE_TIME_ = #{createTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.correlationId != correlationId">
-                CORRELATION_ID_ = #{correlationId, jdbcType=VARCHAR},
+                CORRELATION_ID_ = #{correlationId, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.tenantId != tenantId">
-                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+                TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
             </if>
             <if test="(exceptionByteArrayRef != null and originalPersistentState.exceptionByteArrayRef == null) or (exceptionByteArrayRef == null and originalPersistentState.exceptionByteArrayRef != null) or (originalPersistentState.exceptionByteArrayRef != exceptionByteArrayRef)">
                 EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             </if>
             <if test="originalPersistentState.exceptionMessage != exceptionMessage">
-                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
+                EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=NVARCHAR},
             </if>
         </set>
-        where ID_= #{id, jdbcType=VARCHAR}
+        where ID_= #{id, jdbcType=NVARCHAR}
         and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
     <update id="resetExpiredExternalWorkerJob" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
         update ${prefix}ACT_RU_EXTERNAL_JOB
         set LOCK_OWNER_ = null, LOCK_EXP_TIME_ = null, CREATE_TIME_ = #{parameter.now, jdbcType=TIMESTAMP}
-        where ID_ = #{parameter.id,jdbcType=VARCHAR}
+        where ID_ = #{parameter.id, jdbcType=NVARCHAR}
     </update>
 
 </mapper>

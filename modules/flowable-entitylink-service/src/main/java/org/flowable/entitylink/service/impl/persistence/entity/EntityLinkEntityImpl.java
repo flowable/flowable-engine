@@ -14,8 +14,6 @@ package org.flowable.entitylink.service.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -44,21 +42,8 @@ public class EntityLinkEntityImpl extends AbstractEntityLinkServiceNoRevisionEnt
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("linkType", this.linkType);
-        persistentState.put("scopeId", this.scopeId);
-        persistentState.put("subScopeId", this.subScopeId);
-        persistentState.put("scopeType", this.scopeType);
-        persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
-        persistentState.put("parentElementId", this.parentElementId);
-        persistentState.put("referenceScopeId", this.referenceScopeId);
-        persistentState.put("referenceScopeType", this.referenceScopeType);
-        persistentState.put("referenceScopeDefinitionId", this.referenceScopeDefinitionId);
-        persistentState.put("rootScopeId", this.rootScopeId);
-        persistentState.put("rootScopeType", this.rootScopeType);
-        persistentState.put("hierarchyType", this.hierarchyType);
-
-        return persistentState;
+        // Entity link is immutable
+        return EntityLinkEntityImpl.class;
     }
     
     @Override

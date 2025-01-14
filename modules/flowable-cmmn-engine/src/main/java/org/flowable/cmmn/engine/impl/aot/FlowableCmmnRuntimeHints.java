@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.aot;
 
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
+import org.flowable.common.engine.impl.aot.FlowableSqlResourceHintsRegistrar;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.ResourceHints;
@@ -28,9 +29,8 @@ public class FlowableCmmnRuntimeHints implements RuntimeHintsRegistrar {
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/cmmn/db/mapping", hints, classLoader);
-        resourceHints.registerPattern("org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml");
-        resourceHints.registerPattern("org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog-crdb.xml");
         resourceHints.registerPattern("org/flowable/impl/cmmn/parser/*.xsd");
+        FlowableSqlResourceHintsRegistrar.registerSqlResources("org/flowable/cmmn/db", resourceHints);
 
         hints.reflection()
                 .registerType(QueryVariableValue.class, MemberCategory.INVOKE_PUBLIC_METHODS);

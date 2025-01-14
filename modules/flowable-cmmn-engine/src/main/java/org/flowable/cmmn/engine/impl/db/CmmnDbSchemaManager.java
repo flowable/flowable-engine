@@ -12,181 +12,80 @@
  */
 package org.flowable.cmmn.engine.impl.db;
 
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
-import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.idm.engine.IdmEngineConfiguration;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
 
-public class CmmnDbSchemaManager extends LiquibaseBasedSchemaManager {
+public class CmmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
 
-    public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
+    protected static final String CMMN_DB_SCHEMA_LOCK_NAME = "cmmnDbSchemaLock";
 
-    public static final String LIQUIBASE_CHANGELOG_CRDB = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog-crdb.xml";
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.2.0.0"),
+            Map.entry("2", "6.2.1.0"),
+            Map.entry("3", "6.3.0.0"),
+            Map.entry("4", "6.3.1.0"),
+            Map.entry("5", "6.4.0.0"),
+            Map.entry("6", "6.4.1.3"),
+            Map.entry("7", "6.4.1.3"),
+            Map.entry("8", "6.5.0.6"),
+            Map.entry("9", "6.5.0.6"),
+            Map.entry("10", "6.5.0.6"),
+            Map.entry("11", "6.5.0.6"),
+            Map.entry("12", "6.6.0.0"),
+            Map.entry("13", "6.6.0.0"),
+            Map.entry("14", "6.7.0.0"),
+            Map.entry("15", "6.7.1.0"),
+            Map.entry("16", "6.7.1.0"),
+            Map.entry("17", "6.8.0.0"),
+            Map.entry("18", "7.0.1.1"),
+            Map.entry("19", "7.1.0.0"),
+            Map.entry("20", "7.1.0.0")
+    );
 
-    public CmmnDbSchemaManager(String changelogFile) {
-        super("cmmn", changelogFile, CmmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
+    public CmmnDbSchemaManager() {
+        super("cmmn", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getCmmnEngineConfiguration));
     }
 
     @Override
-    protected LiquibaseDatabaseConfiguration getDatabaseConfiguration() {
-        return new EngineDatabaseConfiguration(CommandContextUtil.getCmmnEngineConfiguration());
-    }
-
-    public void initSchema() {
-        initSchema(CommandContextUtil.getCmmnEngineConfiguration().getDatabaseSchemaUpdate());
+    protected String getEngineVersion() {
+        return CmmnEngine.VERSION;
     }
 
     @Override
-    public void initSchema(String databaseSchemaUpdate) {
-        super.initSchema(databaseSchemaUpdate);
-
-        // When the databaseSchemaUpdate is drop-create:
-        // the IDM engine will have done a drop-create due to the configurator running first
-        // The CmmnDbSchemaManager will go next, but it will do a dropAll, dropping the idm tables too.
-        if (AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-            AbstractEngineConfiguration abstractEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration().getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
-            if (abstractEngineConfiguration != null) {
-                IdmEngineConfiguration idmEngineConfiguration = (IdmEngineConfiguration) abstractEngineConfiguration;
-                idmEngineConfiguration.getSchemaManager().schemaCreate();
-            }
-        }
+    protected String getSchemaVersionPropertyName() {
+        return "cmmn.schema.version";
     }
 
     @Override
-    public void schemaCreate() {
-        try {
-            getCommonSchemaManager().schemaCreate();
-            getIdentityLinkSchemaManager().schemaCreate();
-            getEntityLinkSchemaManager().schemaCreate();
-            getEventSubscriptionSchemaManager().schemaCreate();
-            getTaskSchemaManager().schemaCreate();
-            getVariableSchemaManager().schemaCreate();
-            getJobSchemaManager().schemaCreate();
-            getBatchSchemaManager().schemaCreate();
-
-            super.schemaCreate();
-        } catch (Exception e) {
-            throw new FlowableException("Error creating CMMN engine tables", e);
-        }
+    protected String getDbSchemaLockName() {
+        return CMMN_DB_SCHEMA_LOCK_NAME;
     }
 
     @Override
-    public void schemaDrop() {
-        try {
-            super.schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping CMMN engine tables", e);
-        }
-
-        try {
-            getBatchSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping batch tables", e);
-        }
-        
-        try {
-            getJobSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping job tables", e);
-        }
-          
-        try {
-            getVariableSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping variable tables", e);
-        }
-        
-        try {
-            getTaskSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping task tables", e);
-        }
-        
-        try {
-            getEventSubscriptionSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping event subscription tables", e);
-        }
-        
-        try {
-            getEntityLinkSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping entity link tables", e);
-        }
-        
-        try {
-            getIdentityLinkSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping identity link tables", e);
-        }
-        
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
+    protected String getEngineTableName() {
+        return "ACT_CMMN_RU_CASE_INST";
     }
 
     @Override
-    public String schemaUpdate() {
-        try {
-            
-            getCommonSchemaManager().schemaUpdate();
-            
-            if (CommandContextUtil.getCmmnEngineConfiguration().isExecuteServiceSchemaManagers()) {
-                getIdentityLinkSchemaManager().schemaUpdate();
-                getEntityLinkSchemaManager().schemaUpdate();
-                getEventSubscriptionSchemaManager().schemaUpdate();
-                getTaskSchemaManager().schemaUpdate();
-                getVariableSchemaManager().schemaUpdate();
-                getJobSchemaManager().schemaUpdate();
-                getBatchSchemaManager().schemaUpdate();
-            }
+    protected String getChangeLogTableName() {
+        return "ACT_CMMN_DATABASECHANGELOG";
+    }
 
-            super.schemaUpdate();
-
-        } catch (Exception e) {
-            throw new FlowableException("Error updating CMMN engine tables", e);
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
-        return null;
-    }
-    
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getCommonSchemaManager();
-    }
-    
-    protected SchemaManager getIdentityLinkSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getIdentityLinkSchemaManager();
-    }
-    
-    protected SchemaManager getEntityLinkSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getEntityLinkSchemaManager();
-    }
-    
-    protected SchemaManager getEventSubscriptionSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getEventSubscriptionSchemaManager();
-    }
-    
-    protected SchemaManager getVariableSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getVariableSchemaManager();
-    }
-    
-    protected SchemaManager getTaskSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getTaskSchemaManager();
-    }
-    
-    protected SchemaManager getJobSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getJobSchemaManager();
+        return "6.1.2.0";
     }
 
-    protected SchemaManager getBatchSchemaManager() {
-        return CommandContextUtil.getCmmnEngineConfiguration().getBatchSchemaManager();
+    @Override
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/cmmn/db/";
     }
 }

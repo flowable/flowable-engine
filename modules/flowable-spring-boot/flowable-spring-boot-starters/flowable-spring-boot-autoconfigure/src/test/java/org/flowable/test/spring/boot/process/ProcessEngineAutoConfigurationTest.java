@@ -608,6 +608,7 @@ public class ProcessEngineAutoConfigurationTest {
                                 assertThat(taskExecutor.getMaxPoolSize()).isEqualTo(8);
                                 assertThat(taskExecutor.getQueueSize()).isEqualTo(100);
                                 assertThat(taskExecutor.getThreadPoolNamingPattern()).isEqualTo("flowable-async-task-invoker-%d");
+                                assertThat(taskExecutor.submit(() -> true).join()).isTrue();
                             });
                 });
     }

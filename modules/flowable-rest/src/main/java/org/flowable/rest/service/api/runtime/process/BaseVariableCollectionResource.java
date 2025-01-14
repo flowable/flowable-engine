@@ -19,9 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.runtime.Execution;
@@ -32,6 +29,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -80,11 +80,10 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
         runtimeService.removeVariablesLocal(execution.getId(), currentVariables);
     }
 
-    protected Object createExecutionVariable(Execution execution, boolean override, HttpServletRequest request, HttpServletResponse response) {
-
+    protected Object createExecutionVariable(Execution execution, boolean override, boolean async, HttpServletRequest request, HttpServletResponse response) {
         Object result = null;
         if (request instanceof MultipartHttpServletRequest) {
-            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, true);
+            result = setBinaryVariable((MultipartHttpServletRequest) request, execution, true, async);
         } else {
 
             List<RestVariable> inputVariables = new ArrayList<>();
@@ -140,27 +139,41 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
                     restApiInterceptor.createExecutionVariables(execution, variablesToSet, sharedScope);
                 }
 
-                Map<String, Object> setVariables;
+                Map<String, Object> setVariables = null;
                 if (sharedScope == RestVariableScope.LOCAL) {
-                    runtimeService.setVariablesLocal(execution.getId(), variablesToSet);
-                    setVariables = runtimeService.getVariablesLocal(execution.getId(), variablesToSet.keySet());
+                    
+                    if (async) {
+                        runtimeService.setVariablesLocalAsync(execution.getId(), variablesToSet);
+                        
+                    } else {
+                        runtimeService.setVariablesLocal(execution.getId(), variablesToSet);
+                        setVariables = runtimeService.getVariablesLocal(execution.getId(), variablesToSet.keySet());
+                    }
+                    
                 } else {
                     if (execution.getParentId() != null) {
-                        // Explicitly set on parent, setting non-local variables
-                        // on execution itself will override local-variables if
-                        // exists
-                        runtimeService.setVariables(execution.getParentId(), variablesToSet);
-                        setVariables = runtimeService.getVariables(execution.getParentId(), variablesToSet.keySet());
+                        // Explicitly set on parent, setting non-local variables on execution itself will override local-variables if exists
+                        
+                        if (async) {
+                            runtimeService.setVariablesAsync(execution.getParentId(), variablesToSet);
+                            
+                        } else {
+                            runtimeService.setVariables(execution.getParentId(), variablesToSet);
+                            setVariables = runtimeService.getVariables(execution.getParentId(), variablesToSet.keySet());
+                        }
+                        
                     } else {
                         // Standalone task, no global variables possible
                         throw new FlowableIllegalArgumentException("Cannot set global variables on execution '" + execution.getId() + "', task is not part of process.");
                     }
                 }
 
-                for (RestVariable inputVariable : inputVariables) {
-                    String variableName = inputVariable.getName();
-                    Object variableValue = setVariables.get(variableName);
-                    resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, varScope, execution.getId(), variableType, false));
+                if (!async) {
+                    for (RestVariable inputVariable : inputVariables) {
+                        String variableName = inputVariable.getName();
+                        Object variableValue = setVariables.get(variableName);
+                        resultVariables.add(restResponseFactory.createRestVariable(variableName, variableValue, varScope, execution.getId(), variableType, false));
+                    }
                 }
 
             }

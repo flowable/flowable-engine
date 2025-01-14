@@ -41,6 +41,7 @@ public interface BpmnXMLConstants {
 
     public static final String ATTRIBUTE_ID = "id";
     public static final String ATTRIBUTE_NAME = "name";
+    public static final String ATTRIBUTE_ELEMENT_NAME = "element-name";
     public static final String ATTRIBUTE_TYPE = "type";
     public static final String ATTRIBUTE_EXPORTER = "exporter";
     public static final String ATTRIBUTE_EXPORTER_VERSION = "exporterVersion";
@@ -84,6 +85,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_LISTENER = "eventListener";
     public static final String ELEMENT_TASK_LISTENER = "taskListener";
     public static final String ELEMENT_SCRIPT = "script";
+    public static final String ELEMENT_FORM_REFERENCE = "formreference";
     public static final String ATTRIBUTE_LISTENER_EVENT = "event";
     public static final String ATTRIBUTE_LISTENER_EVENTS = "events";
     public static final String ATTRIBUTE_LISTENER_ENTITY_TYPE = "entityType";
@@ -216,6 +218,9 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SERVICE_STORE_RESULT_AS_TRANSIENT = "storeResultVariableAsTransient";
 
     public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC = "topic";
+    public static final String ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
+    public static final String ELEMENT_EXTERNAL_WORKER_IN_PARAMETER = "externalWorkerInParameter";
+    public static final String ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER = "externalWorkerOutParameter";
 
     public static final String ATTRIBUTE_TASK_HTTP_PARALLEL_IN_SAME_TRANSACTION = "parallelInSameTransaction";
 

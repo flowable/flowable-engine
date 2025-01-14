@@ -69,7 +69,7 @@ public class DeleteHistoricCaseInstancesSequentialJobHandler implements JobHandl
 
         HistoricCaseInstanceQuery query = config.getQuery();
         // In the synchronous deletion, we are always deleting the first elements
-        List<HistoricCaseInstance> historicCaseInstances = query.listPage(0, batchSize);
+        List<HistoricCaseInstance> historicCaseInstances = query.withoutSorting().returnIdsOnly().listPage(0, batchSize);
         ObjectNode resultNode = engineConfiguration.getObjectMapper().createObjectNode();
         Set<String> caseInstanceIdsToDelete = new HashSet<>();
         for (HistoricCaseInstance historicCaseInstance : historicCaseInstances) {

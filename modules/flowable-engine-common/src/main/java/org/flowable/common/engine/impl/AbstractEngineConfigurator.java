@@ -25,7 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.ibatis.type.TypeAliasRegistry;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.flowable.common.engine.api.Engine;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.engine.EngineLifecycleListener;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
@@ -40,9 +42,10 @@ import org.xml.sax.SAXException;
  *
  * @author Joram Barrez
  */
-public abstract class AbstractEngineConfigurator implements EngineConfigurator {
+public abstract class AbstractEngineConfigurator<E extends Engine> implements EngineConfigurator {
 
     protected boolean enableMybatisXmlMappingValidation;
+    protected E buildEngine;
 
     @Override
     public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
@@ -110,7 +113,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
                     Node node = typeAliasList.item(i);
                     MybatisTypeAliasConfigurator typeAlias = new MybatisTypeAliasConfigurator() {
                         @Override
-                        public void configure(TypeAliasRegistry typeAliasRegistry) {
+                        public void configure(AbstractEngineConfiguration abstractEngineConfiguration, TypeAliasRegistry typeAliasRegistry) {
                             try {
                                 typeAliasRegistry.registerAlias(node.getAttributes().getNamedItem("alias").getTextContent(), 
                                                 Class.forName(node.getAttributes().getNamedItem("type").getTextContent()));
@@ -128,7 +131,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
                     Node node = typeHandlerList.item(i);
                     MybatisTypeHandlerConfigurator typeHandler = new MybatisTypeHandlerConfigurator() {
                         @Override
-                        public void configure(TypeHandlerRegistry typeHandlerRegistry) {
+                        public void configure(AbstractEngineConfiguration abstractEngineConfiguration, TypeHandlerRegistry typeHandlerRegistry) {
                             try {
                                 typeHandlerRegistry.register(node.getAttributes().getNamedItem("javaType").getTextContent(),
                                                 node.getAttributes().getNamedItem("handler").getTextContent());
@@ -204,6 +207,30 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         return null;
     }
 
+    protected synchronized E initEngine() {
+        this.buildEngine = buildEngine();
+        return buildEngine;
+    }
+
+    protected abstract E buildEngine();
+
+    protected void initialiseCommonProperties(AbstractEngineConfiguration engineConfiguration, AbstractBuildableEngineConfiguration<E> targetEngineConfiguration) {
+        initialiseCommonProperties(engineConfiguration, (AbstractEngineConfiguration) targetEngineConfiguration);
+        targetEngineConfiguration.setRunPostEngineBuildConsumer(false);
+        engineConfiguration.addEngineLifecycleListener(new EngineLifecycleListener() {
+
+            @Override
+            public void onEngineBuilt(Engine engine) {
+                targetEngineConfiguration.getPostEngineBuildConsumer().accept(buildEngine);
+            }
+
+            @Override
+            public void onEngineClosed(Engine engine) {
+                // nothing to do
+            }
+        });
+    }
+
     protected void initialiseCommonProperties(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         initEngineConfigurations(engineConfiguration, targetEngineConfiguration);
         initEventRegistryEventConsumers(engineConfiguration, targetEngineConfiguration);
@@ -221,6 +248,7 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         initClock(engineConfiguration, targetEngineConfiguration);
         initObjectMapper(engineConfiguration, targetEngineConfiguration);
         initVariableTypes(engineConfiguration, targetEngineConfiguration);
+        initSchemaManager(engineConfiguration, targetEngineConfiguration);
     }
 
     protected void initEngineConfigurations(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
@@ -303,6 +331,12 @@ public abstract class AbstractEngineConfigurator implements EngineConfigurator {
         if (engineConfiguration instanceof HasVariableTypes && targetEngineConfiguration instanceof HasVariableTypes) {
             ((HasVariableTypes) targetEngineConfiguration).setVariableTypes(((HasVariableTypes) engineConfiguration).getVariableTypes());
         }
+    }
+
+    protected void initSchemaManager(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        // We are going to disable the Schema management in the target engine as the lead engine is the one that is going to handle the schema generation
+        targetEngineConfiguration.setDatabaseSchemaUpdate(null);
+        engineConfiguration.addAdditionalSchemaManager(targetEngineConfiguration.createEngineSchemaManager());
     }
 
     protected abstract List<Class<? extends Entity>> getEntityInsertionOrder();

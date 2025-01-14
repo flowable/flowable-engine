@@ -1,6 +1,10 @@
 name: Flowable 5 Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - 'flowable-release-*'
 
 jobs:
   test_jdk:

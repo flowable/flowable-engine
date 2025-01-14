@@ -68,17 +68,28 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
     @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
-        @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given name.", paramType = "query"),
-        @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return models like the given name.", paramType = "query"),
-        @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return models like the given name ignoring case.", paramType = "query"),
+        @ApiImplicitParam(name = "id", dataType = "string", value = "Only return process instances with the given version.", paramType = "query"),
+        @ApiImplicitParam(name = "name", dataType = "string", value = "Only return process instances with the given name.", paramType = "query"),
+        @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return process instances like the given name.", paramType = "query"),
+        @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return process instances like the given name ignoring case.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionName", dataType = "string", value = "Only return process instances with the given process definition name.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionNameLike", dataType = "string", value = "Only return process instances like the given process definition name.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionNameLikeIgnoreCase", dataType = "string", value = "Only return process instances like the given process definition name ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionKeyLike", dataType = "string", value = "Only return process instances like the given process definition key.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return process instances like the given process definition key ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return process instances with the given process definition id.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionCategory", dataType = "string", value = "Only return process instances with the given process definition category.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionCategoryLike", dataType = "string", value = "Only return process instances like the given process definition category.", paramType = "query"),
+        @ApiImplicitParam(name = "processDefinitionCategoryLikeIgnoreCase", dataType = "string", value = "Only return process instances like the given process definition category ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionVersion", dataType = "integer", value = "Only return process instances with the given process definition version.", paramType = "query"),
         @ApiImplicitParam(name = "processDefinitionEngineVersion", dataType = "string", value = "Only return process instances with the given process definition engine version.", paramType = "query"),
-        @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return process instances with the given businessKey.", paramType = "query"),
-        @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return process instances with the businessKey like the given key.", paramType = "query"),
+        @ApiImplicitParam(name = "businessKey", dataType = "string", value = "Only return process instances with the given business key.", paramType = "query"),
+        @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return process instances with the business key like the given key.", paramType = "query"),
+        @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return process instances with the business key like the given key ignoring case.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatus", dataType = "string", value = "Only return process instances with the given business status.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatusLike", dataType = "string", value = "Only return process instances with the business status like the given status.", paramType = "query"),
+        @ApiImplicitParam(name = "businessStatusLikeIgnoreCase", dataType = "string", value = "Only return process instances with the business status like the given status ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Only return process instances started by the given user.", paramType = "query"),
         @ApiImplicitParam(name = "startedBefore", dataType = "string", format = "date-time", value = "Only return process instances started before the given date.", paramType = "query"),
         @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return process instances started after the given date.", paramType = "query"),
@@ -93,8 +104,9 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
-        @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenantId.", paramType = "query"),
-        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenantId like the given value.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenant id.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenant id like the given value.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return process instances with a tenant id like the given value ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
         @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,processDefinitionId,tenantId,processDefinitionKey", paramType = "query"),
     })
@@ -122,9 +134,29 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("nameLikeIgnoreCase")) {
             queryRequest.setProcessInstanceNameLikeIgnoreCase(allRequestParams.get("nameLikeIgnoreCase"));
         }
+        
+        if (allRequestParams.containsKey("processDefinitionName")) {
+            queryRequest.setProcessDefinitionName(allRequestParams.get("processDefinitionName"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionNameLike")) {
+            queryRequest.setProcessDefinitionNameLike(allRequestParams.get("processDefinitionNameLike"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionNameLikeIgnoreCase")) {
+            queryRequest.setProcessDefinitionNameLikeIgnoreCase(allRequestParams.get("processDefinitionNameLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("processDefinitionKey")) {
             queryRequest.setProcessDefinitionKey(allRequestParams.get("processDefinitionKey"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionKeyLike")) {
+            queryRequest.setProcessDefinitionKeyLike(allRequestParams.get("processDefinitionKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionKeyLikeIgnoreCase")) {
+            queryRequest.setProcessDefinitionKeyLikeIgnoreCase(allRequestParams.get("processDefinitionKeyLikeIgnoreCase"));
         }
 
         if (allRequestParams.containsKey("processDefinitionId")) {
@@ -133,6 +165,14 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         
         if (allRequestParams.containsKey("processDefinitionCategory")) {
             queryRequest.setProcessDefinitionCategory(allRequestParams.get("processDefinitionCategory"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionCategoryLike")) {
+            queryRequest.setProcessDefinitionCategoryLike(allRequestParams.get("processDefinitionCategoryLike"));
+        }
+        
+        if (allRequestParams.containsKey("processDefinitionCategoryLikeIgnoreCase")) {
+            queryRequest.setProcessDefinitionCategoryLikeIgnoreCase(allRequestParams.get("processDefinitionCategoryLikeIgnoreCase"));
         }
         
         if (allRequestParams.containsKey("processDefinitionVersion")) {
@@ -149,6 +189,22 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         
         if (allRequestParams.containsKey("businessKeyLike")) {
             queryRequest.setProcessBusinessKeyLike(allRequestParams.get("businessKeyLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessKeyLikeIgnoreCase")) {
+            queryRequest.setProcessBusinessKeyLikeIgnoreCase(allRequestParams.get("businessKeyLikeIgnoreCase"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatus")) {
+            queryRequest.setProcessBusinessStatus(allRequestParams.get("businessStatus"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLike")) {
+            queryRequest.setProcessBusinessStatusLike(allRequestParams.get("businessStatusLike"));
+        }
+        
+        if (allRequestParams.containsKey("businessStatusLikeIgnoreCase")) {
+            queryRequest.setProcessBusinessStatusLikeIgnoreCase(allRequestParams.get("businessStatusLikeIgnoreCase"));
         }
         
         if (allRequestParams.containsKey("startedBy")) {
@@ -214,6 +270,10 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("tenantIdLike")) {
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
+        
+        if (allRequestParams.containsKey("tenantIdLikeIgnoreCase")) {
+            queryRequest.setTenantIdLikeIgnoreCase(allRequestParams.get("tenantIdLikeIgnoreCase"));
+        }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
             if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
@@ -227,8 +287,10 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @ApiOperation(value = "Start a process instance", tags = { "Process Instances" },
             notes = "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
             + "Only one of *processDefinitionId*, *processDefinitionKey* or *message* can be used in the request body. \n\n"
-            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n "
-            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section.\n\n "
+            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n"
+            + "If tenantId is omitted, the default tenant will be used.\n\n "
+            + "It is possible to send variables, transientVariables and startFormVariables in one request.\n\n"
+            + "More information about the variable format can be found in the REST variables section.\n\n "
             + "Note that the variable-scope that is supplied is ignored, process-variables are always local.\n\n",
             code = 201)
     @ApiResponses(value = {
@@ -267,27 +329,25 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 }
                 startFormVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-            
-        } else {
-            
-            if (request.getVariables() != null && !request.getVariables().isEmpty()) {
-                startVariables = new HashMap<>();
-                for (RestVariable variable : request.getVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+        }
+
+        if (request.getVariables() != null && !request.getVariables().isEmpty()) {
+            startVariables = new HashMap<>();
+            for (RestVariable variable : request.getVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                startVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
-    
-            if (request.getTransientVariables() != null && !request.getTransientVariables().isEmpty()) {
-                transientVariables = new HashMap<>();
-                for (RestVariable variable : request.getTransientVariables()) {
-                    if (variable.getName() == null) {
-                        throw new FlowableIllegalArgumentException("Variable name is required.");
-                    }
-                    transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+        }
+
+        if (request.getTransientVariables() != null && !request.getTransientVariables().isEmpty()) {
+            transientVariables = new HashMap<>();
+            for (RestVariable variable : request.getTransientVariables()) {
+                if (variable.getName() == null) {
+                    throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
+                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
             }
         }
 

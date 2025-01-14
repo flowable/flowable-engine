@@ -33,6 +33,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -72,6 +73,14 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(sendEventServiceTask.getSkipExpression(), sendEventServiceTask.getId(), execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(sendEventServiceTask.getSkipExpression(), sendEventServiceTask.getId(), execution, commandContext)) {
+            leave(execution);
+            return;
+        }
+        
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry(commandContext);
 
         EventModel eventModel = getEventModel(commandContext, execution);

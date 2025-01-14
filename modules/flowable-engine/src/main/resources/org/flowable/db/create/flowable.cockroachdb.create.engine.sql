@@ -132,6 +132,7 @@ CREATE TABLE ACT_RU_ACTINST (
     ACT_NAME_ varchar(255),
     ACT_TYPE_ varchar(255) not null,
     ASSIGNEE_ varchar(255),
+    COMPLETED_BY_ varchar(255),
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
     DURATION_ bigint,
@@ -348,9 +349,9 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.0.1.1', 1);
+values ('schema.version', '7.2.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.0.1.1)', 1);
+values ('schema.history', 'create(7.2.0.0)', 1);
 
 --force-commit

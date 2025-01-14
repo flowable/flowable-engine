@@ -12,12 +12,9 @@
  */
 package org.flowable.eventregistry.impl.aot;
 
-import java.util.Collections;
-
 import org.flowable.common.engine.impl.aot.FlowableMyBatisResourceHintsRegistrar;
-import org.flowable.eventregistry.impl.db.SetChannelDefinitionTypeAndImplementationCustomChange;
+import org.flowable.common.engine.impl.aot.FlowableSqlResourceHintsRegistrar;
 import org.flowable.eventregistry.impl.persistence.ResourceRefTypeHandler;
-import org.springframework.aot.hint.ExecutableMode;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.ResourceHints;
 import org.springframework.aot.hint.RuntimeHints;
@@ -30,12 +27,10 @@ public class FlowableEventRegistryRuntimeHints implements RuntimeHintsRegistrar 
 
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
-        ResourceHints resourceHints = hints.resources();
         FlowableMyBatisResourceHintsRegistrar.registerMappingResources("org/flowable/eventregistry/db/mapping", hints, classLoader);
-        resourceHints.registerPattern("org/flowable/eventregistry/db/liquibase/flowable-eventregistry-db-changelog.xml");
         hints.reflection()
-                .registerType(SetChannelDefinitionTypeAndImplementationCustomChange.class,
-                        hint -> hint.withConstructor(Collections.emptyList(), ExecutableMode.INVOKE))
                 .registerType(ResourceRefTypeHandler.class, MemberCategory.values());
+        ResourceHints resourceHints = hints.resources();
+        FlowableSqlResourceHintsRegistrar.registerSqlResources("org/flowable/eventregistry/db", resourceHints);
     }
 }

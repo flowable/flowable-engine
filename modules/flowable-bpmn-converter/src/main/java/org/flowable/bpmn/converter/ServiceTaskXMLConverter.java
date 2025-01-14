@@ -25,6 +25,8 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.EventInParameterParser;
 import org.flowable.bpmn.converter.child.EventOutParameterParser;
+import org.flowable.bpmn.converter.child.ExternalWorkerInParameterParser;
+import org.flowable.bpmn.converter.child.ExternalWorkerOutParameterParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.OutParameterParser;
 import org.flowable.bpmn.converter.export.FieldExtensionExport;
@@ -39,6 +41,7 @@ import org.flowable.bpmn.model.CustomProperty;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
+import org.flowable.bpmn.model.FormAwareServiceTask;
 import org.flowable.bpmn.model.HttpServiceTask;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.SendEventServiceTask;
@@ -51,7 +54,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected Map<String, BaseChildElementParser> caseServiceChildParserMap = new HashMap<>();
     protected Map<String, BaseChildElementParser> sendEventServiceChildParserMap = new HashMap<>();
-    
+    protected Map<String, BaseChildElementParser> externalWorkerTaskChildParserMap = new HashMap<>();
+
     protected static final List<ExtensionAttribute> defaultServiceTaskAttributes = Arrays.asList(
             new ExtensionAttribute(ATTRIBUTE_TYPE),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_CLASS),
@@ -89,6 +93,12 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         sendEventServiceChildParserMap.put(eventInParameterParser.getElementName(), eventInParameterParser);
         EventOutParameterParser eventOutParameterParser = new EventOutParameterParser();
         sendEventServiceChildParserMap.put(eventOutParameterParser.getElementName(), eventOutParameterParser);
+
+        // External Worker
+        ExternalWorkerInParameterParser externalWorkerInParameterParser = new ExternalWorkerInParameterParser();
+        externalWorkerTaskChildParserMap.put(externalWorkerInParameterParser.getElementName(), externalWorkerInParameterParser);
+        ExternalWorkerOutParameterParser externalWorkerOutParameterParser = new ExternalWorkerOutParameterParser();
+        externalWorkerTaskChildParserMap.put(externalWorkerOutParameterParser.getElementName(), externalWorkerOutParameterParser);
     }
 
     @Override
@@ -121,7 +131,19 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             serviceTask = new ExternalWorkerServiceTask();
             
         } else {
-            serviceTask = new ServiceTask();
+            String formKey = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FORMKEY, xtr);
+            if (StringUtils.isNotEmpty(formKey)) {
+                FormAwareServiceTask formAwareServiceTask = new FormAwareServiceTask();
+                formAwareServiceTask.setFormKey(formKey);
+
+                String formFieldValidation = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FORM_FIELD_VALIDATION, xtr);
+                if (StringUtils.isNotEmpty(formFieldValidation)) {
+                    formAwareServiceTask.setValidateFormFields(formFieldValidation);
+                }
+                serviceTask = formAwareServiceTask;
+            } else {
+                serviceTask = new ServiceTask();
+            }
         }
         
         BpmnXMLUtil.addXMLLocation(serviceTask, xtr);
@@ -170,7 +192,6 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         } else {
             parseChildElements(getXMLElementName(), serviceTask, model, xtr);
         }
-
         return serviceTask;
     }
 
@@ -189,6 +210,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             writeHttpServiceTaskAdditionalAttributes((HttpServiceTask) element, model, xtw);
             
         } else {
+            if (element instanceof FormAwareServiceTask formAwareServiceTask) {
+                writeFormAwareServiceTaskAdditionalAttributes(formAwareServiceTask, xtw);
+            }
             writeServiceTaskAdditionalAttributes((ServiceTask) element, xtw);
         }
     }
@@ -248,6 +272,10 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         if (StringUtils.isNotEmpty(externalWorkerTask.getSkipExpression())) {
             writeQualifiedAttribute(ATTRIBUTE_TASK_SERVICE_SKIP_EXPRESSION, externalWorkerTask.getSkipExpression(), xtw);
         }
+
+        if (externalWorkerTask.isDoNotIncludeVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES, String.valueOf(externalWorkerTask.isDoNotIncludeVariables()), xtw);
+        }
     }
 
 
@@ -258,6 +286,16 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
 
         writeServiceTaskAdditionalAttributes(httpServiceTask, xtw);
+    }
+
+    protected void writeFormAwareServiceTaskAdditionalAttributes(FormAwareServiceTask formAwareServiceTask, XMLStreamWriter xtw) throws Exception {
+        if (StringUtils.isNotEmpty(formAwareServiceTask.getFormKey())) {
+            writeQualifiedAttribute(ATTRIBUTE_FORM_FORMKEY, formAwareServiceTask.getFormKey(), xtw);
+        }
+
+        if (StringUtils.isNotEmpty(formAwareServiceTask.getValidateFormFields())) {
+            writeQualifiedAttribute(ATTRIBUTE_FORM_FIELD_VALIDATION, formAwareServiceTask.getValidateFormFields(), xtw);
+        }
     }
 
     protected void writeServiceTaskAdditionalAttributes(ServiceTask element, XMLStreamWriter xtw) throws Exception {
@@ -303,7 +341,8 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         } else if (element instanceof SendEventServiceTask) {
             return writeSendServiceExtensionChildElements(element, didWriteExtensionStartElement, xtw);
-
+        } else if (element instanceof ExternalWorkerServiceTask) {
+            return writeExternalWorkerTaskExtensionChildElements(element, didWriteExtensionStartElement, xtw);
         } else {
             return writeServiceTaskExtensionChildElements((ServiceTask) element, didWriteExtensionStartElement, xtw);
         }
@@ -356,6 +395,14 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         
         BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_IN_PARAMETER, sendEventServiceTask.getEventInParameters(), didWriteExtensionStartElement, xtw);
         BpmnXMLUtil.writeIOParameters(ELEMENT_EVENT_OUT_PARAMETER, sendEventServiceTask.getEventOutParameters(), didWriteExtensionStartElement, xtw);
+
+        return didWriteExtensionStartElement;
+    }
+
+    protected boolean writeExternalWorkerTaskExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        ExternalWorkerServiceTask externalWorkerTask = (ExternalWorkerServiceTask) element;
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_IN_PARAMETER, externalWorkerTask.getInParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER, externalWorkerTask.getOutParameters(), didWriteExtensionStartElement, xtw);
 
         return didWriteExtensionStartElement;
     }
@@ -432,8 +479,11 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
     protected void convertExternalWorkerTaskXMLProperties(ExternalWorkerServiceTask externalWorkerServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {
         externalWorkerServiceTask.setTopic(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_TOPIC, xtr));
+        externalWorkerServiceTask.setDoNotIncludeVariables(
+                Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES, xtr))
+        );
 
-        parseChildElements(getXMLElementName(), externalWorkerServiceTask, bpmnModel, xtr);
+        parseChildElements(getXMLElementName(), externalWorkerServiceTask, externalWorkerTaskChildParserMap, bpmnModel, xtr);
     }
 
     protected void convertHttpServiceTaskXMLProperties(HttpServiceTask httpServiceTask, BpmnModel bpmnModel, XMLStreamReader xtr) throws Exception {

@@ -33,9 +33,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration("classpath:org/flowable/spring/test/email/jndiEmailConfiguaration-context.xml")
+@DirtiesContext
 public class JndiEmailTest extends SpringFlowableTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JndiEmailTest.class);

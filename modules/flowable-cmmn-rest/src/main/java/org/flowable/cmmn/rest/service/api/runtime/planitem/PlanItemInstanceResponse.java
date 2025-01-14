@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -66,6 +69,8 @@ public class PlanItemInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -74,6 +79,8 @@ public class PlanItemInstanceResponse {
     protected String formKey;
     protected String extraValue;
     protected String tenantId;
+    protected List<RestVariable> localVariables = new ArrayList<>();
+
 
     @ApiModelProperty(example = "5")
     public String getId() {
@@ -349,6 +356,22 @@ public class PlanItemInstanceResponse {
         this.formKey = formKey;
     }
 
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+
     public String getExtraValue() {
         return extraValue;
     }
@@ -364,5 +387,17 @@ public class PlanItemInstanceResponse {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public void setLocalVariables(List<RestVariable> localVariables){
+        this.localVariables = localVariables;
+    }
+
+    public List<RestVariable> getLocalVariables() {
+        return localVariables;
+    }
+
+    public void addLocalVariable(RestVariable restVariable) {
+        localVariables.add(restVariable);
     }
 }

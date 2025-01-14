@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -92,6 +93,10 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
                         CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null, null, null);
                     }
+                
+                } else if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                            .executeLifecycleListeners(commandContext, childPlanItemInstance, childPlanItemInstance.getState(), PlanItemInstanceState.TERMINATED);
                 }
             }
         }

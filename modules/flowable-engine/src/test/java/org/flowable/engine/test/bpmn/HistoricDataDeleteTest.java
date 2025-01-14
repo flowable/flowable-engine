@@ -1181,8 +1181,10 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processDefinitionKeyNotIn", "processKeyNotIn");
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKey", "businessKey");
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKeyLike", "businessKeyLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKeyLikeIgnoreCase", "businessKeyLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatus", "businessStatus");
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLike", "businessStatusLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackType", "callbackType");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackId", "callbackId");
         methodNameToExpectedQueryPropertyName.put("withoutProcessInstanceCallbackId", "withoutCallbackId");
@@ -1194,11 +1196,14 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processInstanceWithoutTenantId", "withoutTenantId");
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantId", "tenantId");
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLike", "tenantIdLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLikeIgnoreCase", "tenantIdLikeIgnoreCase");
         Set<String> methodsToIgnore = new HashSet<>();
         methodsToIgnore.add("limitProcessInstanceVariables");
         methodsToIgnore.add("includeProcessVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("withoutSorting");
+        methodsToIgnore.add("returnIdsOnly");
         methodsToIgnore.add("asc");
         methodsToIgnore.add("desc");
         methodsToIgnore.add("or");

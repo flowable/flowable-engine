@@ -1,1 +1,0 @@
-drop table if exists ACT_RU_ENTITYLINK cascade;

@@ -55,6 +55,7 @@ public class CachingAndArtifactsManager {
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(processDefinition);
+            deployment.addProcessDefinitionCacheEntry(processDefinition.getId(), cacheEntry);
         }
     }
     

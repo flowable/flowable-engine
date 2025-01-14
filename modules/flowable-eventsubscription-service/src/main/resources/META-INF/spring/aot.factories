@@ -1,3 +1,0 @@
-org.springframework.aot.hint.RuntimeHintsRegistrar=\
-org.flowable.eventsubscription.service.impl.aot.FlowableEventSubscriptionServiceRuntimeHints
-

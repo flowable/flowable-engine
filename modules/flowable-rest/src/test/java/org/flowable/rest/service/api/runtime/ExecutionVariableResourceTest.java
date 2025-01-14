@@ -34,6 +34,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
@@ -384,5 +385,75 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         variableValue = runtimeService.getVariableLocal(childExecution.getId(), "binaryVariable");
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
+    public void testUpdateExecutionVariableAsync() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
+        runtimeService.setVariable(processInstance.getId(), "myVar", "processValue");
+
+        Execution childExecution = runtimeService.createExecutionQuery().parentId(processInstance.getId()).singleResult();
+        assertThat(childExecution).isNotNull();
+        runtimeService.setVariableLocal(childExecution.getId(), "myVar", "childValue");
+
+        // Update variable local
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "updatedValue");
+        requestNode.put("type", "string");
+
+        HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_ASYNC, childExecution.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("processValue");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("childValue");
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        // Global value should be unaffected
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("processValue");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("updatedValue");
+
+        // Update variable global
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "updatedValueGlobal");
+        requestNode.put("type", "string");
+        requestNode.put("scope", "global");
+
+        httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_ASYNC, childExecution.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("processValue");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("updatedValue");
+        
+        job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+
+        // Local value should be unaffected
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo("updatedValueGlobal");
+        assertThat(runtimeService.getVariableLocal(childExecution.getId(), "myVar")).isEqualTo("updatedValue");
+
+        requestNode.put("name", "unexistingVariable");
+
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+
+        httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_ASYNC, childExecution.getId(), "unexistingVariable"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
+        closeResponse(response);
     }
 }

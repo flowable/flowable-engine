@@ -30,7 +30,7 @@ public class PasswordEncoderIdmEngineConfigurator extends IdmEngineConfigurator 
         initialiseCommonProperties(engineConfiguration, idmEngineConfiguration);
 
         idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.MD5));
-        idmEngineConfiguration.buildIdmEngine();
+        initEngine();
 
         initServiceConfigurations(engineConfiguration, idmEngineConfiguration);
     }

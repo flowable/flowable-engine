@@ -38,6 +38,7 @@ import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
+import org.flowable.common.rest.variable.UUIDRestVariableConverter;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.form.FormProperty;
@@ -1267,8 +1268,8 @@ public class RestResponseFactory {
         response.setId(batchPart.getId());
         response.setBatchId(batchPart.getBatchId());
         response.setBatchType(batchPart.getBatchType());
-        response.setSearchKey(batchPart.getBatchSearchKey());
-        response.setSearchKey2(batchPart.getBatchSearchKey2());
+        response.setSearchKey(batchPart.getSearchKey());
+        response.setSearchKey2(batchPart.getSearchKey2());
         response.setScopeId(batchPart.getScopeId());
         response.setSubScopeId(batchPart.getSubScopeId());
         response.setScopeType(batchPart.getScopeType());
@@ -1528,6 +1529,7 @@ public class RestResponseFactory {
         variableConverters.add(new LocalDateRestVariableConverter());
         variableConverters.add(new LocalDateTimeRestVariableConverter());
         variableConverters.add(new JsonObjectRestVariableConverter(objectMapper));
+        variableConverters.add(new UUIDRestVariableConverter());
     }
 
     protected String formatUrl(String serverRootUrl, String[] fragments, Object... arguments) {

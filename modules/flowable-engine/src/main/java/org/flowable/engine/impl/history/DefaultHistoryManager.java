@@ -129,8 +129,10 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstanceId);
 
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-            if (getHistoryConfigurationSettings().isHistoryEnabledForVariables(historicProcessInstance)) {
-                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+
+            if (getHistoryConfigurationSettings().isHistoryEnabledForVariables(processDefinitionId)) {
+                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
+                        .deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
             }
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
@@ -503,6 +505,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 if (historicActivityInstance != null) {
                     historicActivityInstance.setTaskId(activityInstance.getTaskId());
                     historicActivityInstance.setAssignee(activityInstance.getAssignee());
+                    historicActivityInstance.setCompletedBy(activityInstance.getCompletedBy());
                     historicActivityInstance.setCalledProcessInstanceId(activityInstance.getCalledProcessInstanceId());
                 }
             }
@@ -511,7 +514,9 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     
     @Override
     public void recordHistoricUserTaskLogEntry(HistoricTaskLogEntryBuilder taskLogEntryBuilder) {
-        processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+        if (isHistoryEnabled(taskLogEntryBuilder.getProcessDefinitionId())) {
+            processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().createHistoricTaskLogEntry(taskLogEntryBuilder);
+        }
     }
 
     @Override

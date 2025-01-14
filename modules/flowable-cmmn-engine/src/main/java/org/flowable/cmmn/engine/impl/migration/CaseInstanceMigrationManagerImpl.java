@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.migration.CaseInstanceBatchMigrationResult;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
@@ -281,12 +282,19 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .setRemoveWaitingForRepetitionPlanItemDefinitions(changePlanItemStateBuilder.getRemoveWaitingForRepetitionPlanItemDefinitions())
                 .setChangePlanItemIds(changePlanItemStateBuilder.getChangePlanItemIds())
                 .setChangePlanItemIdsWithDefinitionId(changePlanItemStateBuilder.getChangePlanItemIdsWithDefinitionId())
+                .setChangePlanItemDefinitionWithNewTargetIds(changePlanItemStateBuilder.getChangePlanItemDefinitionWithNewTargetIds())
                 .setCaseVariables(document.getCaseInstanceVariables())
                 .setChildInstanceTaskVariables(document.getPlanItemLocalVariables());
         doMovePlanItemState(caseInstanceChangeState, originalCaseDefinitionId, commandContext);
 
         LOGGER.debug("Updating case definition reference in plan item instances");
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).updatePlanItemInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        
+        LOGGER.debug("Updating case definition reference in milestone instances");
+        CommandContextUtil.getMilestoneInstanceEntityManager(commandContext).updateMilestoneInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        
+        LOGGER.debug("Updating case definition reference in sentry part instances");
+        CommandContextUtil.getSentryPartInstanceEntityManager(commandContext).updateSentryPartInstancesCaseDefinitionId(caseInstance.getId(), caseDefinitionToMigrateTo.getId());
 
         LOGGER.debug("Updating case definition reference in history");
         changeCaseDefinitionReferenceOfHistory(caseInstance, caseDefinitionToMigrateTo, commandContext);
@@ -302,7 +310,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             cmmnEngineConfiguration.getExpressionManager().createExpression(document.getPostUpgradeExpression()).getValue(caseInstance);
         }
     }
-    
+
     protected void doMigrateHistoricCaseInstance(HistoricCaseInstanceEntity historicCaseInstance, CaseDefinition caseDefinitionToMigrateTo, HistoricCaseInstanceMigrationDocument document, CommandContext commandContext) {
         LOGGER.debug("Start migration of historic case instance with Id:'{}' to case definition identified by {}", historicCaseInstance.getId(), printCaseDefinitionIdentifierMessage(document));
         
@@ -367,7 +375,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
         
         for (TerminatePlanItemDefinitionMapping planItemDefinitionMapping : document.getTerminatePlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.terminatePlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.terminatePlanItemDefinition(planItemDefinitionMapping);
         }
         
         for (MoveToAvailablePlanItemDefinitionMapping planItemDefinitionMapping : document.getMoveToAvailablePlanItemDefinitionMappings()) {
@@ -375,11 +383,11 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
         
         for (WaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getWaitingForRepetitionPlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.addWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.addWaitingForRepetitionPlanItemDefinition(planItemDefinitionMapping);
         }
         
         for (RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping : document.getRemoveWaitingForRepetitionPlanItemDefinitionMappings()) {
-            changePlanItemStateBuilder.removeWaitingForRepetitionPlanItemDefinitionId(planItemDefinitionMapping.getPlanItemDefinitionId());
+            changePlanItemStateBuilder.removeWaitingForRepetitionPlanItemDefinition(planItemDefinitionMapping);
         }
         
         for (ChangePlanItemIdMapping changePlanItemIdMapping : document.getChangePlanItemIdMappings()) {
@@ -388,6 +396,11 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         for (ChangePlanItemIdWithDefinitionIdMapping changePlanItemIdWithDefinitionMapping : document.getChangePlanItemIdWithDefinitionIdMappings()) {
             changePlanItemStateBuilder.changePlanItemIdWithDefinitionId(changePlanItemIdWithDefinitionMapping.getExistingPlanItemDefinitionId(), changePlanItemIdWithDefinitionMapping.getNewPlanItemDefinitionId());
+        }
+        
+        for (ChangePlanItemDefinitionWithNewTargetIdsMapping changePlanItemDefinitionWithNewTargetIdsMapping : document.getChangePlanItemDefinitionWithNewTargetIdsMappings()) {
+            changePlanItemStateBuilder.changePlanItemDefinitionWithNewTargetIds(changePlanItemDefinitionWithNewTargetIdsMapping.getExistingPlanItemDefinitionId(), 
+                    changePlanItemDefinitionWithNewTargetIdsMapping.getNewPlanItemId(), changePlanItemDefinitionWithNewTargetIdsMapping.getNewPlanItemDefinitionId());
         }
 
         return changePlanItemStateBuilder;
@@ -465,6 +478,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .searchKey2(caseDefinition.getId())
                 .status(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
                 .batchDocumentJson(document.asJsonString())
+                .tenantId(caseDefinition.getTenantId())
                 .create();
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
@@ -474,10 +488,12 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
 
             JobEntity job = jobService.createJob();
             job.setJobHandlerType(CaseInstanceMigrationJobHandler.TYPE);
+            job.setTenantId(caseInstance.getTenantId());
             job.setScopeId(caseInstance.getId());
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
             jobService.createAsyncJob(job, false);
+            job.setRetries(0);
             jobService.scheduleAsyncJob(job);
         }
 
@@ -485,7 +501,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             TimerJobService timerJobService = engineConfiguration.getJobServiceConfiguration().getTimerJobService();
             TimerJobEntity timerJob = timerJobService.createTimerJob();
             timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+            timerJob.setTenantId(batch.getTenantId());
             timerJob.setRevision(1);
+            timerJob.setRetries(0);
             timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(CaseInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             timerJob.setScopeType(ScopeTypes.CMMN);
@@ -515,6 +533,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 .searchKey2(caseDefinition.getId())
                 .status(CaseInstanceBatchMigrationResult.STATUS_IN_PROGRESS)
                 .batchDocumentJson(document.asJsonString())
+                .tenantId(caseDefinition.getTenantId())
                 .create();
 
         JobService jobService = engineConfiguration.getJobServiceConfiguration().getJobService();
@@ -527,6 +546,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             job.setScopeId(historicCaseInstance.getId());
             job.setScopeType(ScopeTypes.CMMN);
             job.setJobHandlerConfiguration(HistoricCaseInstanceMigrationJobHandler.getHandlerCfgForBatchPartId(batchPart.getId()));
+            job.setTenantId(historicCaseInstance.getTenantId());
             jobService.createAsyncJob(job, false);
             jobService.scheduleAsyncJob(job);
         }
@@ -539,6 +559,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
             timerJob.setJobHandlerType(CaseInstanceMigrationStatusJobHandler.TYPE);
             timerJob.setJobHandlerConfiguration(HistoricCaseInstanceMigrationJobHandler.getHandlerCfgForBatchId(batch.getId()));
             timerJob.setScopeType(ScopeTypes.CMMN);
+            timerJob.setTenantId(batch.getTenantId());
 
             BusinessCalendar businessCalendar = engineConfiguration.getBusinessCalendarManager().getBusinessCalendar(CycleBusinessCalendar.NAME);
             timerJob.setDuedate(businessCalendar.resolveDuedate(engineConfiguration.getBatchStatusTimeCycleConfig()));

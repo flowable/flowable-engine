@@ -54,6 +54,13 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     /**
+     * Called when the operation is planned on the agenda (but not yet executed)
+     */
+    public void onPlanned() {
+        // No-op by default
+    }
+
+    /**
      * @return The id of the case instance related to this operation.
      */
     public abstract String getCaseInstanceId();

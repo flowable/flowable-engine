@@ -27,6 +27,7 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -37,6 +38,7 @@ import org.springframework.test.context.ContextConfiguration;
 // We need to use per class as the test uses auto deployments. If they are deleted then the other tests will fail
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration("classpath:org/flowable/spring/test/components/SpringjobExecutorTest-context.xml")
+//@DirtiesContext
 public class SpringAsyncExecutorTest extends SpringFlowableTestCase {
 
     @Autowired

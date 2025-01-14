@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter;
 
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_CLASS;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_DELEGATE_EXPRESSION;
+import static org.flowable.cmmn.converter.CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
 import static org.flowable.cmmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
 
@@ -28,7 +29,7 @@ import org.flowable.cmmn.converter.util.ListenerXmlConverterUtil;
 import org.flowable.cmmn.model.AbstractFlowableHttpHandler;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
-import org.flowable.cmmn.model.ChildTask;
+import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.DecisionTask;
@@ -38,7 +39,9 @@ import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.GenericEventListener;
+import org.flowable.cmmn.model.HasInParameters;
 import org.flowable.cmmn.model.HasLifecycleListeners;
+import org.flowable.cmmn.model.HasOutParameters;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.IOParameter;
@@ -104,11 +107,13 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     } else if (CmmnXmlConstants.ELEMENT_HTTP_RESPONSE_HANDLER.equals(xtr.getLocalName())) {
                         readHttpResponseHandler(xtr, conversionHelper);
 
-                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_IN_PARAMETERS.equals(xtr.getLocalName())) {
-                        readIOParameter(xtr, true, conversionHelper);
+                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_IN_PARAMETERS.equals(xtr.getLocalName())
+                            || CmmnXmlConstants.ELEMENT_EXTERNAL_WORKER_IN_PARAMETER.equals(xtr.getLocalName())) {
+                        readInputParameter(xtr, conversionHelper);
 
-                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())) {
-                        readIOParameter(xtr, false, conversionHelper);
+                    } else if (CmmnXmlConstants.ELEMENT_CHILD_TASK_OUT_PARAMETERS.equals(xtr.getLocalName())
+                            || CmmnXmlConstants.ELEMENT_EXTERNAL_WORKER_OUT_PARAMETER.equals(xtr.getLocalName())) {
+                        readOutputParameter(xtr, conversionHelper);
 
                     } else if (CmmnXmlConstants.ELEMENT_TASK_LISTENER.equals(xtr.getLocalName())) {
                         readTaskListener(xtr, conversionHelper);
@@ -124,6 +129,8 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
                     } else if (CmmnXmlConstants.ELEMENT_VARIABLE_AGGREGATION.equals(xtr.getLocalName())) {
                         readVariableAggregationDefinition(xtr, conversionHelper);
 
+                    } else if (CmmnXmlConstants.ATTRIBUTE_ELEMENT_NAME.equals(xtr.getLocalName())) {
+                        readElementName(xtr, conversionHelper);
                     } else {
                         ExtensionElement extensionElement = CmmnXmlUtil.parseExtensionElement(xtr);
                         conversionHelper.getCurrentCmmnElement().addExtensionElement(extensionElement);
@@ -307,17 +314,26 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
         ((HttpServiceTask) cmmnElement).setHttpResponseHandler(responseHandler);
     }
 
-    protected void readIOParameter(XMLStreamReader xtr, boolean isInParameter, ConversionHelper conversionHelper) {
+    protected void readInputParameter(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-        if (!(currentCmmnElement instanceof ChildTask)) {
-            return;
+        if (currentCmmnElement instanceof HasInParameters hasInParameters) {
+            hasInParameters.addInParameter(readIoParameter(xtr));
         }
+    }
 
-        ChildTask childTask = (ChildTask) currentCmmnElement;
+    protected void readOutputParameter(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+        if (currentCmmnElement instanceof HasOutParameters hasOutParameters) {
+            hasOutParameters.addOutParameter(readIoParameter(xtr));
+        }
+    }
+
+    protected IOParameter readIoParameter(XMLStreamReader xtr) {
         String source = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
         String target = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
         String targetExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
+        String isTransient = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TRANSIENT);
 
         IOParameter parameter = new IOParameter();
 
@@ -333,11 +349,10 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             parameter.setTarget(target);
         }
 
-        if (isInParameter) {
-            childTask.getInParameters().add(parameter);
-        } else {
-            childTask.getOutParameters().add(parameter);
+        if (StringUtils.isNotEmpty(isTransient)) {
+            parameter.setTransient(Boolean.parseBoolean(isTransient));
         }
+        return parameter;
     }
 
     protected void readTaskListener(XMLStreamReader xtr, ConversionHelper conversionHelper) throws Exception {
@@ -459,6 +474,24 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             } catch (Exception e) {
                 LOGGER.warn("Error parsing collection child elements", e);
             }
+        }
+
+    }
+
+    protected void readElementName(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+
+        if (currentCmmnElement instanceof CaseElement) {
+            try {
+                String elementName = xtr.getElementText();
+
+                if (StringUtils.isNotEmpty(elementName)) {
+                    ((CaseElement) currentCmmnElement).setName(elementName.trim());
+                }
+            } catch (Exception e) {
+                throw new FlowableException("Error while reading " + ATTRIBUTE_ELEMENT_NAME + " extension element", e);
+            }
+
         }
 
     }

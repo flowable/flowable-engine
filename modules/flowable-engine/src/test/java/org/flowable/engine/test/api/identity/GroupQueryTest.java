@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
@@ -256,6 +257,29 @@ public class GroupQueryTest extends PluggableFlowableTestCase {
         assertThat(identityService.createNativeGroupQuery().sql(baseQuerySql).listPage(0, 2)).hasSize(2);
         assertThat(identityService.createNativeGroupQuery().sql(baseQuerySql).listPage(1, 3)).hasSize(3);
         assertThat(identityService.createNativeGroupQuery().sql(baseQuerySql + " where ID_ = #{id}").parameter("id", "admin").listPage(0, 1)).hasSize(1);
+    }
+
+    @Test
+    public void testNativeQueryOrder() {
+        StringBuilder baseQueryBuilder = new StringBuilder();
+        baseQueryBuilder.append("SELECT ");
+        if (AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(processEngineConfiguration.getDatabaseType())) {
+            baseQueryBuilder.append("top 100 percent ");
+        }
+        baseQueryBuilder.append("* FROM ")
+                .append(IdentityTestUtil.getTableName("ACT_ID_GROUP", processEngineConfiguration))
+                .append(" order by ID_ desc");
+        String baseQuerySql = baseQueryBuilder.toString();
+
+        assertThat(identityService.createNativeGroupQuery().sql(baseQuerySql).list())
+                .extracting(Group::getId)
+                .containsExactly("muppets", "mammals", "frogs", "admin");
+
+        assertThat(identityService.createNativeGroupQuery().sql(baseQuerySql)
+                .parameter("orderBy", "ID_ desc")
+                .listPage(0, 2))
+                .extracting(Group::getId)
+                .containsExactly("muppets", "mammals");
     }
 
 }

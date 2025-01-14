@@ -7,11 +7,11 @@
     <insert id="insertMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_)
         values (
-            #{id ,jdbcType=VARCHAR},
-            #{name ,jdbcType=VARCHAR},
-            #{timeStamp ,jdbcType=TIMESTAMP},
-            #{caseInstanceId ,jdbcType=VARCHAR},
-            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{id, jdbcType=VARCHAR},
+            #{name, jdbcType=NVARCHAR},
+            #{timeStamp, jdbcType=TIMESTAMP},
+            #{caseInstanceId, jdbcType=VARCHAR},
+            #{caseDefinitionId, jdbcType=VARCHAR},
             #{elementId, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR}
         )
@@ -21,31 +21,31 @@
     <insert id="bulkInsertMilestoneInstance" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_)
         values
-        <foreach collection="list" item="milestone" index="index" separator=",">
+        <foreach collection="list" item="milestoneInstance" index="index" separator=",">
             (
-                #{milestone.id ,jdbcType=VARCHAR},
-                #{milestone.name ,jdbcType=VARCHAR},
-                #{milestone.timeStamp ,jdbcType=TIMESTAMP},
-                #{milestone.caseInstanceId ,jdbcType=VARCHAR},
-                #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
-                #{milestone.elementId, jdbcType=VARCHAR},
-                #{milestone.tenantId, jdbcType=VARCHAR}
+                #{milestoneInstance.id, jdbcType=VARCHAR},
+                #{milestoneInstance.name, jdbcType=NVARCHAR},
+                #{milestoneInstance.timeStamp, jdbcType=TIMESTAMP},
+                #{milestoneInstance.caseInstanceId, jdbcType=VARCHAR},
+                #{milestoneInstance.caseDefinitionId, jdbcType=VARCHAR},
+                #{milestoneInstance.elementId, jdbcType=VARCHAR},
+                #{milestoneInstance.tenantId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
 
     <insert id="bulkInsertMilestoneInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="milestone" index="index">
+        <foreach collection="list" item="milestoneInstance" index="index">
             into ${prefix}ACT_CMMN_RU_MIL_INST (ID_, NAME_, TIME_STAMP_, CASE_INST_ID_, CASE_DEF_ID_, ELEMENT_ID_, TENANT_ID_) VALUES
             (
-                #{milestone.id ,jdbcType=VARCHAR},
-                #{milestone.name ,jdbcType=VARCHAR},
-                #{milestone.timeStamp ,jdbcType=TIMESTAMP},
-                #{milestone.caseInstanceId ,jdbcType=VARCHAR},
-                #{milestone.caseDefinitionId ,jdbcType=VARCHAR},
-                #{milestone.elementId, jdbcType=VARCHAR},
-                #{milestone.tenantId, jdbcType=VARCHAR}
+                #{milestoneInstance.id, jdbcType=VARCHAR},
+                #{milestoneInstance.name, jdbcType=NVARCHAR},
+                #{milestoneInstance.timeStamp, jdbcType=TIMESTAMP},
+                #{milestoneInstance.caseInstanceId, jdbcType=VARCHAR},
+                #{milestoneInstance.caseDefinitionId, jdbcType=VARCHAR},
+                #{milestoneInstance.elementId, jdbcType=VARCHAR},
+                #{milestoneInstance.tenantId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -58,7 +58,7 @@
                 CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.name != name">
-                NAME_ = #{name, jdbcType=VARCHAR},
+                NAME_ = #{name, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.elementId != elementId">
                 ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
@@ -68,16 +68,16 @@
     </update>
 
     <delete id="deleteMilestoneInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
-        delete from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id}
+        delete from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id, jdbcType=VARCHAR}
     </delete>
 
     <delete id="deleteMilestoneInstanceByCaseInstanceId" parameterType="string">
-        delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{value}
+        delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
     </delete>
 
     <resultMap id="milestoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
-        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="name" column="NAME_" jdbcType="NVARCHAR" />
         <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP" />
         <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
         <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
@@ -106,28 +106,28 @@
         from ${prefix}ACT_CMMN_RU_MIL_INST RES
         <where>
             <if test="milestoneInstanceId != null">
-                RES.ID_ = #{milestoneInstanceId}
+                RES.ID_ = #{milestoneInstanceId, jdbcType=VARCHAR}
             </if>
             <if test="name != null">
-                RES.NAME_ = #{name}
+                RES.NAME_ = #{name, jdbcType=NVARCHAR}
             </if>
             <if test="caseInstanceId != null">
-                and RES.CASE_INST_ID_ = #{caseInstanceId}
+                and RES.CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
             </if>
             <if test="caseDefinitionId != null">
-                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
             </if>
             <if test="reachedBefore != null">
-                and RES.TIME_STAMP_ &lt;= #{reachedBefore}
+                and RES.TIME_STAMP_ &lt;= #{reachedBefore, jdbcType=TIMESTAMP}
             </if>
             <if test="reachedAfter != null">
-                and RES.TIME_STAMP_ &gt;= #{reachedAfter}
+                and RES.TIME_STAMP_ &gt;= #{reachedAfter, jdbcType=TIMESTAMP}
             </if>
             <if test="tenantId != null">
-                and RES.TENANT_ID_ = #{tenantId}
+                and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
             <if test="tenantIdLike != null">
-                and RES.TENANT_ID_ like #{tenantIdLike}
+                and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=VARCHAR}
             </if>
             <if test="withoutTenantId">
                 and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')

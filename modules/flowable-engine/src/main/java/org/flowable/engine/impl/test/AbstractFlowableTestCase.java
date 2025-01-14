@@ -238,6 +238,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         assertTrue(Objects.equals(historicActInst.getActivityType(), activityInstance.getActivityType()));
         assertTrue(Objects.equals(historicActInst.getProcessInstanceId(), activityInstance.getProcessInstanceId()));
         assertTrue(Objects.equals(historicActInst.getAssignee(), activityInstance.getAssignee()));
+        assertTrue(Objects.equals(historicActInst.getCompletedBy(), activityInstance.getCompletedBy()));
         assertTrue(Objects.equals(historicActInst.getTransactionOrder(), activityInstance.getTransactionOrder()));
         assertTrue(Objects.equals(historicActInst.getDurationInMillis(), activityInstance.getDurationInMillis()));
         assertTrue(Objects.equals(historicActInst.getTenantId(), activityInstance.getTenantId()));
@@ -505,6 +506,21 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
             .deploymentId(deployment.getId()).singleResult();
+
+        return processDefinition;
+    }
+
+    protected ProcessDefinition deployProcessDefinition(String name, String path, String tenantId) {
+        Deployment deployment = repositoryService.createDeployment()
+                .name(name)
+                .addClasspathResource(path)
+                .tenantId(tenantId)
+                .deploy();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .processDefinitionTenantId(tenantId)
+                .singleResult();
 
         return processDefinition;
     }

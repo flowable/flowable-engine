@@ -111,7 +111,9 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
             FlowElement currentFlowElement = (FlowElement) parsedElement;
             currentFlowElement.setId(elementId);
-            currentFlowElement.setName(elementName);
+            if (currentFlowElement.getName() == null) {
+                currentFlowElement.setName(elementName);
+            }
 
             if (currentFlowElement instanceof FlowNode) {
                 FlowNode flowNode = (FlowNode) currentFlowElement;
@@ -162,12 +164,15 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         }
     }
 
-    public void convertToXML(XMLStreamWriter xtw, BaseElement baseElement, BpmnModel model) throws Exception {
+    public void convertToXML(XMLStreamWriter xtw, BaseElement baseElement, BpmnModel model, BpmnXMLConverterOptions options) throws Exception {
         xtw.writeStartElement(getXMLElementName());
         boolean didWriteExtensionStartElement = false;
         writeDefaultAttribute(ATTRIBUTE_ID, baseElement.getId(), xtw);
         if (baseElement instanceof FlowElement) {
-            writeDefaultAttribute(ATTRIBUTE_NAME, ((FlowElement) baseElement).getName(), xtw);
+            String name = ((FlowElement) baseElement).getName();
+            if (!(options.isSaveElementNameWithNewLineInExtensionElement() && BpmnXMLUtil.containsNewLine(name))) {
+                writeDefaultAttribute(ATTRIBUTE_NAME, name, xtw);
+            }
         }
 
         if (baseElement instanceof FlowNode) {
@@ -219,6 +224,10 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                 xtw.writeStartElement(ELEMENT_DOCUMENTATION);
                 xtw.writeCharacters(flowElement.getDocumentation());
                 xtw.writeEndElement();
+            }
+
+            if (options.isSaveElementNameWithNewLineInExtensionElement()) {
+                didWriteExtensionStartElement = BpmnXMLUtil.writeElementNameExtensionElement(flowElement, didWriteExtensionStartElement, xtw);
             }
         }
 
@@ -588,6 +597,10 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
         if (StringUtils.isNotEmpty(conditionalDefinition.getConditionExpression())) {
             xtw.writeStartElement(ELEMENT_CONDITION);
+            if (conditionalDefinition.getConditionLanguage() != null) {
+                xtw.writeAttribute(XSI_PREFIX, XSI_NAMESPACE, "type", "tFormalExpression");
+                BpmnXMLUtil.writeDefaultAttribute(BpmnXMLConstants.ATTRIBUTE_SCRIPT_LANGUAGE, conditionalDefinition.getConditionLanguage(), xtw);
+            }
             xtw.writeCharacters(conditionalDefinition.getConditionExpression());
             xtw.writeEndElement();
         }

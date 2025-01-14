@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.impl.behavior.CmmnActivityWithMigrationContextBe
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -84,6 +85,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             TaskService taskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService();
             ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
+            PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
 
             TaskEntity taskEntity = taskService.createTask();
 
@@ -114,7 +116,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             
             handleTaskName(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-            handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity, beforeContext, migrationContext);
+            handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity, planItemInstanceEntityManager, beforeContext, migrationContext);
             handleOwner(planItemInstanceEntity, taskService, expressionManager, taskEntity, beforeContext);
             handlePriority(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleFormKey(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
@@ -207,8 +209,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleAssignee(PlanItemInstanceEntity planItemInstanceEntity, TaskService taskService,
-            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext,
-            MigrationContext migrationContext) {
+            ExpressionManager expressionManager, TaskEntity taskEntity, PlanItemInstanceEntityManager planItemInstanceEntityManager,
+            CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
         String assigneeStringValue = null;
         if (migrationContext != null && migrationContext.getAssignee() != null) {
@@ -226,6 +228,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             }
 
             taskService.changeTaskAssignee(taskEntity, assigneeValue);
+            planItemInstanceEntityManager.updateHumanTaskPlanItemInstanceAssignee(taskEntity, assigneeValue);
         }
     }
 

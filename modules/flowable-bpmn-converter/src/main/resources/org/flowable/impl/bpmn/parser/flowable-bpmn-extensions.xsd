@@ -55,7 +55,7 @@
   <attribute name="formKey" type="string">
     <annotation>
       <documentation>
-        Attribute used on a startEvent or a userTask.
+        Attribute used on a startEvent, userTask or serviceTask.
         The value can be anything. The default form support in Flowable
         assumes that this is a reference to a form html file used in the deployment
         of the process definition. But this key can also be something completely different,
@@ -81,7 +81,7 @@
         Allows to specify a custom class that will be called during the parsing
         of the form information. This way, it is possible to use custom forms and form handling.
         This class must implement the
-        org.activiti.engine.inpl.form.FormHamdler/StartFormHandler/taskFormHandler interface
+        org.activiti.engine.impl.form.FormHandler/StartFormHandler/taskFormHandler interface
         (specific interface depending on the activity).
       </documentation>
     </annotation>
@@ -96,8 +96,8 @@
   <element name="formProperty">
     <annotation>
       <documentation>
-        Subelement of the extensionsElement of activities that support forms.
-        Allows to specifies properties (!= process variables) for a form. See documentation chapter on
+        Sub element of the extensionsElement of activities that support forms.
+        Allows to specify properties (!= process variables) for a form. See documentation chapter on
         form properties.
       </documentation>
     </annotation>
@@ -382,6 +382,14 @@
     <annotation>
       <documentation>
         The topic that should be used for external worker tasks.
+      </documentation>
+    </annotation>
+  </attribute>
+
+  <attribute name="doNotIncludeVariables" type="boolean">
+    <annotation>
+      <documentation>
+        Mark an external worker task to explicit not include the variables.
       </documentation>
     </annotation>
   </attribute>

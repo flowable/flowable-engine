@@ -70,6 +70,9 @@ public class BatchPartEntityManagerImpl
         batchPartEntity.setBatchSearchKey(parentBatch.getBatchSearchKey());
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);
+        if (parentBatch.getTenantId() != null) {
+            batchPartEntity.setTenantId(parentBatch.getTenantId());
+        }
         batchPartEntity.setCreateTime(getClock().getCurrentTime());
         insert(batchPartEntity);
         

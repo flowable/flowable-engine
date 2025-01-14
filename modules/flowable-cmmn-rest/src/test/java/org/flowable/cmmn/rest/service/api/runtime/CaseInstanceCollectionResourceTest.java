@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -262,6 +263,28 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         } finally {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
+    }
+
+    /**
+     * Test getting a list of case instance, using all tenant filters.
+     */
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testSortByBusinessKey() throws Exception {
+        String businessKey3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey3").start().getId();
+        String businessKey1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey1").start().getId();
+        String businessKey2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("businessKey2").start().getId();
+
+        // Test without any parameters
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION);
+        assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey1, businessKey2);
+
+        // Sort by businessKey time
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=businessKey";
+        assertResultsExactlyPresentInDataResponse(url, businessKey1, businessKey2, businessKey3);
+
+        // Sort by businessKey time desc
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?sort=businessKey&order=desc";
+        assertResultsExactlyPresentInDataResponse(url, businessKey3, businessKey2, businessKey1);
     }
 
     /**
@@ -929,4 +952,88 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
     }
 
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/caseWithStartFormAndServiceTask.cmmn" })
+    public void testAllVariablesAreApplied() {
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("caseWithStartFormAndServiceTask").singleResult();
+
+        runUsingMocks(() -> {
+            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
+
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId(), caseDefinition.getTenantId(),
+                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
+
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_START_FORM, caseDefinition.getId());
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + " id: 'formDefId',"
+                            + " key: 'formDefKey',"
+                            + " name: 'Form Definition Name',"
+                            + " type: 'startForm',"
+                            + " definitionKey: 'caseWithStartFormAndServiceTask'"
+                            + "}");
+
+            ArrayNode formVariablesNode = objectMapper.createArrayNode();
+
+            // String variable
+            ObjectNode stringVarNode = formVariablesNode.addObject();
+            stringVarNode.put("name", "user");
+            stringVarNode.put("value", "simple string value");
+            stringVarNode.put("type", "string");
+
+            ObjectNode integerVarNode = formVariablesNode.addObject();
+            integerVarNode.put("name", "number");
+            integerVarNode.put("value", 1234);
+            integerVarNode.put("type", "integer");
+
+            ArrayNode variablesNode = objectMapper.createArrayNode();
+            stringVarNode = variablesNode.addObject();
+            stringVarNode.put("name", "userVariable");
+            stringVarNode.put("value", "simple string value");
+            stringVarNode.put("type", "string");
+
+            ArrayNode transientVariablesNode = objectMapper.createArrayNode();
+            stringVarNode = transientVariablesNode.addObject();
+            stringVarNode.put("name", "userTransient");
+            stringVarNode.put("value", "simple transient value");
+            stringVarNode.put("type", "string");
+
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            requestNode.set("startFormVariables", formVariablesNode);
+            requestNode.set("variables", variablesNode);
+            requestNode.set("transientVariables", transientVariablesNode);
+            requestNode.put("caseDefinitionKey", "caseWithStartFormAndServiceTask");
+
+            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
+                    .thenReturn(formInfo);
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineFormService.getVariablesFromFormSubmission(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, formInfo,
+                    Map.of("user", "simple string value", "number", 1234), null))
+                    .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+            responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+            String instanceId = responseNode.get("id").asText();
+            assertThat(runtimeService.getVariables(instanceId).entrySet()).extracting(Map.Entry::getKey, Map.Entry::getValue).containsExactlyInAnyOrder(
+                    tuple("user", "simple string value return"),
+                    tuple("number", 1234L),
+                    tuple("userVariable", "simple string value"),
+                    tuple("userTransient", "simple transient value")
+            );
+        });
+    }
 }

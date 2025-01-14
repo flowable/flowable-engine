@@ -8,43 +8,45 @@
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
               NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
               LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
-              START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, EXTRA_VALUE_, IS_COUNT_ENABLED_, 
+              START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, EXTRA_VALUE_, IS_COUNT_ENABLED_,
               VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
-            #{id ,jdbcType=VARCHAR},
-            1, #{caseDefinitionId ,jdbcType=VARCHAR},
-            #{derivedCaseDefinitionId ,jdbcType=VARCHAR},
-            #{caseInstanceId ,jdbcType=VARCHAR},
-            #{stageInstanceId ,jdbcType=VARCHAR},
+            #{id, jdbcType=VARCHAR},
+            1, #{caseDefinitionId, jdbcType=VARCHAR},
+            #{derivedCaseDefinitionId, jdbcType=VARCHAR},
+            #{caseInstanceId, jdbcType=VARCHAR},
+            #{stageInstanceId, jdbcType=VARCHAR},
             #{isStage, jdbcType=BOOLEAN},
-            #{elementId ,jdbcType=VARCHAR},
+            #{elementId, jdbcType=VARCHAR},
             #{planItemDefinitionId, jdbcType=VARCHAR},
             #{planItemDefinitionType, jdbcType=VARCHAR},
-            #{name ,jdbcType=VARCHAR},
-            #{state ,jdbcType=VARCHAR},
-            #{createTime ,jdbcType=TIMESTAMP},
-            #{lastAvailableTime ,jdbcType=TIMESTAMP},
-            #{lastUnavailableTime ,jdbcType=TIMESTAMP},
-            #{lastEnabledTime ,jdbcType=TIMESTAMP},
-            #{lastDisabledTime ,jdbcType=TIMESTAMP},
-            #{lastStartedTime ,jdbcType=TIMESTAMP},
-            #{lastSuspendedTime ,jdbcType=TIMESTAMP},
-            #{completedTime ,jdbcType=TIMESTAMP},
-            #{occurredTime ,jdbcType=TIMESTAMP},
-            #{terminatedTime ,jdbcType=TIMESTAMP},
-            #{exitTime ,jdbcType=TIMESTAMP},
-            #{endedTime ,jdbcType=TIMESTAMP},
-            #{startUserId ,jdbcType=VARCHAR},
-            #{referenceId ,jdbcType=VARCHAR},
-            #{referenceType ,jdbcType=VARCHAR},
-            #{completable ,jdbcType=BOOLEAN},
+            #{name, jdbcType=NVARCHAR},
+            #{state, jdbcType=VARCHAR},
+            #{createTime, jdbcType=TIMESTAMP},
+            #{lastAvailableTime, jdbcType=TIMESTAMP},
+            #{lastUnavailableTime, jdbcType=TIMESTAMP},
+            #{lastEnabledTime, jdbcType=TIMESTAMP},
+            #{lastDisabledTime, jdbcType=TIMESTAMP},
+            #{lastStartedTime, jdbcType=TIMESTAMP},
+            #{lastSuspendedTime, jdbcType=TIMESTAMP},
+            #{completedTime, jdbcType=TIMESTAMP},
+            #{occurredTime, jdbcType=TIMESTAMP},
+            #{terminatedTime, jdbcType=TIMESTAMP},
+            #{exitTime, jdbcType=TIMESTAMP},
+            #{endedTime, jdbcType=TIMESTAMP},
+            #{startUserId, jdbcType=VARCHAR},
+            #{assignee, jdbcType=NVARCHAR},
+            #{completedBy, jdbcType=NVARCHAR},
+            #{referenceId, jdbcType=VARCHAR},
+            #{referenceType, jdbcType=VARCHAR},
+            #{completable, jdbcType=BOOLEAN},
             #{entryCriterionId, jdbcType=VARCHAR},
             #{exitCriterionId, jdbcType=VARCHAR},
             #{extraValue, jdbcType=VARCHAR},
             #{countEnabled, jdbcType=BOOLEAN},
             #{variableCount, jdbcType=INTEGER},
             #{sentryPartInstanceCount, jdbcType=INTEGER},
-            #{tenantId ,jdbcType=VARCHAR}
+            #{tenantId, jdbcType=VARCHAR}
         )
     </insert>
 
@@ -52,35 +54,37 @@
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
-                                                     ENDED_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
+                                                     ENDED_TIME_, START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                      EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
     values
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
-        	#{planItemInstance.id ,jdbcType=VARCHAR},
-            1, #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
-            #{planItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
-            #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
-            #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+        	#{planItemInstance.id, jdbcType=VARCHAR},
+            1, #{planItemInstance.caseDefinitionId, jdbcType=VARCHAR},
+            #{planItemInstance.derivedCaseDefinitionId, jdbcType=VARCHAR},
+            #{planItemInstance.caseInstanceId, jdbcType=VARCHAR},
+            #{planItemInstance.stageInstanceId, jdbcType=VARCHAR},
             #{planItemInstance.isStage, jdbcType=BOOLEAN},
-            #{planItemInstance.elementId ,jdbcType=VARCHAR},
+            #{planItemInstance.elementId, jdbcType=VARCHAR},
             #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
             #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
-            #{planItemInstance.name ,jdbcType=VARCHAR},
-            #{planItemInstance.state ,jdbcType=VARCHAR},
-            #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastUnavailableTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.completedTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.occurredTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.exitTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.endedTime ,jdbcType=TIMESTAMP},
-            #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+            #{planItemInstance.name, jdbcType=NVARCHAR},
+            #{planItemInstance.state, jdbcType=VARCHAR},
+            #{planItemInstance.createTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastAvailableTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastUnavailableTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastEnabledTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastDisabledTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastStartedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.lastSuspendedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.completedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.occurredTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.startUserId, jdbcType=VARCHAR},
+            #{planItemInstance.assignee, jdbcType=NVARCHAR},
+            #{planItemInstance.completedBy, jdbcType=NVARCHAR},
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.completable, jdbcType=BOOLEAN},
@@ -90,7 +94,7 @@
             #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
             #{planItemInstance.variableCount, jdbcType=INTEGER},
             #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
-            #{planItemInstance.tenantId ,jdbcType=VARCHAR}
+            #{planItemInstance.tenantId, jdbcType=VARCHAR}
         )
       </foreach>
   </insert>
@@ -101,33 +105,35 @@
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                       NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
                                                       LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
-                                                      START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
+                                                      START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                       EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
-                #{planItemInstance.id ,jdbcType=VARCHAR},
-                1, #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
-                #{planItemInstance.derivedCaseDefinitionId ,jdbcType=VARCHAR},
-                #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
-                #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
-                #{planItemInstance.isStage ,jdbcType=VARCHAR},
-                #{planItemInstance.elementId ,jdbcType=VARCHAR},
+                #{planItemInstance.id, jdbcType=VARCHAR},
+                1, #{planItemInstance.caseDefinitionId, jdbcType=VARCHAR},
+                #{planItemInstance.derivedCaseDefinitionId, jdbcType=VARCHAR},
+                #{planItemInstance.caseInstanceId, jdbcType=VARCHAR},
+                #{planItemInstance.stageInstanceId, jdbcType=VARCHAR},
+                #{planItemInstance.isStage, jdbcType=BOOLEAN},
+                #{planItemInstance.elementId, jdbcType=VARCHAR},
                 #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
                 #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
-                #{planItemInstance.name ,jdbcType=VARCHAR},
-                #{planItemInstance.state ,jdbcType=VARCHAR},
-                #{planItemInstance.createTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastAvailableTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastUnavailableTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastEnabledTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastDisabledTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastStartedTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.lastSuspendedTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.completedTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.occurredTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.terminatedTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.exitTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.endedTime ,jdbcType=TIMESTAMP},
-                #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+                #{planItemInstance.name, jdbcType=NVARCHAR},
+                #{planItemInstance.state, jdbcType=VARCHAR},
+                #{planItemInstance.createTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastAvailableTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastUnavailableTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastEnabledTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastDisabledTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastStartedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.lastSuspendedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.completedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.occurredTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.startUserId, jdbcType=VARCHAR},
+                #{planItemInstance.assignee, jdbcType=NVARCHAR},
+                #{planItemInstance.completedBy, jdbcType=NVARCHAR},
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
                 #{planItemInstance.completable, jdbcType=BOOLEAN},
@@ -137,7 +143,7 @@
                 #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
                 #{planItemInstance.variableCount, jdbcType=INTEGER},
                 #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
-                #{planItemInstance.tenantId ,jdbcType=VARCHAR}
+                #{planItemInstance.tenantId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -172,7 +178,7 @@
             ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.name != name">
-            NAME_ = #{name, jdbcType=VARCHAR},
+            NAME_ = #{name, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.state != state">
             STATE_ = #{state, jdbcType=VARCHAR},
@@ -216,6 +222,12 @@
         <if test="originalPersistentState.startUserId != startUserId">
             START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.assignee != assignee">
+            ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
+        </if>
+        <if test="originalPersistentState.completedBy != completedBy">
+            COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
+        </if>
         <if test="originalPersistentState.referenceId != referenceId">
             REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
         </if>
@@ -251,19 +263,19 @@
 </update>
 
   <delete id="deletePlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
-    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <delete id="deletePlanItemInstancesByCaseDefinitionId" parameterType="string">
-    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_DEF_ID_ = #{value}
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
   </delete>
 
   <delete id="deletePlanItemInstancesByStageInstanceId" parameterType="string">
-    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{value}
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR}
   </delete>
 
   <delete id="deletePlanItemInstancesByCaseInstanceId" parameterType="string">
-    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{value}
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
   </delete>
 
   <!--
@@ -280,7 +292,7 @@
     <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
     <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR" />
     <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
     <result property="lastAvailableTime" column="LAST_AVAILABLE_TIME_" jdbcType="TIMESTAMP"/>
@@ -295,6 +307,8 @@
     <result property="exitTime" column="EXIT_TIME_" jdbcType="TIMESTAMP"/>
     <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR" />
+    <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
     <result property="completable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
@@ -308,28 +322,51 @@
     <!-- Do not forget to update selectCaseInstanceAndAllPlanItemInstances select when adding/changing columns of planItemInstance -->
   </resultMap>
 
-  <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
+    <resultMap id="planItemInstanceResultMapWithVariables" type="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl" extends="planItemInstanceResultMap">
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+                    ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
+            <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
+            <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR"/>
+            <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR"/>
+            <result property="revision" column="VAR_REV_" jdbcType="INTEGER"/>
+            <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR"/>
+            <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR"/>
+            <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR"/>
+            <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
+            <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+            <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+            <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
+            <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
+            <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
+            <result property="textValue" column="VAR_TEXT_" jdbcType="NVARCHAR"/>
+            <result property="textValue2" column="VAR_TEXT2_" jdbcType="NVARCHAR"/>
+            <result property="longValue" column="VAR_LONG_" jdbcType="BIGINT"/>
+        </collection>
+    </resultMap>
+
+
+    <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
   <select id="selectPlanItemInstancesByCaseInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-      where CASE_INST_ID_ = #{parameter}
+      where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
   <select id="selectPlanItemInstancesByCaseInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-      where CASE_INST_ID_ = #{parameter.caseInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
+      where CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR} and ELEMENT_ID_ = #{parameter.planItemId, jdbcType=VARCHAR}
   </select>
 
     <select id="selectPlanItemInstancesByStageInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-        where STAGE_INST_ID_ = #{parameter.stageInstanceId} and ELEMENT_ID_ = #{parameter.planItemId}
+        where STAGE_INST_ID_ = #{parameter.stageInstanceId, jdbcType=VARCHAR} and ELEMENT_ID_ = #{parameter.planItemId, jdbcType=VARCHAR}
     </select>
 
   <select id="selectPlanItemInstancesByStagePlanItemInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-      where STAGE_INST_ID_ = #{parameter}
+      where STAGE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
 
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
@@ -340,6 +377,28 @@
         <if test="needsPaging">${limitAfter}</if>
   </select>
 
+    <select id="selectPlanItemInstancesWithLocalVariablesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMapWithVariables">
+        SELECT RES.*
+        <if test="includeLocalVariables">,
+            VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+            VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as
+            VAR_TASK_ID_, VAR.SCOPE_ID_ as VAR_SCOPE_ID_, VAR.SUB_SCOPE_ID_ as VAR_SUB_SCOPE_ID_, VAR.SCOPE_TYPE_ as VAR_SCOPE_TYPE_,
+            VAR.META_INFO_ as VAR_META_INFO_,
+            VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_,
+            VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+        </if>
+        FROM (
+        <!-- top 100 percent is only needed when doing order by in a subselect -->
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT <if test="_databaseId == 'mssql'">top 100 percent</if> RES.* <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+        ) RES
+        left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SUB_SCOPE_ID_ and VAR.SCOPE_TYPE_= 'cmmn'
+        ${outerJoinOrderBy}
+    </select>
+
   <select id="selectPlanItemInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultType="long">
         select count(RES.ID_)
         <include refid="selectPlanItemInstancesByQueryCriteriaSql"/>
@@ -349,109 +408,109 @@
     from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
     <where>
         <if test="caseDefinitionId != null">
-            RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            RES.CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
         </if>
         <if test="derivedCaseDefinitionId != null">
-            RES.DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId}
+            RES.DERIVED_CASE_DEF_ID_ = #{derivedCaseDefinitionId, jdbcType=VARCHAR}
         </if>
         <if test="caseInstanceId != null">
-            and RES.CASE_INST_ID_ = #{caseInstanceId}
+            and RES.CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="stageInstanceId != null">
-            and RES.STAGE_INST_ID_ = #{stageInstanceId}
+            and RES.STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="planItemInstanceId != null">
-            and RES.ID_ = #{planItemInstanceId}
+            and RES.ID_ = #{planItemInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="elementId != null">
-            and RES.ELEMENT_ID_ = #{elementId}
+            and RES.ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR}
         </if>
         <if test="planItemDefinitionId != null">
-            and RES.ITEM_DEFINITION_ID_ = #{planItemDefinitionId}
+            and RES.ITEM_DEFINITION_ID_ = #{planItemDefinitionId, jdbcType=VARCHAR}
         </if>
         <if test="planItemDefinitionType != null">
-            and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType}
+            and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR}
         </if>
         <if test="planItemDefinitionTypes != null">
-             and RES.ITEM_DEFINITION_TYPE_ in <foreach item="type" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{type}</foreach>
+             and RES.ITEM_DEFINITION_TYPE_ in <foreach item="planItemDefinitionType" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{planItemDefinitionType, jdbcType=VARCHAR}</foreach>
         </if>
         <if test="name != null">
-            and RES.NAME_ = #{name}
+            and RES.NAME_ = #{name, jdbcType=NVARCHAR}
         </if>
         <if test="state != null">
-            and RES.STATE_ = #{state}
+            and RES.STATE_ = #{state, jdbcType=VARCHAR}
         </if>
         <if test="createdBefore != null">
-            and RES.CREATE_TIME_ &lt;= #{createdBefore}
+            and RES.CREATE_TIME_ &lt;= #{createdBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="createdAfter != null">
-            and RES.CREATE_TIME_ &gt;= #{createdAfter}
+            and RES.CREATE_TIME_ &gt;= #{createdAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastAvailableBefore != null">
-            and RES.LAST_AVAILABLE_TIME_ &lt;= #{lastAvailableBefore}
+            and RES.LAST_AVAILABLE_TIME_ &lt;= #{lastAvailableBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastAvailableAfter != null">
-            and RES.LAST_AVAILABLE_TIME_ &gt;= #{lastAvailableAfter}
+            and RES.LAST_AVAILABLE_TIME_ &gt;= #{lastAvailableAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastUnavailableBefore != null">
-            and RES.LAST_UNAVAILABLE_TIME_ &lt;= #{lastUnavailableBefore}
+            and RES.LAST_UNAVAILABLE_TIME_ &lt;= #{lastUnavailableBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastUnavailableAfter != null">
-            and RES.LAST_UNAVAILABLE_TIME_ &gt;= #{lastUnavailableAfter}
+            and RES.LAST_UNAVAILABLE_TIME_ &gt;= #{lastUnavailableAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastEnabledBefore != null">
-            and RES.LAST_ENABLED_TIME_ &lt;= #{lastEnabledBefore}
+            and RES.LAST_ENABLED_TIME_ &lt;= #{lastEnabledBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastEnabledAfter != null">
-            and RES.LAST_ENABLED_TIME_ &gt;= #{lastEnabledAfter}
+            and RES.LAST_ENABLED_TIME_ &gt;= #{lastEnabledAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastDisabledBefore != null">
-            and RES.LAST_DISABLED_TIME_ &lt;= #{lastDisabledBefore}
+            and RES.LAST_DISABLED_TIME_ &lt;= #{lastDisabledBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastDisabledAfter != null">
-            and RES.LAST_DISABLED_TIME_ &gt;= #{lastDisabledAfter}
+            and RES.LAST_DISABLED_TIME_ &gt;= #{lastDisabledAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastStartedBefore != null">
-            and RES.LAST_STARTED_TIME_ &lt;= #{lastStartedBefore}
+            and RES.LAST_STARTED_TIME_ &lt;= #{lastStartedBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastStartedAfter != null">
-            and RES.LAST_STARTED_TIME_ &gt;= #{lastStartedAfter}
+            and RES.LAST_STARTED_TIME_ &gt;= #{lastStartedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="lastSuspendedBefore != null">
-            and RES.LAST_SUSPENDED_TIME_ &lt;= #{lastSuspendedBefore}
+            and RES.LAST_SUSPENDED_TIME_ &lt;= #{lastSuspendedBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="lastSuspendedAfter != null">
-            and RES.LAST_SUSPENDED_TIME_ &gt;= #{lastSuspendedAfter}
+            and RES.LAST_SUSPENDED_TIME_ &gt;= #{lastSuspendedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="completedBefore != null">
-            and RES.COMPLETED_TIME_ &lt;= #{completedBefore}
+            and RES.COMPLETED_TIME_ &lt;= #{completedBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="completedAfter != null">
-            and RES.COMPLETED_TIME_ &gt;= #{completedAfter}
+            and RES.COMPLETED_TIME_ &gt;= #{completedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="occurredBefore != null">
-            and RES.OCCURRED_TIME_ &lt;= #{occurredBefore}
+            and RES.OCCURRED_TIME_ &lt;= #{occurredBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="occurredAfter != null">
-            and RES.OCCURRED_TIME_ &gt;= #{occurredAfter}
+            and RES.OCCURRED_TIME_ &gt;= #{occurredAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="terminatedBefore != null">
-            and RES.TERMINATED_TIME_ &lt;= #{terminatedBefore}
+            and RES.TERMINATED_TIME_ &lt;= #{terminatedBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="terminatedAfter != null">
-            and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter}
+            and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="exitBefore != null">
-            and RES.EXIT_TIME_ &lt;= #{exitBefore}
+            and RES.EXIT_TIME_ &lt;= #{exitBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="exitAfter != null">
-            and RES.EXIT_TIME_ &gt;= #{exitAfter}
+            and RES.EXIT_TIME_ &gt;= #{exitAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="endedBefore != null">
-            and RES.ENDED_TIME_ &lt;= #{endedBefore}
+            and RES.ENDED_TIME_ &lt;= #{endedBefore, jdbcType=TIMESTAMP}
         </if>
         <if test="endedAfter != null">
-            and RES.ENDED_TIME_ &gt;= #{endedAfter}
+            and RES.ENDED_TIME_ &gt;= #{endedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="ended">
             and RES.ENDED_TIME_ is not null
@@ -463,13 +522,19 @@
             and RES.ENDED_TIME_ is null
         </if>
         <if test="startUserId != null">
-            and RES.START_USER_ID_ = #{startUserId}
+            and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
+        </if>
+        <if test="assignee != null">
+            and RES.ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR}
+        </if>
+        <if test="completedBy != null">
+            and RES.COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
         </if>
         <if test="referenceId != null">
-            and RES.REFERENCE_ID_ = #{referenceId}
+            and RES.REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR}
         </if>
         <if test="referenceType != null">
-            and RES.REFERENCE_TYPE_ = #{referenceType}
+            and RES.REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR}
         </if>
         <if test="completable">
             and RES.IS_COMPLETEABLE_ = #{completable, jdbcType=BOOLEAN}
@@ -490,7 +555,7 @@
             and RES.EXTRA_VALUE_ = #{extraValue, jdbcType=VARCHAR}
         </if>
         <if test="tenantId != null">
-            and RES.TENANT_ID_ = #{tenantId}
+            and RES.TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
         </if>
         <if test="withoutTenantId">
             and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
@@ -500,7 +565,7 @@
                 and
                 (
                   <if test="involvedUser != null">
-                    I.USER_ID_ = #{involvedUser}
+                    I.USER_ID_ = #{involvedUser, jdbcType=NVARCHAR}
                   </if>
                   <if test="involvedUser != null &amp;&amp; involvedGroups != null &amp;&amp; !involvedGroups.empty">
                     or
@@ -512,9 +577,9 @@
                         or
                         </if>
                         I.GROUP_ID_ IN
-                        <foreach item="group" index="index" collection="involvedGroupListItem"
+                        <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
                               open="(" separator="," close=")">
-                          #{group}
+                          #{involvedGroup, jdbcType=NVARCHAR}
                         </foreach>
                     </foreach>
                     )
@@ -526,7 +591,7 @@
           <choose>
             <when test="queryVariableValue.operator.equals('EXISTS')">
               and EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                 <if test="!queryVariableValue.local">
                     and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
                 </if>
@@ -537,7 +602,7 @@
             </when>
             <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
               and NOT EXISTS (
-                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name}
+                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
                 <if test="!queryVariableValue.local">
                     and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
                 </if>
@@ -562,10 +627,10 @@
                         </if>
                         <if test="queryVariableValue.name != null">
                             <!-- Match-all variable-names when name is null -->
-                            and V.NAME_= #{queryVariableValue.name}
+                            and V.NAME_= #{queryVariableValue.name, jdbcType=NVARCHAR}
                         </if>
                         <if test="queryVariableValue.needsTypeCheck()">
-                            and V.TYPE_ = #{queryVariableValue.type}
+                            and V.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
                         </if>
                         <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                             <choose>
@@ -580,7 +645,7 @@
                                 <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
                                 <otherwise><include refid="variableOperator" /></otherwise>
                             </choose>
-                            #{queryVariableValue.textValue}
+                            #{queryVariableValue.textValue, jdbcType=NVARCHAR}
                             <choose>
                                 <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
                             </choose>
@@ -595,7 +660,7 @@
                                 <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
                                 <otherwise><include refid="variableOperator" /></otherwise>
                             </choose>
-                            #{queryVariableValue.textValue2}
+                            #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
                             <choose>
                                 <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
                             </choose>
@@ -603,7 +668,7 @@
                         <if test="queryVariableValue.longValue != null">
                             and (V.LONG_
                             <include refid="variableOperator" />
-                            #{queryVariableValue.longValue}
+                            #{queryVariableValue.longValue, jdbcType=BIGINT}
                             <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                 or V.LONG_ is null
                             </if>
@@ -612,7 +677,7 @@
                         <if test="queryVariableValue.doubleValue != null">
                             and (V.DOUBLE_
                             <include refid="variableOperator" />
-                            #{queryVariableValue.doubleValue}
+                            #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
                             <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
                                 or V.DOUBLE_ is null
                             </if>
@@ -634,6 +699,303 @@
             </otherwise>
         </choose>
       </foreach>
+        <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+            and
+            <trim prefix="(" prefixOverrides="OR" suffix=")">
+                <if test="orQueryObject.caseDefinitionId != null">
+                    or RES.CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.derivedCaseDefinitionId != null">
+                    or RES.DERIVED_CASE_DEF_ID_ = #{orQueryObject.derivedCaseDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.caseInstanceId != null">
+                    or RES.CASE_INST_ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.stageInstanceId != null">
+                    or RES.STAGE_INST_ID_ = #{orQueryObject.stageInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemInstanceId != null">
+                    or RES.ID_ = #{orQueryObject.planItemInstanceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.elementId != null">
+                    or RES.ELEMENT_ID_ = #{orQueryObject.elementId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionId != null">
+                    or RES.ITEM_DEFINITION_ID_ = #{orQueryObject.planItemDefinitionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionType != null">
+                    or RES.ITEM_DEFINITION_TYPE_ = #{orQueryObject.planItemDefinitionType, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.planItemDefinitionTypes != null">
+                    or RES.ITEM_DEFINITION_TYPE_ in
+                    <foreach item="planItemDefinitionType" index="index" collection="orQueryObject.planItemDefinitionTypes" open="(" separator="," close=")">
+                        #{planItemDefinitionType, jdbcType=VARCHAR}
+                    </foreach>
+                </if>
+                <if test="orQueryObject.name != null">
+                    or RES.NAME_ = #{orQueryObject.name, jdbcType=NVARCHAR}
+                </if>
+                <if test="orQueryObject.state != null">
+                    or RES.STATE_ = #{orQueryObject.state, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.createdBefore != null">
+                    or RES.CREATE_TIME_ &lt;= #{orQueryObject.createdBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.createdAfter != null">
+                    or RES.CREATE_TIME_ &gt;= #{orQueryObject.createdAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastAvailableBefore != null">
+                    or RES.LAST_AVAILABLE_TIME_ &lt;= #{orQueryObject.lastAvailableBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastAvailableAfter != null">
+                    or RES.LAST_AVAILABLE_TIME_ &gt;= #{orQueryObject.lastAvailableAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastUnavailableBefore != null">
+                    or RES.LAST_UNAVAILABLE_TIME_ &lt;= #{orQueryObject.lastUnavailableBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastUnavailableAfter != null">
+                    or RES.LAST_UNAVAILABLE_TIME_ &gt;= #{orQueryObject.lastUnavailableAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastEnabledBefore != null">
+                    or RES.LAST_ENABLED_TIME_ &lt;= #{orQueryObject.lastEnabledBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastEnabledAfter != null">
+                    or RES.LAST_ENABLED_TIME_ &gt;= #{orQueryObject.lastEnabledAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastDisabledBefore != null">
+                    or RES.LAST_DISABLED_TIME_ &lt;= #{orQueryObject.lastDisabledBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastDisabledAfter != null">
+                    or RES.LAST_DISABLED_TIME_ &gt;= #{orQueryObject.lastDisabledAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastStartedBefore != null">
+                    or RES.LAST_STARTED_TIME_ &lt;= #{orQueryObject.lastStartedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastStartedAfter != null">
+                    or RES.LAST_STARTED_TIME_ &gt;= #{orQueryObject.lastStartedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastSuspendedBefore != null">
+                    or RES.LAST_SUSPENDED_TIME_ &lt;= #{orQueryObject.lastSuspendedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.lastSuspendedAfter != null">
+                    or RES.LAST_SUSPENDED_TIME_ &gt;= #{orQueryObject.lastSuspendedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.completedBefore != null">
+                    or RES.COMPLETED_TIME_ &lt;= #{orQueryObject.completedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.completedAfter != null">
+                    or RES.COMPLETED_TIME_ &gt;= #{orQueryObject.completedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.occurredBefore != null">
+                    or RES.OCCURRED_TIME_ &lt;= #{orQueryObject.occurredBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.occurredAfter != null">
+                    or RES.OCCURRED_TIME_ &gt;= #{orQueryObject.occurredAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.terminatedBefore != null">
+                    or RES.TERMINATED_TIME_ &lt;= #{orQueryObject.terminatedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.terminatedAfter != null">
+                    or RES.TERMINATED_TIME_ &gt;= #{orQueryObject.terminatedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.exitBefore != null">
+                    or RES.EXIT_TIME_ &lt;= #{orQueryObject.exitBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.exitAfter != null">
+                    or RES.EXIT_TIME_ &gt;= #{orQueryObject.exitAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.endedBefore != null">
+                    or RES.ENDED_TIME_ &lt;= #{orQueryObject.endedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.endedAfter != null">
+                    or RES.ENDED_TIME_ &gt;= #{orQueryObject.endedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.ended">
+                    or RES.ENDED_TIME_ is not null
+                </if>
+                <if test="orQueryObject.startUserId != null">
+                    or RES.START_USER_ID_ = #{orQueryObject.startUserId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.assignee != null">
+                    or RES.ASSIGNEE_ = #{orQueryObject.assignee, jdbcType=NVARCHAR}
+                </if>
+                <if test="orQueryObject.completedBy != null">
+                    or RES.COMPLETED_BY_ = #{orQueryObject.completedBy, jdbcType=NVARCHAR}
+                </if>
+                <if test="orQueryObject.referenceId != null">
+                    or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.referenceType != null">
+                    or RES.REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.completable">
+                    or RES.IS_COMPLETEABLE_ = #{orQueryObject.completable, jdbcType=BOOLEAN}
+                </if>
+                <if test="orQueryObject.entryCriterionId != null">
+                    or RES.ENTRY_CRITERION_ID_ = #{orQueryObject.entryCriterionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.exitCriterionId != null">
+                    or RES.EXIT_CRITERION_ID_ = #{orQueryObject.exitCriterionId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.formKey != null">
+                    or RES.EXTRA_VALUE_ = #{orQueryObject.formKey, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.extraValue != null">
+                    or RES.EXTRA_VALUE_ = #{orQueryObject.extraValue, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.tenantId != null">
+                    or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=VARCHAR}
+                </if>
+                <if test="orQueryObject.withoutTenantId">
+                    or (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
+                </if>
+                <if test="orQueryObject.onlyStages">
+                    or RES.IS_STAGE_ = #{orQueryObject.onlyStages, jdbcType=BOOLEAN}
+                </if>
+                <if test="orQueryObject.involvedUser != null || orQueryObject.involvedGroups != null">
+                    or exists(select I.ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SUB_SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'planItem'
+                    and
+                    (
+                    <if test="orQueryObject.involvedUser != null">
+                        I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.involvedUser != null &amp;&amp; orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                        or
+                    </if>
+                    <if test="orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                        (
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                            <if test="groupIndex &gt; 0">
+                                or
+                            </if>
+                            I.GROUP_ID_ IN
+                            <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
+                                     open="(" separator="," close=")">
+                                #{involvedGroup, jdbcType=NVARCHAR}
+                            </foreach>
+                        </foreach>
+                        )
+                    </if>
+                    )
+                    )
+                </if>
+                <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">
+                    or
+                    <trim prefix="(" prefixOverrides="AND" suffix=")">
+                        <choose>
+                            <when test="queryVariableValue.operator.equals('EXISTS')">
+                                and EXISTS (
+                                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                <if test="!queryVariableValue.local">
+                                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                <if test="queryVariableValue.local">
+                                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                )
+                            </when>
+                            <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+                                and NOT EXISTS (
+                                select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                <if test="!queryVariableValue.local">
+                                    and RES.CASE_INST_ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                <if test="queryVariableValue.local">
+                                    and RES.ID_ = SUB_SCOPE_ID_ and SCOPE_TYPE_ = 'cmmn'
+                                </if>
+                                )
+                            </when>
+                            <otherwise>
+                                and exists (
+                                select 1
+                                from ${prefix}ACT_RU_VARIABLE V
+                                <where>
+                                    <if test="queryVariableValue.local">
+                                        and RES.ID_ = V.SUB_SCOPE_ID_
+                                        and V.SCOPE_TYPE_ = 'cmmn'
+                                    </if>
+                                    <if test="!queryVariableValue.local">
+                                        and RES.CASE_INST_ID_ = V.SCOPE_ID_
+                                        and V.SUB_SCOPE_ID_ is null
+                                        and V.SCOPE_TYPE_ = 'cmmn'
+                                    </if>
+                                    <if test="queryVariableValue.name != null">
+                                        <!-- Match-all variable-names when name is null -->
+                                        and V.NAME_= #{queryVariableValue.name, jdbcType=NVARCHAR}
+                                    </if>
+                                    <if test="queryVariableValue.needsTypeCheck()">
+                                        and V.TYPE_ = #{queryVariableValue.type, jdbcType=NVARCHAR}
+                                    </if>
+                                    <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                                and (lower(V.TEXT_)
+                                            </when>
+                                            <otherwise>
+                                                and (V.TEXT_
+                                            </otherwise>
+                                        </choose>
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                                            <otherwise><include refid="variableOperator" /></otherwise>
+                                        </choose>
+                                        #{queryVariableValue.textValue, jdbcType=NVARCHAR}
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                                        </choose>
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.TEXT_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <if test="queryVariableValue.textValue2 != null">
+                                        and V.TEXT2_
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                                            <otherwise><include refid="variableOperator" /></otherwise>
+                                        </choose>
+                                        #{queryVariableValue.textValue2, jdbcType=NVARCHAR}
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                                        </choose>
+                                    </if>
+                                    <if test="queryVariableValue.longValue != null">
+                                        and (V.LONG_
+                                        <include refid="variableOperator" />
+                                        #{queryVariableValue.longValue, jdbcType=BIGINT}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.LONG_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <if test="queryVariableValue.doubleValue != null">
+                                        and (V.DOUBLE_
+                                        <include refid="variableOperator" />
+                                        #{queryVariableValue.doubleValue, jdbcType=DOUBLE}
+                                        <if test="queryVariableValue.operator.equals('NOT_EQUALS') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">
+                                            or V.DOUBLE_ is null
+                                        </if>
+                                        )
+                                    </if>
+                                    <!-- Null variable type -->
+                                    <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                                        <choose>
+                                            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                                and (V.TEXT_ is not null or V.TEXT2_ is not null or V.LONG_ is not null or V.DOUBLE_ is not null or V.BYTEARRAY_ID_ is not null)
+                                            </when>
+                                            <otherwise>
+                                                and V.TEXT_ is null and V.TEXT2_ is null and V.LONG_ is null and V.DOUBLE_ is null and V.BYTEARRAY_ID_ is null
+                                            </otherwise>
+                                        </choose>
+                                    </if>
+                                </where>
+                                )
+                            </otherwise>
+                        </choose>
+                    </trim>
+                </foreach>
+            </trim>
+        </foreach>
     </where>
 
   </sql>
