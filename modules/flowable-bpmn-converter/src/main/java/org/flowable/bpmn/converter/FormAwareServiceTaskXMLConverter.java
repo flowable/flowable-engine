@@ -10,25 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.bpmn.parser.handler;
-
-import java.util.Set;
+package org.flowable.bpmn.converter;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.bpmn.model.FormAwareServiceTask;
 
 /**
- * @author Joram Barrez
+ * @author Christopher Welsch
  */
-public class ServiceTaskParseHandler extends AbstractServiceTaskParseHandler<ServiceTask> {
-
+public class FormAwareServiceTaskXMLConverter extends ServiceTaskXMLConverter {
+    
     @Override
-    public Class<? extends BaseElement> getHandledType() {
-        return ServiceTask.class;
-    }
-
-    @Override
-    public Set<Class<? extends BaseElement>> getHandledTypes() {
-        return Set.of(ServiceTask.class);
+    public Class<? extends BaseElement> getBpmnElementType() {
+        return FormAwareServiceTask.class;
     }
 }

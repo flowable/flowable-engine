@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+
+    <process id="process" name="process1" isExecutable="true">
+        <endEvent id="end"></endEvent>
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="servicetask"></sequenceFlow>
+        <serviceTask id="servicetask" name="FormAwareServiceTask" flowable:delegateExpression="${delegateExpression}" flowable:formKey="someFormKey" flowable:formFieldValidation="true">
+
+        </serviceTask>
+        <startEvent id="start"></startEvent>
+        <sequenceFlow id="flow2" sourceRef="servicetask" targetRef="end"></sequenceFlow>
+    </process>
+</definitions>

@@ -14,21 +14,29 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FormAwareServiceTask;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
+import org.flowable.engine.impl.bpmn.parser.BpmnParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * @author Joram Barrez
+ * @author Christopher Welsch
  */
-public class ServiceTaskParseHandler extends AbstractServiceTaskParseHandler<ServiceTask> {
+public class FormAwareServiceTaskParseHandler extends AbstractServiceTaskParseHandler<FormAwareServiceTask> {
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
-        return ServiceTask.class;
+        return FormAwareServiceTask.class;
     }
 
     @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
-        return Set.of(ServiceTask.class);
+        return Set.of(FormAwareServiceTask.class);
     }
+
 }
