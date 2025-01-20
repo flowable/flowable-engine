@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -273,6 +274,66 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         });
 
         assertThat(value).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testInvokeOnArrayNode() {
+        Map<String, Object> vars = new HashMap<>();
+        ArrayNode arrayNode = processEngineConfiguration.getObjectMapper().createArrayNode();
+        arrayNode.add("firstValue");
+        arrayNode.add("secondValue");
+        arrayNode.add(42);
+
+        vars.put("array", arrayNode);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        assertThat(getExpressionValue("${array.get(0).isTextual()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${array.get(0).textValue()}", processInstance)).isEqualTo("firstValue");
+        assertThat(getExpressionValue("${array.get(0).isNumber()}", processInstance)).isEqualTo(false);
+
+        assertThat(getExpressionValue("${array.get(2).isNumber()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${array.get(2).asInt()}", processInstance)).isEqualTo(42);
+        assertThat(getExpressionValue("${array.get(2).asLong()}", processInstance)).isEqualTo(42L);
+
+        assertThat(getExpressionValue("${array.get(1).textValue()}", processInstance)).isEqualTo("secondValue");
+        assertThat(getExpressionValue("${array.get(1).asLong(123)}", processInstance)).isEqualTo(123L);
+
+        assertThat(getExpressionValue("${array.get(3)}", processInstance)).isNull();
+        assertThat(getExpressionValue("${array.path(3).isMissingNode()}", processInstance)).isEqualTo(true);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testInvokeOnObjectNode() {
+        Map<String, Object> vars = new HashMap<>();
+        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        objectNode.put("firstAttribute", "foo");
+        objectNode.put("secondAttribute", "bar");
+        objectNode.put("thirdAttribute", 42);
+
+        vars.put("object", objectNode);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").isTextual()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").textValue()}", processInstance)).isEqualTo("foo");
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").isNumber()}", processInstance)).isEqualTo(false);
+
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").isNumber()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").asInt()}", processInstance)).isEqualTo(42);
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").asLong()}", processInstance)).isEqualTo(42L);
+
+        assertThat(getExpressionValue("${object.get(\"secondAttribute\").textValue()}", processInstance)).isEqualTo("bar");
+        assertThat(getExpressionValue("${object.get(\"secondAttribute\").asLong(123)}", processInstance)).isEqualTo(123L);
+
+        assertThat(getExpressionValue("${object.get(\"dummyAttribute\")}", processInstance)).isNull();
+        assertThat(getExpressionValue("${object.path(\"dummyAttribute\").isMissingNode()}", processInstance)).isEqualTo(true);
+    }
+  
+    private Object getExpressionValue(String expressionStr, ProcessInstance processInstance) {
+        Expression expression = this.processEngineConfiguration.getExpressionManager().createExpression(expressionStr);
+        return managementService.executeCommand(commandContext ->
+            expression.getValue((ExecutionEntity) runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()));
     }
 
     @ParameterizedTest

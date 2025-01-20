@@ -39,14 +39,14 @@ public class JsonNodeELResolver extends ELResolver {
     private final boolean readOnly;
 
     /**
-     * Creates a new read/write BeanELResolver.
+     * Creates a new read/write JsonNodeELResolver.
      */
     public JsonNodeELResolver() {
         this(false);
     }
 
     /**
-     * Creates a new BeanELResolver whose read-only status is determined by the given parameter.
+     * Creates a new JsonNodeELResolver whose read-only status is determined by the given parameter.
      */
     public JsonNodeELResolver(boolean readOnly) {
         this.readOnly = readOnly;
@@ -257,6 +257,38 @@ public class JsonNodeELResolver extends ELResolver {
         }
         return readOnly;
     }
+    
+    @Override
+	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+        if (!isResolvable(base)) {
+            return null;
+        }
+        if (method == null) {
+            return null;
+        }
+        if (params.length != 1) {
+            return null;
+        }
+        Object param = params[0];
+        if (!(param instanceof Long)) {
+            return null;
+        }
+
+        int index = ((Long) param).intValue();
+        String methodName = method.toString();
+        JsonNode node = (JsonNode) base;
+        if (methodName.equals("path")) {
+            JsonNode valueNode = node.path(index);
+            context.setPropertyResolved(true);
+            return valueNode;
+        } else if (methodName.equals("get")) {
+            JsonNode valueNode = node.get(index);
+            context.setPropertyResolved(true);
+            return valueNode;
+        }
+
+        return null;
+	}
 
     /**
      * If the base object is a map, attempts to set the value associated with the given key, as specified by the property argument. If the base is a Map, the propertyResolved property of the ELContext
