@@ -260,7 +260,7 @@ public class JsonNodeELResolver extends ELResolver {
     
     @Override
 	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-        if (!(base instanceof JsonNode)) {
+        if (!isResolvable(base)) {
             return null;
         }
         if (method == null) {
