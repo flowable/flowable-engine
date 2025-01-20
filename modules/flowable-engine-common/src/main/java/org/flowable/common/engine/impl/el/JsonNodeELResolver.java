@@ -14,11 +14,9 @@ package org.flowable.common.engine.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.flowable.common.engine.impl.javax.el.BeanELResolver;
 import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
@@ -39,7 +37,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JsonNodeELResolver extends ELResolver {
 
     private final boolean readOnly;
-    private final BeanELResolver beanELResolver;
 
     /**
      * Creates a new read/write JsonNodeELResolver.
@@ -53,7 +50,6 @@ public class JsonNodeELResolver extends ELResolver {
      */
     public JsonNodeELResolver(boolean readOnly) {
         this.readOnly = readOnly;
-        this.beanELResolver = new BeanELResolver(readOnly);
     }
 
     /**
@@ -264,32 +260,34 @@ public class JsonNodeELResolver extends ELResolver {
     
     @Override
 	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-        if (context == null) {
-            throw new NullPointerException("context is null");
+        if (!(base instanceof JsonNode)) {
+            return null;
+        }
+        if (method == null) {
+            return null;
+        }
+        if (params.length != 1) {
+            return null;
+        }
+        Object param = params[0];
+        if (!(param instanceof Long)) {
+            return null;
         }
 
-        Object result = null;
-        if (isResolvable(base)) {
-            // Use BeanELResolver to invoke the method.
-            // If a JsonNode method has a number as a parameter (e.g. an index) it is always an int (with the exception of methods like asLong, asDouble etc.).
-            // In JUEL expressions, literal numbers are treated as Long. Therefore, we are converting them to int here.
-            Object[] convertedParams;
-            if (params == null || method.toString().startsWith("as")) {
-                convertedParams = params;
-            } else {
-                convertedParams = Arrays.asList(params).stream().<Object>map(param -> {
-                    if (param instanceof Number) {
-                        return ((Number) param).intValue();
-                    } else {
-                        return param;
-                    }
-                }).toArray();
-            }
-            result = beanELResolver.invoke(context, base, method, paramTypes, convertedParams);
+        int index = ((Long) param).intValue();
+        String methodName = method.toString();
+        JsonNode node = (JsonNode) base;
+        if (methodName.equals("path")) {
+            JsonNode valueNode = node.path(index);
             context.setPropertyResolved(true);
+            return valueNode;
+        } else if (methodName.equals("get")) {
+            JsonNode valueNode = node.get(index);
+            context.setPropertyResolved(true);
+            return valueNode;
         }
 
-        return result;
+        return null;
 	}
 
     /**

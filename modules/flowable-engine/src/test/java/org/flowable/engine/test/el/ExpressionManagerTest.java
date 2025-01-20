@@ -15,7 +15,6 @@ package org.flowable.engine.test.el;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -289,16 +288,19 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         vars.put("array", arrayNode);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-        assertEquals(getExpressionValue("${array.get(0).isTextual()}", processInstance), true);
-        assertEquals(getExpressionValue("${array.get(0).textValue()}", processInstance), "firstValue");
-        assertEquals(getExpressionValue("${array.get(0).isNumber()}", processInstance), false);
+        assertThat(getExpressionValue("${array.get(0).isTextual()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${array.get(0).textValue()}", processInstance)).isEqualTo("firstValue");
+        assertThat(getExpressionValue("${array.get(0).isNumber()}", processInstance)).isEqualTo(false);
 
-        assertEquals(getExpressionValue("${array.get(2).isNumber()}", processInstance), true);
-        assertEquals(getExpressionValue("${array.get(2).asInt()}", processInstance), 42);
-        assertEquals(getExpressionValue("${array.get(2).asLong()}", processInstance), 42L);
+        assertThat(getExpressionValue("${array.get(2).isNumber()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${array.get(2).asInt()}", processInstance)).isEqualTo(42);
+        assertThat(getExpressionValue("${array.get(2).asLong()}", processInstance)).isEqualTo(42L);
 
-        assertEquals(getExpressionValue("${array.get(1).textValue()}", processInstance), "secondValue");
-        assertEquals(getExpressionValue("${array.get(1).asLong(123)}", processInstance), 123L);
+        assertThat(getExpressionValue("${array.get(1).textValue()}", processInstance)).isEqualTo("secondValue");
+        assertThat(getExpressionValue("${array.get(1).asLong(123)}", processInstance)).isEqualTo(123L);
+
+        assertThat(getExpressionValue("${array.get(3)}", processInstance)).isNull();
+        assertThat(getExpressionValue("${array.path(3).isMissingNode()}", processInstance)).isEqualTo(true);
     }
 
     @Test
@@ -313,16 +315,19 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         vars.put("object", objectNode);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 
-        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").isTextual()}", processInstance), true);
-        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").textValue()}", processInstance), "foo");
-        assertEquals(getExpressionValue("${object.get(\"firstAttribute\").isNumber()}", processInstance), false);
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").isTextual()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").textValue()}", processInstance)).isEqualTo("foo");
+        assertThat(getExpressionValue("${object.get(\"firstAttribute\").isNumber()}", processInstance)).isEqualTo(false);
 
-        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").isNumber()}", processInstance), true);
-        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").asInt()}", processInstance), 42);
-        assertEquals(getExpressionValue("${object.get(\"thirdAttribute\").asLong()}", processInstance), 42L);
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").isNumber()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").asInt()}", processInstance)).isEqualTo(42);
+        assertThat(getExpressionValue("${object.get(\"thirdAttribute\").asLong()}", processInstance)).isEqualTo(42L);
 
-        assertEquals(getExpressionValue("${object.get(\"secondAttribute\").textValue()}", processInstance), "bar");
-        assertEquals(getExpressionValue("${object.get(\"secondAttribute\").asLong(123)}", processInstance), 123L);
+        assertThat(getExpressionValue("${object.get(\"secondAttribute\").textValue()}", processInstance)).isEqualTo("bar");
+        assertThat(getExpressionValue("${object.get(\"secondAttribute\").asLong(123)}", processInstance)).isEqualTo(123L);
+
+        assertThat(getExpressionValue("${object.get(\"dummyAttribute\")}", processInstance)).isNull();
+        assertThat(getExpressionValue("${object.path(\"dummyAttribute\").isMissingNode()}", processInstance)).isEqualTo(true);
     }
   
     private Object getExpressionValue(String expressionStr, ProcessInstance processInstance) {
