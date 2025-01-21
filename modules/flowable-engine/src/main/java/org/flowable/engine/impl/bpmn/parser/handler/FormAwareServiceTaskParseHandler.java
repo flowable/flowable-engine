@@ -14,15 +14,8 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FormAwareServiceTask;
-import org.flowable.bpmn.model.ImplementationType;
-import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
-import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Christopher Welsch

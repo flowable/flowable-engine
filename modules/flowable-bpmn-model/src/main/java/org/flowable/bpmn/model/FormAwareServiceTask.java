@@ -12,8 +12,6 @@
  */
 package org.flowable.bpmn.model;
 
-import java.util.List;
-
 /**
  * @author Christopher Welsch
  */
