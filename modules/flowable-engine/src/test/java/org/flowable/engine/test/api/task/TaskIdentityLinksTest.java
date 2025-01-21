@@ -339,6 +339,20 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                 .extracting(IdentityLink::getGroupId)
                 .containsExactly("users");
 
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getUserId() != null)
+                    .extracting(HistoricIdentityLink::getUserId)
+                    .containsExactly("user");
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getGroupId() != null)
+                    .extracting(HistoricIdentityLink::getGroupId)
+                    .containsExactly("users");
+        }
+
         @SuppressWarnings("unchecked")
         Set<String> candidateUsers = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_USERS);
         assertThat(candidateUsers)
