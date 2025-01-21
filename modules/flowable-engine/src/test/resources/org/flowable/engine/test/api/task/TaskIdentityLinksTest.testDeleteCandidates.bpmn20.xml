@@ -14,7 +14,7 @@
       </extensionElements>
       <potentialOwner>
         <resourceAssignmentExpression>
-          <formalExpression>user(user),user(admin)</formalExpression>
+          <formalExpression>user(user),user(admin),group(users),group(admins)</formalExpression>
         </resourceAssignmentExpression>
       </potentialOwner>
     </userTask>

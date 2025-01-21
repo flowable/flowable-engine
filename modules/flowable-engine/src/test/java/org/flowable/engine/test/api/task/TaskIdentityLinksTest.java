@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -321,16 +322,46 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testDeleteCandidateUser.bpmn20.xml")
-    public void testDeleteCandidateUser() {
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testDeleteCandidates.bpmn20.xml")
+    public void testDeleteCandidates() {
         runtimeService.startProcessInstanceByKey("TaskIdentityLinks");
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
         assertThat(identityLinks)
+                .filteredOn(identityLink -> identityLink.getUserId() != null)
                 .extracting(IdentityLink::getUserId)
                 .containsExactly("user");
+
+        assertThat(identityLinks)
+                .filteredOn(identityLink -> identityLink.getGroupId() != null)
+                .extracting(IdentityLink::getGroupId)
+                .containsExactly("users");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getUserId() != null)
+                    .extracting(HistoricIdentityLink::getUserId)
+                    .containsExactly("user");
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getGroupId() != null)
+                    .extracting(HistoricIdentityLink::getGroupId)
+                    .containsExactly("users");
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<String> candidateUsers = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_USERS);
+        assertThat(candidateUsers)
+                .containsExactly("user");
+
+        @SuppressWarnings("unchecked")
+        Set<String> candidateGroups = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_GROUPS);
+        assertThat(candidateGroups)
+                .containsExactly("users");
     }
 
     @Test
