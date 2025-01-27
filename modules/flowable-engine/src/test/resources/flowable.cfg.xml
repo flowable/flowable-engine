@@ -70,6 +70,7 @@
     <property name="asyncHistoryEnabled" value="false" />
     <property name="enableEntityLinks" value="true" />
     <property name="enableProcessDefinitionHistoryLevel" value="true" />
+    <property name="enableSafeBpmnXml" value="true"/>
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
 
