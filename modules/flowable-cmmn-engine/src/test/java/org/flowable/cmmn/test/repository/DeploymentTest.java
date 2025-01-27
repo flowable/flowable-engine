@@ -244,4 +244,17 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         }
 
     }
+
+    @Test
+    public void deployingCaseModelWithEmptyCDATAShouldNotFail() {
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithEmptyCDATA.cmmn")
+                .deploy();
+        autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("myCase")
+                .singleResult();
+        assertThat(caseDefinition).isNotNull();
+
+    }
 }

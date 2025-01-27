@@ -281,7 +281,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 if (!enableSafeBpmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
-                    validateModel(xif.createXMLStreamReader(in));
+                    validateModel(new FlowableXMLStreamReader(xif.createXMLStreamReader(in)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new XMLException("The bpmn 2.0 xml is not properly encoded", e);
