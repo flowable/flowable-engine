@@ -175,7 +175,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 if (!enableSafeBpmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
-                    validateModel(xif.createXMLStreamReader(in));
+                    validateModel(new FlowableXMLStreamReader(xif.createXMLStreamReader(in)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new CmmnXMLException("The CMMN 1.1 xml is not properly encoded", e);
