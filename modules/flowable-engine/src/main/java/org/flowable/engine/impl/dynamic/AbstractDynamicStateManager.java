@@ -694,7 +694,7 @@ public abstract class AbstractDynamicStateManager {
         //Confirm that all the subProcessExecutions are in the executions pool
         List<ExecutionEntity> subProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
         
-        Set<String> executionIdsToMove = new HashSet<String>();
+        Set<String> executionIdsToMove = new HashSet<>();
         for (ExecutionEntity executionPoolItem : executionsPool) {
             executionIdsToMove.add(executionPoolItem.getId());
         }
