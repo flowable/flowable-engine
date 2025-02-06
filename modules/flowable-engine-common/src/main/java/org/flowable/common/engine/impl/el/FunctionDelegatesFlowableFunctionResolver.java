@@ -40,11 +40,11 @@ public class FunctionDelegatesFlowableFunctionResolver implements FlowableFuncti
     }
 
     @Override
-    public Method resolveFunction(String prefix, String localName) {
-        return resolveFunction(functionDelegateMap.get(prefix + ":" + localName));
+    public Method resolveFunction(String prefix, String localName) throws NoSuchMethodException {
+        return resolveFunction(functionDelegateMap.get(prefix + ":" + localName), prefix, localName);
     }
 
-    protected Method resolveFunction(FlowableFunctionDelegate functionDelegate) {
-        return functionDelegate != null ? functionDelegate.functionMethod() : null;
+    protected Method resolveFunction(FlowableFunctionDelegate functionDelegate, String prefix, String localName) throws NoSuchMethodException {
+        return functionDelegate != null ? functionDelegate.functionMethod(prefix, localName) : null;
     }
 }

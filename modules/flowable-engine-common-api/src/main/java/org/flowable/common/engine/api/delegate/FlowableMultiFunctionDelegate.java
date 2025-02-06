@@ -10,16 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.el;
+package org.flowable.common.engine.api.delegate;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 /**
  * @author Filip Hrisafov
  */
-@FunctionalInterface
-public interface FlowableFunctionResolver {
+public interface FlowableMultiFunctionDelegate extends FlowableFunctionDelegate {
 
-    Method resolveFunction(String prefix, String localName) throws NoSuchMethodException;
+    default String localName() {
+        throw new UnsupportedOperationException("Function has more than one local name");
+    }
 
+    Collection<String> localNames();
+
+    @Override
+    default Method functionMethod() {
+        throw new UnsupportedOperationException("Function Delegate has more than one function method");
+    }
+
+    @Override
+    Method functionMethod(String prefix, String localName) throws  NoSuchMethodException;
 }

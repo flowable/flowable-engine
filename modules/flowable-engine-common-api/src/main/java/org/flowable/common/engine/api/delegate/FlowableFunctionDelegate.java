@@ -59,6 +59,10 @@ public interface FlowableFunctionDelegate {
     /**
      * Returns the method that is invoked by JUEL.
      */
-    Method functionMethod();
-    
+    Method functionMethod() throws NoSuchMethodException;
+
+    default Method functionMethod(String prefix, String localName) throws NoSuchMethodException{
+        return functionMethod();
+    }
+
 }
