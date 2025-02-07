@@ -48,11 +48,17 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -1324,6 +1330,98 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
                     .singleResult();
 
             assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.childCaseWithAsyncFirstStep.cmmn")
+    public void testCaseTaskInMappingWithArrayNodeAsyncFirstPlanItem() {
+
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CaseTaskTest.testCaseTaskMappingMappingWithArrayNode.bpmn20.xml")
+                .deploy();
+
+        try {
+
+            ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+            ArrayNode arrayNode = objectMapper.createArrayNode();
+            for (int i = 0; i < 10; i++) {
+                ObjectNode arrayElement = objectMapper.createObjectNode();
+                arrayElement.put("field", "value-" + i);
+                arrayNode.add(arrayElement);
+            }
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myRootVariable", arrayNode);
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTaskMapping", variables);
+
+            List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+            assertThat(caseInstances).hasSize(10);
+
+            // The script task is async, so the change will only have happened after the job is executed
+            for (CaseInstance caseInstance : caseInstances) {
+                JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
+                assertThat(jsonNode.path("field").asText()).startsWith("value-");
+            }
+
+            for (Job job : cmmnManagementService.createJobQuery().list()) {
+                cmmnManagementService.executeJob(job.getId());
+            }
+
+            for (CaseInstance caseInstance : caseInstances) {
+                JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
+                assertThat(jsonNode.path("field").asText()).startsWith("CHANGED");
+            }
+
+            ArrayNode rootArrayNode = (ArrayNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myRootVariable");
+            assertThat(rootArrayNode).hasSize(10);
+            for (JsonNode rootArrayNodeElement : rootArrayNode) {
+                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            }
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.childCaseWithSyncFirstStep.cmmn")
+    public void testCaseTaskInMappingWithArrayNodeSyncFirstPlanItem() {
+
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CaseTaskTest.testCaseTaskMappingMappingWithArrayNode.bpmn20.xml")
+                .deploy();
+
+        try {
+
+            ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
+            ArrayNode arrayNode = objectMapper.createArrayNode();
+            for (int i = 0; i < 10; i++) {
+                ObjectNode arrayElement = objectMapper.createObjectNode();
+                arrayElement.put("field", "value-" + i);
+                arrayNode.add(arrayElement);
+            }
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("myRootVariable", arrayNode);
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTaskMapping", variables);
+
+            List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+            assertThat(caseInstances).hasSize(10);
+
+            for (CaseInstance caseInstance : caseInstances) {
+                JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
+                assertThat(jsonNode.path("field").asText()).startsWith("CHANGED");
+            }
+
+            ArrayNode rootArrayNode = (ArrayNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myRootVariable");
+            assertThat(rootArrayNode).hasSize(10);
+            for (JsonNode rootArrayNodeElement : rootArrayNode) {
+                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            }
+
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
