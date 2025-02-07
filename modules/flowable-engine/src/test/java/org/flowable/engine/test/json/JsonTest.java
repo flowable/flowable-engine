@@ -232,6 +232,7 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .transientVariable("jsonBean", javaDelegate)
                 .start();
 
+        customer = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "customer");
         assertThatJson(customer)
                 .isEqualTo("{"
                         + "  name: 'Kermit',"
@@ -372,6 +373,7 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .transientVariable("jsonBean", javaDelegate)
                 .start();
 
+        customer = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "customer");
         assertThatJson(customer)
                 .isEqualTo("{"
                         + "  name: 'Kermit',"
@@ -433,6 +435,7 @@ public class JsonTest extends PluggableFlowableTestCase {
                 .transientVariable("jsonBean", javaDelegate)
                 .start();
 
+        customer = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "customer");
         assertThatJson(customer)
                 .isEqualTo("{"
                         + "  name: 'Kermit'"
