@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-work-case-palette">
+  <case id="caseWithInAndOutMapping" name="Case with in and out mapping" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItemHumanTask_1" name="Human task" definitionRef="HumanTask_1">
+        <entryCriterion id="EntryCriterion_3" sentryRef="sentryEntryCriterion_3"></entryCriterion>
+      </planItem>
+      <planItem id="planItemScriptTask_2" name="Script task" definitionRef="ScriptTask_2"></planItem>
+      <sentry id="sentryEntryCriterion_3">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartEntryCriterion_3" sourceRef="planItemScriptTask_2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="HumanTask_1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+          <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </humanTask>
+      <task id="ScriptTask_2" name="Script task" flowable:type="script" flowable:scriptFormat="groovy">
+        <extensionElements>
+          <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          <flowable:field name="script">
+            <flowable:string><![CDATA[var myVar = caseInstance.getVariable('myInMappedVariable');
+myVar.put("field", "CHANGED");]]></flowable:string>
+          </flowable:field>
+        </extensionElements>
+      </task>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_caseWithInAndOutMapping">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="679.0" width="830.0" x="270.0" y="120.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemHumanTask_1" cmmnElementRef="planItemHumanTask_1">
+        <dc:Bounds height="80.0" width="100.0" x="696.0" y="248.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_EntryCriterion_3" cmmnElementRef="EntryCriterion_3">
+        <dc:Bounds height="28.0" width="18.0" x="687.0" y="259.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemScriptTask_2" cmmnElementRef="planItemScriptTask_2">
+        <dc:Bounds height="80.0" width="100.0" x="425.0" y="271.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_Connector_4" cmmnElementRef="planItemScriptTask_2" targetCMMNElementRef="EntryCriterion_3">
+        <di:extension>
+          <flowable:docker type="source" x="50.0" y="40.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="525.0" y="311.0"></di:waypoint>
+        <di:waypoint x="606.0" y="311.0"></di:waypoint>
+        <di:waypoint x="606.0" y="273.0"></di:waypoint>
+        <di:waypoint x="687.0" y="273.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>
