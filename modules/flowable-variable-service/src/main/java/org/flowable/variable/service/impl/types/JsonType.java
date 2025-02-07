@@ -116,6 +116,9 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             valueFields.setCachedValue(null);
         } else {
             JsonNode jsonNode = (JsonNode) value;
+
+            jsonNode = jsonNode.deepCopy();
+
             String textValue = value.toString();
             if (textValue.length() <= maxLength) {
                 valueFields.setTextValue(textValue);
