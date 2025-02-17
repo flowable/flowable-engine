@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/CMMN/20151109/MODEL https://www.omg.org/spec/CMMN/20151109/CMMN11.xsd"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="scriptCase" flowable:initiatorVariableName="test">
+        <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+
+            <planItem id="planItemTaskA" definitionRef="taskA"/>
+            <task id="taskA" name="A" flowable:type="script" flowable:scriptFormat="javascript" flowable:resultVariableName="scriptResult"
+                  flowable:autoStoreVariables="false">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <expression><![CDATA[var a = '${testA}';]]></expression>
+                    </flowable:field>
+                    <flowable:in source="aVar" target="targetAVar"/>
+                    <flowable:in source="aVar" targetExpression="${targetVarName}"/>
+                    <flowable:in sourceExpression="${'test'}" target="targetVar"/>
+                </extensionElements>
+            </task>
+        </casePlanModel>
+    </case>
+
+</definitions>

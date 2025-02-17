@@ -18,11 +18,11 @@ import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -31,7 +31,8 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class VariableScopeResolver implements Resolver {
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected VariableScope variableScope;
+    protected VariableContainer variableScope;
+    protected VariableContainer inputVariableContainer;
 
     protected String variableScopeKey = "execution";
 
@@ -48,7 +49,8 @@ public class VariableScopeResolver implements Resolver {
         processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
         repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey));
 
-    public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
+    public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableContainer variableScope,
+            VariableContainer inputVariableContainer) {
 
         this.processEngineConfiguration = processEngineConfiguration;
 
@@ -63,11 +65,12 @@ public class VariableScopeResolver implements Resolver {
             throw new FlowableException("unsupported variable scope type: " + variableScope.getClass().getName());
         }
         this.variableScope = variableScope;
+        this.inputVariableContainer = inputVariableContainer;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return variableScopeKey.equals(key) || KEYS.contains(key) || variableScope.hasVariable((String) key);
+        return variableScopeKey.equals(key) || KEYS.contains(key) || inputVariableContainer.hasVariable((String) key);
     }
 
     @Override
@@ -92,6 +95,6 @@ public class VariableScopeResolver implements Resolver {
             return processEngineConfiguration.getHistoryService();
         }
 
-        return variableScope.getVariable((String) key);
+        return inputVariableContainer.getVariable((String) key);
     }
 }

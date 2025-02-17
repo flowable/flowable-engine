@@ -23,6 +23,6 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
  */
 public interface ResolverFactory {
 
-    Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableContainer);
+    Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableContainer, VariableContainer inputVariableContainer);
 
 }

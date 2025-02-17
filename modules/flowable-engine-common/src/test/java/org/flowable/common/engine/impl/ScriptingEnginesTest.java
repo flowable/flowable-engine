@@ -58,7 +58,7 @@ public class ScriptingEnginesTest {
     public void expectVariableResolvedFromResolverFactory() {
         // GIVEN
         MapResolver factoryMapResolver = new MapResolver().put("myBean", new MyBean());
-        ResolverFactory resolverFactory = (config, variableScope) -> factoryMapResolver;
+        ResolverFactory resolverFactory = (config, variableScope, ignored) -> factoryMapResolver;
         resolverFactories.add(resolverFactory);
         String script = "myBean.setBar('setInScript'); myBean";
 
@@ -105,7 +105,7 @@ public class ScriptingEnginesTest {
         MyBean myBeanResolverFactory = new MyBean();
 
         MapResolver factoryMapResolver = new MapResolver().put("myBean", new MyBean());
-        ResolverFactory resolverFactory = (config, variableScope) -> factoryMapResolver;
+        ResolverFactory resolverFactory = (config, variableScope, ignored) -> factoryMapResolver;
         resolverFactories.add(resolverFactory);
 
         MyBean myBeanAdditionalResolver = new MyBean();

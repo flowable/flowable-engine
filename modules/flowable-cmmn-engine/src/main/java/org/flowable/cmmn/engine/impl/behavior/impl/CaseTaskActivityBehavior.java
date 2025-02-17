@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
-import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
@@ -31,8 +30,8 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
 import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -239,49 +238,18 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
     protected void handleOutParameters(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-        handleOutParameters(
-            planItemInstance,
-            caseInstance,
-            cmmnEngineConfiguration.getCmmnRuntimeService(),
-            cmmnEngineConfiguration);
+        handleOutParameters(planItemInstance, cmmnEngineConfiguration);
     }
 
-    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance,
-                                       CaseInstanceEntity caseInstance,
-                                       CmmnRuntimeService cmmnRuntimeService, CmmnEngineConfiguration cmmnEngineConfiguration) {
+    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance, CmmnEngineConfiguration cmmnEngineConfiguration) {
         if (outParameters == null) {
             return;
         }
 
-        for (IOParameter outParameter : outParameters) {
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        CaseInstanceEntity referenceCase = caseInstanceEntityManager.findById(planItemInstance.getReferenceId());
 
-            String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
-                variableName = outParameter.getTarget();
-
-            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Object variableNameValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getTargetExpression());
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                            outParameter.getTargetExpression());
-                }
-
-            }
-
-            Object variableValue = null;
-            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
-                variableValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getSourceExpression());
-
-            } else if (StringUtils.isNotEmpty(outParameter.getSource())) {
-                variableValue = cmmnRuntimeService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
-
-            }
-            planItemInstance.setVariable(variableName, variableValue);
-        }
+        IOParameterUtil.processOutParameters(outParameters, referenceCase, planItemInstance, cmmnEngineConfiguration.getExpressionManager());
     }
 
 

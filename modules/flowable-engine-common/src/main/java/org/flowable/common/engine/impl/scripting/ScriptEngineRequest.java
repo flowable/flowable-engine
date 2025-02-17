@@ -28,6 +28,7 @@ public class ScriptEngineRequest {
     protected final String language;
     protected final String script;
     protected final VariableContainer variableContainer;
+    protected final VariableContainer inputVariableContainer;
     protected final List<Resolver> additionalResolvers;
     protected final boolean storeScriptVariables;
     protected final ScriptTraceEnhancer traceEnhancer;
@@ -47,6 +48,7 @@ public class ScriptEngineRequest {
         protected String language;
         protected String script;
         protected VariableContainer variableContainer;
+        protected VariableContainer inputVariableContainer;
         protected List<Resolver> additionalResolvers = new LinkedList<>();
         protected boolean storeScriptVariables;
         protected ScriptTraceEnhancer traceEnhancer;
@@ -78,6 +80,18 @@ public class ScriptEngineRequest {
          */
         public Builder variableContainer(VariableContainer variableContainer) {
             this.variableContainer = variableContainer;
+            return this;
+        }
+
+        /**
+         * The variable container that can be used to provide different dynamic variables for the script context.
+         * If not provided then the {@link #variableContainer} will be used.
+         * <p>
+         * The variable container will be passed to {@link ResolverFactory} to create specialized Resolvers
+         * for the specific VariableContainer implementations.
+         */
+        public Builder inputVariableContainer(VariableContainer variableContainer) {
+            this.inputVariableContainer = variableContainer;
             return this;
         }
 
@@ -122,6 +136,7 @@ public class ScriptEngineRequest {
             return new ScriptEngineRequest(script,
                     language,
                     variableContainer,
+                    inputVariableContainer != null ? inputVariableContainer : variableContainer,
                     storeScriptVariables,
                     additionalResolvers,
                     traceEnhancer);
@@ -131,12 +146,14 @@ public class ScriptEngineRequest {
     private ScriptEngineRequest(String script,
             String language,
             VariableContainer variableContainer,
+            VariableContainer inputVariableContainer,
             boolean storeScriptVariables,
             List<Resolver> additionalResolvers,
             ScriptTraceEnhancer errorTraceEnhancer) {
         this.script = script;
         this.language = language;
         this.variableContainer = variableContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.storeScriptVariables = storeScriptVariables;
         this.additionalResolvers = additionalResolvers;
         this.traceEnhancer = errorTraceEnhancer;
@@ -161,6 +178,13 @@ public class ScriptEngineRequest {
      */
     public VariableContainer getVariableContainer() {
         return variableContainer;
+    }
+
+    /**
+     * @see Builder#inputVariableContainer(VariableContainer)
+     */
+    public VariableContainer getInputVariableContainer() {
+        return inputVariableContainer;
     }
 
     /**

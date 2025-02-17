@@ -67,18 +67,21 @@ public class CmmnVariableScopeResolver implements Resolver {
 
     protected CmmnEngineConfiguration engineConfiguration;
     protected VariableContainer variableContainer;
+    protected VariableContainer inputVariableContainer;
 
-    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer variableContainer) {
+    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer variableContainer,
+            VariableContainer inputVariableContainer) {
         if (variableContainer == null) {
             throw new FlowableIllegalArgumentException("variableContainer cannot be null");
         }
         this.variableContainer = variableContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.engineConfiguration = engineConfiguration;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return variableContainer.hasVariable((String) key) || KEYS.contains(key);
+        return inputVariableContainer.hasVariable((String) key) || KEYS.contains(key);
     }
 
     @Override
@@ -146,7 +149,7 @@ public class CmmnVariableScopeResolver implements Resolver {
             }
 
         } else {
-            return variableContainer.getVariable((String) key);
+            return inputVariableContainer.getVariable((String) key);
 
         }
     }
