@@ -24,7 +24,8 @@ public class BeansResolverFactory implements ResolverFactory, Resolver {
     protected AbstractEngineConfiguration engineConfiguration;
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration processEngineConfiguration, VariableContainer variableContainer) {
+    public Resolver createResolver(AbstractEngineConfiguration processEngineConfiguration, VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer) {
         this.engineConfiguration = processEngineConfiguration;
         return this;
     }

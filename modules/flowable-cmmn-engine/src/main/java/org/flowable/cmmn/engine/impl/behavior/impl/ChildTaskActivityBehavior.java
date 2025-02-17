@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavio
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
 import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -31,16 +32,12 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChildTaskActivityBehavior.class);
 
     protected boolean isBlocking;
     protected String isBlockingExpression;
@@ -86,43 +83,7 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
                                       CmmnEngineConfiguration cmmnEngineConfiguration, Map<String, Object> inParametersMap,
                                       ExpressionManager expressionManager) {
 
-        if (inParameters == null) {
-            return;
-        }
-
-        for (IOParameter inParameter : inParameters) {
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                Expression expression = cmmnEngineConfiguration.getExpressionManager().createExpression(inParameter.getTargetExpression());
-                Object variableNameValue = expression.getValue(planItemInstanceEntity);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                            inParameter.getTargetExpression());
-                }
-
-            } else if (StringUtils.isNotEmpty(inParameter.getTarget())) {
-                variableName = inParameter.getTarget();
-
-            }
-
-            Object variableValue = null;
-            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getSourceExpression());
-                variableValue = expression.getValue(planItemInstanceEntity);
-
-            } else if (StringUtils.isNotEmpty(inParameter.getSource())) {
-                variableValue = planItemInstanceEntity.getVariable(inParameter.getSource());
-
-            }
-
-            if (variableName != null) {
-                inParametersMap.put(variableName, variableValue);
-            }
-
-        }
+        IOParameterUtil.processInParameters(inParameters, planItemInstanceEntity, inParametersMap, expressionManager);
     }
 
     protected String getBusinessKey(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceEntity planItemInstanceEntity, ChildTask childTask) {

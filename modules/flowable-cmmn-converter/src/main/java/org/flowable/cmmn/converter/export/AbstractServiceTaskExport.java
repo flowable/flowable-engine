@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FormAwareServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
@@ -23,7 +24,7 @@ import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.cmmn.model.ServiceTask;
 
-public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends AbstractPlanItemDefinitionExport<ServiceTask> {
+public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends AbstractPlanItemDefinitionExport<T> {
 
     @Override
     public String getPlanItemDefinitionXmlElementValue(ServiceTask serviceTask) {
@@ -31,7 +32,7 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     }
 
     @Override
-    public void writePlanItemDefinitionSpecificAttributes(ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
+    public void writePlanItemDefinitionSpecificAttributes(T serviceTask, XMLStreamWriter xtw) throws Exception {
         super.writePlanItemDefinitionSpecificAttributes(serviceTask, xtw);
         TaskExport.writeCommonTaskAttributes(serviceTask, xtw);
 
@@ -82,6 +83,9 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
                 if (((ScriptServiceTask) serviceTask).isAutoStoreVariables()) {
                     xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, "true");
                 }
+                if (((ScriptServiceTask) serviceTask).isDoNotIncludeVariables()) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES, "true");
+                }
                 break;
             default:
                 break;
@@ -89,13 +93,14 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     }
     
     @Override
-    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ServiceTask serviceTask, boolean didWriteExtensionElement, XMLStreamWriter xtw) throws Exception {
+    protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, T serviceTask, boolean didWriteExtensionElement, XMLStreamWriter xtw)
+            throws Exception {
         boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, serviceTask, didWriteExtensionElement, xtw);
         return TaskExport.writeTaskFieldExtensions(serviceTask, extensionElementWritten, xtw);
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, ServiceTask serviceTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+    protected void writePlanItemDefinitionBody(CmmnModel model, T serviceTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
         super.writePlanItemDefinitionBody(model, serviceTask, xtw, options);
     }
 
@@ -107,30 +112,39 @@ public abstract class AbstractServiceTaskExport<T extends ServiceTask> extends A
     }
 
     public static class HttpServiceTaskExport extends AbstractServiceTaskExport<HttpServiceTask> {
+
         @Override
-        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+        protected Class<? extends HttpServiceTask> getExportablePlanItemDefinitionClass() {
             return HttpServiceTask.class;
         }
     }
 
     public static class ScriptServiceTaskExport extends AbstractServiceTaskExport<ScriptServiceTask> {
         @Override
-        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+        protected Class<? extends ScriptServiceTask> getExportablePlanItemDefinitionClass() {
             return ScriptServiceTask.class;
+        }
+
+        @Override
+        protected boolean writePlanItemDefinitionExtensionElements(CmmnModel model, ScriptServiceTask serviceTask, boolean didWriteExtensionElement,
+                XMLStreamWriter xtw) throws Exception {
+            boolean extensionElementWritten = super.writePlanItemDefinitionExtensionElements(model, serviceTask, didWriteExtensionElement, xtw);
+            extensionElementWritten = CmmnXmlUtil.writeIOParameters(ELEMENT_EXTERNAL_WORKER_IN_PARAMETER, serviceTask.getInParameters(),
+                    extensionElementWritten, xtw);
+            return extensionElementWritten;
         }
     }
 
     public static class FormAwareServiceTaskExport extends AbstractServiceTaskExport<FormAwareServiceTask> {
 
         @Override
-        protected Class<? extends ServiceTask> getExportablePlanItemDefinitionClass() {
+        protected Class<? extends FormAwareServiceTask> getExportablePlanItemDefinitionClass() {
             return FormAwareServiceTask.class;
         }
 
         @Override
-        public void writePlanItemDefinitionSpecificAttributes(ServiceTask serviceTask, XMLStreamWriter xtw) throws Exception {
-            super.writePlanItemDefinitionSpecificAttributes(serviceTask, xtw);
-            FormAwareServiceTask formAwareServiceTask = (FormAwareServiceTask) serviceTask;
+        public void writePlanItemDefinitionSpecificAttributes(FormAwareServiceTask formAwareServiceTask, XMLStreamWriter xtw) throws Exception {
+            super.writePlanItemDefinitionSpecificAttributes(formAwareServiceTask, xtw);
             if (StringUtils.isNotBlank(formAwareServiceTask.getFormKey())) {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, formAwareServiceTask.getFormKey());
             }

@@ -208,6 +208,9 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
             scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
         }
 
+        scriptTask.setDoNotIncludeVariables(Boolean.parseBoolean(
+                xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES)));
+
         return scriptTask;
     }
 

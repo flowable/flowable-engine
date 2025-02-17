@@ -66,7 +66,7 @@ public class JuelFormEngine implements FormEngine {
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
                 .script(formTemplateString)
                 .language(ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE)
-                .variableContainer(executionEntity);
+                .scopeContainer(executionEntity);
         return scriptingEngines.evaluate(builder.build()).getResult();
     }
 

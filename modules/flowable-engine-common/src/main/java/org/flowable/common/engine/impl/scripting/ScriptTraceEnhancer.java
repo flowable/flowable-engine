@@ -50,7 +50,7 @@ public interface ScriptTraceEnhancer {
          * @return the variable container which shall be used to extract trace tags from
          */
         default VariableContainer getVariableContainer() {
-            return getRequest().getVariableContainer();
+            return getRequest().getScopeContainer();
         }
 
         /**

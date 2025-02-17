@@ -53,7 +53,8 @@ public class ScriptingEngines {
         FlowableScriptEvaluationRequest evaluationRequest = scriptEngine.createEvaluationRequest()
                 .language(request.getLanguage())
                 .script(request.getScript())
-                .variableContainer(request.getVariableContainer())
+                .scopeContainer(request.getScopeContainer())
+                .inputVariableContainer(request.getInputVariableContainer())
                 .resolver(getScriptBindingsFactory().createResolver(request));
         if (request.isStoreScriptVariables()) {
             evaluationRequest.storeScriptVariables();
@@ -71,7 +72,7 @@ public class ScriptingEngines {
         } catch (FlowableScriptException e) {
             DefaultScriptTrace scriptTrace = DefaultScriptTrace.errorTrace(Duration.ofNanos(System.nanoTime() - startNanos), request, e);
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Caught exception evaluating script for {}. {}{}{}", request.getVariableContainer(), request.getLanguage(), System.lineSeparator(),
+                LOGGER.debug("Caught exception evaluating script for {}. {}{}{}", request.getScopeContainer(), request.getLanguage(), System.lineSeparator(),
                         request.getScript());
             }
             enhanceScriptTrace(request, scriptTrace);

@@ -138,7 +138,8 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
         protected String language;
         protected String script;
         protected Resolver resolver;
-        protected VariableContainer variableContainer;
+        protected VariableContainer scopeContainer;
+        protected VariableContainer inputVariableContainer;
         protected boolean storeScriptVariables;
 
         @Override
@@ -166,8 +167,14 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
         }
 
         @Override
-        public FlowableScriptEvaluationRequest variableContainer(VariableContainer variableContainer) {
-            this.variableContainer = variableContainer;
+        public FlowableScriptEvaluationRequest scopeContainer(VariableContainer scopeContainer) {
+            this.scopeContainer = scopeContainer;
+            return this;
+        }
+
+        @Override
+        public FlowableScriptEvaluationRequest inputVariableContainer(VariableContainer inputVariableContainer) {
+            this.inputVariableContainer = inputVariableContainer;
             return this;
         }
 
@@ -198,7 +205,7 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
         }
 
         protected Bindings createBindings() {
-            return new ScriptBindings(Collections.singletonList(resolver), variableContainer, storeScriptVariables);
+            return new ScriptBindings(Collections.singletonList(resolver), scopeContainer, inputVariableContainer, storeScriptVariables);
         }
     }
 }

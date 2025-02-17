@@ -66,19 +66,22 @@ public class CmmnVariableScopeResolver implements Resolver {
     ));
 
     protected CmmnEngineConfiguration engineConfiguration;
-    protected VariableContainer variableContainer;
+    protected VariableContainer scopeContainer;
+    protected VariableContainer inputVariableContainer;
 
-    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer variableContainer) {
-        if (variableContainer == null) {
-            throw new FlowableIllegalArgumentException("variableContainer cannot be null");
+    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer) {
+        if (scopeContainer == null) {
+            throw new FlowableIllegalArgumentException("scopeContainer cannot be null");
         }
-        this.variableContainer = variableContainer;
+        this.scopeContainer = scopeContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.engineConfiguration = engineConfiguration;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return variableContainer.hasVariable((String) key) || KEYS.contains(key);
+        return inputVariableContainer.hasVariable((String) key) || KEYS.contains(key);
     }
 
     @Override
@@ -99,54 +102,54 @@ public class CmmnVariableScopeResolver implements Resolver {
             return engineConfiguration.getCmmnTaskService();
 
         } else if (CASE_INSTANCE_KEY.equals(key)) {
-            if (variableContainer instanceof CaseInstance) {
-                return variableContainer;
+            if (scopeContainer instanceof CaseInstance) {
+                return scopeContainer;
 
-            } else if (variableContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
+            } else if (scopeContainer instanceof PlanItemInstance) {
+                PlanItemInstance planItemInstance = (PlanItemInstance) scopeContainer;
                 if (StringUtils.isNotEmpty(planItemInstance.getCaseInstanceId())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
                 }
 
-            } else if (variableContainer instanceof Task) {
-                Task task = (Task) variableContainer;
+            } else if (scopeContainer instanceof Task) {
+                Task task = (Task) scopeContainer;
                 if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
                 }
 
             }
 
-            throw new FlowableException("Unsupported variableContainer for key '" + CASE_INSTANCE_KEY + "': " + variableContainer.getClass().getName());
+            throw new FlowableException("Unsupported variableContainer for key '" + CASE_INSTANCE_KEY + "': " + scopeContainer.getClass().getName());
 
         } else if (PLAN_ITEM_INSTANCE_KEY.equals(key)) {
-            if (variableContainer instanceof PlanItemInstance) {
-                return variableContainer;
+            if (scopeContainer instanceof PlanItemInstance) {
+                return scopeContainer;
 
-            }  else if (variableContainer instanceof Task) {
-                Task task = (Task) variableContainer;
+            }  else if (scopeContainer instanceof Task) {
+                Task task = (Task) scopeContainer;
                 if (StringUtils.isNotEmpty(task.getSubScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getPlanItemInstanceEntityManager().findById(task.getSubScopeId());
                 }
 
             }
 
-            throw new FlowableException("Unsupported variableContainer for key '" + PLAN_ITEM_INSTANCE_KEY + "': " + variableContainer.getClass().getName());
+            throw new FlowableException("Unsupported variableContainer for key '" + PLAN_ITEM_INSTANCE_KEY + "': " + scopeContainer.getClass().getName());
 
         } else if (TASK_KEY.equals(key)) {
-            if (variableContainer instanceof Task) {
-                return variableContainer;
+            if (scopeContainer instanceof Task) {
+                return scopeContainer;
 
-            } else  if (variableContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
+            } else  if (scopeContainer instanceof PlanItemInstance) {
+                PlanItemInstance planItemInstance = (PlanItemInstance) scopeContainer;
                 return CommandContextUtil.getTaskService().findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
 
             } else {
-                throw new FlowableException("Unsupported variableContainer for key '" + TASK_KEY + "': " + variableContainer.getClass().getName());
+                throw new FlowableException("Unsupported variableContainer for key '" + TASK_KEY + "': " + scopeContainer.getClass().getName());
 
             }
 
         } else {
-            return variableContainer.getVariable((String) key);
+            return inputVariableContainer.getVariable((String) key);
 
         }
     }
