@@ -36,7 +36,7 @@ public class ScriptBindingsFactory {
         List<Resolver> scriptResolvers = new ArrayList<>();
         scriptResolvers.addAll(request.getAdditionalResolvers());
         for (ResolverFactory scriptResolverFactory : resolverFactories) {
-            Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, request.getVariableContainer(), request.getInputVariableContainer());
+            Resolver resolver = scriptResolverFactory.createResolver(engineConfiguration, request.getScopeContainer(), request.getInputVariableContainer());
             if (resolver != null) {
                 scriptResolvers.add(resolver);
             }

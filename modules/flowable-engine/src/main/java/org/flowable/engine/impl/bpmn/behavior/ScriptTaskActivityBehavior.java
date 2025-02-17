@@ -125,7 +125,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         ScriptingEngines scriptingEngines = processEngineConfiguration.getScriptingEngines();
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder().script(script)
                 .traceEnhancer(trace -> trace.addTraceTag("type", "scriptTask"))
-                .language(language).variableContainer(execution);
+                .language(language).scopeContainer(execution);
         builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
         FlowElement flowElement = execution.getCurrentFlowElement();
         if (flowElement instanceof ScriptTask scriptTask) {

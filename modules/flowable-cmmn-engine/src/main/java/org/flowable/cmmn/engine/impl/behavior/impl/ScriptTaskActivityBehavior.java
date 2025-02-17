@@ -52,7 +52,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             ScriptEngineRequest.Builder request = ScriptEngineRequest.builder()
                     .language(scriptFormat)
                     .script(scriptTask.getScript())
-                    .variableContainer(planItemInstanceEntity)
+                    .scopeContainer(planItemInstanceEntity)
                     .traceEnhancer(trace -> trace.addTraceTag("type", "scriptTask"));
             if (scriptTask.isAutoStoreVariables()) {
                 request.storeScriptVariables();

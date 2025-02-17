@@ -66,7 +66,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .build();
         // WHEN
         Object scriptResult = engines.evaluate(request).getResult();
@@ -86,7 +86,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .additionalResolver(resolver)
                 .build();
 
@@ -116,7 +116,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .additionalResolver(resolver)
                 .build();
 

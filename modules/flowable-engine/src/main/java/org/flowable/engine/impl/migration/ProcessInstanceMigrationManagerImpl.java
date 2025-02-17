@@ -578,7 +578,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
             ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
                     .script(script.getScript())
                     .language(script.getLanguage())
-                    .variableContainer((ExecutionEntityImpl) processInstance);
+                    .scopeContainer((ExecutionEntityImpl) processInstance);
             scriptingEngines.evaluate(builder.build());
         } catch (FlowableException e) {
             LOGGER.warn("Exception while executing upgrade of process instance {} : {}", processInstance.getId(), e.getMessage());

@@ -39,7 +39,7 @@ public class ScriptCondition implements Condition {
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder()
                 .script(expression)
                 .language(language)
-                .variableContainer(execution);
+                .scopeContainer(execution);
         Object result = scriptingEngines.evaluate(builder.build()).getResult();
         if (result == null) {
             throw new FlowableException("condition script returns null: " + expression + " for " + execution);

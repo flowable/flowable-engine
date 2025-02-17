@@ -26,7 +26,7 @@ public class SecureJavascriptExecutionListener extends ScriptExecutionListener {
     @Override
     protected Object evaluateScript(ScriptingEngines engines, ScriptEngineRequest request) {
         if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(request.getLanguage())) {
-            return SecureJavascriptUtil.evaluateScript(request.getVariableContainer(), request.getScript());
+            return SecureJavascriptUtil.evaluateScript(request.getScopeContainer(), request.getScript());
         } else {
             return super.evaluateScript(engines, request);
         }

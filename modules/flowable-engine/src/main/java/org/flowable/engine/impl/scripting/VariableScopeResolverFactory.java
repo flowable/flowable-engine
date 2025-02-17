@@ -25,10 +25,10 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 public class VariableScopeResolverFactory implements ResolverFactory {
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableContainer,
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer scopeContainer,
             VariableContainer inputVariableContainer) {
-        if (variableContainer != null) {
-            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, variableContainer, inputVariableContainer);
+        if (scopeContainer != null) {
+            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, scopeContainer, inputVariableContainer);
         }
         return null;
     }

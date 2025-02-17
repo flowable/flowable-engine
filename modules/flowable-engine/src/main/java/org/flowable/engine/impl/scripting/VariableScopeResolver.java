@@ -31,7 +31,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 public class VariableScopeResolver implements Resolver {
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    protected VariableContainer variableScope;
+    protected VariableContainer scopeContainer;
     protected VariableContainer inputVariableContainer;
 
     protected String variableScopeKey = "execution";
@@ -49,22 +49,22 @@ public class VariableScopeResolver implements Resolver {
         processEngineConfigurationKey, runtimeServiceKey, taskServiceKey,
         repositoryServiceKey, managementServiceKey, historyServiceKey, formServiceKey, identityServiceKey));
 
-    public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableContainer variableScope,
+    public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableContainer scopeContainer,
             VariableContainer inputVariableContainer) {
 
         this.processEngineConfiguration = processEngineConfiguration;
 
-        if (variableScope == null) {
-            throw new FlowableIllegalArgumentException("variableScope cannot be null");
+        if (scopeContainer == null) {
+            throw new FlowableIllegalArgumentException("scopeContainer cannot be null");
         }
-        if (variableScope instanceof ExecutionEntity) {
+        if (scopeContainer instanceof ExecutionEntity) {
             variableScopeKey = "execution";
-        } else if (variableScope instanceof TaskEntity) {
+        } else if (scopeContainer instanceof TaskEntity) {
             variableScopeKey = "task";
         } else {
-            throw new FlowableException("unsupported variable scope type: " + variableScope.getClass().getName());
+            throw new FlowableException("unsupported variable scope type: " + scopeContainer.getClass().getName());
         }
-        this.variableScope = variableScope;
+        this.scopeContainer = scopeContainer;
         this.inputVariableContainer = inputVariableContainer;
     }
 
@@ -76,7 +76,7 @@ public class VariableScopeResolver implements Resolver {
     @Override
     public Object get(Object key) {
         if (variableScopeKey.equals(key)) {
-            return variableScope;
+            return scopeContainer;
         } else if (processEngineConfigurationKey.equals(key)) {
             return processEngineConfiguration;
         } else if (runtimeServiceKey.equals(key)) {
