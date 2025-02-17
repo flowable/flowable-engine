@@ -25,9 +25,9 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
 public class CmmnVariableScopeResolverFactory implements ResolverFactory {
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableScope) {
-        if (variableScope != null) {
-            return new CmmnVariableScopeResolver((CmmnEngineConfiguration) engineConfiguration, variableScope);
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer scopeContainer, VariableContainer inputVariableContainer) {
+        if (scopeContainer != null) {
+            return new CmmnVariableScopeResolver((CmmnEngineConfiguration) engineConfiguration, scopeContainer, inputVariableContainer);
         }
         return null;
     }

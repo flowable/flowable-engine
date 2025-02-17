@@ -12,15 +12,21 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 
 /**
  * Implementation of ScriptActivity CMMN 2.0 PlanItem.
@@ -46,11 +52,22 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
             ScriptEngineRequest.Builder request = ScriptEngineRequest.builder()
                     .language(scriptFormat)
                     .script(scriptTask.getScript())
-                    .variableContainer(planItemInstanceEntity)
+                    .scopeContainer(planItemInstanceEntity)
                     .traceEnhancer(trace -> trace.addTraceTag("type", "scriptTask"));
             if (scriptTask.isAutoStoreVariables()) {
                 request.storeScriptVariables();
             }
+
+            List<IOParameter> inParameters = scriptTask.getInParameters();
+            if (inParameters != null && !inParameters.isEmpty()) {
+                MapDelegateVariableContainer inputVariableContainer = new MapDelegateVariableContainer();
+                IOParameterUtil.processInParameters(inParameters, planItemInstanceEntity, inputVariableContainer,
+                        CommandContextUtil.getExpressionManager(commandContext));
+                request.inputVariableContainer(inputVariableContainer);
+            } else if (scriptTask.isDoNotIncludeVariables()) {
+                request.inputVariableContainer(VariableContainer.empty());
+            }
+
             Object result = scriptingEngines.evaluate(request.build()).getResult();
             String resultVariableName = scriptTask.getResultVariableName();
             if (StringUtils.isNotBlank(scriptTask.getResultVariableName())) {

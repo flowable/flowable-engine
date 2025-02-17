@@ -211,6 +211,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME = "elementIndexVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+    String ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
 
     String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType"; // Note that this is the same as ELEMENT_EVENT_TYPE. We can't change this (backwards compatibility)
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";

@@ -25,7 +25,9 @@ public interface FlowableScriptEvaluationRequest {
 
     FlowableScriptEvaluationRequest resolver(Resolver resolver);
 
-    FlowableScriptEvaluationRequest variableContainer(VariableContainer variableContainer);
+    FlowableScriptEvaluationRequest scopeContainer(VariableContainer scopeContainer);
+
+    FlowableScriptEvaluationRequest inputVariableContainer(VariableContainer inputVariableContainer);
 
     FlowableScriptEvaluationRequest storeScriptVariables();
 

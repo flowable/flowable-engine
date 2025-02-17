@@ -64,7 +64,7 @@ public class ScriptTypeTaskListener implements TaskListener {
         ScriptEngineRequest.Builder request = ScriptEngineRequest.builder()
                 .script(script)
                 .language(language)
-                .variableContainer(delegateTask)
+                .scopeContainer(delegateTask)
                 .traceEnhancer(trace -> trace.addTraceTag("type", "taskListener"));
         Object result = scriptingEngines.evaluate(request.build()).getResult();
 

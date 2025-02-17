@@ -63,6 +63,33 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testInputVariables() {
+        // When input parameters are defined then doNotIncludeVariables is ignored
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("a", 20)
+                .variable("b", 22)
+                .variable("aVar", 100)
+                .variable("bVar", 10)
+                .start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseVariables().get("sum"))
+                .isInstanceOfSatisfying(Number.class, number -> assertThat(number.intValue()).isEqualTo(120));
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testDoNotIncludeVariables() {
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("a", 20)
+                .variable("b", 22)
+                .start())
+                .hasMessageContaining("\"a\" is not defined");
+    }
+
+    @Test
+    @CmmnDeployment
     public void testPlanItemInstanceVarScopeAndVarHistory() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
