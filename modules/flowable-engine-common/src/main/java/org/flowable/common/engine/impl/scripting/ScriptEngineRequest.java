@@ -87,6 +87,10 @@ public class ScriptEngineRequest {
          * The variable container that can be used to provide different dynamic variables for the script context.
          * If not provided then the {@link #variableContainer} will be used.
          * <p>
+         *     e.g. if we have the following script <code>var sum = a + b</code>.
+         *     When <code>inputVariableContainer</code> is defined the variables <code>a</code> and <code>b</code> will come from it.
+         *     Otherwise, they will come from the variable container defined in {@link #variableContainer(VariableContainer)}.
+         *  <p>
          * The variable container will be passed to {@link ResolverFactory} to create specialized Resolvers
          * for the specific VariableContainer implementations.
          */
