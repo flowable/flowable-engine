@@ -73,6 +73,7 @@ public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowab
         assertVariable(caseInstance, "classDelegateVariable", "Hello World");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVar", "planItemIsActive");
+        assertVariable(caseInstance, "expressionCaseVar", "planItemIsActive");
 
         assertVariable(caseInstance, "stageActive",true);
         assertVariable(caseInstance, "milestoneReached", true);

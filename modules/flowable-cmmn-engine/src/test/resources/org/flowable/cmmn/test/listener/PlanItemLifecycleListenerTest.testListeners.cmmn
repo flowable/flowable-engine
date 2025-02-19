@@ -8,6 +8,7 @@
                 <extensionElements>
                     <flowable:planItemLifecycleListener sourceState="available" targetState="active" class="org.flowable.cmmn.test.listener.TestLifecycleListener"></flowable:planItemLifecycleListener>
                     <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${planItemInstance.setVariable('expressionVar', 'planItemIsActive')}"></flowable:planItemLifecycleListener>
+                    <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${caseInstance.setVariable('expressionCaseVar', 'planItemIsActive')}"></flowable:planItemLifecycleListener>
                     <flowable:planItemLifecycleListener sourceState="available" targetState="active" delegateExpression="${delegateListener}"></flowable:planItemLifecycleListener>
                 </extensionElements>
             </humanTask>
