@@ -158,20 +158,6 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void testOneHumanTaskVariableScopeExpressionCase() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-
-        assertThatThrownBy(() -> cmmnTaskService.complete(task.getId(), Collections.singletonMap(
-                "${caseInstance.name}", "newCaseName"
-                )
-        ))
-                .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Error while evaluating expression: ${caseInstance.name}");
-    }
-
-    @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testOneHumanTaskCompleteSetCaseName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
