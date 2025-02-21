@@ -66,6 +66,8 @@ public class TaskListenerTest extends CustomCmmnConfigurationFlowableTestCase {
         assertVariable(caseInstance, "variableFromClassDelegate", "Hello World from class delegate");
         assertVariable(caseInstance, "variableFromDelegateExpression", "Hello World from delegate expression");
         assertVariable(caseInstance, "expressionVariable", "Hello World from expression");
+        assertVariable(caseInstance, "expressionPlanItemVariable", "Hello World from expression");
+        assertVariable(caseInstance, "expressionCaseVariable", "Hello World from expression");
         assertVariable(caseInstance, "javascriptResult", "Hello World from JavaScript");
         assertVariable(caseInstance, "javaScriptVariable", "setInJavaScript");
         assertVariable(caseInstance, "groovyVar", "setInGroovy");
