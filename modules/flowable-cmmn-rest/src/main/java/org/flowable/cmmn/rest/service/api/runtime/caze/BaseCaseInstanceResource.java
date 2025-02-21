@@ -85,6 +85,9 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseDefinitionKeys() != null && !queryRequest.getCaseDefinitionKeys().isEmpty()) {
             query.caseDefinitionKeys(queryRequest.getCaseDefinitionKeys());
         }
+        if (queryRequest.getExcludeCaseDefinitionKeys() != null && !queryRequest.getExcludeCaseDefinitionKeys().isEmpty()) {
+            query.excludeCaseDefinitionKeys(queryRequest.getExcludeCaseDefinitionKeys());
+        }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }

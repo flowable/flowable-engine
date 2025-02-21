@@ -484,6 +484,12 @@
           #{processDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
+      <if test="excludeProcessDefinitionKeys != null and !excludeProcessDefinitionKeys.empty">
+        and DEF.KEY_ not in
+        <foreach item="processDefinitionKey" index="index" collection="excludeProcessDefinitionKeys" open="(" separator="," close=")">
+          #{processDefinitionKey, jdbcType=NVARCHAR}
+        </foreach>
+      </if>
       <if test="processDefinitionVersion != null">
         and DEF.VERSION_ = #{processDefinitionVersion, jdbcType=INTEGER}
       </if>
@@ -632,6 +638,13 @@
           <if test="orQueryObject.processDefinitionKeyIn != null &amp;&amp; !orQueryObject.processDefinitionKeyIn.empty">
             or DEF.KEY_ IN
             <foreach item="processDefinitionKey" index="index" collection="orQueryObject.processDefinitionKeyIn"
+                     open="(" separator="," close=")">
+              #{processDefinitionKey, jdbcType=NVARCHAR}
+            </foreach>
+          </if>
+          <if test="orQueryObject.excludeProcessDefinitionKeys != null &amp;&amp; !orQueryObject.excludeProcessDefinitionKeys.empty">
+            or DEF.KEY_ NOT IN
+            <foreach item="processDefinitionKey" index="index" collection="orQueryObject.excludeProcessDefinitionKeys"
                      open="(" separator="," close=")">
               #{processDefinitionKey, jdbcType=NVARCHAR}
             </foreach>

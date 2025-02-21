@@ -34,6 +34,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseDefinitionKeyLike;
     private String caseDefinitionKeyLikeIgnoreCase;
     private Set<String> caseDefinitionKeys;
+    private Set<String> excludeCaseDefinitionKeys;
     private String caseDefinitionCategory;
     private String caseDefinitionCategoryLike;
     private String caseDefinitionCategoryLikeIgnoreCase;
@@ -128,6 +129,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseDefinitionKeys(Set<String> caseDefinitionKeys) {
         this.caseDefinitionKeys = caseDefinitionKeys;
+    }
+
+    public Set<String> getExcludeCaseDefinitionKeys() {
+        return excludeCaseDefinitionKeys;
+    }
+
+    public void setExcludeCaseDefinitionKeys(Set<String> excludeCaseDefinitionKeys) {
+        this.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
     }
 
     public String getCaseDefinitionCategory() {

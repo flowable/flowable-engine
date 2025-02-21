@@ -45,6 +45,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private String processDefinitionKeyLike;
     private String processDefinitionKeyLikeIgnoreCase;
     private Set<String> processDefinitionKeys;
+    private Set<String> excludeProcessDefinitionKeys;
     private String processDefinitionName;
     private String processDefinitionNameLike;
     private String processDefinitionNameLikeIgnoreCase;
@@ -242,6 +243,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessDefinitionKeys(Set<String> processDefinitionKeys) {
         this.processDefinitionKeys = processDefinitionKeys;
+    }
+
+    public Set<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
+    }
+
+    public void setExcludeProcessDefinitionKeys(Set<String> excludeProcessDefinitionKeys) {
+        this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
     }
 
     public String getProcessDefinitionName() {

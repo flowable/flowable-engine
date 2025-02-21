@@ -56,6 +56,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Set<String> caseDefinitionKeys;
+    protected Set<String> excludeCaseDefinitionKeys;
     protected Set<String> caseDefinitionIds;
     protected String caseDefinitionName;
     protected String caseDefinitionNameLike;
@@ -465,6 +466,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.caseDefinitionKeys = caseDefinitionKeys;
         } else {
             this.caseDefinitionKeys = caseDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl excludeCaseDefinitionKeys(Set<String> excludeCaseDefinitionKeys) {
+        if (excludeCaseDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Case definition keys is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
+        } else {
+            this.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
         }
         return this;
     }
@@ -1216,6 +1230,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public Set<String> getCaseDefinitionKeys() {
         return caseDefinitionKeys;
+    }
+    
+    public Set<String> getExcludeCaseDefinitionKeys() {
+        return excludeCaseDefinitionKeys;
     }
 
     public Set<String> getCaseDefinitionIds() {

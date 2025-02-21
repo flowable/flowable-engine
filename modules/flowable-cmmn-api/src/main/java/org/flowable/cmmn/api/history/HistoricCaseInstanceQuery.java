@@ -127,6 +127,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseDefinitionKeys(Set<String> caseDefinitionKeys);
     
     /**
+     * Only select historic case instances that don't match the given case definition keys.
+     */
+    HistoricCaseInstanceQuery excludeCaseDefinitionKeys(Set<String> caseDefinitionKeys);
+    
+    /**
      * Only select historic case instances with the given case definition identifier.
      */
     HistoricCaseInstanceQuery caseDefinitionId(String caseDefinitionId);

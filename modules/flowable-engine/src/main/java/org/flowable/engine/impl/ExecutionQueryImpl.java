@@ -94,6 +94,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected Set<String> involvedGroups;
     private List<List<String>> safeInvolvedGroups;
     protected Set<String> processDefinitionKeys;
+    protected Set<String> excludeProcessDefinitionKeys;
     protected Set<String> processDefinitionIds;
 
     // Not exposed in API, but here for the ProcessInstanceQuery support, since
@@ -425,6 +426,19 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
         } else {
             this.processDefinitionKeys = processDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public ExecutionQuery excludeProcessDefinitionKeys(Set<String> excludeProcessDefinitionKeys) {
+        if (excludeProcessDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Process definition keys is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+        } else {
+            this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
         }
         return this;
     }
@@ -1244,6 +1258,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public Set<String> getProcessDefinitionKeys() {
         return processDefinitionKeys;
+    }
+
+    public Set<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
     }
 
     public String getParentId() {

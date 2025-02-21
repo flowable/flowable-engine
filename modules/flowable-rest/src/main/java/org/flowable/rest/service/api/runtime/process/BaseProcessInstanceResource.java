@@ -106,6 +106,9 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessDefinitionKeys() != null) {
             query.processDefinitionKeys(queryRequest.getProcessDefinitionKeys());
         }
+        if (queryRequest.getExcludeProcessDefinitionKeys() != null) {
+            query.excludeProcessDefinitionKeys(queryRequest.getExcludeProcessDefinitionKeys());
+        }
         if (queryRequest.getProcessDefinitionId() != null) {
             query.processDefinitionId(queryRequest.getProcessDefinitionId());
         }

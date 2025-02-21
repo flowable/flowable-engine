@@ -156,6 +156,40 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     }
     
     @Test
+    public void testQueryByExcludeProcessDefinitionKeys() {
+        Set<String> processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY_2);
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.list()).hasSize(0);
+        
+        processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY);
+        
+        query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        
+        processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY_2);
+        
+        query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+        assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+    }
+
+    @Test
+    public void testQueryByInvalidExcludeProcessDefinitionKeys() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(Collections.emptySet()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+    
+    @Test
     public void testQueryByProcessDefinitionKeyLike() {
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().processDefinitionKeyLike(PROCESS_DEFINITION_KEY_2);
         assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);

@@ -164,6 +164,55 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .caseDefinitionKeys(Collections.singleton("oneTaskCase"))
                 .endOr().singleResult().getId()).isEqualTo(caseInstance.getId());
     }
+    
+    @Test
+    public void getCaseInstanceByExcludeCaseDefinitionKeys() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        Set<String> excludeKeys = new HashSet<>();
+        excludeKeys.add("oneTaskCase");
+        excludeKeys.add("myCase");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).count()).isEqualTo(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).list()).hasSize(0);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add("myCase");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr().singleResult().getId()).isEqualTo(caseInstance.getId());
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add("oneTaskCase");
+        excludeKeys.add("myCase");
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .count()).isEqualTo(0);
+    }
 
     @Test
     public void getCaseInstanceByCaseDefinitionCategory() {

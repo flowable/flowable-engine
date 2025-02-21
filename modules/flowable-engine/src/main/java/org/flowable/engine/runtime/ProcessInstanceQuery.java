@@ -126,6 +126,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery processDefinitionKeys(Set<String> processDefinitionKeys);
     
     /**
+     * Select the process instances which are defined by process definitions that don't match the given keys.
+     */
+    ProcessInstanceQuery excludeProcessDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /**
      * Select process instances whose process definition key is like the given value
      */
     ProcessInstanceQuery processDefinitionKeyLike(String processDefinitionKeyLike);

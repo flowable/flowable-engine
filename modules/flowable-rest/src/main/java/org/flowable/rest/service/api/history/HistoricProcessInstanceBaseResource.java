@@ -94,6 +94,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionKeyLikeIgnoreCase() != null) {
             query.processDefinitionKeyLikeIgnoreCase(queryRequest.getProcessDefinitionKeyLikeIgnoreCase());
         }
+        if (queryRequest.getProcessDefinitionKeys() != null) {
+            query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeys());
+        }
+        if (queryRequest.getExcludeProcessDefinitionKeys() != null) {
+            query.excludeProcessDefinitionKeys(queryRequest.getExcludeProcessDefinitionKeys());
+        }
         if (queryRequest.getProcessDefinitionKeyIn() != null) {
             query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeyIn());
         }
