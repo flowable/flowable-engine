@@ -157,6 +157,9 @@ public class BatchDeleteCaseConfig {
                 case "caseDefinitionKeys":
                     query.caseDefinitionKeys(asStringSet(value));
                     break;
+                case "excludeCaseDefinitionKeys":
+                    query.excludeCaseDefinitionKeys(asStringSet(value));
+                    break;
                 case "caseDefinitionIds":
                     query.caseDefinitionIds(asStringSet(value));
                     break;
