@@ -28,14 +28,11 @@ import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
-import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<HistoricEntityLinkEntity> implements HistoricEntityLinkDataManager {
-
-    protected CachedEntityMatcher<HistoricEntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
 
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     
@@ -61,7 +58,7 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
         
-        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters);
     }
 
     @Override

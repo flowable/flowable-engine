@@ -1232,6 +1232,8 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 // We only care about methods that return the query itself
                 continue;
             }
+            
+            System.out.println(methodName);
 
             Instant baseTime = Instant.now().truncatedTo(ChronoUnit.SECONDS)
                     .minus(365, ChronoUnit.DAYS)

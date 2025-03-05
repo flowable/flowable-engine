@@ -1,3 +1,4 @@
+drop index if exists FLW_IDX_EVENT_RSRC_DPL;
 drop index if exists ACT_IDX_CHANNEL_DEF_UNIQ;
 drop index if exists ACT_IDX_EVENT_DEF_UNIQ;
 

@@ -70,6 +70,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String processDefinitionKeyLike;
     protected String processDefinitionKeyLikeIgnoreCase;
     protected Set<String> processDefinitionKeys;
+    protected Set<String> excludeProcessDefinitionKeys;
     protected String processDefinitionEngineVersion;
     protected String deploymentId;
     protected List<String> deploymentIds;
@@ -475,6 +476,23 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
         } else {
             this.processDefinitionKeys = processDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery excludeProcessDefinitionKeys(Set<String> excludeProcessDefinitionKeys) {
+        if (excludeProcessDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Set of process definition keys is null");
+        }
+        if (excludeProcessDefinitionKeys.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process definition keys is empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+        } else {
+            this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
         }
         return this;
     }
@@ -1138,6 +1156,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public Set<String> getProcessDefinitionKeys() {
         return processDefinitionKeys;
+    }
+
+    public Set<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
     }
 
     public String getProcessDefinitionEngineVersion() {

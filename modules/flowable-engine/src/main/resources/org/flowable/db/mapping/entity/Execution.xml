@@ -691,6 +691,12 @@
           #{processDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
+      <if test="excludeProcessDefinitionKeys != null and !excludeProcessDefinitionKeys.empty">
+        and P.KEY_ not in
+        <foreach item="processDefinitionKey" index="index" collection="excludeProcessDefinitionKeys" open="(" separator="," close=")">
+          #{processDefinitionKey, jdbcType=NVARCHAR}
+        </foreach>
+      </if>
       <if test="processDefinitionCategory != null">
         and P.CATEGORY_ = #{processDefinitionCategory, jdbcType=NVARCHAR}
       </if>
@@ -1048,6 +1054,12 @@
           <if test="orQueryObject.processDefinitionKeys != null and !orQueryObject.processDefinitionKeys.empty">
             or P.KEY_ in
             <foreach item="processDefinitionKey" index="index" collection="orQueryObject.processDefinitionKeys" open="(" separator="," close=")">
+              #{processDefinitionKey, jdbcType=NVARCHAR}
+            </foreach>
+          </if>
+          <if test="orQueryObject.excludeProcessDefinitionKeys != null and !orQueryObject.excludeProcessDefinitionKeys.empty">
+            or P.KEY_ not in
+            <foreach item="processDefinitionKey" index="index" collection="orQueryObject.excludeProcessDefinitionKeys" open="(" separator="," close=")">
               #{processDefinitionKey, jdbcType=NVARCHAR}
             </foreach>
           </if>

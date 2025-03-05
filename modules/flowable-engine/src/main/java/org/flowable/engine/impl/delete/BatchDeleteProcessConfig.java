@@ -206,6 +206,9 @@ public class BatchDeleteProcessConfig {
                 case "processDefinitionKeyIn":
                     query.processDefinitionKeyIn(asStringList(value));
                     break;
+                case "excludeProcessDefinitionKeys":
+                    query.excludeProcessDefinitionKeys(asStringList(value));
+                    break;
                 case "processKeyNotIn":
                     query.processDefinitionKeyNotIn(asStringList(value));
                     break;

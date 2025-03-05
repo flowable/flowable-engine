@@ -106,6 +106,26 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         includeIds.add("invalid");
         assertThat(runtimeService.createExecutionQuery().processDefinitionKeys(includeIds).list()).isEmpty();
     }
+    
+    @Test
+    public void testQueryByExcludeProcessDefinitionKeys() {
+        Set<String> excludeKeys = new HashSet<>();
+        excludeKeys.add(CONCURRENT_PROCESS_KEY);
+        excludeKeys.add(SEQUENTIAL_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(0);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add(CONCURRENT_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(2);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add(SEQUENTIAL_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(12);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add("invalid");
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(14);
+    }
 
     @Test
     public void testQueryByInvalidProcessDefinitionKey() {

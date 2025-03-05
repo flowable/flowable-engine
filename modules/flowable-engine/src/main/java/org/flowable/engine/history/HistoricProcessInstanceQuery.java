@@ -56,6 +56,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select historic process instances that are defined by a process definition with one of the given process definition keys.
      */
     HistoricProcessInstanceQuery processDefinitionKeyIn(List<String> processDefinitionKeys);
+    
+    /**
+     * Only select historic process instances that are defined by a process definition that doesn't match one of the given process definition keys.
+     */
+    HistoricProcessInstanceQuery excludeProcessDefinitionKeys(List<String> processDefinitionKeys);
 
     /**
      * Only select historic process instances that don't have a process-definition of which the key is present in the given list

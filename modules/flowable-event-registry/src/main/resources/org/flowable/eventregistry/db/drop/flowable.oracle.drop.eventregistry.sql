@@ -1,3 +1,6 @@
+alter table FLW_EVENT_RESOURCE drop constraint FLW_FK_EVENT_RSRC_DPL;
+
+drop index FLW_IDX_EVENT_RSRC_DPL;
 drop index ACT_IDX_CHANNEL_DEF_UNIQ;
 drop index ACT_IDX_EVENT_DEF_UNIQ;
 

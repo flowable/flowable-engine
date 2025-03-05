@@ -193,6 +193,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "superProcessInstanceId", query.getSuperProcessInstanceId());
         putIfTrue(queryNode, "excludeSubprocesses", query.isExcludeSubprocesses());
         putIfNotNullOrEmpty(queryNode, "processDefinitionKeyIn", query.getProcessDefinitionKeyIn());
+        putIfNotNullOrEmpty(queryNode, "excludeProcessDefinitionKeys", query.getExcludeProcessDefinitionKeys());
         putIfNotNullOrEmpty(queryNode, "processKeyNotIn", query.getProcessKeyNotIn());
         putIfNotNull(queryNode, "startedBefore", query.getStartedBefore());
         putIfNotNull(queryNode, "startedAfter", query.getStartedAfter());

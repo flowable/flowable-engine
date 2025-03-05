@@ -358,6 +358,12 @@
                     #{caseDefinitionKey, jdbcType=VARCHAR}
                 </foreach>
             </if>
+            <if test="excludeCaseDefinitionKeys != null">
+                and CASE_DEF.KEY_ NOT IN
+                <foreach item="caseDefinitionKey" index="index" collection="excludeCaseDefinitionKeys" open="(" separator="," close=")">
+                    #{caseDefinitionKey, jdbcType=VARCHAR}
+                </foreach>
+            </if>
             <if test="caseDefinitionCategory != null">
                 and CASE_DEF.CATEGORY_ = #{caseDefinitionCategory, jdbcType=VARCHAR}
             </if>
@@ -497,6 +503,12 @@
                     <if test="orQueryObject.caseDefinitionKeys != null &amp;&amp; !orQueryObject.caseDefinitionKeys.empty">
                         or CASE_DEF.KEY_ IN
                         <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.caseDefinitionKeys" open="(" separator="," close=")">
+                            #{caseDefinitionKey, jdbcType=VARCHAR}
+                        </foreach>
+                    </if>
+                    <if test="orQueryObject.excludeCaseDefinitionKeys != null &amp;&amp; !orQueryObject.excludeCaseDefinitionKeys.empty">
+                        or CASE_DEF.KEY_ NOT IN
+                        <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.excludeCaseDefinitionKeys" open="(" separator="," close=")">
                             #{caseDefinitionKey, jdbcType=VARCHAR}
                         </foreach>
                     </if>

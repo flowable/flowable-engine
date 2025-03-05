@@ -264,6 +264,70 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                 .isEqualTo(caseInstance.getId());
         }
     }
+    
+    @Test
+    public void getCaseInstanceByExcludeCaseDefinitionKeys() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            Set<String> excludeKeys = new HashSet<>();
+            excludeKeys.add("oneTaskCase");
+            excludeKeys.add("myCase");
+            
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).count()).isEqualTo(0);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).list()).hasSize(0);
+            
+            excludeKeys = new HashSet<>();
+            excludeKeys.add("myCase");
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+
+            excludeKeys = new HashSet<>();
+            excludeKeys.add("dummy");
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().excludeCaseDefinitionKeys(excludeKeys).list()).hasSize(2);
+            
+            excludeKeys = new HashSet<>();
+            excludeKeys.add("myCase");
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .count())
+                .isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .list().get(0).getId())
+                .isEqualTo(caseInstance.getId());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .caseInstanceId("undefined")
+                .excludeCaseDefinitionKeys(excludeKeys)
+                .endOr()
+                .singleResult().getId())
+                .isEqualTo(caseInstance.getId());
+            
+            excludeKeys = new HashSet<>();
+            excludeKeys.add("oneTaskCase");
+            excludeKeys.add("myCase");
+            
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .or()
+                    .caseInstanceId("undefined")
+                    .excludeCaseDefinitionKeys(excludeKeys)
+                    .endOr()
+                    .count()).isEqualTo(0);
+        }
+    }
 
     @Test
     public void getCaseInstanceByCaseDefinitionCategory() {

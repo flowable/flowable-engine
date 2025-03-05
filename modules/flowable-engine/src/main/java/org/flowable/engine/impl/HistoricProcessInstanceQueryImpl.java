@@ -72,6 +72,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String superProcessInstanceId;
     protected boolean excludeSubprocesses;
     protected List<String> processDefinitionKeyIn;
+    protected List<String> excludeProcessDefinitionKeys;
     protected List<String> processKeyNotIn;
     protected Date startedBefore;
     protected Date startedAfter;
@@ -185,6 +186,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.processDefinitionKeyIn = processDefinitionKeys;
         } else {
             this.processDefinitionKeyIn = processDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery excludeProcessDefinitionKeys(List<String> excludeProcessDefinitionKeys) {
+        if (inOrStatement) {
+            currentOrQueryObject.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+        } else {
+            this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
         }
         return this;
     }
@@ -1245,6 +1256,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public List<String> getProcessDefinitionKeyIn() {
         return processDefinitionKeyIn;
+    }
+
+    public List<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
     }
 
     public String getProcessDefinitionIdLike() {
