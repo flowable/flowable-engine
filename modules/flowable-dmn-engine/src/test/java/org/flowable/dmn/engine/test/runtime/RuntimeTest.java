@@ -416,4 +416,21 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
 
         assertThat(result).containsEntry("outputVariable1", "result2");
     }
+    
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionExpressionNotAtBeginning.dmn")
+    public void testDecisionExpressionNotAtBeginning() {
+        Map<String, Object> processVariablesInput = new HashMap<>();
+        processVariablesInput.put("selectedValue", "type2");
+
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("dmnExpression")
+                .variables(processVariablesInput)
+                .executeWithSingleResult();
+
+        assertThat(result)
+                .containsOnly(
+                        entry("outputValue", ": this does not work : type2")
+                );
+    }
 }
