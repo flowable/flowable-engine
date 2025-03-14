@@ -60,7 +60,8 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
             }
 
-        } else if (PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(variableEventListener.getAvailableConditionExpression()) || PlanItemTransition.INITIATE.equals(transition)) {
+        } else if ((PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(variableEventListener.getAvailableConditionExpression()))
+                || PlanItemTransition.INITIATE.equals(transition)) {
             String configuration = null;
             if (StringUtils.isNotEmpty(variableEventListener.getVariableChangeType())) {
                 ObjectNode configurationNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
