@@ -30,8 +30,13 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -144,8 +149,6 @@ public class MultiInstanceNoWaitStatesTest extends PluggableFlowableTestCase {
         assertNoJobsAndNoProcessInstances();
     }
 
-
-
     @Test
     @Deployment
     public void testNestedParallelAsyncAndExclusiveSubProcess() {
@@ -180,6 +183,30 @@ public class MultiInstanceNoWaitStatesTest extends PluggableFlowableTestCase {
 
         waitForJobExecutorToProcessAllJobs(Duration.ofMinutes(5).toMillis(), 200);
         assertNoJobsAndNoProcessInstances();
+    }
+    
+    @Test
+    @Deployment
+    public void testJsonArrayVariable() {
+        ArrayNode customerArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        ObjectNode customer1Node = customerArray.addObject();
+        customer1Node.put("name", "John Doe");
+        ObjectNode customer2Node = customerArray.addObject();
+        customer2Node.put("name", "Jane Doe");
+        
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("jsonVarTest")
+            .variable("customerList", customerArray)
+            .start();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ArrayNode persistedCustomerArray = (ArrayNode) runtimeService.getVariable(processInstance.getId(), "customerList");
+        JsonNode persistedCustomer1Object = persistedCustomerArray.get(0);
+        
+        assertThat(persistedCustomer1Object.has("newProperty")).isTrue();
+        assertThat(persistedCustomer1Object.get("newProperty").asText()).isEqualTo("test");
     }
 
     protected void assertNoJobsAndNoProcessInstances() {
