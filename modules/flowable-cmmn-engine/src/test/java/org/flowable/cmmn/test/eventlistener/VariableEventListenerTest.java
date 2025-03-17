@@ -31,6 +31,32 @@ public class VariableEventListenerTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testVariableEventListenerWithAvailableCondition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").variable("availableConditionVar", false).start();
+
+        PlanItemInstance listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).singleResult();
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        // create var1 variable
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test1");
+        // should not trigger variable event listener
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isZero();
+
+        // setting the variable should make the variable event listener available
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "availableConditionVar", true);
+        listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).singleResult();
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        // update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test2");
+        // variable event listener should be completed
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(1);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testTriggerVariableEventListener() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").start();
 
