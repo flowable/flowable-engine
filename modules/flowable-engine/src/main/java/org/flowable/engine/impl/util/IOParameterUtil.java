@@ -26,6 +26,8 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Filip Hrisafov
  */
@@ -73,6 +75,10 @@ public class IOParameterUtil {
                 value = expression.getValue(sourceContainer);
             } else {
                 value = sourceContainer.getVariable(parameter.getSource());
+            }
+            
+            if (value != null && value instanceof JsonNode) {
+                value = ((JsonNode) value).deepCopy();
             }
 
             String variableName = null;
