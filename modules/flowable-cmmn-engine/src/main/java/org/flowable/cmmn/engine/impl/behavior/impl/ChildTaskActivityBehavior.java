@@ -34,6 +34,8 @@ import org.flowable.form.api.FormInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
@@ -115,7 +117,10 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
 
             } else if (StringUtils.isNotEmpty(inParameter.getSource())) {
                 variableValue = planItemInstanceEntity.getVariable(inParameter.getSource());
-
+            }
+            
+            if (variableValue != null && variableValue instanceof JsonNode) {
+                variableValue = ((JsonNode) variableValue).deepCopy();
             }
 
             if (variableName != null) {
