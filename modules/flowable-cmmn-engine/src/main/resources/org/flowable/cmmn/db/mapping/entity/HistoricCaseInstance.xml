@@ -628,11 +628,17 @@
             ${queryTablePrefix}ID_ = #{caseInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="caseInstanceIds != null &amp;&amp; !caseInstanceIds.empty">
-            and ${queryTablePrefix}ID_ IN
-            <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
-                     open="(" separator="," close=")">
-              #{caseInstanceId, jdbcType=VARCHAR}
+            and (
+            <foreach item="caseInstanceIdListItem" index="groupIndex" collection="safeCaseInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                ${queryTablePrefix}ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                  #{caseInstanceId, jdbcType=VARCHAR}
+                </foreach>
             </foreach>
+            )
         </if>
         <if test="caseDefinitionId != null">
             and ${queryTablePrefix}CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
@@ -794,11 +800,17 @@
             ${queryTablePrefix}ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="orQueryObject.caseInstanceIds != null &amp;&amp; !orQueryObject.caseInstanceIds.empty">
-            or ${queryTablePrefix}ID_ IN
-            <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds"
-                     open="(" separator="," close=")">
-                #{caseInstanceId, jdbcType=VARCHAR}
+            or (
+            <foreach item="caseInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeCaseInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                ${queryTablePrefix}ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                  #{caseInstanceId, jdbcType=VARCHAR}
+                </foreach>
             </foreach>
+            )
         </if>
         <if test="orQueryObject.caseDefinitionId != null">
             or ${queryTablePrefix}CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}
