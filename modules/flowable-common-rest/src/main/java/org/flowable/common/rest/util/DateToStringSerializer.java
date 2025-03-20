@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 public class DateToStringSerializer extends JsonSerializer<Date> {
 
-    protected DateTimeFormatter isoFormatter = ISODateTimeFormat.dateTime();
+    protected DateTimeFormatter isoFormatter = ISODateTimeFormat.dateTime().withZoneUTC();
 
     @Override
     public void serialize(Date tmpDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {

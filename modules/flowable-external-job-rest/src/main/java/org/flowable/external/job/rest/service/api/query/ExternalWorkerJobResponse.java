@@ -15,7 +15,7 @@ package org.flowable.external.job.rest.service.api.query;
 
 import java.util.Date;
 
-import org.flowable.common.rest.util.DateToStringIso8601Serializer;
+import org.flowable.common.rest.util.DateToStringSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -69,11 +69,11 @@ public class ExternalWorkerJobResponse {
     protected String exceptionMessage;
 
     @ApiModelProperty(value = "The due date for the job", example = "2021-05-04T16:35:10.474Z")
-    @JsonSerialize(using = DateToStringIso8601Serializer.class, as = Date.class)
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date dueDate;
 
     @ApiModelProperty(value = "The creation time of the job", example = "2020-05-04T16:35:10.474Z")
-    @JsonSerialize(using = DateToStringIso8601Serializer.class, as = Date.class)
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date createTime;
 
     @ApiModelProperty(value = "The tenant if of the job", example = "flowable")
@@ -83,7 +83,7 @@ public class ExternalWorkerJobResponse {
     protected String lockOwner;
 
     @ApiModelProperty(value = "The time when the lock expires", example = "2020-05-04T16:35:10.474Z")
-    @JsonSerialize(using = DateToStringIso8601Serializer.class, as = Date.class)
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date lockExpirationTime;
 
     public String getId() {
