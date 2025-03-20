@@ -352,11 +352,18 @@
             <if test="caseInstanceId != null">
                 and RES.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
             </if>
-            <if test="caseInstanceIds != null">
-                and RES.ID_ IN
-                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
-                    #{caseInstanceId, jdbcType=VARCHAR}
+            <if test="caseInstanceIds != null &amp;&amp; !caseInstanceIds.empty">
+                and (
+                <foreach item="caseInstanceIdListItem" index="groupIndex" collection="safeCaseInstanceIds">
+                    <if test="groupIndex &gt; 0">
+                    or
+                    </if>
+                    RES.ID_ IN
+                    <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                      #{caseInstanceId, jdbcType=VARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
@@ -631,11 +638,18 @@
                     <if test="orQueryObject.caseInstanceId != null">
                         or RES.ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
                     </if>
-                    <if test="orQueryObject.caseInstanceIds != null">
-                        or RES.ID_ IN
-                        <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds" open="(" separator="," close=")">
-                            #{caseInstanceId, jdbcType=VARCHAR}
+                    <if test="orQueryObject.caseInstanceIds != null &amp;&amp; !orQueryObject.caseInstanceIds.empty">
+                        or (
+                        <foreach item="caseInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeCaseInstanceIds">
+                            <if test="groupIndex &gt; 0">
+                            or
+                            </if>
+                            RES.ID_ IN
+                            <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                              #{caseInstanceId, jdbcType=VARCHAR}
+                            </foreach>
                         </foreach>
+                        )
                     </if>
                     <if test="orQueryObject.caseDefinitionId != null">
                         or RES.CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}

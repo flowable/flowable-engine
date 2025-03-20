@@ -68,6 +68,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String businessStatusLikeIgnoreCase;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String caseInstanceParentId;
     protected String caseInstanceParentPlanItemInstanceId;
     protected Date startedBefore;
@@ -1232,6 +1233,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public List<CaseInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeCaseInstanceIds) {
+        this.safeCaseInstanceIds = safeCaseInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

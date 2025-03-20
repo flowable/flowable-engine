@@ -105,6 +105,10 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     }
 
     protected void setSafeInValueLists(HistoricCaseInstanceQueryImpl caseInstanceQuery) {
+        if (caseInstanceQuery.getCaseInstanceIds() != null) {
+            caseInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(caseInstanceQuery.getCaseInstanceIds()));
+        }
+        
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
         }
