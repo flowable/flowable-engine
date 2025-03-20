@@ -116,6 +116,10 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
     }
 
     protected void setSafeInValueLists(HistoricProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getProcessInstanceIds() != null) {
+            processInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(processInstanceQuery.getProcessInstanceIds()));
+        }
+        
         if (processInstanceQuery.getInvolvedGroups() != null) {
             processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
         }

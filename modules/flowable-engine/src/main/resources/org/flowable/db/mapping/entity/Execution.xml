@@ -731,10 +731,17 @@
         and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.empty">
-        and RES.PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{processInstanceId, jdbcType=NVARCHAR}
+        and (
+        <foreach item="processInstanceIdListItem" index="groupIndex" collection="safeProcessInstanceIds">
+            <if test="groupIndex &gt; 0">
+            or
+            </if>
+            RES.PROC_INST_ID_ IN
+            <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+              #{processInstanceId, jdbcType=NVARCHAR}
+            </foreach>
         </foreach>
+        )
       </if>
       <if test="businessKey != null or businessKeyLike != null or businessKeyLikeIgnoreCase != null">
           <choose>
@@ -1094,10 +1101,17 @@
             or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.empty">
-            or RES.PROC_INST_ID_ in
-            <foreach item="processInstanceId" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
-              #{processInstanceId, jdbcType=NVARCHAR}
+            or (
+            <foreach item="processInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeProcessInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                RES.PROC_INST_ID_ IN
+                <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+                  #{processInstanceId, jdbcType=NVARCHAR}
+                </foreach>
             </foreach>
+            )
           </if>
           <if test="orQueryObject.businessKey != null">
             or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=NVARCHAR}
