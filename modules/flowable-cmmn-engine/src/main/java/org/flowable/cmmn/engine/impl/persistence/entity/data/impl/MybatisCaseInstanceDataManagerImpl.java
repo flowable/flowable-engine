@@ -214,6 +214,10 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     }
 
     protected void setSafeInValueLists(CaseInstanceQueryImpl caseInstanceQuery) {
+        if (caseInstanceQuery.getCaseInstanceIds() != null) {
+            caseInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(caseInstanceQuery.getCaseInstanceIds()));
+        }
+        
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
         }

@@ -1403,6 +1403,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     public List<ExecutionQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }
+    
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return null;
+    }
 
     public List<List<String>> getSafeInvolvedGroups() {
         return safeInvolvedGroups;

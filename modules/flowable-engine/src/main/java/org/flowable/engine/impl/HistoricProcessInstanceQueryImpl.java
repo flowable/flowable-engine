@@ -89,6 +89,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String processDefinitionNameLikeIgnoreCase;
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String involvedUser;
@@ -1471,6 +1472,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
 
         return hasOrderByForColumn(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

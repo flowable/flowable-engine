@@ -67,6 +67,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String caseInstanceName;
     protected String caseInstanceNameLike;
     protected String caseInstanceNameLikeIgnoreCase;
@@ -1457,6 +1458,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         return hasOrderByForColumn(HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeCaseInstanceIds) {
+        this.safeCaseInstanceIds = safeCaseInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {
