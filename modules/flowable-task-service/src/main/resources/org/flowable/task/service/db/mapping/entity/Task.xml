@@ -658,6 +658,19 @@
       <if test="scopeId != null">
         and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
       </if>
+      <if test="scopeIds != null &amp;&amp; !scopeIds.empty">
+          and (
+          <foreach item="scopeIdListItem" index="groupIndex" collection="safeScopeIds">
+              <if test="groupIndex &gt; 0">
+                  or
+              </if>
+              RES.SCOPE_ID_ IN
+              <foreach item="scopeId" index="index" collection="scopeIdListItem" open="(" separator="," close=")">
+                  #{scopeId, jdbcType=NVARCHAR}
+              </foreach>
+          </foreach>
+          )
+      </if>
       <if test="subScopeId != null">
         and RES.SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
       </if>
@@ -1244,8 +1257,21 @@
             <if test="orQueryObject.scopeId != null">
               or RES.SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
             </if>
+            <if test="orQueryObject.scopeIds != null &amp;&amp; !orQueryObject.scopeIds.empty">
+                or (
+                <foreach item="scopeIdListItem" index="groupIndex" collection="orQueryObject.safeScopeIds">
+                    <if test="groupIndex &gt; 0">
+                        or
+                    </if>
+                    RES.SCOPE_ID_ IN
+                    <foreach item="scopeId" index="index" collection="scopeIdListItem" open="(" separator="," close=")">
+                        #{scopeId, jdbcType=NVARCHAR}
+                    </foreach>
+                </foreach>
+                )
+            </if>
             <if test="orQueryObject.subScopeId != null">
-              or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}
+                or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="orQueryObject.scopeType != null">
               or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType, jdbcType=NVARCHAR}

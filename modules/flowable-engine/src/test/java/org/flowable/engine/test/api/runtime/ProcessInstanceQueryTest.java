@@ -2362,6 +2362,18 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByCallbackIds() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("processOneId").start()
+                .getId();
+        String processInstanceId2 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("someOtherCallBack").start()
+                .getId();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceCallbackIds(Set.of("someId", "processOneId")).list()).extracting(
+                        ProcessInstance::getId)
+                .containsExactly(processInstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidCallbackType() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();

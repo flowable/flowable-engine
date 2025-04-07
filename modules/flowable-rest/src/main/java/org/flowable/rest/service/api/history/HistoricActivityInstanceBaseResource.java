@@ -98,8 +98,16 @@ public class HistoricActivityInstanceBaseResource {
             query.processInstanceId(queryRequest.getProcessInstanceId());
         }
 
+        if (queryRequest.getProcessInstanceIds() != null && !queryRequest.getProcessInstanceIds().isEmpty()) {
+            query.processInstanceIds(queryRequest.getProcessInstanceIds());
+        }
+
         if (queryRequest.getProcessDefinitionId() != null) {
             query.processDefinitionId(queryRequest.getProcessDefinitionId());
+        }
+
+        if (queryRequest.getCalledProcessInstanceIds() != null && !queryRequest.getCalledProcessInstanceIds().isEmpty()) {
+            query.calledProcessInstanceIds(queryRequest.getCalledProcessInstanceIds());
         }
 
         if (queryRequest.getTenantId() != null) {

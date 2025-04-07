@@ -836,10 +836,16 @@
         </if>
       </if>
       <if test="callbackId != null">
-           and CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
+          and RES.CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
       </if>
+        <if test="callbackIds != null">
+            and RES.CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="callbackIds" open="(" separator="," close=")">
+                #{callbackId, jdbcType=NVARCHAR}
+            </foreach>
+        </if>
       <if test="callbackType != null">
-           and CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
+          and RES.CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
       </if>
       <if test="parentCaseInstanceId != null">
           and EXISTS(select 1 from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST PLANITEM where
@@ -849,10 +855,10 @@
           )
       </if>
       <if test="referenceId != null">
-           and REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
+          and RES.REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
       </if>
       <if test="referenceType != null">
-           and REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
+          and RES.REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
@@ -1180,10 +1186,15 @@
             </if>
           </if>
           <if test="orQueryObject.callbackId != null">
-              or CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=NVARCHAR}
+              or RES.CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=NVARCHAR}
           </if>
+            <if test="orQueryObject.callbackIds != null">
+                or RES.CALLBACK_ID_ in
+                <foreach item="callbackId" index="index" collection="orQueryObject.callbackIds" open="(" separator="," close=")">#{callbackId, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
           <if test="orQueryObject.callbackType != null">
-              or CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
+              or RES.CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.parentCaseInstanceId != null">
               or EXISTS(select 1 from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST PLANITEM where
@@ -1193,10 +1204,10 @@
               )
           </if>
           <if test="orQueryObject.referenceId != null">
-              or REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=NVARCHAR}
+              or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.referenceType != null">
-              or REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=NVARCHAR}
+              or RES.REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}

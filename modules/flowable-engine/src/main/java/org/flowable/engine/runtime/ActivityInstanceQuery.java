@@ -13,8 +13,9 @@
 
 package org.flowable.engine.runtime;
 
-import org.flowable.common.engine.api.query.Query;
+import java.util.Set;
 
+import org.flowable.common.engine.api.query.Query;
 /**
  * Programmatic querying for {@link ActivityInstance}s.
  * 
@@ -31,6 +32,11 @@ public interface ActivityInstanceQuery extends Query<ActivityInstanceQuery, Acti
      * Only select activity instances with the given process instance. {@link ProcessInstance} ids and {@link ActivityInstance#getProcessInstanceId()} ids match.
      */
     ActivityInstanceQuery processInstanceId(String processInstanceId);
+
+    /**
+     * Only select activity instances with the given process instance ids. {@link ProcessInstance} ids and {@link ActivityInstance#getProcessInstanceId()} ids match.
+     */
+    ActivityInstanceQuery processInstanceIds(Set<String> processInstanceIds);
 
     /** Only select activity instances for the given process definition */
     ActivityInstanceQuery processDefinitionId(String processDefinitionId);

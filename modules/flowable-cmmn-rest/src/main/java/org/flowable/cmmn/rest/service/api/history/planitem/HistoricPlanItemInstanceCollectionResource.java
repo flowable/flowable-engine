@@ -13,11 +13,14 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +54,10 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
         mapping.put("planItemInstanceState", HistoricPlanItemInstanceQueryRequest::setPlanItemInstanceState);
         mapping.put("caseDefinitionId", HistoricPlanItemInstanceQueryRequest::setCaseDefinitionId);
         mapping.put("caseInstanceId", HistoricPlanItemInstanceQueryRequest::setCaseInstanceId);
+        mapping.put("caseInstanceIds", (req, value) -> {
+            String[] csv = StringUtils.split(value, ","); // split by comma
+            req.setCaseInstanceIds(new HashSet<>(Arrays.asList(csv)));
+        });
         mapping.put("stageInstanceId", HistoricPlanItemInstanceQueryRequest::setStageInstanceId);
         mapping.put("elementId", HistoricPlanItemInstanceQueryRequest::setElementId);
         mapping.put("planItemDefinitionId", HistoricPlanItemInstanceQueryRequest::setPlanItemDefinitionId);
@@ -91,6 +98,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiImplicitParam(name = "planItemInstanceState", dataType = "string", value = "The state of the historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The id of the definition of the case were the historic planItem instance is defined.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The id of the case instance were the historic planItem instance existed.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "The ids of the case instances were the historic planItem instance existed.", paramType = "query"),
             @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "The id of the stage were the historic planItem instance was contained.", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "The id of the planItem model of the historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "The id of the planItem model definition of the historic planItem instance.", paramType = "query"),

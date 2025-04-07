@@ -103,5 +103,9 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
         }
+        if(planItemInstanceQuery.getCaseInstanceIds() != null) {
+            planItemInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(planItemInstanceQuery.getCaseInstanceIds()));
+        }
+
     }
 }

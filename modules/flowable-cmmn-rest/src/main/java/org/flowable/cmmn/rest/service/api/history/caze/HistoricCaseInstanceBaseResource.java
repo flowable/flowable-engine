@@ -155,6 +155,9 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseInstanceCallbackId() != null) {
             query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
         }
+        if (queryRequest.getCaseInstanceCallbackIds() != null && !queryRequest.getCaseInstanceCallbackIds().isEmpty()) {
+            query.caseInstanceCallbackIds(queryRequest.getCaseInstanceCallbackIds());
+        }
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
         }

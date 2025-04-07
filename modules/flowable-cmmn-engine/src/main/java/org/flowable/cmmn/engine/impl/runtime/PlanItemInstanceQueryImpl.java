@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -39,6 +40,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String caseDefinitionId;
     protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String stageInstanceId;
     protected String planItemInstanceId;
     protected String elementId;
@@ -146,6 +149,23 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             this.currentOrQueryObject.caseInstanceId = caseInstanceId;
         } else {
             this.caseInstanceId = caseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is null");
+        }
+        if (caseInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
+        } else {
+            this.caseInstanceIds = caseInstanceIds;
         }
         return this;
     }
@@ -1351,5 +1371,17 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
 
     public List<PlanItemInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeCaseInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getCaseInstanceIds() {
+        return caseInstanceIds;
     }
 }

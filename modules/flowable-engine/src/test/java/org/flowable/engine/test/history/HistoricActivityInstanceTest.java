@@ -247,6 +247,18 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testQueryByProcessInstanceIds() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("noopProcess");
+        ProcessInstance otherProcessInstance = runtimeService.startProcessInstanceByKey("noopProcess");
+        ProcessInstance instance3 = runtimeService.startProcessInstanceByKey("noopProcess");
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+        assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceIds(Set.of(processInstance.getId(), otherProcessInstance.getId()))
+                .list()).hasSize(10);
+    }
+
+    @Test
+    @Deployment
     public void testHistoricActivityInstanceForEventsQuery() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("eventProcess");
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
@@ -307,6 +319,26 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         HistoricProcessInstance oldInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey("calledProcess").singleResult();
 
         assertThat(historicActivityInstance.getCalledProcessInstanceId()).isEqualTo(oldInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/calledProcess.bpmn20.xml",
+            "org/flowable/engine/test/history/HistoricActivityInstanceTest.testCallSimpleSubProcess.bpmn20.xml" })
+    public void testHistoricActivityInstanceCalledProcessIds() {
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("callSimpleSubProcess").start();
+        runtimeService.createProcessInstanceBuilder().processDefinitionKey("callSimpleSubProcess").start();
+
+        waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+        HistoricProcessInstance calledProcess = historyService.createHistoricProcessInstanceQuery()
+                .processDefinitionKey("calledProcess").list().get(0);
+
+        HistoricActivityInstance callingActivityInstance = historyService.createHistoricActivityInstanceQuery()
+                .calledProcessInstanceIds(Set.of("someId", calledProcess.getId())).singleResult();
+
+        assertThat(callingActivityInstance.getActivityId()).isEqualTo("callSubProcess");
+        assertThat(callingActivityInstance.getCalledProcessInstanceId()).isEqualTo(calledProcess.getId());
+
     }
 
     @Test

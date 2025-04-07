@@ -102,6 +102,10 @@ public class ActivityInstanceBaseResource {
             query.processInstanceId(queryRequest.getProcessInstanceId());
         }
 
+        if (queryRequest.getProcessInstanceIds() != null && !queryRequest.getProcessInstanceIds().isEmpty()) {
+            query.processInstanceIds(queryRequest.getProcessInstanceIds());
+        }
+
         if (queryRequest.getProcessDefinitionId() != null) {
             query.processDefinitionId(queryRequest.getProcessDefinitionId());
         }

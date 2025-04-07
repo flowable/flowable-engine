@@ -125,6 +125,12 @@ public class ExecutionCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?tenantIdLike=" + encode("%whatever");
         assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceId=" + processInstance.getId();
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_COLLECTION) + "?processInstanceIds=someId," + processInstance.getId();
+        assertResultsPresentInDataResponse(url, id, childExecutionInTask.getId(), childExecutionInSubProcess.getId());
     }
 
     /**

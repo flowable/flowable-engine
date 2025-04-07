@@ -38,6 +38,10 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
      * Only select historic activity instances with the given process instance. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
      */
     HistoricActivityInstanceQuery processInstanceId(String processInstanceId);
+    /**
+     * Only select historic activity instances with the given process instances. {@link org.flowable.engine.runtime.ProcessInstance} ids and {@link HistoricProcessInstance} ids match.
+     */
+    HistoricActivityInstanceQuery processInstanceIds(Set<String> processInstanceIds);
 
     /** Only select historic activity instances for the given process definition */
     HistoricActivityInstanceQuery processDefinitionId(String processDefinitionId);
@@ -64,6 +68,11 @@ public interface HistoricActivityInstanceQuery extends Query<HistoricActivityIns
      * Only select historic activity instances whose activity type is in the given set of activity types.
      */
     HistoricActivityInstanceQuery activityTypes(Set<String>  activityTypes);
+
+    /**
+     * Only select historic activity instances with the given process instance ids as called process instance id.
+     */
+    HistoricActivityInstanceQuery calledProcessInstanceIds(Set<String> calledProcessInstanceIds);
 
     /**
      * Only select historic activity instances for userTask activities assigned to the given user

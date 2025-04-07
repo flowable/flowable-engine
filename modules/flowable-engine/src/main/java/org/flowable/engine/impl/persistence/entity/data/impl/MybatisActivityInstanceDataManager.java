@@ -95,12 +95,14 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
 
     @Override
     public long findActivityInstanceCountByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery) {
+        setSafeInValueLists(activityInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectActivityInstanceCountByQueryCriteria", activityInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<ActivityInstance> findActivityInstancesByQueryCriteria(ActivityInstanceQueryImpl activityInstanceQuery) {
+        setSafeInValueLists(activityInstanceQuery);
         return getDbSqlSession().selectList("selectActivityInstancesByQueryCriteria", activityInstanceQuery);
     }
 
@@ -115,4 +117,9 @@ public class MybatisActivityInstanceDataManager extends AbstractProcessDataManag
         return (Long) getDbSqlSession().selectOne("selectActivityInstanceCountByNativeQuery", parameterMap);
     }
 
+    protected void setSafeInValueLists(ActivityInstanceQueryImpl activityInstanceQuery) {
+        if (activityInstanceQuery.getProcessInstanceIds() != null) {
+            activityInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(activityInstanceQuery.getProcessInstanceIds()));
+        }
+    }
 }

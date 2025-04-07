@@ -86,6 +86,8 @@ public class ActivityInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
         assertResultsPresentInDataResponse(url + "?processInstanceId=" + processInstance2.getId(), 3, "theStart", "flow1", "processTask");
 
+        assertResultsPresentInDataResponse(url + "?processInstanceIds=someOtherId," + processInstance.getId(), 5, "theStart", "flow1", "processTask", "flow2", "processTask2");
+
         assertResultsPresentInDataResponse(url + "?processDefinitionId=" + processInstance.getProcessDefinitionId(), 8,
             "theStart", "flow1",  "processTask", "flow2", "processTask2");
 
