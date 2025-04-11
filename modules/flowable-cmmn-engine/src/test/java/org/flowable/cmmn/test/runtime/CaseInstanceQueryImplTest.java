@@ -823,6 +823,65 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByCallBackIds() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .callbackId("callBackId")
+                .start();
+
+        CaseInstance otherCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .callbackId("otherCallBackId")
+                .start();
+
+        Set<String> callBackIdParameter = new HashSet<>();
+        callBackIdParameter.add("callBackId");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceCallbackIds(callBackIdParameter)
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceCallbackIds(callBackIdParameter)
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceCallbackIds(callBackIdParameter)
+                .caseDefinitionId("undefined")
+                .endOr()
+                .singleResult().getId()).isEqualTo(caseInstance.getId());
+
+        callBackIdParameter.add("otherCallBackId");
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).list().get(0).getId()).isEqualTo(caseInstance.getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callBackIdParameter).list().get(1).getId()).isEqualTo(otherCaseInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceCallbackIds(callBackIdParameter)
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .count()).isEqualTo(2);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceCallbackIds(callBackIdParameter)
+                .caseDefinitionName("undefinedId")
+                .endOr()
+                .list()).extracting(CaseInstance::getId).containsExactlyInAnyOrder(
+                caseInstance.getId(),
+                otherCaseInstance.getId()
+        );
+    }
+
+    @Test
     public void getCaseInstanceByCallBackType() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")

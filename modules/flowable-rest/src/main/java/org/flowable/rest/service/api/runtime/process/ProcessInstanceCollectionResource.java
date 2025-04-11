@@ -13,9 +13,12 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -103,6 +106,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which are not sub processes.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
+        @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return process instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenant id.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenant id like the given value.", paramType = "query"),
@@ -258,7 +262,11 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("callbackId")) {
             queryRequest.setCallbackId(allRequestParams.get("callbackId"));
         }
-        
+
+        if (allRequestParams.containsKey("callbackIds")) {
+            String[] list = allRequestParams.get("callbackIds").split(",");
+            queryRequest.setCallbackIds(new HashSet<>(Arrays.asList(list)));
+        }
         if (allRequestParams.containsKey("callbackType")) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }

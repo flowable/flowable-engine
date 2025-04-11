@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class CaseInstanceQueryRequest extends PaginateRequest {
 
     private String caseInstanceId;
+    private Set<String> caseInstanceIds;
     private String caseDefinitionId;
     private String caseDefinitionKey;
     private String caseDefinitionKeyLike;
@@ -60,6 +61,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceState;
     private String involvedUser;
     private String caseInstanceCallbackId;
+    private Set<String> caseInstanceCallbackIds;
     private String caseInstanceCallbackType;
     private String caseInstanceReferenceId;
     private String caseInstanceReferenceType;
@@ -442,5 +444,21 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
         this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+    }
+
+    public Set<String> getCaseInstanceIds() {
+        return caseInstanceIds;
+    }
+
+    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
+        this.caseInstanceIds = caseInstanceIds;
+    }
+
+    public Set<String> getCaseInstanceCallbackIds() {
+        return caseInstanceCallbackIds;
+    }
+
+    public void setCaseInstanceCallbackIds(Set<String> caseInstanceCallbackIds) {
+        this.caseInstanceCallbackIds = caseInstanceCallbackIds;
     }
 }

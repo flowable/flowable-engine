@@ -13,9 +13,12 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -61,6 +64,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
     @ApiOperation(value = "List case instances", nickname ="listCaseInstances", tags = { "Case Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "ids", dataType = "string", value = "Only return models with the given versions.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return case instances like given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like given case definition key, ignoring case.", paramType = "query"),
@@ -88,6 +92,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return case instances started after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "state", dataType = "string", value = "Only return case instances with the given state.", paramType = "query"),
             @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return case instances which have the given callback id.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return case instances which have the given callback ids.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return case instances which have the given callback type.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return case instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return case instances which have the given reference type.", paramType = "query"),
@@ -113,6 +118,11 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("id")) {
             queryRequest.setCaseInstanceId(allRequestParams.get("id"));
+        }
+
+        if (allRequestParams.containsKey("ids")) {
+            String[] csv = StringUtils.split(allRequestParams.get("ids"), ","); // split by comma
+            queryRequest.setCaseInstanceIds(new HashSet<>(Arrays.asList(csv)));
         }
 
         if (allRequestParams.containsKey("caseDefinitionKey")) {
@@ -223,6 +233,11 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
         }
         
+        if (allRequestParams.containsKey("callbackIds")) {
+            String[] list = StringUtils.split(allRequestParams.get("callbackIds"), ","); // split by comma
+            queryRequest.setCaseInstanceCallbackIds(new HashSet<>(Arrays.asList(list)));
+        }
+
         if (allRequestParams.containsKey("callbackType")) {
             queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
         }

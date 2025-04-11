@@ -335,6 +335,10 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         if (executionQuery.getInvolvedGroups() != null) {
             executionQuery.setSafeInvolvedGroups(createSafeInValuesList(executionQuery.getInvolvedGroups()));
         }
+
+        if (executionQuery.getProcessInstanceIds() != null) {
+            executionQuery.setSafeProcessInstanceIds(createSafeInValuesList(executionQuery.getProcessInstanceIds()));
+        }
         
         if (executionQuery.getOrQueryObjects() != null && !executionQuery.getOrQueryObjects().isEmpty()) {
             for (ExecutionQueryImpl orExecutionQuery : executionQuery.getOrQueryObjects()) {

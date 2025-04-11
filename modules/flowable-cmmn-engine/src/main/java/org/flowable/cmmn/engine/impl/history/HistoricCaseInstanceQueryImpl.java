@@ -118,6 +118,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean withLocalizationFallback;
     protected boolean withoutSorting;
     protected boolean returnIdsOnly;
+    protected Set<String> callbackIds;
 
     public HistoricCaseInstanceQueryImpl() {
     }
@@ -684,6 +685,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.callbackId = callbackId;
         } else {
             this.callbackId = callbackId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
         }
         return this;
     }
@@ -1368,6 +1382,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCallbackId() {
         return callbackId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
     }
 
     public String getCallbackType() {

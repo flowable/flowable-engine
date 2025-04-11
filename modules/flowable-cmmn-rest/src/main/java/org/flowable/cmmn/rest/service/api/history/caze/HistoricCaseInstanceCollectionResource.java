@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
@@ -46,6 +49,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "A comma separated list of historic case instance ids.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The case definition key of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return historic case instances like the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition key, ignoring case.", paramType = "query"),
@@ -101,6 +105,11 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("caseInstanceId") != null) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("caseInstanceIds")) {
+            String[] list = StringUtils.split(allRequestParams.get("caseInstanceIds"), ","); // split by comma
+            queryRequest.setCaseInstanceIds(new HashSet<>(Arrays.asList(list)));
         }
 
         if (allRequestParams.get("caseDefinitionKey") != null) {
@@ -197,6 +206,11 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         
         if (allRequestParams.get("callbackId") != null) {
             queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
+        }
+
+        if (allRequestParams.containsKey("callbackIds")) {
+            String[] list = StringUtils.split(allRequestParams.get("callbackIds"), ","); // split by comma
+            queryRequest.setCaseInstanceCallbackIds(new HashSet<>(Arrays.asList(list)));
         }
         
         if (allRequestParams.get("callbackType") != null) {
