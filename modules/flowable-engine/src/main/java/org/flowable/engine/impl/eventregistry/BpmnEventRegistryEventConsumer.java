@@ -62,6 +62,17 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     public String getConsumerKey() {
         return "bpmnEventConsumer";
     }
+    
+    @Override
+    public String findDefinitionKeyById(String definitionId) {
+        String processDefinitionKey = null;
+        ProcessDefinition processDefinition = processEngineConfiguration.getProcessDefinitionEntityManager().findById(definitionId);
+        if (processDefinition != null) {
+            processDefinitionKey = processDefinition.getKey();
+        }
+        
+        return processDefinitionKey;
+    }
 
     @Override
     protected EventRegistryProcessingInfo eventReceived(EventInstance eventInstance) {

@@ -64,6 +64,17 @@ public class CmmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
     public String getConsumerKey() {
         return "cmmnEventConsumer";
     }
+    
+    @Override
+    public String findDefinitionKeyById(String definitionId) {
+        String caseefinitionKey = null;
+        CaseDefinition caseDefinition = cmmnEngineConfiguration.getCaseDefinitionEntityManager().findById(definitionId);
+        if (caseDefinition != null) {
+            caseefinitionKey = caseDefinition.getKey();
+        }
+        
+        return caseefinitionKey;
+    }
 
     @Override
     protected EventRegistryProcessingInfo eventReceived(EventInstance eventInstance) {
