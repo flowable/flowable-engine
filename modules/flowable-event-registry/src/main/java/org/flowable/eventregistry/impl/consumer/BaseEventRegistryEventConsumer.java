@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
@@ -192,6 +193,57 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                             .tenantId(eventInstance.getTenantId())
                             .withoutTenantId()
                         .endOr();
+                        
+                        List<EventSubscription> cleanedEventSubscriptions = new ArrayList<>();
+                        List<EventSubscription> eventSubscriptions = eventSubscriptionQuery.list();
+                        List<String> tenantProcessDefinitionKeys = new ArrayList<>();
+                        List<String> tenantCaseDefinitionKeys = new ArrayList<>();
+                        List<EventSubscription> defaultTenantEventSubscriptions = new ArrayList<>();
+                        for (EventSubscription eventSubscription : eventSubscriptions) {
+                            if (StringUtils.isNotEmpty(eventSubscription.getProcessInstanceId()) || StringUtils.isNotEmpty(eventSubscription.getScopeId())) {
+                                if (eventInstanceTenantId.equals(eventSubscription.getTenantId())) {
+                                    cleanedEventSubscriptions.add(eventSubscription);
+                                }
+                                
+                            } else {
+                                if (AbstractEngineConfiguration.NO_TENANT_ID.equals(eventSubscription.getTenantId())) {
+                                    defaultTenantEventSubscriptions.add(eventSubscription);
+                                    
+                                } else {
+                                    if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
+                                        tenantCaseDefinitionKeys.add(eventSubscription.getScopeDefinitionKey());
+                                    
+                                    } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
+                                        EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
+                                        String processDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getProcessDefinitionId());
+                                        if (StringUtils.isNotEmpty(processDefinitionKey)) {
+                                            tenantProcessDefinitionKeys.add(processDefinitionKey);
+                                        }
+                                    }
+                                    
+                                    cleanedEventSubscriptions.add(eventSubscription);
+                                }
+                            }
+                        }
+                        
+                        if (!defaultTenantEventSubscriptions.isEmpty()) {
+                            for (EventSubscription eventSubscription : defaultTenantEventSubscriptions) {
+                                if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
+                                    if (!tenantCaseDefinitionKeys.contains(eventSubscription.getScopeDefinitionKey())) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                
+                                } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
+                                    EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
+                                    String processDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getProcessDefinitionId());
+                                    if (StringUtils.isNotEmpty(processDefinitionKey) && !tenantProcessDefinitionKeys.contains(processDefinitionKey)) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                }
+                            }
+                        }
+
+                        return cleanedEventSubscriptions;
 
                     } else {
                         eventSubscriptionQuery.tenantIds(Arrays.asList(eventInstanceTenantId, defaultTenant));
@@ -202,11 +254,9 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                     eventSubscriptionQuery.tenantId(eventInstanceTenantId);
 
                 }
-
             }
-
+            
             return eventSubscriptionQuery.list();
-
         });
     }
 

@@ -119,4 +119,219 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
 
         repositoryService.deleteDeployment(deployment2.getId());
     }
+    
+    @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml" }, tenantId = "tenant1")
+    @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
+    public void testSendEventWithCustomAndDefaultTenant() throws Exception {
+        boolean fallbackToDefaultTenant = eventRegistryEngineConfiguration.isFallbackToDefaultTenant();
+        eventRegistryEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        EventDeployment defaultEventDeployment = null;
+        org.flowable.engine.repository.Deployment defaultDeployment = null;
+        try {
+            defaultEventDeployment = repositoryService.createDeployment().tenantId("")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel")
+                .deploy();
+            
+            defaultDeployment = processRepositoryService.createDeployment().tenantId("")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml")
+                .deploy();
+            
+            ProcessInstance processInstance = processRuntimeService.startProcessInstanceByKeyAndTenantId("process", Collections.singletonMap("customerIdVar", "123"), "tenant1");
+            Task task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+            
+            ProcessInstance defaultProcessInstance = processRuntimeService.startProcessInstanceByKeyAndTenantId("process", Collections.singletonMap("customerIdVar", "123"), "");
+            Task defaultTask = processTaskService.createTaskQuery().processInstanceId(defaultProcessInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+            
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            
+            // first send event that doesn't match process boundary event
+            requestNode.put("eventDefinitionKey", "myEvent");
+            requestNode.put("channelDefinitionKey", "myChannel");
+            requestNode.put("tenantId", "tenant1");
+            ObjectNode payloadNode = requestNode.putObject("eventPayload");
+            payloadNode.put("customerId", "notExisting");
+            payloadNode.put("productNumber", "p456");
+    
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
+            
+            task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("task");
+    
+            // now send event with matching correlation value
+            requestNode.put("eventDefinitionKey", "myEvent");
+            payloadNode = requestNode.putObject("eventPayload");
+            payloadNode.put("customerId", "123");
+            payloadNode.put("productNumber", "p456");
+    
+            httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
+            
+            task = processTaskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
+            
+            // default process instance task should not have been changed
+            defaultTask = processTaskService.createTaskQuery().processInstanceId(defaultProcessInstance.getId()).singleResult();
+            assertThat(defaultTask.getTaskDefinitionKey()).isEqualTo("task");
+            
+        } finally {
+            if (defaultEventDeployment != null) {
+                repositoryService.deleteDeployment(defaultEventDeployment.getId());
+            }
+            
+            if (defaultDeployment != null) {
+                processRepositoryService.deleteDeployment(defaultDeployment.getId(), true);
+            }
+            
+            eventRegistryEngineConfiguration.setFallbackToDefaultTenant(fallbackToDefaultTenant);
+        }
+    }
+    
+    @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "tenant1")
+    @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
+    public void testStartEventWithCustomAndDefaultTenant() throws Exception {
+        boolean fallbackToDefaultTenant = eventRegistryEngineConfiguration.isFallbackToDefaultTenant();
+        eventRegistryEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        EventDeployment defaultEventDeployment = null;
+        org.flowable.engine.repository.Deployment defaultDeployment = null;
+        try {
+            defaultEventDeployment = repositoryService.createDeployment().tenantId("")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel")
+                .deploy();
+            
+            defaultDeployment = processRepositoryService.createDeployment().tenantId("")
+                .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml")
+                .deploy();
+            
+            long tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isZero();
+            
+            long defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            
+            // first send event that doesn't match process boundary event
+            requestNode.put("eventDefinitionKey", "myEvent");
+            requestNode.put("channelDefinitionKey", "myChannel");
+            requestNode.put("tenantId", "tenant1");
+            ObjectNode payloadNode = requestNode.putObject("eventPayload");
+            payloadNode.put("customerId", "123");
+            payloadNode.put("productNumber", "p456");
+    
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
+            
+            tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isEqualTo(1);
+            
+            defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+        } finally {
+            if (defaultEventDeployment != null) {
+                repositoryService.deleteDeployment(defaultEventDeployment.getId());
+            }
+            
+            if (defaultDeployment != null) {
+                processRepositoryService.deleteDeployment(defaultDeployment.getId(), true);
+            }
+            
+            eventRegistryEngineConfiguration.setFallbackToDefaultTenant(fallbackToDefaultTenant);
+        }
+    }
+    
+    @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "")
+    @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "")
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "")
+    public void testStartEventWithDefaultTenant() throws Exception {
+        boolean fallbackToDefaultTenant = eventRegistryEngineConfiguration.isFallbackToDefaultTenant();
+        eventRegistryEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            long tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isZero();
+            
+            long defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            
+            // first send event that doesn't match process boundary event
+            requestNode.put("eventDefinitionKey", "myEvent");
+            requestNode.put("channelDefinitionKey", "myChannel");
+            requestNode.put("tenantId", "tenant1");
+            ObjectNode payloadNode = requestNode.putObject("eventPayload");
+            payloadNode.put("customerId", "123");
+            payloadNode.put("productNumber", "p456");
+    
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
+            
+            tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isEqualTo(1);
+            
+            defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+        } finally {
+            eventRegistryEngineConfiguration.setFallbackToDefaultTenant(fallbackToDefaultTenant);
+        }
+    }
+    
+    @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "tenant1")
+    @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
+    @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
+    public void testStartEventWithCustomTenant() throws Exception {
+        boolean fallbackToDefaultTenant = eventRegistryEngineConfiguration.isFallbackToDefaultTenant();
+        eventRegistryEngineConfiguration.setFallbackToDefaultTenant(true);
+        
+        try {
+            long tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isZero();
+            
+            long defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            
+            // first send event that doesn't match process boundary event
+            requestNode.put("eventDefinitionKey", "myEvent");
+            requestNode.put("channelDefinitionKey", "myChannel");
+            requestNode.put("tenantId", "tenant1");
+            ObjectNode payloadNode = requestNode.putObject("eventPayload");
+            payloadNode.put("customerId", "123");
+            payloadNode.put("productNumber", "p456");
+    
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_INSTANCE_COLLECTION));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
+            
+            tenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("tenant1").count();
+            assertThat(tenantInstanceCount).isEqualTo(1);
+            
+            defaultTenantInstanceCount = processRuntimeService.createProcessInstanceQuery().processDefinitionKey("process").processInstanceTenantId("").count();
+            assertThat(defaultTenantInstanceCount).isZero();
+            
+        } finally {
+            eventRegistryEngineConfiguration.setFallbackToDefaultTenant(fallbackToDefaultTenant);
+        }
+    }
 }

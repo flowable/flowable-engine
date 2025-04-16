@@ -19,5 +19,7 @@ public interface EventRegistryEventConsumer {
 
     EventRegistryProcessingInfo eventReceived(EventRegistryEvent event);
     
+    String findDefinitionKeyById(String definitionId);
+    
     String getConsumerKey();
 }
