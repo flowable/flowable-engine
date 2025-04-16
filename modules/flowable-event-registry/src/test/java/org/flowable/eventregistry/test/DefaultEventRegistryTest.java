@@ -407,6 +407,11 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         public String getConsumerKey() {
             return "myTestEventConsumer";
         }
+        
+        @Override
+        public String findDefinitionKeyById(String definitionId) {
+            return null;
+        }
 
         @Override
         public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
