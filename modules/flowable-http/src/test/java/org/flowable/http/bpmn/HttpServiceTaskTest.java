@@ -705,12 +705,41 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         );
     }
 
+    @Test
+    @Deployment
+    public void testHttpSecureHeaders() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("url", "https://localhost:9799/api?code=200");
+        variables.put("headers", "Content-Type: text/plain");
+        variables.put("secureHeaders", "Authorization: Bearer secretToken\nX-Request-Key: testKey");
+        variables.put("prefix", "test");
+
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpSecureHeaders", variables);
+        assertThat(process.isEnded()).isFalse();
+
+        Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("Authorization", "Bearer secretToken"),
+                        entry("X-Request-Key", "testKey")
+                );
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("testRequestMethod", "POST");
+        request.put("testRequestUrl", "https://localhost:9799/api?code=200");
+        request.put("testRequestHeaders", "Content-Type: text/plain");
+        request.put("testRequestSecureHeaders", "Authorization: *****\nX-Request-Key: *****");
+        assertKeysEquals(process.getId(), request);
+    }
+
     private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
             if (key.contains("Headers")) {
-                assertThat((String) runtimeService.getVariable(processInstanceId, key)).containsSequence((String) vars.get(key));
+                assertThat((String) runtimeService.getVariable(processInstanceId, key)).as(key).containsSequence((String) vars.get(key));
             } else {
-                assertThat(runtimeService.getVariable(processInstanceId, key)).isEqualTo(vars.get(key));
+                assertThat(runtimeService.getVariable(processInstanceId, key)).as(key).isEqualTo(vars.get(key));
             }
         }
     }

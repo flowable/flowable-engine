@@ -192,9 +192,8 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(request, requestInfo.getHttpHeaders());
-            }
+            setHeaders(request, requestInfo.getHttpHeaders());
+            setHeaders(request, requestInfo.getSecureHttpHeaders());
 
             return new ApacheHttpComponentsExecutableHttpRequest(request.build(), createRequestConfig(requestInfo));
         } catch (URISyntaxException ex) {
@@ -246,6 +245,9 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
     }
 
     protected void setHeaders(AsyncRequestBuilder base, HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {

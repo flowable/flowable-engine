@@ -25,6 +25,10 @@ public class HttpRequest {
     protected String method;
     protected String url;
     protected HttpHeaders httpHeaders;
+    /**
+     * Additional headers to {@link #httpHeaders} that which can be used and won't be saved in plain text.
+     */
+    protected HttpHeaders secureHttpHeaders;
     protected String body;
     protected String bodyEncoding;
     protected Collection<MultiValuePart> multiValueParts;
@@ -58,6 +62,18 @@ public class HttpRequest {
 
     public void setHttpHeaders(HttpHeaders httpHeaders) {
         this.httpHeaders = httpHeaders;
+    }
+
+    public HttpHeaders getSecureHttpHeaders() {
+        return secureHttpHeaders;
+    }
+
+    public String getSecureHttpHeadersAsString() {
+        return secureHttpHeaders != null ? secureHttpHeaders.formatAsString(true) : null;
+    }
+
+    public void setSecureHttpHeaders(HttpHeaders secureHttpHeaders) {
+        this.secureHttpHeaders = secureHttpHeaders;
     }
 
     public String getBody() {
