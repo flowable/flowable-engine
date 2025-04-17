@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
 
     private String caseInstanceId;
-    private List<String> caseInstanceIds;
+    private Set<String> caseInstanceIds;
     private String caseDefinitionId;
     private String caseDefinitionKey;
     private String caseDefinitionKeyLike;
@@ -57,6 +57,7 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceParentId;
     private String caseInstanceState;
     private String caseInstanceCallbackId;
+    private Set<String> caseInstanceCallbackIds;
     private String caseInstanceCallbackType;
     private String caseInstanceReferenceId;
     private String caseInstanceReferenceType;
@@ -89,11 +90,11 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
         this.caseInstanceId = caseInstanceId;
     }
 
-    public List<String> getCaseInstanceIds() {
+    public Set<String> getCaseInstanceIds() {
         return caseInstanceIds;
     }
 
-    public void setCaseInstanceIds(List<String> caseInstanceIds) {
+    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
         this.caseInstanceIds = caseInstanceIds;
     }
 
@@ -496,5 +497,13 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     
     public void setWithoutCaseInstanceCallbackId(Boolean withoutCaseInstanceCallbackId) {
         this.withoutCaseInstanceCallbackId = withoutCaseInstanceCallbackId;
+    }
+
+    public Set<String> getCaseInstanceCallbackIds() {
+        return caseInstanceCallbackIds;
+    }
+
+    public void setCaseInstanceCallbackIds(Set<String> caseInstanceCallbackIds) {
+        this.caseInstanceCallbackIds = caseInstanceCallbackIds;
     }
 }

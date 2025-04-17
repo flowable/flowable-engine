@@ -1187,6 +1187,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackType", "callbackType");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackId", "callbackId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceCallbackIds", "callbackIds");
         methodNameToExpectedQueryPropertyName.put("withoutProcessInstanceCallbackId", "withoutCallbackId");
         methodNameToExpectedQueryPropertyName.put("processInstanceReferenceType", "referenceType");
         methodNameToExpectedQueryPropertyName.put("processInstanceReferenceId", "referenceId");

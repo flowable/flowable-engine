@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -81,6 +84,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
+        @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
         @ApiImplicitParam(name = "withoutCallbackId", dataType = "boolean", value = "Only return instances that do not have a callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
@@ -240,6 +244,11 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             queryRequest.setCallbackId(allRequestParams.get("callbackId"));
         }
         
+        if (allRequestParams.get("callbackIds") != null) {
+            String[] callbackIds = allRequestParams.get("callbackIds").split(",");
+            queryRequest.setCallbackIds(new HashSet<>(Arrays.asList(callbackIds)));
+        }
+
         if (allRequestParams.get("callbackType") != null) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }

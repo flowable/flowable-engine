@@ -310,6 +310,32 @@
       <if test="processInstanceId != null">
         ${queryTablePrefix}PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
+      <if test="processInstanceIds != null and !processInstanceIds.empty">
+          and (
+          <foreach item="processInstanceIdListItem" index="groupIndex" collection="safeProcessInstanceIds">
+              <if test="groupIndex &gt; 0">
+                  or
+              </if>
+              RES.PROC_INST_ID_ IN
+              <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+                  #{processInstanceId, jdbcType=NVARCHAR}
+              </foreach>
+          </foreach>
+          )
+      </if>
+      <if test="calledProcessInstanceIds != null and !calledProcessInstanceIds.empty">
+          and (
+          <foreach item="calledProcessInstanceIdListItem" index="groupIndex" collection="safeCalledProcessInstanceIds">
+              <if test="groupIndex &gt; 0">
+                  or
+              </if>
+              RES.CALL_PROC_INST_ID_ IN
+              <foreach item="processInstanceId" index="index" collection="calledProcessInstanceIdListItem" open="(" separator="," close=")">
+                  #{processInstanceId, jdbcType=NVARCHAR}
+              </foreach>
+          </foreach>
+          )
+      </if>
       <if test="activityInstanceId != null">
         and ${queryTablePrefix}ID_ = #{activityInstanceId, jdbcType=NVARCHAR}
       </if>

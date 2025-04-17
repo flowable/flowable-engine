@@ -14,8 +14,10 @@
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +46,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return plan item instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return plan item instances which are part of the case instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "Only return plan item instances which are part of the case instance with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "Only return plan item instances which are part of the given stage instance.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "Only return plan item instances which have the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionType", dataType = "string", value = "Only return plan item instances which have the given plan item definition type.", paramType = "query"),
@@ -77,6 +80,11 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
 
         if (allRequestParams.containsKey("caseInstanceId")) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("caseInstanceIds")) {
+            String[] csv = StringUtils.split(allRequestParams.get("caseInstanceIds"), ","); // split by comma
+            queryRequest.setCaseInstanceIds(new HashSet<>(Arrays.asList(csv)));
         }
 
         if (allRequestParams.containsKey("caseDefinitionId")) {

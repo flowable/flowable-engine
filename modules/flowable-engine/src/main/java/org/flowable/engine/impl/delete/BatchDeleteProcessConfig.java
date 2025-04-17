@@ -284,6 +284,8 @@ public class BatchDeleteProcessConfig {
                     break;
                 case "callbackId":
                     query.processInstanceCallbackId(value.textValue());
+                case "callbackIds":
+                    query.processInstanceCallbackIds(asStringSet(value));
                     break;
                 case "callbackType":
                     query.processInstanceCallbackType(value.textValue());

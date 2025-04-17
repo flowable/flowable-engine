@@ -71,6 +71,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private Boolean includeProcessVariables;
     private List<QueryVariable> variables;
     private String callbackId;
+    private Set<String> callbackIds;
     private String callbackType;
     private String tenantId;
     private String tenantIdLike;
@@ -460,5 +461,13 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setParentScopeId(String parentScopeId) {
         this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
+    public void setCallbackIds(Set<String> callbackIds) {
+        this.callbackIds = callbackIds;
     }
 }

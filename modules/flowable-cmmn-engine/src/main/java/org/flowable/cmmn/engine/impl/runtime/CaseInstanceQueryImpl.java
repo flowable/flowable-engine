@@ -80,6 +80,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected Date lastReactivatedAfter;
     protected String lastReactivatedBy;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
     protected String referenceId;
     protected String referenceType;
@@ -602,6 +603,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.callbackId = callbackId;
         } else {
             this.callbackId = callbackId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
         }
         return this;
     }
@@ -1173,6 +1187,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getCallbackId() {
         return callbackId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
     }
 
     public String getCallbackType() {

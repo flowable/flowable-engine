@@ -109,6 +109,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String rootScopeId;
     protected String parentScopeId;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
     protected boolean withoutCallbackId;
     protected String referenceId;
@@ -692,6 +693,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.callbackId = callbackId;
         } else {
             this.callbackId = callbackId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
         }
         return this;
     }
@@ -1418,6 +1432,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     
     public String getCallbackId() {
         return callbackId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
     }
 
     public String getCallbackType() {
