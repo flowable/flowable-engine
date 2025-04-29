@@ -206,7 +206,7 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                                 }
                                 
                             } else {
-                                if (AbstractEngineConfiguration.NO_TENANT_ID.equals(eventSubscription.getTenantId())) {
+                                if (StringUtils.isEmpty(eventSubscription.getTenantId())) {
                                     defaultTenantEventSubscriptions.add(eventSubscription);
                                     
                                 } else {
@@ -215,14 +215,14 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                                         
                                     } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
                                         EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
-                                        String caseDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getScopeDefinitionId());
+                                        String caseDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getScopeDefinitionId());
                                         if (StringUtils.isNotEmpty(caseDefinitionKey)) {
                                             tenantCaseDefinitionKeys.add(caseDefinitionKey);
                                         }
                                     
                                     } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
                                         EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
-                                        String processDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getProcessDefinitionId());
+                                        String processDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getProcessDefinitionId());
                                         if (StringUtils.isNotEmpty(processDefinitionKey)) {
                                             tenantProcessDefinitionKeys.add(processDefinitionKey);
                                         }
@@ -242,14 +242,14 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                                     
                                 } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
                                     EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
-                                    String caseDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getScopeDefinitionId());
+                                    String caseDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getScopeDefinitionId());
                                     if (StringUtils.isNotEmpty(caseDefinitionKey) && !tenantCaseDefinitionKeys.contains(caseDefinitionKey)) {
                                         cleanedEventSubscriptions.add(eventSubscription);
                                     }
                                 
                                 } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
                                     EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
-                                    String processDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getProcessDefinitionId());
+                                    String processDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getProcessDefinitionId());
                                     if (StringUtils.isNotEmpty(processDefinitionKey) && !tenantProcessDefinitionKeys.contains(processDefinitionKey)) {
                                         cleanedEventSubscriptions.add(eventSubscription);
                                     }
@@ -273,6 +273,16 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
             return eventSubscriptionQuery.list();
         });
     }
+
+    protected String findDefinitionKeyById(EventRegistryEventConsumer eventConsumer, String definitionId) {
+        if (eventConsumer instanceof BaseEventRegistryEventConsumer baseEventRegistryEventConsumer) {
+            return baseEventRegistryEventConsumer.findDefinitionKeyById(definitionId);
+        } else {
+            return null;
+        }
+    }
+
+    public abstract String findDefinitionKeyById(String definitionId);
 
     protected abstract EventSubscriptionQuery createEventSubscriptionQuery();
 
