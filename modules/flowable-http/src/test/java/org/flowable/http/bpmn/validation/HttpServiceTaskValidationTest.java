@@ -47,6 +47,14 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
 
     @Test
     @Deployment
+    public void testInvalidSecureHeaders() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidSecureHeaders"))
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContainingAll("requestSecureHeaders are invalid for Execution[", " - definition 'invalidSecureHeaders:1:", " - activity 'httpGet'");
+    }
+
+    @Test
+    @Deployment
     public void testInvalidFlags() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidFlags"))
                 .isExactlyInstanceOf(FlowableException.class)

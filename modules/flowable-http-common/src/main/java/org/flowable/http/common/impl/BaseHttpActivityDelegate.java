@@ -42,6 +42,7 @@ public abstract class BaseHttpActivityDelegate {
     public static final String HTTP_TASK_REQUEST_METHOD_INVALID = "requestMethod is invalid";
     public static final String HTTP_TASK_REQUEST_URL_REQUIRED = "requestUrl is required";
     public static final String HTTP_TASK_REQUEST_HEADERS_INVALID = "requestHeaders are invalid";
+    public static final String HTTP_TASK_REQUEST_SECURE_HEADERS_INVALID = "requestSecureHeaders are invalid";
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
     // HttpRequest method (GET,POST,PUT etc)
@@ -50,6 +51,8 @@ public abstract class BaseHttpActivityDelegate {
     protected Expression requestUrl;
     // Line separated HTTP body headers(Optional)
     protected Expression requestHeaders;
+    // Line separated HTTP body headers(Optional)
+    protected Expression requestSecureHeaders;
     // HttpRequest body expression (Optional)
     protected Expression requestBody;
     // HttpRequest body encoding expression, for example UTF-8 (Optional)
@@ -97,6 +100,7 @@ public abstract class BaseHttpActivityDelegate {
         request.setMethod(ExpressionUtils.getStringFromField(requestMethod, variableContainer));
         request.setUrl(ExpressionUtils.getStringFromField(requestUrl, variableContainer));
         request.setHttpHeaders(getRequestHeaders(variableContainer));
+        request.setSecureHttpHeaders(getRequestSecureHeaders(variableContainer));
         request.setBody(ExpressionUtils.getStringFromField(requestBody, variableContainer));
         request.setBodyEncoding(ExpressionUtils.getStringFromField(requestBodyEncoding, variableContainer));
         request.setTimeout(ExpressionUtils.getIntFromField(requestTimeout, variableContainer));
@@ -128,6 +132,7 @@ public abstract class BaseHttpActivityDelegate {
             variableContainer.setVariable(prefix + "RequestMethod", request.getMethod());
             variableContainer.setVariable(prefix + "RequestUrl", request.getUrl());
             variableContainer.setVariable(prefix + "RequestHeaders", request.getHttpHeadersAsString());
+            variableContainer.setVariable(prefix + "RequestSecureHeaders", request.getSecureHttpHeadersAsString());
             variableContainer.setVariable(prefix + "RequestBody", request.getBody());
             variableContainer.setVariable(prefix + "RequestBodyEncoding", request.getBodyEncoding());
             variableContainer.setVariable(prefix + "RequestTimeout", request.getTimeout());
@@ -255,11 +260,19 @@ public abstract class BaseHttpActivityDelegate {
         }
     }
     protected HttpHeaders getRequestHeaders(VariableContainer variableContainer) {
+        return parseRequestHeaders(variableContainer, requestHeaders, HTTP_TASK_REQUEST_HEADERS_INVALID);
+    }
+
+    protected HttpHeaders getRequestSecureHeaders(VariableContainer variableContainer) {
+        return parseRequestHeaders(variableContainer, requestSecureHeaders, HTTP_TASK_REQUEST_SECURE_HEADERS_INVALID);
+    }
+
+    protected HttpHeaders parseRequestHeaders(VariableContainer variableContainer, Expression headers, String errorPrefix) {
         try {
-            String headersString = ExpressionUtils.getStringFromField(requestHeaders, variableContainer);
+            String headersString = ExpressionUtils.getStringFromField(headers, variableContainer);
             return HttpHeaders.parseFromString(headersString);
         } catch (FlowableIllegalArgumentException ex) {
-            throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID + " for " + variableContainer, ex);
+            throw new FlowableException(errorPrefix + " for " + variableContainer, ex);
         }
     }
 

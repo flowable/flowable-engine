@@ -212,6 +212,13 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                                 } else {
                                     if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
                                         tenantCaseDefinitionKeys.add(eventSubscription.getScopeDefinitionKey());
+                                        
+                                    } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
+                                        EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
+                                        String caseDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getScopeDefinitionId());
+                                        if (StringUtils.isNotEmpty(caseDefinitionKey)) {
+                                            tenantCaseDefinitionKeys.add(caseDefinitionKey);
+                                        }
                                     
                                     } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
                                         EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
@@ -230,6 +237,13 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                             for (EventSubscription eventSubscription : defaultTenantEventSubscriptions) {
                                 if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
                                     if (!tenantCaseDefinitionKeys.contains(eventSubscription.getScopeDefinitionKey())) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                    
+                                } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
+                                    EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
+                                    String caseDefinitionKey = eventRegistryEventConsumer.findDefinitionKeyById(eventSubscription.getScopeDefinitionId());
+                                    if (StringUtils.isNotEmpty(caseDefinitionKey) && !tenantCaseDefinitionKeys.contains(caseDefinitionKey)) {
                                         cleanedEventSubscriptions.add(eventSubscription);
                                     }
                                 

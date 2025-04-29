@@ -42,4 +42,26 @@ class HttpRequestTest {
                 .hasMessage("Cannot set both body and multi value parts");
         assertThat(request.getMultiValueParts()).isNull();
     }
+
+    @Test
+    void getHttpHeadersAsString() {
+        HttpRequest request = new HttpRequest();
+        assertThat(request.getHttpHeadersAsString()).isNull();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        request.setHttpHeaders(headers);
+        assertThat(request.getHttpHeadersAsString()).isEqualTo("Content-Type: application/json");
+    }
+
+    @Test
+    void getSecureHttpHeadersAsString() {
+        HttpRequest request = new HttpRequest();
+        assertThat(request.getSecureHttpHeadersAsString()).isNull();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json");
+        request.setSecureHttpHeaders(headers);
+        assertThat(request.getSecureHttpHeadersAsString()).isEqualTo("Content-Type: *****");
+    }
 }

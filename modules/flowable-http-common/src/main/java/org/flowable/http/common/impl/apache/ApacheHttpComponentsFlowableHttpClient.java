@@ -205,9 +205,8 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(request, requestInfo.getHttpHeaders());
-            }
+            setHeaders(request, requestInfo.getHttpHeaders());
+            setHeaders(request, requestInfo.getSecureHttpHeaders());
 
             setConfig(request, requestInfo);
             return new ApacheHttpComponentsExecutableHttpRequest(request);
@@ -260,6 +259,9 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
     }
 
     protected void setHeaders(final HttpMessage base, final HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {

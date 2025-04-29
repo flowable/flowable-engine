@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -149,9 +151,8 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(headersSpec, requestInfo.getHttpHeaders());
-            }
+            setHeaders(headersSpec, requestInfo.getHttpHeaders());
+            setHeaders(headersSpec, requestInfo.getSecureHttpHeaders());
 
             return new WebClientExecutableHttpRequest(headersSpec);
         } catch (URISyntaxException ex) {
@@ -214,6 +215,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     }
 
     protected void setHeaders(WebClient.RequestHeadersSpec<?> base, org.flowable.http.common.api.HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         base.headers(httpHeaders -> {
             httpHeaders.putAll(headers);
         });
@@ -250,7 +254,13 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
 
     protected org.flowable.http.common.api.HttpHeaders toFlowableHeaders(HttpHeaders httpHeaders) {
         org.flowable.http.common.api.HttpHeaders headers = new org.flowable.http.common.api.HttpHeaders();
-        headers.putAll(httpHeaders);
+        for (Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+            String headerName = entry.getKey();
+            List<String> headerValues = entry.getValue();
+            for (String headerValue : headerValues) {
+                headers.add(headerName, headerValue);
+            }
+        }
         return headers;
     }
 
