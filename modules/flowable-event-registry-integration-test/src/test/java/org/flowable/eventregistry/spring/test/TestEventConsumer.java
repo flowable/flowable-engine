@@ -35,11 +35,6 @@ public class TestEventConsumer implements EventRegistryEventConsumer {
     }
     
     @Override
-    public String findDefinitionKeyById(String definitionId) {
-        return null;
-    }
-
-    @Override
     public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
         events.add(event);
         EventRegistryProcessingInfo eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
