@@ -13,8 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
@@ -31,6 +29,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -62,7 +61,7 @@ public class ExecutionResource extends ExecutionBaseResource {
         Execution execution = getExecutionFromRequest(executionId);
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.doExecutionActionRequest(actionRequest);
+            restApiInterceptor.doExecutionActionRequest(execution, actionRequest);
         }
 
         if (ExecutionActionRequest.ACTION_SIGNAL.equals(actionRequest.getAction())
@@ -74,6 +73,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             } else {
                 runtimeService.trigger(execution.getId());
             }
+            
         } else if (ExecutionActionRequest.ACTION_SIGNAL_EVENT_RECEIVED.equals(actionRequest.getAction())) {
             if (actionRequest.getSignalName() == null) {
                 throw new FlowableIllegalArgumentException("Signal name is required");
@@ -83,6 +83,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             } else {
                 runtimeService.signalEventReceived(actionRequest.getSignalName(), execution.getId());
             }
+            
         } else if (ExecutionActionRequest.ACTION_MESSAGE_EVENT_RECEIVED.equals(actionRequest.getAction())) {
             if (actionRequest.getMessageName() == null) {
                 throw new FlowableIllegalArgumentException("Message name is required");
@@ -92,6 +93,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             } else {
                 runtimeService.messageEventReceived(actionRequest.getMessageName(), execution.getId());
             }
+            
         } else {
             throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
         }
@@ -117,8 +119,10 @@ public class ExecutionResource extends ExecutionBaseResource {
     public void changeActivityState(@ApiParam(name = "executionId") @PathVariable String executionId,
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest) {
         
+        Execution execution = getExecutionFromRequest(executionId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.changeActivityState(activityStateRequest);
+            restApiInterceptor.changeActivityState(execution, activityStateRequest);
         }
 
         runtimeService.createChangeActivityStateBuilder()

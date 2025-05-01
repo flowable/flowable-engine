@@ -185,8 +185,10 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     public void changePlanItemState(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
             @RequestBody ChangePlanItemStateRequest planItemStateRequest) {
         
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.changePlanItemState(caseInstanceId, planItemStateRequest);
+            restApiInterceptor.changePlanItemState(caseInstance, planItemStateRequest);
         }
 
         ChangePlanItemStateBuilder changePlanItemStateBuilder = runtimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstanceId);
@@ -239,8 +241,10 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     public void migrateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                                        @RequestBody String migrationDocumentJson) {
 
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.migrateCaseInstance(caseInstanceId, migrationDocumentJson);
+            restApiInterceptor.migrateCaseInstance(caseInstance, migrationDocumentJson);
         }
 
         CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);

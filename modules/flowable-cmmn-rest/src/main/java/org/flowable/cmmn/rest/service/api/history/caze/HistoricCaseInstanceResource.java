@@ -121,8 +121,10 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
     public void migrateHistoricCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                                        @RequestBody String migrationDocumentJson) {
 
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.migrateHistoricCaseInstance(caseInstanceId, migrationDocumentJson);
+            restApiInterceptor.migrateHistoricCaseInstance(caseInstance, migrationDocumentJson);
         }
 
         HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);

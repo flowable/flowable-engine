@@ -13,8 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
@@ -45,6 +43,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -160,8 +159,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest) {
         
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.changeActivityState(activityStateRequest);
+            restApiInterceptor.changeActivityState(processInstance, activityStateRequest);
         }
 
         if (activityStateRequest.getCancelActivityIds() != null && activityStateRequest.getCancelActivityIds().size() == 1) {
@@ -204,8 +205,9 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     public void migrateProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody String migrationDocumentJson) {
         
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
         if (restApiInterceptor != null) {
-            restApiInterceptor.migrateProcessInstance(processInstanceId, migrationDocumentJson);
+            restApiInterceptor.migrateProcessInstance(processInstance, migrationDocumentJson);
         }
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
@@ -223,8 +225,10 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     public void injectActivityInProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody InjectActivityRequest injectActivityRequest) {
         
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.injectActivity(injectActivityRequest);
+            restApiInterceptor.injectActivity(processInstance, injectActivityRequest);
         }
 
         if ("task".equalsIgnoreCase(injectActivityRequest.getInjectionType())) {
