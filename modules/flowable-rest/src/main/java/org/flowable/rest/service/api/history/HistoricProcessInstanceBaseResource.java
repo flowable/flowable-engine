@@ -216,6 +216,10 @@ public class HistoricProcessInstanceBaseResource {
             query.withoutProcessInstanceCallbackId();
         }
         
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
+        }
+        
         if (queryRequest.getTenantId() != null) {
             query.processInstanceTenantId(queryRequest.getTenantId());
         }

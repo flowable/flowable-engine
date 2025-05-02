@@ -899,6 +899,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         methodNameToExpectedQueryPropertyName.put("withoutCaseInstanceParent", "withoutCaseInstanceParentId");
         Set<String> methodsToIgnore = new HashSet<>();
         methodsToIgnore.add("limitCaseVariables");
+        methodsToIgnore.add("parentCaseInstanceId");
         methodsToIgnore.add("includeCaseVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
