@@ -109,6 +109,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected Set<String> activeActivityIds;
     protected String callbackId;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected String referenceId;
     protected String referenceType;
     
@@ -1400,6 +1401,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return callbackType;
     }
     
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
     public List<ExecutionQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }
