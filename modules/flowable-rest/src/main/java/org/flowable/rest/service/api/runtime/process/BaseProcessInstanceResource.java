@@ -209,6 +209,10 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
         }
+        
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
+        }
 
         if (queryRequest.getTenantId() != null) {
             query.processInstanceTenantId(queryRequest.getTenantId());

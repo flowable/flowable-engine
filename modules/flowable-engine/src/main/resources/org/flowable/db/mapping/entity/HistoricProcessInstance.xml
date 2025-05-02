@@ -915,6 +915,13 @@
       <if test="callbackType != null">
         and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
       </if>
+      <if test="parentCaseInstanceId != null">
+          and EXISTS(select 1 from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where
+            PLANITEM.CASE_INST_ID_ = #{parentCaseInstanceId, jdbcType=VARCHAR}
+            and RES.CALLBACK_ID_ = PLANITEM.ID_
+            and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-bpmn-2.0-child-process'
+          )
+      </if>
       <if test="withoutCallbackId">
         and ${queryTablePrefix}CALLBACK_ID_ is null
       </if>
@@ -1074,6 +1081,13 @@
       </if>
       <if test="orQueryObject.callbackType != null">
         or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
+      </if>
+      <if test="orQueryObject.parentCaseInstanceId != null">
+          or EXISTS(select 1 from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where
+            PLANITEM.CASE_INST_ID_ = #{orQueryObject.parentCaseInstanceId, jdbcType=VARCHAR}
+            and RES.CALLBACK_ID_ = PLANITEM.ID_
+            and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-bpmn-2.0-child-process'
+          )
       </if>
       <if test="orQueryObject.withoutCallbackId">
           or ${queryTablePrefix}CALLBACK_ID_ is null

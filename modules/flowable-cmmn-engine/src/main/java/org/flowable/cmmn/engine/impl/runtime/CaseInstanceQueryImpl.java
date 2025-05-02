@@ -81,6 +81,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected String referenceId;
     protected String referenceType;
     protected boolean completeable;
@@ -615,6 +616,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId) {
+        if (parentCaseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("parentCaseInstanceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
+        } else {
+            this.parentCaseInstanceId = parentCaseInstanceId;
         }
         return this;
     }
@@ -1177,6 +1191,30 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNameLike() {
+        return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
     }
 
     public String getReferenceId() {

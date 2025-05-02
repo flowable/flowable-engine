@@ -104,6 +104,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
+        @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return process instances with the given parent case instance id.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenant id.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenant id like the given value.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return process instances with a tenant id like the given value ignoring case.", paramType = "query"),
@@ -261,6 +262,10 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         
         if (allRequestParams.containsKey("callbackType")) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
+        }
+        
+        if (allRequestParams.containsKey("parentCaseInstanceId")) {
+            queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
         }
 
         if (allRequestParams.containsKey("tenantId")) {

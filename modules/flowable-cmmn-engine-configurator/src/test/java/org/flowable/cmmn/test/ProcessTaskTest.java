@@ -2098,7 +2098,75 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .singleResult();
 
         assertThat(subCasePlanItemInstance.getReferenceId()).isEqualTo(processInstance.getId());
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/oneProcessTaskV2.cmmn"
+    })
+    public void testGetProcessInstanceByParentCaseInstanceId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+        ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTask").latestVersion().singleResult();
 
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneProcessTaskCase").start();
+        
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
+                .parentCaseInstanceId(caseInstance.getId())
+                .singleResult();
+
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+        
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().or()
+                .parentCaseInstanceId(caseInstance.getId()).processDefinitionCategory("unexisting").endOr().singleResult();
+        assertThat(processInstance).isNotNull();
+        
+        processInstance = processEngineRuntimeService.createProcessInstanceQuery().or()
+                .parentCaseInstanceId("unexisting").processDefinitionCategory("unexisting").endOr().singleResult();
+        assertThat(processInstance).isNull();
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = processEngineHistoryService.createHistoricProcessInstanceQuery()
+                    .parentCaseInstanceId(caseInstance.getId())
+                    .singleResult();
+            
+            assertThat(historicProcessInstance).isNotNull();
+            assertThat(historicProcessInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+            
+            historicProcessInstance = processEngineHistoryService.createHistoricProcessInstanceQuery().or()
+                    .parentCaseInstanceId(caseInstance.getId()).processDefinitionCategory("unexisting").endOr().singleResult();
+            assertThat(historicProcessInstance).isNotNull();
+            
+            historicProcessInstance = processEngineHistoryService.createHistoricProcessInstanceQuery().or()
+                    .parentCaseInstanceId("unexisting").processDefinitionCategory("unexisting").endOr().singleResult();
+            assertThat(historicProcessInstance).isNull();
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/oneCaseTaskCase.cmmn",
+            "org/flowable/cmmn/test/oneProcessTaskV2.cmmn"
+    })
+    public void testGetProcessInstanceHierarchyByParentScopeId() {
+        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+        ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTask").latestVersion().singleResult();
+        
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCaseTask").start();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        PlanItemInstance subCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(planItemInstance.getReferenceId())
+                .singleResult();
+        
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery()
+                .processInstanceParentScopeId(caseInstance.getId())
+                .singleResult()).isNull();
+
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery()
+                .processInstanceParentScopeId(subCasePlanItemInstance.getCaseInstanceId())
+                .singleResult();
+
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     }
 
     @Test

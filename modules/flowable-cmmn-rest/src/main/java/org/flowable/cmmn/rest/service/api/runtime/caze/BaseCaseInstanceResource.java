@@ -169,6 +169,9 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
         }
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
+        }
         if (queryRequest.getCaseInstanceReferenceId() != null) {
             query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
         }

@@ -95,6 +95,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected Set<String> activeActivityIds;
     protected String callbackId;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected String referenceId;
     protected String referenceType;
     protected String locale;
@@ -743,6 +744,16 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
+        } else {
+            this.parentCaseInstanceId = parentCaseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
     public ProcessInstanceQuery processInstanceReferenceId(String referenceId) {
         if (inOrStatement) {
             this.currentOrQueryObject.referenceId = referenceId;
@@ -1285,6 +1296,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
     }
 
     public String getReferenceId() {

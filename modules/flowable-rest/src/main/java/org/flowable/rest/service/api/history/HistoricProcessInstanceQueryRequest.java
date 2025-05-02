@@ -71,6 +71,7 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private List<QueryVariable> variables;
     private String callbackId;
     private String callbackType;
+    private String parentCaseInstanceId;
     private Boolean withoutCallbackId;
     private String tenantId;
     private String tenantIdLike;
@@ -422,6 +423,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
     }
 
     public Boolean getWithoutCallbackId() {

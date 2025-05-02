@@ -82,6 +82,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
+        @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return instances with the given parent case instance id.", paramType = "query"),
         @ApiImplicitParam(name = "withoutCallbackId", dataType = "boolean", value = "Only return instances that do not have a callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenant id like the given value.", paramType = "query"),
@@ -243,6 +244,11 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         if (allRequestParams.get("callbackType") != null) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }
+        
+        if (allRequestParams.get("parentCaseInstanceId") != null) {
+            queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
+        }
+        
         if (allRequestParams.get("withoutCallbackId") != null) {
             queryRequest.setWithoutCallbackId(Boolean.valueOf(allRequestParams.get("withoutCallbackId")));
         }

@@ -58,6 +58,7 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceState;
     private String caseInstanceCallbackId;
     private String caseInstanceCallbackType;
+    private String parentCaseInstanceId;
     private String caseInstanceReferenceId;
     private String caseInstanceReferenceType;
     private Boolean finished;
@@ -319,6 +320,14 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceCallbackType(String caseInstanceCallbackType) {
         this.caseInstanceCallbackType = caseInstanceCallbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
     }
 
     public String getCaseInstanceReferenceId() {

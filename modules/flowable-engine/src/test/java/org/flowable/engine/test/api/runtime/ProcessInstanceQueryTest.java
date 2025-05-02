@@ -2582,7 +2582,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     public void testQueryByParentScopeId() {
         ProcessInstance validationProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
-
+        
         List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
         assertThat(result).isEmpty();
 

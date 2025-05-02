@@ -72,6 +72,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private List<QueryVariable> variables;
     private String callbackId;
     private String callbackType;
+    private String parentCaseInstanceId;
     private String tenantId;
     private String tenantIdLike;
     private String tenantIdLikeIgnoreCase;
@@ -412,6 +413,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
     }
 
     public void setTenantId(String tenantId) {
