@@ -322,6 +322,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
 
         // Event
         info.addQueryParameter("eventSubscriptionValue.eventType", PARAMETER_TYPE_NVARCHAR);
@@ -499,6 +501,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("group", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
 
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
@@ -921,6 +925,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
@@ -1028,6 +1033,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
