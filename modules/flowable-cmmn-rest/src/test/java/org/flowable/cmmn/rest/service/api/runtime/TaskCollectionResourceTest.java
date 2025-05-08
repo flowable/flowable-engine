@@ -321,9 +321,21 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getIsoDateStringWithMS(
+                    inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getIsoDateStringWithoutSeconds(
+                    inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // CreatedBefore filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getISODateString(
+                    inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getIsoDateStringWithoutSeconds(
+                    inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getIsoDateStringWithMS(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
@@ -342,9 +354,22 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             // Duedate filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getISODateString(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithoutSeconds(
+                    adhocTaskCreate.getTime());
+            assertResultsPresentInDataResponse(url);
+            assertResultsPresentInDataResponse(url);
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithMS(adhocTaskCreate.getTime());
+            assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Due after filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getISODateString(inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithoutSeconds(
+                    inBetweenTaskCreation.getTime());
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+            assertResultsPresentInDataResponse(url, caseTask.getId(), adhocTask.getId());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithMS(
+                    inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
             // Due before filtering

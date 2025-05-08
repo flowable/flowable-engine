@@ -13,6 +13,10 @@
 
 package org.flowable.common.rest.api;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -20,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
 /**
  * @author Tijs Rademakers
@@ -28,7 +31,24 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 public class RequestUtil {
 
     private static final FastDateFormat shortDateFormat = FastDateFormat.getInstance("yyyy-MM-dd");
-    private static final FastDateFormat longDateFormat = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssz");
+    private static final FastDateFormat longDateFormatOutputFormater = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ssz");
+
+    private static final DateTimeFormatter longDateFormat =
+            new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-MM-dd'T'HH:mm")
+                    .optionalStart()
+                        .appendPattern(":ss")
+                        .optionalStart()
+                            .appendPattern(".SSS")
+                        .optionalEnd()
+                    .optionalEnd()
+                    .optionalStart()
+                        .appendOffset("+HH:mm", "Z")
+                    .optionalEnd()
+                    .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                    .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
+
+                    .toFormatter();
 
     public static boolean getBoolean(Map<String, String> requestParams, String name, boolean defaultValue) {
         boolean value = defaultValue;
@@ -54,32 +74,15 @@ public class RequestUtil {
     }
 
     public static Date parseLongDate(String aDate) {
-        if (aDate != null) {
-            String input = aDate.trim();
-            // this is zero time so we need to add that TZ indicator for
-            if (input.endsWith("Z")) {
-                input = input.substring(0, input.length() - 1) + "GMT-00:00";
-            } else {
-                int inset = 6;
-                String s0 = input.substring(0, input.length() - inset);
-                String s1 = input.substring(input.length() - inset);
-                input = s0 + "GMT" + s1;
-            }
-            try {
-                return longDateFormat.parse(input);
-            } catch (Exception e) {
-                throw new FlowableIllegalArgumentException("Failed to parse date " + input);
-            }
-        }
-        return null;
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(aDate, longDateFormat);
+        return Date.from(offsetDateTime.toInstant());
     }
 
     public static String dateToString(Date date) {
         String dateString = null;
         if (date != null) {
-            dateString = longDateFormat.format(date);
+            dateString = longDateFormatOutputFormater.format(date);
         }
-
         return dateString;
     }
 
