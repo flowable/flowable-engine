@@ -183,6 +183,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             }
 
             evaluationResult.increaseActiveChildren();
+        } else if (PlanItemInstanceState.ACTIVE_STATES.contains(state)) {
+            evaluationResult.increaseActiveChildren();
         }
         return false;
     }

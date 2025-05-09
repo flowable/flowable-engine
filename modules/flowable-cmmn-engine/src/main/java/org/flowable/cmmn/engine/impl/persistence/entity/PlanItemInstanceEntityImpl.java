@@ -161,7 +161,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completable);
+        persistentState.put("completable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
         persistentState.put("extraValue", extraValue);

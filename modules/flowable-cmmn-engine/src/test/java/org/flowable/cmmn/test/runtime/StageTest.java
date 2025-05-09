@@ -15,10 +15,15 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -32,8 +37,12 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;
+import org.opentest4j.AssertionFailedError;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -1048,5 +1057,51 @@ public class StageTest extends FlowableCmmnTestCase {
 
         HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertThat(historicCaseInstance.getBusinessStatus()).isEqualTo("secondStage");
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/StageTest.testStageWithAsyncNonExclusiveChildren.cmmn",
+            "org/flowable/cmmn/test/runtime/StageTest.sleepCase.cmmn"
+    })
+    public void testStageWithAsyncNonExclusiveChildren() {
+        ArrayNode elementsVar = cmmnEngineConfiguration.getObjectMapper()
+                .createArrayNode();
+        int numberOfJobs = 2;
+        for (int i = 0; i < numberOfJobs; i++) {
+            elementsVar.add("element" + i);
+        }
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("caseWithAsyncNonExclusiveStageChildren")
+                .variable("elementsVar", elementsVar)
+                .start();
+
+        // The stage should not be completable yet, as the async jobs are not completed
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().singleResult().isCompletable()).isFalse();
+
+        List<Job> jobs = cmmnManagementService.createJobQuery().list();
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfJobs);
+        List<Future<?>> jobExecutions = new ArrayList<>(numberOfJobs);
+        for (Job job : jobs) {
+            jobExecutions.add(executorService.submit(() -> {
+                cmmnManagementService.executeJob(job.getId());
+                return null;
+            }));
+        }
+        executorService.shutdown();
+        try {
+            boolean terminated = executorService.awaitTermination(10, TimeUnit.SECONDS);
+            if (!terminated) {
+                throw new AssertionFailedError("Failed to terminate executor service");
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        // Prior to the fix that was done for this, we were having FlowableOptimisticLockException here
+        // The reason for this was the fact that the Stage was initially marked as completable, and then when the jobs run
+        // they marked the stage as not completable again, due to the fact that they were active
+        assertThat(jobExecutions)
+                .extracting(Future::get)
+                .containsOnlyNulls();
     }
 }
