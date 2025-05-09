@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Set;
+
 import org.flowable.common.rest.api.PaginateRequest;
 
 /**
@@ -28,7 +30,9 @@ public class HistoricActivityInstanceQueryRequest extends PaginateRequest {
     private Boolean finished;
     private String taskAssignee;
     private String processInstanceId;
+    private Set<String> processInstanceIds;
     private String processDefinitionId;
+    private Set<String> calledProcessInstanceIds;
     private String tenantId;
     private String tenantIdLike;
     private Boolean withoutTenantId;
@@ -127,5 +131,21 @@ public class HistoricActivityInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Set<String> getProcessInstanceIds() {
+        return processInstanceIds;
+    }
+
+    public void setProcessInstanceIds(Set<String> processInstanceIds) {
+        this.processInstanceIds = processInstanceIds;
+    }
+
+    public Set<String> getCalledProcessInstanceIds() {
+        return calledProcessInstanceIds;
+    }
+
+    public void setCalledProcessInstanceIds(Set<String> calledProcessInstanceIds) {
+        this.calledProcessInstanceIds = calledProcessInstanceIds;
     }
 }
