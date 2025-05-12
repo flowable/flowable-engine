@@ -206,6 +206,11 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getCallbackId() != null) {
             query.processInstanceCallbackId(queryRequest.getCallbackId());
         }
+
+        if(queryRequest.getCallbackIds() != null && !queryRequest.getCallbackIds().isEmpty()) {
+            query.processInstanceCallbackIds(queryRequest.getCallbackIds());
+        }
+
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
         }

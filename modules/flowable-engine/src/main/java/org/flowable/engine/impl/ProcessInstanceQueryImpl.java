@@ -94,6 +94,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
     protected String parentCaseInstanceId;
     protected String referenceId;
@@ -732,6 +733,19 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         }
         return this;
     }
+
+    @Override
+    public ProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
+        }
+        return this;
+    }
     
     @Override
     public ProcessInstanceQuery processInstanceCallbackType(String callbackType) {
@@ -1292,6 +1306,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getCallbackId() {
         return callbackId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
     }
 
     public String getCallbackType() {

@@ -70,6 +70,7 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private Boolean includeProcessVariables;
     private List<QueryVariable> variables;
     private String callbackId;
+    private Set<String> callbackIds;
     private String callbackType;
     private String parentCaseInstanceId;
     private Boolean withoutCallbackId;
@@ -487,5 +488,13 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setParentScopeId(String parentScopeId) {
         this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
+    public void setCallbackIds(Set<String> callbackIds) {
+        this.callbackIds = callbackIds;
     }
 }
