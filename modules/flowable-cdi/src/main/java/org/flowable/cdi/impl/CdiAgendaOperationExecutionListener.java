@@ -29,6 +29,11 @@ import org.flowable.engine.impl.agenda.AbstractOperation;
 public class CdiAgendaOperationExecutionListener implements AgendaOperationExecutionListener {
 
     @Override
+    public void beforeAll(CommandContext commandContext) {
+
+    }
+
+    @Override
     public void beforeExecute(CommandContext commandContext, Runnable runnable) {
         if (runnable instanceof AbstractOperation operation && operation.getExecution() != null) {
             ExecutionContextHolder.setExecutionContext(operation.getExecution());
@@ -45,6 +50,11 @@ public class CdiAgendaOperationExecutionListener implements AgendaOperationExecu
     @Override
     public void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error) {
         afterExecute(commandContext, runnable);
+    }
+
+    @Override
+    public void afterAll(CommandContext commandContext) {
+
     }
 
 }

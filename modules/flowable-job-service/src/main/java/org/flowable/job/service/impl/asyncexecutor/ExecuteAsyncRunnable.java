@@ -14,10 +14,13 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.tenant.TenantContext;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -28,13 +31,21 @@ import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.JobProcessorContext;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncRunnableJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
+import org.flowable.job.service.impl.nontx.NonTransactionalJobHandler;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.util.JobProcessorUtil;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,8 +133,20 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     protected void executeJob(final boolean unlock, JobExecutionObservation observation) {
         try (JobExecutionObservation.Scope ignored = observation.executionScope()) {
-            jobServiceConfiguration.getCommandExecutor().execute(
-                new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+
+            boolean jobHandled = false;
+            if (job instanceof JobEntity) { // only instances of JobEntity can be made non-transactional
+                Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
+                JobHandler jobHandler = jobHandlers.get(job.getJobHandlerType());
+
+                if (jobHandler instanceof NonTransactionalJobHandler nonTransactionalJobHandler) {
+                    jobHandled = handleNontransactionalJob(nonTransactionalJobHandler, unlock);
+                }
+            }
+
+            if (!jobHandled) {
+                handleTransactionalJob(unlock);
+            }
 
         } catch (final FlowableOptimisticLockingException e) {
 
@@ -149,6 +172,41 @@ public class ExecuteAsyncRunnable implements Runnable {
                 observation.executionError(exception);
             }
         }
+    }
+
+    protected void handleTransactionalJob(boolean unlock) {
+        // Wrapping in a command and passing to the command executor starts a new transaction
+        jobServiceConfiguration.getCommandExecutor().execute(
+                new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+    }
+
+    protected boolean handleNontransactionalJob(NonTransactionalJobHandler jobHandler, boolean unlock) {
+
+        JobProcessorUtil.callJobProcessors(jobServiceConfiguration, JobProcessorContext.Phase.BEFORE_EXECUTE, (JobEntity) job);
+
+        if (unlock) {
+            jobServiceConfiguration.getCommandExecutor().execute(new UnlockExclusiveJobCmd((Job) job, jobServiceConfiguration));
+        }
+
+        // If an exception is thrown during job handler exception, it goes up and will be caught in the general exception handling.
+        // The delete at the end won't happen in that case.
+
+        jobHandler.executeNonTransactionally((JobEntity) job, job.getJobHandlerConfiguration());
+
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job),
+                    jobServiceConfiguration.getEngineName());
+        }
+
+        // The delete still needs to happen in a new transaction
+        jobServiceConfiguration.getCommandExecutor().execute(commandContext -> {
+            jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+            return null;
+        });
+
+        return true;
+
     }
 
     protected void unlockJobIfNeeded() {
