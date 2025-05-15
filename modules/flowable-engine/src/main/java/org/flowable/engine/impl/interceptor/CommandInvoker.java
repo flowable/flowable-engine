@@ -64,6 +64,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             
         } else {
 
+            executeExecutionListenersBeforeAll(commandContext);
+
             // Execute the command.
             // This will produce operations that will be put on the agenda.
             agenda.planOperation(new Runnable() {
@@ -109,6 +111,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                 if (!processInstanceIds.isEmpty()) {
                     executeOperations(commandContext);
                 }
+
+                executeExecutionListenersAfterAll(commandContext);
             }
     
             return (T) commandContext.getResult();
@@ -127,6 +131,22 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                 ExceptionUtil.sneakyThrow(throwable);
             }
             executeExecutionListenersAfterExecute(commandContext, runnable);
+        }
+    }
+
+    protected void executeExecutionListenersBeforeAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterAll(commandContext);
+            }
         }
     }
 

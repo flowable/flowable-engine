@@ -14,6 +14,7 @@ package org.flowable.job.service.impl.asyncexecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
 import org.flowable.common.engine.api.FlowableException;
@@ -28,13 +29,16 @@ import org.flowable.job.api.HistoryJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncRunnableJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,8 +126,25 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     protected void executeJob(final boolean unlock, JobExecutionObservation observation) {
         try (JobExecutionObservation.Scope ignored = observation.executionScope()) {
-            jobServiceConfiguration.getCommandExecutor().execute(
-                new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+
+            Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
+            JobHandler jobHandler = jobHandlers.get(job.getJobHandlerType());
+
+            if (jobHandler != null && jobHandler.isNonTransactional() && job instanceof JobEntity) {
+
+                // TODO:
+                // - fire event similar to ExecuteAsyncRunnableJobCmd
+                // - unlock job if needed (part of ExecuteAsyncRunnableJobCmd)
+                // - delete job: jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+                jobHandler.execute((JobEntity) job, job.getJobHandlerConfiguration(), NoExecutionVariableScope.getSharedInstance(), null);
+
+            } else {  // Default behavior
+
+                // Wrapping in a command and passing to the command executor starts a new transaction
+                jobServiceConfiguration.getCommandExecutor().execute(
+                        new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+
+            }
 
         } catch (final FlowableOptimisticLockingException e) {
 

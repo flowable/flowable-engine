@@ -18,10 +18,15 @@ import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public interface JobHandler {
 
     String getType();
 
     void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext);
+
+    default boolean isNonTransactional() {
+        return false;
+    }
 }
