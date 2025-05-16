@@ -430,6 +430,12 @@
       <if test="needsPaging">${limitAfter}</if>
       ) RES
       left outer join ${prefix}ACT_HI_VARINST VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+          <if test="variableNamesToInclude != null and !variableNamesToInclude.empty">
+              and VAR.NAME_ in
+              <foreach item="variableName" collection="variableNamesToInclude" open="(" separator="," close=")">
+                  #{variableName, jdbcType=NVARCHAR}
+              </foreach>
+          </if>
       <if test="needsProcessDefinitionOuterJoin">
           left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
       </if>

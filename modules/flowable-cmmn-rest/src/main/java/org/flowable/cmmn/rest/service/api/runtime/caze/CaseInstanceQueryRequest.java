@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -66,6 +67,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private Date caseInstanceLastReactivatedBefore;
     private Date caseInstanceLastReactivatedAfter;
     private Boolean includeCaseVariables;
+    private Collection<String> includeCaseVariablesNames;
     private List<QueryVariable> variables;
     private String activePlanItemDefinitionId;
     private Set<String> activePlanItemDefinitionIds;
@@ -376,6 +378,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setIncludeCaseVariables(Boolean includeCaseVariables) {
         this.includeCaseVariables = includeCaseVariables;
+    }
+
+    public Collection<String> getIncludeCaseVariablesNames() {
+        return includeCaseVariablesNames;
+    }
+
+    public void setIncludeCaseVariablesNames(Collection<String> includeCaseVariablesNames) {
+        this.includeCaseVariablesNames = includeCaseVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)

@@ -334,6 +334,12 @@
             <if test="needsPaging">${limitAfter}</if>
         ) RES
         left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_= 'cmmn' and VAR.SUB_SCOPE_ID_ is null
+            <if test="variableNamesToInclude != null and !variableNamesToInclude.empty">
+                and VAR.NAME_ in
+                <foreach item="variableName" collection="variableNamesToInclude" open="(" separator="," close=")">
+                    #{variableName, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
         <if test="needsCaseDefinitionOuterJoin">
             inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         </if>
