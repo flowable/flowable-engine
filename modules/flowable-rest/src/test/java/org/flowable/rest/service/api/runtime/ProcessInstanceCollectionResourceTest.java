@@ -149,6 +149,59 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                         + "}");
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testGetProcessInstancesIncludeDefinedVariables() throws Exception {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processOne")
+                .businessKey("myBusinessKey")
+                .variable("testVar", "testValue")
+                .variable("intVar", 123)
+                .start();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION);
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .inPath("data[0].variables")
+                .isArray()
+                .isEmpty();
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?includeProcessVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data[0].variables")
+                .isEqualTo("""
+                        [
+                          { name: 'testVar', value: 'testValue' },
+                          { name: 'intVar', value: 123 }
+                        ]
+                        """);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION) + "?includeProcessVariablesNames=testVar,dummy";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("data[0].variables")
+                .isEqualTo("""
+                        [
+                          { name: 'testVar', value: 'testValue' }
+                        ]
+                        """);
+    }
+
     /**
      * Test getting a list of process instance, using all possible filters.
      */

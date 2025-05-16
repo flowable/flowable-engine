@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
@@ -2579,4 +2580,40 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 validationProcessInstance.getId()
         );
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testIncludeDefinedVariables() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .businessKey("testBusinessKey")
+                .variable("testVar", "test value")
+                .variable("intVar", 123)
+                .start();
+
+        assertThat(processInstance).isNotNull();
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey").singleResult();
+        assertThat(processInstance.getProcessVariables()).isEmpty();
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey").includeProcessVariables().singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(
+                        entry("testVar", "test value"),
+                        entry("intVar", 123)
+                );
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                .includeProcessVariables(List.of("testVar", "dummy")).singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(
+                        entry("testVar", "test value")
+                );
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                .includeProcessVariables(List.of("unknown", "dummy")).singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .isEmpty();
+    }
+
 }
