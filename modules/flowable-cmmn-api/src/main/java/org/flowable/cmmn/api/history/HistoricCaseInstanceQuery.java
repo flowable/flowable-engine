@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -180,6 +181,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Include historic case variables in the historic case query result
      */
     HistoricCaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Include the historic case variables with the given names into the query result.
+     */
+    HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
 
     /**
      * Only select historic case instances that are defined by a case definition with the given deployment identifier.

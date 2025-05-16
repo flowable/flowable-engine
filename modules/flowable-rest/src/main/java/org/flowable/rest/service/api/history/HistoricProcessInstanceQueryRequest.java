@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -68,6 +69,7 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedBefore;
     private String startedBy;
     private Boolean includeProcessVariables;
+    private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
     private String callbackId;
     private String callbackType;
@@ -398,6 +400,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setIncludeProcessVariables(Boolean includeProcessVariables) {
         this.includeProcessVariables = includeProcessVariables;
+    }
+
+    public Collection<String> getIncludeProcessVariablesNames() {
+        return includeProcessVariablesNames;
+    }
+
+    public void setIncludeProcessVariablesNames(Collection<String> includeProcessVariablesNames) {
+        this.includeProcessVariablesNames = includeProcessVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)

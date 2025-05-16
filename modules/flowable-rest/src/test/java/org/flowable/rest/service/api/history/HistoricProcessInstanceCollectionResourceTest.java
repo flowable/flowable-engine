@@ -111,6 +111,9 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=false&processInstanceId=" + processInstance.getId(), processInstance.getId(), new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=true&processInstanceId=" + processInstance.getId(), processInstance.getId(), processVariables);
 
+        assertVariablesPresentInPostDataResponse(url, "?includeProcessVariablesNames=stringVar,dummy&processInstanceId=" + processInstance.getId(),
+                processInstance.getId(), Map.of("stringVar", "Azerty"));
+
         // Without tenant ID, before setting tenant
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", processInstance.getId(), processInstance2.getId());
 
