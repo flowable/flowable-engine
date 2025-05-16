@@ -118,7 +118,6 @@ public class VariableListenerEventDbQueryTest extends PluggableFlowableTestCase 
                 "selectExecutionsByParentExecutionId", 3L,
                 "selectIdentityLinksByProcessInstance", 1L,
                 "selectProcessDefinitionInfoByProcessDefinitionId", 1L,
-                "selectSubProcessInstanceBySuperExecutionId", 1L,
                 "selectTasksByExecutionId", 1L,
                 "selectUnfinishedActivityInstanceExecutionIdAndActivityId", 2L,
                 "selectEventSubscriptionsByExecution", 2L,
