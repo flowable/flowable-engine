@@ -40,9 +40,13 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
     
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId);
 
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId, Collection<String> variableNames);
+
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByTaskId(String taskId);
 
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType);
+
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType, Collection<String> variableNames);
 
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 

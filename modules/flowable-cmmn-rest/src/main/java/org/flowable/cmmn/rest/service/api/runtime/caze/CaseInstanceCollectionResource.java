@@ -96,6 +96,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "lastReactivatedBefore", dataType = "string", format = "date-time", value = "Only return case instances last reactivated before the given date.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "Indication to include case variables in the result.", paramType = "query"),
+            @ApiImplicitParam(name = "includeCaseVariablesName", dataType = "string", value = "Indication to include case variables with the given names in the result.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return case instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return case instances with a tenantId like the given value.", paramType = "query"),
@@ -254,6 +255,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("includeCaseVariables")) {
             queryRequest.setIncludeCaseVariables(Boolean.valueOf(allRequestParams.get("includeCaseVariables")));
+        }
+
+        if (allRequestParams.containsKey("includeCaseVariablesNames")) {
+            queryRequest.setIncludeCaseVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeCaseVariablesNames")));
         }
         
         if (allRequestParams.containsKey("activePlanItemDefinitionId")) {

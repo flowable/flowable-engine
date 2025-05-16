@@ -13,7 +13,9 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -105,6 +107,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String tenantIdLikeIgnoreCase;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
+    protected Collection<String> variableNamesToInclude;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -915,9 +918,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public void enhanceCachedValue(HistoricCaseInstanceEntity caseInstance) {
         if (isIncludeCaseVariables()) {
-            caseInstance.getQueryVariables()
-                    .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
-                            .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            if (variableNamesToInclude == null) {
+                caseInstance.getQueryVariables()
+                        .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            } else {
+                caseInstance.getQueryVariables()
+                        .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN, variableNamesToInclude));
+            }
         }
     }
 
@@ -956,6 +965,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public HistoricCaseInstanceQuery includeCaseVariables() {
         this.includeCaseVariables = true;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            throw new FlowableIllegalArgumentException("variableNames is null or empty");
+        }
+        includeCaseVariables();
+        this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
         return this;
     }
 
@@ -1446,6 +1465,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isIncludeCaseVariables() {
         return includeCaseVariables;
+    }
+
+    public Collection<String> getVariableNamesToInclude() {
+        return variableNamesToInclude;
     }
 
     public List<HistoricCaseInstanceQueryImpl> getOrQueryObjects() {

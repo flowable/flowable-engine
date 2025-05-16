@@ -202,6 +202,9 @@ public class HistoricProcessInstanceBaseResource {
                 query.includeProcessVariables();
             }
         }
+        if (queryRequest.getIncludeProcessVariablesNames() != null) {
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames());
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
