@@ -19,6 +19,8 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableBatchPartMigrationException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.tenant.TenantContext;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -31,6 +33,7 @@ import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncRunnableJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
 import org.flowable.job.service.impl.cmd.UnlockExclusiveJobCmd;
@@ -38,6 +41,7 @@ import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,18 +135,10 @@ public class ExecuteAsyncRunnable implements Runnable {
             JobHandler jobHandler = jobHandlers.get(job.getJobHandlerType());
 
             if (jobHandler != null && jobHandler.isNonTransactional() && job instanceof JobEntity) {
+                handleNontransactionalJob(jobHandler);
 
-                // TODO:
-                // - fire event similar to ExecuteAsyncRunnableJobCmd
-                // - unlock job if needed (part of ExecuteAsyncRunnableJobCmd)
-                // - delete job: jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
-                jobHandler.execute((JobEntity) job, job.getJobHandlerConfiguration(), NoExecutionVariableScope.getSharedInstance(), null);
-
-            } else {  // Default behavior
-
-                // Wrapping in a command and passing to the command executor starts a new transaction
-                jobServiceConfiguration.getCommandExecutor().execute(
-                        new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+            } else {
+                handleTransactionalJob(unlock);
 
             }
 
@@ -170,6 +166,35 @@ public class ExecuteAsyncRunnable implements Runnable {
                 observation.executionError(exception);
             }
         }
+    }
+
+    protected void handleTransactionalJob(boolean unlock) {
+        // Wrapping in a command and passing to the command executor starts a new transaction
+        jobServiceConfiguration.getCommandExecutor().execute(
+                new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
+    }
+
+    protected void handleNontransactionalJob(JobHandler jobHandler) {
+        // TODO:
+        // - unlock job if needed (part of ExecuteAsyncRunnableJobCmd)
+
+        // If an exception is thrown during job handler exception, it goes up and will be caught in the general exception handling.
+        // The delete at the end won't happen in that case.
+
+        jobHandler.execute((JobEntity) job, job.getJobHandlerConfiguration(), NoExecutionVariableScope.getSharedInstance(), null);
+
+        FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job),
+                    jobServiceConfiguration.getEngineName());
+        }
+
+        // The delete still needs to happen in a new transaction
+        jobServiceConfiguration.getCommandExecutor().execute(commandContext -> {
+            jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
+            return null;
+        });
+
     }
 
     protected void unlockJobIfNeeded() {
