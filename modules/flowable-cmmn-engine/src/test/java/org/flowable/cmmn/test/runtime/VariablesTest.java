@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -862,7 +863,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
 
@@ -883,7 +884,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
 

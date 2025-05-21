@@ -306,7 +306,7 @@ public class JsonTest extends PluggableFlowableTestCase {
         }
 
         // Set customer.street to long value
-        String randomLongValue = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        String randomLongValue = RandomStringUtils.insecure().nextAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
         customer.put("street", randomLongValue);
         runtimeService.setVariable(processInstance.getId(), "customer", customer);
 
@@ -357,7 +357,7 @@ public class JsonTest extends PluggableFlowableTestCase {
     public void testUpdateJsonValueToLongValueDuringExecution() {
         ObjectNode customer = objectMapper.createObjectNode();
         customer.put("name", "Kermit");
-        String randomLongStreetName = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        String randomLongStreetName = RandomStringUtils.insecure().nextAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
         JavaDelegate javaDelegate = new JavaDelegate() {
 
             @Override
@@ -417,7 +417,7 @@ public class JsonTest extends PluggableFlowableTestCase {
     public void testUpdateLongJsonValueDuringExecution() {
         ObjectNode customer = objectMapper.createObjectNode();
 
-        String randomLongStreetName = RandomStringUtils.randomAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
+        String randomLongStreetName = RandomStringUtils.insecure().nextAlphanumeric(processEngineConfiguration.getMaxLengthString() + 1);
         customer.put("name", "Kermit");
         customer.putObject("address")
                 .put("address", randomLongStreetName);
