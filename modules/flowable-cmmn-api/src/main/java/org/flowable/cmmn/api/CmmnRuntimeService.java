@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionB
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
+import org.flowable.cmmn.api.runtime.IntentEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
@@ -80,6 +81,8 @@ public interface CmmnRuntimeService {
     void completeGenericEventListenerInstance(String genericEventListenerInstanceId);
 
     void completeUserEventListenerInstance(String userEventListenerInstanceId);
+    
+    void completeIntentEventListenerInstance(String intentEventListenerInstanceId);
     
     /**
      * All variables visible from the given case instance scope.
@@ -251,6 +254,8 @@ public interface CmmnRuntimeService {
     GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
     
     SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery();
+    
+    IntentEventListenerInstanceQuery createIntentEventListenerInstanceQuery();
 
     UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
     

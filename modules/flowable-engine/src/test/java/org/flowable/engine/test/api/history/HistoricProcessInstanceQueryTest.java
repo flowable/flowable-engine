@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.HashSet;
@@ -610,5 +611,45 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
             assertThat(historicProcessInstance.getProcessDefinitionId()).isNotNull();
         }
+    }
+
+    @Test
+    public void testIncludeDefinedVariables() {
+        deployOneTaskTestProcess();
+        runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .businessKey("testBusinessKey")
+                .variable("testVar", "test value")
+                .variable("intVar", 123)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                    .singleResult();
+            assertThat(processInstance.getProcessVariables()).isEmpty();
+
+            processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey").includeProcessVariables()
+                    .singleResult();
+            assertThat(processInstance.getProcessVariables())
+                    .containsOnly(
+                            entry("testVar", "test value"),
+                            entry("intVar", 123)
+                    );
+
+            processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                    .includeProcessVariables(List.of("testVar", "dummy")).singleResult();
+            assertThat(processInstance.getProcessVariables())
+                    .containsOnly(
+                            entry("testVar", "test value")
+                    );
+
+            processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                    .includeProcessVariables(List.of("unknown", "dummy")).singleResult();
+            assertThat(processInstance.getProcessVariables())
+                    .isEmpty();
+        }
+
     }
 }

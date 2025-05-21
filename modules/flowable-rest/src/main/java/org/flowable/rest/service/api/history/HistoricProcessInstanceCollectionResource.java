@@ -80,6 +80,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
         @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return instances with the given parent case instance id.", paramType = "query"),
@@ -235,6 +236,10 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
 
         if (allRequestParams.get("includeProcessVariables") != null) {
             queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
+        }
+
+        if (allRequestParams.get("includeProcessVariablesNames") != null) {
+            queryRequest.setIncludeProcessVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeProcessVariablesNames")));
         }
         
         if (allRequestParams.get("callbackId") != null) {

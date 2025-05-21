@@ -22,6 +22,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerAct
 import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.IntentEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -45,6 +46,7 @@ import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.IntentEventListener;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
@@ -150,6 +152,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public VariableEventListenerActivityBehaviour createVariableEventListenerActivityBehaviour(PlanItem planItem, VariableEventListener variableEventListener) {
         return new VariableEventListenerActivityBehaviour(variableEventListener);
+    }
+
+    @Override
+    public IntentEventListenerActivityBehaviour createIntentEventListenerActivityBehaviour(PlanItem planItem, IntentEventListener intentEventListener) {
+        return new IntentEventListenerActivityBehaviour(intentEventListener);
     }
 
     @Override

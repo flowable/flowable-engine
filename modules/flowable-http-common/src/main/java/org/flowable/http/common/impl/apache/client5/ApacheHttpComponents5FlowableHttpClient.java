@@ -269,7 +269,13 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
         HttpResponse responseInfo = new HttpResponse();
 
         responseInfo.setStatusCode(response.getCode());
-        responseInfo.setReason(response.getReasonPhrase());
+        try {
+            responseInfo.setReason(response.getReasonPhrase());
+        } catch (IllegalArgumentException ignored) {
+            // Ignore the exception, it is not important
+            // HttpClient 5 throws an exception if the status code is not in the range of 100-599
+            // Therefore, if there is an exception we just ignore it
+        }
         responseInfo.setProtocol((response.getVersion() != null ? response.getVersion() : HttpVersion.HTTP_1_1).toString());
 
         HttpHeaders headers = null;

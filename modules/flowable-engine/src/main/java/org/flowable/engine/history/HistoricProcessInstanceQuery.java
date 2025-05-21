@@ -14,6 +14,7 @@
 package org.flowable.engine.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -532,6 +533,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Include process variables in the process query result
      */
     HistoricProcessInstanceQuery includeProcessVariables();
+
+    /**
+     * Include the process variables with the given names into the query result.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
 
     /**
      * Only select process instances that failed due to an exception happening during a job execution.

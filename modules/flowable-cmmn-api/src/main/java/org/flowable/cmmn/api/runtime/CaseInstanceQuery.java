@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -238,6 +239,11 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * @return caseInstanceQuery with the flag to retrieve case variables into the response.
      */
     CaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Include the case variables with the given names into the query result.
+     */
+    CaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
 
     /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.

@@ -128,6 +128,7 @@ import org.flowable.cmmn.engine.impl.parser.handler.FormAwareServiceTaskParseHan
 import org.flowable.cmmn.engine.impl.parser.handler.GenericEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HttpTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.IntentEventListenerParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.MilestoneParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.PlanFragmentParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ProcessTaskParseHandler;
@@ -1163,6 +1164,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         cmmnParseHandlers.add(new UserEventListenerParseHandler());
         cmmnParseHandlers.add(new ReactivateEventListenerParseHandler());
         cmmnParseHandlers.add(new VariableEventListenerParseHandler());
+        cmmnParseHandlers.add(new IntentEventListenerParseHandler());
 
         // Replace any default handler with a custom one (if needed)
         if (getCustomCmmnParseHandlers() != null) {

@@ -27,6 +27,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionB
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
+import org.flowable.cmmn.api.runtime.IntentEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
@@ -211,6 +212,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     public void completeUserEventListenerInstance(String userEventListenerInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(userEventListenerInstanceId));
     }
+    
+    @Override
+    public void completeIntentEventListenerInstance(String intentEventListenerInstanceId) {
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(intentEventListenerInstanceId));
+    }
 
     @Override
     public Map<String, Object> getVariables(String caseInstanceId) {
@@ -365,6 +371,11 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery() {
         return new SignalEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
+    }
+    
+    @Override
+    public IntentEventListenerInstanceQuery createIntentEventListenerInstanceQuery() {
+        return new IntentEventListenerInstanceQueryImpl(configuration.getCommandExecutor(), configuration);
     }
 
     @Override

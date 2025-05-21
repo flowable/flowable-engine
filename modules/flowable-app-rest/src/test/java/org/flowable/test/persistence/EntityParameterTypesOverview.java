@@ -322,6 +322,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
         
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
 
@@ -501,6 +502,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("group", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
         
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
 
@@ -946,6 +948,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
         info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addCmmnDeploymentParams() {
@@ -1055,6 +1058,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addHistoricMilestoneInstanceParams() {
@@ -1178,6 +1182,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addMilestoneInstanceParams() {

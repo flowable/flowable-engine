@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -64,17 +65,36 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmmnEngineAgenda.class);
 
+    protected final LinkedList<EvaluateCriteriaOperation> evaluateCriteriaOperations = new LinkedList<>();
+
     public DefaultCmmnEngineAgenda(CommandContext commandContext) {
         super(commandContext);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && evaluateCriteriaOperations.isEmpty();
+    }
+
+    @Override
+    public Runnable getNextOperation() {
+        if (operations.isEmpty() && !evaluateCriteriaOperations.isEmpty()) {
+            return evaluateCriteriaOperations.poll();
+        }
+        return super.getNextOperation();
     }
 
     public void addOperation(CmmnOperation operation) {
 
         operation.onPlanned();
         
-        int operationIndex = getOperationIndex(operation);
-        if (operationIndex >= 0) {
-            operations.add(operationIndex, operation);
+        // The operation to evaluate the criteria is the most expensive operation.
+        // As such, when it's planned it is always
+        // - moved to the end of the operations list
+        // - other operations are always planned before, as these can trigger new evaluation operations
+
+        if (operation instanceof EvaluateCriteriaOperation evaluateCriteriaOperation) {
+            evaluateCriteriaOperations.addLast(evaluateCriteriaOperation);
         } else {
             operations.addLast(operation);
         }
@@ -84,28 +104,6 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         }
     }
     
-    /**
-     * Returns the index in the list of operations where the {@link CmmnOperation} should be inserted.
-     * Returns a negative value if the element should be added to the end of the list. 
-     */
-    protected int getOperationIndex(CmmnOperation operation) {
-        
-        // The operation to evaluate the criteria is the most expensive operation.
-        // As such, when it's planned it is always 
-        // - moved to the end of the operations list
-        // - checked for duplicates to avoid duplicate evaluations (see the add method for it)
-        // - other operations are always planned before, as these can trigger new evaluation operations
-        
-        if (!operations.isEmpty() && !(operation instanceof EvaluateCriteriaOperation)) {
-            for (int i=0; i<operations.size(); i++) {
-                if (operations.get(i) instanceof EvaluateCriteriaOperation) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
         return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getAgendaFutureMaxWaitTimeoutProvider();

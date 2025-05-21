@@ -170,6 +170,8 @@ public class HttpServiceTaskTestServer {
 
             } else if (code >= 500 && code < 600) {
                 resp.sendError(code, "Server Error");
+            } else {
+                resp.sendError(code, "Custom error");
             }
         }
 

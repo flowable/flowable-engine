@@ -523,7 +523,15 @@
     </select>
 
     <select id="selectHistoricVariableInstanceByProcessInstanceId" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
+        select *
+        from ${prefix}ACT_HI_VARINST
+        where PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
+        <if test="parameter.variableNames != null and !parameter.variableNames.empty">
+            and NAME_ in
+            <foreach item="variableName" collection="parameter.variableNames" open="(" separator="," close=")">
+                #{variableName, jdbcType=NVARCHAR}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectHistoricVariableInstanceByTaskId" resultMap="historicProcessVariableResultMap">
@@ -531,7 +539,15 @@
     </select>
     
     <select id="selectHistoricVariableInstanceByScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
-        select * from ${prefix}ACT_HI_VARINST where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
+        select *
+        from ${prefix}ACT_HI_VARINST
+        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
+        <if test="parameter.variableNames != null and !parameter.variableNames.empty">
+            and NAME_ in
+            <foreach item="variableName" collection="parameter.variableNames" open="(" separator="," close=")">
+                #{variableName, jdbcType=NVARCHAR}
+            </foreach>
+        </if>
     </select>
     
     <select id="selectHistoricVariableInstanceBySubScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">

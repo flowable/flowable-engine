@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -89,6 +90,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected ExecutionEntityImpl superExecution;
 
     /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+    protected boolean isSubProcessInstanceInitialized;
     protected ExecutionEntityImpl subProcessInstance;
 
     /** The tenant identifier (if any) */
@@ -597,8 +599,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     protected void ensureSubProcessInstanceInitialized() {
-        if (subProcessInstance == null) {
-            subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+        if (!isSubProcessInstanceInitialized && activityId != null && subProcessInstance == null) {
+            isSubProcessInstanceInitialized = true;
+            FlowElement flowElement = getCurrentFlowElement();
+            if (flowElement != null && flowElement instanceof CallActivity) {
+                subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+            }
         }
     }
 
