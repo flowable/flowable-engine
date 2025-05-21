@@ -141,7 +141,7 @@ Flowable uses [SLF4J](http://www.slf4j.org/) as its logging framework internally
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>slf4j-reload4j</artifactId>
       <version>2.0.7</version>
     </dependency>
 
