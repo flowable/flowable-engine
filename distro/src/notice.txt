@@ -98,7 +98,7 @@ org.eclipse.angus                 angus-mail                  2.0.3           ED
 org.mybatis                       mybatis                     3.5.19          The Apache Software License, Version 2.0
 org.slf4j                         jcl-over-slf4j              2.0.17          MIT License
 org.slf4j                         slf4j-api                   2.0.17          MIT License
-org.slf4j                         slf4j-log4j12               2.0.17          MIT License
+org.slf4j                         slf4j-reload4j              2.0.17          MIT License
 org.springframework               spring-beans                6.2.7           The Apache Software License, Version 2.0
 org.springframework               spring-core                 6.2.7           The Apache Software License, Version 2.0
 org.springframework               spring-context              6.2.7           The Apache Software License, Version 2.0
