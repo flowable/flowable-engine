@@ -31,8 +31,8 @@ jobs:
             serviceName: XEPDB1
             type: xe
           - oracle: 23-slim-faststart
-            driverVersion: 23.5.0.24.07
-            driverArtifact: ojdbc11
+            driverVersion: 23.7.0.25.01
+            driverArtifact: ojdbc17
             serviceName: FREEPDB1
             type: free
     services:
