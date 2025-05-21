@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2220,7 +2221,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
 
@@ -2241,7 +2242,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
 
