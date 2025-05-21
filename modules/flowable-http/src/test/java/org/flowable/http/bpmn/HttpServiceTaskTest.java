@@ -445,8 +445,42 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(process.getId());
     }
 
+    @Test
+    @Deployment
+    public void testHttpGetNonSpecStatusCode() {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGetNonSpecCode");
+        assertThat(process.isEnded()).isFalse();
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("get981RequestMethod", "GET");
+        request.put("get981RequestUrl", "https://localhost:9799/api?code=981");
+        request.put("get981RequestHeaders", "Accept: application/json");
+        request.put("get981RequestTimeout", 5000);
+        request.put("get981HandleStatusCodes", "981");
+        request.put("get981SaveRequestVariables", true);
+        assertKeysEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("get981ResponseStatusCode", 981);
+        response.put("get981ResponseReason", getNonSpecResponseReason(981));
+        assertKeysEquals(process.getId(), response);
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(process.getId())
+                .onlyChildExecutions()
+                .singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("waitAfterError");
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(process.getId());
+    }
+
     protected String get500ResponseReason() {
         return "Server Error";
+    }
+
+    protected String getNonSpecResponseReason(int code) {
+        return String.valueOf(code);
     }
 
     @Test
