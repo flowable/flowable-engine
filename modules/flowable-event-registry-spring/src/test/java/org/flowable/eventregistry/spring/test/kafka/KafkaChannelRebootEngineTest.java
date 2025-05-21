@@ -62,7 +62,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Tag("docker")
 @Tag("kafka")
 @Testcontainers(disabledWithoutDocker = true)
-@Disabled
 public class KafkaChannelRebootEngineTest {
 
     @Test
