@@ -80,7 +80,6 @@ import org.springframework.test.context.TestPropertySource;
         "application.test.kafka-partition1=0-2",
         "application.test.kafka-partition2=3-4",
 })
-@Disabled
 class KafkaChannelDefinitionProcessorTest {
 
     @Autowired
