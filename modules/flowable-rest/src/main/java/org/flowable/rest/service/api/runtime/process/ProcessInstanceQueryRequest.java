@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +70,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Boolean suspended;
     private Boolean includeProcessVariables;
+    private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
     private String callbackId;
     private String callbackType;
@@ -388,6 +390,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setIncludeProcessVariables(Boolean includeProcessVariables) {
         this.includeProcessVariables = includeProcessVariables;
+    }
+
+    public Collection<String> getIncludeProcessVariablesNames() {
+        return includeProcessVariablesNames;
+    }
+
+    public void setIncludeProcessVariablesNames(Collection<String> includeProcessVariablesNames) {
+        this.includeProcessVariablesNames = includeProcessVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)

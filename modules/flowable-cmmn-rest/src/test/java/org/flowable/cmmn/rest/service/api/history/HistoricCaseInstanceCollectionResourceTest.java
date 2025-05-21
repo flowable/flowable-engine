@@ -141,6 +141,9 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                 new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeCaseVariables=true&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(), caseVariables);
 
+        assertVariablesPresentInPostDataResponse(url, "?includeCaseVariablesNames=stringVar,dummy&caseInstanceId=" + caseInstance.getId(), caseInstance.getId(),
+                Map.of("stringVar", "Azerty"));
+
         // Without tenant ID, before setting tenant
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", caseInstance.getId(), caseInstance2.getId());
 

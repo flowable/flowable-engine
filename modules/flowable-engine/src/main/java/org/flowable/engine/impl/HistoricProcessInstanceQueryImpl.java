@@ -14,7 +14,9 @@
 package org.flowable.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -98,6 +100,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     private List<List<String>> safeInvolvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
+    protected Collection<String> variableNamesToInclude;
     protected boolean withJobException;
     protected String tenantId;
     protected String tenantIdLike;
@@ -595,6 +598,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public HistoricProcessInstanceQuery includeProcessVariables() {
         this.includeProcessVariables = true;
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            throw new FlowableIllegalArgumentException("variableNames are null or empty");
+        }
+        includeProcessVariables();
+        this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
         return this;
     }
 
@@ -1175,9 +1188,15 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public void enhanceCachedValue(HistoricProcessInstanceEntity processInstance) {
         if (includeProcessVariables) {
-            processInstance.getQueryVariables()
-                    .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
-                            .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
+            if (variableNamesToInclude == null) {
+                processInstance.getQueryVariables()
+                        .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
+            } else {
+                processInstance.getQueryVariables()
+                        .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId(), variableNamesToInclude));
+            }
         }
     }
 
@@ -1405,6 +1424,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public boolean isIncludeProcessVariables() {
         return includeProcessVariables;
+    }
+
+    public Collection<String> getVariableNamesToInclude() {
+        return variableNamesToInclude;
     }
 
     public boolean isWithException() {

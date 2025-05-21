@@ -192,6 +192,9 @@ public class BaseCaseInstanceResource {
                 query.includeCaseVariables();
             }
         }
+        if (queryRequest.getIncludeCaseVariablesNames() != null) {
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
