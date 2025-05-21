@@ -68,6 +68,11 @@ public class ExecutionBaseResource {
         if (queryRequest.getProcessInstanceId() != null) {
             query.processInstanceId(queryRequest.getProcessInstanceId());
         }
+
+        if (queryRequest.getProcessInstanceIds() != null && !queryRequest.getProcessInstanceIds().isEmpty()) {
+            query.processInstanceIds(queryRequest.getProcessInstanceIds());
+        }
+
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());
         }

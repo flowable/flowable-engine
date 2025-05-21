@@ -13,7 +13,9 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -31,6 +33,8 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     private static final long serialVersionUID = 1L;
     protected String activityInstanceId;
     protected String processInstanceId;
+    protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String executionId;
     protected String processDefinitionId;
     protected String activityId;
@@ -70,6 +74,18 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     @Override
     public ActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public ActivityInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is null");
+        }
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is empty");
+        }
+        this.processInstanceIds = processInstanceIds;
         return this;
     }
 
@@ -305,5 +321,17 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
 
     public String getDeleteReasonLike() {
         return deleteReasonLike;
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getProcessInstanceIds() {
+        return processInstanceIds;
     }
 }
