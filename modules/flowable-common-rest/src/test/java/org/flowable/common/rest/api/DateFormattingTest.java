@@ -13,11 +13,12 @@
 package org.flowable.common.rest.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class DateFormattingTest {
@@ -53,12 +54,14 @@ public class DateFormattingTest {
     @Test
     public void testInvalidDates() {
         // Missing minutes or malformed time still invalid
-        Assertions.assertThrows(Exception.class, () -> RequestUtil.parseLongDate("2024-05-08T14"));
-        Assertions.assertThrows(Exception.class, () -> RequestUtil.parseLongDate("2024-05-08T:30"));
-        Assertions.assertThrows(Exception.class, () -> RequestUtil.parseLongDate("May 8, 2024"));
-        Assertions.assertThrows(Exception.class, () -> RequestUtil.parseLongDate("2024-05-08T14-30"));
-        // null input still NPE
-        Assertions.assertThrows(NullPointerException.class, () -> RequestUtil.parseLongDate(null));
+        assertThatThrownBy(() -> RequestUtil.parseLongDate("2024-05-08T14"))
+                .isInstanceOf(DateTimeParseException.class);
+        assertThatThrownBy(() -> RequestUtil.parseLongDate("2024-05-08T:30"))
+                .isInstanceOf(DateTimeParseException.class);
+        assertThatThrownBy(() -> RequestUtil.parseLongDate("May 8, 2024"))
+                .isInstanceOf(DateTimeParseException.class);
+        assertThatThrownBy(() -> RequestUtil.parseLongDate("2024-05-08T14-30"))
+                .isInstanceOf(DateTimeParseException.class);
     }
 
     protected Date toDate(String dateString) {

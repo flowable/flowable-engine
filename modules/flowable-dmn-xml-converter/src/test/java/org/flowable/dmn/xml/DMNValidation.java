@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.xml;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +22,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
@@ -40,7 +41,8 @@ public class DMNValidation {
 
     @Test
     public void validateDMN11invalid() {
-        Assertions.assertThrows(SAXException.class, () -> validateResource(DMN11_invalid_resource));
+        assertThatThrownBy(() -> validateResource(DMN11_invalid_resource))
+                .isInstanceOf(SAXException.class);
     }
 
     @Test
@@ -50,7 +52,8 @@ public class DMNValidation {
 
     @Test
     public void validateDMN12invalid() {
-        Assertions.assertThrows(SAXException.class, () -> validateResource(DMN12_invalid_resource));
+        assertThatThrownBy(() -> validateResource(DMN12_invalid_resource))
+                .isInstanceOf(SAXException.class);
     }
 
     @Test
@@ -60,7 +63,8 @@ public class DMNValidation {
 
     @Test
     public void validateDMN13invalid() {
-        Assertions.assertThrows(SAXException.class, () -> validateResource(DMN13_invalid_resource));
+        assertThatThrownBy(() -> validateResource(DMN13_invalid_resource))
+                .isInstanceOf(SAXException.class);
     }
 
     protected void validateResource(String resource) throws Exception {
