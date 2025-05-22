@@ -53,13 +53,11 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.rest.conf.ApplicationConfiguration;
 import org.flowable.cmmn.rest.service.api.RestUrlBuilder;
 import org.flowable.cmmn.rest.util.TestServerUtil;
 import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
@@ -124,6 +122,9 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected DateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    protected DateFormat formatWithoutSeconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+    protected DateFormat formatWithMS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
 
     static {
 
@@ -459,6 +460,18 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         longDateFormat.setTimeZone(tz);
         return longDateFormat.format(time);
+    }
+
+    protected String getIsoDateStringWithoutSeconds(Date time) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        formatWithoutSeconds.setTimeZone(tz);
+        return formatWithoutSeconds.format(time);
+    }
+
+    protected String getIsoDateStringWithMS(Date time) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        formatWithMS.setTimeZone(tz);
+        return formatWithMS.format(time);
     }
 
     protected String getISODateStringWithTZ(Date date) {
