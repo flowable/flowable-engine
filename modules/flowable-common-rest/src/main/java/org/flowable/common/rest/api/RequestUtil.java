@@ -35,19 +35,24 @@ public class RequestUtil {
 
     private static final DateTimeFormatter longDateFormat =
             new DateTimeFormatterBuilder()
-                    .appendPattern("yyyy-MM-dd'T'HH:mm")
+                    .appendPattern("yyyy-MM-dd")
                     .optionalStart()
-                        .appendPattern(":ss")
-                        .optionalStart()
-                            .appendPattern(".SSS")
-                        .optionalEnd()
+                    .appendLiteral('T')
+                    .appendPattern("HH:mm")
+                    .optionalStart()
+                    .appendPattern(":ss")
+                    .optionalStart()
+                    .appendPattern(".SSS")
+                    .optionalEnd()
                     .optionalEnd()
                     .optionalStart()
-                        .appendOffset("+HH:mm", "Z")
+                    .appendOffset("+HH:mm", "Z")
                     .optionalEnd()
+                    .optionalEnd()
+                    .parseDefaulting(ChronoField.HOUR_OF_DAY,     0)
+                    .parseDefaulting(ChronoField.MINUTE_OF_HOUR,   0)
                     .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                    .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
-
+                    .parseDefaulting(ChronoField.OFFSET_SECONDS,   0)
                     .toFormatter();
 
     public static boolean getBoolean(Map<String, String> requestParams, String name, boolean defaultValue) {

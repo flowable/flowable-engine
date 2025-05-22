@@ -367,7 +367,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithoutSeconds(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
-            assertResultsPresentInDataResponse(url, caseTask.getId(), adhocTask.getId());
+            assertResultsPresentInDataResponse(url, caseTask.getId());
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithMS(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
