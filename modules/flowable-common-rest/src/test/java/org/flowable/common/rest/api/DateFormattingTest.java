@@ -25,29 +25,29 @@ public class DateFormattingTest {
     @Test
     public void testValidDates() {
         assertThat(RequestUtil.parseLongDate("2024-05-08"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T00:00:00Z")));
+                .isEqualTo(toDate("2024-05-08T00:00:00Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T14:30:00Z")));
+                .isEqualTo(toDate("2024-05-08T14:30:00Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30Z"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T14:30:00Z")));
+                .isEqualTo(toDate("2024-05-08T14:30:00Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30:45Z"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T14:30:45Z")));
+                .isEqualTo(toDate("2024-05-08T14:30:45Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30:45.123Z"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T14:30:45.123Z")));
+                .isEqualTo(toDate("2024-05-08T14:30:45.123Z"));
 
         // positive offset
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30+02:00"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T12:30:00Z")));
+                .isEqualTo(toDate("2024-05-08T12:30:00Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30:45+02:00"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T12:30:45Z")));
+                .isEqualTo(toDate("2024-05-08T12:30:45Z"));
 
         assertThat(RequestUtil.parseLongDate("2024-05-08T14:30:45.123+02:00"))
-                .isEqualTo(Date.from(Instant.parse("2024-05-08T12:30:45.123Z")));
+                .isEqualTo(toDate("2024-05-08T12:30:45.123Z"));
     }
 
     @Test
@@ -59,5 +59,9 @@ public class DateFormattingTest {
         Assertions.assertThrows(Exception.class, () -> RequestUtil.parseLongDate("2024-05-08T14-30"));
         // null input still NPE
         Assertions.assertThrows(NullPointerException.class, () -> RequestUtil.parseLongDate(null));
+    }
+
+    protected Date toDate(String dateString) {
+        return Date.from(Instant.parse(dateString));
     }
 }
