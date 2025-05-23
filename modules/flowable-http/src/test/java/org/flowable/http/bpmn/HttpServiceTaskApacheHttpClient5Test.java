@@ -44,4 +44,9 @@ public class HttpServiceTaskApacheHttpClient5Test extends HttpServiceTaskTest {
     protected String get500ResponseReason() {
         return HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
     }
+
+    @Override
+    protected String getNonSpecResponseReason(int code) {
+        return null;
+    }
 }

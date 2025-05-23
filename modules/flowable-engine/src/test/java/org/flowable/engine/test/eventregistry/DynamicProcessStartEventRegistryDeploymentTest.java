@@ -13,6 +13,7 @@
 package org.flowable.engine.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -117,15 +117,16 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
     public void testDynamicEventRegistryProcessStartWithoutProcessDefinition() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+
+        assertThatThrownBy(() -> {
             // manually register start subscription, but with different correlation than the actual event being sent
             runtimeService.createProcessInstanceStartEventSubscriptionBuilder()
-                .addCorrelationParameterValue("customer", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
-        assertThat(exception.getMessage()).isEqualTo("The process definition must be provided using the key for the subscription to be registered.");
+                    .addCorrelationParameterValue("customer", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process definition must be provided using the key for the subscription to be registered.");
     }
 
     @Test
@@ -135,18 +136,18 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
     public void testDynamicEventRegistryProcessStartWithIllegalManualSubscriptionForWrongStartEvent() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("eventRegistryStaticStartTestProcess").latestVersion().singleResult();
+        assertThatThrownBy(() -> {
             // manually register start subscription, but with different correlation than the actual event being sent
             runtimeService.createProcessInstanceStartEventSubscriptionBuilder()
-                .processDefinitionKey("eventRegistryStaticStartTestProcess")
-                .addCorrelationParameterValue("customer", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("eventRegistryStaticStartTestProcess").latestVersion().singleResult();
-
-        assertThat(exception.getMessage()).isEqualTo("The process definition with id '" + processDefinition.getId() + "' does not have an event-registry based start event with a manual subscription behavior.");
+                    .processDefinitionKey("eventRegistryStaticStartTestProcess")
+                    .addCorrelationParameterValue("customer", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The process definition with id '" + processDefinition.getId()
+                        + "' does not have an event-registry based start event with a manual subscription behavior.");
     }
 
     @Test
@@ -176,16 +177,18 @@ public class DynamicProcessStartEventRegistryDeploymentTest extends FlowableEven
             "org/flowable/engine/test/eventregistry/SendInternalEventTaskTest.simple.event"
     })
     public void testDynamicEventRegistryProcessStartWithIllegalManualSubscriptionForWrongCorrelation() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+
+        assertThatThrownBy(() -> {
             // manually register start subscription, but with different correlation than the actual event being sent
             runtimeService.createProcessInstanceStartEventSubscriptionBuilder()
-                .processDefinitionKey("eventRegistryDynamicStartTestProcess")
-                .addCorrelationParameterValue("invalidCorrelationParameter", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
-        assertThat(exception.getMessage()).isEqualTo("There is no correlation parameter with name 'invalidCorrelationParameter' defined in event model with key 'simpleTest'. You can only subscribe for an event with a combination of valid correlation parameters.");
+                    .processDefinitionKey("eventRegistryDynamicStartTestProcess")
+                    .addCorrelationParameterValue("invalidCorrelationParameter", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage(
+                        "There is no correlation parameter with name 'invalidCorrelationParameter' defined in event model with key 'simpleTest'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
     @Test

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
+
 
 /**
  * Various tests for event-registry based case starts, both static and dynamic and the handling of the event subscriptions.
@@ -74,15 +75,16 @@ public class DynamicCaseStartEventRegistryDeploymentTest extends FlowableEventRe
             "org/flowable/cmmn/test/eventregistry/DynamicCaseStartEventRegistryDeploymentTest.eventRegistryStaticStartTestCase.cmmn"
     })
     public void testDynamicEventRegistryCaseStartWithoutCaseDefinition() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+
+        assertThatThrownBy(() -> {
             // manually register start subscription, but with different correlation than the actual event being sent
             cmmnRuntimeService.createCaseInstanceStartEventSubscriptionBuilder()
-                .addCorrelationParameterValue("customer", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
-        assertThat(exception.getMessage()).isEqualTo("The case definition must be provided using the key for the subscription to be registered.");
+                    .addCorrelationParameterValue("customer", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The case definition must be provided using the key for the subscription to be registered.");
     }
 
     @Test
@@ -90,18 +92,18 @@ public class DynamicCaseStartEventRegistryDeploymentTest extends FlowableEventRe
             "org/flowable/cmmn/test/eventregistry/DynamicCaseStartEventRegistryDeploymentTest.eventRegistryStaticStartTestCase.cmmn"
     })
     public void testDynamicEventRegistryCaseStartWithIllegalManualSubscriptionForWrongStartEvent() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
-            // manually register start subscription, but with different correlation than the actual event being sent
-            cmmnRuntimeService.createCaseInstanceStartEventSubscriptionBuilder()
-                .caseDefinitionKey("eventRegistryStaticStartTestCase")
-                .addCorrelationParameterValue("customer", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().caseDefinitionKey("eventRegistryStaticStartTestCase").latestVersion().singleResult();
 
-        assertThat(exception.getMessage()).isEqualTo("The case definition with id '" + caseDefinition.getId() + "' does not have an event-registry based start event with a manual subscription behavior.");
+        assertThatThrownBy(() -> {
+            // manually register start subscription, but with different correlation than the actual event being sent
+            cmmnRuntimeService.createCaseInstanceStartEventSubscriptionBuilder()
+                    .caseDefinitionKey("eventRegistryStaticStartTestCase")
+                    .addCorrelationParameterValue("customer", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("The case definition with id '" + caseDefinition.getId() + "' does not have an event-registry based start event with a manual subscription behavior.");
     }
 
     @Test
@@ -127,16 +129,16 @@ public class DynamicCaseStartEventRegistryDeploymentTest extends FlowableEventRe
             "org/flowable/cmmn/test/eventregistry/DynamicCaseStartEventRegistryDeploymentTest.eventRegistryDynamicStartTestCase.cmmn"
     })
     public void testDynamicEventRegistryCaseStartWithIllegalManualSubscriptionForWrongCorrelation() {
-        FlowableIllegalArgumentException exception = Assertions.assertThrowsExactly(FlowableIllegalArgumentException.class, () -> {
+        assertThatThrownBy(() -> {
             // manually register start subscription, but with different correlation than the actual event being sent
             cmmnRuntimeService.createCaseInstanceStartEventSubscriptionBuilder()
-                .caseDefinitionKey("eventRegistryDynamicStartTestCase")
-                .addCorrelationParameterValue("invalidCorrelationParameter", "test")
-                .addCorrelationParameterValue("action", "start")
-                .subscribe();
-        });
-
-        assertThat(exception.getMessage()).isEqualTo("There is no correlation parameter with name 'invalidCorrelationParameter' defined in event model with key 'simpleTest'. You can only subscribe for an event with a combination of valid correlation parameters.");
+                    .caseDefinitionKey("eventRegistryDynamicStartTestCase")
+                    .addCorrelationParameterValue("invalidCorrelationParameter", "test")
+                    .addCorrelationParameterValue("action", "start")
+                    .subscribe();
+        })
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("There is no correlation parameter with name 'invalidCorrelationParameter' defined in event model with key 'simpleTest'. You can only subscribe for an event with a combination of valid correlation parameters.");
     }
 
     @Test
