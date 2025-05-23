@@ -42,7 +42,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.LoggingProducerListener;
-import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -135,7 +135,7 @@ public class EventRegistryKafkaConfiguration {
 
     @Bean(destroyMethod = "stop")
     public KafkaContainer kafkaContainer() {
-        KafkaContainer container = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka").withTag("5.4.3"));
+        KafkaContainer container = new KafkaContainer(DockerImageName.parse("apache/kafka-native").withTag("3.9.1"));
         container.withEnv("KAFKA_DELETE_TOPIC_ENABLE", "true");
         container.withEnv("KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS ", "500");
         container.start();
