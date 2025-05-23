@@ -440,6 +440,11 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
+    /**
+     * Flag to indicate whether the services should be enabled in the scripting engine. This is set to true by default.
+     * If set to false, then services like cmmnTaskService, cmmnRuntimeService, etc. will not be available in the scripting engine.
+     */
+    protected boolean servicesEnabledInScripting = true;
 
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
@@ -4296,6 +4301,15 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         return this;
     }
     
+    public boolean isServicesEnabledInScripting() {
+        return servicesEnabledInScripting;
+    }
+
+    public CmmnEngineConfiguration setServicesEnabledInScripting(boolean servicesEnabledInScripting) {
+        this.servicesEnabledInScripting = servicesEnabledInScripting;
+        return this;
+    }
+
     public void resetClock() {
         if (this.clock != null) {
             clock.reset();

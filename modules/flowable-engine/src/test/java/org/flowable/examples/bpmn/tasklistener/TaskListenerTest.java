@@ -370,6 +370,19 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTypeScript.bpmn20.xml" })
+    public void testTaskListenerTypeScriptWithDisabledServicesInScript() {
+        try {
+            processEngineConfiguration.setServicesEnabledInScripting(false);
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("taskListenerTypeScriptProcess"))
+                    .isInstanceOf(FlowableScriptEvaluationException.class)
+                    .hasMessageContaining("No such property: taskService");
+        } finally {
+            processEngineConfiguration.setServicesEnabledInScripting(true);
+        }
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/TaskListenerTest.throwBpmnErrorCatchEventSubProcess.bpmn20.xml" })
     public void testTaskListenerThrowBpmnErrorCreate() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
