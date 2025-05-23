@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -99,11 +101,60 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                         SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "unexistingVariable")),
                 HttpStatus.SC_NOT_FOUND));
     }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceBigDecimalVariable() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        BigDecimal decimal = new BigDecimal("25.67");
+        runtimeService.setVariable(processInstance.getId(), "variable", decimal);
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+                HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'variable',"
+                        + "  type: 'bigDecimal',"
+                        + "  value: '" + decimal.toPlainString() + "'"
+                        + "}");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testGetProcessInstanceBigIntegerVariable() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        BigInteger integer = new BigInteger("123456789123456789123456789123456789123456789");
+        runtimeService.setVariable(processInstance.getId(), "variable", integer);
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(
+                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "variable")),
+                HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'variable',"
+                        + "  type: 'bigInteger',"
+                        + "  value: '" + integer + "'"
+                        + "}");
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessInstanceInstantVariable() throws Exception {
-
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Instant now = Instant.now();
         Instant nowWithoutNanos = now.truncatedTo(ChronoUnit.MILLIS);
@@ -339,6 +390,68 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
                 SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "unexistingVariable"));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_NOT_FOUND));
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateBigDecimalProcessVariable() throws Exception {
+        BigDecimal decimal = new BigDecimal("25.67");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.setVariable(processInstance.getId(), "myVar", decimal);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "11.66778899");
+        requestNode.put("type", "bigDecimal");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(new BigDecimal("11.66778899"));
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  scope: null,"
+                        + "  value: '11.66778899'"
+                        + "}");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
+    public void testUpdateBigIntegerProcessVariable() throws Exception {
+        BigInteger integer = new BigInteger("123456789123456789123456789123456789123456789");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.setVariable(processInstance.getId(), "myVar", integer);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "8888999999777777766666");
+        requestNode.put("type", "bigInteger");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "myVar")).isEqualTo(new BigInteger("8888999999777777766666"));
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  scope: null,"
+                        + "  value: '8888999999777777766666'"
+                        + "}");
     }
 
     @Test

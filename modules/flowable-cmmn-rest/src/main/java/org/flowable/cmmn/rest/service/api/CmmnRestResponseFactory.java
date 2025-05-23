@@ -56,6 +56,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
+import org.flowable.common.rest.variable.BigDecimalRestVariableConverter;
+import org.flowable.common.rest.variable.BigIntegerRestVariableConverter;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
@@ -1112,6 +1114,8 @@ public class CmmnRestResponseFactory {
         variableConverters.add(new LongRestVariableConverter());
         variableConverters.add(new ShortRestVariableConverter());
         variableConverters.add(new DoubleRestVariableConverter());
+        variableConverters.add(new BigDecimalRestVariableConverter());
+        variableConverters.add(new BigIntegerRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
         variableConverters.add(new InstantRestVariableConverter());

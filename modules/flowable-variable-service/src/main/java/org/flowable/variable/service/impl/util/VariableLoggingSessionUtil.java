@@ -12,12 +12,16 @@
  */
 package org.flowable.variable.service.impl.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.UUID;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
@@ -82,6 +86,10 @@ public class VariableLoggingSessionUtil {
             loggingNode.put(variableRawValueName, (Integer) variableValue);
         } else if (DoubleType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Double) variableValue);
+        } else if (BigDecimalType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, (BigDecimal) variableValue);
+        } else if (BigIntegerType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, (BigInteger) variableValue);
         } else if (ShortType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Short) variableValue);
         } else if (DateType.TYPE_NAME.equals(variableTypeName)) {

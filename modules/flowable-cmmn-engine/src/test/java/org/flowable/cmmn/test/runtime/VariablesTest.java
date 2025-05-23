@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -199,6 +201,52 @@ public class VariablesTest extends FlowableCmmnTestCase {
                         entry("stringVar", "Changed value"),
                         entry("doubleVar", 12.6)
                 );
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testBigDecimalVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("testDecimal", new BigDecimal(65.67))
+                .start();
+
+        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertThat(variablesFromGet).containsKey("testDecimal");
+        assertThat(variablesFromGet.get("testDecimal")).isEqualTo(new BigDecimal(65.67));
+
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertThat(variableInstancesFromGet).containsKey("testDecimal");
+        VariableInstance variableInstance = variableInstancesFromGet.get("testDecimal");
+        assertThat(variableInstance.getValue()).isEqualTo(new BigDecimal(65.67));
+        assertThat(variableInstance.getTypeName()).isEqualTo("bigdecimal");
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "testDecimal", new BigDecimal(145.3333));
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "testDecimal")).isEqualTo(new BigDecimal(145.3333));
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testBigIntegerVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("testInteger", new BigInteger("65"))
+                .start();
+
+        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertThat(variablesFromGet).containsKey("testInteger");
+        assertThat(variablesFromGet.get("testInteger")).isEqualTo(new BigInteger("65"));
+
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertThat(variableInstancesFromGet).containsKey("testInteger");
+        VariableInstance variableInstance = variableInstancesFromGet.get("testInteger");
+        assertThat(variableInstance.getValue()).isEqualTo(new BigInteger("65"));
+        assertThat(variableInstance.getTypeName()).isEqualTo("biginteger");
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "testInteger", new BigInteger("145"));
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "testInteger")).isEqualTo(new BigInteger("145"));
     }
 
     @Test
