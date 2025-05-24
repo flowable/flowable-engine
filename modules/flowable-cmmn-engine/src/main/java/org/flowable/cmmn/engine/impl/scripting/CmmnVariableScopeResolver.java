@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.scripting;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -35,35 +35,28 @@ import org.flowable.task.api.Task;
  */
 public class CmmnVariableScopeResolver implements Resolver {
 
-    protected static final String ENGINE_CONFIG_KEY = "engineConfiguration";
-    protected static final String CMMN_ENGINE_CONFIG_KEY = "cmmnEngineConfiguration";
-
-    protected static final String RUNTIME__SERVICE_KEY = "runtimeService";
-    protected static final String CMMN_RUNTIME__SERVICE_KEY = "cmmnRuntimeService";
-
-    protected static final String HISTORY_SERVICE_KEY = "historyService";
-    protected static final String CMMN_HISTORY_SERVICE_KEY = "cmmnHistoryService";
-
-    protected static final String MANAGEMENT_SERVICE_KEY = "managementService";
-    protected static final String CMMN_MANAGEMENT_SERVICE_KEY = "cmmnManagementService";
-
-    protected static final String TASK_SERVICE_KEY = "taskService";
-    protected static final String CMMN_TASK_SERVICE_KEY = "cmmnTaskService";
-
     protected static final String CASE_INSTANCE_KEY = "caseInstance";
     protected static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
     protected static final String TASK_KEY = "task";
 
-    protected static final Set<String> KEYS = new HashSet<>(Arrays.asList(
-        ENGINE_CONFIG_KEY, CMMN_ENGINE_CONFIG_KEY,
-        RUNTIME__SERVICE_KEY, CMMN_RUNTIME__SERVICE_KEY,
-        HISTORY_SERVICE_KEY, CMMN_HISTORY_SERVICE_KEY,
-        MANAGEMENT_SERVICE_KEY, CMMN_MANAGEMENT_SERVICE_KEY,
-        TASK_SERVICE_KEY, CMMN_TASK_SERVICE_KEY,
+    protected static final Map<String, Function<CmmnEngineConfiguration, ?>> SERVICE_RESOLVERS = Map.of(
+            "engineConfiguration", Function.identity(),
+            "cmmnEngineConfiguration", Function.identity(),
+            "runtimeService", CmmnEngineConfiguration::getCmmnRuntimeService,
+            "cmmnRuntimeService", CmmnEngineConfiguration::getCmmnRuntimeService,
+            "historyService", CmmnEngineConfiguration::getCmmnHistoryService,
+            "cmmnHistoryService", CmmnEngineConfiguration::getCmmnHistoryService,
+            "managementService", CmmnEngineConfiguration::getCmmnManagementService,
+            "cmmnManagementService", CmmnEngineConfiguration::getCmmnManagementService,
+            "taskService", CmmnEngineConfiguration::getCmmnTaskService,
+            "cmmnTaskService", CmmnEngineConfiguration::getCmmnTaskService
+    );
+
+    protected static final Set<String> KEYS = Set.of(
         CASE_INSTANCE_KEY,
         PLAN_ITEM_INSTANCE_KEY,
         TASK_KEY
-    ));
+    );
 
     protected CmmnEngineConfiguration engineConfiguration;
     protected VariableContainer scopeContainer;
@@ -81,26 +74,18 @@ public class CmmnVariableScopeResolver implements Resolver {
 
     @Override
     public boolean containsKey(Object key) {
-        return inputVariableContainer.hasVariable((String) key) || KEYS.contains(key);
+        return inputVariableContainer.hasVariable((String) key) || KEYS.contains(key)
+                || SERVICE_RESOLVERS.containsKey(key) && engineConfiguration.isServicesEnabledInScripting();
     }
 
     @Override
     public Object get(Object key) {
-        if (ENGINE_CONFIG_KEY.equals(key) || CMMN_ENGINE_CONFIG_KEY.equals(key)) {
-            return engineConfiguration;
-
-        } else if (RUNTIME__SERVICE_KEY.equals(key) || CMMN_RUNTIME__SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnRuntimeService();
-
-        } else if (HISTORY_SERVICE_KEY.equals(key) || CMMN_HISTORY_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnHistoryService();
-
-        } else if (MANAGEMENT_SERVICE_KEY.equals(key) || CMMN_MANAGEMENT_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnManagementService();
-
-        } else if (TASK_SERVICE_KEY.equals(key) || CMMN_TASK_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnTaskService();
-
+        if (SERVICE_RESOLVERS.containsKey((String) key)) {
+            if (engineConfiguration.isServicesEnabledInScripting()) {
+                return SERVICE_RESOLVERS.get(key).apply(engineConfiguration);
+            } else {
+                throw new FlowableException("The service '" + key + "' is not available in the current context. Please enable services in scripting.");
+            }
         } else if (CASE_INSTANCE_KEY.equals(key)) {
             if (scopeContainer instanceof CaseInstance) {
                 return scopeContainer;

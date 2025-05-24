@@ -740,6 +740,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
+    /**
+     * Flag to indicate whether the services should be enabled in the scripting engine. This is set to true by default.
+     * If set to false, then services like cmmnTaskService, cmmnRuntimeService, etc. will not be available in the scripting engine.
+     */
+    protected boolean servicesEnabledInScripting = true;
     // END SCRIPTING
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
@@ -3685,6 +3690,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
 
         this.postDefaultResolverFactories.add(resolverFactory);
+        return this;
+    }
+
+    public boolean isServicesEnabledInScripting() {
+        return servicesEnabledInScripting;
+    }
+
+    public ProcessEngineConfigurationImpl setServicesEnabledInScripting(boolean servicesEnabledInScripting) {
+        this.servicesEnabledInScripting = servicesEnabledInScripting;
         return this;
     }
 
