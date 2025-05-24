@@ -226,6 +226,39 @@ class FlowableHttpClientTest {
 
     @ParameterizedTest
     @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithFormData(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-form?queryArg=testFormData");
+        request.setMethod("POST");
+        request.addFormData("name", "kermit");
+        request.addFormData("name", "fozzie");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test FormData Value");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-form',
+                          args: {
+                            queryArg: [ 'testFormData' ],
+                            name: [ 'kermit', 'fozzie' ]
+                          },
+                          headers: {
+                            X-Test: [ 'Test FormData Value' ],
+                            Content-Type: [ 'application/x-www-form-urlencoded' ]
+                          }
+                        }
+                        """);
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
     void deleteWithoutBody(FlowableHttpClient httpClient) {
         HttpRequest request = new HttpRequest();
         request.setUrl("http://localhost:9798/api/test");
