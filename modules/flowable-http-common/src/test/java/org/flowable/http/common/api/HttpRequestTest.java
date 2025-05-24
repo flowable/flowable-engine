@@ -34,6 +34,16 @@ class HttpRequestTest {
     }
 
     @Test
+    void setBodyShouldNotBePossibleWhenFormDataIsSet() {
+        HttpRequest request = new HttpRequest();
+        request.addFormData("name", "kermit");
+        assertThatThrownBy(() -> request.setBody("test"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body and form data");
+        assertThat(request.getBody()).isNull();
+    }
+
+    @Test
     void addMultiValuePartShouldNotBePossibleWhenBodyIsSet() {
         HttpRequest request = new HttpRequest();
         request.setBody("test");
@@ -41,6 +51,36 @@ class HttpRequestTest {
                 .isInstanceOf(FlowableIllegalStateException.class)
                 .hasMessage("Cannot set both body and multi value parts");
         assertThat(request.getMultiValueParts()).isNull();
+    }
+
+    @Test
+    void addMultiValuePartShouldNotBePossibleWhenFormDataIsSet() {
+        HttpRequest request = new HttpRequest();
+        request.addFormData("name", "kermit");
+        assertThatThrownBy(() -> request.addMultiValuePart(MultiValuePart.fromText("name", "kermit")))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both form data and multi value parts");
+        assertThat(request.getMultiValueParts()).isNull();
+    }
+
+    @Test
+    void addFormDataShouldNotBePossibleWhenBodyIsSet() {
+        HttpRequest request = new HttpRequest();
+        request.setBody("test");
+        assertThatThrownBy(() -> request.addFormData("name", "kermit"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body and form data");
+        assertThat(request.getFormData()).isNull();
+    }
+
+    @Test
+    void addFormDataShouldNotBePossibleWhenMultiValuePartsAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        assertThatThrownBy(() -> request.addFormData("name", "fozzie"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both multi value parts and form data");
+        assertThat(request.getFormData()).isNull();
     }
 
     @Test

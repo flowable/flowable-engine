@@ -14,6 +14,9 @@ package org.flowable.http.common.api;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 
@@ -32,6 +35,7 @@ public class HttpRequest {
     protected String body;
     protected String bodyEncoding;
     protected Collection<MultiValuePart> multiValueParts;
+    protected Map<String, List<String>> formData;
     protected int timeout;
     protected boolean noRedirects;
 
@@ -83,6 +87,8 @@ public class HttpRequest {
     public void setBody(String body) {
         if (multiValueParts != null && !multiValueParts.isEmpty()) {
             throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        } else if (formData != null && !formData.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body and form data");
         }
         this.body = body;
     }
@@ -102,11 +108,29 @@ public class HttpRequest {
     public void addMultiValuePart(MultiValuePart part) {
         if (body != null) {
             throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        } else if (formData != null && !formData.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both form data and multi value parts");
         }
         if (multiValueParts == null) {
             multiValueParts = new ArrayList<>();
         }
         multiValueParts.add(part);
+    }
+
+    public Map<String, List<String>> getFormData() {
+        return formData;
+    }
+
+    public void addFormData(String key, String value) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and form data");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both multi value parts and form data");
+        }
+        if (formData == null) {
+            formData = new LinkedHashMap<>();
+        }
+        formData.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
     }
 
     public int getTimeout() {
