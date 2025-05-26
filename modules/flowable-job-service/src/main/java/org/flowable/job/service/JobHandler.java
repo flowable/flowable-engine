@@ -26,7 +26,4 @@ public interface JobHandler {
 
     void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext);
 
-    default boolean isNonTransactional() {
-        return false;
-    }
 }

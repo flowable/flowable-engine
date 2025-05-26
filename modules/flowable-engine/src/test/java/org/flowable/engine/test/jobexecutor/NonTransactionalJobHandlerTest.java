@@ -23,10 +23,9 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.nontx.NonTransactionalJobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,33 +82,6 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testJobExecutedWithTransaction() {
-        nonTransactionalTestJobHandler.setNonTransactional(false);
-
-        managementService.executeCommand(commandContext -> {
-            JobService jobService = CommandContextUtil.getJobService();
-            JobEntity job = jobService.createJob();
-            job.setJobHandlerType(nonTransactionalTestJobHandler.getType());
-            job.setJobHandlerConfiguration("myTest");
-            jobService.createAsyncJob(job, false);
-            jobService.scheduleAsyncJob(job);
-            return null;
-        });
-
-        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 10000L, 20L,
-                () -> managementService.createJobQuery().count() == 0);
-
-        assertThat(nonTransactionalTestJobHandler.getCounter().get()).isEqualTo(1);
-        assertThat(nonTransactionalTestJobHandler.getWithCommandContext().get()).isEqualTo(1);
-        assertThat(nonTransactionalTestJobHandler.getWithoutTransactionCounter().get()).isEqualTo(0);
-        assertThat(nonTransactionalTestJobHandler.getWithTransactionCounter().get()).isEqualTo(1);
-        assertThat(nonTransactionalTestJobHandler.getWithoutCommandContext().get()).isEqualTo(0);
-
-        assertThat(managementService.createJobQuery().count()).isEqualTo(0);
-        assertThat(nonTransactionalTestJobHandler.getJobConfiguration()).isEqualTo("myTest");
-    }
-
-    @Test
     public void testJobExecutedWithoutTransactionThrowsException() {
         managementService.executeCommand(commandContext -> {
             JobService jobService = CommandContextUtil.getJobService();
@@ -140,15 +112,13 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         assertThat(job.getRetries()).isEqualTo(initialRetries - 1);
     }
 
-    public static class NonTransactionalTestJobHandler implements JobHandler {
+    public static class NonTransactionalTestJobHandler implements NonTransactionalJobHandler {
 
         protected AtomicInteger counter = new AtomicInteger();
         protected AtomicInteger withCommandContext = new AtomicInteger(0);
         protected AtomicInteger withoutCommandContext = new AtomicInteger(0);
         protected AtomicInteger withTransactionCounter = new AtomicInteger(0);
         protected AtomicInteger withoutTransactionCounter = new AtomicInteger(0);
-
-        protected boolean nonTransactional = true;
 
         protected String jobConfiguration;
 
@@ -158,7 +128,7 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
+        public void executeNonTransactionally(JobEntity job, String configuration) {
 
             // Not checking the passed command context, but checking the low-level one on Context
             counter.incrementAndGet();
@@ -179,15 +149,6 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
 
             this.jobConfiguration = job.getJobHandlerConfiguration();
 
-        }
-
-        @Override
-        public boolean isNonTransactional() {
-            return nonTransactional;
-        }
-
-        public void setNonTransactional(boolean nonTransactional) {
-            this.nonTransactional = nonTransactional;
         }
 
         public AtomicInteger getCounter() {
@@ -222,7 +183,6 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
             this.withoutTransactionCounter.set(0);
 
             this.jobConfiguration = null;
-            this.nonTransactional = true;
         }
 
     }
@@ -235,8 +195,8 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-            super.execute(job, configuration, variableScope, commandContext);
+        public void executeNonTransactionally(JobEntity job, String configuration) {
+            super.executeNonTransactionally(job, configuration);
 
             throw new RuntimeException();
         }
