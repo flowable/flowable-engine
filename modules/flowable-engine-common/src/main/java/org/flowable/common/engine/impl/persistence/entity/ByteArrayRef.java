@@ -122,14 +122,6 @@ public class ByteArrayRef implements Serializable {
         return entity;
     }
 
-    /**
-     * Returns the byte array entity, without the usual initialization checks.
-     * Use this method with care, as it can lead to subtle bugs.
-     */
-    public ByteArrayEntity getByteArrayEntityNoCheck() {
-        return entity;
-    }
-
     public void delete(String engineType) {
         if (!deleted && id != null) {
             if (entity != null) {
