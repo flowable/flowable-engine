@@ -63,7 +63,6 @@ public class FlowableRestApplicationSecurityTest {
             "info",
             "loggers-name",
             "loggers",
-            "heapdump",
             "threaddump",
             "metrics",
             "metrics-requiredMetricName",
@@ -178,7 +177,6 @@ public class FlowableRestApplicationSecurityTest {
 
         Map<String, TestLink> links = getEndpointLinks();
         Set<String> ignoredEndpoints = new HashSet<>();
-        ignoredEndpoints.add("heapdump");
         ignoredEndpoints.add("threaddump");
 
         for (Map.Entry<String, TestLink> entry : links.entrySet()) {

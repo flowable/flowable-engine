@@ -181,7 +181,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testGetJobExceptionMessageMaxLengthIsWellPersisted() {
-        String randomText = RandomStringUtils.randomAlphanumeric(2000);
+        String randomText = RandomStringUtils.insecure().nextAlphanumeric(2000);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("message_with_max_length", randomText);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution", parameters);

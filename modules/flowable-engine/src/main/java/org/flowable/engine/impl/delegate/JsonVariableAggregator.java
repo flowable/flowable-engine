@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.delegate;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +27,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -121,6 +125,12 @@ public class JsonVariableAggregator implements VariableAggregator {
                             break;
                         case DoubleType.TYPE_NAME:
                             objectNode.put(targetVarName, (Double) varInstance.getValue());
+                            break;
+                        case BigDecimalType.TYPE_NAME:
+                            objectNode.put(targetVarName, (BigDecimal) varInstance.getValue());
+                            break;
+                        case BigIntegerType.TYPE_NAME:
+                            objectNode.put(targetVarName, (BigInteger) varInstance.getValue());
                             break;
                         case DateType.TYPE_NAME:
                             objectNode.put(targetVarName, ((Date) varInstance.getValue()).toInstant().toString());

@@ -146,6 +146,8 @@ create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO(PROC_DEF_ID_);
 
+create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
+
 create index ACT_IDX_RU_ACTI_START on ACT_RU_ACTINST(START_TIME_);
 create index ACT_IDX_RU_ACTI_END on ACT_RU_ACTINST(END_TIME_);
 create index ACT_IDX_RU_ACTI_PROC on ACT_RU_ACTINST(PROC_INST_ID_);
@@ -318,7 +320,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.2.0.1', 1);
+values ('schema.version', '7.2.0.2', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.2.0.1)', 1);
+values ('schema.history', 'create(7.2.0.2)', 1);

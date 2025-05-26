@@ -401,6 +401,8 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -738,6 +740,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
+    /**
+     * Flag to indicate whether the services should be enabled in the scripting engine. This is set to true by default.
+     * If set to false, then services like cmmnTaskService, cmmnRuntimeService, etc. will not be available in the scripting engine.
+     */
+    protected boolean servicesEnabledInScripting = true;
     // END SCRIPTING
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
@@ -2181,6 +2188,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new BigDecimalType());
+            variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
             variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
@@ -3681,6 +3690,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
 
         this.postDefaultResolverFactories.add(resolverFactory);
+        return this;
+    }
+
+    public boolean isServicesEnabledInScripting() {
+        return servicesEnabledInScripting;
+    }
+
+    public ProcessEngineConfigurationImpl setServicesEnabledInScripting(boolean servicesEnabledInScripting) {
+        this.servicesEnabledInScripting = servicesEnabledInScripting;
         return this;
     }
 

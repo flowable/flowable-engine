@@ -196,20 +196,17 @@ public class TableColumnTypeValidationTest {
                 if (StringUtils.isNotEmpty(databaseTablePrefix)) {
                     prefixedTableName = databaseTablePrefix + "." + tableName;
                 }
-                String catalog = processEngine.getProcessEngineConfiguration().getDatabaseCatalog();
+
+                // If the configured catalog is empty, we use null.
+                // This is the same logic as in the other places where we retrieve metadata
+                // (e.g., AbstractSqlScriptBasedDbSchemaManager.isTablePresent(String tableName)).
+                String catalog = StringUtils.defaultIfEmpty(processEngine.getProcessEngineConfiguration().getDatabaseCatalog(), null);
                 String schema = processEngine.getProcessEngineConfiguration().getDatabaseSchema();
                 if (StringUtils.isNotEmpty(schema) && AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equalsIgnoreCase(databaseType)) {
                     schema = schema.toUpperCase(Locale.ROOT);
                 }
 
                 Map<String, String> columnNameToTypeMap = new HashMap<>();
-
-                if (StringUtils.isEmpty(catalog) &&
-                        (databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL)
-                         || databaseType.equals(AbstractEngineConfiguration.DATABASE_TYPE_MYSQL))
-                ) {
-                    catalog = null; // Otherwise SQL server errors out
-                }
 
                 ResultSet resultSet = databaseMetaData.getColumns(catalog, schema, prefixedTableName, null);
                 while (resultSet.next()) {

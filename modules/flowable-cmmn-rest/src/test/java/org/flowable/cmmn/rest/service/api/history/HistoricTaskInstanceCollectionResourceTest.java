@@ -132,19 +132,27 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=" + encode("TASK%"), task1.getId(), task2.getId());
             assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=NONE");
 
-            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getISODateString(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getIsoDateStringWithoutSeconds(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getIsoDateStringWithMS(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
 
             assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 0);
 
-            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getISODateString(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getIsoDateStringWithoutSeconds(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getIsoDateStringWithMS(new GregorianCalendar(2010, 0, 1).getTime()), 0);
 
             assertResultsPresentInDataResponse(url + "?dueDateBefore=" + longDateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 1, task.getId());
 
             created.set(Calendar.YEAR, 2002);
-            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + longDateFormat.format(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" +getISODateString(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" +getIsoDateStringWithoutSeconds(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" +getIsoDateStringWithMS(created.getTime()), 1, task1.getId());
 
             created.set(Calendar.YEAR, 2000);
-            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + longDateFormat.format(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getISODateString(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getIsoDateStringWithoutSeconds(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getIsoDateStringWithMS(created.getTime()), 3, task1.getId(), task2.getId());
 
             // Without tenant id
             assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 2, task.getId(), task1.getId());

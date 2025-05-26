@@ -29,6 +29,11 @@ public class LoggingAgendaOperationExecutionListener implements AgendaOperationE
     }
 
     @Override
+    public void beforeAll(CommandContext commandContext) {
+
+    }
+
+    @Override
     public void beforeExecute(CommandContext commandContext, Runnable runnable) {
         DebugInfoOperationExecuted debugInfo = null;
         if (runnable instanceof AbstractOperation operation) {
@@ -56,6 +61,11 @@ public class LoggingAgendaOperationExecutionListener implements AgendaOperationE
     @Override
     public void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error) {
         afterExecute(commandContext, runnable);
+    }
+
+    @Override
+    public void afterAll(CommandContext commandContext) {
+
     }
 
     protected String getDebugInfoKey(Runnable runnable) {

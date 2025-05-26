@@ -28,6 +28,11 @@ public class LoggingExecutionTreeAgendaOperationExecutionListener implements Age
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingExecutionTreeAgendaOperationExecutionListener.class);
 
     @Override
+    public void beforeAll(CommandContext commandContext) {
+
+    }
+
+    @Override
     public void beforeExecute(CommandContext commandContext, Runnable runnable) {
         if (runnable instanceof AbstractOperation operation) {
 
@@ -46,6 +51,11 @@ public class LoggingExecutionTreeAgendaOperationExecutionListener implements Age
 
     @Override
     public void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error) {
+
+    }
+
+    @Override
+    public void afterAll(CommandContext commandContext) {
 
     }
 }
