@@ -258,20 +258,20 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                         + " If you want to use, please make sure that the org.apache.httpcomponents:httpmime dependency is available");
             }
 
-        } else if (requestInfo.getFormData() != null) {
-            Map<String, List<String>> formData = requestInfo.getFormData();
-            List<BasicNameValuePair> formParameters = new ArrayList<>(formData.size());
-            for (Map.Entry<String, List<String>> entry : formData.entrySet()) {
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
                 String name = entry.getKey();
                 for (String value : entry.getValue()) {
-                    formParameters.add(new BasicNameValuePair(name, value));
+                    parameters.add(new BasicNameValuePair(name, value));
                 }
             }
 
             if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
-                requestBase.setEntity(new UrlEncodedFormEntity(formParameters, requestInfo.getBodyEncoding()));
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters, requestInfo.getBodyEncoding()));
             } else {
-                requestBase.setEntity(new UrlEncodedFormEntity(formParameters));
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters));
             }
         }
     }

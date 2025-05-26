@@ -244,19 +244,19 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             } catch (IOException e) {
                 throw new FlowableException("Cannot create multi part entity", e);
             }
-        } else if (requestInfo.getFormData() != null) {
-            Map<String, List<String>> formData = requestInfo.getFormData();
-            List<BasicNameValuePair> formParameters = new ArrayList<>(formData.size());
-            for (Map.Entry<String, List<String>> entry : formData.entrySet()) {
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
                 String name = entry.getKey();
                 for (String value : entry.getValue()) {
-                    formParameters.add(new BasicNameValuePair(name, value));
+                    parameters.add(new BasicNameValuePair(name, value));
                 }
             }
 
             Charset charset = requestInfo.getBodyEncoding() != null ? Charset.forName(requestInfo.getBodyEncoding()) : null;
 
-            String formParametersString = WWWFormCodec.format(formParameters, charset);
+            String formParametersString = WWWFormCodec.format(parameters, charset);
             requestBase.setEntity(AsyncEntityProducers.create(formParametersString, ContentType.APPLICATION_FORM_URLENCODED.withCharset(charset)));
         }
     }

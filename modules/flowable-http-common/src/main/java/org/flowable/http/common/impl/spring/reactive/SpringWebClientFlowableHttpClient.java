@@ -212,8 +212,8 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
 
             requestBodySpec.body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()));
-        } else if (requestInfo.getFormData() != null) {
-            requestBodySpec.body(BodyInserters.fromFormData(CollectionUtils.toMultiValueMap(requestInfo.getFormData())));
+        } else if (requestInfo.getFormParameters() != null) {
+            requestBodySpec.body(BodyInserters.fromFormData(CollectionUtils.toMultiValueMap(requestInfo.getFormParameters())));
         }
     }
 
