@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,6 +34,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -53,6 +55,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
@@ -255,6 +258,21 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                         + " If you want to use, please make sure that the org.apache.httpcomponents:httpmime dependency is available");
             }
 
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
+                String name = entry.getKey();
+                for (String value : entry.getValue()) {
+                    parameters.add(new BasicNameValuePair(name, value));
+                }
+            }
+
+            if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters, requestInfo.getBodyEncoding()));
+            } else {
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters));
+            }
         }
     }
 

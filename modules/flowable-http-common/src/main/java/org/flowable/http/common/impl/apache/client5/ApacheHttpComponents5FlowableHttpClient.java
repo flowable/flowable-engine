@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +51,13 @@ import org.apache.hc.core5.http.HttpVersion;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
 import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.io.ModalCloseable;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import org.flowable.common.engine.api.FlowableException;
@@ -241,6 +244,20 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             } catch (IOException e) {
                 throw new FlowableException("Cannot create multi part entity", e);
             }
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
+                String name = entry.getKey();
+                for (String value : entry.getValue()) {
+                    parameters.add(new BasicNameValuePair(name, value));
+                }
+            }
+
+            Charset charset = requestInfo.getBodyEncoding() != null ? Charset.forName(requestInfo.getBodyEncoding()) : null;
+
+            String formParametersString = WWWFormCodec.format(parameters, charset);
+            requestBase.setEntity(AsyncEntityProducers.create(formParametersString, ContentType.APPLICATION_FORM_URLENCODED.withCharset(charset)));
         }
     }
 
