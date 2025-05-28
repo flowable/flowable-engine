@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.history;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -81,6 +82,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected List<QueryVariable> processVariables;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected Set<String> scopeIds;
     protected Boolean withoutScopeId;
     protected String scopeType;
     protected String propagatedStageInstanceId;
@@ -607,4 +609,11 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
         this.parentScopeId = parentScopeId;
     }
 
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public void setScopeIds(Set<String> scopeIds) {
+        this.scopeIds = scopeIds;
+    }
 }

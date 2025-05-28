@@ -263,6 +263,19 @@
       <if test="processInstanceId != null">
         RES.PROC_INST_ID_ = #{processInstanceId, jdbcType=NVARCHAR}
       </if>
+       <if test="processInstanceIds != null and !processInstanceIds.empty">
+           and (
+           <foreach item="processInstanceIdListItem" index="groupIndex" collection="safeProcessInstanceIds">
+               <if test="groupIndex &gt; 0">
+                   or
+               </if>
+               RES.PROC_INST_ID_ IN
+               <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+                   #{processInstanceId, jdbcType=NVARCHAR}
+               </foreach>
+           </foreach>
+           )
+       </if>
       <if test="activityInstanceId != null">
         and RES.ID_ = #{activityInstanceId, jdbcType=NVARCHAR}
       </if>

@@ -15,6 +15,7 @@ package org.flowable.task.api;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
@@ -269,6 +270,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given scope identifier. 
      */
     T scopeId(String scopeId);
+
+    /**
+     * Only select tasks for the given scope identifiers.
+     */
+    T scopeIds(Set<String> scopeIds);
     
     /**
      * Only select tasks for the given sub scope identifier. 

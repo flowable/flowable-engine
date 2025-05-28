@@ -14,8 +14,10 @@
 package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -85,6 +87,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
@@ -235,6 +238,11 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("scopeId")) {
             request.setScopeId(requestParams.get("scopeId"));
+        }
+
+        if (requestParams.containsKey("scopeIds")) {
+            String[] scopeIdsSplit = requestParams.get("scopeIds").split(",");
+            request.setScopeIds(new HashSet<>(Arrays.asList(scopeIdsSplit)));
         }
         
         if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {
