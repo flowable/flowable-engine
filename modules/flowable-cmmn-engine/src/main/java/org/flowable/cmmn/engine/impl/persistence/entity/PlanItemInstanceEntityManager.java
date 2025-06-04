@@ -50,6 +50,9 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
 
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
 
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndTypeAndState(String caseInstanceId, List<String> planItemDefinitionTypes,
+            List<String> states, boolean ended);
+
     PlanItemInstanceEntity updateHumanTaskPlanItemInstanceAssignee(TaskEntity taskEntity, String assignee);
 
     PlanItemInstanceEntity updateHumanTaskPlanItemInstanceCompletedBy(TaskEntity taskEntity, String assignee);
