@@ -409,6 +409,19 @@
             <if test="caseInstanceId != null">
                 and RES.CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
             </if>
+            <if test="caseInstanceIds != null and !caseInstanceIds.empty">
+                and (
+                <foreach item="caseInstanceIdListItem" index="groupIndex" collection="safeCaseInstanceIds">
+                    <if test="groupIndex &gt; 0">
+                        or
+                    </if>
+                    RES.CASE_INST_ID_ IN
+                    <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                        #{caseInstanceId, jdbcType=VARCHAR}
+                    </foreach>
+                </foreach>
+                )
+            </if>
             <if test="stageInstanceId != null">
                 and RES.STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR}
             </if>
