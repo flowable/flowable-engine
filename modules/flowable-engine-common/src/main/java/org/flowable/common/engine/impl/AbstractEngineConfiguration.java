@@ -400,6 +400,12 @@ public abstract class AbstractEngineConfiguration {
      */
     protected int maxLengthStringVariableType = -1;
 
+    /**
+     * Define a max allowed length for storing large variables, e.g. String, JSON, etc. in the database.
+     * If the length of the variable exceeds this value, there will be an exception thrown when trying to store the variable.
+     */
+    protected int maxAllowedLengthVariableType = -1;
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -1932,6 +1938,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public int getMaxAllowedLengthVariableType() {
+        return maxAllowedLengthVariableType;
+    }
+
+    public AbstractEngineConfiguration setMaxAllowedLengthVariableType(int maxAllowedLengthVariableType) {
+        this.maxAllowedLengthVariableType = maxAllowedLengthVariableType;
         return this;
     }
 

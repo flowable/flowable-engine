@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
@@ -28,6 +29,7 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.util.VariableTypeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,17 +48,23 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonType.class);
 
+    protected final int maxAllowedLength;
     protected final int maxLength;
     protected final boolean trackObjects;
     protected final String typeName;
     protected ObjectMapper objectMapper;
 
     public JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        this(maxLength, objectMapper, trackObjects, TYPE_NAME);
+        this(maxLength, -1, objectMapper, trackObjects);
     }
 
-    protected JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, String typeName) {
+    public JsonType(int maxLength, int maxAllowedLength, ObjectMapper objectMapper, boolean trackObjects) {
+        this(maxLength, maxAllowedLength, objectMapper, trackObjects, TYPE_NAME);
+    }
+
+    protected JsonType(int maxLength, int maxAllowedLength, ObjectMapper objectMapper, boolean trackObjects, String typeName) {
         this.maxLength = maxLength;
+        this.maxAllowedLength = maxAllowedLength;
         this.trackObjects = trackObjects;
         this.objectMapper = objectMapper;
         this.typeName = typeName;
@@ -64,7 +72,11 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
 
     // Needed for backwards compatibility of longJsonType
     public static JsonType longJsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        return new JsonType(maxLength, objectMapper, trackObjects, LONG_JSON_TYPE_NAME);
+        return longJsonType(maxLength, -1, objectMapper, trackObjects);
+    }
+
+    public static JsonType longJsonType(int maxLength, int maxAllowedLength, ObjectMapper objectMapper, boolean trackObjects) {
+        return new JsonType(maxLength, maxAllowedLength, objectMapper, trackObjects, LONG_JSON_TYPE_NAME);
     }
 
     @Override
@@ -118,7 +130,9 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             JsonNode jsonNode = (JsonNode) value;
 
             String textValue = value.toString();
-            if (textValue.length() <= maxLength) {
+            int length = textValue.length();
+            VariableTypeUtils.validateMaxAllowedLength(maxAllowedLength, length, valueFields, this);
+            if (length <= maxLength) {
                 valueFields.setTextValue(textValue);
                 valueFields.setBytes(null);
             } else {

@@ -54,9 +54,15 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     }
 
     public SerializableType() {
+        this(false, -1);
     }
 
     public SerializableType(boolean trackDeserializedObjects) {
+        this(trackDeserializedObjects, -1);
+    }
+
+    public SerializableType(boolean trackDeserializedObjects, int maxAllowedLength) {
+        super(maxAllowedLength);
         this.trackDeserializedObjects = trackDeserializedObjects;
     }
 
