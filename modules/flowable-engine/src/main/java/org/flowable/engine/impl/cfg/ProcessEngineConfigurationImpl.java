@@ -2175,7 +2175,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
             variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
+            variableTypes.addType(new StringType(getMaxLengthString(), maxAllowedLengthVariableType));
             variableTypes.addType(new LongStringType(getMaxLengthString() + 1, maxAllowedLengthVariableType));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
