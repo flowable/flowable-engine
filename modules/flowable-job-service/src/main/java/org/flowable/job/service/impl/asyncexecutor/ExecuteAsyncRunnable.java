@@ -43,9 +43,7 @@ import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
-import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.util.JobProcessorUtil;
-import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

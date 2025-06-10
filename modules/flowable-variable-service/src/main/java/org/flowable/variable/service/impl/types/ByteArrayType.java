@@ -14,6 +14,7 @@ package org.flowable.variable.service.impl.types;
 
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.util.VariableTypeUtils;
 
 /**
  * @author Tom Baeyens
@@ -23,6 +24,16 @@ public class ByteArrayType implements VariableType {
     public static final String TYPE_NAME = "bytes";
 
     private static final long serialVersionUID = 1L;
+
+    protected final int maxAllowedLength;
+
+    public ByteArrayType() {
+        this(-1);
+    }
+
+    public ByteArrayType(int maxAllowedLength) {
+        this.maxAllowedLength = maxAllowedLength;
+    }
 
     @Override
     public String getTypeName() {
@@ -41,6 +52,14 @@ public class ByteArrayType implements VariableType {
 
     @Override
     public void setValue(Object value, ValueFields valueFields) {
+        if (value == null) {
+            valueFields.setBytes(null);
+            return;
+        }
+
+        byte[] bytes = (byte[]) value;
+        VariableTypeUtils.validateMaxAllowedLength(maxAllowedLength, bytes.length, valueFields, this);
+
         valueFields.setBytes((byte[]) value);
     }
 

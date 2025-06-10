@@ -427,6 +427,12 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceIdAndTypeAndState(String caseInstanceId, List<String> planItemDefinitionTypes,
+            List<String> states, boolean ended) {
+        return dataManager.findByCaseInstanceIdAndTypeAndState(caseInstanceId, planItemDefinitionTypes, states, ended);
+    }
+
+    @Override
     public PlanItemInstanceEntity updateHumanTaskPlanItemInstanceAssignee(TaskEntity taskEntity, String assignee) {
         PlanItemInstanceEntity planItemInstanceEntity = null;
         if (taskEntity.getScopeId() != null && taskEntity.getSubScopeId() != null) {

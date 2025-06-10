@@ -392,8 +392,8 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
                 }
             }
             variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new StringType(getMaxLengthString(), maxAllowedLengthVariableType));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, maxAllowedLengthVariableType));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -408,12 +408,12 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), maxAllowedLengthVariableType, objectMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
-            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), maxAllowedLengthVariableType, objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new ByteArrayType(maxAllowedLengthVariableType));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, maxAllowedLengthVariableType));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);

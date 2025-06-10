@@ -38,6 +38,10 @@ public class SerializableType extends ByteArrayType {
 
     public static final String TYPE_NAME = "serializable";
 
+    public SerializableType() {
+        super(-1);
+    }
+
     @Override
     public String getTypeName() {
         return TYPE_NAME;
