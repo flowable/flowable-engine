@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.variable.MaxAllowedLengthVariableVerifier;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -36,7 +37,7 @@ public class MaxAllowedShortStringVariableLengthTest extends CustomConfiguration
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         // The max length is usually 2000 / 4000, so we want to test that the maxAllowedLengthVariableType is applied for the short strings as well
-        processEngineConfiguration.setMaxAllowedLengthVariableType(500);
+        processEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(500));
     }
 
     @Test

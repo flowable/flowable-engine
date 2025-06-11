@@ -12,9 +12,10 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.service.impl.util.VariableTypeUtils;
 
 /**
  * @author Tom Baeyens
@@ -25,14 +26,14 @@ public class ByteArrayType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
-    protected final int maxAllowedLength;
+    protected final VariableLengthVerifier lengthVerifier;
 
     public ByteArrayType() {
-        this(-1);
+        this(NoopVariableLengthVerifier.INSTANCE);
     }
 
-    public ByteArrayType(int maxAllowedLength) {
-        this.maxAllowedLength = maxAllowedLength;
+    public ByteArrayType(VariableLengthVerifier lengthVerifier) {
+        this.lengthVerifier = lengthVerifier != null ? lengthVerifier : NoopVariableLengthVerifier.INSTANCE;
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ByteArrayType implements VariableType {
         }
 
         byte[] bytes = (byte[]) value;
-        VariableTypeUtils.validateMaxAllowedLength(maxAllowedLength, bytes.length, valueFields, this);
+        lengthVerifier.verifyLength(bytes.length, valueFields, this);
 
         valueFields.setBytes((byte[]) value);
     }

@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.variable.MaxAllowedLengthVariableVerifier;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -181,7 +182,7 @@ public class MaxAllowedShortStringVariableLengthTest {
         @Bean
         public EngineConfigurationConfigurer<SpringAppEngineConfiguration> customAppEngineConfigurationConfigurer() {
             return appEngineConfiguration -> {
-                appEngineConfiguration.setMaxAllowedLengthVariableType(500);
+                appEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(500));
             };
         }
     }

@@ -27,6 +27,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.variable.MaxAllowedLengthVariableVerifier;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class MaxAllowedVariableLengthTest extends CustomCmmnConfigurationFlowabl
 
     @Override
     protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        cmmnEngineConfiguration.setMaxAllowedLengthVariableType(5000);
+        cmmnEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(5000));
     }
 
     @Test
