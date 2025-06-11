@@ -122,6 +122,8 @@ import org.flowable.common.engine.impl.util.DbUtil;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -401,10 +403,10 @@ public abstract class AbstractEngineConfiguration {
     protected int maxLengthStringVariableType = -1;
 
     /**
-     * Define a max allowed length for storing large variables, e.g. String, JSON, etc. in the database.
-     * If the length of the variable exceeds this value, there will be an exception thrown when trying to store the variable.
+     * Define variable length for variables that have length, e.g. String, JSON, etc.
+     * The length verifier can be used to throw an exception if the length exceeds a certain threshold and / or it can log a warning.
      */
-    protected int maxAllowedLengthVariableType = -1;
+    protected VariableLengthVerifier variableLengthVerifier = NoopVariableLengthVerifier.INSTANCE;
 
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
@@ -1941,12 +1943,12 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public int getMaxAllowedLengthVariableType() {
-        return maxAllowedLengthVariableType;
+    public VariableLengthVerifier getVariableLengthVerifier() {
+        return variableLengthVerifier;
     }
 
-    public AbstractEngineConfiguration setMaxAllowedLengthVariableType(int maxAllowedLengthVariableType) {
-        this.maxAllowedLengthVariableType = maxAllowedLengthVariableType;
+    public AbstractEngineConfiguration setVariableLengthVerifier(VariableLengthVerifier variableLengthVerifier) {
+        this.variableLengthVerifier = variableLengthVerifier;
         return this;
     }
 

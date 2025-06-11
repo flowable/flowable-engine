@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +37,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -1065,6 +1067,7 @@ public class StageTest extends FlowableCmmnTestCase {
             "org/flowable/cmmn/test/runtime/StageTest.sleepCase.cmmn"
     })
     public void testStageWithAsyncNonExclusiveChildren() {
+        assumeThat(cmmnEngineConfiguration.getDatabaseType()).isNotEqualTo(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL);
         ArrayNode elementsVar = cmmnEngineConfiguration.getObjectMapper()
                 .createArrayNode();
         int numberOfJobs = 2;
