@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.variable.MaxAllowedLengthVariableVerifier;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -42,7 +43,7 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        processEngineConfiguration.setMaxAllowedLengthVariableType(5000);
+        processEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(5000));
     }
 
     @Test

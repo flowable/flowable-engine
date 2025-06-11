@@ -12,8 +12,9 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
-import org.flowable.variable.service.impl.util.VariableTypeUtils;
 
 /**
  * @author Martin Grofcik
@@ -24,11 +25,11 @@ public class LongStringType extends SerializableType {
     private final int minLength;
 
     public LongStringType(int minLength) {
-        this(minLength, -1);
+        this(minLength, NoopVariableLengthVerifier.INSTANCE);
     }
 
-    public LongStringType(int minLength, int maxAllowedLength) {
-        super(false, maxAllowedLength);
+    public LongStringType(int minLength, VariableLengthVerifier lengthVerifier) {
+        super(false, lengthVerifier);
         this.minLength = minLength;
     }
 
@@ -44,7 +45,7 @@ public class LongStringType extends SerializableType {
             valueFields.setBytes(null);
         }
         String textValue = (String) value;
-        VariableTypeUtils.validateMaxAllowedLength(maxAllowedLength, textValue.length(), valueFields, this);
+        lengthVerifier.verifyLength(textValue.length(), valueFields, this);
         byte[] serializedValue = serialize(textValue, valueFields);
         valueFields.setBytes(serializedValue);
     }

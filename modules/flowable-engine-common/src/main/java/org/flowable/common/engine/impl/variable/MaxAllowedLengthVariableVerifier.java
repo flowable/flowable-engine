@@ -10,11 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.variable.service.impl.util;
+package org.flowable.common.engine.impl.variable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
@@ -22,14 +21,20 @@ import org.flowable.variable.api.types.VariableType;
 /**
  * @author Filip Hrisafov
  */
-public class VariableTypeUtils {
+public class MaxAllowedLengthVariableVerifier implements VariableLengthVerifier {
 
-    public static void validateMaxAllowedLength(int maxAllowedLength, int length, ValueFields valueFields, VariableType variableType) {
-        if (maxAllowedLength < 0) {
-            return;
+    protected final int maxAllowedLength;
+
+    public MaxAllowedLengthVariableVerifier(int maxAllowedLength) {
+        if (maxAllowedLength <= 0) {
+            throw new FlowableIllegalArgumentException("The maximum allowed length must be greater than 0");
         }
+        this.maxAllowedLength = maxAllowedLength;
+    }
 
-        if (maxAllowedLength > 0 && length > maxAllowedLength) {
+    @Override
+    public void verifyLength(int length, ValueFields valueFields, VariableType variableType) {
+        if (length > maxAllowedLength) {
             String scopeId;
             String scopeType;
             if (StringUtils.isNotEmpty(valueFields.getTaskId())) {
