@@ -259,6 +259,14 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("planItemInstanceId", finishedTaskCase1.getSubScopeId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("scopeId", caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), finishedTaskCase1.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("scopeIds").add("someId").add(caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), finishedTaskCase1.getId());
     }
 
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })

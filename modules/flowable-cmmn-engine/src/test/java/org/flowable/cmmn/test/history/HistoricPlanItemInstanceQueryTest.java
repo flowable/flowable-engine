@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
@@ -66,6 +67,14 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).list()).hasSize(4);
             }
+        }
+    }
+
+    @Test
+    public void testByCaseInstanceIds() {
+        List<String> caseInstanceIds = startInstances(3);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceIds(Set.of(caseInstanceIds.get(0),caseInstanceIds.get(1))).list()).hasSize(8);
         }
     }
 
