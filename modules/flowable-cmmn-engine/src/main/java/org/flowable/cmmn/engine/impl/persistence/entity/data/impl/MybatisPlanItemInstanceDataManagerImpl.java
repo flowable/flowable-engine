@@ -219,8 +219,8 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
             boolean ended = (boolean) map.get("ended");
 
             return caseInstanceId.equals(entity.getCaseInstanceId())
-                    && planItemDefinitionTypes.contains(entity.getPlanItemDefinitionType())
-                    && states.contains(entity.getState())
+                    && (planItemDefinitionTypes == null || planItemDefinitionTypes.contains(entity.getPlanItemDefinitionType()))
+                    && (states == null || states.contains(entity.getState()))
                     && (ended ? entity.getEndedTime() != null : entity.getEndedTime() == null);
         }
 

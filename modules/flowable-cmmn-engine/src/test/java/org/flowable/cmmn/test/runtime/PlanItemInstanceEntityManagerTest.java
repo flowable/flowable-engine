@@ -13,30 +13,16 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
-import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,6 +58,28 @@ public class PlanItemInstanceEntityManagerTest extends FlowableCmmnTestCase {
 
         assertThat(planItemInstances).hasSize(1);
         assertThat(planItemInstances.get(0).getName()).isEqualTo("B");
+        
+        planItemInstances = ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(
+                commandContext -> CommandContextUtil.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndTypeAndState(caseInstanceId,
+                        null, List.of(PlanItemInstanceState.ENABLED), false));
+
+        assertThat(planItemInstances).hasSize(1);
+        assertThat(planItemInstances.get(0).getName()).isEqualTo("B");
+        
+        planItemInstances = ((CmmnManagementServiceImpl) cmmnManagementService).executeCommand(
+                commandContext -> CommandContextUtil.getPlanItemInstanceEntityManager().findByCaseInstanceIdAndTypeAndState(caseInstanceId,
+                        null, null, false));
+
+        assertThat(planItemInstances).hasSize(4);
+        List<String> names = new ArrayList<>();
+        for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+            names.add(planItemInstance.getName());
+        }
+        
+        assertThat(names).contains("A");
+        assertThat(names).contains("B");
+        assertThat(names).contains("Stage one");
+        assertThat(names).contains("Stage two");
     }
 
     private List<String> startInstances(int numberOfInstances) {
