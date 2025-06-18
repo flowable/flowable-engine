@@ -12,6 +12,15 @@
  */
 package org.flowable.cmmn.test.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.common.engine.api.delegate.event.FlowableEngineEventType.ENTITY_UPDATED;
+import static org.flowable.common.engine.api.delegate.event.FlowableEngineEventType.JOB_RETRIES_DECREMENTED;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -28,15 +37,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.flowable.common.engine.api.delegate.event.FlowableEngineEventType.ENTITY_UPDATED;
-import static org.flowable.common.engine.api.delegate.event.FlowableEngineEventType.JOB_RETRIES_DECREMENTED;
 
 /**
  * @author martin.grofcik
