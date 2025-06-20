@@ -67,6 +67,9 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
+        if (queryRequest.getCaseInstanceIds() != null) {
+            query.caseInstanceIds(queryRequest.getCaseInstanceIds());
+        }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }

@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.history;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -30,6 +31,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId);
+
+    HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceIds(Set<String> caseInstanceIds);
     HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId);

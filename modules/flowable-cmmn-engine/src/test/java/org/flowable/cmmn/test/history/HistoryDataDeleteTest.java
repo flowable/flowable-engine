@@ -889,6 +889,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         methodNameToExpectedQueryPropertyName.put("caseInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("caseInstanceCallbackType", "callbackType");
         methodNameToExpectedQueryPropertyName.put("caseInstanceCallbackId", "callbackId");
+        methodNameToExpectedQueryPropertyName.put("caseInstanceCallbackIds", "callbackIds");
         methodNameToExpectedQueryPropertyName.put("withoutCaseInstanceCallbackId", "withoutCallbackId");
         methodNameToExpectedQueryPropertyName.put("caseInstanceReferenceType", "referenceType");
         methodNameToExpectedQueryPropertyName.put("caseInstanceReferenceId", "referenceId");

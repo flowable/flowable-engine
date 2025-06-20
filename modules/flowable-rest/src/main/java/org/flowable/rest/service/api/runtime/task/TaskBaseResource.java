@@ -319,6 +319,10 @@ public class TaskBaseResource {
             taskQuery.scopeId(request.getScopeId());
         }
         
+        if (request.getScopeIds() != null && !request.getScopeIds().isEmpty()) {
+            taskQuery.scopeIds(request.getScopeIds());
+        }
+        
         if (Boolean.TRUE.equals(request.getWithoutScopeId())) {
             taskQuery.withoutScopeId();
         }
