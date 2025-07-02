@@ -63,6 +63,9 @@ public class MaxAllowedShortStringVariableLengthTest extends CustomConfiguration
                                 + task.getId());
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        runtimeService.removeVariable(processInstance.getId(), "stringVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isNull();
     }
 
     @Test
@@ -88,6 +91,9 @@ public class MaxAllowedShortStringVariableLengthTest extends CustomConfiguration
                                 + task.getId());
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        runtimeService.removeVariable(processInstance.getId(), "stringVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isNull();
     }
 
 }

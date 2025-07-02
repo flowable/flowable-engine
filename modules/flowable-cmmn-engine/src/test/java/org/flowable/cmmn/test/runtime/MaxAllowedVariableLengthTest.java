@@ -71,6 +71,38 @@ public class MaxAllowedVariableLengthTest extends CustomCmmnConfigurationFlowabl
                                 + task.getId());
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void longStringVariable() {
+        String initialValue = RandomStringUtils.insecure().nextAlphanumeric(4999);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("stringVar", initialValue)
+                .start();
+
+        assertThatThrownBy(() -> cmmnRuntimeService.setVariable(caseInstance.getId(), "stringVar", RandomStringUtils.insecure().nextAlphanumeric(5001)))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage(
+                        "The length of the longString value exceeds the maximum allowed length of 5000 characters. Current length: 5001, for variable: stringVar in scope cmmn with id "
+                                + caseInstance.getId());
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThatThrownBy(() -> cmmnTaskService.setVariableLocal(task.getId(), "stringVar", RandomStringUtils.insecure().nextAlphanumeric(5001)))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage(
+                        "The length of the longString value exceeds the maximum allowed length of 5000 characters. Current length: 5001, for variable: stringVar in scope task with id "
+                                + task.getId());
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo(initialValue);
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
     }
 
     @Test
@@ -101,6 +133,9 @@ public class MaxAllowedVariableLengthTest extends CustomCmmnConfigurationFlowabl
 
         assertThatJson(cmmnRuntimeService.getVariable(caseInstance.getId(), "jsonVar"))
                 .isEqualTo("{ name:  'John Doe' }");
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "jsonVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "jsonVar")).isNull();
     }
 
     @Test
@@ -130,6 +165,9 @@ public class MaxAllowedVariableLengthTest extends CustomCmmnConfigurationFlowabl
                 .asInstanceOf(BYTE_ARRAY)
                 .asString(StandardCharsets.UTF_8)
                 .isEqualTo("Test");
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "bytesVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "bytesVar")).isNull();
     }
 
     @Test
@@ -155,6 +193,9 @@ public class MaxAllowedVariableLengthTest extends CustomCmmnConfigurationFlowabl
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serializableVar"))
                 .isInstanceOfSatisfying(Customer.class, customer -> assertThat(customer.name).isEqualTo("Test"));
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "serializableVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "serializableVar")).isNull();
     }
 
     protected static class Customer implements Serializable {

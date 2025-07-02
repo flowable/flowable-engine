@@ -63,6 +63,9 @@ public class MaxAllowedShortStringVariableLengthTest extends CustomCmmnConfigura
                                 + task.getId());
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
     }
 
     @Test
@@ -88,6 +91,9 @@ public class MaxAllowedShortStringVariableLengthTest extends CustomCmmnConfigura
                                 + task.getId());
 
         assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar")).isNull();
     }
 
 }

@@ -69,6 +69,38 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
                                 + task.getId());
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isEqualTo("Test value");
+
+        runtimeService.removeVariable(processInstance.getId(), "stringVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void longStringVariable() {
+        String initialValue = RandomStringUtils.insecure().nextAlphanumeric(4999);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("stringVar", initialValue)
+                .start();
+
+        assertThatThrownBy(() -> runtimeService.setVariable(processInstance.getId(), "stringVar", RandomStringUtils.insecure().nextAlphanumeric(5001)))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage(
+                        "The length of the longString value exceeds the maximum allowed length of 5000 characters. Current length: 5001, for variable: stringVar in scope bpmn with id "
+                                + processInstance.getId());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        assertThatThrownBy(() -> taskService.setVariableLocal(task.getId(), "stringVar", RandomStringUtils.insecure().nextAlphanumeric(5001)))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage(
+                        "The length of the longString value exceeds the maximum allowed length of 5000 characters. Current length: 5001, for variable: stringVar in scope task with id "
+                                + task.getId());
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isEqualTo(initialValue);
+
+        runtimeService.removeVariable(processInstance.getId(), "stringVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "stringVar")).isNull();
     }
 
     @Test
@@ -99,6 +131,9 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
 
         assertThatJson(runtimeService.getVariable(processInstance.getId(), "jsonVar"))
                 .isEqualTo("{ name:  'John Doe' }");
+
+        runtimeService.removeVariable(processInstance.getId(), "jsonVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "jsonVar")).isNull();
     }
 
     @Test
@@ -127,6 +162,9 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
         assertThat(runtimeService.getVariable(processInstance.getId(), "bytesVar", byte[].class))
                 .asString(StandardCharsets.UTF_8)
                 .isEqualTo("Test");
+
+        runtimeService.removeVariable(processInstance.getId(), "bytesVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "bytesVar")).isNull();
     }
 
     @Test
@@ -152,6 +190,9 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "serializableVar"))
                 .isInstanceOfSatisfying(Customer.class, customer -> assertThat(customer.name).isEqualTo("Test"));
+
+        runtimeService.removeVariable(processInstance.getId(), "serializableVar");
+        assertThat(runtimeService.getVariable(processInstance.getId(), "serializableVar")).isNull();
     }
 
     protected static class Customer implements Serializable {
