@@ -66,6 +66,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean onlySubProcessExecutions;
     protected boolean onlyProcessInstanceExecutions;
     protected String processInstanceId;
+    protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String rootProcessInstanceId;
     protected List<EventSubscriptionQueryValue> eventSubscriptions;
 
@@ -108,6 +110,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
     protected String parentCaseInstanceId;
     protected String referenceId;
@@ -299,6 +302,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.currentOrQueryObject.processInstanceId = processInstanceId;
         } else {
             this.processInstanceId = processInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery processInstanceIds(Set<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is null");
+        }
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processInstanceIds = processInstanceIds;
+        } else {
+            this.processInstanceIds = processInstanceIds;
         }
         return this;
     }
@@ -1156,8 +1176,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return rootProcessInstanceId;
     }
 
-    public String getProcessInstanceIds() {
-        return null;
+    public Set<String> getProcessInstanceIds() {
+        return processInstanceIds;
     }
 
     public String getBusinessKey() {
@@ -1397,6 +1417,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return callbackId;
     }
 
+    public Set<String> getCallBackIds() {
+        return callbackIds;
+    }
+
+
     public String getCallbackType() {
         return callbackType;
     }
@@ -1410,7 +1435,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     }
     
     public List<List<String>> getSafeProcessInstanceIds() {
-        return null;
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

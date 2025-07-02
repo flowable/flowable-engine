@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -72,6 +73,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String processInstanceBusinessKeyLikeIgnoreCase;
     protected String executionId;
     protected String scopeId;
+    protected Set<String> scopeIds;
+    protected List<List<String>> safeScopeIds;
     protected String subScopeId;
     protected String scopeType;
     protected String scopeDefinitionId;
@@ -466,6 +469,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.scopeId = scopeId;
         } else {
             this.scopeId = scopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery scopeIds(Set<String> scopeIds) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeIds = scopeIds;
+        } else {
+            this.scopeIds = scopeIds;
         }
         return this;
     }
@@ -2660,5 +2673,17 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public List<List<String>> getSafeScopeIds() {
+        return safeScopeIds;
+    }
+
+    public void setSafeScopeIds(List<List<String>> safeScopeIds) {
+        this.safeScopeIds = safeScopeIds;
     }
 }
