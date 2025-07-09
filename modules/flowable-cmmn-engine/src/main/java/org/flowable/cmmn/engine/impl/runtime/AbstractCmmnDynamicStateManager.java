@@ -566,6 +566,10 @@ public abstract class AbstractCmmnDynamicStateManager {
     protected void executeVerifySatisfiedSentryParts(CaseInstanceChangeState caseInstanceChangeState, 
             CaseInstanceEntity caseInstance, String originalCaseDefinitionId, CommandContext commandContext) {
         
+        if (caseInstanceChangeState.getCaseDefinitionToMigrateTo() == null) {
+            return;
+        }
+        
         SentryPartInstanceEntityManager sentryPartInstanceEntityManager = cmmnEngineConfiguration.getSentryPartInstanceEntityManager();
         List<SentryPartInstanceEntity> sentryPartInstances = sentryPartInstanceEntityManager.findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
         if (sentryPartInstances.isEmpty()) {
