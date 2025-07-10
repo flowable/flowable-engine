@@ -39,10 +39,6 @@
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
 
-    <bean id="flowableRule" class="org.flowable.engine.test.FlowableRule">
-        <property name="processEngine" ref="processEngine"/>
-    </bean>
-
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
 </beans>
