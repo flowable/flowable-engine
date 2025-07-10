@@ -50,14 +50,11 @@ import org.flowable.form.api.FormService;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -72,10 +69,8 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Saeid Mirzaei
  * @author Filip Hrisafov
  */
+@MockitoSettings
 public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCase {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -86,13 +81,13 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     @Mock
     protected FormService formEngineFormService;
 
-    @Before
+    @BeforeEach
     public void initializeMocks() {
         Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void resetMocks() {
         processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }

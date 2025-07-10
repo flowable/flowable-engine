@@ -29,8 +29,8 @@ import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -42,7 +42,7 @@ public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
 
     protected boolean databaseReset;
 
-    @Before
+    @BeforeEach
     public void createDatabase() throws Exception {
         if (!databaseReset) {
             String originalDatabaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();

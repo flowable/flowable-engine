@@ -34,25 +34,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.server.Server;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.FormService;
@@ -65,25 +56,24 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.test.TestHelper;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.DeploymentId;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
-import org.flowable.rest.util.TestServerUtil;
-import org.flowable.rest.util.TestServerUtil.TestServer;
+import org.flowable.rest.util.TestServer;
+import org.flowable.spring.impl.test.InternalFlowableSpringExtension;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -91,166 +81,71 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+@SpringJUnitWebConfig(ApplicationConfiguration.class)
+@ExtendWith(InternalFlowableSpringExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
 public class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-    
-    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-            "ACT_GE_PROPERTY",
-            "ACT_ID_PROPERTY",
-            "ACT_FO_DATABASECHANGELOG",
-            "ACT_FO_DATABASECHANGELOGLOCK",
-            "FLW_EV_DATABASECHANGELOG",
-            "FLW_EV_DATABASECHANGELOGLOCK"
-    );
-    
-    @Rule 
-    public TestName testName = new TestName();
-    
-    protected static String SERVER_URL_PREFIX = "";
-    protected static RestUrlBuilder URL_BUILDER;
+
+    protected String SERVER_URL_PREFIX = "";
+    protected RestUrlBuilder URL_BUILDER;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     protected String deploymentId;
     protected Throwable exception;
 
-    protected static ProcessEngine processEngine;
+    @Autowired
+    protected ProcessEngine processEngine;
+    @Autowired
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    @Autowired
     protected RepositoryService repositoryService;
+    @Autowired
     protected RuntimeService runtimeService;
+    @Autowired
     protected TaskService taskService;
+    @Autowired
     protected FormService formService;
+    @Autowired
     protected HistoryService historyService;
+    @Autowired
     protected IdentityService identityService;
+    @Autowired
     protected ManagementService managementService;
+    @Autowired
     protected DynamicBpmnService dynamicBpmnService;
+    @Autowired
     protected ProcessMigrationService processInstanceMigrationService;
 
-    protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+    @Autowired
+    protected CloseableHttpClient client;
+    protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
-    
-    protected static Server server;
-    
-    protected static Class<?> configurationClass;
-    protected static AnnotationConfigWebApplicationContext appContext;
-    
-    @Before
-    public void init() throws Exception {
-        
-        if (configurationClass != null && !configurationClass.equals(getConfigurationClass())) {
-            if (appContext != null) {
-                appContext.close();
-            }
-            if (server != null && server.isRunning()) {
-                try {
-                    server.stop();
-                    server = null;
-                } catch (Exception e) {
-                    LOGGER.error("Error stopping server", e);
-                    throw e;
-                }
-            }
-        }
-        
-        if (configurationClass == null || appContext == null || !configurationClass.equals(getConfigurationClass())) {
-            appContext = new AnnotationConfigWebApplicationContext();
-            appContext.register(getConfigurationClass());
-            appContext.refresh();
-            configurationClass = getConfigurationClass();
-        }
-        
-        processEngine = appContext.getBean("processEngine", ProcessEngine.class);
-        processEngineConfiguration = appContext.getBean(ProcessEngineConfigurationImpl.class);
-        repositoryService = appContext.getBean(RepositoryService.class);
-        runtimeService = appContext.getBean(RuntimeService.class);
-        taskService = appContext.getBean(TaskService.class);
-        formService = appContext.getBean(FormService.class);
-        historyService = appContext.getBean(HistoryService.class);
-        identityService = appContext.getBean(IdentityService.class);
-        managementService = appContext.getBean(ManagementService.class);
-        dynamicBpmnService = appContext.getBean(DynamicBpmnService.class);
-        processInstanceMigrationService = appContext.getBean(ProcessMigrationService.class);
-        
-        if (server == null) {
-            TestServer testServer = TestServerUtil.createAndStartServer(appContext);
-            server = testServer.getServer();
-            SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-            URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-        }
-        
-        createHttpClient();
+
+    @Autowired
+    protected TestServer server;
+
+    @BeforeEach
+    public void init(@DeploymentId String deploymentId) {
+        this.deploymentId = deploymentId;
         createUsers();
-        
-        deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), testName.getMethodName());
-    }
-    
-    protected Class<?> getConfigurationClass() {
-        return ApplicationConfiguration.class;
+        SERVER_URL_PREFIX = server.getServerUrlPrefix();
+        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+
     }
 
-    protected void createHttpClient() {
-        
-        if (client != null) {
-            return;
-        }
-        
-        // Create Http client for all tests
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-        provider.setCredentials(AuthScope.ANY, credentials);
-        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-        // Clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not close http client", e);
-                    }
-                }
-                if (server != null && server.isRunning()) {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        LOGGER.error("Error stopping server", e);
-                    }
-                }
-            }
-        });
-    }
-    
-    @After
-    public void cleanup() throws Throwable {
-        try {
-            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
-
-        } catch (AssertionError e) {
-            LOGGER.error(System.lineSeparator());
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            exception = e;
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(System.lineSeparator());
-            LOGGER.error("EXCEPTION: {}", e, e);
-            exception = e;
-            throw e;
-
-        } finally {
-            Authentication.setAuthenticatedUserId(null);
-            TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), testName.getMethodName());
-            dropUsers();
-            assertAndEnsureCleanDb();
-            processEngineConfiguration.getClock().reset();
-            closeHttpConnections();
-        }
+    @AfterEach
+    public void cleanup() {
+        Authentication.setAuthenticatedUserId(null);
+        dropUsers();
+        processEngineConfiguration.getClock().reset();
+        closeHttpConnections();
     }
 
 
@@ -352,21 +247,6 @@ public class BaseSpringRestTestCase {
         identityService.deleteUser("aSalesUser");
         identityService.deleteGroup("sales");
         identityService.deleteMembership("aSalesUser", "sales");
-    }
-
-    /**
-     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
-     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-     */
-    protected void assertAndEnsureCleanDb() throws Throwable {
-        EnsureCleanDbUtils.assertAndEnsureCleanDb(
-                "",
-                LOGGER,
-                processEngineConfiguration,
-                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
-                exception == null,
-                processEngineConfiguration.getSchemaManagementCmd()
-        );
     }
 
     protected void closeHttpConnections() {

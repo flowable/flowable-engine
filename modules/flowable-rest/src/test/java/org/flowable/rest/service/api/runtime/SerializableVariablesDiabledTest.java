@@ -34,83 +34,26 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.flowable.engine.IdentityService;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.idm.api.Group;
-import org.flowable.idm.api.User;
+import org.flowable.engine.test.Deployment;
 import org.flowable.rest.conf.ObjectVariableSerializationDisabledApplicationConfiguration;
+import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
-import org.flowable.rest.util.TestServerUtil;
-import org.flowable.rest.util.TestServerUtil.TestServer;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 /**
  * @author Joram Barrez
  */
-public class SerializableVariablesDiabledTest {
+@SpringJUnitWebConfig(ObjectVariableSerializationDisabledApplicationConfiguration.class)
+public class SerializableVariablesDiabledTest extends BaseSpringRestTestCase {
 
-    private RepositoryService repositoryService;
-    private RuntimeService runtimeService;
-    private IdentityService identityService;
-    private TaskService taskService;
-
-    private String serverUrlPrefix;
-
-    private String testUserId;
-    private String testGroupId;
-
-    @Before
-    public void setupServer() {
-        if (serverUrlPrefix == null) {
-            TestServer testServer = TestServerUtil.createAndStartServer(ObjectVariableSerializationDisabledApplicationConfiguration.class);
-            serverUrlPrefix = testServer.getServerUrlPrefix();
-
-            this.repositoryService = testServer.getApplicationContext().getBean(RepositoryService.class);
-            this.runtimeService = testServer.getApplicationContext().getBean(RuntimeService.class);
-            this.identityService = testServer.getApplicationContext().getBean(IdentityService.class);
-            this.taskService = testServer.getApplicationContext().getBean(TaskService.class);
-
-            User user = identityService.newUser("kermit");
-            user.setFirstName("Kermit");
-            user.setLastName("the Frog");
-            user.setPassword("kermit");
-            identityService.saveUser(user);
-
-            Group group = identityService.newGroup("admin");
-            group.setName("Administrators");
-            identityService.saveGroup(group);
-
-            identityService.createMembership(user.getId(), group.getId());
-
-            this.testUserId = user.getId();
-            this.testGroupId = group.getId();
-        }
-    }
-
-    @After
-    public void removeUsers() {
-        identityService.deleteMembership(testUserId, testGroupId);
-        identityService.deleteGroup(testGroupId);
-        identityService.deleteUser(testUserId);
-
-        for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
-    }
 
     @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
     public void testCreateSingleSerializableProcessVariable() throws Exception {
-
-        repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml").deploy();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -131,7 +74,7 @@ public class SerializableVariablesDiabledTest {
         additionalFields.put("type", "serializable");
 
         // Upload a valid BPMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
@@ -140,11 +83,8 @@ public class SerializableVariablesDiabledTest {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
     public void testCreateSingleSerializableTaskVariable() throws Exception {
-        repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
-                .deploy();
-
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -165,7 +105,7 @@ public class SerializableVariablesDiabledTest {
         additionalFields.put("name", "serializableVariable");
         additionalFields.put("type", "serializable");
 
-        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
