@@ -20,7 +20,7 @@ import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.DeclarativeProcessController;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testcase for assuring that the {@link CompleteTaskInterceptor} works as expected

@@ -18,7 +18,7 @@ import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 

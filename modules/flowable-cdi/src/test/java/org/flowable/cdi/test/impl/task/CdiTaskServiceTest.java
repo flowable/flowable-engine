@@ -14,7 +14,7 @@ package org.flowable.cdi.test.impl.task;
 
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CdiTaskServiceTest extends CdiFlowableTestCase {
 
