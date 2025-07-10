@@ -29,19 +29,16 @@ import org.flowable.rest.conf.ApplicationWithTaskLogging;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Luis Belloch
  */
+@SpringJUnitWebConfig(ApplicationWithTaskLogging.class)
 public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCase {
-
-    @Override
-    protected Class<?> getConfigurationClass() {
-        return ApplicationWithTaskLogging.class;
-    }
 
     @Test
     @Deployment(resources = { "org/flowable/rest/api/history/HistoricTaskLogCollectionResourceTest.bpmn20.xml" })
