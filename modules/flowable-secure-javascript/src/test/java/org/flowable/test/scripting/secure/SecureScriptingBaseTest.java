@@ -26,8 +26,8 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.scripting.secure.SecureJavascriptConfigurator;
 import org.flowable.scripting.secure.impl.SecureScriptClassShutter;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Joram Barrez
@@ -46,7 +46,7 @@ public abstract class SecureScriptingBaseTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void initProcessEngine() {
 
         SecureJavascriptConfigurator configurator = new SecureJavascriptConfigurator()
@@ -70,7 +70,7 @@ public abstract class SecureScriptingBaseTest {
         this.taskService = processEngine.getTaskService();
     }
 
-    @After
+    @AfterEach
     public void shutdownProcessEngine() {
 
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
