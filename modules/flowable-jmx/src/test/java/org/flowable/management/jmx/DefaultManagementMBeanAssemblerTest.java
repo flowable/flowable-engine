@@ -26,7 +26,7 @@ import javax.management.modelmbean.ModelMBean;
 
 import org.flowable.management.jmx.annotations.NotificationSenderAware;
 import org.flowable.management.jmx.testMbeans.TestMbean;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**

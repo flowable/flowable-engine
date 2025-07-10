@@ -29,15 +29,16 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.management.jmx.DefaultManagementMBeanAssembler;
 import org.flowable.management.jmx.ManagementMBeanAssembler;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Saeid Mirzaei
  */
-
+@MockitoSettings
 public class JobExecutorMBeanTest {
 
     protected JobExecutorMBean jobExecutorMbean;
@@ -48,9 +49,8 @@ public class JobExecutorMBeanTest {
     @Mock
     protected AsyncExecutor jobExecutor;
 
-    @Before
+    @BeforeEach
     public void initMocks() throws MalformedObjectNameException {
-        MockitoAnnotations.initMocks(this);
         when(processEngineConfiguration.getAsyncExecutor()).thenReturn(jobExecutor);
         jobExecutorMbean = new JobExecutorMBean(processEngineConfiguration);
     }
