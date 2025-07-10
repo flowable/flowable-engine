@@ -32,7 +32,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
@@ -504,7 +504,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
 
 
     protected void deleteAllDmnDeployments() {
-        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) flowableRule.getProcessEngine().getProcessEngineConfiguration().getEngineConfigurations()
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
             .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list().stream()
         .forEach(

@@ -17,34 +17,26 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.test.FlowableRule;
-import org.junit.Before;
-import org.junit.Rule;
+import org.flowable.engine.test.FlowableTest;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Yvo Swillens
  */
+@FlowableTest
 public class AbstractFlowableDmnEngineConfiguratorTest {
 
-    @Rule
-    public FlowableRule flowableRule = new FlowableRule();
-
-    protected static ProcessEngine cachedProcessEngine;
     protected ProcessEngineConfiguration processEngineConfiguration;
     protected RepositoryService repositoryService;
     protected RuntimeService runtimeService;
     protected HistoryService historyService;
 
-    @Before
-    public void initProcessEngine() {
-        if (cachedProcessEngine == null) {
-            cachedProcessEngine = flowableRule.getProcessEngine();
-        }
-
-        this.processEngineConfiguration = cachedProcessEngine.getProcessEngineConfiguration();
-        this.repositoryService = cachedProcessEngine.getRepositoryService();
-        this.runtimeService = cachedProcessEngine.getRuntimeService();
-        this.historyService = cachedProcessEngine.getHistoryService();
+    @BeforeEach
+    public void initProcessEngine(ProcessEngine processEngine) {
+        this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        this.repositoryService = processEngine.getRepositoryService();
+        this.runtimeService = processEngine.getRuntimeService();
+        this.historyService = processEngine.getHistoryService();
     }
 
 }

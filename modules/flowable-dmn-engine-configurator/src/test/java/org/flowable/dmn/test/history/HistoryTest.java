@@ -30,7 +30,7 @@ import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnEngineConfiguratorTest;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -117,7 +117,7 @@ public class HistoryTest extends AbstractFlowableDmnEngineConfiguratorTest {
     }
     
     protected void deleteAllDmnDeployments() {
-        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) flowableRule.getProcessEngine().getProcessEngineConfiguration().getEngineConfigurations()
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
             .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list().stream()
             .forEach(
