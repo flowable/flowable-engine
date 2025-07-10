@@ -26,7 +26,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SignalEventTest extends CdiFlowableTestCase {
 

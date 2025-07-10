@@ -17,15 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
  * @author Daniel Meyer
  */
-@RunWith(Arquillian.class)
 public class ProcessIdTest extends CdiFlowableTestCase {
 
     @Test
