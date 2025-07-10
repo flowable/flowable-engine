@@ -32,6 +32,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -43,6 +44,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @CleanTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration("classpath:org/flowable/spring/test/components/SpringjobExecutorTest-context.xml")
+@DirtiesContext
 public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase {
 
     protected NonTransactionalTestJobHandler nonTransactionalTestJobHandler = new NonTransactionalTestJobHandler();
