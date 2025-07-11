@@ -25,6 +25,7 @@ import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -40,6 +41,7 @@ public class ChannelDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single event definition. GET event-registry-repository/channel-definitions/{channelDefinitionResource}
      */
+    @Test
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel" })
     public void testGetChannelDefinition() throws Exception {
 
@@ -72,12 +74,14 @@ public class ChannelDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting channel definition. GET event-registry-repository/channel-definitions/{channelDefinitionId}
      */
+    @Test
     public void testGetUnexistingChannelDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_CHANNEL_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     @ChannelDeploymentAnnotation(resources = { "simpleChannel.channel" })
     public void testGetChannelDefinitionResourceData() throws Exception {
         ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery().singleResult();
@@ -102,6 +106,7 @@ public class ChannelDefinitionResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
     
+    @Test
     @ChannelDeploymentAnnotation(resources = { "simpleChannel.channel" })
     public void testGetChannelDefinitionModel() throws Exception {
         ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery().singleResult();
@@ -129,6 +134,7 @@ public class ChannelDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting resource content for an unexisting channel definition .
      */
+    @Test
     public void testGetResourceContentForUnexistingChannelDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_CHANNEL_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);

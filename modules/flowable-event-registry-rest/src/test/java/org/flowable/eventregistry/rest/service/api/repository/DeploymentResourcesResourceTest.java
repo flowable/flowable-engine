@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -38,6 +39,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single deployment. GET event-registry-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResources() throws Exception {
 
         try {
@@ -73,6 +75,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single unexisting deployment. GET event-registry-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResourcesUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
