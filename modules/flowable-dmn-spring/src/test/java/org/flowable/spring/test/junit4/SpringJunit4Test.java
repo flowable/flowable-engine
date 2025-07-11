@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
+@Deprecated(forRemoval = true)
 public class SpringJunit4Test {
 
     @Autowired
