@@ -28,6 +28,7 @@ import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.HttpMultipartHelper;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,6 +44,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying singe event definition file. POST event-registry-repository/deployments
      */
+    @Test
     public void testPostNewDeploymentEventFile() throws Exception {
         try {
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_COLLECTION));
@@ -84,6 +86,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying an invalid file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentInvalidFile() throws Exception {
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_COLLECTION));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("simpleEvent.invalidfile", "application/json",
@@ -94,6 +97,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" })
     public void testGetDeployment() throws Exception {
         EventDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -119,6 +123,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     public void testGetUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -128,6 +133,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     public void testDeleteDeployment() throws Exception {
         EventDeployment existingDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
                     .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
@@ -145,6 +151,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     public void testDeleteUnexistingDeployment() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);

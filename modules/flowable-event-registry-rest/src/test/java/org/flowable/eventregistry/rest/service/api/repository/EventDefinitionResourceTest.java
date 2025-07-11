@@ -25,6 +25,7 @@ import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -40,6 +41,7 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single event definition. GET event-registry-repository/event-definitions/{eventDefinitionResource}
      */
+    @Test
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" })
     public void testGetEventDefinition() throws Exception {
 
@@ -69,12 +71,14 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting event definition. GET event-registry-repository/event-definitions/{eventDefinitionId}
      */
+    @Test
     public void testGetUnexistingEventDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     @EventDeploymentAnnotation(resources = { "simpleEvent.event" })
     public void testGetEventDefinitionResourceData() throws Exception {
         EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery().singleResult();
@@ -99,6 +103,7 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
     
+    @Test
     @EventDeploymentAnnotation(resources = { "simpleEvent.event" })
     public void testGetEventDefinitionModel() throws Exception {
         EventDefinition eventDefinition = repositoryService.createEventDefinitionQuery().singleResult();
@@ -125,6 +130,7 @@ public class EventDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting resource content for an unexisting event definition .
      */
+    @Test
     public void testGetResourceContentForUnexistingEventDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_EVENT_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);

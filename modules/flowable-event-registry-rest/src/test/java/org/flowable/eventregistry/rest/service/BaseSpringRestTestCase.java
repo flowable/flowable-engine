@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -32,202 +33,106 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.server.Server;
-import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.rest.conf.ApplicationConfiguration;
 import org.flowable.eventregistry.rest.service.api.RestUrlBuilder;
-import org.flowable.eventregistry.rest.util.TestServerUtil;
-import org.flowable.eventregistry.rest.util.TestServerUtil.TestServer;
-import org.flowable.eventregistry.test.EventTestHelper;
+import org.flowable.eventregistry.rest.util.TestServer;
+import org.flowable.eventregistry.spring.test.FlowableEventSpringExtension;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
+import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.TestCase;
-
-public abstract class BaseSpringRestTestCase extends TestCase {
+@SpringJUnitWebConfig(ApplicationConfiguration.class)
+@ExtendWith(FlowableEventSpringExtension.class)
+@ExtendWith(FlowableSpringExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
+public abstract class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-    
-    protected static final String EMPTY_LINE = "\n";
-    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-                    "ACT_GE_PROPERTY",
-                    "ACT_ID_PROPERTY",
-                    "FLW_EV_DATABASECHANGELOG",
-                    "FLW_EV_DATABASECHANGELOGLOCK"
-    );
 
-    protected static String SERVER_URL_PREFIX;
-    protected static RestUrlBuilder URL_BUILDER;
+    protected String SERVER_URL_PREFIX;
+    protected RestUrlBuilder URL_BUILDER;
 
-    protected static Server server;
-    protected static ApplicationContext appContext;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    protected static ProcessEngine processEngine;
+    @Autowired
+    protected ProcessEngine processEngine;
 
-    protected String processDeploymentId;
-    protected String deploymentId;
-    protected Throwable exception;
+    @Autowired
+    protected EventRegistryEngineConfiguration eventRegistryEngineConfiguration;
+    @Autowired
+    protected EventRepositoryService repositoryService;
+    @Autowired
+    protected EventManagementService managementService;
+    @Autowired
+    protected EventRegistry eventRegistry;
+    @Autowired
+    protected RepositoryService processRepositoryService;
+    @Autowired
+    protected RuntimeService processRuntimeService;
+    @Autowired
+    protected TaskService processTaskService;
+    @Autowired
+    protected IdmIdentityService idmIdentityService;
 
-    protected static EventRegistryEngineConfiguration eventRegistryEngineConfiguration;
-    protected static EventRepositoryService repositoryService;
-    protected static EventManagementService managementService;
-    protected static EventRegistry eventRegistry;
-    protected static RepositoryService processRepositoryService;
-    protected static RuntimeService processRuntimeService;
-    protected static TaskService processTaskService;
-    protected static IdmIdentityService idmIdentityService;
-
-    protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+    @Autowired
+    protected CloseableHttpClient client;
+    protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected DateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    static {
+    @Autowired
+    protected TestServer server;
 
-        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-        server = testServer.getServer();
-        appContext = testServer.getApplicationContext();
-        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-
-        // Lookup services
-        processEngine = appContext.getBean(ProcessEngine.class);
-        eventRegistryEngineConfiguration = appContext.getBean(EventRegistryEngineConfiguration.class);
-        repositoryService = appContext.getBean(EventRepositoryService.class);
-        managementService = appContext.getBean(EventManagementService.class);
-        eventRegistry = appContext.getBean(EventRegistry.class);
-        
-        processRepositoryService = appContext.getBean(RepositoryService.class);
-        processRuntimeService = appContext.getBean(RuntimeService.class);
-        processTaskService = appContext.getBean(TaskService.class);
-        
-        idmIdentityService = appContext.getBean(IdmIdentityService.class);
-
-        // Create http client for all tests
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-        provider.setCredentials(AuthScope.ANY, credentials);
-        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-        // Clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not close http client", e);
-                    }
-                }
-
-                if (server != null && server.isRunning()) {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        LOGGER.error("Error stopping server", e);
-                    }
-                }
-            }
-        });
-    }
-    
-    @Override
-    protected void runTest() throws Throwable {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(EMPTY_LINE);
-            LOGGER.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
-        }
-
-        try {
-
-            super.runTest();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            throw e;
-
-        } finally {
-            LOGGER.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
-        }
-    }
-
-    @Override
-    public void runBare() throws Throwable {
+    @BeforeEach
+    void init() {
         createUsers();
+        SERVER_URL_PREFIX = server.getServerUrlPrefix();
+        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+    }
 
-        try {
-
-            processDeploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
-            deploymentId = EventTestHelper.annotationDeploymentSetUp(repositoryService, getClass(), getName());
-
-            super.runBare();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            exception = e;
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            exception = e;
-            throw e;
-
-        } finally {
-            Authentication.setAuthenticatedUserId(null);
-            EventTestHelper.annotationDeploymentTearDown(repositoryService, deploymentId, getClass(), getName());
-            TestHelper.annotationDeploymentTearDown(processEngine, processDeploymentId, getClass(), getName());
-            dropUsers();
-            assertAndEnsureCleanDb();
-            eventRegistryEngineConfiguration.getClock().reset();
-            closeHttpConnections();
-        }
+    @AfterEach
+    void cleanup() {
+        Authentication.setAuthenticatedUserId(null);
+        dropUsers();
+        closeHttpConnections();
     }
 
     protected void createUsers() {
@@ -305,21 +210,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected void dropUsers() {
         idmIdentityService.deleteUser("kermit");
         idmIdentityService.deleteGroup("admin");
-    }
-
-    /**
-     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
-     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-     */
-    protected void assertAndEnsureCleanDb() throws Throwable {
-        EnsureCleanDbUtils.assertAndEnsureCleanDb(
-                getName(),
-                LOGGER,
-                eventRegistryEngineConfiguration,
-                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
-                exception == null,
-                eventRegistryEngineConfiguration.getSchemaManagementCmd()
-        );
     }
 
     protected void closeHttpConnections() {
