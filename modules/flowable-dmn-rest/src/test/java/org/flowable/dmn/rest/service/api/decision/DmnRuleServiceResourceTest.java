@@ -22,6 +22,7 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -34,6 +35,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
     public void testExecuteWithDecision() throws Exception {
         // Add decision key
@@ -55,6 +57,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         assertThat(resultVariables).hasSize(3);
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
     public void testExecuteWithDecisionSingleResult() throws Exception {
         // Add decision key
@@ -76,6 +79,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         assertThat(resultVariables).hasSize(1);
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
     public void testExecuteWithDecisionSingleResultViolated() throws Exception {
         // Add decision key
@@ -89,6 +93,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         executeRequest(httpPost, HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
     public void testExecuteWithDecisionService() throws Exception {
         // Add decision key
@@ -134,6 +139,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
     public void testExecuteWithDecisionServiceSingleResult() throws Exception {
         // Add decision key
@@ -164,6 +170,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
     public void testExecuteWithDecisionServiceSingleResultViolated() throws Exception {
         // Add decision key
@@ -177,6 +184,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         executeRequest(httpPost, HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
     public void testExecuteDecision() throws Exception {
         // Add decision key
@@ -222,6 +230,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
     public void testExecuteDecisionSingleResult() throws Exception {
         // Add decision key
@@ -252,6 +261,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
     public void testExecuteDecisionSingleResultViolated() throws Exception {
         // Add decision key
@@ -266,6 +276,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         executeRequest(httpPost, HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
     public void testExecuteDecisionService() throws Exception {
         // Add decision key
@@ -311,6 +322,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
     public void testExecuteDecisionServiceSingleResult() throws Exception {
         // Add decision key
@@ -341,6 +353,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "]");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
     public void testExecuteDecisionServiceSingleResultViolated() throws Exception {
         // Add decision key

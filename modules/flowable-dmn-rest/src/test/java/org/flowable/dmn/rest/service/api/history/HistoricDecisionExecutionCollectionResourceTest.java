@@ -20,6 +20,7 @@ import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -29,6 +30,7 @@ public class HistoricDecisionExecutionCollectionResourceTest extends BaseSpringD
     /**
      * Test getting deployments. GET dmn-history/historic-decision-executions
      */
+    @Test
     public void testGetHistoricDecisionExecutions() throws Exception {
 
         try {
@@ -91,6 +93,7 @@ public class HistoricDecisionExecutionCollectionResourceTest extends BaseSpringD
     /**
      * Test getting deployments. GET dmn-history/historic-decision-executions
      */
+    @Test
     public void testGetHistoricDecisionServiceExecutions() throws Exception {
 
         try {
