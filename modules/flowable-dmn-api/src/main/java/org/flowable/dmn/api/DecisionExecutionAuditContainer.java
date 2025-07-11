@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.api;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -256,7 +258,8 @@ public class DecisionExecutionAuditContainer {
     }
 
     protected static boolean isDate(Object obj) {
-        return (obj instanceof Date || obj instanceof DateTime || obj instanceof LocalDate);
+        return (obj instanceof Date || obj instanceof DateTime || obj instanceof LocalDate || obj instanceof java.time.LocalDate || obj instanceof LocalDateTime
+                || obj instanceof Instant);
     }
 
     protected static boolean isNumber(Object obj) {

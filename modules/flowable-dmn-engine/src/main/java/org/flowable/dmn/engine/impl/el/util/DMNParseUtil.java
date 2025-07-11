@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -128,6 +129,7 @@ public class DMNParseUtil {
         if (Date.class.equals(collectionType)) {
             return DateUtil.toDate(value);
         } else if (LocalDate.class.equals(collectionType)) {
+            JodaDeprecationLogger.LOGGER.warn("Using Joda-Time LocalDate has been deprecated and will be removed in a future version.");
             return new DateTime(DateUtil.toDate(value)).toLocalDate();
         } else if (Integer.class.equals(collectionType) || Long.class.equals(collectionType) || Float.class.equals(collectionType)
             || Double.class.equals(collectionType) || BigInteger.class.equals(collectionType)) {
