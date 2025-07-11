@@ -18,6 +18,7 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -29,6 +30,7 @@ public class AppDefinitionCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting app definitions. GET app-repository/app-definitions
      */
+    @Test
     public void testGetAppDefinitions() throws Exception {
 
         try {
