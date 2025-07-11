@@ -26,6 +26,7 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.dmn.rest.service.api.HttpMultipartHelper;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -39,6 +40,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFile() throws Exception {
 
         try {
@@ -85,6 +87,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFileDecisionService() throws Exception {
 
         try {
@@ -130,6 +133,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -193,6 +197,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
         }
     }
 
+    @Test
     public void testGetDeploymentsSorting() throws Exception {
 
         try {
@@ -289,6 +294,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeploymentsDecisionService() throws Exception {
 
         try {
@@ -352,6 +358,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
         }
     }
 
+    @Test
     public void testGetDeploymentsDecisionServiceSorting() throws Exception {
 
         try {

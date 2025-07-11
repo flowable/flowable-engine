@@ -27,6 +27,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDmnRestTestCase {
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetHistoricDecisionExecutionAuditData() throws Exception {
 
@@ -67,6 +69,7 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
                         + " }");
     }
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/decision_service-2.dmn" })
     public void testGetHistoricDecisionServiceExecutionAuditData() throws Exception {
         Map<String, Object> variables = new HashMap<>();
@@ -98,6 +101,7 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
                         + " }");
     }
 
+    @Test
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
         HttpGet httpGet = new HttpGet(
                 SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_AUDITDATA, "unexisting"));
