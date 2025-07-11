@@ -14,9 +14,12 @@ package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.test.FlowableAppExtension;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -26,13 +29,25 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Tijs Rademakers
  */
-public class DeploymentTest extends FlowableAppTestCase {
-    
+@ExtendWith(FlowableAppExtension.class)
+class DeploymentTest {
+
+    protected AppEngineConfiguration appEngineConfiguration;
+    protected AppRepositoryService appRepositoryService;
+
+    @BeforeEach
+    void setUp(AppEngine appEngine) {
+        appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        appRepositoryService = appEngine.getAppRepositoryService();
+    }
+
     @Test
     public void testAppDefinitionDeployed() throws Exception {
         String baseResourcePath = "org/flowable/engine/configurator/test/";
