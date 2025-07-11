@@ -23,7 +23,9 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.rest.TestInboundEventChannelAdapter;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
@@ -144,6 +146,14 @@ public class EngineConfiguration {
         return processEngine.getTaskService();
     }
     
+    @Bean
+    public EventRegistryEngine eventRegistryEngine(ProcessEngine processEngine) {
+        // The process engine needs to be injected, as otherwise it won't be initialized, which means that the EventRegistryEngine is not initialized yet
+        if (!EventRegistryEngines.isInitialized()) {
+            throw new IllegalStateException("Event registry has not been initialized");
+        }
+        return EventRegistryEngines.getDefaultEventRegistryEngine();
+    }
     @Bean
     public EventRepositoryService eventRepositoryService(ProcessEngine processEngine) {
         return getEventRegistryEngineConfiguration(processEngine).getEventRepositoryService();

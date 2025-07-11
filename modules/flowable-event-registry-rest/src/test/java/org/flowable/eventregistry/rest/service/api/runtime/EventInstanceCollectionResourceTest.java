@@ -29,11 +29,13 @@ import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml" })
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" })
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel" })
@@ -74,6 +76,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfterBoundary");
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml" })
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent2.event" })
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleChannel.channel" })
@@ -120,6 +123,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         repositoryService.deleteDeployment(deployment2.getId());
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/boundaryEvent.bpmn20.xml" }, tenantId = "tenant1")
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
@@ -196,6 +200,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "tenant1")
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
@@ -255,6 +260,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "")
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "")
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "")
@@ -295,6 +301,7 @@ public class EventInstanceCollectionResourceTest extends BaseSpringRestTestCase 
         }
     }
     
+    @Test
     @Deployment(resources = { "org/flowable/eventregistry/rest/service/api/repository/startEvent.bpmn20.xml" }, tenantId = "tenant1")
     @EventDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event" }, tenantId = "tenant1")
     @ChannelDeploymentAnnotation(resources = { "org/flowable/eventregistry/rest/service/api/repository/simpleTenantChannel.channel" }, tenantId = "tenant1")
