@@ -13,6 +13,7 @@
 package org.flowable.app.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -33,182 +34,82 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.server.Server;
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.app.engine.test.impl.AppTestHelper;
 import org.flowable.app.rest.conf.ApplicationConfiguration;
-import org.flowable.app.rest.util.TestServerUtil;
-import org.flowable.app.rest.util.TestServerUtil.TestServer;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.app.rest.util.TestServer;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.common.rest.util.RestUrlBuilder;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.TestCase;
-
-public class BaseSpringRestTestCase extends TestCase {
+@SpringJUnitWebConfig(ApplicationConfiguration.class)
+@ExtendWith(InternalFlowableAppSpringExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
+public class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-    
-    protected static final String EMPTY_LINE = "\n";
-    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-                    "ACT_GE_PROPERTY",
-                    "ACT_ID_PROPERTY",
-                    "ACT_APP_DATABASECHANGELOG",
-                    "ACT_APP_DATABASECHANGELOGLOCK",
-                    "ACT_CMMN_DATABASECHANGELOG",
-                    "ACT_CMMN_DATABASECHANGELOGLOCK",
-                    "ACT_FO_DATABASECHANGELOG",
-                    "ACT_FO_DATABASECHANGELOGLOCK",
-                    "FLW_EV_DATABASECHANGELOG",
-                    "FLW_EV_DATABASECHANGELOGLOCK"
-    );
 
-    protected static String SERVER_URL_PREFIX;
-    protected static RestUrlBuilder URL_BUILDER;
+    protected String SERVER_URL_PREFIX;
+    protected RestUrlBuilder URL_BUILDER;
 
-    protected static Server server;
-    protected static ApplicationContext appContext;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    protected static AppEngine appEngine;
+    @Autowired
+    protected AppEngine appEngine;
 
-    protected String deploymentId;
-    protected Throwable exception;
+    @Autowired
+    protected AppEngineConfiguration appEngineConfiguration;
+    @Autowired
+    protected AppRepositoryService repositoryService;
+    @Autowired
+    protected AppManagementService managementService;
 
-    protected static AppEngineConfiguration appEngineConfiguration;
-    protected static AppRepositoryService repositoryService;
-    protected static AppManagementService managementService;
-
-    protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+    @Autowired
+    protected CloseableHttpClient client;
+    protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
     protected DateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    static {
+    @Autowired
+    protected TestServer server;
 
-        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-        server = testServer.getServer();
-        appContext = testServer.getApplicationContext();
-        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+    @BeforeEach
+    void init() {
+        SERVER_URL_PREFIX = server.getServerUrlPrefix();
         URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-
-        // Lookup services
-        appEngine = appContext.getBean("appEngine", AppEngine.class);
-        appEngineConfiguration = appContext.getBean(AppEngineConfiguration.class);
-        repositoryService = appContext.getBean(AppRepositoryService.class);
-        managementService = appContext.getBean(AppManagementService.class);
-        
-        // Create http client for all tests
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-        provider.setCredentials(AuthScope.ANY, credentials);
-        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-        // Clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not close http client", e);
-                    }
-                }
-
-                if (server != null && server.isRunning()) {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        LOGGER.error("Error stopping server", e);
-                    }
-                }
-            }
-        });
-    }
-    
-    @Override
-    protected void runTest() throws Throwable {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(EMPTY_LINE);
-            LOGGER.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
-        }
-
-        try {
-
-            super.runTest();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            throw e;
-
-        } finally {
-            LOGGER.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
-        }
     }
 
-    @Override
-    public void runBare() throws Throwable {
-        try {
-
-            deploymentId = AppTestHelper.annotationDeploymentSetUp(appEngine, getClass(), getName());
-
-            super.runBare();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            exception = e;
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            exception = e;
-            throw e;
-
-        } finally {
-            AppTestHelper.annotationDeploymentTearDown(appEngine, deploymentId, getClass(), getName());
-            assertAndEnsureCleanDb();
-            appEngineConfiguration.getClock().reset();
-            closeHttpConnections();
-        }
+    @AfterEach
+    void cleanup() {
+        closeHttpConnections();
     }
 
     /**
@@ -260,21 +161,6 @@ public class BaseSpringRestTestCase extends TestCase {
                 throw new AssertionError("Could not close http connection", e);
             }
         }
-    }
-
-    /**
-     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
-     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-     */
-    protected void assertAndEnsureCleanDb() throws Throwable {
-        EnsureCleanDbUtils.assertAndEnsureCleanDb(
-                getName(),
-                LOGGER,
-                appEngineConfiguration,
-                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
-                exception == null,
-                appEngineConfiguration.getSchemaManagementCmd()
-        );
     }
 
     protected void closeHttpConnections() {

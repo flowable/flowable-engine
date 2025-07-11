@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -38,6 +39,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET app-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -96,6 +98,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetDeploymentsSorting() throws Exception {
 
         try {

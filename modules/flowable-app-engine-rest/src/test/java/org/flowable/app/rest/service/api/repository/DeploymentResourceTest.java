@@ -27,6 +27,7 @@ import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
 import org.flowable.app.rest.service.HttpMultipartHelper;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -42,6 +43,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying singe app file. POST app-repository/deployments
      */
+    @Test
     public void testPostNewDeploymentAppFile() throws Exception {
         try {
             // Upload a valid BPMN-file using multipart-data
@@ -87,6 +89,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying singe zip file. POST app-repository/deployments
      */
+    @Test
     public void testPostNewDeploymentZipFile() throws Exception {
         try {
             // Upload a valid BPMN-file using multipart-data
@@ -142,6 +145,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying an invalid file. POST app-repository/deployments
      */
+    @Test
     public void testPostNewDeploymentInvalidFile() throws Exception {
         // Upload a valid App-file using multipart-data
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_COLLECTION));
@@ -153,6 +157,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single deployment. GET app-repository/deployments/{deploymentId}
      */
+    @Test
     @org.flowable.app.engine.test.AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testGetDeployment() throws Exception {
         AppDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -179,6 +184,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting deployment. GET app-repository/deployments/{deploymentId}
      */
+    @Test
     public void testGetUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -188,23 +194,33 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single deployment. DELETE app-repository/deployments/{deploymentId}
      */
-    @org.flowable.app.engine.test.AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
+    @Test
     public void testDeleteDeployment() throws Exception {
-        AppDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertThat(existingDeployment).isNotNull();
+        AppDeployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/app/rest/service/api/repository/oneApp.app")
+                .deploy();
+        assertThat(deployment).isNotNull();
 
-        // Delete the deployment
-        HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
-        CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
-        closeResponse(response);
+        try {
+            // Delete the deployment
+            HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, deployment.getId()));
+            CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NO_CONTENT);
+            closeResponse(response);
 
-        existingDeployment = repositoryService.createDeploymentQuery().singleResult();
-        assertThat(existingDeployment).isNull();
+            deployment = repositoryService.createDeploymentQuery().singleResult();
+            assertThat(deployment).isNull();
+        } finally {
+            if (deployment != null) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+
     }
 
     /**
      * Test deleting an unexisting deployment. DELETE app-repository/deployments/{deploymentId}
      */
+    @Test
     public void testDeleteUnexistingDeployment() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);

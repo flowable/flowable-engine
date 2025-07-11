@@ -28,6 +28,7 @@ import org.apache.http.message.BasicHeader;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,6 +44,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single resource, deployed in a deployment. GET app-repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResource() throws Exception {
         try {
             String rawResourceName = "org/flowable/app/rest/service/api/repository/oneApp.app";
@@ -78,6 +80,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single resource for an unexisting deployment. GET app-repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
         httpGet.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "image/png,application/json"));
@@ -87,6 +90,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting resource for an existing deployment. GET app-repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceUnexistingResource() throws Exception {
         try {
             AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1").addInputStream("test.txt", new ByteArrayInputStream("Test content".getBytes())).deploy();
@@ -107,6 +111,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a deployment resource content. GET app-repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceContent() throws Exception {
         try {
             AppDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
