@@ -41,7 +41,6 @@ public abstract class AppTestHelper {
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(AppEngine appEngine, Class<?> testClass, String methodName) {
-        String deploymentId = null;
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -50,6 +49,12 @@ public abstract class AppTestHelper {
             return null;
         }
         AppDeployment deploymentAnnotation = method.getAnnotation(AppDeployment.class);
+        return annotationDeploymentSetUp(appEngine, testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(AppEngine appEngine, Class<?> testClass, Method method, AppDeployment deploymentAnnotation) {
+        String deploymentId = null;
+        String methodName = method.getName();
         if (deploymentAnnotation != null) {
             LOGGER.debug("annotation @AppDeployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();

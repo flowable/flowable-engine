@@ -18,13 +18,13 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppModel;
 import org.flowable.app.api.repository.AppResourceConverter;
-import org.flowable.app.engine.test.FlowableAppTestCase;
-import org.junit.Test;
+import org.flowable.app.engine.test.BaseFlowableAppTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class CustomAppModelTest extends FlowableAppTestCase {
+class CustomAppModelTest extends BaseFlowableAppTest {
     
     @Test
     public void testAppDefinitionDeployed() throws Exception {

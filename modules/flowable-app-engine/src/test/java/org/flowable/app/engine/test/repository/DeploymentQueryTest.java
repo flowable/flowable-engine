@@ -20,21 +20,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.test.BaseFlowableAppTest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class DeploymentQueryTest extends FlowableAppTestCase {
+class DeploymentQueryTest extends BaseFlowableAppTest {
     
     private String deploymentId1;
     private String deploymentId2;
     
-    @Before
+    @BeforeEach
     public void deployTestDeployments() {
         this.deploymentId1 = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/app/engine/test/test.app")
@@ -48,7 +48,7 @@ public class DeploymentQueryTest extends FlowableAppTestCase {
             .getId();
     }
     
-    @After
+    @AfterEach
     public void deleteTestDeployments() {
         List<AppDeployment> deployments = appRepositoryService.createDeploymentQuery().list();
         for (AppDeployment appDeployment : deployments) {
