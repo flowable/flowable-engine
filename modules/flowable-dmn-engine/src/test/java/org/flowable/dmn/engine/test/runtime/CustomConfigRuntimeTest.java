@@ -18,14 +18,14 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.flowable.dmn.engine.test.DmnConfigurationResource;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
@@ -35,46 +35,49 @@ public class CustomConfigRuntimeTest {
     protected static final String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
     protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
 
-    @Rule
-    public FlowableDmnRule flowableRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
 
-    @Rule
-    public FlowableDmnRule flowableRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
+    @Nested
+    @DmnConfigurationResource(ENGINE_CONFIG_1)
+    class CustomFunction extends BaseFlowableDmnTest {
 
-    @Test
-    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void postCustomExpressionFunction() {
+        @Test
+        @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+        public void postCustomExpressionFunction() {
+            DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
-        DmnEngine dmnEngine = flowableRule1.getDmnEngine();
-        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+            LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+            Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+                    .decisionKey("decision")
+                    .variable("input1", localDate.toDate())
+                    .executeWithSingleResult();
 
-        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
-                .decisionKey("decision")
-                .variable("input1", localDate.toDate())
-                .executeWithSingleResult();
+            assertThat(result).containsEntry("output1", "test2");
+        }
 
-        assertThat(result).containsEntry("output1", "test2");
     }
 
-    @Test
-    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void customExpressionFunctionMissingDefaultFunction() {
+    @Nested
+    @DmnConfigurationResource(ENGINE_CONFIG_2)
+    class CustomFunctionMissingDefault extends BaseFlowableDmnTest {
 
-        DmnEngine dmnEngine = flowableRule2.getDmnEngine();
-        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        @Test
+        @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+        public void customExpressionFunctionMissingDefaultFunction() {
+            DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+            LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
-                .decisionKey("decision")
-                .variable("input1", localDate.toDate())
-                .executeWithAuditTrail();
+            DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
+                    .decisionKey("decision")
+                    .variable("input1", localDate.toDate())
+                    .executeWithAuditTrail();
 
-        assertThat(result.getDecisionResult()).isEmpty();
-        assertThat(result.isFailed()).isTrue();
+            assertThat(result.getDecisionResult()).isEmpty();
+            assertThat(result.isFailed()).isTrue();
+        }
+
     }
 }

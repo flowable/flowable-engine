@@ -21,8 +21,9 @@ import java.util.List;
 
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
-import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -31,8 +32,9 @@ import net.javacrumbs.jsonunit.core.Option;
 /**
  * @author Tijs Rademakers
  */
-public class HistoryTest extends PluggableFlowableDmnTestCase {
+class HistoryTest extends BaseFlowableDmnTest {
 
+    @Test
     @DmnDeployment
     public void testFirstHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -104,6 +106,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
                         + "}");
     }
     
+    @Test
     @DmnDeployment
     public void testOutputOrderHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -181,6 +184,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
                         + "}");
     }
     
+    @Test
     @DmnDeployment
     public void testPriorityHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -266,6 +270,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
                         + "}");
     }
     
+    @Test
     @DmnDeployment
     public void testHistoricDecisionQueryOrdering() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -313,6 +318,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         }
     }
     
+    @Test
     @DmnDeployment
     public void testHistoricDecisionQueryOrderingAndPaging() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -360,6 +366,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         }
     }
 
+    @Test
     @DmnDeployment
     public void testHistoricDecisionService() throws Exception {
         ruleService.createExecuteDecisionBuilder()
@@ -400,6 +407,7 @@ public class HistoryTest extends PluggableFlowableDmnTestCase {
         assertThat(ruleExecutions.has("decision2")).isTrue();
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/history/HistoryTest.testHistoricDecisionService.dmn")
     public void testHistoricDecisionServiceNativeQuery() throws Exception {
         ruleService.createExecuteDecisionBuilder()
