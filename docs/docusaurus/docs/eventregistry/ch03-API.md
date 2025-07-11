@@ -74,9 +74,9 @@ The Query API allows to program completely typesafe queries with a fluent API. Y
 
 As the Flowable Event Registry is an embeddable Java engine, writing unit tests for Event and Channel definitions is as simple as writing regular unit tests.
 
-Flowable supports the JUnit version 5 style of unit testing.
+Flowable supports the JUnit Jupiter style of unit testing.
 
-In the JUnit 5 style one needs to register the org.flowable.eventregistry.test.FlowableEventExtension.
+In the JUnit Jupiter style one needs to register the org.flowable.eventregistry.test.FlowableEventExtension.
 Registering the FlowableEventExtension can be done with @ExtendWith(FlowableEventExtension.class).
 This will make the EventRegistryEngine and the services available as parameters into the test and lifecycle methods
 (@BeforeAll, @BeforeEach, @AfterEach, @AfterAll).
@@ -97,9 +97,9 @@ In case there are no resources defined, a resource file of the form testClassNam
 At the end of the test, the deployment will be deleted, including all related event and channel definitions.
 See the EventDeploymentAnnotation class for more information.
 
-Taking all that in account, a JUnit 5 test looks as follows:
+Taking all that in account, a JUnit Jupiter test looks as follows:
 
-**JUnit 5 test with default resource.**
+**JUnit Jupiter test with default resource.**
 
     @ExtendWith(FlowableEventExtension.class)
     class MyEventDefinitionTest {
@@ -118,7 +118,7 @@ Taking all that in account, a JUnit 5 test looks as follows:
       }
     }
 
-**JUnit 5 test with custom resource.**
+**JUnit Jupiter test with custom resource.**
 
     @ExtendWith(FlowableEventExtension.class)
     @EventConfigurationResource("flowable.custom.eventregistry.cfg.xml")

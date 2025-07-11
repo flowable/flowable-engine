@@ -65,7 +65,9 @@ import org.junit.runners.model.Statement;
  * </p>
  * 
  * @author Tom Baeyens
+ * @deprecated Use JUnit Jupiter with {@link FlowableAppExtension} instead
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableAppRule implements TestRule {
 
     protected String configurationResource = "flowable.app.cfg.xml";

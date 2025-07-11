@@ -50,7 +50,11 @@ public class HistoryTestHelper {
         
         return false;
     }
-    
+
+    /**
+     * @deprecated {@link #waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration, ManagementService, long, long, boolean)}
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static void waitForJobExecutorToProcessAllHistoryJobs(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
     }
@@ -111,6 +115,10 @@ public class HistoryTestHelper {
         }
     }
 
+    /**
+     * @deprecated use {@link #areHistoryJobsAvailable(ManagementService)} instead.
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static boolean areHistoryJobsAvailable(FlowableRule activitiRule) {
         return areHistoryJobsAvailable(activitiRule.getManagementService());
 
