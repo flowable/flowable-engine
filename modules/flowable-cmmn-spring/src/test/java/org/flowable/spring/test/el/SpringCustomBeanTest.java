@@ -15,29 +15,43 @@ package org.flowable.spring.test.el;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.test.FlowableCmmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Tijs Rademakers
  */
+@SpringJUnitConfig(locations = {
+        "SpringBeanTest-context.xml"
+})
+@ExtendWith(FlowableCmmnSpringExtension.class)
 public class SpringCustomBeanTest {
 
-    @Rule
-    public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/spring/test/el/SpringBeanTest-context.xml");
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
+
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
+
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
+
 
     @Test
     public void testSimpleCaseBean() {
-        cmmnRule.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/spring/test/el/springExpression.cmmn").deploy();
+        cmmnRepositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/el/springExpression.cmmn").deploy();
         
         try {
-            CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                             .caseDefinitionKey("myCase")
                             .variable("var1", "John Doe")
@@ -57,7 +71,7 @@ public class SpringCustomBeanTest {
             cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
             
-            assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .variableName("customResponse")
                     .singleResult().getValue()).isEqualTo("hello John Doe");
@@ -70,8 +84,8 @@ public class SpringCustomBeanTest {
     // ----------------------------------------------------------
 
     private void removeAllDeployments() {
-        for (CmmnDeployment deployment : cmmnRule.getCmmnRepositoryService().createDeploymentQuery().list()) {
-            cmmnRule.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true);
+        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
+            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
 
