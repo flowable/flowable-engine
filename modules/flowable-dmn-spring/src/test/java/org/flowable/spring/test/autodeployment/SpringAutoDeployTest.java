@@ -304,6 +304,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
             @Value("${jdbc.password:}") String password
         ) {
             HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setMinimumIdle(0);
             dataSource.setJdbcUrl(url);
             dataSource.setDriverClassName(driver);
             dataSource.setUsername(username);

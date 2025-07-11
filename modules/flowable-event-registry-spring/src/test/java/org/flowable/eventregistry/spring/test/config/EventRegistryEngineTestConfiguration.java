@@ -46,6 +46,7 @@ public class EventRegistryEngineTestConfiguration {
         @Value("${jdbc.password:}") String jdbcPassword
     ) {
         HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setMinimumIdle(0);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriverClass);
         dataSource.setUsername(jdbcUsername);
