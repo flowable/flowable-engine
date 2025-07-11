@@ -315,6 +315,7 @@ public class SpringAutoDeployTest {
                 @Value("${jdbc.password:}") String password
         ) {
             HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setMinimumIdle(0);
             dataSource.setJdbcUrl(url);
             dataSource.setDriverClassName(driver);
             dataSource.setUsername(username);

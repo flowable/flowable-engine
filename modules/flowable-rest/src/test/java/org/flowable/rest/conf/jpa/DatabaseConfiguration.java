@@ -62,6 +62,7 @@ public class DatabaseConfiguration {
     @Bean
     public DataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setMinimumIdle(0);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriver);
         dataSource.setUsername(jdbcUsername);
