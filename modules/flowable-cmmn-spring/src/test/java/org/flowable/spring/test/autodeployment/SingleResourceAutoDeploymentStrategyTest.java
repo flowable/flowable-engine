@@ -23,21 +23,21 @@ import static org.mockito.Mockito.verify;
 import java.io.InputStream;
 
 import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private SingleResourceAutoDeploymentStrategy classUnderTest;
 
-    @Before
+    @BeforeEach
     @Override
     public void before() throws Exception {
         super.before();

@@ -33,6 +33,7 @@
 
     <bean id="cmmnRepositoryService" factory-bean="cmmnEngine" factory-method="getCmmnRepositoryService"/>
     <bean id="cmmnRuntimeService" factory-bean="cmmnEngine" factory-method="getCmmnRuntimeService"/>
+    <bean id="cmmnHistoryService" factory-bean="cmmnEngine" factory-method="getCmmnHistoryService"/>
     
     <bean id="customBean" class="org.flowable.spring.test.el.CustomBean" />
 

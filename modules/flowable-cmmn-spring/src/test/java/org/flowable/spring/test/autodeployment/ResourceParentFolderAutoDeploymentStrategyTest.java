@@ -26,17 +26,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.flowable.cmmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private ResourceParentFolderAutoDeploymentStrategy classUnderTest;
@@ -50,7 +50,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     private final String parentFilename1 = "parentFilename1";
     private final String parentFilename2 = "parentFilename2";
 
-    @Before
+    @BeforeEach
     @Override
     public void before() throws Exception {
         super.before();

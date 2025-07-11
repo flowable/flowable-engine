@@ -23,6 +23,7 @@ import org.junit.Test;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated(forRemoval = true)
 public class SpringJunit4Test {
     
     @Rule
