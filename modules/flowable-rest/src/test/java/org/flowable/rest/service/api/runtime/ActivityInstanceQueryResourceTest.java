@@ -118,6 +118,10 @@ public class ActivityInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
 
         requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("processInstanceIds").add("someOtherId").add(processInstance.getId());
+        assertResultsPresentInDataResponse(url, requestNode, 5, "theStart", "flow1", "processTask", "flow2", "processTask2");
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processInstance.getProcessDefinitionId());
         assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "processTask", "flow2", "processTask2");
 

@@ -13,8 +13,9 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import org.flowable.common.rest.api.PaginateRequest;
+import java.util.Set;
 
+import org.flowable.common.rest.api.PaginateRequest;
 /**
  * @author Tijs Rademakers
  */
@@ -29,6 +30,7 @@ public class ActivityInstanceQueryRequest extends PaginateRequest {
     private String taskAssignee;
     private String taskCompletedBy;
     private String processInstanceId;
+    private Set<String> processInstanceIds;
     private String processDefinitionId;
     private String tenantId;
     private String tenantIdLike;
@@ -136,5 +138,13 @@ public class ActivityInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Set<String> getProcessInstanceIds() {
+        return processInstanceIds;
+    }
+
+    public void setProcessInstanceIds(Set<String> processInstanceIds) {
+        this.processInstanceIds = processInstanceIds;
     }
 }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -37,6 +38,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
     PlanItemInstanceQuery derivedCaseDefinitionId(String derivedCaseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
+    PlanItemInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
 
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);
 
