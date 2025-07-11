@@ -22,6 +22,7 @@ import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,6 +33,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class DecisionTableModelResourceTest extends BaseSpringDmnRestTestCase {
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionTableModel() throws Exception {
 
