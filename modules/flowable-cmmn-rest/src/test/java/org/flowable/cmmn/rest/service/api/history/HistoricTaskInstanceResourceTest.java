@@ -41,7 +41,10 @@ import org.flowable.form.api.FormService;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -52,6 +55,7 @@ import net.javacrumbs.jsonunit.core.Option;
  *
  * @author Tijs Rademakers
  */
+@MockitoSettings
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
 
     @Mock
@@ -60,9 +64,16 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Mock
     protected FormService formEngineFormService;
 
+    @AfterEach
+    void tearDown() {
+        cmmnEngineConfiguration.getEngineConfigurations()
+                .remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
+
     /**
      * Test getting a single task, spawned by a case. GET cmmn-history/historic-task-instances/{taskId}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseTask() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
@@ -107,6 +118,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single task, created using the API. GET cmmn-history/historic-task-instances/{taskId}
      */
+    @Test
     public void testGetTaskAdhoc() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
@@ -167,6 +179,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single task. DELETE cmmn-history/historic-task-instances/{taskId}
      */
+    @Test
     public void testDeleteTask() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
@@ -200,43 +213,41 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskWithFormCase.cmmn" })
     public void testCompletedTaskForm() throws Exception {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            runUsingMocks(() -> {
-                Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
-                engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
-                CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
-                CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-                Task task = taskService.createTaskQuery().scopeId(caseInstance.getId()).singleResult();
-                String taskId = task.getId();
+            CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
+            CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+            Task task = taskService.createTaskQuery().scopeId(caseInstance.getId()).singleResult();
+            String taskId = task.getId();
 
-                FormInfo formInfo = new FormInfo();
-                formInfo.setId("formDefId");
-                formInfo.setKey("formDefKey");
-                formInfo.setName("Form Definition Name");
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
 
-                when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-                when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId(), taskId,
-                        Collections.emptyMap(), task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant()))
-                        .thenReturn(formInfo);
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId(), taskId,
+                    Collections.emptyMap(), task.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
-                String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
-                CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS)
-                        .isEqualTo("{"
-                                + "  id: 'formDefId',"
-                                + "  name: 'Form Definition Name',"
-                                + "  key: 'formDefKey',"
-                                + "  type: 'historicTaskForm',"
-                                + "  historicTaskId: '" + taskId +"'"
-                                + "}");
-            });
-
+            String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS)
+                    .isEqualTo("{"
+                            + "  id: 'formDefId',"
+                            + "  name: 'Form Definition Name',"
+                            + "  key: 'formDefKey',"
+                            + "  type: 'historicTaskForm',"
+                            + "  historicTaskId: '" + taskId +"'"
+                            + "}");
         }
     }
 }

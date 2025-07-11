@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.identitylink.api.IdentityLink;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,6 +46,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
     /**
      * Test getting identitylinks for a case definition.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetIdentityLinksForProcessDefinition() throws Exception {
 
@@ -78,6 +80,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
                         + "]");
     }
 
+    @Test
     public void testGetIdentityLinksForUnexistingCaseDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(
                 SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINKS_COLLECTION, "unexisting"));
@@ -85,6 +88,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testAddCandidateStarterToCaseDefinition() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -142,6 +146,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         repositoryService.deleteCandidateStarterUser(caseDefinition.getId(), "admin");
     }
 
+    @Test
     public void testAddCandidateStarterToUnexistingCaseDefinition() throws Exception {
         // Create user candidate
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -154,6 +159,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCaseWithStarters.cmmn" })
     public void testGetCandidateStarterFromCaseDefinition() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -193,6 +199,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteCandidateStarterFromCaseDefinition() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -222,6 +229,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         assertThat(remainingLinks).isEmpty();
     }
 
+    @Test
     public void testDeleteCandidateStarterFromUnexistingCaseDefinition() throws Exception {
         HttpDelete httpDelete = new HttpDelete(
                 SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, "unexisting", "groups", "admin"));
@@ -229,6 +237,7 @@ public class CaseDefinitionIdentityLinksResourceTest extends BaseSpringRestTestC
         closeResponse(response);
     }
 
+    @Test
     public void testGetCandidateStarterFromUnexistingCaseDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(
                 SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IDENTITYLINK, "unexisting", "groups", "admin"));

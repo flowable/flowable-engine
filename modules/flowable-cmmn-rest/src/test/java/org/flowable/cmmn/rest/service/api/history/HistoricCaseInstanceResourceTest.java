@@ -30,6 +30,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -47,6 +48,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test retrieval of historic case instances. GET cmmn-history/historic-case-instances/{caseInstanceId}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -94,6 +96,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverview() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -160,6 +163,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverviewWithExclusions() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
@@ -208,6 +212,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverviewWithoutDisplayOrder() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
@@ -266,6 +271,7 @@ public class HistoricCaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(historyService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count()).isEqualTo(1);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageAndMilestoneOverview() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -32,19 +33,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.server.Server;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -53,184 +48,93 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
+import org.flowable.cmmn.engine.test.CmmnDeploymentId;
 import org.flowable.cmmn.rest.conf.ApplicationConfiguration;
 import org.flowable.cmmn.rest.service.api.RestUrlBuilder;
-import org.flowable.cmmn.rest.util.TestServerUtil;
-import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
+import org.flowable.cmmn.rest.util.TestServer;
+import org.flowable.cmmn.spring.impl.test.InternalFlowableCmmnSpringExtension;
 import org.flowable.common.engine.impl.identity.Authentication;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
-import org.junit.function.ThrowingRunnable;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.MockitoSession;
-import org.mockito.quality.Strictness;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import junit.framework.TestCase;
-
-public abstract class BaseSpringRestTestCase extends TestCase {
+@SpringJUnitWebConfig(ApplicationConfiguration.class)
+@ExtendWith(InternalFlowableCmmnSpringExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
+public abstract class BaseSpringRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringRestTestCase.class);
-    
-    protected static final String EMPTY_LINE = "\n";
-    protected static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Arrays.asList(
-        "ACT_GE_PROPERTY",
-        "ACT_ID_PROPERTY",
-        "ACT_CMMN_DATABASECHANGELOG",
-        "ACT_CMMN_DATABASECHANGELOGLOCK",
-        "ACT_FO_DATABASECHANGELOG",
-        "ACT_FO_DATABASECHANGELOGLOCK",
-        "FLW_EV_DATABASECHANGELOG",
-        "FLW_EV_DATABASECHANGELOGLOCK"
-    );
 
-    protected static String SERVER_URL_PREFIX;
-    protected static RestUrlBuilder URL_BUILDER;
+    protected String SERVER_URL_PREFIX;
+    protected RestUrlBuilder URL_BUILDER;
 
-    protected static Server server;
-    protected static ApplicationContext appContext;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    protected ObjectMapper objectMapper;
 
-    protected static CmmnEngine cmmnEngine;
+    @Autowired
+    protected CmmnEngine cmmnEngine;
 
     protected String deploymentId;
-    protected Throwable exception;
 
-    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected static CmmnRepositoryService repositoryService;
-    protected static CmmnRuntimeService runtimeService;
-    protected static CmmnTaskService taskService;
-    protected static CmmnHistoryService historyService;
-    protected static CmmnManagementService managementService;
-    protected static IdmIdentityService identityService;
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    @Autowired
+    protected CmmnRepositoryService repositoryService;
+    @Autowired
+    protected CmmnRuntimeService runtimeService;
+    @Autowired
+    protected CmmnTaskService taskService;
+    @Autowired
+    protected CmmnHistoryService historyService;
+    @Autowired
+    protected CmmnManagementService managementService;
+    @Autowired
+    protected IdmIdentityService identityService;
 
-    protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+    @Autowired
+    protected CloseableHttpClient client;
+    protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+
+    @Autowired
+    protected TestServer server;
 
     protected DateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     protected DateFormat formatWithoutSeconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
     protected DateFormat formatWithMS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-
-    static {
-
-        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-        server = testServer.getServer();
-        appContext = testServer.getApplicationContext();
-        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
-        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-
-        // Lookup services
-        cmmnEngine = appContext.getBean("cmmnEngine", CmmnEngine.class);
-        cmmnEngineConfiguration = appContext.getBean(CmmnEngineConfiguration.class);
-        repositoryService = appContext.getBean(CmmnRepositoryService.class);
-        runtimeService = appContext.getBean(CmmnRuntimeService.class);
-        taskService = appContext.getBean(CmmnTaskService.class);
-        historyService = appContext.getBean(CmmnHistoryService.class);
-        managementService = appContext.getBean(CmmnManagementService.class);
-        identityService = appContext.getBean(IdmIdentityService.class);
-
-        // Create http client for all tests
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-        provider.setCredentials(AuthScope.ANY, credentials);
-        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-        // Clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not close http client", e);
-                    }
-                }
-
-                if (server != null && server.isRunning()) {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        LOGGER.error("Error stopping server", e);
-                    }
-                }
-            }
-        });
-    }
-    
-    @Override
-    protected void runTest() throws Throwable {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(EMPTY_LINE);
-            LOGGER.debug("#### START {}.{} ###########################################################", this.getClass().getSimpleName(), getName());
-        }
-
-        try {
-
-            super.runTest();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            throw e;
-
-        } finally {
-            LOGGER.debug("#### END {}.{} #############################################################", this.getClass().getSimpleName(), getName());
-        }
-    }
-
-    @Override
-    public void runBare() throws Throwable {
+    @BeforeEach
+    void init(@CmmnDeploymentId String deploymentId) {
+        this.deploymentId = deploymentId;
         createUsers();
+        SERVER_URL_PREFIX = server.getServerUrlPrefix();
+        URL_BUILDER = RestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
+    }
 
-        try {
-
-            deploymentId = CmmnTestHelper.annotationDeploymentSetUp(cmmnEngine, getClass(), getName());
-
-            super.runBare();
-
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            exception = e;
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            exception = e;
-            throw e;
-
-        } finally {
-            Authentication.setAuthenticatedUserId(null);
-            CmmnTestHelper.annotationDeploymentTearDown(cmmnEngine, deploymentId, getClass(), getName());
-            dropUsers();
-            assertAndEnsureCleanDb();
-            cmmnEngineConfiguration.getClock().reset();
-            closeHttpConnections();
-        }
+    @AfterEach
+    void cleanup() {
+        Authentication.setAuthenticatedUserId(null);
+        dropUsers();
+        closeHttpConnections();
     }
 
     protected void createUsers() {
@@ -300,21 +204,6 @@ public abstract class BaseSpringRestTestCase extends TestCase {
     protected void dropUsers() {
         identityService.deleteUser("kermit");
         identityService.deleteGroup("admin");
-    }
-
-    /**
-     * Each test is assumed to clean up all DB content it entered. After a test method executed, this method scans all tables to see if the DB is completely clean. It throws AssertionFailed in case
-     * the DB is not clean. If the DB is not clean, it is cleaned by performing a create a drop.
-     */
-    protected void assertAndEnsureCleanDb() throws Throwable {
-        EnsureCleanDbUtils.assertAndEnsureCleanDb(
-                getName(),
-                LOGGER,
-                cmmnEngineConfiguration,
-                TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
-                exception == null,
-                cmmnEngineConfiguration.getSchemaManagementCmd()
-        );
     }
 
     protected void closeHttpConnections() {
@@ -485,20 +374,4 @@ public abstract class BaseSpringRestTestCase extends TestCase {
         return URL_BUILDER.buildUrl(fragments, arguments);
     }
 
-    protected void runUsingMocks(ThrowingRunnable runnable) {
-        MockitoSession mockitoSession = Mockito.mockitoSession()
-                .name(getName())
-                .strictness(Strictness.STRICT_STUBS)
-                .initMocks(this)
-                .startMocking();
-
-        try (AutoCloseable ignored = MockitoAnnotations.openMocks(this)) {
-            runnable.run();
-            mockitoSession.finishMocking();
-        } catch (Throwable exception) {
-            mockitoSession.finishMocking(exception);
-        } finally {
-            cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
-        }
-    }
 }

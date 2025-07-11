@@ -27,6 +27,7 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -42,6 +43,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying single cmmn file. POST cmmn-repository/deployments
      */
+    @Test
     public void testPostNewDeploymentCmmnFile() throws Exception {
         try {
             // Upload a valid BPMN-file using multipart-data
@@ -89,6 +91,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deploying an invalid file. POST repository/deployments
      */
+    @Test
     public void testPostNewDeploymentInvalidFile() throws Exception {
         // Upload a valid BPMN-file using multipart-data
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_COLLECTION));
@@ -100,6 +103,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -126,6 +130,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting deployment. GET repository/deployments/{deploymentId}
      */
+    @Test
     public void testGetUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
@@ -135,6 +140,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     @org.flowable.cmmn.engine.test.CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteDeployment() throws Exception {
         CmmnDeployment existingDeployment = repositoryService.createDeploymentQuery().singleResult();
@@ -153,6 +159,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting deployment. DELETE repository/deployments/{deploymentId}
      */
+    @Test
     public void testDeleteUnexistingDeployment() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND);

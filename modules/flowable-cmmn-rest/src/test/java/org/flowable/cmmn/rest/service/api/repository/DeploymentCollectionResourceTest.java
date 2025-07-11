@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -38,6 +39,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET cmmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -98,6 +100,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetDeploymentsSorting() throws Exception {
 
         try {

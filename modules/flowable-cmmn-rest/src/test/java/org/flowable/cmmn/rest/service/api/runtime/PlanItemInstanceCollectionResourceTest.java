@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,6 +42,7 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
     /**
      * Test getting a list of plan item instance, using all possible filters.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetPlanItemInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -72,6 +74,7 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
     /**
      * Test getting a list of plan item instances, using all possible filters.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItemInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").businessKey("myBusinessKey").start();
@@ -110,6 +113,7 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
         assertResultsPresentInDataResponse(url, activePlanItemId, endedPlanItemId);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItemInstancesWithLocalVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
