@@ -34,6 +34,10 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 // between Junit3 and junit 4 test support classes
 public class JobTestHelper {
 
+    /**
+     * @deprecated Use {@link #waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration, ManagementService, long, long)}
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static void waitForJobExecutorToProcessAllJobs(FlowableRule rule, long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllJobs(rule.getProcessEngine().getProcessEngineConfiguration(),
             rule.getManagementService(), maxMillisToWait, intervalMillis);
@@ -73,6 +77,10 @@ public class JobTestHelper {
             maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
+    /**
+     * @deprecated Use {@link #waitForJobExecutorOnCondition(ProcessEngineConfiguration, long, long, Callable)}
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static void waitForJobExecutorOnCondition(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
         waitForJobExecutorOnCondition(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis, condition);
     }
@@ -109,6 +117,10 @@ public class JobTestHelper {
         }
     }
 
+    /**
+     * @deprecated Use {@link #executeJobExecutorForTime(ProcessEngineConfiguration, long, long)}
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static void executeJobExecutorForTime(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
         executeJobExecutorForTime(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis);
     }
@@ -136,6 +148,10 @@ public class JobTestHelper {
         }
     }
 
+    /**
+     * @deprecated Use {@link #areJobsAvailable(ManagementService)}
+     */
+    @Deprecated(forRemoval = true, since = "7.2.0")
     public static boolean areJobsAvailable(FlowableRule activitiRule) {
         return areJobsAvailable(activitiRule.getManagementService());
 

@@ -21,6 +21,7 @@ import org.flowable.engine.test.FlowableTestCase;
 /**
  * @author Joram Barrez
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableTestCaseTest extends FlowableTestCase {
 
     @Deployment
