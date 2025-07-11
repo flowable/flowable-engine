@@ -14,21 +14,21 @@ package org.flowable.dmn.engine.test.deployment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-public class DeploymentQueryTest extends AbstractFlowableDmnTest {
+class DeploymentQueryTest extends BaseFlowableDmnTest {
     
     private String deploymentId1;
     private String deploymentId2;
     private String deploymentId3;
     
-    @Before
+    @BeforeEach
     public void deploy() {
         deploymentId1 = repositoryService.createDeployment()
                 .name("test1.dmn")
@@ -52,7 +52,7 @@ public class DeploymentQueryTest extends AbstractFlowableDmnTest {
                 .deploy().getId();
     }
     
-    @After
+    @AfterEach
     public void cleanup() {
         repositoryService.deleteDeployment(deploymentId1);
         repositoryService.deleteDeployment(deploymentId2);

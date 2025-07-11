@@ -21,22 +21,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Yvo Swillens
  */
-public class RuntimeTest extends AbstractFlowableDmnTest {
-
-    public ObjectMapper objectMapper = new ObjectMapper();
+public class RuntimeTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
@@ -404,7 +401,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/json.dmn")
     public void testJsonNumbers1() {
         Map<String, Object> processVariablesInput = new HashMap<>();
-        ObjectNode inputNode = objectMapper.createObjectNode();
+        ObjectNode inputNode = dmnEngineConfiguration.getObjectMapper().createObjectNode();
         inputNode.put("value", 5L);
 
         processVariablesInput.put("inputVariable1", inputNode);

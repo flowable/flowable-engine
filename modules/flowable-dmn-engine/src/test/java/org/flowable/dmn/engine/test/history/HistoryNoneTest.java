@@ -14,18 +14,18 @@ package org.flowable.dmn.engine.test.history;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.dmn.engine.impl.test.ResourceFlowableDmnTestCase;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.flowable.dmn.engine.test.DmnConfigurationResource;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoryNoneTest extends ResourceFlowableDmnTestCase {
-    
-    public HistoryNoneTest() {
-        super("historynone.flowable.dmn.cfg.xml");
-    }
+@DmnConfigurationResource(value = "historynone.flowable.dmn.cfg.xml")
+class HistoryNoneTest extends BaseFlowableDmnTest {
 
+    @Test
     @DmnDeployment
     public void testFirstHitPolicy() throws Exception {
         ruleService.createExecuteDecisionBuilder()

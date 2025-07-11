@@ -26,21 +26,15 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DecisionServiceTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class DecisionServiceTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/simple_decisionservice.dmn")
     public void executeDecisionServiceDecisionExecutionOrder() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -64,7 +58,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/simple_decisionservice.dmn")
     public void evaluateDecisionServiceDecisionExecutionOrder() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -88,7 +81,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/related_decisionservice.dmn")
     public void executeDecisionServiceWithDecisionOutcomes() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -110,7 +102,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/evaluateMortgageRequestService.dmn")
     public void executeEvaluateMortgageRequest() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -136,7 +127,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/evaluateMortgageRequestService.dmn")
     public void evaluateMortgageRequest() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -162,7 +152,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
     public void executeDecisionServiceMultipleOutputDecisions() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, List<Map<String, Object>>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -187,7 +176,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
     public void executeDecisionServiceMultipleOutputDecisionsWithMultiOutcomes() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, List<Map<String, Object>>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -217,7 +205,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
     public void executeDecisionServiceMultipleOutputDecisionsWithAuditTrail() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionServiceExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -244,10 +231,9 @@ public class DecisionServiceTest {
             .hasSize(2);
     }
 
-    @Test()
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/simple.dmn")
     public void executeDecisionServiceWithDecision() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
@@ -262,7 +248,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
     public void executeDecisionWithDecisionService() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
@@ -275,7 +260,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
     public void evaluateDecisionWithSingleResult() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -297,7 +281,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
     public void evaluateDecisionWithSingleResultMultipleResults() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
@@ -314,7 +297,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions.dmn")
     public void executeDecisionServiceWithSingleResult() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -336,7 +318,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceMultipleOutputDecisions2.dmn")
     public void executeDecisionServiceWithSingleResultMultipleResults() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         assertThatThrownBy(() -> dmnRuleService.createExecuteDecisionBuilder()
@@ -353,7 +334,6 @@ public class DecisionServiceTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/decisionServiceStackUpdate.dmn")
     public void executeDecisionServiceWithCollectStackUpdate() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()

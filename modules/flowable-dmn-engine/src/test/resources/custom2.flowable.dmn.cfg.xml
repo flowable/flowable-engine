@@ -29,6 +29,7 @@
             </list>
         </property>
 
+        <property name="databaseSchemaUpdate" value="drop-create" />
 
     </bean>
 

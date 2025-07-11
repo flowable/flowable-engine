@@ -23,14 +23,12 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -39,12 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Yvo Swillens
  */
-public class CollectionsContainsTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
-
-    public ObjectMapper objectMapper = new ObjectMapper();
+class CollectionsContainsTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
@@ -62,6 +55,7 @@ public class CollectionsContainsTest {
         List inputVariable8 = Arrays.asList("100", "101");
         LocalDate date1 = dtf.parseLocalDate("2021-02-02");
 
+        ObjectMapper objectMapper = dmnEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
         ArrayNode arrayNode3 = objectMapper.createArrayNode().add(5.5D).add(10.5D).add(20.5D).add(50.5D);
@@ -86,7 +80,6 @@ public class CollectionsContainsTest {
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
         processVariablesInput.put("date1", date1.toDate());
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -137,6 +130,7 @@ public class CollectionsContainsTest {
         List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
         List inputVariable8 = Arrays.asList("100", "101");
 
+        ObjectMapper objectMapper = dmnEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
         ArrayNode arrayNode2 = objectMapper.createArrayNode().add(5L).add(10L).add(20L).add(50L);
         ArrayNode arrayNode3 = objectMapper.createArrayNode().add(5.5D).add(10.5D).add(20.5D).add(50.5D);
@@ -162,7 +156,6 @@ public class CollectionsContainsTest {
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
         processVariablesInput.put("date1", date1);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -211,7 +204,6 @@ public class CollectionsContainsTest {
         processVariablesInput.put("jodaLocalDate", date1);
         processVariablesInput.put("javaLocalDate", date3);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
