@@ -44,7 +44,7 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -62,6 +62,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a process instance variable. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariable() throws Exception {
 
@@ -143,6 +144,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceInstantVariable() throws Exception {
 
@@ -168,6 +170,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceLocalDateVariable() throws Exception {
 
@@ -192,6 +195,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceLocalDateTimeVariable() throws Exception {
 
@@ -217,6 +221,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceUUIDVariable() throws Exception {
 
@@ -244,6 +249,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable data. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableData() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -262,6 +268,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable data. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableDataSerializable() throws Exception {
 
@@ -287,6 +294,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable, for illegal vars. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableDataForIllegalVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -306,6 +314,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
      * <p>
      * DELETE cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteProcessVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -327,6 +336,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
      * <p>
      * PUT cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -429,6 +439,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateInstantCaseVariable() throws Exception {
 
@@ -463,6 +474,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateLocalDateCaseVariable() throws Exception {
 
@@ -496,6 +508,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateLocalDateTimeCaseVariable() throws Exception {
 
@@ -532,6 +545,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single case variable using a binary stream. PUT cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateBinaryCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -569,6 +583,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateUUIDCaseVariable() throws Exception {
 
@@ -602,6 +617,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateCaseVariableAsync() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")

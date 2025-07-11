@@ -40,6 +40,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -54,6 +55,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn" })
     public void testSimpleHistoricPlanItemInstanceFlow() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
@@ -118,6 +120,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED));
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceResource() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithStage").start();
@@ -357,6 +360,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertCaseEnded(caseInstance.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceCollectionResource() throws Exception {
         //Set the clock for the first instance
@@ -476,6 +480,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     /**
      * Test querying plan item instance and return local variables. POST query/planitem-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryHistoricPlanItemInstancesWithLocalVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -530,6 +535,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
     }
 
     //Same as the previous test, but using query post
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithStage.cmmn" })
     public void testHistoricPlanItemInstanceQueryResource() throws Exception {
         //Set the clock for the first instance

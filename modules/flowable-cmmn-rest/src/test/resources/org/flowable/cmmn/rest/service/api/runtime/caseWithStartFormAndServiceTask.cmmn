@@ -16,7 +16,7 @@
                     <standardEvent>complete</standardEvent>
                 </planItemOnPart>
             </sentry>
-            <humanTask id="cmmnTask_1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+            <humanTask id="cmmnTask_1" name="Human task" flowable:formFieldValidation="false">
                 <extensionElements>
                     <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
                     <design:stencilid><![CDATA[HumanTask]]></design:stencilid>

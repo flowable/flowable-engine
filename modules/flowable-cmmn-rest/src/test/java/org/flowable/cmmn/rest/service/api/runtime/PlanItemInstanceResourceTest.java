@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -45,6 +46,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single plan item instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetPlanItemInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -107,6 +109,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single plan item instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testChangeAssignee() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -268,6 +271,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting plan item instance.
      */
+    @Test
     public void testGetUnexistingPlanItemInstance() {
         closeResponse(
                 executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE, "unexistingpi")),
@@ -277,6 +281,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test action on a single plan item instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneManualActivationHumanTaskCase.cmmn" })
     public void testEnablePlanItem() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -296,6 +301,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test action on a single plan item instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneManualActivationHumanTaskCase.cmmn" })
     public void testDisablePlanItem() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -315,6 +321,7 @@ public class PlanItemInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test retrieving ended plan item instance
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItems() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();

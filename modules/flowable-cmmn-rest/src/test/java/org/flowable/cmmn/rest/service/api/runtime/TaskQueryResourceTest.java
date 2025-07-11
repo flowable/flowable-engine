@@ -31,6 +31,7 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,6 +46,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasks() throws Exception {
         try {
@@ -327,6 +329,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks using task and case variables. GET cmmn-runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasksWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -486,6 +489,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET cmmn-runtime/tasks
      */
+    @Test
     public void testQueryTasksWithPaging() throws Exception {
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();

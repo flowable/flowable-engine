@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +45,7 @@ public class HistoricVariableInstanceQueryResourceTest extends BaseSpringRestTes
     /**
      * Test querying historic variable instance. POST cmmn-query/historic-variable-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryVariableInstances() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();

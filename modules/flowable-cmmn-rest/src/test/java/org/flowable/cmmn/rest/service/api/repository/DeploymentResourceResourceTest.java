@@ -28,6 +28,7 @@ import org.apache.http.message.BasicHeader;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,6 +44,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single resource, deployed in a deployment. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResource() throws Exception {
         try {
             String rawResourceName = "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn";
@@ -78,6 +80,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single resource for an unexisting deployment. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(
                 SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, "unexisting", "resource.png"));
@@ -88,6 +91,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting resource for an existing deployment. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceUnexistingResource() throws Exception {
         try {
             CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
@@ -110,6 +114,7 @@ public class DeploymentResourceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a deployment resource content. GET repository/deployments/{deploymentId}/resources/{resourceId}
      */
+    @Test
     public void testGetDeploymentResourceContent() throws Exception {
         try {
             CmmnDeployment deployment = repositoryService.createDeployment().name("Deployment 1")
