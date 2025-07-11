@@ -31,6 +31,7 @@ import org.junit.Test;
  *
  * @author Joram Barrez
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableRuleJunit4Test {
 
     @Rule

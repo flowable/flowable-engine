@@ -22,6 +22,7 @@ package org.flowable.standalone.testing;
  * 
  * Specifically, {@link org.flowable.engine.impl.test.TestHelper} needs to call getMethod() rather than getDeclaredMethod() since the method is declared in a parent of the actual test class.
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableRuleJunit4SubclassTest extends FlowableRuleJunit4Test {
 
 }

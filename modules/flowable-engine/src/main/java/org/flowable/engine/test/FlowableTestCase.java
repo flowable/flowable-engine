@@ -59,7 +59,9 @@ import junit.framework.TestCase;
  * </p>
  * 
  * @author Tom Baeyens
+ * @deprecated Use JUnit Jupiter with {@link FlowableTest} instead
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public abstract class FlowableTestCase extends TestCase {
 
     protected String configurationResource = "flowable.cfg.xml";

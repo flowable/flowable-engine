@@ -66,7 +66,9 @@ import org.junit.runners.model.Statement;
  * order to verify e.g. e.g. due dates of timers. Or start, end and duration times in the history service. In the tearDown, the internal clock will automatically be reset to use the current system
  * time rather then the time that was set during a test method.
  * </p>
+ * @deprecated Use JUnit Jupiter with {@link FlowableCmmnTest} instead
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableCmmnRule implements TestRule {
 
     protected String configurationResource = "flowable.cmmn.cfg.xml";

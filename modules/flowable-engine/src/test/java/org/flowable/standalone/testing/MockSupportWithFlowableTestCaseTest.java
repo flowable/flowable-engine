@@ -24,6 +24,7 @@ import org.flowable.standalone.testing.helpers.ServiceTaskTestMock;
 /**
  * @author Joram Barrez
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class MockSupportWithFlowableTestCaseTest extends FlowableTestCase {
 
     @Override

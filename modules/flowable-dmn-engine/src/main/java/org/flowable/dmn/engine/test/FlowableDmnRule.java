@@ -56,7 +56,9 @@ import org.junit.runners.model.Statement;
  * </p>
  *
  * @author Tijs Rademakers
+ * @deprecated Use JUnit Jupiter with {@link FlowableDmnTest} instead
  */
+@Deprecated(forRemoval = true, since = "7.2.0")
 public class FlowableDmnRule implements TestRule {
 
     protected String configurationResource = "flowable.dmn.cfg.xml";
