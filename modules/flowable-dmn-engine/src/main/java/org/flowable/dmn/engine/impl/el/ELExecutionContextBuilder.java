@@ -78,7 +78,7 @@ public class ELExecutionContextBuilder {
         }
 
         Map<String, Object> inputVariables = executeDecisionInfo.getVariables();
-        preProcessInputVariables(decisionTable, inputVariables);
+        preProcessInputVariables(decisionTable, inputVariables, executeDecisionInfo);
         executionContext.setStackVariables(inputVariables);
 
         LOGGER.debug("Execution Context created");
