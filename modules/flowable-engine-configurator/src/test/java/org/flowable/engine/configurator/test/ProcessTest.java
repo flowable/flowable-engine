@@ -21,8 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.test.FlowableAppExtension;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -50,22 +53,22 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessTest extends FlowableAppTestCase {
+@ExtendWith(FlowableAppExtension.class)
+@MockitoSettings
+public class ProcessTest {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+    protected AppEngineConfiguration appEngineConfiguration;
+    protected AppRepositoryService appRepositoryService;
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -76,13 +79,15 @@ public class ProcessTest extends FlowableAppTestCase {
     @Mock
     protected FormRepositoryService formRepositoryService;
 
-    @Before
-    public void initializeMocks() {
+    @BeforeEach
+    void setUp(AppEngine appEngine) {
+        appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        appRepositoryService = appEngine.getAppRepositoryService();
         Map engineConfigurations = appEngineConfiguration.getEngineConfigurations();
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void resetMocks() {
         appEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
