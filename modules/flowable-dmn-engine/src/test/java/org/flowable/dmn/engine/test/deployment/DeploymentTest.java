@@ -24,12 +24,12 @@ import org.flowable.dmn.api.DecisionTypes;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.h2.util.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DeploymentTest extends AbstractFlowableDmnTest {
+class DeploymentTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
@@ -107,16 +107,21 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         assertThat(decision.getVersion()).isEqualTo(1);
 
-        repositoryService.createDeployment().name("secondDeployment")
+        org.flowable.dmn.api.DmnDeployment secondDeployment = repositoryService.createDeployment().name("secondDeployment")
                 .addClasspathResource("org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
                 .deploy();
 
-        decision = repositoryService.createDecisionQuery()
-                .latestVersion()
-                .decisionKey("decision")
-                .singleResult();
+        try {
+            decision = repositoryService.createDecisionQuery()
+                    .latestVersion()
+                    .decisionKey("decision")
+                    .singleResult();
 
-        assertThat(decision.getVersion()).isEqualTo(2);
+            assertThat(decision.getVersion()).isEqualTo(2);
+        } finally {
+            repositoryService.deleteDeployment(secondDeployment.getId());
+        }
+
     }
 
     @Test

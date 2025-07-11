@@ -20,25 +20,18 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyCollectTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyCollectTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void collectHitPolicyNoAggregator() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -54,8 +47,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyNoAggregatorCompound() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -78,8 +69,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyWithAggregatorMultipleOutputs() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -95,8 +84,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyWithAggregatorWrongOutputType() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -112,8 +99,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicySUM() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -128,8 +113,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicySUM_force_DMN11() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -144,8 +127,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyMIN() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -160,8 +141,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyMAX() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -176,8 +155,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyCOUNT() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -192,8 +169,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyCOUNT_force_DMN11() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -208,8 +183,6 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment
     public void collectHitPolicyCOUNTNoResults() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()

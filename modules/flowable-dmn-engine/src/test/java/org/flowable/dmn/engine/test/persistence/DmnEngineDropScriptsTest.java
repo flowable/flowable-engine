@@ -16,13 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
-import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
-import org.junit.Test;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-public class DmnEngineDropScriptsTest extends PluggableFlowableDmnTestCase {
+class DmnEngineDropScriptsTest extends BaseFlowableDmnTest {
 
     @Test
     public void testDropSchema() {

@@ -12,14 +12,17 @@
  */
 package org.flowable.dmn.engine.test;
 
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.junit.Before;
-import org.junit.Rule;
+import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Parent class for internal Flowable DMN tests.
@@ -31,28 +34,28 @@ import org.junit.Rule;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class AbstractFlowableDmnTest {
+@ExtendWith(PluggableFlowableDmnExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(
+        excludeTables = "ACT_GE_PROPERTY"
+)
+public class BaseFlowableDmnTest {
 
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
-
-    protected static DmnEngine cachedDmnEngine;
+    protected DmnEngine dmnEngine;
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnRepositoryService repositoryService;
     protected DmnDecisionService ruleService;
-    protected DmnHistoryService dmnHistoryService;
+    protected DmnHistoryService historyService;
     protected DmnManagementService managementService;
 
-    @Before
-    public void initDmnEngine() {
-        if (cachedDmnEngine == null) {
-            cachedDmnEngine = flowableDmnRule.getDmnEngine();
-        }
-        this.dmnEngineConfiguration = cachedDmnEngine.getDmnEngineConfiguration();
-        this.repositoryService = cachedDmnEngine.getDmnRepositoryService();
-        this.ruleService = cachedDmnEngine.getDmnDecisionService();
-        this.dmnHistoryService = cachedDmnEngine.getDmnHistoryService();
-        this.managementService = cachedDmnEngine.getDmnManagementService();
+    @BeforeEach
+    public void initDmnEngine(DmnEngine dmnEngine) {
+        this.dmnEngine = dmnEngine;
+        this.dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
+        this.repositoryService = dmnEngine.getDmnRepositoryService();
+        this.ruleService = dmnEngine.getDmnDecisionService();
+        this.historyService = dmnEngine.getDmnHistoryService();
+        this.managementService = dmnEngine.getDmnManagementService();
     }
 
 }

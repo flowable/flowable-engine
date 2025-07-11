@@ -14,12 +14,12 @@ package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.flowable.dmn.engine.test.DmnConfigurationResource;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
@@ -30,41 +30,47 @@ public class CustomHitPoliciesEngineConfigTest {
     protected static final String ENGINE_CONFIG_2 = "custom4.flowable.dmn.cfg.xml";
     protected static final String ENGINE_CONFIG_3 = "custom5.flowable.dmn.cfg.xml";
 
-    @Rule
-    public FlowableDmnRule flowableDmnRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
+    @Nested
+    @DmnConfigurationResource(ENGINE_CONFIG_1)
+    class OveriteHitPolicyBehaviors extends BaseFlowableDmnTest {
 
-    @Rule
-    public FlowableDmnRule flowableDmnRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
+        @Test
+        public void overwriteHitPolicyBehaviors() {
+            DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
 
-    @Rule
-    public FlowableDmnRule flowableDmnRule3 = new FlowableDmnRule(ENGINE_CONFIG_3);
+            assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(1);
+        }
 
-    @Test
-    public void overwriteHitPolicyBehaviors() {
-        DmnEngine dmnEngine = flowableDmnRule1.getDmnEngine();
-        DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
-
-        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(1);
     }
 
-    @Test
-    public void overwriteSpecificHitPolicyBehavior() {
-        DmnEngine dmnEngine = flowableDmnRule2.getDmnEngine();
-        DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
+    @Nested
+    @DmnConfigurationResource(ENGINE_CONFIG_2)
+    class OveriteSpecificHitPolicyBehaviors extends BaseFlowableDmnTest {
 
-        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(7);
-        AbstractHitPolicy overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
-        assertThat(overwrittenHitPolicyBehavior.getHitPolicyName()).isEqualTo("CUSTOM_HIT_POLICY");
+        @Test
+        public void overwriteSpecificHitPolicyBehavior() {
+            DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
+
+            assertThat(dmnEngineConfiguration.getHitPolicyBehaviors()).hasSize(7);
+            AbstractHitPolicy overwrittenHitPolicyBehavior = dmnEngineConfiguration.getHitPolicyBehaviors().get("FIRST");
+            assertThat(overwrittenHitPolicyBehavior.getHitPolicyName()).isEqualTo("CUSTOM_HIT_POLICY");
+        }
+
     }
 
-    @Test
-    public void addHitPolicyBehavior() {
-        DmnEngine dmnEngine = flowableDmnRule3.getDmnEngine();
-        DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
+    @Nested
+    @DmnConfigurationResource(ENGINE_CONFIG_3)
+    class AddHitPolicyBehaviors extends BaseFlowableDmnTest {
 
-        assertThat(dmnEngineConfiguration.getHitPolicyBehaviors())
-                .hasSize(8)
-                .containsKey("CUSTOM_HIT_POLICY");
+        @Test
+        public void addHitPolicyBehavior() {
+            DmnEngineConfiguration dmnEngineConfiguration = dmnEngine.getDmnEngineConfiguration();
+
+            assertThat(dmnEngineConfiguration.getHitPolicyBehaviors())
+                    .hasSize(8)
+                    .containsKey("CUSTOM_HIT_POLICY");
+        }
+
     }
 
 }
