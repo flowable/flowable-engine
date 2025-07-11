@@ -17,17 +17,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author Tijs Rademakers
  */
-public class SpringRuleBeanTest extends AbstractDmnTestCase {
+@ExtendWith(LoggingExtension.class)
+class SpringRuleBeanTest {
 
     protected static final String CTX_PATH = "org/flowable/spring/test/el/SpringBeanTest-context.xml";
 
@@ -41,15 +46,15 @@ public class SpringRuleBeanTest extends AbstractDmnTestCase {
         this.ruleService = applicationContext.getBean(DmnDecisionService.class);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
         removeAllDeployments();
         this.applicationContext = null;
         this.repositoryService = null;
         this.ruleService = null;
-        super.tearDown();
     }
 
+    @Test
     public void testSimpleRuleBean() {
         createAppContext(CTX_PATH);
         repositoryService.createDeployment().addClasspathResource("org/flowable/spring/test/el/springbean.dmn").deploy();
