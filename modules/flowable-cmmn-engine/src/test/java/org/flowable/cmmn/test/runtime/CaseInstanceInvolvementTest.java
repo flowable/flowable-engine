@@ -25,11 +25,11 @@ import java.util.stream.Stream;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik

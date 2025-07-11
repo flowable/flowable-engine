@@ -23,8 +23,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
@@ -38,9 +38,9 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
 import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.types.IntegerType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This test checks the basic functionality of the {@link VariableInstanceValueModifier} implementation.
@@ -54,12 +54,12 @@ public class VariableInstanceValueModifierCmmnTest extends FlowableCmmnTestCase 
     VariableInstanceValueModifier originalModifier;
     VariableType customType;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         originalModifier = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceValueModifier();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cmmnEngineConfiguration.getVariableServiceConfiguration().setVariableInstanceValueModifier(originalModifier);
         if (customType != null) {

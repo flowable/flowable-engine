@@ -21,9 +21,9 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.job.SetAsyncVariablesJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VariablesAsyncTest extends FlowableCmmnTestCase {
 

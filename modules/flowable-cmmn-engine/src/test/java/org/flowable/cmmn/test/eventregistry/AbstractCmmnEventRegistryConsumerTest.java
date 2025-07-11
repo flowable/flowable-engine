@@ -24,8 +24,8 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.impl.DefaultInboundEvent;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +39,7 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         inboundEventChannelAdapter = setupTestChannel();
 
@@ -70,7 +70,7 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
         return inboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();

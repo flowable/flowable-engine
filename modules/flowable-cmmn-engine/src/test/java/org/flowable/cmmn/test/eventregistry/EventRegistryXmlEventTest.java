@@ -24,9 +24,9 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -35,7 +35,7 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         inboundEventChannelAdapter = setupTestChannel();
 
@@ -64,7 +64,7 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         return inboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();

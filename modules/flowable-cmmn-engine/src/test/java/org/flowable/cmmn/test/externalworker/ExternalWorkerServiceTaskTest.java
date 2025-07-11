@@ -35,7 +35,7 @@ import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterCont
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -53,9 +53,9 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityM
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -69,7 +69,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         which will make it impossible to test the lock releasing logic.
      */
 
-    @Before
+    @BeforeEach
     public void disableAsyncExecutorIfNeeded() {
         asyncExecutorActivated = cmmnEngineConfiguration.getAsyncExecutor().isActive();
 
@@ -78,7 +78,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         }
     }
 
-    @After
+    @AfterEach
     public void enabledAsyncExecutorIfNeeded() {
         if (asyncExecutorActivated) {
             cmmnEngineConfiguration.getAsyncExecutor().start();

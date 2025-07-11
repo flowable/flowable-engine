@@ -25,8 +25,8 @@ import org.flowable.cmmn.api.runtime.SignalEventListenerInstance;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -34,23 +34,18 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.task.api.Task;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class SignalEventListenerTest extends FlowableCmmnTestCase {
 
-    @Rule
-    public TestName name = new TestName();
-
     @Test
     @CmmnDeployment
     public void testSimpleEnableTask() {
         //Simple use of the SignalEventListener as EntryCriteria of a Task
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleEnableTask").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -161,7 +156,7 @@ public class SignalEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateStage() {
         //Test case where the SignalEventListener is used to complete (ExitCriteria) of a Stage
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateStage").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 

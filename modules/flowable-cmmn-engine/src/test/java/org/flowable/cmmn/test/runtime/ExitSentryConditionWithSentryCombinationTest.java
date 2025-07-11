@@ -21,8 +21,8 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Test;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing entry and exit sentries, both with conditions as a combination on a stage.

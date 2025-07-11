@@ -24,20 +24,15 @@ import java.util.List;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
-import org.flowable.cmmn.api.CmmnHistoryService;
-import org.flowable.cmmn.api.CmmnManagementService;
-import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.delete.DeleteCaseInstanceBatchConstants;
 import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentialJobHandler;
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnConfigurationResource;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTest;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.job.api.Job;
@@ -45,21 +40,19 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-@FlowableCmmnTest
 @CmmnConfigurationResource("flowable.historyclean.cmmn.cfg.xml")
-public class HistoricDataEngineDeleteTest {
+public class HistoricDataEngineDeleteTest extends FlowableCmmnTestCase {
 
     protected Collection<String> batchesToRemove = new HashSet<>();
 
     @AfterEach
-    void tearDown(CmmnManagementService managementService) {
-        batchesToRemove.forEach(managementService::deleteBatch);
+    void tearDown() {
+        batchesToRemove.forEach(cmmnManagementService::deleteBatch);
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/human-task-milestone-model.cmmn")
-    public void testHistoryCleanupTimerJob(CmmnEngineConfiguration cmmnEngineConfiguration, CmmnRuntimeService cmmnRuntimeService,
-            CmmnHistoryService cmmnHistoryService, CmmnTaskService cmmnTaskService, CmmnManagementService cmmnManagementService) {
+    public void testHistoryCleanupTimerJob() {
 
         try {
             Clock clock = cmmnEngineConfiguration.getClock();

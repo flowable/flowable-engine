@@ -27,7 +27,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;

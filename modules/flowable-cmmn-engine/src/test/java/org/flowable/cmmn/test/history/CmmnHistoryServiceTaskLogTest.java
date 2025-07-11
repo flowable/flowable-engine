@@ -23,10 +23,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
-import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -35,27 +34,17 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.api.history.HistoricTaskLogEntryQuery;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
  */
-public class CmmnHistoryServiceTaskLogTest extends CustomCmmnConfigurationFlowableTestCase {
+public class CmmnHistoryServiceTaskLogTest extends FlowableCmmnTestCase {
 
     protected Task task;
 
-    @Override
-    protected String getEngineName() {
-        return "cmmnEngineWithUserTaskEventLogging";
-    }
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        cmmnEngineConfiguration.setEnableHistoricTaskLogging(true);
-    }
-
-    @After
+    @AfterEach
     public void deleteTasks() {
         if (task != null) {
             deleteTaskWithLogEntries(task.getId());
