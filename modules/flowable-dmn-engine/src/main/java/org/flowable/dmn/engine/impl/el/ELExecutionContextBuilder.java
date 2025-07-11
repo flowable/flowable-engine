@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
@@ -77,7 +78,7 @@ public class ELExecutionContextBuilder {
         }
 
         Map<String, Object> inputVariables = executeDecisionInfo.getVariables();
-        preProcessInputVariables(decisionTable, inputVariables);
+        preProcessInputVariables(decisionTable, inputVariables, executeDecisionInfo);
         executionContext.setStackVariables(inputVariables);
 
         LOGGER.debug("Execution Context created");
@@ -85,7 +86,7 @@ public class ELExecutionContextBuilder {
         return executionContext;
     }
 
-    protected static void preProcessInputVariables(DecisionTable decisionTable, Map<String, Object> inputVariables) {
+    protected static void preProcessInputVariables(DecisionTable decisionTable, Map<String, Object> inputVariables, ExecuteDecisionContext executeDecisionInfo) {
 
         if (inputVariables == null) {
             inputVariables = new HashMap<>();
@@ -119,6 +120,10 @@ public class ELExecutionContextBuilder {
             try {
                 Object inputVariableValue = inputVariable.getValue();
                 if (inputVariableValue instanceof LocalDate) {
+                    JodaDeprecationLogger.LOGGER.warn(
+                            "Using Joda-Time LocalDate has been deprecated and will be removed in a future version."
+                                    + " Input variable {} from {} {} for decision table {} is a Joda-Time LocalDate. ",
+                            inputVariableName, executeDecisionInfo.getScopeType(), executeDecisionInfo.getInstanceId(), decisionTable.getId());
                     Date transformedDate = ((LocalDate) inputVariableValue).toDate();
                     inputVariables.put(inputVariableName, transformedDate);
                 } else if (inputVariableValue instanceof java.time.LocalDate) {

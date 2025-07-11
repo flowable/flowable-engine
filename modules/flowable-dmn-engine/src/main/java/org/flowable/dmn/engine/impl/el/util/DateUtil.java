@@ -15,6 +15,7 @@ package org.flowable.dmn.engine.impl.el.util;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -32,6 +33,7 @@ public class DateUtil {
         if (dateObject instanceof Date) {
             return (Date) dateObject;
         } else if (dateObject instanceof LocalDate) {
+            JodaDeprecationLogger.LOGGER.warn("Using Joda-Time LocalDate has been deprecated and will be removed in a future version.");
             return ((LocalDate) dateObject).toDate();
         } else if (dateObject instanceof java.time.LocalDate) {
             return Date.from(((java.time.LocalDate) dateObject).atStartOfDay()

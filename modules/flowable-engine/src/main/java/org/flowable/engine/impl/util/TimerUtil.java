@@ -37,6 +37,7 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -119,6 +120,9 @@ public class TimerUtil {
             duedate = (Date) dueDateValue;
 
         } else if (dueDateValue instanceof DateTime) {
+            JodaDeprecationLogger.LOGGER.warn(
+                    "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
+                    expression.getExpressionText(), scopeForExpression);
             // JodaTime support
             duedate = ((DateTime) dueDateValue).toDate();
 
