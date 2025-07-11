@@ -18,11 +18,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -30,22 +30,15 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
-    public void deployTimerProcess() {
-        if (cmmnRepositoryService.createDeploymentQuery().count() == 0) {
-            cmmnRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/timerInStage.cmmn").deploy();
-        }
-    }
-
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/timerInStage.cmmn")
     public void testCmmnTimerTask() {
         Date startTime = setCmmnClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerInStage").start();
@@ -97,10 +90,6 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
         cmmnEngineConfiguration.resetClock();
         ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).resetClock();
-
-        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
-            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
-        }
     }
 
 }

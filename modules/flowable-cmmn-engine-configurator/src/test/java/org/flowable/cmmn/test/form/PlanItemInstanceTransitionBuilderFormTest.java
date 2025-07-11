@@ -34,24 +34,19 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Filip Hrisafov
  */
+@MockitoSettings
 public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEngineIntegrationTest {
 
     protected String processDeploymentId;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -64,7 +59,7 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
     protected FormFieldHandler originalFormFieldHandler;
 
-    @Before
+    @BeforeEach
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setUp() {
         originalFormFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
@@ -73,7 +68,7 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cmmnEngineConfiguration.setFormFieldHandler(originalFormFieldHandler);
         cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);

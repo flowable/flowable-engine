@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -62,6 +63,10 @@ public abstract class CmmnTestHelper {
     }
 
     public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, Method method, CmmnDeployment deploymentAnnotation) {
+        return annotationDeploymentSetUp(cmmnEngine.getCmmnRepositoryService(), testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(CmmnRepositoryService cmmnRepositoryService, Class<?> testClass, Method method, CmmnDeployment deploymentAnnotation) {
         String deploymentId = null;
         String methodName = method.getName();
         if (deploymentAnnotation != null) {
@@ -73,7 +78,7 @@ public abstract class CmmnTestHelper {
                 resources = new String[] { resource };
             }
 
-            CmmnDeploymentBuilder deploymentBuilder = cmmnEngine.getCmmnRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+            CmmnDeploymentBuilder deploymentBuilder = cmmnRepositoryService.createDeployment().name(testClass.getSimpleName() + "." + methodName);
 
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);

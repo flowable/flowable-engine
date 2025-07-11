@@ -24,24 +24,18 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class BpmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
-    public void deployTimerProcess() {
-        if (processEngineRepositoryService.createDeploymentQuery().count() == 0) {
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/taskTimerProcess.bpmn20.xml").deploy();
-        }
-    }
-
     @Test
+    @Deployment(resources = "org/flowable/cmmn/test/taskTimerProcess.bpmn20.xml")
     public void testBpmnTimerTask() {
         ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("timerProcess");
         List<Task> processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
