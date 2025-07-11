@@ -14,15 +14,15 @@ package org.flowable.app.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.test.BaseFlowableAppTest;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-public class AppEngineDropScriptsTest extends FlowableAppTestCase {
+class AppEngineDropScriptsTest extends BaseFlowableAppTest {
 
     @Test
     public void testDropSchema() {

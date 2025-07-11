@@ -24,15 +24,15 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppModel;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.test.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.test.BaseFlowableAppTest;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class DeploymentTest extends FlowableAppTestCase {
+class DeploymentTest extends BaseFlowableAppTest {
 
     @Test
     @AppDeployment
