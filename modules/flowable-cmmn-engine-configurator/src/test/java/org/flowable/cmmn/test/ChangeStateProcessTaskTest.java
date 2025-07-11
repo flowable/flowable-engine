@@ -24,18 +24,29 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class ChangeStateProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
+    protected String processDeploymentId;
+
+    @BeforeEach
     public void deployOneTaskProcess() {
-        if (processEngineRepositoryService.createDeploymentQuery().count() == 0) {
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
+        processDeploymentId = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+                .deploy()
+                .getId();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (processDeploymentId != null) {
+            processEngineRepositoryService.deleteDeployment(processDeploymentId, true);
         }
     }
 

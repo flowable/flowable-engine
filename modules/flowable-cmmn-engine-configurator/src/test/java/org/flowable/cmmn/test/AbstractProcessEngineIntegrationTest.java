@@ -29,8 +29,9 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.engine.DynamicBpmnService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
@@ -40,21 +41,25 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.repository.Deployment;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Joram Barrez
  */
-@RunWith(CmmnTestRunner.class)
+@ExtendWith(CmmnEngineConfiguratorExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
 public abstract class AbstractProcessEngineIntegrationTest {
 
-    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected static ProcessEngine processEngine;
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
+    protected ProcessEngine processEngine;
 
-    protected static Map<Object, Object> beans = new HashMap<>();
+    protected Map<Object, Object> beans = new HashMap<>();
 
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
@@ -70,20 +75,12 @@ public abstract class AbstractProcessEngineIntegrationTest {
     protected ProcessEngineConfiguration processEngineConfiguration;
     protected DynamicBpmnService processEngineDynamicBpmnService;
 
-    @BeforeClass
-    public static void bootProcessEngine() {
-        if (processEngine == null) {
-            ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml");
-            processEngineConfiguration.setBeans(beans);
-            processEngine = processEngineConfiguration.buildProcessEngine();
-            cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
-                    .getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-            CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
-        }
-    }
-
-    @Before
-    public void setupServices() {
+    @BeforeEach
+    public void setupServices(ProcessEngine processEngine) {
+        this.processEngine = processEngine;
+        this.cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
+                .getEngineConfigurations()
+                .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
@@ -97,15 +94,9 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.processEngineHistoryService = processEngine.getHistoryService();
         this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
         this.processEngineDynamicBpmnService = processEngine.getDynamicBpmnService();
-
-        beans.put("cmmnRepositoryService", cmmnEngineConfiguration.getCmmnRepositoryService());
-        beans.put("cmmnRuntimeService", cmmnEngineConfiguration.getCmmnRuntimeService());
-        beans.put("cmmnTaskService", cmmnEngineConfiguration.getCmmnTaskService());
-        beans.put("cmmnHistoryService", cmmnEngineConfiguration.getCmmnHistoryService());
-        beans.put("cmmnManagementService", cmmnEngineConfiguration.getCmmnManagementService());
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
@@ -114,8 +105,6 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
-
-        beans.clear();
     }
 
     protected Date setCmmnClockFixedToCurrentTime() {

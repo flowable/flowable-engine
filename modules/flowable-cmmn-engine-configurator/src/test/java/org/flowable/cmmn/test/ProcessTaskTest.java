@@ -62,8 +62,9 @@ import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,15 +77,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
-    public void deployOneTaskProcess() {
-        if (processEngineRepositoryService.createDeploymentQuery().count() == 0) {
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
-        }
-    }
-
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testOneTaskProcessNonBlocking() {
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
         List<Task> processTasks = processEngine.getTaskService().createTaskQuery().list();
@@ -645,6 +640,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testOneTaskProcessBlocking() {
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
 
@@ -765,6 +761,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+    //@org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/twoTaskProcess.bpmn20.xml")
     public void testTwoTaskProcessBlocking() {
         try {
             if (processEngineRepositoryService.createDeploymentQuery().count() == 1) {
@@ -833,6 +830,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testProcessRefExpression() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("processDefinitionKey", "oneTask");
@@ -858,6 +856,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testProcessIOParameter() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("processDefinitionKey", "oneTask");
@@ -887,6 +886,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testProcessIOParameterExpressions() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
@@ -906,6 +906,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testIOParameterCombinations() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testProcessTaskParameterExpressions")
@@ -1135,6 +1136,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testTriggerUnfinishedProcessPlanItem() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
@@ -1157,6 +1159,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testStartProcessInstanceNonBlockingAndCaseInstanceFinished() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
 
@@ -1171,6 +1174,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testStartMultipleProcessInstancesBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
 
@@ -1197,6 +1201,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testTerminateCaseInstanceWithBlockingProcessTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(8);
@@ -1369,6 +1374,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ProcessTaskTest.testOneTaskProcessBlocking.cmmn")
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testDeleteProcessTaskShouldNotBePossible() {
         startCaseInstanceWithOneTaskProcess();
 
@@ -1383,6 +1389,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testChangeActiveStagesWithProcessTasks() {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("activatePlanItemTest").start();
@@ -1442,6 +1449,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testChangeActiveStagesWithManualProcessTasks() {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("activatePlanItemTest").start();
@@ -1501,6 +1509,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testChangeActiveStages() {
 
         Deployment deployment = this.processEngineRepositoryService.createDeployment().
@@ -1583,6 +1592,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testPassChildTaskVariables() {
         assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
 
@@ -1644,6 +1654,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testExitActiveProcessTaskThroughExitSentryOnStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testExitActiveProcessTaskThroughExitSentryOnStage")
@@ -1673,6 +1684,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testExitCaseInstanceOnProcessInstanceComplete() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testExitCaseInstanceOnProcessInstanceComplete")
@@ -1697,6 +1709,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testIdVariableName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIdVariableName")
@@ -1710,6 +1723,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testIdVariableNameExpression() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIdVariableName")
@@ -1968,6 +1982,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testSequentialRepeatingProcessTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testProcessTask")
@@ -2027,6 +2042,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testDeleteCaseInstanceWithRepeatingProcessTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCaseInstanceDeletion").start();
 
@@ -2148,8 +2164,8 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             "org/flowable/cmmn/test/oneCaseTaskCase.cmmn",
             "org/flowable/cmmn/test/oneProcessTaskV2.cmmn"
     })
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testGetProcessInstanceHierarchyByParentScopeId() {
-        processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml").deploy();
         ProcessDefinition processDefinition = processEngineRepositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTask").latestVersion().singleResult();
         
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneCaseTask").start();
