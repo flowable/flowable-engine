@@ -40,6 +40,7 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -103,6 +104,9 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
                 timerDueDate = (Date) timerValue;
 
             } else if (timerValue instanceof DateTime) {
+                JodaDeprecationLogger.LOGGER.warn(
+                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
+                        timerEventListener.getTimerExpression(), planItemInstance);
                 DateTime timerDateTime = (DateTime) timerValue;
                 timerDueDate = timerDateTime.toDate();
 
