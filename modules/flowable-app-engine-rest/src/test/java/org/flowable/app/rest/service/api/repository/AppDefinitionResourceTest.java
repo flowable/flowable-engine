@@ -27,6 +27,7 @@ import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.engine.test.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,6 +44,7 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single app definition. GET app-repository/app-definitions/{appeDefinitionId}
      */
+    @Test
     @AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testGetAppDefinition() throws Exception {
 
@@ -69,12 +71,14 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting app definition. GET app-repository/app-definitions/{appeDefinitionId}
      */
+    @Test
     public void testGetUnexistingAppDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_APP_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     @AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testGetAppDefinitionResourceData() throws Exception {
         AppDefinition appDefinition = repositoryService.createAppDefinitionQuery().singleResult();
@@ -95,12 +99,14 @@ public class AppDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting resource content for an unexisting app definition .
      */
+    @Test
     public void testGetResourceContentForUnexistingAppDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_APP_DEFINITION_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     @AppDeployment(resources = { "org/flowable/app/rest/service/api/repository/oneApp.app" })
     public void testUpdateAppDefinitionCategory() throws Exception {
         AppDefinition appDefinition = repositoryService.createAppDefinitionQuery().singleResult();
