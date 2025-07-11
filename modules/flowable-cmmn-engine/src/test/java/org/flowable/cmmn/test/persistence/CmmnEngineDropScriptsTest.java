@@ -14,10 +14,10 @@ package org.flowable.cmmn.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez

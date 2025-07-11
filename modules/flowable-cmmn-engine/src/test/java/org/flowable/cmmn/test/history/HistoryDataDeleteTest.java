@@ -48,8 +48,8 @@ import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentia
 import org.flowable.cmmn.engine.impl.job.CmmnHistoryCleanupJobHandler;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -58,8 +58,8 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 
 import net.javacrumbs.jsonunit.core.Option;
@@ -72,7 +72,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
     protected Collection<String> batchesToRemove = new HashSet<>();
 
-    @After
+    @AfterEach
     public void tearDown() {
         batchesToRemove.forEach(cmmnManagementService::deleteBatch);
         Authentication.setAuthenticatedUserId(null);

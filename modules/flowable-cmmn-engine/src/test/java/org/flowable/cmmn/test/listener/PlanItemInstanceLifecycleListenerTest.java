@@ -24,11 +24,11 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -39,8 +39,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
 
     private AbstractTestLifecycleListener testLifeCycleListener;
 
-
-    @Before
+    @BeforeEach
     public void addListeners() {
         this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
@@ -49,7 +48,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
             .deploy());
     }
 
-    @After
+    @AfterEach
     public void removeListeners() {
         cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
     }

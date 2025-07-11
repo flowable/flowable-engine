@@ -24,9 +24,9 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -43,7 +43,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
@@ -78,7 +78,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
         return outboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         getEventRepositoryService().createDeploymentQuery().list()
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));

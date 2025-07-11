@@ -14,9 +14,9 @@ package org.flowable.cmmn.test.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez

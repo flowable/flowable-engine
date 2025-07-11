@@ -16,12 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -30,17 +31,12 @@ public class CmmnHistoryServiceDisableTaskLogTest extends CustomCmmnConfiguratio
 
     protected Task task;
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         cmmnEngineConfiguration.setEnableHistoricTaskLogging(false);
     }
 
-    @After
+    @AfterEach
     public void deleteTasks() {
         if (task != null) {
 

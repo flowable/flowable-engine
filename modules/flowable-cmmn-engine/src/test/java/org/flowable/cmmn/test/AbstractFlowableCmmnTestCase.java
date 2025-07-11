@@ -10,13 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.test;
+package org.flowable.cmmn.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.time.Instant;
 import java.time.temporal.ChronoField;
@@ -50,20 +47,25 @@ import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
-import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Joram Barrez
  */
-@RunWith(CmmnTestRunner.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY",
+        "ACT_ID_PROPERTY"
+})
 public abstract class AbstractFlowableCmmnTestCase {
 
-    public static CmmnEngine cmmnEngine;
+    public CmmnEngine cmmnEngine;
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnManagementService cmmnManagementService;
@@ -86,15 +88,27 @@ public abstract class AbstractFlowableCmmnTestCase {
         this.autoCleanupDeploymentIds.add(deploymentId);
     }
 
-    @After
-    public void cleanup() {
+    @BeforeEach
+    void init(CmmnEngine cmmnEngine) {
+        this.cmmnEngine = cmmnEngine;
+        this.cmmnEngineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
+        this.cmmnManagementService = cmmnEngine.getCmmnManagementService();
+        this.cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
+        this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+        this.dynamicCmmnService = cmmnEngine.getDynamicCmmnService();
+        this.cmmnTaskService = cmmnEngine.getCmmnTaskService();
+        this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
+        this.cmmnMigrationService = cmmnEngine.getCmmnMigrationService();
+    }
+
+    @AfterEach
+    void baseCleanup() {
         if (autoCleanupDeploymentIds != null && !autoCleanupDeploymentIds.isEmpty()) {
             for (String deploymentId : autoCleanupDeploymentIds) {
                 CmmnTestHelper.deleteDeployment(cmmnEngineConfiguration, deploymentId);
             }
         }
         autoCleanupDeploymentIds = new HashSet<>();
-        Authentication.setAuthenticatedUserId(null);
     }
 
     protected void deployOneHumanTaskCaseModel() {
@@ -172,11 +186,16 @@ public abstract class AbstractFlowableCmmnTestCase {
 
     protected void assertCaseInstanceEnded(String caseInstanceId) {
         long count = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).count();
-        assertEquals(createCaseInstanceEndedErrorMessage(caseInstanceId, count), 0, count);
-        assertEquals("Runtime case instance found", 0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).count());
+        assertThat(count)
+                .withFailMessage(() -> createCaseInstanceEndedErrorMessage(caseInstanceId, count))
+                .isZero();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).count())
+                .withFailMessage("Runtime case instance found")
+                .isZero();
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).finished().count());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).finished().count())
+                    .isEqualTo(1);
         }
     }
 
@@ -198,21 +217,28 @@ public abstract class AbstractFlowableCmmnTestCase {
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance, int nrOfExpectedMilestones) {
         assertCaseInstanceEnded(caseInstance);
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count())
+                .isZero();
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            assertEquals(nrOfExpectedMilestones,
-                cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+            assertThat(cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count())
+                    .isEqualTo(nrOfExpectedMilestones);
         }
     }
     
     protected void assertCaseInstanceNotEnded(CaseInstance caseInstance) {
-        assertTrue("Found no plan items for case instance", cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
-        assertTrue("No runtime case instance found", cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count() > 0);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count())
+                .withFailMessage("Found no plan items for case instance")
+                .isPositive();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count())
+                .withFailMessage("No runtime case instance found")
+                .isPositive();
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            assertNull("Historical case instance is already marked as ended",
-                cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime());
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getEndTime())
+                    .withFailMessage("Historical case instance is already marked as ended")
+                    .isNull();
         }
     }
 
@@ -222,8 +248,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             .map(Task::getId)
             .collect(Collectors.toList());
 
-        assertNotNull(taskIds);
-        assertEquals(1, taskIds.size());
+        assertThat(taskIds).hasSize(1);
     }
 
     protected void assertSamePlanItemState(CaseInstance c1) {
@@ -231,9 +256,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             List<PlanItemInstance> runtimePlanItems = getAllPlanItemInstances(c1.getId());
             List<HistoricPlanItemInstance> historicPlanItems = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(c1.getId()).list();
 
-            assertNotNull(runtimePlanItems);
-            assertNotNull(historicPlanItems);
-            assertEquals(runtimePlanItems.size(), historicPlanItems.size());
+            assertThat(historicPlanItems).hasSameSizeAs(runtimePlanItems);
 
             Map<String, HistoricPlanItemInstance> historyMap = new HashMap<>(historicPlanItems.size());
             for (HistoricPlanItemInstance historicPlanItem : historicPlanItems) {
@@ -242,11 +265,11 @@ public abstract class AbstractFlowableCmmnTestCase {
 
             for (PlanItemInstance runtimePlanItem : runtimePlanItems) {
                 HistoricPlanItemInstance historicPlanItemInstance = historyMap.remove(runtimePlanItem.getId());
-                assertNotNull(historicPlanItemInstance);
-                assertEquals(runtimePlanItem.getState(), historicPlanItemInstance.getState());
+                assertThat(historicPlanItemInstance).isNotNull();
+                assertThat(historicPlanItemInstance.getState()).isEqualTo(runtimePlanItem.getState());
             }
 
-            assertEquals(0, historyMap.size());
+            assertThat(historyMap).isEmpty();
         }
     }
 
@@ -271,11 +294,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             fail("No plan item instances found with name " + name + ", following names were found:" + String.join(",", planItemInstanceNames));
         }
 
-        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
-        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
-        for (String state : states) {
-            assertTrue("State '" + state + "' not found in plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
-        }
+        assertThat(planItemInstanceStates).containsExactlyInAnyOrder(states);
     }
 
     protected void assertHistoricPlanItemInstanceState(List<HistoricPlanItemInstance> planItemInstances, String name, String ... states) {
@@ -288,11 +307,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             fail("No historic plan item instances found with name " + name);
         }
 
-        assertEquals("Incorrect number of states found: " + planItemInstanceStates, states.length, planItemInstanceStates.size());
-        List<String> originalStates = new ArrayList<>(planItemInstanceStates);
-        for (String state : states) {
-            assertTrue("State '" + state + "' not found in historic plan item instances states '" + originalStates + "'", planItemInstanceStates.remove(state));
-        }
+        assertThat(planItemInstanceStates).containsExactlyInAnyOrder(states);
     }
 
     protected void assertNoPlanItemInstance(List<PlanItemInstance> planItemInstances, String name) {
@@ -314,7 +329,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             .orderByCreateTime().asc()
             .list();
 
-        assertEquals(itemVariableValues.size(), tasks.size());
+        assertThat(tasks).hasSameSizeAs(itemVariableValues);
 
         List<Object> itemValues = new ArrayList<>(tasks.size());
         List<Object> itemIndexValues = new ArrayList<>(tasks.size());
@@ -351,9 +366,9 @@ public abstract class AbstractFlowableCmmnTestCase {
             .orderByCreateTime().asc()
             .list();
 
-        assertEquals(expectedTotalCount, tasks.size());
-        assertNotNull(itemValues);
-        assertTrue(itemValues.length <= expectedTotalCount);
+        assertThat(tasks).hasSize(expectedTotalCount);
+        assertThat(itemValues).isNotNull();
+        assertThat(itemValues.length).isLessThanOrEqualTo(expectedTotalCount);
 
         for (Object itemValue : itemValues) {
             if (!completePlanItemWithItemValue(tasks, itemValue)) {
@@ -381,7 +396,7 @@ public abstract class AbstractFlowableCmmnTestCase {
             .orderByCreateTime().asc()
             .list();
 
-        assertEquals(expectedCount, tasks.size());
+        assertThat(tasks).hasSize(expectedCount);
         for (PlanItemInstance task : tasks) {
             cmmnRuntimeService.triggerPlanItemInstance(task.getId());
         }

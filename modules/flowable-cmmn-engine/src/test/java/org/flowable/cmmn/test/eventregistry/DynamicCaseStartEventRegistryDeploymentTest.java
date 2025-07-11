@@ -28,9 +28,9 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 /**
@@ -804,7 +804,7 @@ public class DynamicCaseStartEventRegistryDeploymentTest extends FlowableEventRe
         return caseInstance;
     }
 
-    @Before
+    @BeforeEach
     public void deployEventDefinitionAndSendEventCaseDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         eventRepositoryService.createDeployment()
@@ -816,7 +816,7 @@ public class DynamicCaseStartEventRegistryDeploymentTest extends FlowableEventRe
             "org/flowable/cmmn/test/eventregistry/DynamicCaseStartEventRegistryDeploymentTest.sendTestEventCase.cmmn");
     }
 
-    @After
+    @AfterEach
     public void deleteEventAndCaseDeployment() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();

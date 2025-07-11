@@ -28,13 +28,11 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dennis Federico
@@ -42,14 +40,11 @@ import org.junit.rules.TestName;
  */
 public class UserEventListenerTest extends FlowableCmmnTestCase {
 
-    @Rule
-    public TestName name = new TestName();
-
     @Test
     @CmmnDeployment
     public void testSimpleEnableTask() {
         //Simple use of the UserEventListener as EntryCriteria of a Task
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleEnableTask").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -150,7 +145,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateTask() {
         //Test case where the UserEventListener is used to complete (ExitCriteria) of a task
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateTask").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -197,7 +192,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateStage() {
         //Test case where the UserEventListener is used to complete (ExitCriteria) of a Stage
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateStage").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -232,7 +227,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testRepetitionWithUserEventExitCriteria() {
         //Test case where a repeating task is completed by its ExitCriteria fired by a UserEvent
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testRepetitionWithUserEventExitCriteria")
                 .variable("whileTrue", "true")
                 .start();
 
@@ -255,7 +250,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testRepetitionWithUserEventEntryCriteria() {
         //Test case that activates a repeating task (entryCriteria) with a UserEvent
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testRepetitionWithUserEventEntryCriteria")
                 .variable("whileRepeatTaskA", "true")
                 .start();
 
@@ -308,7 +303,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testStageWithoutFiringTheEvent() {
         //Test case where the only "standing" plainItem for a stage is a UserEventListener
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testStageWithoutFiringTheEvent")
                 .start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
@@ -348,7 +343,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testCaseWithoutFiringTheEvent() {
         //Test case where the only "standing" plainItem for a Case is a UserEventListener
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testCaseWithoutFiringTheEvent")
                 .start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
@@ -389,7 +384,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testAutocompleteStageWithoutFiringTheEvent() {
         //Test case where the only "standing" plainItem for a autocomplete stage is a UserEventListener
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testAutocompleteStageWithoutFiringTheEvent")
                 .start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
@@ -426,7 +421,7 @@ public class UserEventListenerTest extends FlowableCmmnTestCase {
     public void testUserEventListenerInstanceQuery() {
         //Test for UserEventListenerInstanceQuery
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testUserEventListenerInstanceQuery")
                 .start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);

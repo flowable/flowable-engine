@@ -25,11 +25,11 @@ import java.util.List;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CaseDefinitionLocalizationManager;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -41,7 +41,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     private String deploymentId2;
     private String deploymentId3;
 
-    @Before
+    @BeforeEach
     public void deployTestDeployments() {
         this.deploymentId1 = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/repository/simple-case.cmmn")
@@ -62,7 +62,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
                 .getId();
     }
 
-    @After
+    @AfterEach
     public void deleteTestDeployments() {
         List<CmmnDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().list();
         for (CmmnDeployment cmmnDeployment : deployments) {

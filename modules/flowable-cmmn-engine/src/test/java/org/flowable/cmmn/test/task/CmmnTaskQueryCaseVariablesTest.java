@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.assertj.core.data.MapEntry;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
@@ -34,9 +34,9 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -46,13 +46,13 @@ public class CmmnTaskQueryCaseVariablesTest extends FlowableCmmnTestCase {
 
     private List<String> taskIds = new ArrayList<>();
 
-    @Before
+    @BeforeEach
     public void deploy() {
         deployOneHumanTaskCaseModel();
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         cmmnEngineConfiguration.getIdmIdentityService()
                 .deleteGroup("accountancy");

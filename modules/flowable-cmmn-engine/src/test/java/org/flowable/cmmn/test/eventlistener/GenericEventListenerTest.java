@@ -26,26 +26,21 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 
 public class GenericEventListenerTest extends FlowableCmmnTestCase {
-
-    @Rule
-    public TestName name = new TestName();
 
     @Test
     @CmmnDeployment
     public void testSimpleEnableTask() {
         //Simple use of the UserEventListener as EntryCriteria of a Task
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleEnableTask").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -153,7 +148,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateTask() {
         //Test case where the EventListener is used to complete (ExitCriteria) of a task
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateTask").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -200,7 +195,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateStage() {
         //Test case where the GenericEventListener is used to complete (ExitCriteria) of a Stage
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTerminateStage").start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);
 
@@ -235,7 +230,7 @@ public class GenericEventListenerTest extends FlowableCmmnTestCase {
     public void testGenericEventListenerInstanceQuery() {
         //Test for EventListenerInstanceQuery
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey(name.getMethodName())
+                .caseDefinitionKey("testGenericEventListenerInstanceQuery")
                 .start();
         assertThat(caseInstance).isNotNull();
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isEqualTo(1);

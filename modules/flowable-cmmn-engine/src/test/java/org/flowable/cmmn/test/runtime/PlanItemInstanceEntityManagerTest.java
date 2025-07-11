@@ -22,9 +22,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Before;
-import org.junit.Test;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests methods not directly exposed on a service
@@ -35,7 +35,7 @@ public class PlanItemInstanceEntityManagerTest extends FlowableCmmnTestCase {
 
     protected String caseDefinitionId;
 
-    @Before
+    @BeforeEach
     public void deployCaseDefinition() {
         String deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceQueryTest.testPlanItemInstanceQuery.cmmn")

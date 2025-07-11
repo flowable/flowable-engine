@@ -19,15 +19,15 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Fabio Filippelli
@@ -39,7 +39,7 @@ public class AsyncJobCategoryTest extends FlowableCmmnTestCase {
 
     protected List<String> originalEnabledJobCategories;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         originalEnabledJobCategories = cmmnEngineConfiguration.getEnabledJobCategories();
         if (originalEnabledJobCategories != null) {
@@ -47,7 +47,7 @@ public class AsyncJobCategoryTest extends FlowableCmmnTestCase {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cmmnEngineConfiguration.setEnabledJobCategories(originalEnabledJobCategories);
         cmmnEngineConfiguration.getJobServiceConfiguration().setEnabledJobCategories(originalEnabledJobCategories);

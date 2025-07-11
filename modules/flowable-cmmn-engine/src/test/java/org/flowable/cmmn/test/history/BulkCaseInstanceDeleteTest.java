@@ -22,7 +22,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -31,7 +31,7 @@ import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
 
