@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -45,6 +46,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic case instance based on variables. POST cmmn-query/historic-case-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -255,6 +257,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                         + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByActivePlanItemDefinitionId() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -318,6 +321,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                     + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByActivePlanItemDefinitionIds() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -387,6 +391,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                     + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByWithoutParentId() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -426,6 +431,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByWithoutCallbackId() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -465,6 +471,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
         "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryHistoricCaseInstancesByCaseDefinitionKeys() throws Exception {
@@ -539,6 +546,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
             .isEqualTo("[]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
         "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryHistoricCaseInstancesByExcludeCaseDefinitionKeys() throws Exception {

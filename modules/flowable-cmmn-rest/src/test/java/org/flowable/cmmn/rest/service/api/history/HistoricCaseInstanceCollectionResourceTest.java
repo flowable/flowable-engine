@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -58,6 +59,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
     /**
      * Test querying historic case instance based on variables. GET history/historic-process-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstances() throws Exception {
         Calendar startTime = Calendar.getInstance();
@@ -215,7 +217,8 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         }
         assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
     }
-    
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetCaseInstancesByActivePlanItemDefinitionId() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -241,6 +244,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testBulkDeleteHistoricCaseInstances() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -276,6 +280,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testInvalidBulkDeleteHistoricCaseInstances() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -318,6 +323,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testOrderByStartTime() throws IOException {
         Instant startTime = Instant.now().minus(2, ChronoUnit.DAYS);
@@ -379,6 +385,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
             "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn"
@@ -442,6 +449,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testWithoutParentIDWithoutCallbackId() throws IOException {
         CaseInstance parentInstance = runtimeService.createCaseInstanceBuilder()
@@ -506,6 +514,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
@@ -550,6 +559,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
@@ -589,6 +599,7 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",

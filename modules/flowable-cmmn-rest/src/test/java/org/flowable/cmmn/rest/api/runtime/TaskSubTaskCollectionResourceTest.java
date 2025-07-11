@@ -22,6 +22,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -37,6 +38,7 @@ public class TaskSubTaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all sub tasks. GET runtime/tasks/{taskId}/subtasks
      */
+    @Test
     public void testGetSubTasks() throws Exception {
 
         Task parentTask = taskService.newTask();

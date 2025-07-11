@@ -34,7 +34,10 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -46,6 +49,7 @@ import net.javacrumbs.jsonunit.core.Option;
  *
  * @author Tijs Rademakers
  */
+@MockitoSettings
 public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
 
     @Mock
@@ -54,9 +58,16 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     @Mock
     protected FormRepositoryService formRepositoryService;
 
+    @AfterEach
+    void tearDown() {
+        cmmnEngineConfiguration.getEngineConfigurations()
+                .remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
+
     /**
      * Test getting a single process definition. GET cmmn-repository/case-definitions/{caseDefinitionResource}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDefinition() throws Exception {
 
@@ -92,6 +103,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single process definition with a graphical notation defined. GET cmmn-repository/case-definitions/{caseDefinitionResource}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
     public void testGetCaseDefinitionWithGraphicalNotation() throws Exception {
 
@@ -127,12 +139,14 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting case-definition. GET repository/case-definitions/{caseDefinitionId}
      */
+    @Test
     public void testGetUnexistingCaseDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetProcessDefinitionResourceData() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -150,6 +164,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting resource content for an unexisting case definition .
      */
+    @Test
     public void testGetResourceContentForUnexistingCaseDefinition() throws Exception {
         HttpGet httpGet = new HttpGet(
                 SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_RESOURCE_CONTENT, "unexisting"));
@@ -157,6 +172,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateProcessDefinitionCategory() throws Exception {
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
@@ -179,81 +195,79 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
 
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/repository/caseWithStartForm.cmmn",
     })
     public void testGetCaseDefinitionStartForm() throws Exception {
 
-        runUsingMocks(() -> {
-            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
-            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+        Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
-            CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-            FormInfo formInfo = new FormInfo();
-            formInfo.setId("formDefId");
-            formInfo.setKey("formDefKey");
-            formInfo.setName("Form Definition Name");
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId("formDefId");
+        formInfo.setKey("formDefKey");
+        formInfo.setName("Form Definition Name");
 
-            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
-            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", caseDefinition.getDeploymentId(), caseDefinition.getTenantId(),
-                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
-                    .thenReturn(formInfo);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+        when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", caseDefinition.getDeploymentId(), caseDefinition.getTenantId(),
+                cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                .thenReturn(formInfo);
 
-            HttpGet httpGet = new HttpGet(
-                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
-            CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " id: 'formDefId',"
-                            + " key: 'formDefKey',"
-                            + " name: 'Form Definition Name',"
-                            + " type: 'startForm',"
-                            + " definitionKey: 'caseWithStartForm'"
-                            + "}");
-        });
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: 'formDefId',"
+                        + " key: 'formDefKey',"
+                        + " name: 'Form Definition Name',"
+                        + " type: 'startForm',"
+                        + " definitionKey: 'caseWithStartForm'"
+                        + "}");
 
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/repository/caseWithStartFormSameDeploymentFalse.cmmn",
     })
-    public void testGetCaseDefinitionStartFormWithSameDeploymentFalse() {
+    public void testGetCaseDefinitionStartFormWithSameDeploymentFalse() throws Exception {
 
-        runUsingMocks(() -> {
-            Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
-            engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+        Map engineConfigurations = cmmnEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
 
-            CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
+        CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().singleResult();
 
-            FormInfo formInfo = new FormInfo();
-            formInfo.setId("formDefId");
-            formInfo.setKey("formDefKey");
-            formInfo.setName("Form Definition Name");
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId("formDefId");
+        formInfo.setKey("formDefKey");
+        formInfo.setName("Form Definition Name");
 
-            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
-            when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", null, caseDefinition.getTenantId(),
-                    cmmnEngineConfiguration.isFallbackToDefaultTenant()))
-                    .thenReturn(formInfo);
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+        when(formRepositoryService.getFormModelByKey("testFormKey", caseDefinition.getTenantId(),
+                cmmnEngineConfiguration.isFallbackToDefaultTenant()))
+                .thenReturn(formInfo);
 
-            HttpGet httpGet = new HttpGet(
-                    SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
-            CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
-            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + " id: 'formDefId',"
-                            + " key: 'formDefKey',"
-                            + " name: 'Form Definition Name',"
-                            + " type: 'startForm',"
-                            + " definitionKey: 'caseWithStartForm'"
-                            + "}");
-        });
+        HttpGet httpGet = new HttpGet(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseDefinition.getId()) + "/start-form");
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + " id: 'formDefId',"
+                        + " key: 'formDefKey',"
+                        + " name: 'Form Definition Name',"
+                        + " type: 'startForm',"
+                        + " definitionKey: 'caseWithStartForm'"
+                        + "}");
 
     }
 

@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,6 +46,7 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all identity links. GET cmmn-runtime/tasks/{taskId}/identitylinks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
         // Test candidate user/groups links + manual added identityLink
@@ -84,6 +86,7 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all identity links. POST cmmn-runtime/tasks/{taskId}/identitylinks
      */
+    @Test
     public void testCreateIdentityLink() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -174,6 +177,7 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single identity link for a task. GET runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}
      */
+    @Test
     public void testGetSingleIdentityLink() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -215,6 +219,7 @@ public class TaskIdentityLinkResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single identity link for a task. DELETE runtime/tasks/{taskId}/identitylinks/{family}/{identityId}/{type}
      */
+    @Test
     public void testDeleteSingleIdentityLink() throws Exception {
         try {
             Task task = taskService.newTask();

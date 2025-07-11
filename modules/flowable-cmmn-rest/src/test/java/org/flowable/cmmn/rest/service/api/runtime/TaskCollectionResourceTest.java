@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,6 +37,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -53,6 +55,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTask() throws Exception {
         try {
             Task parentTask = taskService.newTask();
@@ -107,6 +110,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test creating a task. POST runtime/tasks
      */
+    @Test
     public void testCreateTaskNoBody() throws Exception {
         try {
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION));
@@ -125,6 +129,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a collection of tasks. GET runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetTasks() throws Exception {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
@@ -440,6 +445,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PropagatedStageInstanceId.cmmn" })
     public void testQueryWithPropagatedStageId() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("propagatedStageInstanceId").start();
@@ -475,6 +481,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         assertEmptyResultsPresentInDataResponse(url);
     }
 
+    @Test
     public void testBulkUpdateTaskAssignee() throws IOException {
 
         taskService.createTaskBuilder().id("taskID1").create();
@@ -498,6 +505,8 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         taskService.deleteTask("taskID3", true);
 
     }
+
+    @Test
     public void testInvalidBulkUpdateTasks() throws IOException {
         ObjectNode requestNode = objectMapper.createObjectNode();
 
@@ -523,6 +532,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         executeRequest(httpPut, HttpStatus.SC_NOT_FOUND);
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
@@ -575,6 +585,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",

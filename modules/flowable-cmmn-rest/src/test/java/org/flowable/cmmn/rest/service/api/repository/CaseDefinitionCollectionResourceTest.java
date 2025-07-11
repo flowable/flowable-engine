@@ -23,6 +23,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -36,6 +37,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
     /**
      * Test getting case definitions. GET cmmn-repository/case-definitions
      */
+    @Test
     public void testGetCaseDefinitions() throws Exception {
 
         try {

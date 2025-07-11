@@ -17,14 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class QueryVariableTest extends BaseSpringRestTestCase {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
-
+    @Test
     public void testSerializeQueryVariable() throws Exception {
         // Create a QueryVariable
         QueryVariable origQueryVariable = new QueryVariable();

@@ -33,6 +33,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn" })
     public void testHistoricMilestoneInstanceResource() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
@@ -70,6 +72,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertCaseEnded(caseInstance.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceCollectionResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
@@ -173,6 +176,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertCaseEnded(caseInstance2.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceQueryResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
