@@ -22,33 +22,20 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
  */
 public class ExternalWorkerCombinedScopeTest extends AbstractProcessEngineIntegrationTest {
 
-    protected Deployment deployment;
-
-    @After
-    public void tearDown() throws Exception {
-        if (deployment != null) {
-            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
-        }
-    }
-
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/ExternalWorkerCombinedScopeTest.simpleCase.cmmn")
+    @Deployment(resources = "org/flowable/cmmn/test/ExternalWorkerCombinedScopeTest.simpleProcess.bpmn20.xml")
     public void testSimpleCombined() {
-        processEngineRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/ExternalWorkerCombinedScopeTest.simpleProcess.bpmn20.xml")
-                .deploy();
-
         CaseInstance simpleCase = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("simpleCase")
                 .start();

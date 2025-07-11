@@ -26,7 +26,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -135,6 +135,10 @@ public class EntityLinkDeletionTest extends AbstractProcessEngineIntegrationTest
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
 
         } finally {
+            cmmnRepositoryService.createDeploymentQuery()
+                    .parentDeploymentId(deployment.getId())
+                    .list()
+                    .forEach(cmmnDeployment -> cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true));
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }

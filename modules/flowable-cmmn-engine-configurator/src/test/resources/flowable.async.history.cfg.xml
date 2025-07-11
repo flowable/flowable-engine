@@ -21,6 +21,7 @@
     </bean>
 
     <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.engine.CmmnEngineConfiguration">
+        <property name="cmmnEngineName" value="asyncHistory" />
         <property name="customHistoryJobHandlers">
             <list>
                 <bean class="org.flowable.cmmn.test.TestHistoryJobHandler">
@@ -35,6 +36,7 @@
     </bean>
 
     <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+        <property name="engineName" value="asyncHistory" />
         <property name="dataSource" ref="dataSource"/>
 
         <property name="engineLifecycleListeners">

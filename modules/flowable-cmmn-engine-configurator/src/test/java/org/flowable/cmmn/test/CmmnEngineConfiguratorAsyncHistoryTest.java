@@ -14,60 +14,32 @@ package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngines;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnEngineConfiguratorAsyncHistoryTest {
-
-    private ProcessEngine processEngine;
-    private CmmnEngine cmmnEngine;
-
-    @Before
-    public void setup() {
-        processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.async.history.cfg.xml").buildProcessEngine();
-        cmmnEngine = CmmnEngines.getDefaultCmmnEngine();
-    }
-
-    @After
-    public void cleanup() {
-        processEngine.getRepositoryService()
-                .createDeploymentQuery()
-                .list()
-                .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
-        cmmnEngine.getCmmnRepositoryService()
-                .createDeploymentQuery()
-                .list()
-                .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
-
-        cmmnEngine.close();
-        processEngine.close();
-    }
+@ConfigurationResource("flowable.async.history.cfg.xml")
+public class CmmnEngineConfiguratorAsyncHistoryTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     public void testSharedAsyncHistoryExecutor() {
         // The async history executor should be the same instance
         AsyncExecutor processEngineAsyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncHistoryExecutor();
-        AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncHistoryExecutor();
+        AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngineConfiguration.getAsyncHistoryExecutor();
         assertThat(processEngineAsyncExecutor).isNotNull();
         assertThat(cmmnEngineAsyncExecutor).isSameAs(processEngineAsyncExecutor);
 
         AsyncTaskExecutor processEngineAsyncHistoryTaskExecutor = processEngine.getProcessEngineConfiguration().getAsyncHistoryTaskExecutor();
-        AsyncTaskExecutor cmmnEngineAsyncHistoryTaskExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncHistoryTaskExecutor();
+        AsyncTaskExecutor cmmnEngineAsyncHistoryTaskExecutor = cmmnEngineConfiguration.getAsyncHistoryTaskExecutor();
         assertThat(processEngineAsyncHistoryTaskExecutor).isNotNull();
         assertThat(cmmnEngineAsyncHistoryTaskExecutor).isSameAs(processEngineAsyncHistoryTaskExecutor);
 
@@ -94,7 +66,7 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
                     return null;
                 });
 
-        cmmnEngine.getCmmnEngineConfiguration()
+        cmmnEngineConfiguration
                 .getCommandExecutor()
                 .execute(commandContext -> {
                     HistoryJobService historyJobService = org.flowable.cmmn.engine.impl.util.CommandContextUtil.getCmmnEngineConfiguration(commandContext)
@@ -110,13 +82,13 @@ public class CmmnEngineConfiguratorAsyncHistoryTest {
                     return null;
                 });
 
-        assertThat(cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count()).isEqualTo(2);
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isEqualTo(2);
         assertThat(processEngine.getManagementService().createHistoryJobQuery().count()).isEqualTo(2);
 
         // Starting the async history executor should process all of these
-        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngine.getCmmnEngineConfiguration(), 10000L, 200L, true);
+        CmmnJobTestHelper.waitForAsyncHistoryExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 200L, true);
 
-        assertThat(cmmnEngine.getCmmnManagementService().createHistoryJobQuery().count()).isZero();
+        assertThat(cmmnManagementService.createHistoryJobQuery().count()).isZero();
         assertThat(processEngine.getManagementService().createHistoryJobQuery().count()).isZero();
     }
 }

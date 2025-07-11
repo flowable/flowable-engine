@@ -17,56 +17,42 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnEngines;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
+import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnEngineConfiguratorAsyncJobTest {
+@ConfigurationResource("flowable.async.cfg.xml")
+public class CmmnEngineConfiguratorAsyncJobTest extends AbstractProcessEngineIntegrationTest {
 
-    private ProcessEngine processEngine;
-    private CmmnEngine cmmnEngine;
-
-    @Before
-    public void setup() {
-        processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.async.cfg.xml").buildProcessEngine();
-        cmmnEngine = CmmnEngines.getDefaultCmmnEngine();
-    }
-
-    @After
+    @AfterEach
     public void cleanup() {
         processEngine.getRepositoryService()
                 .createDeploymentQuery()
                 .list()
                 .forEach(deployment -> processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true));
-        cmmnEngine.getCmmnRepositoryService()
+        cmmnRepositoryService
                 .createDeploymentQuery()
                 .list()
-                .forEach(deployment -> cmmnEngine.getCmmnRepositoryService().deleteDeployment(deployment.getId(), true));
+                .forEach(deployment -> cmmnRepositoryService.deleteDeployment(deployment.getId(), true));
         // Execute history jobs for the delete deployments
         processEngine.getManagementService().createHistoryJobQuery().list()
                 .forEach(historyJob -> processEngine.getManagementService().executeHistoryJob(historyJob.getId()));
 
-        cmmnEngine.close();
-        processEngine.close();
     }
 
     @Test
     public void testSharedAsyncExecutor() throws Exception {
         // The async executor should be the same instance
         AsyncExecutor processEngineAsyncExecutor = processEngine.getProcessEngineConfiguration().getAsyncExecutor();
-        AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngine.getCmmnEngineConfiguration().getAsyncExecutor();
+        AsyncExecutor cmmnEngineAsyncExecutor = cmmnEngineConfiguration.getAsyncExecutor();
         assertThat(processEngineAsyncExecutor).isNotNull();
         assertThat(cmmnEngineAsyncExecutor).isNotNull();
 
@@ -80,15 +66,15 @@ public class CmmnEngineConfiguratorAsyncJobTest {
         // Trigger one plan item instance to start the process
         processEngine.getRepositoryService().createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.taskAndTimer.bpmn20.xml").deploy();
-        cmmnEngine.getCmmnRepositoryService().createDeployment()
+        cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/CmmnEngineConfiguratorAsyncJobTest.processAndTimer.cmmn.xml").deploy();
 
 
         // Starting the case instance starts the process task. The process has an async job at the beginning
-        cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder().caseDefinitionKey("timerAndProcess").start();
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerAndProcess").start();
 
         // One timer job should exist for the timer event listener
-        Job timerEventListenerJob = cmmnEngine.getCmmnManagementService().createTimerJobQuery().singleResult();
+        Job timerEventListenerJob = cmmnManagementService.createTimerJobQuery().singleResult();
         assertThat(timerEventListenerJob).isNotNull();
 
         Job job = processEngine.getManagementService().createJobQuery().singleResult();
@@ -125,7 +111,7 @@ public class CmmnEngineConfiguratorAsyncJobTest {
 
         // There should be two user tasks now: one after the timer of the case and one after the timer of the process
         assertThat(processEngine.getTaskService().createTaskQuery().count()).isEqualTo(2);
-        assertThat(cmmnEngine.getCmmnTaskService().createTaskQuery().count()).isEqualTo(2);
+        assertThat(cmmnTaskService.createTaskQuery().count()).isEqualTo(2);
 
     }
 

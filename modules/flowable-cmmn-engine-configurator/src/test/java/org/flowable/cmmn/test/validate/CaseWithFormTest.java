@@ -39,18 +39,16 @@ import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author martin.grofcik
  */
+@MockitoSettings
 public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     public static final String ONE_TASK_CASE = """
@@ -78,9 +76,6 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             </definitions>
             """;
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
-
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
 
@@ -95,7 +90,7 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     protected FormFieldHandler originalFormFieldHandler;
 
-    @Before
+    @BeforeEach
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void initialize() {
         originalFormFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
@@ -117,7 +112,7 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         SideEffectTaskListener.reset();
     }
 
-    @After
+    @AfterEach
     public void cleanDeployments() {
         cmmnEngineConfiguration.setFormFieldHandler(originalFormFieldHandler);
         cmmnEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);

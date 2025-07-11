@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +54,7 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.types.JsonType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -431,6 +432,10 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         } finally {
             for (String deploymentId : deploymentsToDelete) {
+                cmmnRepositoryService.createDeploymentQuery()
+                        .parentDeploymentId(deploymentId)
+                        .list()
+                        .forEach(deployment -> cmmnRepositoryService.deleteDeployment(deployment.getId(), true));
                 processEngineRepositoryService.deleteDeployment(deploymentId, true);
             }
         }
@@ -488,6 +493,10 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         } finally {
             for (String deploymentId : deploymentsToDelete) {
+                cmmnRepositoryService.createDeploymentQuery()
+                        .parentDeploymentId(deploymentId)
+                        .list()
+                        .forEach(deployment -> cmmnRepositoryService.deleteDeployment(deployment.getId(), true));
                 processEngineRepositoryService.deleteDeployment(deploymentId, true);
             }
         }
@@ -537,6 +546,10 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         } finally {
             for (String deploymentId : deploymentsToDelete) {
+                cmmnRepositoryService.createDeploymentQuery()
+                        .parentDeploymentId(deploymentId)
+                        .list()
+                        .forEach(deployment -> cmmnRepositoryService.deleteDeployment(deployment.getId(), true));
                 processEngineRepositoryService.deleteDeployment(deploymentId, true);
             }
         }
@@ -1302,16 +1315,24 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/oneHumanTaskCase.cmmn")
     public void testGetCaseInstanceByParentScopeId() {
+        Collection<String> deploymentsToDelete = new HashSet<>();
 
-        Deployment deployment = processEngineRepositoryService.createDeployment()
+        deploymentsToDelete.add(processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
                 .addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml")
-                .deploy();
+                .deploy()
+                .getId());
 
         try {
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml").deploy();
+            deploymentsToDelete.add(processEngineRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/nestedCallActivityProcess.bpmn20.xml")
+                    .deploy()
+                    .getId());
 
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml").deploy();
+            deploymentsToDelete.add(processEngineRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/oneCaseTaskProcessV2.bpmn20.xml")
+                    .deploy()
+                    .getId());
 
             ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("nestedCallActivity");
 
@@ -1331,7 +1352,13 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             assertThat(caseInstanceId).isEqualTo(loadedCaseInstance.getId());
         } finally {
-            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+            for (String deploymentId : deploymentsToDelete) {
+                cmmnRepositoryService.createDeploymentQuery()
+                        .parentDeploymentId(deploymentId)
+                        .list()
+                        .forEach(deployment -> cmmnRepositoryService.deleteDeployment(deployment.getId(), true));
+                processEngineRepositoryService.deleteDeployment(deploymentId, true);
+            }
         }
     }
 
@@ -1431,7 +1458,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
         @Override
         public Void execute(CommandContext commandContext) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
             List<Execution> query = new ExecutionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration).list();
             ExecutionEntityManager entityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
             for (Execution execution : query) {
