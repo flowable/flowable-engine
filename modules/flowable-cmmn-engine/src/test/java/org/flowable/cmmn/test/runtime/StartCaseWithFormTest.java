@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Test;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik

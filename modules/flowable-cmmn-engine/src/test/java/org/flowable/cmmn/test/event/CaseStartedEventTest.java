@@ -21,14 +21,14 @@ import java.util.function.Consumer;
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -37,13 +37,13 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
 
     protected TestEventListener listener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         listener = new TestEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (listener != null) {
             cmmnEngineConfiguration.getEventDispatcher().removeEventListener(listener);

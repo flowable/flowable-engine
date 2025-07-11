@@ -33,11 +33,12 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -47,20 +48,15 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class PlanItemLifecycleListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         Map<Object, Object> beans = new HashMap<>();
         cmmnEngineConfiguration.setBeans(beans);
 
         beans.put("delegateListener", new TestDelegateTaskListener());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         StateCapturingStaticPlanItemInstanceLifecycleListener.reset();
     }

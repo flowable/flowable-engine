@@ -24,6 +24,7 @@ import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -40,8 +41,6 @@ public abstract class CmmnTestHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnTestHelper.class);
 
-    public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn" };
-    
     static Map<String, CmmnEngine> cmmnEngines = new HashMap<>();
     
     // Test annotation support /////////////////////////////////////////////
@@ -126,8 +125,8 @@ public abstract class CmmnTestHelper {
      * parameter: <code>CMMN_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
      */
     public static String getCmmnCaseDefinitionResource(Class<?> type, String name) {
-        for (String suffix : CMMN_RESOURCE_SUFFIXES) {
-            String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+        for (String suffix : CmmnDeployer.CMMN_RESOURCE_SUFFIXES) {
+            String resource = type.getName().replace('.', '/') + "." + name + suffix;
             InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
             if (inputStream == null) {
                 continue;
@@ -135,7 +134,7 @@ public abstract class CmmnTestHelper {
                 return resource;
             }
         }
-        return type.getName().replace('.', '/') + "." + name + "." + CMMN_RESOURCE_SUFFIXES[1];
+        return type.getName().replace('.', '/') + "." + name + CmmnDeployer.CMMN_RESOURCE_SUFFIXES[1];
     }
 
     public static void deleteDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, String deploymentId) {

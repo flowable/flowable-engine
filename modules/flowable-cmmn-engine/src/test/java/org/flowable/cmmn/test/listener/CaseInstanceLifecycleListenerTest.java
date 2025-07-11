@@ -26,12 +26,13 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -40,20 +41,13 @@ import org.junit.Test;
  */
 public class CaseInstanceLifecycleListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
-    }
-
-    protected TestReceiveAllLifecycleListener testReceiveAllLifecycleListener = new TestReceiveAllLifecycleListener();
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         Map<Object, Object> beans = new HashMap<>();
         cmmnEngineConfiguration.setBeans(beans);
 
         beans.put("delegateListener", new TestDelegateTaskListener());
-        beans.put("receiveAll", testReceiveAllLifecycleListener);
+        beans.put("receiveAll", new TestReceiveAllLifecycleListener());
 
         cmmnEngineConfiguration.addCaseInstanceLifeCycleListener(new CaseInstanceLifecycleListener() {
 

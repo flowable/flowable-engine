@@ -33,14 +33,14 @@ import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
@@ -55,7 +55,7 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
     protected static Wiser wiser;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupWiser() throws Exception {
         wiser = Wiser.port(5025);
 
@@ -76,12 +76,12 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
         }
     }
 
-    @Before
+    @BeforeEach
     public void resetMessages() {
         wiser.getMessages().clear();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopWiser() {
         wiser.stop();
     }

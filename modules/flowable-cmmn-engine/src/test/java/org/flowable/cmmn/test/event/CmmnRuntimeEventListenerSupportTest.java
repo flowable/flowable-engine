@@ -20,15 +20,15 @@ import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventType;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This test is using the event support on the CMMN runtime service level.
@@ -40,7 +40,7 @@ public class CmmnRuntimeEventListenerSupportTest extends FlowableCmmnTestCase {
     protected TestEventListener allEventListener;
     protected TestEventListener caseStartedEventListener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         allEventListener = new TestEventListener();
         caseStartedEventListener = new TestEventListener();
@@ -48,7 +48,7 @@ public class CmmnRuntimeEventListenerSupportTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.addEventListener(caseStartedEventListener, FlowableEngineEventType.CASE_STARTED);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (allEventListener != null) {
             cmmnRuntimeService.removeEventListener(allEventListener);

@@ -23,14 +23,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov

@@ -26,8 +26,9 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CaseCompletionOnStageListenerTest extends CustomCmmnConfigurationFlowableTestCase {
 
@@ -78,13 +79,8 @@ public class CaseCompletionOnStageListenerTest extends CustomCmmnConfigurationFl
         assertCaseInstanceEnded(caseInstance);
     }
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         Map<Object, Object> beans = new HashMap<>();
         beans.put("testListener", new VariableReadingLifecycleListener(cmmnEngineConfiguration.getCmmnRuntimeService()));
         cmmnEngineConfiguration.setBeans(beans);

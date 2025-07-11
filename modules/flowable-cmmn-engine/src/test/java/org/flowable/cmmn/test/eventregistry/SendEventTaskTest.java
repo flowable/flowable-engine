@@ -23,9 +23,9 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -36,7 +36,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
     protected TestOutboundEventChannelAdapter outboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         outboundEventChannelAdapter = setupTestChannel();
 
@@ -64,7 +64,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         return outboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();

@@ -32,9 +32,9 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,7 +67,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
 
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void setup() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
@@ -152,7 +152,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         eventModelBuilder.deploy();
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         getEventRepositoryService().createDeploymentQuery().list()
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
