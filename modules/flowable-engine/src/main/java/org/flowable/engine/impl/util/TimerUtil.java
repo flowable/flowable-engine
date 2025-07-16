@@ -50,9 +50,6 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * @author Joram Barrez
@@ -268,11 +265,8 @@ public class TimerUtil {
 
     public static String prepareRepeat(String dueDate) {
         if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
-            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
             Clock clock = CommandContextUtil.getProcessEngineConfiguration().getClock();
-            Date now = clock.getCurrentTime();
-            return dueDate.replace("/", "/" + fmt.print(new DateTime(now,
-                    DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
+            return dueDate.replace("/", "/" + clock.getCurrentTime().toInstant().toString() + "/");
         }
         return dueDate;
     }

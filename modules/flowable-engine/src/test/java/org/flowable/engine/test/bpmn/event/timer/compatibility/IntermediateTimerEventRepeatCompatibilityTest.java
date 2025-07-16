@@ -26,30 +26,24 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
     @Test
     @Deployment
-    public void testRepeatWithEnd() throws Throwable {
+    public void testRepeatWithEnd() {
 
         // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
         Instant baseInstant = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(337);
 
-        // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-
         // expect to wait after completing task A for 1 hour even I set the end
         // date for 2 hours (the expression will trigger the execution)
-        String endDateForIntermediate1 = fmt.print(new DateTime(baseInstant.plus(2, ChronoUnit.HOURS).getEpochSecond()));
+        String endDateForIntermediate1 = baseInstant.plus(2, ChronoUnit.HOURS).toString();
 
         // expect to wait after completing task B for 1 hour and 30 minutes (the
         // end date will be reached, the expression will not be considered)
-        String endDateForIntermediate2 = fmt.print(new DateTime(baseInstant.plus(1, ChronoUnit.HOURS).plus(30, ChronoUnit.MINUTES).getEpochSecond()));
+        String endDateForIntermediate2 = baseInstant.plus(1, ChronoUnit.HOURS).plus(30, ChronoUnit.MINUTES).toString();
 
         // reset the timer
         Instant nextTimeInstant = baseInstant;

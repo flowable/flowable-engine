@@ -12,12 +12,14 @@
  */
 package org.flowable.common.engine.impl.calendar;
 
+import java.time.Duration;
+import java.time.Period;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.runtime.ClockReader;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
+import org.flowable.common.engine.impl.util.DateUtil;
 
 public class DueDateBusinessCalendar extends BusinessCalendarImpl {
 
@@ -32,10 +34,29 @@ public class DueDateBusinessCalendar extends BusinessCalendarImpl {
         try {
             // check if due period was specified
             if (duedate.startsWith("P")) {
-                return new DateTime(clockReader.getCurrentTime()).plus(Period.parse(duedate)).toDate();
+                ZonedDateTime calculateTime = clockReader.getCurrentTime()
+                        .toInstant()
+                        .atZone(clockReader.getCurrentTimeZone().toZoneId());
+                Period period;
+                Duration duration;
+                if (duedate.startsWith("PT")) {
+                    period = Period.ZERO;
+                    duration = Duration.parse(duedate);
+                } else {
+                    int timeIndex = duedate.indexOf('T');
+                    if (timeIndex > 0) {
+                        period = Period.parse(duedate.substring(0, timeIndex));
+                        duration = Duration.parse("P" + duedate.substring(timeIndex));
+                    } else {
+                        period = Period.parse(duedate);
+                        duration = Duration.ZERO;
+                    }
+                }
+
+                return Date.from(calculateTime.plus(period).plus(duration).toInstant());
             }
 
-            return DateTime.parse(duedate).toDate();
+            return DateUtil.parseDate(duedate);
 
         } catch (Exception e) {
             throw new FlowableException("couldn't resolve duedate: " + e.getMessage(), e);

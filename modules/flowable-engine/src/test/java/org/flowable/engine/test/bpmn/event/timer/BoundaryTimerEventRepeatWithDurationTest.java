@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,8 +29,6 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 public class BoundaryTimerEventRepeatWithDurationTest extends PluggableFlowableTestCase {
@@ -67,8 +66,7 @@ public class BoundaryTimerEventRepeatWithDurationTest extends PluggableFlowableT
         String startDateStr = expression.get(1);
 
         // Validate that repeat string is in ISO8601 Zulu time.
-        DateTime startDateTime = ISODateTimeFormat.dateTime().parseDateTime(startDateStr);
-        assertThat(new DateTime(baseTime)).isEqualTo(startDateTime);
+        assertThat(baseTime).isEqualTo(Instant.parse(startDateStr));
 
         // boundary events
         Job executableJob = managementService.moveTimerToExecutableJob(jobs.get(0).getId());

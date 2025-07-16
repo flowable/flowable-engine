@@ -15,8 +15,7 @@ package org.flowable.common.engine.impl.calendar;
 import java.util.Date;
 
 import org.flowable.common.engine.impl.runtime.ClockReader;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.ISODateTimeFormat;
+import org.flowable.common.engine.impl.util.DateUtil;
 
 /**
  * This class implements business calendar based on internal clock
@@ -44,7 +43,7 @@ public abstract class BusinessCalendarImpl implements BusinessCalendar {
 
     @Override
     public Date resolveEndDate(String endDateString) {
-        return ISODateTimeFormat.dateTimeParser().withZone(DateTimeZone.forTimeZone(clockReader.getCurrentTimeZone())).parseDateTime(endDateString).toCalendar(null).getTime();
+        return DateUtil.parseDate(endDateString);
     }
 
 }

@@ -16,6 +16,7 @@ package org.flowable.common.engine.impl.calendar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,9 +28,8 @@ import javax.xml.datatype.Duration;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.runtime.ClockReader;
+import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.common.engine.impl.util.TimeZoneUtil;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Helper class for parsing ISO8601 duration format (also recurring) and computing next timer date.
@@ -183,10 +183,9 @@ public class DurationHelper {
     protected Calendar parseDate(String date) throws Exception {
         Calendar dateCalendar = null;
         try {
-            dateCalendar = ISODateTimeFormat.dateTimeParser().withZone(DateTimeZone.forTimeZone(
-                    clockReader.getCurrentTimeZone())).parseDateTime(date).toCalendar(null);
+            dateCalendar = DateUtil.parseCalendar(date, clockReader.getCurrentTimeZone().toZoneId());
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | DateTimeParseException e) {
             // try to parse a java.util.date to string back to a java.util.date
             dateCalendar = new GregorianCalendar();
             dateCalendar.setTime(DATE_FORMAT.parse(date));
