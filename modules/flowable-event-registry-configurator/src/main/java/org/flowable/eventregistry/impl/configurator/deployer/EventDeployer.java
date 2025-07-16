@@ -12,11 +12,13 @@
  */
 package org.flowable.eventregistry.impl.configurator.deployer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventDeploymentBuilder;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.util.CommandContextUtil;
@@ -69,6 +71,18 @@ public class EventDeployer implements EngineDeployer {
             }
 
             eventDeploymentBuilder.deploy();
+        }
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        EventRepositoryService repositoryService = CommandContextUtil.getEventRepositoryService();
+        List<EventDeployment> eventDeployments = repositoryService.createDeploymentQuery()
+                .parentDeploymentId(parentDeployment.getId())
+                .list();
+
+        for (EventDeployment eventDeployment : eventDeployments) {
+            repositoryService.deleteDeployment(eventDeployment.getId());
         }
     }
 }

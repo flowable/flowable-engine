@@ -13,6 +13,7 @@
 package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
@@ -92,16 +93,26 @@ class DeploymentTest {
             CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
             assertThat(caseDefinition).isNotNull();
             assertThat(caseDefinition.getKey()).isEqualTo("oneTaskCase");
+
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+
+            assertThat(appRepositoryService.createAppDefinitionQuery().list())
+                    .extracting(AppDefinition::getKey)
+                    .isEmpty();
+
+            assertThat(repositoryService.createProcessDefinitionQuery().list())
+                    .extracting(ProcessDefinition::getKey)
+                    .isEmpty();
+
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list())
+                    .extracting(CaseDefinition::getKey)
+                    .isEmpty();
             
             
         } finally {
-            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
-            if (deployment != null) {
-                processEngineConfiguration.getRepositoryService().deleteDeployment(deployment.getId());
-            }
-            
-            if (cmmnDeployment != null) {
-                cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
+            appDeployment = appRepositoryService.createDeploymentQuery().deploymentId(appDeployment.getId()).singleResult();
+            if (appDeployment != null) {
+                appRepositoryService.deleteDeployment(appDeployment.getId(), true);
             }
         }
     }

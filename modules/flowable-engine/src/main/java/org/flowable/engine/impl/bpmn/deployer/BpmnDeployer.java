@@ -116,6 +116,11 @@ public class BpmnDeployer implements EngineDeployer {
         }
     }
 
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
+    }
+
     /**
      * Creates new diagrams for process definitions if the deployment is new, the process definition in question supports it, and the engine is configured to make new diagrams.
      *

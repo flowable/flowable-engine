@@ -26,6 +26,7 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.test.FlowableAppExtension;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -468,5 +469,54 @@ public class ProcessTest {
                     .list()
                     .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
         }
+    }
+
+    @Test
+    public void deletingAppDeploymentShouldDeleteChildInstances() {
+        AppDeployment appDeployment = appRepositoryService
+                .createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/test.app")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithListener.cmmn")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseTaskProcessWithListener.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+            TaskService taskService = processEngineConfiguration.getTaskService();
+            HistoryService historyService = processEngineConfiguration.getHistoryService();
+
+            CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("caseTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+            CaseInstance subCaseInstance = cmmnRuntimeService
+                    .createCaseInstanceQuery()
+                    .caseDefinitionKey("caseWithListener")
+                    .singleResult();
+            assertThat(subCaseInstance).isNotNull();
+
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery().list()).isEmpty();
+                assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+            }
+        } finally {
+            appDeployment = appRepositoryService.createDeploymentQuery().deploymentId(appDeployment.getId()).singleResult();
+            if (appDeployment != null) {
+                appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+            }
+
+        }
+
     }
 }

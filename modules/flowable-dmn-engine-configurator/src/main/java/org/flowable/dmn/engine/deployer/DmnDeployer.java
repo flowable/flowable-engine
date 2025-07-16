@@ -12,11 +12,13 @@
  */
 package org.flowable.dmn.engine.deployer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
@@ -61,6 +63,19 @@ public class DmnDeployer implements EngineDeployer {
             }
 
             dmnDeploymentBuilder.deploy();
+        }
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        DmnRepositoryService repositoryService = CommandContextUtil.getDmnRepositoryService();
+        List<DmnDeployment> deployments = repositoryService
+                .createDeploymentQuery()
+                .parentDeploymentId(parentDeployment.getId())
+                .list();
+
+        for (DmnDeployment deployment : deployments) {
+            repositoryService.deleteDeployment(deployment.getId());
         }
     }
 }

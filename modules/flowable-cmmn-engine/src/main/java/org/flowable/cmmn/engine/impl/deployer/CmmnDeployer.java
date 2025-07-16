@@ -446,4 +446,9 @@ public class CmmnDeployer implements EngineDeployer {
             return cmmnEngineConfiguration.getCaseValidator();
         }
     }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
+    }
 }

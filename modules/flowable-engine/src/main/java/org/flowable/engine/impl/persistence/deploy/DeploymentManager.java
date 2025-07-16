@@ -189,6 +189,10 @@ public class DeploymentManager {
             return;
         }
 
+        for (EngineDeployer deployer : deployers) {
+            deployer.undeploy(deployment, cascade);
+        }
+
         // Remove any process definition from the cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
