@@ -12,9 +12,9 @@
  */
 package org.flowable.spring.test.servicetask;
 
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.el.FixedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
