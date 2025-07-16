@@ -52,7 +52,6 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -669,10 +668,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 return job;
             });
 
-            try {
-                managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
-                Assert.fail();
-            } catch (FlowableIllegalArgumentException e) { }
+            assertThatThrownBy(() -> managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3))
+                    .isInstanceOf(FlowableIllegalArgumentException.class);
 
             managementService.deleteDeadLetterJob(deadLetterJob.getId());
         }

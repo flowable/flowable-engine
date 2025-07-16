@@ -16,7 +16,6 @@ package org.flowable.engine.test.bpmn.callactivity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -1129,10 +1128,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         tenantId = "flowable"
     )
     public void testCallSubProcessWithFallbackToDefaultTenantFalse() {
-        assertThrows(
-            FlowableObjectNotFoundException.class,
-            () -> assertCallActivityToFallback()
-        );
+        assertThatThrownBy(this::assertCallActivityToFallback)
+                .isInstanceOf(FlowableObjectNotFoundException.class);
     }
 
     @Test
@@ -1140,11 +1137,8 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
         tenantId = "flowable"
     )
     public void testCallSubProcessWithFallbackToDefaultTenantNonBooleanValue() {
-        assertThrows(
-            FlowableException.class,
-            () -> assertCallActivityToFallback(),
-            "Unable to recognize fallbackToDefaultTenant value 1"
-        );
+        assertThatThrownBy(this::assertCallActivityToFallback, "Unable to recognize fallbackToDefaultTenant value 1")
+                .isInstanceOf(FlowableException.class);
     }
     
     @Test

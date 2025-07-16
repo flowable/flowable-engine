@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.jobexecutor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
 
@@ -33,7 +34,7 @@ public class TweetHandler implements JobHandler {
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         messages.add(configuration);
-        Assert.assertNotNull(commandContext);
+        assertThat(commandContext).isNotNull();
     }
 
     public List<String> getMessages() {

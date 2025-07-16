@@ -14,7 +14,7 @@
 package org.flowable.engine.test.bpmn.usertask;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -85,9 +85,8 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("dateVariable", notAValidDate);
 
-        assertThrows(FlowableIllegalArgumentException.class, () -> {
-            runtimeService.startProcessInstanceByKey("dueDateExtensionWithUnparseableDate", variables);
-        });
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("dueDateExtensionWithUnparseableDate", variables))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
     }
 
     @Test

@@ -12,7 +12,7 @@
  */
 package org.flowable.test.persistence;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -99,7 +99,7 @@ public class EntityHelperUtil {
 
             resources.remove("TableData"); // not an entity
 
-            assertFalse(resources.isEmpty());
+            assertThat(resources).isNotEmpty();
 
             return resources;
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class EntityHelperUtil {
 
             resources.remove("TableData"); // not an entity
 
-            assertFalse(resources.isEmpty());
+            assertThat(resources).isNotEmpty();
 
             return resources;
         } catch (Exception e) {

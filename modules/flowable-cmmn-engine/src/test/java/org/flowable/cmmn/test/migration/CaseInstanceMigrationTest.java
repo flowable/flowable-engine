@@ -17,7 +17,6 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ELEMENT_STAGE;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
 import java.util.List;
@@ -1292,7 +1291,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         }
         
         MilestoneInstance milestoneInstance = cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
-        assertNotNull(milestoneInstance);
+        assertThat(milestoneInstance).isNotNull();
         
         // Act
         cmmnMigrationService.createCaseInstanceMigrationBuilder()

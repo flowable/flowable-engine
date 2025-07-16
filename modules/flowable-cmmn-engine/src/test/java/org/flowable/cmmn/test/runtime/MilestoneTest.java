@@ -26,7 +26,6 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -60,7 +59,7 @@ public class MilestoneTest extends FlowableCmmnTestCase {
     public void testRepeatingMilestoneWithLocalVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingMilestone").start();
 
-        Assert.assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().count()).isZero();
 
         for (int i = 1; i <= 10; i++) {
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId());
@@ -95,7 +94,7 @@ public class MilestoneTest extends FlowableCmmnTestCase {
     }
 
     public void assertMilestoneState(String caseInstanceId, int nrOfExpectedCompletedMilestones) {
-        Assert.assertEquals(nrOfExpectedCompletedMilestones, cmmnRuntimeService.createMilestoneInstanceQuery().count());
+        assertThat(cmmnRuntimeService.createMilestoneInstanceQuery().count()).isEqualTo(nrOfExpectedCompletedMilestones);
 
         List<PlanItemInstance> milestonePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
             .planItemInstanceName("Milestone")

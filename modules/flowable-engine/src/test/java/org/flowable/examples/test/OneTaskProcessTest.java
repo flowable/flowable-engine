@@ -120,10 +120,9 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setScript(
                 """
                         import org.flowable.engine.impl.context.Context;
-                        import static org.hamcrest.core.Is.is;
-                        import static org.flowable.examples.test.MatcherAssert.assertThat;
+                        import static org.assertj.core.api.Assertions.assertThat
 
-                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"""
+                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count()).isZero();"""
         );
         testFlowNodesSkeleton.add(assertTask);
 
@@ -248,10 +247,9 @@ public class OneTaskProcessTest extends PluggableFlowableTestCase {
         assertTask.setScript(
                 """
                         import org.flowable.engine.impl.context.Context;
-                        import static org.hamcrest.core.Is.is;
-                        import static org.flowable.examples.test.MatcherAssert.assertThat;
+                        import static org.assertj.core.api.Assertions.assertThat
 
-                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));"""
+                        assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count()).isZero();"""
         );
         process.addFlowElement(assertTask);
 

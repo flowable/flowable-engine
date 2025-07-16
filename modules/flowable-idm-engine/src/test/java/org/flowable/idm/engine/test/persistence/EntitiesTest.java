@@ -13,7 +13,7 @@
 package org.flowable.idm.engine.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;

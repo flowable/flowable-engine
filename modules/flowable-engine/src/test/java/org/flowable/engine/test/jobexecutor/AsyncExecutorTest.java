@@ -15,6 +15,7 @@ package org.flowable.engine.test.jobexecutor;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
@@ -38,7 +39,6 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -328,7 +328,7 @@ public class AsyncExecutorTest {
             assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(1);
 
         } catch(Exception e)  {
-            Assert.fail("Unexpected exception: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
             throw e;
         } finally {
 

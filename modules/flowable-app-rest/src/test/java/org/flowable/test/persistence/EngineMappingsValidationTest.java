@@ -13,12 +13,9 @@
 package org.flowable.test.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.flowable.test.persistence.EntityParameterTypesOverview.getColumnType;
 import static org.flowable.test.persistence.EntityParameterTypesOverview.getParameterType;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.test.persistence.EntityHelperUtil.EntityMappingPackageInformation;
 import org.flowable.test.persistence.EntityHelperUtil.EntityPackageTestArgumentsProvider;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,7 +67,7 @@ public class EngineMappingsValidationTest {
     @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyMappedEntitiesExist(EntityMappingPackageInformation packageInformation) {
         Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
-        assertFalse(mappedResources.isEmpty());
+        assertThat(mappedResources).isNotEmpty();
 
         for (String mappedResource : mappedResources.keySet()) {
             Document mappingFileContent = mappedResources.get(mappedResource);
@@ -84,10 +82,13 @@ public class EngineMappingsValidationTest {
         Map<String, Document> mappedResources = EntityHelperUtil.readMappingFile(packageInformation);
         for (String mappedResource : mappedResources.keySet()) {
             Document mappingFileContent = mappedResources.get(mappedResource);
-            assertTrue(packageInformation.getEntityInsertOrder().contains(getAndAssertEntityImplClass(mappingFileContent, mappedResource)),
-                "No insert entry in EntityDependencyOrder for " + mappedResource);
-            assertTrue(packageInformation.getEntityDeleteOrder().contains(getAndAssertEntityImplClass(mappingFileContent, mappedResource)),
-                "No delete entry in EntityDependencyOrder for " + mappedResource);
+            Class<? extends Entity> entityImplClass = getAndAssertEntityImplClass(mappingFileContent, mappedResource);
+            assertThat(packageInformation.getEntityInsertOrder())
+                    .withFailMessage("No insert entry in EntityDependencyOrder for " + mappedResource)
+                    .contains(entityImplClass);
+            assertThat(packageInformation.getEntityDeleteOrder())
+                    .withFailMessage("No delete entry in EntityDependencyOrder for " + mappedResource)
+                    .contains(entityImplClass);
         }
     }
 
@@ -199,7 +200,7 @@ public class EngineMappingsValidationTest {
     @ArgumentsSource(EntityPackageTestArgumentsProvider.class)
     public void verifyAllParametersAreTyped(EntityMappingPackageInformation packageInformation) throws IOException {
         Map<String, String> mappedResources = EntityHelperUtil.readMappingFileAsString(packageInformation);
-        assertFalse(mappedResources.isEmpty());
+        assertThat(mappedResources).isNotEmpty();
 
         for (String mappedResource : mappedResources.keySet()) {
             System.out.println("Checking mapping " + mappedResource);
@@ -313,7 +314,7 @@ public class EngineMappingsValidationTest {
         String expectedClass = entityPackage + "." + mappedEntity + "Entity";
         try {
             Class<?> c = Class.forName(expectedClass);
-            assertNotNull(c);
+            assertThat(c).isNotNull();
             return c;
         } catch (Exception e) {
             fail("Entity interface class " + entityPackage + "." + mappedEntity + " for " + mappedEntity + " not found");
@@ -321,13 +322,13 @@ public class EngineMappingsValidationTest {
         return null;
     }
 
-    protected Class<?> getAndAssertEntityImplClass(Document mappingFileContent, String mappedEntity) {
+    protected Class<? extends Entity> getAndAssertEntityImplClass(Document mappingFileContent, String mappedEntity) {
         String entityPackage = getEntityPackageFromMapperElement(mappingFileContent);
         String expectedClass = entityPackage + "." + mappedEntity + "EntityImpl";
         try {
             Class<?> c = Class.forName(expectedClass);
-            assertNotNull(c);
-            return c;
+            assertThat(c).isNotNull();
+            return (Class<? extends Entity>) c;
         } catch (Exception e) {
             fail("Entity interface class " + expectedClass + " for " + mappedEntity + " not found");
         }

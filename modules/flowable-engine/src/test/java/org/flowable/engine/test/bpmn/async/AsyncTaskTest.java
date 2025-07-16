@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.async;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Collections;
@@ -36,7 +37,6 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 public class AsyncTaskTest extends PluggableFlowableTestCase {
@@ -569,7 +569,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                     sequenceFlowCount++;
 
                 } else {
-                    Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
+                    fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
@@ -609,7 +609,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                     sequenceFlowCount++;
 
                 } else {
-                    Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
+                    fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
@@ -666,7 +666,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                     sequenceFlowCount++;
 
                 } else {
-                    Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
+                    fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 
@@ -706,7 +706,7 @@ public class AsyncTaskTest extends PluggableFlowableTestCase {
                     sequenceFlowCount++;
 
                 } else {
-                    Assert.fail("Unexpected activity found " + historicActivityInstance.getActivityId());
+                    fail("Unexpected activity found " + historicActivityInstance.getActivityId());
                 }
             }
 

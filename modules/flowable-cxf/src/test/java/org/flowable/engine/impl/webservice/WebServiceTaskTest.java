@@ -14,7 +14,7 @@ package org.flowable.engine.impl.webservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -360,10 +360,12 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
         final HistoricProcessInstance histProcInst = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstance.getId()).includeProcessVariables().singleResult();
-        final Map<String, Object> procVariables = histProcInst.getProcessVariables();
-        assertEquals("23", procVariables.get("outParam1"));
-        assertEquals(23, procVariables.get("outParam2"));
-        assertEquals("23-23", procVariables.get("outParam3"));
+        assertThat(histProcInst.getProcessVariables())
+                .contains(
+                        entry("outParam1", "23"),
+                        entry("outParam2", 23),
+                        entry("outParam3", "23-23")
+                );
     }
 
 }
