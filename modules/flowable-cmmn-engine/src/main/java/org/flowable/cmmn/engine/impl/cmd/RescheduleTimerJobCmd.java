@@ -26,15 +26,12 @@ import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 public class RescheduleTimerJobCmd implements Command<Job> {
 
@@ -108,7 +105,7 @@ public class RescheduleTimerJobCmd implements Command<Job> {
 
                 // Try to parse as ISO8601 first
                 try {
-                    timerDueDate = DateTime.parse(newDateValue).toDate();
+                    timerDueDate = DateUtil.parseDate(newDateValue);
                 } catch (Exception e) { }
 
                 // Try to parse as cron expression
@@ -162,8 +159,7 @@ public class RescheduleTimerJobCmd implements Command<Job> {
     
     public String prepareRepeat(String dueDate, Clock clock) {
         if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
-            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-            return dueDate.replace("/", "/" + fmt.print(new DateTime(clock.getCurrentTime(),DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
+            return dueDate.replace("/", "/" + clock.getCurrentTime().toInstant().toString() + "/");
         }
         return dueDate;
     }

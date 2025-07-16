@@ -48,6 +48,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
+import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -57,8 +58,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.joda.time.DateTime;
-import org.joda.time.Period;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -293,12 +292,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
                 } else if (dueDate instanceof String) {
                     String dueDateString = (String) dueDate;
-                    if (dueDateString.startsWith("P")) {
-                        taskEntity.setDueDate(new DateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime())
-                                .plus(Period.parse(dueDateString)).toDate());
-                    } else {
-                        taskEntity.setDueDate(DateTime.parse(dueDateString).toDate());
-                    }
+                    Date resolvedDuedate = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager()
+                            .getBusinessCalendar(DueDateBusinessCalendar.NAME)
+                            .resolveDuedate(dueDateString);
+                    taskEntity.setDueDate(resolvedDuedate);
 
                 } else if (dueDate instanceof Instant) {
                     taskEntity.setDueDate(Date.from((Instant) dueDate));
