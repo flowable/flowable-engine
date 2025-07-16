@@ -56,4 +56,9 @@ public class AppDeployer implements EngineDeployer {
             deploymentManager.getAppResourceCache().add(deployment.getId(), appResourceObject);
         }
     }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
+    }
 }
