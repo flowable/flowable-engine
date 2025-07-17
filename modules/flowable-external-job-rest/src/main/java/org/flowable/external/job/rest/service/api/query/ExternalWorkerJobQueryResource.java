@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -36,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
  */
 @RestController
 @Api(tags = { "Info and Query" })
-public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseResource {
+public class ExternalWorkerJobQueryResource extends ExternalWorkerJobBaseResource {
 
     public static final Map<String, QueryProperty> PROPERTIES;
 
@@ -53,11 +55,17 @@ public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseRe
 
     protected final ExternalJobRestResponseFactory restResponseFactory;
 
-    public ExternalWorkerJobCollectionResource(ExternalJobRestResponseFactory restResponseFactory) {
+    public ExternalWorkerJobQueryResource(ExternalJobRestResponseFactory restResponseFactory) {
         this.restResponseFactory = restResponseFactory;
     }
 
     @ApiOperation(value = "List External Worker Jobs", tags = { "Info and Query" })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'id'.", allowableValues = "id,dueDate,createTime,executionId,processInstanceId,retries,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
+    })
     @ApiResponses({
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error."),
