@@ -1597,6 +1597,7 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    @Disabled("This can lead to creating invalid retry topics with retry duplicates not being in the end, which is required from Spring Kafka")
     void uniformRandomBackOffRetry() throws Exception {
         createTopic("uniform-random-backoff");
 
