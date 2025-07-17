@@ -67,7 +67,10 @@ public class PrivilegeCollectionResource {
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return privileges with the given id", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return privileges with the given name", paramType = "query"),
             @ApiImplicitParam(name = "userId", dataType = "string", value = "Only return privileges with the given userId", paramType = "query"),
-            @ApiImplicitParam(name = "groupId", dataType = "string", value = "Only return privileges with the given groupId", paramType = "query")
+            @ApiImplicitParam(name = "groupId", dataType = "string", value = "Only return privileges with the given groupId", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
+
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested privileges were returned.")

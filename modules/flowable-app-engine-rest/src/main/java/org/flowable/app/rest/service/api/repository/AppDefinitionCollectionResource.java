@@ -88,6 +88,9 @@ public class AppDefinitionCollectionResource {
             @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "Only return app definitions without a tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "If true; only the latest versions will be returned.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "key,category,id,version,name,deploymentId,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the app definitions are returned"),
