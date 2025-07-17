@@ -44,6 +44,14 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(PluggableFlowableExtension.class);
 
     @Override
+    public void beforeEach(ExtensionContext context) {
+        super.beforeEach(context);
+        if (AnnotationSupport.isAnnotated(context.getRequiredTestClass(), EnableVerboseExecutionTreeLogging.class)) {
+            swapCommandInvoker(getProcessEngine(context), true);
+        }
+    }
+
+    @Override
     public void afterEach(ExtensionContext context) throws Exception {
         try {
             super.afterEach(context);
@@ -57,14 +65,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        ProcessEngine processEngine = getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
-
-        // Enable verbose execution tree debugging if needed
-        Class<?> testClass = context.getRequiredTestClass();
-        if (AnnotationSupport.isAnnotated(testClass, EnableVerboseExecutionTreeLogging.class)) {
-            swapCommandInvoker(processEngine, true);
-        }
-        return processEngine;
+        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
     }
 
     protected ProcessEngine initializeProcessEngine(String configurationResource) {
