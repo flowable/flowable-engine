@@ -31,22 +31,15 @@ public class PluggableFlowableDmnExtension extends InternalFlowableDmnExtension 
     @Override
     protected DmnEngine getDmnEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeDmnEngine, DmnEngine.class);
+        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeDmnEngine, CloseableEngine.class).dmnEngine;
     }
 
-    protected DmnEngine initializeDmnEngine(String configurationResource) {
+    protected CloseableEngine initializeDmnEngine(String configurationResource) {
         logger.info("No cached dmn engine found for test. Retrieving engine from {}.", configurationResource);
         DmnEngineConfiguration dmnEngineConfiguration = DmnEngineConfiguration.createDmnEngineConfigurationFromResource(configurationResource);
-        if (DmnEngines.isInitialized()) {
-            DmnEngine previousDmnEngine = DmnEngines.getDmnEngine(dmnEngineConfiguration.getEngineName());
-            if (previousDmnEngine != null) {
-                DmnEngines.unregister(previousDmnEngine); // Just to be sure we're not getting any previously cached version
-                previousDmnEngine.close();
-            }
-        }
         DmnEngine dmnEngine = dmnEngineConfiguration.buildDmnEngine();
         DmnEngines.setInitialized(true);
-        return dmnEngine;
+        return new CloseableEngine(dmnEngine);
     }
 
     protected String getConfigurationResource(ExtensionContext context) {
@@ -58,6 +51,22 @@ public class PluggableFlowableDmnExtension extends InternalFlowableDmnExtension 
     @Override
     protected ExtensionContext.Store getStore(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE);
+    }
+
+    protected static class CloseableEngine implements ExtensionContext.Store.CloseableResource {
+
+        protected final DmnEngine dmnEngine;
+
+        protected CloseableEngine(DmnEngine dmnEngine) {
+            this.dmnEngine = dmnEngine;
+        }
+
+        @Override
+        public void close() throws Throwable {
+            if (dmnEngine != null) {
+                dmnEngine.close();
+            }
+        }
     }
 
     protected record ConfigurationResource(String resource, String engineName) {
