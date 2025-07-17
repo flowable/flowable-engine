@@ -540,7 +540,6 @@
 						<exclude>**/*TestCase.java</exclude>
 					</excludes>
 					<runOrder>alphabetical</runOrder>
-					<rerunFailingTestsCount>5</rerunFailingTestsCount>
 				</configuration>
 			</plugin>
 			<plugin>
