@@ -41,7 +41,7 @@ public class HistoricPlanItemInstanceQueryResource extends HistoricPlanItemInsta
     @ApiOperation(value = "Query for historic plan item instances", tags = {"History PlanItem", "Query"}, nickname = "queryHistoricPlanItemInstance",
             notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic plan item instances, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'createTime'.", allowableValues = "createTime,createdTime,endedTime,name", paramType = "body"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'createTime'.", allowableValues = "createTime,endedTime,name", paramType = "body"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the plan item instances are returned"),
