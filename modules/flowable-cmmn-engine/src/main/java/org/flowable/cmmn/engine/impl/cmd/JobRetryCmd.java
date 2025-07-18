@@ -18,19 +18,24 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Saeid Mirzaei
  * @author Joram Barrez
+ * @author martin.grofcik
  */
 public class JobRetryCmd implements Command<Object> {
 
@@ -52,7 +57,7 @@ public class JobRetryCmd implements Command<Object> {
             return null;
         }
 
-        AbstractRuntimeJobEntity newJobEntity = null;
+        AbstractRuntimeJobEntity newJobEntity;
         if (job.getRetries() <= 1 || isUnrecoverableException()) {
             newJobEntity = jobService.moveJobToDeadLetterJob(job);
         } else {
@@ -71,6 +76,16 @@ public class JobRetryCmd implements Command<Object> {
         if (exception != null) {
             newJobEntity.setExceptionMessage(exception.getMessage());
             newJobEntity.setExceptionStacktrace(getExceptionStacktrace());
+        }
+
+        // Dispatch both an update and a retry-decrement event
+        CmmnEngineConfiguration configuration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        FlowableEventDispatcher eventDispatcher = configuration.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, newJobEntity),
+                    configuration.getEngineCfgKey());
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_RETRIES_DECREMENTED, newJobEntity),
+                    configuration.getEngineCfgKey());
         }
 
         return null;
