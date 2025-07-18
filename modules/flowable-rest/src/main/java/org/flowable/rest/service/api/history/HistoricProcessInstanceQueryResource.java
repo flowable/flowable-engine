@@ -40,10 +40,7 @@ public class HistoricProcessInstanceQueryResource extends HistoricProcessInstanc
     @ApiOperation(value = "Query for historic process instances", tags = {"History Process", "Query" }, nickname = "queryHistoricProcessInstance",
             notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic process instances, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format as described here.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'processInstanceId'.", allowableValues = "processInstanceId,processDefinitionId,businessKey,startTime,endTime,duration,tenantId", paramType = "query"),
-            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
-            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
-            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'processInstanceId'.", allowableValues = "processInstanceId,processDefinitionId,businessKey,startTime,endTime,duration,tenantId", paramType = "body"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the process instances are returned"),

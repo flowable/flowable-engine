@@ -107,11 +107,11 @@ public interface PaginateListUtil {
         String sort = paginateRequest.getSort();
         if (sort == null) {
             sort = defaultSort;
-        }        if (order == null) {
-            order = "asc";
         }
         String order = paginateRequest.getOrder();
-
+        if (order == null) {
+            order = "asc";
+        }
 
         // Sort order
         if (sort != null && properties != null && !properties.isEmpty()) {

@@ -44,9 +44,6 @@ public class HistoricVariableInstanceQueryResource extends HistoricVariableInsta
             + "The variables property is a JSON-array containing objects with the format as described here.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'variableName'.", allowableValues = "caseInstanceId,variableName", paramType = "query"),
-            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
-            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
-            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
