@@ -12,6 +12,8 @@
  */
 package org.flowable.common.rest.api;
 
+import io.swagger.annotations.ApiParam;
+
 /**
  * Interface representing a paginated request object, use when paging is needed without using URL-parameters.
  * 
@@ -33,6 +35,7 @@ public class PaginateRequest {
         return start;
     }
 
+    @ApiParam(value = "From the paginate request. Index of the first row to fetch. Defaults to 0.")
     public void setStart(Integer start) {
         this.start = start;
     }
@@ -41,6 +44,7 @@ public class PaginateRequest {
         return size;
     }
 
+    @ApiParam(name = "size", type = "integer", value = "From the paginate request. Number of rows to fetch, starting from start. Defaults to 10.")
     public void setSize(Integer size) {
         this.size = size;
     }
@@ -57,6 +61,7 @@ public class PaginateRequest {
         return order;
     }
 
+    @ApiParam(name = "order", type = "string", value = "From the paginate request.  The sort order, either 'asc' or 'desc'. Defaults to 'asc'.")
     public void setOrder(String order) {
         this.order = order;
     }

@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -58,6 +60,9 @@ public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseRe
     }
 
     @ApiOperation(value = "List External Worker Jobs", tags = { "Info and Query" })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'id'.", allowableValues = "id,dueDate,createTime,executionId,processInstanceId,retries,tenantId", paramType = "body"),
+   })
     @ApiResponses({
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error."),

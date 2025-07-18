@@ -67,7 +67,10 @@ public class HistoryJobCollectionResource {
             @ApiImplicitParam(name = "lockOwner", dataType = "string", value = "If true, only return jobs which are owned by the given lockOwner.", paramType = "query"),
             @ApiImplicitParam(name = "locked", dataType = "boolean", value = "If true, only return jobs which are locked.  If false, this parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "unlocked", dataType = "boolean", value = "If true, only return jobs which are unlocked. If false, this parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,retries,tenantId", paramType = "query")
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,retries,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),

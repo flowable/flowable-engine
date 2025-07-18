@@ -96,7 +96,8 @@ public class VariableInstanceBaseResource {
             restApiInterceptor.accessVariableInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, query, "variableName", allowedSortProperties, restResponseFactory::createVariableInstanceResponseList);
+        return paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
+                restResponseFactory::createVariableInstanceResponseList);
     }
     
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {

@@ -43,7 +43,11 @@ public class VariableInstanceCollectionResource extends VariableInstanceBaseReso
             @ApiImplicitParam(name = "excludeTaskVariables", dataType = "boolean", value = "Indication to exclude the task variables from the result.", paramType = "query"),
             @ApiImplicitParam(name = "excludeLocalVariables", dataType = "boolean", value = "Indication to exclude local variables or not.", paramType = "query"),
             @ApiImplicitParam(name = "variableName", dataType = "string", value = "The variable name of the variable instance.", paramType = "query"),
-            @ApiImplicitParam(name = "variableNameLike", dataType = "string", value = "The variable name using the like operator for the variable instance.", paramType = "query")
+            @ApiImplicitParam(name = "variableNameLike", dataType = "string", value = "The variable name using the like operator for the variable instance.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'variableName'.", allowableValues = "caseInstanceId,variableName", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that variable instances could be queried."),

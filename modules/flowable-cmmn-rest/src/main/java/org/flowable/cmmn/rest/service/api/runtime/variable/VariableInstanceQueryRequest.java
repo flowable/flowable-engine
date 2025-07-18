@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.variable;
 import java.util.List;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.common.rest.api.PaginateRequest;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 /**
  * @author Tijs Rademakers
  */
-public class VariableInstanceQueryRequest {
+public class VariableInstanceQueryRequest extends PaginateRequest {
 
     private Boolean excludeTaskVariables;
     private String taskId;
@@ -33,8 +34,6 @@ public class VariableInstanceQueryRequest {
     private String variableNameLike;
     private List<QueryVariable> variables;
     private Boolean excludeLocalVariables;
-
-
     private String variableScope;
 
     public Boolean getExcludeTaskVariables() {

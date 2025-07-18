@@ -52,7 +52,11 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query")
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'startTime'.", allowableValues = "activityId,activityName,activityType,duration,endTime,executionId,activityInstanceId,processDefinitionId,processInstanceId,startTime,tenantId,", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @GetMapping(value = "/runtime/activity-instances", produces = "application/json")
     public DataResponse<ActivityInstanceResponse> getActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {

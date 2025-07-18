@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -39,6 +41,9 @@ public class ExecutionQueryResource extends ExecutionBaseResource {
     @ApiOperation(value = "Query executions", tags = {"Executions", "Query" }, nickname = "queryExecutions",
             notes = "The request body can contain all possible filters that can be used in the List executions URL query. On top of these, it’s possible to provide an array of variables and processInstanceVariables to include in the query, with their format described here.\n"
             + "\n" + "The general paging and sorting query-parameters can be used for this URL.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'processInstanceId'.", allowableValues = "processDefinitionId,processDefinitionKey,processInstanceId,tenantId", paramType = "body"),
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned."),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
