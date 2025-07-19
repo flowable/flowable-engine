@@ -184,6 +184,8 @@ public class RabbitChannelRebootEngineTest {
         for (EventDeployment eventDeployment : eventDeployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
+
+        applicationContext.close();
     }
 
     @Configuration

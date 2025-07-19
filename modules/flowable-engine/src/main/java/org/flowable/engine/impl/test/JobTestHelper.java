@@ -162,12 +162,15 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsOrExecutableTimersAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
-        if (emptyJobs) {
-            return !managementService.createTimerJobQuery().executable().list().isEmpty();
-        } else {
-            return true;
-        }
+        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
+        return managementService.executeCommand(commandContext -> {
+            boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
+            if (emptyJobs) {
+                return !managementService.createTimerJobQuery().executable().list().isEmpty();
+            } else {
+                return true;
+            }
+        });
     }
 
     /**
@@ -175,12 +178,15 @@ public class JobTestHelper {
      * which only take in account executable timers).
      */
     public static boolean areJobsOrTimersAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().count() == 0L;
-        if (emptyJobs) {
-            return !(managementService.createTimerJobQuery().count() == 0L);
-        } else {
-            return true;
-        }
+        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
+        return managementService.executeCommand(commandContext -> {
+            boolean emptyJobs = managementService.createJobQuery().count() == 0L;
+            if (emptyJobs) {
+                return !(managementService.createTimerJobQuery().count() == 0L);
+            } else {
+                return true;
+            }
+        });
     }
 
     protected static void internalWaitForJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,

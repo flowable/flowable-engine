@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -39,7 +40,8 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCatchingTimerEvent() throws Exception {
         // Set the clock fixed
-        Date startTime = new Date();
+        Instant startTime = Instant.now();
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(startTime));
 
         // After process start, there should be timer created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("intermediateTimerEventExample");
@@ -50,8 +52,8 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertThat(job.getElementId()).isEqualTo("timer");
         assertThat(job.getElementName()).isEqualTo("Timer catch");
 
-        // After setting the clock to time '50minutes and 5 seconds', the second timer should fire
-        processEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
+        // After setting the clock to time '5 minutes and 5 seconds', the second timer should fire
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(startTime.plus(5, ChronoUnit.MINUTES).plus(5, ChronoUnit.SECONDS)));
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
 
         assertThat(jobQuery.count()).isZero();

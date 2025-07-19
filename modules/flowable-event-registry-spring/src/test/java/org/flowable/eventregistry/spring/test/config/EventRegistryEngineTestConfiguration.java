@@ -72,8 +72,6 @@ public class EventRegistryEngineTestConfiguration {
 
         channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
 
-        engineConfiguration.setEnableEventRegistryChangeDetection(true);
-
         engineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
 
         configurationConfigurers.orderedStream()

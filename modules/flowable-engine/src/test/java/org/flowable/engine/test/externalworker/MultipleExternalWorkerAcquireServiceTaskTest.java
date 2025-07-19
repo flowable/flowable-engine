@@ -13,6 +13,7 @@
 package org.flowable.engine.test.externalworker;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.time.Duration;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -101,6 +103,10 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
     @Test
     @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.bpmn20.xml")
     void testAcquireJobsInTheSameTimeWithNoRetries() throws ExecutionException, InterruptedException {
+        String databaseType = processEngineConfiguration.getDatabaseType();
+        assumeThat(databaseType)
+                .withFailMessage("Test is disabled on Oracle since Oracle manages to acquire the correct jobs for both workers.")
+                .isNotEqualTo(AbstractEngineConfiguration.DATABASE_TYPE_ORACLE);
         for (int i = 0; i < 5; i++) {
             runtimeService.createProcessInstanceBuilder()
                     .processDefinitionKey("simpleExternalWorker")

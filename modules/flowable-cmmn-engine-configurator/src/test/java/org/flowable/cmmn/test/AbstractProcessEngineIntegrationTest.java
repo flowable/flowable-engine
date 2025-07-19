@@ -14,7 +14,6 @@ package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,12 +104,6 @@ public abstract class AbstractProcessEngineIntegrationTest {
         for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
             cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
         }
-    }
-
-    protected Date setCmmnClockFixedToCurrentTime() {
-        Date date = new Date();
-        cmmnEngineConfiguration.getClock().setCurrentTime(date);
-        return date;
     }
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {

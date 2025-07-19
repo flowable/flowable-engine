@@ -41,7 +41,7 @@
 			Therefore, we are fixing it like this.
 		-->
 		<byte-buddy.version>1.14.19</byte-buddy.version>
-		<testcontainers.version>1.21.0</testcontainers.version>
+		<testcontainers.version>1.21.3</testcontainers.version>
 		<artemis.version>2.40.0</artemis.version>
 
 		<oracle.jdbc.version>23.7.0.25.01</oracle.jdbc.version>
@@ -440,6 +440,11 @@
 				<version>3.27.3</version>
 				<scope>test</scope>
 			</dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>4.0.3</version>
+            </dependency>
 			<dependency>
 				<groupId>net.javacrumbs.json-unit</groupId>
 				<artifactId>json-unit-assertj</artifactId>

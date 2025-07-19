@@ -37,6 +37,7 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Test
+        id: test
         # use postgres for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
         # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
@@ -54,3 +55,9 @@ jobs:
           -Dspring.datasource.username=flowable
           -Dspring.datasource.password=flowable
           -Dmaven.test.redirectTestOutputToFile=false
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with:
+          name: surefire-test-reports-postgres-${{ matrix.postgres }}
+          path: '**/target/surefire-reports/*'

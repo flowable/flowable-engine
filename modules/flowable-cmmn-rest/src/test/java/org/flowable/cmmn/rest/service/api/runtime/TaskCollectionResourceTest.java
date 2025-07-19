@@ -135,14 +135,17 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();
+            adhocTaskCreate.set(Calendar.SECOND, 14);
             adhocTaskCreate.set(Calendar.MILLISECOND, 0);
 
             Calendar processTaskCreate = Calendar.getInstance();
             processTaskCreate.add(Calendar.HOUR, 2);
+            processTaskCreate.set(Calendar.SECOND, 15);
             processTaskCreate.set(Calendar.MILLISECOND, 0);
 
             Calendar inBetweenTaskCreation = Calendar.getInstance();
             inBetweenTaskCreation.add(Calendar.HOUR, 1);
+            inBetweenTaskCreation.set(Calendar.SECOND, 21);
 
             cmmnEngineConfiguration.getClock().setCurrentTime(adhocTaskCreate.getTime());
             Task adhocTask = taskService.newTask();
@@ -361,7 +364,6 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             assertResultsPresentInDataResponse(url, adhocTask.getId());
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithoutSeconds(
                     adhocTaskCreate.getTime());
-            assertResultsPresentInDataResponse(url);
             assertResultsPresentInDataResponse(url);
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithMS(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());

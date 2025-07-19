@@ -14,6 +14,7 @@ package org.flowable.job.service.impl;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
@@ -156,4 +157,10 @@ public class AcquiredExternalWorkerJobImpl implements AcquiredExternalWorkerJob 
         return job.getLockExpirationTime();
     }
     
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", AcquiredExternalWorkerJobImpl.class.getSimpleName() + "[", "]")
+                .add("job=" + job)
+                .toString();
+    }
 }

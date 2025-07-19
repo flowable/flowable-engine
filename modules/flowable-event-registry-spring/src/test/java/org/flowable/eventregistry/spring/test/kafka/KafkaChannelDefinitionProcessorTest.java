@@ -156,7 +156,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-new-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("eventShouldBeReceivedWhenChannelDefinitionIsRegistered")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("test-new-customer")
             .eventProcessingPipeline()
@@ -211,7 +211,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-expression-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("kafkaTopicIsCorrectlyResolvedFromExpression")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("${application.test.kafka-topic}")
             .eventProcessingPipeline()
@@ -266,7 +266,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("inbound-custom-bean-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("kafkaTopicIsCorrectlyResolvedFromExpressionUsingCustomBean")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
             .eventProcessingPipeline()
@@ -467,7 +467,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventShouldBeReceivedAfterChannelDefinitionIsRegistered")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -538,7 +538,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventWithSimpleHeader")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -591,7 +591,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventWithMultipleHeaders")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -927,7 +927,7 @@ class KafkaChannelDefinitionProcessorTest {
         });
 
         eventRepositoryService.createInboundChannelModelBuilder()
-                .key("newCustomerChannel")
+                .key("eventShouldBeReceivedMultipleTimesAfterAnExceptionIsThrown")
                 .resourceName("customer.channel")
                 .kafkaChannelAdapter("test-throwing-topic")
                 .eventProcessingPipeline()

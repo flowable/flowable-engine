@@ -14,7 +14,9 @@
 package org.flowable.camel.examples.multiinstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
@@ -53,7 +55,7 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
 
     @Test
     @Deployment(resources = { "process/multiinstanceReceive.bpmn20.xml" })
-    public void testRunProcess() throws Exception {
+    public void testRunProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miProcessExample");
         List<Job> jobList = managementService.createJobQuery().list();
         assertThat(jobList).hasSize(5);
@@ -64,13 +66,9 @@ public class MultiInstanceTest extends SpringFlowableTestCase {
                 .count()).isEqualTo(5);
 
         waitForJobExecutorToProcessAllJobs(3000, 500);
-        int counter = 0;
-        long processInstanceCount = 1;
-        while (processInstanceCount == 1 && counter < 20) {
-            Thread.sleep(500);
-            processInstanceCount = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count();
-            counter++;
-        }
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        await("Receive from Camel")
+                .atMost(Duration.ofSeconds(30))
+                .pollInterval(Duration.ofMillis(500))
+                .untilAsserted(() -> assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).isEmpty());
     }
 }
