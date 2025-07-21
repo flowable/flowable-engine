@@ -74,28 +74,29 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     protected CamelContext camelContextObj;
     protected List<MapExceptionEntry> mapExceptions;
 
-    protected abstract void setPropertTargetVariable(FlowableEndpoint endpoint);
-
     public enum TargetType {
         BODY_AS_MAP, BODY, PROPERTIES
     }
 
-    protected TargetType toTargetType;
+    protected TargetType determineToTargetType(FlowableEndpoint endpoint) {
+        if (endpoint.isCopyVariablesToBodyAsMap()) {
+            return TargetType.BODY_AS_MAP;
+        }
 
-    protected void updateTargetVariables(FlowableEndpoint endpoint) {
-        toTargetType = null;
-        if (endpoint.isCopyVariablesToBodyAsMap())
-            toTargetType = TargetType.BODY_AS_MAP;
-        else if (endpoint.isCopyCamelBodyToBody())
-            toTargetType = TargetType.BODY;
-        else if (endpoint.isCopyVariablesToProperties())
-            toTargetType = TargetType.PROPERTIES;
+        if (endpoint.isCopyCamelBodyToBody()) {
+            return TargetType.BODY;
+        }
 
-        if (toTargetType == null)
-            setPropertTargetVariable(endpoint);
+        if (endpoint.isCopyVariablesToProperties()) {
+            return TargetType.PROPERTIES;
+        }
+
+        return getDefaultToTargetType();
     }
 
-    protected void copyVariables(Map<String, Object> variables, Exchange exchange, FlowableEndpoint endpoint) {
+    protected abstract TargetType getDefaultToTargetType();
+
+    protected void copyVariables(Map<String, Object> variables, Exchange exchange, FlowableEndpoint endpoint, TargetType toTargetType) {
         switch (toTargetType) {
             case BODY_AS_MAP:
                 copyVariablesToBodyAsMap(variables, exchange);
@@ -112,8 +113,6 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
 
     @Override
     public void execute(DelegateExecution execution) {
-        setAppropriateCamelContext(execution);
-
         boolean isV5Execution = false;
         if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
             (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
@@ -143,11 +142,14 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
 
     protected FlowableEndpoint createEndpoint(DelegateExecution execution, boolean isV5Execution) {
         String uri = "flowable://" + getProcessDefinitionKey(execution, isV5Execution) + ":" + execution.getCurrentActivityId();
-        return getEndpoint(uri);
+        CamelContext camelContext = getCamelContext(execution, isV5Execution);
+        return getEndpoint(camelContext, uri);
     }
 
-    protected FlowableEndpoint getEndpoint(String key) {
-        for (Endpoint e : camelContextObj.getEndpoints()) {
+    protected abstract CamelContext getCamelContext(DelegateExecution execution, boolean isV5Execution);
+
+    protected FlowableEndpoint getEndpoint(CamelContext camelContext, String key) {
+        for (Endpoint e : camelContext.getEndpoints()) {
             if (e.getEndpointKey().equals(key) && (e instanceof FlowableEndpoint)) {
                 return (FlowableEndpoint) e;
             }
@@ -160,8 +162,8 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         ex.setProperty(FlowableProducer.PROCESS_ID_PROPERTY, activityExecution.getProcessInstanceId());
         ex.setProperty(FlowableProducer.EXECUTION_ID_PROPERTY, activityExecution.getId());
         Map<String, Object> variables = activityExecution.getVariables();
-        updateTargetVariables(endpoint);
-        copyVariables(variables, ex, endpoint);
+        TargetType toTargetType = determineToTargetType(endpoint);
+        copyVariables(variables, ex, endpoint, toTargetType);
         return ex;
     }
 
@@ -231,8 +233,6 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         }
         return async;
     }
-
-    protected abstract void setAppropriateCamelContext(DelegateExecution execution);
 
     protected String getStringFromField(Expression expression, DelegateExecution execution) {
         if (expression != null) {
