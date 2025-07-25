@@ -1,0 +1,45 @@
+services:
+
+  postgres:
+    image: postgres:14.2
+    environment:
+      POSTGRES_DB:       flowable
+      POSTGRES_USER:     flowable
+      POSTGRES_PASSWORD: flowable
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      cluster.name: flowable-cluster
+      node.name: flowable-node-01
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  flowable-rest:
+    image: flowable-rest      # nutzt dein lokal gebautes Image
+    container_name: flowable-rest
+    entrypoint: ["/flowable-entrypoint.sh"]
+    environment:
+      SPRING_DATASOURCE_URL:       jdbc:postgresql://postgres:5432/flowable
+      SPRING_DATASOURCE_USERNAME:  flowable
+      SPRING_DATASOURCE_PASSWORD:  flowable
+      SPRING_ELASTICSEARCH_URIS:   http://elasticsearch:9200
+      SERVER_SERVLET_CONTEXT_PATH: /app-api
+      JAVA_OPTS:                   "-Xms512m -Xmx2g"
+    ports:
+      - "8184:8080"
+    depends_on:
+      - postgres
+      - elasticsearch
+
+volumes:
+  pg_data:
+  es_data:
