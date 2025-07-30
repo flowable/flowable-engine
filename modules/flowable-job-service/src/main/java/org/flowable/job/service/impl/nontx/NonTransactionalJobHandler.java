@@ -25,12 +25,34 @@ import org.flowable.variable.api.delegate.VariableScope;
  *
  * @author Joram Barrez
  */
-public interface NonTransactionalJobHandler extends JobHandler {
+public interface NonTransactionalJobHandler<Output> extends JobHandler {
 
     default void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         throw new UnsupportedOperationException();
     }
 
-    void executeNonTransactionally(JobEntity job, String configuration);
+    /**
+     * Execute the job handler logic outside a transaction.
+     * If the handler needs to execute certain login transactionally,
+     * it can return some output and that use that in the {@link #afterExecute(JobEntity, String, Object, CommandContext)} (which gets executed in a transaction).
+     *
+     * @param job the job that is being executed
+     * @param configuration the job handler configuration
+     * @return the result of the non-transactional execution
+     */
+    Output executeNonTransactionally(JobEntity job, String configuration);
+
+    /**
+     * Method invoked with the result from {@link #executeNonTransactionally(JobEntity, String)}.
+     * This should be used when the result of the non-transactional execution should be executed in a transaction.
+     *
+     * @param job The job that is being executed
+     * @param configuration the job configuration
+     * @param output the output from the non-transactional execution
+     * @param commandContext the command context of the current transaction
+     */
+    default void afterExecute(JobEntity job, String configuration, Output output, CommandContext commandContext) {
+        // Nothing to do by default
+    }
 
 }
