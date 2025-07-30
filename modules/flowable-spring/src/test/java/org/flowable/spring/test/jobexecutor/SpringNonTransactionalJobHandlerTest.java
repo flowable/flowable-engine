@@ -22,12 +22,10 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.api.Job;
-import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.nontx.NonTransactionalJobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,6 +86,8 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
         assertThat(nonTransactionalTestJobHandler.getWithoutTransactionCounter().get()).isEqualTo(1);
         assertThat(nonTransactionalTestJobHandler.getWithTransactionCounter().get()).isEqualTo(0);
         assertThat(nonTransactionalTestJobHandler.getWithoutCommandContext().get()).isEqualTo(1);
+        assertThat(nonTransactionalTestJobHandler.nonTransactionalOutput).isEqualTo("myTest");
+        assertThat(nonTransactionalTestJobHandler.nonTransactionalCounter).hasValue(1);
 
         assertThat(managementService.createJobQuery().count()).isEqualTo(0);
     }
@@ -116,6 +116,8 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
         assertThat(nonTransactionalTestJobHandlerWithException.getWithoutTransactionCounter().get()).isEqualTo(1);
         assertThat(nonTransactionalTestJobHandlerWithException.getWithTransactionCounter().get()).isEqualTo(0);
         assertThat(nonTransactionalTestJobHandlerWithException.getWithoutCommandContext().get()).isEqualTo(1);
+        assertThat(nonTransactionalTestJobHandlerWithException.nonTransactionalOutput).isNull();
+        assertThat(nonTransactionalTestJobHandlerWithException.nonTransactionalCounter).hasValue(0);
 
         assertThat(managementService.createJobQuery().count()).isEqualTo(0);
 
@@ -123,15 +125,17 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
         assertThat(job.getRetries()).isEqualTo(initialRetries - 1);
     }
 
-    public static class NonTransactionalTestJobHandler implements NonTransactionalJobHandler {
+    public static class NonTransactionalTestJobHandler implements NonTransactionalJobHandler<String> {
 
         protected AtomicInteger counter = new AtomicInteger();
         protected AtomicInteger withCommandContext = new AtomicInteger(0);
         protected AtomicInteger withoutCommandContext = new AtomicInteger(0);
         protected AtomicInteger withTransactionCounter = new AtomicInteger(0);
         protected AtomicInteger withoutTransactionCounter = new AtomicInteger(0);
+        protected AtomicInteger nonTransactionalCounter = new AtomicInteger(0);
 
         protected String jobConfiguration;
+        protected String nonTransactionalOutput;
 
         @Override
         public String getType() {
@@ -139,7 +143,7 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
         }
 
         @Override
-        public void executeNonTransactionally(JobEntity job, String configuration) {
+        public String executeNonTransactionally(JobEntity job, String configuration) {
 
             // Not checking the passed command context, but checking the low-level one on Context
             counter.incrementAndGet();
@@ -160,7 +164,14 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
             }
 
             this.jobConfiguration = job.getJobHandlerConfiguration();
+            return this.jobConfiguration;
 
+        }
+
+        @Override
+        public void afterExecute(JobEntity job, String configuration, String output, CommandContext commandContext) {
+            nonTransactionalCounter.incrementAndGet();
+            this.nonTransactionalOutput = output;
         }
 
         public AtomicInteger getCounter() {
@@ -205,7 +216,7 @@ public class SpringNonTransactionalJobHandlerTest extends SpringFlowableTestCase
         }
 
         @Override
-        public void executeNonTransactionally(JobEntity job, String configuration) {
+        public String executeNonTransactionally(JobEntity job, String configuration) {
             super.executeNonTransactionally(job, configuration);
 
             throw new RuntimeException();

@@ -178,7 +178,7 @@ public class ExecuteAsyncRunnable implements Runnable {
                 new ExecuteAsyncRunnableJobCmd(job.getId(), jobEntityManager, jobServiceConfiguration, unlock));
     }
 
-    protected boolean handleNontransactionalJob(NonTransactionalJobHandler jobHandler, boolean unlock) {
+    protected boolean handleNontransactionalJob(NonTransactionalJobHandler<Object> jobHandler, boolean unlock) {
 
         JobProcessorUtil.callJobProcessors(jobServiceConfiguration, JobProcessorContext.Phase.BEFORE_EXECUTE, (JobEntity) job);
 
@@ -189,7 +189,7 @@ public class ExecuteAsyncRunnable implements Runnable {
         // If an exception is thrown during job handler exception, it goes up and will be caught in the general exception handling.
         // The delete at the end won't happen in that case.
 
-        jobHandler.executeNonTransactionally((JobEntity) job, job.getJobHandlerConfiguration());
+        Object nonTransactionalOutput = jobHandler.executeNonTransactionally((JobEntity) job, job.getJobHandlerConfiguration());
 
         FlowableEventDispatcher eventDispatcher = jobServiceConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
@@ -199,6 +199,7 @@ public class ExecuteAsyncRunnable implements Runnable {
 
         // The delete still needs to happen in a new transaction
         jobServiceConfiguration.getCommandExecutor().execute(commandContext -> {
+            jobHandler.afterExecute((JobEntity) job, job.getJobHandlerConfiguration(), nonTransactionalOutput, commandContext);
             jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
             return null;
         });

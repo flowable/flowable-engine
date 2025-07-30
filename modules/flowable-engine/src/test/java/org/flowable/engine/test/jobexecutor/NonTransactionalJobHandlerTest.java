@@ -79,6 +79,8 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
 
         assertThat(managementService.createJobQuery().count()).isEqualTo(0);
         assertThat(nonTransactionalTestJobHandler.getJobConfiguration()).isEqualTo("myTest");
+        assertThat(nonTransactionalTestJobHandler.nonTransactionalOutput).isEqualTo("myTest");
+        assertThat(nonTransactionalTestJobHandler.nonTransactionalCounter).hasValue(1);
     }
 
     @Test
@@ -105,6 +107,8 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         assertThat(nonTransactionalTestJobHandlerWithException.getWithoutTransactionCounter().get()).isEqualTo(1);
         assertThat(nonTransactionalTestJobHandlerWithException.getWithTransactionCounter().get()).isEqualTo(0);
         assertThat(nonTransactionalTestJobHandlerWithException.getWithoutCommandContext().get()).isEqualTo(1);
+        assertThat(nonTransactionalTestJobHandlerWithException.nonTransactionalOutput).isNull();
+        assertThat(nonTransactionalTestJobHandlerWithException.nonTransactionalCounter).hasValue(0);
 
         assertThat(managementService.createJobQuery().count()).isEqualTo(0);
 
@@ -112,15 +116,17 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         assertThat(job.getRetries()).isEqualTo(initialRetries - 1);
     }
 
-    public static class NonTransactionalTestJobHandler implements NonTransactionalJobHandler {
+    public static class NonTransactionalTestJobHandler implements NonTransactionalJobHandler<String> {
 
         protected AtomicInteger counter = new AtomicInteger();
         protected AtomicInteger withCommandContext = new AtomicInteger(0);
         protected AtomicInteger withoutCommandContext = new AtomicInteger(0);
         protected AtomicInteger withTransactionCounter = new AtomicInteger(0);
         protected AtomicInteger withoutTransactionCounter = new AtomicInteger(0);
+        protected AtomicInteger nonTransactionalCounter = new AtomicInteger(0);
 
         protected String jobConfiguration;
+        protected String nonTransactionalOutput;
 
         @Override
         public String getType() {
@@ -128,7 +134,7 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void executeNonTransactionally(JobEntity job, String configuration) {
+        public String executeNonTransactionally(JobEntity job, String configuration) {
 
             // Not checking the passed command context, but checking the low-level one on Context
             counter.incrementAndGet();
@@ -148,7 +154,14 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
             }
 
             this.jobConfiguration = job.getJobHandlerConfiguration();
+            return jobConfiguration;
 
+        }
+
+        @Override
+        public void afterExecute(JobEntity job, String configuration, String output, CommandContext commandContext) {
+            nonTransactionalCounter.incrementAndGet();
+            this.nonTransactionalOutput = output;
         }
 
         public AtomicInteger getCounter() {
@@ -195,7 +208,7 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void executeNonTransactionally(JobEntity job, String configuration) {
+        public String executeNonTransactionally(JobEntity job, String configuration) {
             super.executeNonTransactionally(job, configuration);
 
             throw new RuntimeException();
