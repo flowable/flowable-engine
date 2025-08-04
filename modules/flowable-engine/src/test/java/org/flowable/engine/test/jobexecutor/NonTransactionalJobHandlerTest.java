@@ -14,18 +14,24 @@ package org.flowable.engine.test.jobexecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.nontx.NonTransactionalJobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +90,54 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    public void testAsyncExclusiveJob() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+        Task task = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getId())
+                .singleResult();
+        managementService.executeCommand(commandContext -> {
+            JobService jobService = CommandContextUtil.getJobService();
+            JobEntity job = jobService.createJob();
+            job.setProcessInstanceId(processInstance.getId());
+            job.setExecutionId(task.getExecutionId());
+            job.setJobHandlerType(nonTransactionalTestJobHandler.getType());
+            job.setJobHandlerConfiguration("myTest");
+            jobService.createAsyncJob(job, true);
+            jobService.scheduleAsyncJob(job);
+            return null;
+        });
+
+        AtomicReference<String> processLockOwner = new AtomicReference<>();
+        AtomicReference<Date> processLockTime = new AtomicReference<>();
+        nonTransactionalTestJobHandler.nonTransactionalRunnable = () -> {
+            ExecutionEntity executionEntity = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+            processLockOwner.set(executionEntity.getLockOwner());
+            processLockTime.set(executionEntity.getLockTime());
+        };
+
+        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 10000L, 20L,
+                () -> managementService.createJobQuery().count() == 0);
+
+        assertThat(processLockOwner).hasValue(processEngineConfiguration.getAsyncExecutor().getLockOwner());
+        assertThat(processLockTime).doesNotHaveNullValue();
+
+        managementService.executeCommand(commandContext -> {
+            ExecutionEntity executionEntity = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .singleResult();
+
+            assertThat(executionEntity.getLockOwner()).isNull();
+            assertThat(executionEntity.getLockTime()).isNull();
+            return null;
+        });
+    }
+
+    @Test
     public void testJobExecutedWithoutTransactionThrowsException() {
         managementService.executeCommand(commandContext -> {
             JobService jobService = CommandContextUtil.getJobService();
@@ -125,6 +179,8 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         protected AtomicInteger withoutTransactionCounter = new AtomicInteger(0);
         protected AtomicInteger nonTransactionalCounter = new AtomicInteger(0);
 
+        protected Runnable nonTransactionalRunnable;
+
         protected String jobConfiguration;
         protected String nonTransactionalOutput;
 
@@ -154,6 +210,9 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
             }
 
             this.jobConfiguration = job.getJobHandlerConfiguration();
+            if (nonTransactionalRunnable != null) {
+                nonTransactionalRunnable.run();
+            }
             return jobConfiguration;
 
         }
@@ -189,6 +248,7 @@ public class NonTransactionalJobHandlerTest extends PluggableFlowableTestCase {
         }
 
         public void reset() {
+            this.nonTransactionalRunnable = null;
             this.counter.set(0);
             this.withCommandContext.set(0);
             this.withoutCommandContext.set(0);

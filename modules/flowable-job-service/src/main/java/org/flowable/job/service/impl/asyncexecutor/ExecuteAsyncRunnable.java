@@ -182,10 +182,6 @@ public class ExecuteAsyncRunnable implements Runnable {
 
         JobProcessorUtil.callJobProcessors(jobServiceConfiguration, JobProcessorContext.Phase.BEFORE_EXECUTE, (JobEntity) job);
 
-        if (unlock) {
-            jobServiceConfiguration.getCommandExecutor().execute(new UnlockExclusiveJobCmd((Job) job, jobServiceConfiguration));
-        }
-
         // If an exception is thrown during job handler exception, it goes up and will be caught in the general exception handling.
         // The delete at the end won't happen in that case.
 
@@ -200,6 +196,14 @@ public class ExecuteAsyncRunnable implements Runnable {
         // The delete still needs to happen in a new transaction
         jobServiceConfiguration.getCommandExecutor().execute(commandContext -> {
             jobHandler.afterExecute((JobEntity) job, job.getJobHandlerConfiguration(), nonTransactionalOutput, commandContext);
+
+            if (unlock) {
+                // Part of the same transaction to avoid a race condition with the
+                // potentially new jobs (wrt process instance locking) that are created
+                // during the execution of the original job
+                new UnlockExclusiveJobCmd((Job) job, jobServiceConfiguration).execute(commandContext);
+            }
+
             jobServiceConfiguration.getJobEntityManager().delete((JobEntity) job);
             return null;
         });
