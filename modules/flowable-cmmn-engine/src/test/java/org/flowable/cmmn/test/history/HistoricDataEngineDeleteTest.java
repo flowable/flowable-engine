@@ -139,6 +139,8 @@ public class HistoricDataEngineDeleteTest extends FlowableCmmnTestCase {
                             });
                 }
 
+                cmmnEngineConfiguration.resetClock();
+
                 assertThat(cmmnManagementService.createTimerJobQuery().handlerType(CmmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
 
                 Job executableJob = cmmnManagementService.moveTimerToExecutableJob(
