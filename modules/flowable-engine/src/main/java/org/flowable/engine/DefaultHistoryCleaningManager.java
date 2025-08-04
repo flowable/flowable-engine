@@ -45,7 +45,7 @@ public class DefaultHistoryCleaningManager implements HistoryCleaningManager {
 
     protected Date getEndedBefore() {
         Duration endedAfterDuration = processEngineConfiguration.getCleanInstancesEndedAfter();
-        Instant endedBefore = Instant.now().minus(endedAfterDuration);
+        Instant endedBefore = processEngineConfiguration.getClock().getCurrentTime().toInstant().minus(endedAfterDuration);
         return Date.from(endedBefore);
     }
 }
