@@ -980,7 +980,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                     waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
                 }
-                        
+
+                processEngineConfiguration.resetClock();
+
                 managementService.handleHistoryCleanupTimerJob();
                 
                 assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);

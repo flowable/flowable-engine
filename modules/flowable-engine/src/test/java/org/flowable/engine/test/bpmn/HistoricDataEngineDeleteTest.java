@@ -142,6 +142,7 @@ public class HistoricDataEngineDeleteTest extends ResourceFlowableTestCase {
                 
                 assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
                 
+                processEngineConfiguration.getClock().reset();
                 Job executableJob = managementService.moveTimerToExecutableJob(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).singleResult().getId());
                 managementService.executeJob(executableJob.getId());
                 
