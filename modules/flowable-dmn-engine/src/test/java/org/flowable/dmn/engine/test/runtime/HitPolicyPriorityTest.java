@@ -43,6 +43,19 @@ class HitPolicyPriorityTest extends BaseFlowableDmnTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyPriorityTest.priorityHitPolicy.dmn")
+    public void priorityHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .executeWithSingleResult();
+
+        assertThat(result).isNull();
+    }
+
+    @Test
     @DmnDeployment
     public void priorityHitPolicyCompound() {
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
