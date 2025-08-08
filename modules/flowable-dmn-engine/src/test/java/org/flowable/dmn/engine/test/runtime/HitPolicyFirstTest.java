@@ -54,7 +54,7 @@ public class HitPolicyFirstTest {
     @Test
     @DmnDeployment
     public void firstHitPolicyNoMatch() {
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+        DmnDecisionService dmnRuleService = flowableDmnRule.getDmnEngine().getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

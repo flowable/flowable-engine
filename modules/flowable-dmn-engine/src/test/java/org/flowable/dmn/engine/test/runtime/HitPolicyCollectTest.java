@@ -54,7 +54,7 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyCollectTest.collectHitPolicyNoAggregator.dmn")
     public void collectHitPolicyNoAggregatorNoMatch() {
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+        DmnDecisionService dmnRuleService = flowableDmnRule.getDmnEngine().getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
@@ -141,7 +141,7 @@ public class HitPolicyCollectTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyCollectTest.collectHitPolicySUM.dmn")
     public void collectHitPolicySUMNoMatch() {
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+        DmnDecisionService dmnRuleService = flowableDmnRule.getDmnEngine().getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")

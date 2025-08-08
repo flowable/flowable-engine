@@ -52,7 +52,7 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyPriorityTest.priorityHitPolicy.dmn")
     public void priorityHitPolicyNoMatch() {
-        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+        DmnDecisionService dmnRuleService = flowableDmnRule.getDmnEngine().getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
                 .decisionKey("decision1")
