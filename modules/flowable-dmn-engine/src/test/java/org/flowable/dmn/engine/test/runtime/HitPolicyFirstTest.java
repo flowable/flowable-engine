@@ -50,4 +50,17 @@ public class HitPolicyFirstTest {
                         entry("outputVariable2", "result2")
                 );
     }
+
+    @Test
+    @DmnDeployment
+    public void firstHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .executeWithSingleResult();
+
+        assertThat(result).isNull();
+    }
 }

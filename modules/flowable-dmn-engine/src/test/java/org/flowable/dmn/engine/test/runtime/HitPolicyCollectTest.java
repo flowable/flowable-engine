@@ -52,6 +52,19 @@ public class HitPolicyCollectTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyCollectTest.collectHitPolicyNoAggregator.dmn")
+    public void collectHitPolicyNoAggregatorNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .execute();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     @DmnDeployment
     public void collectHitPolicyNoAggregatorCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
@@ -123,6 +136,19 @@ public class HitPolicyCollectTest {
 
         assertThat(result)
                 .containsExactly(entry("outputVariable1", 90D));
+    }
+
+    @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyCollectTest.collectHitPolicySUM.dmn")
+    public void collectHitPolicySUMNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .executeWithSingleResult();
+
+        assertThat(result).isNull();
     }
 
     @Test

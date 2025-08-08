@@ -52,6 +52,19 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyOutputOrderTest.outputOrderHitPolicy.dmn")
+    public void outputOrderHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .execute();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     @DmnDeployment
     public void outputOrderHitPolicyNumberAsString() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
