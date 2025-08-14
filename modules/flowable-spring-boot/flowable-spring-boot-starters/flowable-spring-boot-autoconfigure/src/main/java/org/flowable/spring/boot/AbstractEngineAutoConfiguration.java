@@ -13,6 +13,7 @@
 package org.flowable.spring.boot;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +56,14 @@ public abstract class AbstractEngineAutoConfiguration {
     protected void configureEngine(AbstractEngineConfiguration engineConfiguration, DataSource dataSource) {
 
         engineConfiguration.setDataSource(dataSource);
+
+        try (Connection connection = dataSource.getConnection()) {
+            if (StringUtils.hasText(connection.getCatalog())) {
+                engineConfiguration.setDatabaseCatalog(connection.getCatalog());
+            }
+        } catch (Exception e) {
+            throw new FlowableException("Could not set database catalog on connection", e);
+        }
 
         engineConfiguration.setDatabaseSchema(defaultText(flowableProperties.getDatabaseSchema(), engineConfiguration.getDatabaseSchema()));
         engineConfiguration.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), engineConfiguration
