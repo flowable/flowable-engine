@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.sql.Connection;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -466,6 +468,9 @@ public abstract class AbstractEngineConfiguration {
             }
         }
 
+        // Flowable issue #4095: Set databaseCatalog from DataSource if not configured
+        initDatabaseCatalogFromDataSource();
+
         if (databaseType == null) {
             initDatabaseType();
         }
@@ -478,6 +483,28 @@ public abstract class AbstractEngineConfiguration {
         // Especially with executions, with 100 as default, this limit is passed.
         if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
             maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
+        }
+    }
+
+    /**
+     * Initializes the databaseCatalog from the DataSource if it has not been set.
+     * <p>
+     * This ensures that the catalog is automatically derived from the database connection metadata
+     * when {@link #databaseCatalog} is null.
+     * </p>
+     *
+     * @see <a href="https://github.com/flowable/flowable-engine/issues/4095">#4095</a>
+     */
+    protected void initDatabaseCatalogFromDataSource() {
+        if (this.databaseCatalog == null) {
+            try (Connection connection = dataSource.getConnection()) {
+                String catalog = connection.getCatalog();
+                if (StringUtils.isNoneBlank(catalog)) {
+                    this.databaseCatalog = catalog;
+                }
+            } catch (Exception e) {
+                throw new FlowableException("Could not set database catalog from DataSource connection", e);
+            }
         }
     }
 
