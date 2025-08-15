@@ -64,6 +64,11 @@ public class FlowableProperties {
     private String databaseSchemaUpdate = "true";
 
     /**
+     * In some situations you want to set the catalog to use for database checks / generation if the database metadata doesn't return that correctly.
+     */
+    private String databaseCatalog;
+
+    /**
      * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly.
      */
     private String databaseSchema;
@@ -219,6 +224,14 @@ public class FlowableProperties {
 
     public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
+    }
+
+    public String getDatabaseCatalog() {
+        return databaseCatalog;
+    }
+
+    public void setDatabaseCatalog(String databaseCatalog) {
+        this.databaseCatalog = databaseCatalog;
     }
 
     public String getDatabaseSchema() {
