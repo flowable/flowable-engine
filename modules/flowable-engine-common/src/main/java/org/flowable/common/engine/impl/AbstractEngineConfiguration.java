@@ -496,7 +496,7 @@ public abstract class AbstractEngineConfiguration {
      * @see <a href="https://github.com/flowable/flowable-engine/issues/4095">#4095</a>
      */
     protected void initDatabaseCatalogFromDataSource() {
-        if (this.databaseCatalog == null) {
+        if (StringUtils.isBlank(this.databaseCatalog)) {
             try (Connection connection = dataSource.getConnection()) {
                 String catalog = connection.getCatalog();
                 if (StringUtils.isNoneBlank(catalog)) {
