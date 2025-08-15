@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.FlowableVersion;
 import org.flowable.common.engine.impl.FlowableVersions;
@@ -129,6 +130,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             ResultSet tables = null;
 
             String catalog = databaseConfiguration.getDatabaseCatalog();
+
+            // Flowable issue #4095: Set catalog from current connection if not configured
+            if (StringUtils.isBlank(catalog)) {
+                catalog = connection.getCatalog();
+            }
 
             String schema = databaseConfiguration.getDatabaseSchema();
 
