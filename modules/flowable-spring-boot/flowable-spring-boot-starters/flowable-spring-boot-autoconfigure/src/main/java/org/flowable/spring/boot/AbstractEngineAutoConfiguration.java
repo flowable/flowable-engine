@@ -55,6 +55,8 @@ public abstract class AbstractEngineAutoConfiguration {
 
         engineConfiguration.setDataSource(dataSource);
 
+        engineConfiguration.setDatabaseCatalog(defaultText(flowableProperties.getDatabaseCatalog(), engineConfiguration.getDatabaseCatalog()));
+
         engineConfiguration.setDatabaseSchema(defaultText(flowableProperties.getDatabaseSchema(), engineConfiguration.getDatabaseSchema()));
         engineConfiguration.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), engineConfiguration
             .getDatabaseSchemaUpdate()));
