@@ -1,0 +1,37 @@
+name: Distribution Check
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  MAVEN_ARGS: >-
+    -B -V --no-transfer-progress
+    -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+jobs:
+  check-distribution:
+    name: Linux JDK 21
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: 21
+    - name: Cache Maven Repository
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Verify Distribution
+      run: ./mvnw verify -Pdeploy ${MAVEN_ARGS} -T 1C -DskipTests=true -Dgpg.skip=true
+    - name: Upload Distribution Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: flowable-distribution-artifact
+        path: 'distro/target/flowable-*.zip'
+        retention-days: 10
+        if-no-files-found: 'error'
