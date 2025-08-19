@@ -8,8 +8,8 @@
 
   <parent>
     <groupId>org.flowable</groupId>
-    <artifactId>flowable-root</artifactId>
-    <relativePath>../../../../</relativePath>
+    <artifactId>flowable-parent</artifactId>
+    <relativePath>../../../../modules/flowable-parent</relativePath>
     <version>7.1.1-SNAPSHOT</version>
   </parent>
 

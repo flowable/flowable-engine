@@ -23,7 +23,7 @@ jobs:
       - name: Build Docker images with Maven
         run: |
           ./mvnw clean package -B -Dstyle.color=always \
-          -P dockerDeps,dockerPublishWithLatest \
+          -P distro,dockerPublishWithLatest \
           -pl :flowable-app-rest \
           -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} \
           -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }} \

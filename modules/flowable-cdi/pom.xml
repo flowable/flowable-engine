@@ -9,12 +9,15 @@
 
 	<parent>
 		<groupId>org.flowable</groupId>
-		<artifactId>flowable-root</artifactId>
-		<relativePath>../..</relativePath>
+		<artifactId>flowable-parent</artifactId>
 		<version>7.1.1-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
 	</parent>
 
 	<properties>
+        <flowable.artifact>
+            org.flowable.cdi
+        </flowable.artifact>
 		<skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 

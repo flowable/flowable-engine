@@ -10,8 +10,8 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-spring-boot</artifactId>
-        <relativePath>../flowable-spring-boot/pom.xml</relativePath>
         <version>7.1.1-SNAPSHOT</version>
+        <relativePath>../flowable-spring-boot/pom.xml</relativePath>
     </parent>
 
     <properties>
@@ -43,46 +43,50 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
                 <configuration>
                     <excludeArtifactIds>
                         spring-boot-configuration-processor
                     </excludeArtifactIds>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>${start-class}</mainClass>
+                            <!-- The generated Spring Boot jar / war should not be made executable be prepending a launch script to the jar / war
+                            Such jars cause issues when being unpacked by maven dependency:unpack, it can also cause issues when deploying in a servlet container.
+                            NB: The jar / war is still self contained and can be run with java -jar
+                            -->
+                            <executable>false</executable>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
-                    m2e settings only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>com.github.kongchen</groupId>
-                                        <artifactId>swagger-maven-plugin</artifactId>
-                                        <versionRange>[3.1.5,)</versionRange>
-                                        <goals>
-                                            <goal>generate</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
                 <plugin>
                     <groupId>com.google.cloud.tools</groupId>
                     <artifactId>jib-maven-plugin</artifactId>
+                    <version>${jib-maven-plugin.version}</version>
                     <configuration>
                         <container>
                             <appRoot>/app</appRoot>

@@ -28,6 +28,6 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     - name: Install
-      run: ./mvnw install -Pdistro ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
+      run: ./mvnw install -Pdistro,include-spring-boot-samples ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
     - name: Test
-      run: ./mvnw test -PnativeTest,native,distro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false -pl modules/flowable-spring-boot/flowable-spring-boot-samples/flowable-spring-boot-sample-native
+      run: ./mvnw test -PnativeTest,native,errorLogging,distro,include-spring-boot-samples ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false -pl modules/flowable-spring-boot/flowable-spring-boot-samples/flowable-spring-boot-sample-native
