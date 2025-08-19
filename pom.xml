@@ -178,6 +178,7 @@
 		<profile>
 			<id>deploy</id>
 			<modules>
+                <module>distro</module>
 				<module>modules/flowable-secure-javascript</module>
 				<module>modules/flowable-groovy-script-static-engine</module>
                 <module>modules/flowable-spring-common</module>
@@ -272,6 +273,9 @@
                             <!--<autoPublish>true</autoPublish>-->
                             <!--<waitUntil>published</waitUntil>-->
                             <!--<skipPublishing>true</skipPublishing>-->
+                            <excludeArtifacts>
+                                <excludeArtifact>flowable-distribution</excludeArtifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>

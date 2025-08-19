@@ -1,0 +1,226 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-dependencies</artifactId>
+        <version>7.1.1-SNAPSHOT</version>
+        <relativePath>../modules/flowable-dependencies</relativePath>
+    </parent>
+
+    <name>Flowable Distribution</name>
+    <artifactId>flowable-distribution</artifactId>
+    <packaging>jar</packaging>
+    <version>7.1.1-SNAPSHOT</version>
+
+    <properties>
+        <flowable.version>7.1.1-SNAPSHOT</flowable.version>
+    </properties>
+
+    <dependencies>
+        <!--
+            NOTE: These dependency declarations are only required to sort this project to the
+             end of the line in the multimodule build.
+
+             Since we only include the child1 module in our assembly, we only need to ensure this
+             distribution project builds AFTER that one...
+        -->
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-app-rest</artifactId>
+            <version>${flowable.version}</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-camel</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cdi</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-cdi</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cxf</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-jmx</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-ldap-configurator</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-secure-javascript</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable5-spring-compatibility</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-osgi</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-actuator</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-boot-starter-integration</artifactId>
+            <version>${flowable.version}</version>
+        </dependency>
+
+        <!-- Needed here so references to Spring Test classes can be resolved during Javadoc generation -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+
+        <!-- Needed here so references to Junit Jupiter Test classes can be resolved during Javadoc generation -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+
+        <!-- Needed here so references to Junit Test classes can be resolved during Javadoc generation -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <!-- Needed here so references to Drools classes can be resolved during Javadoc generation -->
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doctitle>Flowable ${flowable.version}</doctitle>
+                    <windowtitle>Flowable ${flowable.version}</windowtitle>
+                    <doclint>none</doclint>
+
+                    <includeDependencySources>true</includeDependencySources>
+                    <includeTransitiveDependencySources>true</includeTransitiveDependencySources>
+
+                    <dependencySourceIncludes>
+                        <dependencySourceInclude>org.flowable:flowable-bpmn-model</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-engine</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-engine-common-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-cmmn-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-cmmn-model</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-dmn-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-dmn-model</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-event-registry-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-task-service-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-variable-service-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-job-service-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-identitylink-service-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-eventsubscription-service-api</dependencySourceInclude>
+                        <dependencySourceInclude>org.flowable:flowable-batch-service-api</dependencySourceInclude>
+                    </dependencySourceIncludes>
+
+                    <excludePackageNames>
+                        org.flowable.engine.impl;org.flowable.engine.impl*;
+                    </excludePackageNames>
+
+                    <groups>
+                        <group>
+                            <title>Process Engine</title>
+                            <!--
+                              Include packages and their subpackages:
+                                org.flowable.engine
+                              -->
+                            <packages>org.flowable.engine*</packages>
+                        </group>
+                        <group>
+                            <title>CMMN Engine</title>
+                            <!--
+                              Include packages and their subpackages:
+                                org.flowable.cmmn*
+                              -->
+                            <packages>org.flowable.cmmn*</packages>
+                        </group>
+                        <group>
+                            <title>DMN Engine</title>
+                            <!--
+                              Include packages and their subpackages:
+                                org.flowable.dmn*
+                              -->
+                            <packages>org.flowable.dmn*</packages>
+                        </group>
+                    </groups>
+
+                    <additionalDependencies>
+                        <additionalDependency>
+                            <groupId>junit</groupId>
+                            <artifactId>junit</artifactId>
+                            <version>4.13.2</version>
+                        </additionalDependency>
+                    </additionalDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>${project.basedir}/src/main/assembly/dist.xml</descriptor>
+                    </descriptors>
+                    <finalName>flowable-${project.version}</finalName>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
