@@ -58,7 +58,6 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,mssql,distro
-          -P'!include-spring-boot-samples'
           -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
           -Djdbc.username=flowable
           -Djdbc.password=flowable

@@ -5,9 +5,9 @@
 
     <parent>
         <groupId>org.flowable</groupId>
-        <artifactId>flowable-root</artifactId>
-        <relativePath>../..</relativePath>
+        <artifactId>flowable-parent</artifactId>
         <version>7.1.1-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
     </parent>
 
     <artifactId>flowable-spring-boot</artifactId>
@@ -30,13 +30,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-bom</artifactId>
-                <version>${spring.security.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -106,9 +99,6 @@
             <modules>
                 <module>flowable-spring-boot-samples</module>
             </modules>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
     </profiles>
 

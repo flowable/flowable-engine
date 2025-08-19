@@ -1,0 +1,273 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-dependencies</artifactId>
+        <version>7.1.1-SNAPSHOT</version>
+        <relativePath>../flowable-dependencies</relativePath>
+    </parent>
+
+    <artifactId>flowable-parent</artifactId>
+    <packaging>pom</packaging>
+    <name>Flowable Parent</name>
+    <description>
+        Flowable is a compact and highly efficient workflow (BPMN, CMMN and DMN) platform for developers, system admins and business users
+    </description>
+
+    <properties>
+        <jdk.version>17</jdk.version>
+
+        <!-- JVM params for test execution -->
+        <argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>
+
+        <!-- OSGi bundles properties -->
+        <flowable.artifact />
+        <flowable.osgi.import.flowable.version>version="[$(version;==;${flowable.osgi.version.clean}),$(version;=+;${flowable.osgi.version.clean}))"</flowable.osgi.import.flowable.version>
+        <flowable.osgi.import.strict.version>version="[$(version;===;${flowable.osgi.version.clean}),$(version;==+;${flowable.osgi.version.clean}))"</flowable.osgi.import.strict.version>
+        <flowable.osgi.import.default.version>[$(version;==;$(@)),$(version;+;$(@)))</flowable.osgi.import.default.version>
+        <flowable.osgi.import.defaults>
+        </flowable.osgi.import.defaults>
+        <flowable.osgi.import.before.defaults />
+        <flowable.osgi.import.additional />
+        <flowable.osgi.export.additional />
+        <flowable.osgi.import.pkg>
+            org.flowable.*;${flowable.osgi.import.flowable.version},
+            ${flowable.osgi.import.before.defaults},
+            ${flowable.osgi.import.defaults},
+            ${flowable.osgi.import.additional},
+            *
+        </flowable.osgi.import.pkg>
+        <flowable.osgi.activator />
+        <flowable.osgi.failok>false</flowable.osgi.failok>
+        <flowable.osgi.export>${flowable.osgi.export.pkg};${flowable.osgi.version};-noimport:=true</flowable.osgi.export>
+        <!-- <flowable.osgi.export.pkg>!*.impl;${flowable.artifact}*</flowable.osgi.export.pkg>
+            <flowable.osgi.private.pkg>${flowable.artifact}*.impl</flowable.osgi.private.pkg> -->
+        <flowable.osgi.export.pkg>
+            ${flowable.artifact}*,
+            ${flowable.osgi.export.additional}
+        </flowable.osgi.export.pkg>
+        <flowable.osgi.private.pkg></flowable.osgi.private.pkg>
+        <flowable.osgi.version>version=${project.version}</flowable.osgi.version>
+        <flowable.osgi.split.pkg>-split-package:=first</flowable.osgi.split.pkg>
+        <flowable.osgi.import>${flowable.osgi.import.pkg}</flowable.osgi.import>
+        <flowable.osgi.dynamic />
+        <flowable.osgi.symbolic.name>${flowable.artifact}</flowable.osgi.symbolic.name>
+        <flowable.osgi.exclude.dependencies>false</flowable.osgi.exclude.dependencies>
+        <flowable.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</flowable.osgi.remove.headers>
+        <flowable.osgi.include.resource>{maven-resources}</flowable.osgi.include.resource>
+        <flowable.osgi.embed></flowable.osgi.embed>
+
+        <skip.test.db.drop>true</skip.test.db.drop>
+
+
+        <!-- Plugin dependencies -->
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-dependencies</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <release>${jdk.version}</release>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <parameters>true</parameters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <failIfNoTests>false</failIfNoTests>
+                    <trimStackTrace>false</trimStackTrace>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <runOrder>alphabetical</runOrder>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <excludeDependencies>${flowable.osgi.exclude.dependencies}</excludeDependencies>
+                    <instructions>
+                        <Bundle-Name>${project.name}</Bundle-Name>
+                        <Bundle-SymbolicName>${flowable.osgi.symbolic.name}</Bundle-SymbolicName>
+                        <Bundle-Activator>${flowable.osgi.activator}</Bundle-Activator>
+                        <Export-Package>${flowable.osgi.export}</Export-Package>
+                        <Import-Package>org.flowable.osgi;resolution:=optional,
+                            ${flowable.osgi.import}</Import-Package>
+                        <DynamicImport-Package>${flowable.osgi.dynamic}</DynamicImport-Package>
+                        <Private-Package>${flowable.osgi.private.pkg}</Private-Package>
+                        <Implementation-Title>Flowable</Implementation-Title>
+                        <Implementation-Version>${project.version}</Implementation-Version>
+                        <Include-Resource>${flowable.osgi.include.resource}</Include-Resource>
+                        <_versionpolicy>${flowable.osgi.import.default.version}</_versionpolicy>
+                        <_removeheaders>${flowable.osgi.remove.headers}</_removeheaders>
+                        <_failok>${flowable.osgi.failok}</_failok>
+                        <Export-Service>${flowable.osgi.export.service}</Export-Service>
+                        <Import-Service>${flowable.osgi.import.service}</Import-Service>
+                        <Embed-Dependency>${flowable.osgi.embed}</Embed-Dependency>
+                    </instructions>
+                    <versions>
+                        <flowable.osgi.version.clean>${project.version}</flowable.osgi.version.clean>
+                    </versions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>cleanVersions</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>postgresql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>mssql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.microsoft.sqlserver</groupId>
+                    <artifactId>mssql-jdbc</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>mysql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>mariadb</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>db2</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.database.jdbc</groupId>
+                    <artifactId>${oracle.jdbc.artifact}</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>cleanDb</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.liquibase</groupId>
+                        <artifactId>liquibase-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>dropAll</goal>
+                                </goals>
+                                <configuration>
+                                    <skip>${skip.test.db.drop}</skip>
+                                    <url>${jdbc.url}</url>
+                                    <username>${jdbc.username}</username>
+                                    <password>${jdbc.password}</password>
+                                    <driver>${jdbc.driver}</driver>
+                                    <showBanner>false</showBanner>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
