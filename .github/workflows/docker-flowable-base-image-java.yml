@@ -31,12 +31,12 @@ jobs:
           context: ./docker/base-image
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: flowable/flowable-jre-test:21
+          tags: flowable/flowable-jre:21
 
       - name: Scan image
         uses: anchore/scan-action@v6
         with:
-          image: flowable/flowable-jre-test:21
+          image: flowable/flowable-jre:21
           output-format: 'table'
           severity-cutoff: 'high'
 
