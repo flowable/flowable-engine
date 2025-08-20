@@ -79,6 +79,305 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.github.kongchen</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>3.1.7</version>
+                <configuration>
+                    <apiSources>
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/service</basePath>
+                            <info>
+                                <title>Flowable REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-process</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/process</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- IDM -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.idm.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/idm-api</basePath>
+                            <info>
+                                <title>Flowable IDM REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-idm</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/idm</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- DMN -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.dmn.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/dmn-api</basePath>
+                            <info>
+                                <title>Flowable DMN REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-decision</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/dmn</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- EVENT REGISTRY -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.eventregistry.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/event-registry-api</basePath>
+                            <info>
+                                <title>Flowable Event Registry REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-eventregistry</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/eventregistry</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- APP -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.app.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/app-api</basePath>
+                            <info>
+                                <title>Flowable APP REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-app</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/app</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- CMMN -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.cmmn.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/cmmn-api</basePath>
+                            <info>
+                                <title>Flowable CMMN REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-cmmn</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/cmmn</swaggerDirectory>
+                        </apiSource>
+                        <!-- ++++++++++ -->
+                        <!-- External Worker Job -->
+                        <!-- ++++++++++ -->
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.flowable.external.job.rest.service.api</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                                <scheme>https</scheme>
+                            </schemes>
+                            <host>${swagger.host}</host>
+                            <basePath>/flowable-rest/external-job-api</basePath>
+                            <info>
+                                <title>Flowable External Worker Job REST API</title>
+                                <version>v1</version>
+                                <contact>
+                                    <email></email>
+                                    <name>Flowable</name>
+                                    <url>http://www.flowable.org/</url>
+                                </contact>
+                                <license>
+                                    <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                                    <name>Apache 2.0</name>
+                                </license>
+                            </info>
+                            <securityDefinitions>
+                                <securityDefinition>
+                                    <name>basicAuth</name>
+                                    <type>basic</type>
+                                </securityDefinition>
+                            </securityDefinitions>
+                            <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                            <outputFormats>json,yaml</outputFormats>
+                            <swaggerFileName>flowable-swagger-external-worker</swaggerFileName>
+                            <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/external-worker</swaggerDirectory>
+                        </apiSource>
+                    </apiSources>
+                </configuration>
+                <dependencies>
+                    <!-- Swagger uses javax XML Bind, so add that in order for everything to work properly -->
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                    <!-- The swagger Maven plugin uses older Spring version. Use the same version in order to avoid problems -->
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-web</artifactId>
+                        <version>${spring.framework.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                        <version>${spring.framework.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -118,344 +417,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>swagger</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.kongchen</groupId>
-                        <artifactId>swagger-maven-plugin</artifactId>
-                        <version>3.1.7</version>
-                        <configuration>
-                            <apiSources>
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/service</basePath>
-                                    <info>
-                                        <title>Flowable REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-process</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/process</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- IDM -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.idm.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/idm-api</basePath>
-                                    <info>
-                                        <title>Flowable IDM REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-idm</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/idm</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- DMN -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.dmn.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/dmn-api</basePath>
-                                    <info>
-                                        <title>Flowable DMN REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-decision</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/dmn</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- EVENT REGISTRY -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.eventregistry.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/event-registry-api</basePath>
-                                    <info>
-                                        <title>Flowable Event Registry REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-eventregistry</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/eventregistry</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- APP -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.app.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/app-api</basePath>
-                                    <info>
-                                        <title>Flowable APP REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-app</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/app</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- CMMN -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.cmmn.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/cmmn-api</basePath>
-                                    <info>
-                                        <title>Flowable CMMN REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-cmmn</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/cmmn</swaggerDirectory>
-                                </apiSource>
-                                <!-- ++++++++++ -->
-                                <!-- External Worker Job -->
-                                <!-- ++++++++++ -->
-                                <apiSource>
-                                    <springmvc>true</springmvc>
-                                    <locations>
-                                        <location>org.flowable.external.job.rest.service.api</location>
-                                    </locations>
-                                    <schemes>
-                                        <scheme>http</scheme>
-                                        <scheme>https</scheme>
-                                    </schemes>
-                                    <host>${swagger.host}</host>
-                                    <basePath>/flowable-rest/external-job-api</basePath>
-                                    <info>
-                                        <title>Flowable External Worker Job REST API</title>
-                                        <version>v1</version>
-                                        <contact>
-                                            <email></email>
-                                            <name>Flowable</name>
-                                            <url>http://www.flowable.org/</url>
-                                        </contact>
-                                        <license>
-                                            <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                                            <name>Apache 2.0</name>
-                                        </license>
-                                    </info>
-                                    <securityDefinitions>
-                                        <securityDefinition>
-                                            <name>basicAuth</name>
-                                            <type>basic</type>
-                                        </securityDefinition>
-                                    </securityDefinitions>
-                                    <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                                    <outputFormats>json,yaml</outputFormats>
-                                    <swaggerFileName>flowable-swagger-external-worker</swaggerFileName>
-                                    <swaggerDirectory>${basedir}/src/main/resources/static/docs/specfile/external-worker</swaggerDirectory>
-                                </apiSource>
-                            </apiSources>
-                        </configuration>
-                        <dependencies>
-                            <!-- Swagger uses javax XML Bind, so add that in order for everything to work properly -->
-                            <dependency>
-                                <groupId>javax.xml.bind</groupId>
-                                <artifactId>jaxb-api</artifactId>
-                                <version>2.3.1</version>
-                            </dependency>
-                            <!-- The swagger Maven plugin uses older Spring version. Use the same version in order to avoid problems -->
-                            <dependency>
-                                <groupId>org.springframework</groupId>
-                                <artifactId>spring-web</artifactId>
-                                <version>${spring.framework.version}</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.springframework</groupId>
-                                <artifactId>spring-context</artifactId>
-                                <version>${spring.framework.version}</version>
-                            </dependency>
-                        </dependencies>
-                        <executions>
-                            <execution>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>h2mem</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.h2database</groupId>
-                    <artifactId>h2</artifactId>
-                </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.tomcat.maven</groupId>
-                        <artifactId>tomcat7-maven-plugin</artifactId>
-                        <version>2.2</version>
-                        <configuration>
-                            <path>/flowable-rest</path>
-                            <port>8080</port>
-                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
-                            <systemProperties>
-                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
-                            </systemProperties>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>postgresql</id>
             <dependencies>
