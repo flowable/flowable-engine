@@ -5,7 +5,7 @@ name: Flowable Base Image Multi-Arch Build and Push
 #     - cron: "0 1 * * *"
 #   workflow_dispatch:
 
-on: workflow_dispatch
+on: push
 
 jobs:
   build:
