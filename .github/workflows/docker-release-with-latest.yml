@@ -18,11 +18,11 @@ jobs:
 
       - name: Get current project meta
         id: meta
-        run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+        run: echo "::set-output name=version::$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Build Docker images with Maven
         run: |
-          mvn clean package -B -Dstyle.color=always \
+          ./mvnw clean package -B -Dstyle.color=always \
           -P dockerDeps,dockerPublishWithLatest \
           -pl :flowable-app-rest \
           -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} \
