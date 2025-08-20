@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - External Job REST</name>
     <artifactId>flowable-external-job-rest</artifactId>
 
     <properties>

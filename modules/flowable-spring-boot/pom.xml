@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - Spring Boot Parent</name>
     <artifactId>flowable-spring-boot</artifactId>
 
     <packaging>pom</packaging>

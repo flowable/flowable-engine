@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - Event Registry Engine Configurator</name>
     <artifactId>flowable-event-registry-configurator</artifactId>
 
     <properties>

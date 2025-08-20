@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - IDM Spring Configurator</name>
     <artifactId>flowable-idm-spring-configurator</artifactId>
 
     <properties>

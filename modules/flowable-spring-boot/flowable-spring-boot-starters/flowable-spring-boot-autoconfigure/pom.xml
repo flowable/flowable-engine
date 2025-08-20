@@ -9,6 +9,7 @@
         <version>7.1.1-SNAPSHOT</version>
     </parent>
 
+    <name>Flowable - Spring Boot Autoconfigure</name>
     <artifactId>flowable-spring-boot-autoconfigure</artifactId>
 
     <properties>

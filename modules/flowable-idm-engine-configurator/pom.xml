@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - IDM Engine Configurator</name>
     <artifactId>flowable-idm-engine-configurator</artifactId>
 
     <properties>

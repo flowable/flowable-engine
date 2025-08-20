@@ -10,6 +10,7 @@
         <version>7.1.1-SNAPSHOT</version>
     </parent>
 
+    <name>Flowable - Spring Boot Starters Parent</name>
     <artifactId>flowable-spring-boot-starters</artifactId>
 
     <packaging>pom</packaging>

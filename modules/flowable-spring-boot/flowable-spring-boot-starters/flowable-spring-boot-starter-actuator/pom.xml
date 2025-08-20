@@ -9,6 +9,7 @@
 		<version>7.1.1-SNAPSHOT</version>
 	</parent>
 
+    <name>Flowable - Spring Boot Actuator Starter</name>
 	<artifactId>flowable-spring-boot-starter-actuator</artifactId>
 
 	<dependencies>

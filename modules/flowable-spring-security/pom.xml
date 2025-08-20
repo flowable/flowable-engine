@@ -10,6 +10,7 @@
         <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - Spring Security</name>
     <artifactId>flowable-spring-security</artifactId>
 
     <properties>
