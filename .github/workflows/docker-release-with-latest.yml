@@ -10,28 +10,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Get current project meta
         id: meta
-        run: echo "::set-output name=version::$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)"
+        run: echo "::set-output name=version::$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)"
 
       - name: Build Docker images with Maven
         run: |
-          mvn clean package -B -Dstyle.color=always \
+          ./mvnw clean package -B -Dstyle.color=always \
           -P dockerDeps,dockerPublishWithLatest \
           -pl :flowable-app-rest \
           -Ddocker.publisher.user=${{ secrets.DOCKER_USER }} \
-          -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }}
+          -Ddocker.publisher.password=${{ secrets.DOCKER_PASSWORD }} \
+          -B -V --no-transfer-progress
 
-      - name: Install cosign
-        uses: sigstore/cosign-installer@d6a3abf1bdea83574e28d40543793018b6035605
-        with:
-          cosign-release: 'v1.7.1'
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
 
       - name: Write signing key to disk
         run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
@@ -49,8 +48,10 @@ jobs:
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            flowable/flowable-rest:${{ steps.meta.outputs.version }} 
+            flowable/flowable-rest:${{ steps.meta.outputs.version }} \
+            -y
           cosign sign --key cosign.key \
             -a "repo=${{ github.repository }}" \
             -a "ref=${{ github.sha }}" \
-            flowable/flowable-rest:latest
+            flowable/flowable-rest:latest \
+            -y
