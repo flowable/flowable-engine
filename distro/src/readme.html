@@ -28,6 +28,50 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 7.2.0</h3>
+
+<ul>
+    <li>Support for setting Variables asynchronous for BPMN and CMMN</li>
+    <li>Support for Skip Expression for Receive Task and Send Event Task</li>
+    <li>Support for setting local variables when migration case instances</li>
+    <li>Support querying Historic Variables by collection of Case / Process instance ids</li>
+    <li>Support querying Process / Case instances excluding a set of definition keys</li>
+    <li>Support for including only defined variables when querying (Historic) Process / Case instances</li>
+    <li>Support for querying Case instances by parent ID</li>
+    <li>Support Input variables for Script Task</li>
+    <li>Support resolving Case / Plan Item instance in a task listener expression</li>
+    <li>Support DMN rule expressions with logic not at the beginning of the rule</li>
+    <li>Support for using available conditions for Variable Event Listeners</li>
+    <li>Support for secure HTTP Headers in the HTTP Task. When using these headers, then the header values are going to be masked when logging them and / or storing them as variables</li>
+    <li>Support for `BigInteger` and `BigDecimal` as variables</li>
+    <li>Support for configuring the max length for large variables (string, json, serializable, byte array)</li>
+    <li>Remove child deployments when un-deploying an App</li>
+    <li>Add completedBy to Activity Instance</li>
+    <li>Add assignee / completedBy to Plan Item Instance</li>
+    <li>Change REST API Date responses to use UTC instead of Server Timezone</li>
+    <li>Improve REST API to support querying dates without seconds or milliseconds</li>
+    <li>Improve Swagger Docs by including information for start, size, order, and sort in relevant places</li>
+    <li>Improve performance by avoiding dirty checks for Immutable entities</li>
+    <li>Improve BPMN performance for straight through processes by avoiding unnecessary selects during deletion</li>
+    <li>Improve CMMN performance by using a dedicated list for storing the evaluate criteria operations (which are executed once all other operations are done)</li>
+    <li>Improve Housekeeping performance</li>
+    <li>Fix issue when invoking `get` and `path` on `JsonNode` through expressions</li>
+    <li>Fix issue when parsing and validating XML with empty CDATA</li>
+    <li>Fix issue with matching incoming events when having channel definitions in the default tenant</li>
+    <li>Fix issue with optimistic locking for stages with async elements</li>
+    <li>Fix issue when using Apache HttpClient 5, and the response uses a non-compliant HTTP Status code</li>
+    <li>Fix issue when using a DMN Hit Policy Priority and no results</li>
+    <li>Fix issue with boundary events when dynamically moving the current state to the parent process instance</li>
+    <li>Deprecate support for JUnit 3 and JUnit 4</li>
+    <li>Deprecate support for Joda Time</li>
+    <li>Upgrade to Spring Boot 3.5</li>
+</ul>
+
+<h4>Future Plans</h4>
+<p>
+    Our current plan is the next Release (Flowable 8) to be based on Spring 7, Spring Boot 4 and use Jackson 3. We will also support Jackson 2, but by default we would use Jackson 3.
+    See <a href="https://github.com/FasterXML/jackson-future-ideas/discussions/72">Path to Jackson 3.0.0</a> from the Jackson team.
+</p>
 <h3>Release Notes - Flowable - 7.1.0</h3>
 
 <ul>
