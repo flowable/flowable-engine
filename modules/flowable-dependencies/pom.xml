@@ -18,20 +18,20 @@
 
     <properties>
         <!-- External dependencies -->
-        <angus-mail.version>2.0.3</angus-mail.version>
-        <artemis.version>2.40.0</artemis.version>
+        <angus-mail.version>2.0.4</angus-mail.version>
+        <artemis.version>2.42.0</artemis.version>
         <camel.version>4.8.0</camel.version>
-        <commons-codec.version>1.18.0</commons-codec.version>
-        <commons-io.version>2.19.0</commons-io.version>
+        <commons-codec.version>1.19.0</commons-codec.version>
+        <commons-io.version>2.20.0</commons-io.version>
         <commons-lang3.version>3.18.0</commons-lang3.version>
         <cxf.version>4.0.5</cxf.version>
         <drools.version>9.44.0.Final</drools.version>
-        <groovy.version>4.0.26</groovy.version>
-        <hikari.version>6.3.0</hikari.version>
+        <groovy.version>4.0.28</groovy.version>
+        <hikari.version>6.3.2</hikari.version>
         <httpclient.version>4.5.14</httpclient.version>
-        <httpcore.version>4.4.15</httpcore.version>
+        <httpcore.version>4.4.16</httpcore.version>
         <httpclient5.version>5.4.4</httpclient5.version>
-        <jackson.version>2.19.0</jackson.version>
+        <jackson.version>2.19.2</jackson.version>
         <jakarta.enterprise.cdi-api.version>4.0.1</jakarta.enterprise.cdi-api.version>
         <jakarta.enterprise.concurrent-api.version>3.0.2</jakarta.enterprise.concurrent-api.version>
         <jakarta.inject-api.version>2.0.1</jakarta.inject-api.version>
@@ -42,43 +42,43 @@
         <jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
         <java-uuid-generator.version>5.1.0</java-uuid-generator.version>
         <jaxb-glassfish.version>4.0.5</jaxb-glassfish.version>
-        <joda-time.version>2.13.0</joda-time.version>
+        <joda-time.version>2.14.0</joda-time.version>
         <mybatis.version>3.5.19</mybatis.version>
         <nashorn-core.version>15.4</nashorn-core.version>
         <osgi-core.version>8.0.0</osgi-core.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <reactor-netty.version>1.2.6</reactor-netty.version>
+        <reactor-netty.version>1.2.9</reactor-netty.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-        <spring.amqp.version>3.2.5</spring.amqp.version>
-        <spring.boot.version>3.5.0</spring.boot.version>
-        <spring.kafka.version>3.3.6</spring.kafka.version>
-        <spring.ldap.version>3.3.0</spring.ldap.version>
-        <spring.framework.version>6.2.7</spring.framework.version>
-        <spring.security.version>6.5.0</spring.security.version>
+        <spring.amqp.version>3.2.6</spring.amqp.version>
+        <spring.boot.version>3.5.4</spring.boot.version>
+        <spring.kafka.version>3.3.9</spring.kafka.version>
+        <spring.ldap.version>3.3.3</spring.ldap.version>
+        <spring.framework.version>6.2.10</spring.framework.version>
+        <spring.security.version>6.5.3</spring.security.version>
         <swagger.version>1.6.2</swagger.version>
 
         <!-- JDBC Driver dependencies -->
         <db2-jcc.version>11.5.9.0</db2-jcc.version>
         <h2.version>2.3.232</h2.version>
         <hsqldb.version>2.7.2</hsqldb.version>
-        <mariadb.version>3.5.3</mariadb.version>
-        <mssql-jdbc.version>12.10.0.jre11</mssql-jdbc.version>
-        <mysql-connector.version>9.2.0</mysql-connector.version>
+        <mariadb.version>3.5.5</mariadb.version>
+        <mssql-jdbc.version>12.10.1.jre11</mssql-jdbc.version>
+        <mysql-connector.version>9.4.0</mysql-connector.version>
         <oracle.jdbc.version>23.7.0.25.01</oracle.jdbc.version>
         <oracle.jdbc.artifact>ojdbc17</oracle.jdbc.artifact>
         <postgresql.version>42.7.7</postgresql.version>
 
         <!-- Test dependencies -->
-        <assertj.version>3.27.3</assertj.version>
-        <awaitility.version>4.0.3</awaitility.version>
-        <hibernate.version>6.6.15.Final</hibernate.version>
+        <assertj.version>3.27.4</assertj.version>
+        <awaitility.version>4.3.0</awaitility.version>
+        <hibernate.version>6.6.26.Final</hibernate.version>
         <json-unit.version>4.1.1</json-unit.version>
         <junit.version>4.13.2</junit.version>
-        <junit.jupiter.version>5.12.2</junit.jupiter.version>
-        <mockito.version>5.17.0</mockito.version>
-        <simple-jndi.version>0.24.0</simple-jndi.version>
-        <subethasmtp.version>7.1.1</subethasmtp.version>
+        <junit.jupiter.version>5.13.4</junit.jupiter.version>
+        <mockito.version>5.19.0</mockito.version>
+        <simple-jndi.version>0.25.0</simple-jndi.version>
+        <subethasmtp.version>7.1.8</subethasmtp.version>
         <testcontainers.version>1.21.3</testcontainers.version>
 
         <!-- Plugin dependencies -->
