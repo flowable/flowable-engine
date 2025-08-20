@@ -1,11 +1,9 @@
 name: Flowable Base Image Multi-Arch Build and Push
 
-# on:
-#   schedule:
-#     - cron: "0 1 * * *"
-#   workflow_dispatch:
-
-on: push
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
 
 jobs:
   build:
