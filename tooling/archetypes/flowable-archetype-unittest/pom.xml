@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.flowable</groupId>
     <artifactId>archetypes</artifactId>
-    <version>7.3.0.17</version>
+    <version>7.3.0.18</version>
   </parent>
 
   <artifactId>flowable-archetype-unittest</artifactId>
