@@ -18,7 +18,7 @@
 
         <!-- Plugin versions, see also flowable-dependencies -->
 		<central-publishing-maven-plugin.version>0.8.0</central-publishing-maven-plugin.version>
-		<jib-maven-plugin.version>3.4.8</jib-maven-plugin.version>
+		<jib-maven-plugin.version>3.4.6</jib-maven-plugin.version>
 		<maven-antrun-plugin.version>1.4</maven-antrun-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
 		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
