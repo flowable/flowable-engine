@@ -36,7 +36,7 @@ jobs:
         run: echo "${{ secrets.SIGNING_SECRET }}" > cosign.key
 
       - name: Log into dockerhub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
