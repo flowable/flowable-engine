@@ -266,6 +266,7 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
+                            <deploymentName>Flowable ${project.version} Deployment</deploymentName>
                             <!--
                                 Uncomment autoPublish and waitUntil for automatic publishing.
                                 Without those, a manual intervention is needed in the Maven Central UI.
