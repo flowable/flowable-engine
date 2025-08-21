@@ -173,6 +173,22 @@
                               -->
                             <packages>org.flowable.dmn*</packages>
                         </group>
+                        <group>
+                            <title>Event Registry</title>
+                            <!--
+                              Include packages and their subpackages:
+                                org.flowable.eventregistry*
+                              -->
+                            <packages>org.flowable.eventregistry*</packages>
+                        </group>
+                        <group>
+                            <title>Task</title>
+                            <!--
+                              Include packages and their subpackages:
+                                org.flowable.task*
+                              -->
+                            <packages>org.flowable.task*</packages>
+                        </group>
                     </groups>
 
                     <additionalDependencies>
