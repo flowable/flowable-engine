@@ -23,7 +23,6 @@ import static org.mockito.Mockito.verify;
 import java.io.InputStream;
 
 import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.junit.jupiter.MockitoSettings;

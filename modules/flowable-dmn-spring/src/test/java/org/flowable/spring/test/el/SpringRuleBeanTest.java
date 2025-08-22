@@ -21,7 +21,6 @@ import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

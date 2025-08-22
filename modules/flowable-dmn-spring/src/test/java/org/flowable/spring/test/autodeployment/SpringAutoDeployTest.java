@@ -33,7 +33,6 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.xml.exception.DmnXMLException;

@@ -25,7 +25,6 @@
             org.flowable.idm.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            junit*;resolution:=optional,
             org.junit*;resolution:=optional,
 			org.springframework*;resolution:=optional,
             org.apache.commons.codec*;resolution:=optional,
@@ -73,11 +72,6 @@
 
 		<!-- For testing -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
 			<scope>provided</scope>
@@ -85,11 +79,6 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

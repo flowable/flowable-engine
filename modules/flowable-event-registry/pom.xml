@@ -83,11 +83,6 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
@@ -95,11 +90,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -129,9 +119,7 @@
             org.flowable.eventregistry.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            junit*;resolution:=optional,
             org.junit*;resolution:=optional,
-            org.junit.jupiter*;resolution:=optional,
             com.sun*;resolution:=optional,
             jakarta.activation*;resolution:=optional,
             jakarta.persistence*;resolution:=optional,

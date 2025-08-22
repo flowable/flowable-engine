@@ -48,11 +48,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.groovy</groupId>
 			<artifactId>groovy-jsr223</artifactId>
 			<scope>provided</scope>
@@ -159,7 +154,6 @@
 			org.activiti.db.mapping.entity
 		</flowable.osgi.export.additional>
 		<flowable.osgi.import.additional>
-			junit*;resolution:=optional,
 			org.junit*;resolution:=optional,
 			com.sun*;resolution:=optional,
 			jakarta.persistence*;resolution:=optional,

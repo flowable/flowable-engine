@@ -23,7 +23,6 @@ import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngine;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;

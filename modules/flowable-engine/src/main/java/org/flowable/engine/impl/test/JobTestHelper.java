@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
@@ -33,15 +32,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 // This helper class helps sharing the same code for jobExecutor test helpers,
 // between Junit3 and junit 4 test support classes
 public class JobTestHelper {
-
-    /**
-     * @deprecated Use {@link #waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration, ManagementService, long, long)}
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static void waitForJobExecutorToProcessAllJobs(FlowableRule rule, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllJobs(rule.getProcessEngine().getProcessEngineConfiguration(),
-            rule.getManagementService(), maxMillisToWait, intervalMillis);
-    }
 
     public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration,
             ManagementService managementService, long maxMillisToWait, long intervalMillis) {
@@ -77,14 +67,6 @@ public class JobTestHelper {
             maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
-    /**
-     * @deprecated Use {@link #waitForJobExecutorOnCondition(ProcessEngineConfiguration, long, long, Callable)}
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static void waitForJobExecutorOnCondition(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
-        waitForJobExecutorOnCondition(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis, condition);
-    }
-
     public static void waitForJobExecutorOnCondition(ProcessEngineConfiguration processEngineConfiguration,
             long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
@@ -117,14 +99,6 @@ public class JobTestHelper {
         }
     }
 
-    /**
-     * @deprecated Use {@link #executeJobExecutorForTime(ProcessEngineConfiguration, long, long)}
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static void executeJobExecutorForTime(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
-        executeJobExecutorForTime(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis);
-    }
-
     public static void executeJobExecutorForTime(ProcessEngineConfiguration processEngineConfiguration, long maxMillisToWait, long intervalMillis) {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         asyncExecutor.start();
@@ -146,15 +120,6 @@ public class JobTestHelper {
         } finally {
             asyncExecutor.shutdown();
         }
-    }
-
-    /**
-     * @deprecated Use {@link #areJobsAvailable(ManagementService)}
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static boolean areJobsAvailable(FlowableRule activitiRule) {
-        return areJobsAvailable(activitiRule.getManagementService());
-
     }
 
     public static boolean areJobsAvailable(ManagementService managementService) {

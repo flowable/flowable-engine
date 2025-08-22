@@ -23,7 +23,6 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
@@ -51,15 +50,7 @@ public class HistoryTestHelper {
         return false;
     }
 
-    /**
-     * @deprecated {@link #waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration, ManagementService, long, long, boolean)}
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static void waitForJobExecutorToProcessAllHistoryJobs(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
-    }
-
-    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, 
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,
             long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
     }
@@ -113,15 +104,6 @@ public class HistoryTestHelper {
                 }
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #areHistoryJobsAvailable(ManagementService)} instead.
-     */
-    @Deprecated(forRemoval = true, since = "7.2.0")
-    public static boolean areHistoryJobsAvailable(FlowableRule activitiRule) {
-        return areHistoryJobsAvailable(activitiRule.getManagementService());
-
     }
 
     public static boolean areHistoryJobsAvailable(ManagementService managementService) {

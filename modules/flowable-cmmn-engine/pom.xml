@@ -116,11 +116,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
@@ -207,7 +202,6 @@
             org.flowable.cmmn.db.mapping.entity
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            junit*;resolution:=optional,
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
             jakarta.activation*;resolution:=optional,
