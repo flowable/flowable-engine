@@ -31,18 +31,18 @@ import java.util.Set;
 // Remove getExpressionFactory static method -> We are instead passing the expression Factory to the appropriate methods in this class
 // Remove nullTcclFactory and factoryCache static fields -> They are only relevant to the getExpressionFactory method, and we don't need that one
 // Remove private static CacheKey, CacheValue and PrivilegedGetTccl classes -> They are only relevant to the getExpressionFactory method, and we don't need that one
-// Remove private static getContextLoader method -> Only relevant for the getExpressionFactory method, abd we don't need that one
+// Remove private static getContextLoader method -> Only relevant for the getExpressionFactory method, and we don't need that one
 // Remove handleThrowable static method -> We are not using it
 // Remove findConstructor static method -> We are not using it
 // Throw fixed error messages instead of using LocalString resource bundle
-// Remove message static method -> ew are not using it
+// Remove message static method -> we are not using it
 // Add ExpressionFactory as last method parameter to findMethod, findWrapper, isCoercibleFrom and buildParameters
 // Make public methods accessible if they aren't
 // The findWrapper method has been enhanced with the implementation from https://github.com/eclipse-ee4j/el-ri/blob/4e7c61bce9e7750c2fa6fb85476e33f17b0246b4/api/src/main/java/jakarta/el/ELUtil.java
 // This method follows the JLS more closely and allows picking of ambiguous overloaded methods better.
 // The code in findWrapper is not identical to the one from ELUtil in order to make it more readable for the maintainers of Flowable
 
-// In order for this class to be more easily kept in sync with the Tomcat implementation we should not do style changes, nor fix warnings.
+// In order for this class to be more easily kept in sync with the Tomcat implementation, we should not do style changes, nor fix warnings.
 // Keeping the modifications to minimum would make it easier to keep this class in sync
 class Util {
 
