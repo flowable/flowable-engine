@@ -57,6 +57,9 @@ public class UnacquireExternalWorkerJobCmd implements Command<Void> {
         jobEntity.setLockExpirationTime(null);
         jobEntity.setLockOwner(null);
         externalWorkerJobEntityManager.update(jobEntity);
+        if (jobEntity.isExclusive()) {
+            new UnlockExclusiveJobCmd(jobEntity, jobServiceConfiguration).execute(commandContext);
+        }
         
         return null;
     }
