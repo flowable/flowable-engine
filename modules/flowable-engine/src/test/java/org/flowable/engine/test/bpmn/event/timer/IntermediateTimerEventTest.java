@@ -54,7 +54,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
 
         // After setting the clock to time '5 minutes and 5 seconds', the second timer should fire
         processEngineConfiguration.getClock().setCurrentTime(Date.from(startTime.plus(5, ChronoUnit.MINUTES).plus(5, ChronoUnit.SECONDS)));
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(7000L, 200L);
 
         assertThat(jobQuery.count()).isZero();
         assertProcessEnded(pi.getProcessInstanceId());
@@ -93,7 +93,7 @@ public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         processEngineConfiguration.getClock().setCurrentTime(new Date(startDate.getTime() + 11000L));
-        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(15000L, 25L);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(15000L, 200L);
 
         jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         assertThat(jobQuery.count()).isZero();
