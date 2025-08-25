@@ -27,7 +27,7 @@ public class ServiceConfiguratorTest {
         AtomicBoolean afterInit = new AtomicBoolean(false);
 
         TestServiceConfiguration serviceConfig = new TestServiceConfiguration("test");
-        serviceConfig.setConfigurators(List.of(new ServiceConfigurator<TestServiceConfiguration>() {
+        serviceConfig.setConfigurators(List.of(new ServiceConfigurator<>() {
 
             @Override
             public void beforeInit(TestServiceConfiguration service) {
@@ -52,7 +52,7 @@ public class ServiceConfiguratorTest {
         AtomicBoolean afterInit = new AtomicBoolean(false);
 
         TestServiceConfiguration serviceConfig = new TestServiceConfiguration("test");
-        serviceConfig.addConfigurator(new ServiceConfigurator<TestServiceConfiguration>() {
+        serviceConfig.addConfigurator(new ServiceConfigurator<>() {
 
             @Override
             public void beforeInit(TestServiceConfiguration service) {
@@ -78,7 +78,7 @@ public class ServiceConfiguratorTest {
 
         TestServiceConfiguration serviceConfig = new TestServiceConfiguration("test");
 
-        serviceConfig.addConfigurator(new ServiceConfigurator<TestServiceConfiguration>() {
+        serviceConfig.addConfigurator(new ServiceConfigurator<>() {
 
             @Override
             public void beforeInit(TestServiceConfiguration service) {
@@ -96,7 +96,7 @@ public class ServiceConfiguratorTest {
             }
         });
 
-        serviceConfig.addConfigurator(new ServiceConfigurator<TestServiceConfiguration>() {
+        serviceConfig.addConfigurator(new ServiceConfigurator<>() {
 
             @Override
             public void beforeInit(TestServiceConfiguration service) {
