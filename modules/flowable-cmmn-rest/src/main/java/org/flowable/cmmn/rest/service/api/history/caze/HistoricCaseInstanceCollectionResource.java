@@ -46,6 +46,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
     @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "Only return historic case instances with the given comma-separated ids.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The case definition key of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return historic case instances like the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition key, ignoring case.", paramType = "query"),
@@ -102,6 +103,10 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("caseInstanceId") != null) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.get("caseInstanceIds") != null) {
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToList(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.get("caseDefinitionKey") != null) {
