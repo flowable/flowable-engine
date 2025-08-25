@@ -16,4 +16,4 @@ CREATE TABLE FLW_CHANNEL_DEFINITION (ID_ varchar(255) NOT NULL, NAME_ nvarchar(2
 CREATE UNIQUE NONCLUSTERED INDEX ACT_IDX_CHANNEL_DEF_UNIQ ON FLW_CHANNEL_DEFINITION(KEY_, VERSION_, TENANT_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('eventregistry.schema.version', '7.2.0.2', 1);
+values ('eventregistry.schema.version', '8.0.0.0', 1);

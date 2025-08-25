@@ -260,4 +260,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE NONCLUSTERED INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST(CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '7.2.0.2', 1);
+values ('cmmn.schema.version', '8.0.0.0', 1);

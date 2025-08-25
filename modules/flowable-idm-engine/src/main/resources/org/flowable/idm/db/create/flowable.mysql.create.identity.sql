@@ -6,7 +6,7 @@ create table ACT_ID_PROPERTY (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '7.2.0.2', 1);
+values ('schema.version', '8.0.0.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64),
