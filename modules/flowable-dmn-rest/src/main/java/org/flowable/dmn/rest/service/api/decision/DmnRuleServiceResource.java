@@ -127,7 +127,7 @@ public class DmnRuleServiceResource {
                 decisionBuilder.tenantId(request.getTenantId());
             }
 
-            if(request.isDisableHistory()) {
+            if (request.isDisableHistory()) {
                 decisionBuilder.disableHistory();
             }
 
