@@ -112,6 +112,24 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?id=anotherId";
         assertResultsPresentInDataResponse(url);
+
+        // Case instance ids
+        String id2 = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("myCaseInstanceName")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .start().getId();
+        String id3 = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("myCaseInstanceName")
+                .businessKey("myBusinessKey")
+                .businessStatus("myBusinessStatus")
+                .start().getId();
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?ids=" + id + "," + id2;
+        assertResultsPresentInDataResponse(url, id, id2);
+        runtimeService.terminateCaseInstance(id2);
+        runtimeService.terminateCaseInstance(id3);
         
         // Case instance name
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION) + "?name=myCaseInstanceName";
