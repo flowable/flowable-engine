@@ -23,10 +23,12 @@ import org.flowable.eventregistry.model.EventModel;
 @FunctionalInterface
 public interface InboundEventInfoAwarePayloadExtractor<T> extends InboundEventPayloadExtractor<T> {
 
+    @Override
     default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload) {
         throw new UnsupportedOperationException("Payload extraction should never call this ");
     }
 
+    @Override
     Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event);
 
 }

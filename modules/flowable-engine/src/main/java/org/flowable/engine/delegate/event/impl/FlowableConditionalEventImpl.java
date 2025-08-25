@@ -36,6 +36,7 @@ public class FlowableConditionalEventImpl extends FlowableActivityEventImpl impl
         this.conditionExpression = conditionExpression;
     }
 
+    @Override
     public String getConditionLanguage() {
         return conditionLanguage;
     }

@@ -27,6 +27,7 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public interface NonTransactionalJobHandler<Output> extends JobHandler {
 
+    @Override
     default void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         throw new UnsupportedOperationException();
     }
