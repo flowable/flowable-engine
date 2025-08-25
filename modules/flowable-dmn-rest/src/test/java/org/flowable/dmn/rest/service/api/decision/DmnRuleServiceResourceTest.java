@@ -15,8 +15,11 @@ package org.flowable.dmn.rest.service.api.decision;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.dmn.engine.test.DmnDeployment;
@@ -58,6 +61,24 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
     @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
+    public void testExecuteWithDecisionWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "decision1");
+        requestNode.put("disableHistory", true);
+
+        requestNode.set("inputVariables", createDecisionTableMultiHitPayload());
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+    }
+
+
+
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
     public void testExecuteWithDecisionSingleResult() throws Exception {
         // Add decision key
@@ -80,11 +101,29 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
     @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
+    public void testExecuteWithDecisionSingleResultWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "decision");
+        requestNode.put("disableHistory", true);
+
+        requestNode.set("inputVariables", createDecisionTableSingleHitPayload());
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE_SINGLE_RESULT));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
+    }
+
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
     public void testExecuteWithDecisionSingleResultViolated() throws Exception {
         // Add decision key
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("decisionKey", "decision1");
+        requestNode.put("disableHistory", true);
 
         requestNode.set("inputVariables", createDecisionTableMultiHitPayload());
 
@@ -140,6 +179,23 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
     @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
+    public void testExecuteWithDecisionServiceWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "expandedDecisionService");
+
+        requestNode.set("inputVariables", createDecisionServiceRequestPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
+    }
+
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
     public void testExecuteWithDecisionServiceSingleResult() throws Exception {
         // Add decision key
@@ -168,6 +224,23 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "        }"
                         + "    ]"
                         + "]");
+    }
+
+    @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
+    public void testExecuteWithDecisionServiceSingleResultWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "evaluateMortgageRequestService");
+
+        requestNode.set("inputVariables", createMortgageRequestPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
     }
 
     @Test
@@ -231,6 +304,23 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
     @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/multi-hit.dmn" })
+    public void testExecuteDecisionWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "decision1");
+
+        requestNode.set("inputVariables", createDecisionTableSingleHitPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE_DECISION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
+    }
+
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
     public void testExecuteDecisionSingleResult() throws Exception {
         // Add decision key
@@ -259,6 +349,24 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "            \"value\": \"result2\""
                         + "        }"
                         + "]");
+    }
+
+    @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/single-hit.dmn" })
+    public void testExecuteDecisionSingleResultWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "decision");
+
+        requestNode.set("inputVariables", createDecisionTableSingleHitPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE_DECISION_SINGLE_RESULT));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
     }
 
     @Test
@@ -323,6 +431,23 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
     @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/decision-service-multiple-output-decisions.dmn" })
+    public void testExecuteDecisionServiceWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "expandedDecisionService");
+
+        requestNode.set("inputVariables", createDecisionServiceRequestPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE_DECISION_SERVICE));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
+    }
+
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
     public void testExecuteDecisionServiceSingleResult() throws Exception {
         // Add decision key
@@ -351,6 +476,24 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
                         + "            \"value\": \"APPROVED\""
                         + "        }"
                         + "]");
+    }
+
+    @Test
+    @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/decision/evaluate-mortgage-request-service.dmn" })
+    public void testExecuteDecisionServiceSingleResultWithoutHistory() throws Exception {
+        // Add decision key
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("decisionKey", "evaluateMortgageRequestService");
+
+        requestNode.set("inputVariables", createMortgageRequestPayload());
+        requestNode.put("disableHistory", true);
+
+        HttpPost httpPost = new HttpPost(
+                SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE_DECISION_SERVICE_SINGLE_RESULT));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        executeRequest(httpPost, HttpStatus.SC_CREATED);
+        verifyNoHistory();
+
     }
 
     @Test
@@ -460,6 +603,20 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
         variablesNode.add(variableNode4);
 
         return variablesNode;
+    }
+
+    protected void verifyNoHistory() throws IOException {
+
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION_COLLECTION));
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+
+        // Check response
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        ArrayNode resultVariables = (ArrayNode) responseNode.get("data");
+
+        assertThat(resultVariables).hasSize(0);
     }
 
 }
