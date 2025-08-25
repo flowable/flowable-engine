@@ -697,6 +697,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return this;
     }
     
+    @Override
     public ProcessInstanceQuery processInstanceRootScopeId(String rootId) {
         if (inOrStatement) {
             this.currentOrQueryObject.rootScopeId = rootId;

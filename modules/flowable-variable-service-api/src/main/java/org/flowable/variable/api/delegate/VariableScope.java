@@ -163,6 +163,7 @@ public interface VariableScope extends VariableContainer {
     /**
      * Returns all the names of the variables for this scope and all parent scopes.
      */
+    @Override
     Set<String> getVariableNames();
 
     /**

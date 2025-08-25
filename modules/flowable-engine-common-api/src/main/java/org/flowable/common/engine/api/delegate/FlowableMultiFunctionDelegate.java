@@ -20,10 +20,12 @@ import java.util.Collection;
  */
 public interface FlowableMultiFunctionDelegate extends FlowableFunctionDelegate {
 
+    @Override
     default String localName() {
         throw new UnsupportedOperationException("Function has more than one local name");
     }
 
+    @Override
     Collection<String> localNames();
 
     @Override
