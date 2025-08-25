@@ -69,6 +69,7 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String finishedBy;
     private String lastReactivatedBy;
     private Date lastReactivatedBefore;
     private Date lastReactivatedAfter;
@@ -402,6 +403,14 @@ public class HistoricCaseInstanceQueryRequest extends PaginateRequest {
 
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
+    }
+
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public void setFinishedBy(String finishedBy) {
+        this.finishedBy = finishedBy;
     }
     
     public String getLastReactivatedBy() {

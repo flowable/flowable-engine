@@ -43,6 +43,7 @@ public class HistoricCaseInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date endTime;
     protected String startUserId;
+    protected String endUserId;
     protected String superProcessInstanceId;
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
@@ -158,6 +159,15 @@ public class HistoricCaseInstanceResponse {
 
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+
+    @ApiModelProperty(example = "kermit")
+    public String getEndUserId() {
+        return endUserId;
+    }
+
+    public void setEndUserId(String endUserId) {
+        this.endUserId = endUserId;
     }
 
     @ApiModelProperty(example = "3")

@@ -42,7 +42,9 @@
         REFERENCE_ID_,
         REFERENCE_TYPE_,
         PROPAGATED_STAGE_INST_ID_,
-        BUSINESS_STATUS_
+        BUSINESS_STATUS_,
+        STATE_,
+        END_USER_ID_
       ) values (
         #{id, jdbcType=NVARCHAR},
         1, #{processInstanceId, jdbcType=NVARCHAR},
@@ -63,7 +65,9 @@
         #{referenceId, jdbcType=NVARCHAR},
         #{referenceType, jdbcType=NVARCHAR},
         #{propagatedStageInstanceId, jdbcType=NVARCHAR},
-        #{businessStatus, jdbcType=NVARCHAR}
+        #{businessStatus, jdbcType=NVARCHAR},
+        #{state, jdbcType=NVARCHAR},
+        #{endUserId, jdbcType=NVARCHAR}
       )
   </insert>
   
@@ -89,7 +93,9 @@
         REFERENCE_ID_,
         REFERENCE_TYPE_,
         PROPAGATED_STAGE_INST_ID_,
-        BUSINESS_STATUS_
+        BUSINESS_STATUS_,
+        STATE_,
+        END_USER_ID_
       ) values
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
@@ -112,7 +118,9 @@
            #{historicProcessInstance.referenceId, jdbcType=NVARCHAR},
            #{historicProcessInstance.referenceType, jdbcType=NVARCHAR},
            #{historicProcessInstance.propagatedStageInstanceId, jdbcType=NVARCHAR},
-           #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR}
+           #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR},
+           #{historicProcessInstance.state, jdbcType=NVARCHAR},
+           #{historicProcessInstance.endUserId, jdbcType=NVARCHAR}
           )
          </foreach>
   </insert>
@@ -141,7 +149,9 @@
             REFERENCE_ID_,
             REFERENCE_TYPE_,
             PROPAGATED_STAGE_INST_ID_,
-            BUSINESS_STATUS_
+            BUSINESS_STATUS_,
+            STATE_,
+            END_USER_ID_
           ) VALUES
               (
                #{historicProcessInstance.id, jdbcType=NVARCHAR},
@@ -163,7 +173,9 @@
                #{historicProcessInstance.referenceId, jdbcType=NVARCHAR},
                #{historicProcessInstance.referenceType, jdbcType=NVARCHAR},
                #{historicProcessInstance.propagatedStageInstanceId, jdbcType=NVARCHAR},
-               #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR}
+               #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR},
+               #{historicProcessInstance.state, jdbcType=NVARCHAR},
+               #{historicProcessInstance.endUserId, jdbcType=NVARCHAR}
               )
        </foreach>
     SELECT * FROM dual
@@ -216,6 +228,12 @@
         </if>
         <if test="originalPersistentState.businessStatus != businessStatus">
           BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
+        </if>
+        <if test="originalPersistentState.state != state">
+          STATE_ = #{state, jdbcType=NVARCHAR},
+        </if>
+        <if test="originalPersistentState.endUserId != endUserId">
+          END_USER_ID_ = #{endUserId, jdbcType=NVARCHAR},
         </if>
       </set>
     where ID_ = #{id, jdbcType=NVARCHAR}
@@ -277,6 +295,8 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="state" column="STATE_" jdbcType="NVARCHAR" />
+    <result property="endUserId" column="END_USER_ID_" jdbcType="NVARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceIdResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -310,6 +330,8 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="state" column="STATE_" jdbcType="NVARCHAR" />
+    <result property="endUserId" column="END_USER_ID_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
@@ -909,6 +931,12 @@
       <if test="startedBy != null">
       	and ${queryTablePrefix}START_USER_ID_ = #{startedBy, jdbcType=NVARCHAR}
       </if>
+      <if test="state != null">
+          and ${queryTablePrefix}STATE_ = #{state, jdbcType=NVARCHAR}
+      </if>
+      <if test="finishedBy != null">
+          and ${queryTablePrefix}END_USER_ID_ = #{finishedBy, jdbcType=NVARCHAR}
+      </if>
       <if test="superProcessInstanceId != null">
         and ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId, jdbcType=NVARCHAR}
       </if>
@@ -1075,6 +1103,12 @@
       </if>
       <if test="orQueryObject.startedBy != null">
         or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy, jdbcType=NVARCHAR}
+      </if>
+      <if test="orQueryObject.state != null">
+          or ${queryTablePrefix}STATE_ = #{orQueryObject.state, jdbcType=NVARCHAR}
+      </if>
+      <if test="orQueryObject.finishedBy != null">
+          or ${queryTablePrefix}END_USER_ID_ = #{orQueryObject.finishedBy, jdbcType=NVARCHAR}
       </if>
       <if test="orQueryObject.superProcessInstanceId != null">
         or ${queryTablePrefix}SUPER_PROCESS_INSTANCE_ID_ = #{orQueryObject.superProcessInstanceId, jdbcType=NVARCHAR}

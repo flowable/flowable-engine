@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
 
     <insert id="insertHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, END_USER_ID_)
         values (
             #{id, jdbcType=VARCHAR},
             1, #{name, jdbcType=NVARCHAR},
@@ -23,12 +23,13 @@
             #{referenceId, jdbcType=VARCHAR},
             #{referenceType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
-            #{businessStatus, jdbcType=NVARCHAR}
+            #{businessStatus, jdbcType=NVARCHAR},
+            #{endUserId, jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertHistoricCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, END_USER_ID_)
         values
         <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
             (
@@ -48,7 +49,8 @@
                 #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
                 #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId, jdbcType=VARCHAR},
-                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -56,7 +58,7 @@
     <insert id="bulkInsertHistoricCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicCaseInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_) VALUES
+            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, END_USER_ID_) VALUES
             (
                 #{historicCaseInstance.id, jdbcType=VARCHAR},
                 1, #{historicCaseInstance.name, jdbcType=NVARCHAR},
@@ -74,7 +76,8 @@
                 #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
                 #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId, jdbcType=VARCHAR},
-                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -132,6 +135,9 @@
             <if test="originalPersistentState.businessStatus != businessStatus">
                 BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
+            <if test="originalPersistentState.endUserId != endUserId">
+                END_USER_ID_ = #{endUserId, jdbcType=VARCHAR},
+            </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
@@ -176,6 +182,7 @@
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+        <result property="endUserId" column="END_USER_ID_" jdbcType="VARCHAR" />
 
         <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
         <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="NVARCHAR" />
@@ -829,6 +836,9 @@
             and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
             I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
         </if>
+        <if test="finishedBy != null">
+            and ${queryTablePrefix}END_USER_ID_ = #{finishedBy, jdbcType=VARCHAR}
+        </if>
     </sql>
     
     <sql id="commonCaseInstanceOrQuerySql">
@@ -1008,6 +1018,9 @@
                 LINK.REF_SCOPE_ID_ = RES.ID_
                 and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId, jdbcType=NVARCHAR}
             )
+        </if>
+        <if test="orQueryObject.finishedBy != null">
+            or ${queryTablePrefix}END_USER_ID_ = #{orQueryObject.finishedBy, jdbcType=VARCHAR}
         </if>
     </sql>
 

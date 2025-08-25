@@ -86,9 +86,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String state, String deleteReason, String activityId, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceEnd(processInstance, deleteReason, activityId, endTime);
+            historyManager.recordProcessInstanceEnd(processInstance, state, deleteReason, activityId, endTime);
         }
     }
 

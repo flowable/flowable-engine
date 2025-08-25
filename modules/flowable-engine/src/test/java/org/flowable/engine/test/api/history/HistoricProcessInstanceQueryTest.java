@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -649,6 +651,85 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
                     .includeProcessVariables(List.of("unknown", "dummy")).singleResult();
             assertThat(processInstance.getProcessVariables())
                     .isEmpty();
+        }
+    }
+
+    @Test
+    public void testQueryByState() {
+        deployOneTaskTestProcess();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+
+        ProcessInstance processInstance2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+
+        ProcessInstance processInstance3 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .start();
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "cancel");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().state(ProcessInstanceState.CANCELLED).singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance.getId());
+
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().state(ProcessInstanceState.COMPLETED).singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance2.getId());
+
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery().state(ProcessInstanceState.RUNNING).singleResult();
+            assertThat(historicProcessInstance.getId()).isEqualTo(processInstance3.getId());
+        }
+    }
+
+    @Test
+    public void testQueryByFinishedBy() {
+        deployOneTaskTestProcess();
+
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("elmo");
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("oneTaskProcess")
+                    .start();
+
+            Authentication.setAuthenticatedUserId("kermit");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().finishedBy("elmo").count()).isEqualTo(0);
+            assertThat(historyService.createHistoricProcessInstanceQuery().finishedBy("kermit").count()).isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery().finishedBy("kermit").list().get(0).getId()).isEqualTo(processInstance.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().finishedBy("kermit").singleResult().getId()).isEqualTo(processInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .finishedBy("kermit")
+                    .processDefinitionName("undefinedId")
+                    .endOr()
+                    .count())
+                    .isEqualTo(1);
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .finishedBy("kermit")
+                    .processDefinitionName("undefinedId")
+                    .endOr()
+                    .list().get(0).getId())
+                    .isEqualTo(processInstance.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .finishedBy("kermit")
+                    .processDefinitionName("undefined")
+                    .endOr()
+                    .singleResult().getId())
+                    .isEqualTo(processInstance.getId());
+
+        } finally {
+            Authentication.setAuthenticatedUserId(authenticatedUserId);
         }
 
     }

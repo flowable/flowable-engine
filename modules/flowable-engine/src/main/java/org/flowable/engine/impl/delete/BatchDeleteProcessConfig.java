@@ -195,6 +195,12 @@ public class BatchDeleteProcessConfig {
                 case "startedBy":
                     query.startedBy(value.textValue());
                     break;
+                case "finishedBy":
+                    query.finishedBy(value.textValue());
+                    break;
+                case "state":
+                    query.state(value.textValue());
+                    break;
                 case "superProcessInstanceId":
                     query.superProcessInstanceId(value.textValue());
                     break;

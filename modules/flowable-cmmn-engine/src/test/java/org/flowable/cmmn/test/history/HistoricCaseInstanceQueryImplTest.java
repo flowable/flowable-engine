@@ -55,6 +55,7 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn")
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
                 .deploy());
 
         cmmnRuntimeService.createCaseInstanceBuilder()
@@ -993,6 +994,53 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
                     .endOr()
                     .singleResult().getId())
                     .isEqualTo(caseInstance.getId());
+            }
+        } finally {
+            Authentication.setAuthenticatedUserId(authenticatedUserId);
+        }
+    }
+
+    @Test
+    public void getCaseInstanceByEndedBy() {
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+        try {
+            Authentication.setAuthenticatedUserId("elmo");
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneHumanTaskCase")
+                    .start();
+
+            Authentication.setAuthenticatedUserId("kermit");
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+
+            if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finishedBy("elmo").count()).isEqualTo(0);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finishedBy("kermit").count()).isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finishedBy("kermit").list().get(0).getId()).isEqualTo(caseInstance.getId());
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().finishedBy("kermit").singleResult().getId()).isEqualTo(caseInstance.getId());
+
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                        .or()
+                        .finishedBy("kermit")
+                        .caseDefinitionName("undefinedId")
+                        .endOr()
+                        .count())
+                        .isEqualTo(1);
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                        .or()
+                        .finishedBy("kermit")
+                        .caseDefinitionName("undefinedId")
+                        .endOr()
+                        .list().get(0).getId())
+                        .isEqualTo(caseInstance.getId());
+                assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                        .or()
+                        .finishedBy("kermit")
+                        .caseDefinitionId("undefined")
+                        .endOr()
+                        .singleResult().getId())
+                        .isEqualTo(caseInstance.getId());
             }
         } finally {
             Authentication.setAuthenticatedUserId(authenticatedUserId);

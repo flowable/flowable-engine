@@ -33,6 +33,10 @@ public interface HistoricProcessInstanceEntity extends HistoricScopeInstanceEnti
 
     void setStartUserId(String startUserId);
 
+    void setState(String state);
+
+    void setEndUserId(String endUserId);
+
     void setStartActivityId(String startUserId);
 
     void setSuperProcessInstanceId(String superProcessInstanceId);

@@ -838,6 +838,8 @@ public class RestResponseFactory {
         result.setStartActivityId(processInstance.getStartActivityId());
         result.setStartTime(processInstance.getStartTime());
         result.setStartUserId(processInstance.getStartUserId());
+        result.setEndUserId(processInstance.getEndUserId());
+        result.setState(processInstance.getState());
         result.setSuperProcessInstanceId(processInstance.getSuperProcessInstanceId());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, processInstance.getId()));
         if (processInstance.getProcessVariables() != null) {

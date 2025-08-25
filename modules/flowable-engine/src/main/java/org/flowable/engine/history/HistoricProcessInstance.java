@@ -84,6 +84,19 @@ public interface HistoricProcessInstance {
      */
     String getStartUserId();
 
+    /**
+     * The state of this process instance.
+     *
+     * @see IdentityService#setAuthenticatedUserId(String)
+     */
+    String getState();
+
+    /**
+     * The authenticated user that ended this process instance.
+     *
+     */
+    String getEndUserId();
+
     /** The start activity. */
     String getStartActivityId();
 

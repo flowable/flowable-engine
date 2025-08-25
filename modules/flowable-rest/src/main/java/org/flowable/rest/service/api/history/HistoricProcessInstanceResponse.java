@@ -44,6 +44,8 @@ public class HistoricProcessInstanceResponse {
     protected Date endTime;
     protected Long durationInMillis;
     protected String startUserId;
+    protected String endUserId;
+    protected String state;
     protected String startActivityId;
     protected String endActivityId;
     protected String deleteReason;
@@ -171,6 +173,24 @@ public class HistoricProcessInstanceResponse {
 
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+
+    @ApiModelProperty(example = "kermit")
+    public String getEndUserId() {
+        return endUserId;
+    }
+
+    public void setEndUserId(String endUserId) {
+        this.endUserId = endUserId;
+    }
+
+    @ApiModelProperty(example = "running")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     @ApiModelProperty(example = "startEvent")

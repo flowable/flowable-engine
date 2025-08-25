@@ -6,7 +6,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '7.2.0.2', 1);
+values ('schema.version', '8.0.0.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ NVARCHAR2(64),

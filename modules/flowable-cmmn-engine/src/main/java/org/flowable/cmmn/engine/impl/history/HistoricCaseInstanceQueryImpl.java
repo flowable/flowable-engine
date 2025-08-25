@@ -92,6 +92,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected String startedBy;
+    protected String finishedBy;
     protected String state;
     protected Date lastReactivatedBefore;
     protected Date lastReactivatedAfter;
@@ -619,6 +620,20 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.startedBy = userId;
         } else {
             this.startedBy = userId;
+        }
+
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQueryImpl finishedBy(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("user id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.finishedBy = userId;
+        } else {
+            this.finishedBy = userId;
         }
 
         return this;
@@ -1381,6 +1396,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getStartedBy() {
         return startedBy;
+    }
+
+    public String getFinishedBy() {
+        return finishedBy;
     }
     
     public String getState() {

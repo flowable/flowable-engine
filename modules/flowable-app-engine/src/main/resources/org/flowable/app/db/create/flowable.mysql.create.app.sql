@@ -17,4 +17,4 @@ ALTER TABLE ACT_APP_DEPLOYMENT MODIFY DEPLOY_TIME_ datetime(3);
 CREATE UNIQUE INDEX ACT_IDX_APP_DEF_UNIQ ON ACT_APP_APPDEF(KEY_, VERSION_, TENANT_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('app.schema.version', '7.2.0.2', 1);
+values ('app.schema.version', '8.0.0.0', 1);

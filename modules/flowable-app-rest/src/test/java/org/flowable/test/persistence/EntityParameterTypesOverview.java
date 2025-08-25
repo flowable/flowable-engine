@@ -475,6 +475,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("REFERENCE_ID_", "referenceId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("PROPAGATED_STAGE_INST_ID_", "propagatedStageInstanceId",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("STATE_", "state",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("END_USER_ID_", "endUserId",  PARAMETER_TYPE_NVARCHAR);
+
 
         addVariableColumnsWhenUsedInQueries(info);
 
@@ -505,6 +508,9 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
         
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
+
+        info.addQueryParameter("state", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("finishedBy", PARAMETER_TYPE_NVARCHAR);
 
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
@@ -1002,6 +1008,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("END_USER_ID_", "endUserId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionName", "caseDefinitionName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CaseDefinitionVersion", "caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
@@ -1059,6 +1066,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
         info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("finishedBy", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addHistoricMilestoneInstanceParams() {

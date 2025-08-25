@@ -45,6 +45,7 @@ public interface HistoricCaseInstanceEntity extends Entity, HasRevision, Histori
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);
     void setTenantId(String tenantId);
+    void setEndUserId(String endUserId);
 
     List<HistoricVariableInstanceEntity> getQueryVariables();
 }

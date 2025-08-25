@@ -700,6 +700,7 @@ public class CmmnRestResponseFactory {
         result.setCaseDefinitionUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, caseInstance.getCaseDefinitionId()));
         result.setStartTime(caseInstance.getStartTime());
         result.setStartUserId(caseInstance.getStartUserId());
+        result.setEndUserId(caseInstance.getEndUserId());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
         Map<String, Object> variableMap = caseInstance.getCaseVariables();
         if (variableMap != null) {

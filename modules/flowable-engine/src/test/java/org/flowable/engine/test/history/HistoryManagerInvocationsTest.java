@@ -51,7 +51,7 @@ public class HistoryManagerInvocationsTest extends CustomConfigurationFlowableTe
         verify(mockHistoryManager, times(1)).recordTaskEnd(any(), any(), any(), any(), any());
 
         verify(mockHistoryManager, times(1)).recordProcessInstanceStart(any());
-        verify(mockHistoryManager, times(1)).recordProcessInstanceEnd(any(), any(), any(), any());
+        verify(mockHistoryManager, times(1)).recordProcessInstanceEnd(any(), any(), any(), any(), any());
 
     }
 

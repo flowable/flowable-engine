@@ -71,6 +71,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected boolean deleted;
     protected boolean notDeleted;
     protected String startedBy;
+    protected String finishedBy;
+    protected String state;
     protected String superProcessInstanceId;
     protected boolean excludeSubprocesses;
     protected List<String> processDefinitionKeyIn;
@@ -441,6 +443,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.startedBy = startedBy;
         } else {
             this.startedBy = startedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery finishedBy(String finishedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.finishedBy = finishedBy;
+        } else {
+            this.finishedBy = finishedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery state(String state) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
         }
         return this;
     }
@@ -1340,6 +1362,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getStartedBy() {
         return startedBy;
+    }
+
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public String getState() {
+        return state;
     }
 
     public String getSuperProcessInstanceId() {
