@@ -652,7 +652,9 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
             assertThat(processInstance.getProcessVariables())
                     .isEmpty();
         }
+    }
 
+    @Test
     public void testQueryByState() {
         deployOneTaskTestProcess();
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
@@ -729,5 +731,6 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
         } finally {
             Authentication.setAuthenticatedUserId(authenticatedUserId);
         }
+
     }
 }
