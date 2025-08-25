@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
@@ -84,6 +85,9 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(endTime);
                 historicCaseInstanceEntity.setState(state);
+
+                String authenticatedUserId = Authentication.getAuthenticatedUserId();
+                historicCaseInstanceEntity.setEndUserId(authenticatedUserId);
             }
         }
     }
@@ -96,6 +100,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(null);
+                historicCaseInstanceEntity.setEndUserId(null);
                 historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
                 historicCaseInstanceEntity.setLastReactivationTime(caseInstanceEntity.getLastReactivationTime());
                 historicCaseInstanceEntity.setLastReactivationUserId(caseInstanceEntity.getLastReactivationUserId());

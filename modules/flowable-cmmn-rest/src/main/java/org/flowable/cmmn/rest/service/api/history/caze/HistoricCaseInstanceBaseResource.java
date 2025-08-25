@@ -182,6 +182,9 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }
+        if (queryRequest.getFinishedBy() != null) {
+            query.finishedBy(queryRequest.getFinishedBy());
+        }
         if (queryRequest.getLastReactivatedAfter() != null) {
             query.lastReactivatedAfter(queryRequest.getLastReactivatedAfter());
         }

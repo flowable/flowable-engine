@@ -68,6 +68,8 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String finishedBy;
+    private String state;
     private Boolean includeProcessVariables;
     private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
@@ -392,6 +394,22 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setStartedBy(String startedBy) {
         this.startedBy = startedBy;
+    }
+
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public void setFinishedBy(String finishedBy) {
+        this.finishedBy = finishedBy;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public Boolean getIncludeProcessVariables() {

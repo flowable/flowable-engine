@@ -46,6 +46,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     protected String referenceType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected List<HistoricVariableInstanceEntity> queryVariables;
+    protected String endUserId;
 
     protected String localizedName;
     
@@ -100,6 +101,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("endUserId", endUserId);
         return persistentState;
     }
     
@@ -233,6 +235,14 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+    @Override
+    public String getEndUserId() {
+        return endUserId;
+    }
+    @Override
+    public void setEndUserId(String endUserId) {
+        this.endUserId = endUserId;
     }
 
     @Override

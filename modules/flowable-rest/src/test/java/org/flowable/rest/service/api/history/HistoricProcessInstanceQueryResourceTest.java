@@ -22,6 +22,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -164,6 +165,17 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionKey", "oneTaskProcess");
         assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId(), processInstance2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("finishedBy", "historyQueryAndSortUser");
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("state", ProcessInstanceState.COMPLETED);
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId());
+
+        requestNode.put("state", ProcessInstanceState.RUNNING);
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance2.getId());
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionKey", "oneTaskProcess");

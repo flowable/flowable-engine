@@ -41,6 +41,7 @@ public interface HistoricCaseInstance {
     String getReferenceId();
     String getReferenceType();
     String getTenantId();
+    String getEndUserId();
 
     Map<String, Object> getCaseVariables();
 

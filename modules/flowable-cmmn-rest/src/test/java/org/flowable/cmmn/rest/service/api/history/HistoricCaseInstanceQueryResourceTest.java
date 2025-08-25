@@ -105,6 +105,10 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
         
         requestNode.put("startedBy", "fozzie");
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("finishedBy", "kermit");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
         
         Calendar todayCal = new GregorianCalendar();
         Calendar futureCal = new GregorianCalendar(todayCal.get(Calendar.YEAR) + 2, todayCal.get(Calendar.MONTH), todayCal.get(Calendar.DAY_OF_MONTH));

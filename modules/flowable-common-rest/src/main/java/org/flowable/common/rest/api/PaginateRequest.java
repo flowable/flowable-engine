@@ -53,6 +53,7 @@ public class PaginateRequest {
         return sort;
     }
 
+    @ApiParam(value = "Property to sort the results on")
     public void setSort(String sort) {
         this.sort = sort;
     }

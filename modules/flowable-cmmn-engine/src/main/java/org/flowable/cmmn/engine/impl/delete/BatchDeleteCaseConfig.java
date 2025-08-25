@@ -230,6 +230,9 @@ public class BatchDeleteCaseConfig {
                 case "startedBy":
                     query.startedBy(value.textValue());
                     break;
+                case "finishedBy":
+                    query.finishedBy(value.textValue());
+                    break;
                 case "lastReactivatedBefore":
                     query.lastReactivatedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
                     break;

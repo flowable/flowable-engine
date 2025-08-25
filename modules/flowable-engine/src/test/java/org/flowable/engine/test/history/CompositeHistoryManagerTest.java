@@ -140,10 +140,10 @@ class CompositeHistoryManagerTest {
     void recordProcessInstanceEnd() {
         ExecutionEntity instance = new ExecutionEntityImpl();
         Date endTime = Date.from(Instant.now().plusSeconds(1));
-        compositeHistoryManager.recordProcessInstanceEnd(instance, "reason", "activity-id", endTime);
+        compositeHistoryManager.recordProcessInstanceEnd(instance, "state", "reason", "activity-id", endTime);
 
-        verify(historyManager1).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"), eq(endTime));
-        verify(historyManager2).recordProcessInstanceEnd(same(instance), eq("reason"), eq("activity-id"), eq(endTime));
+        verify(historyManager1).recordProcessInstanceEnd(same(instance), eq("state"), eq("reason"), eq("activity-id"), eq(endTime));
+        verify(historyManager2).recordProcessInstanceEnd(same(instance), eq("state"), eq("reason"), eq("activity-id"), eq(endTime));
     }
 
     @Test
