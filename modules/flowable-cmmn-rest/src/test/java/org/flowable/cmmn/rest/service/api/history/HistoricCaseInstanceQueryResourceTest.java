@@ -620,4 +620,68 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                         + "  }"
                         + "]");
     }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+    public void testQueryHistoricCaseInstancesByCaseInstanceIds() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .inPath("data")
+                .isEqualTo("""
+                        [
+                          { id: '%s' },
+                          { id: '%s' },
+                          { id: '%s' }
+                        ]
+                        """.formatted(caseInstance.getId(), caseInstance2.getId(), caseInstance3.getId()));
+
+        requestNode = objectMapper.createObjectNode();
+        ArrayNode itemArrayNode = requestNode.putArray("caseInstanceIds");
+        itemArrayNode.add(caseInstance.getId());
+        itemArrayNode.add(caseInstance3.getId());
+
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .inPath("data")
+                .isEqualTo("""
+                        [
+                          { id: '%s' },
+                          { id: '%s' }
+                        ]
+                        """.formatted(caseInstance.getId(), caseInstance3.getId()));
+
+        requestNode = objectMapper.createObjectNode();
+        itemArrayNode = requestNode.putArray("caseInstanceIds");
+        itemArrayNode.add("notExisting");
+
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThatJson(rootNode)
+                .inPath("data")
+                .isEqualTo("[]");
+    }
 }
