@@ -25,7 +25,6 @@ public class DmnRuleServiceRequest {
     protected String tenantId;
     protected String parentDeploymentId;
     protected List<EngineRestVariable> inputVariables;
-    protected boolean disableHistory;
 
     public String getDecisionKey() {
         return decisionKey;
@@ -57,13 +56,5 @@ public class DmnRuleServiceRequest {
 
     public void setInputVariables(List<EngineRestVariable> variables) {
         this.inputVariables = variables;
-    }
-
-    public boolean isDisableHistory() {
-        return disableHistory;
-    }
-
-    public void setDisableHistory(boolean disableHistory) {
-        this.disableHistory = disableHistory;
     }
 }
