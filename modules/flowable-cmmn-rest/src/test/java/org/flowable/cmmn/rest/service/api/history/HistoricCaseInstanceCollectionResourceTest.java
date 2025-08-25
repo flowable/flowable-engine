@@ -654,6 +654,22 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @CmmnDeployment(resources = "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn")
+    public void testQueryByCaseInstanceIds() throws IOException {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES);
+        assertResultsPresentInDataResponse(url, caseInstance1.getId(), caseInstance2.getId(), caseInstance3.getId());
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?caseInstanceIds=" + caseInstance1.getId() + "," + caseInstance3.getId();
+        assertResultsPresentInDataResponse(url, caseInstance1.getId(), caseInstance3.getId());
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCES) + "?caseInstanceIds=dummy1,dummy2";
+        assertEmptyResultsPresentInDataResponse(url);
+    }
+
     private void assertVariablesPresentInPostDataResponse(String url, String queryParameters, String caseInstanceId, Map<String, Object> expectedVariables)
             throws IOException {
 
