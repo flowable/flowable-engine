@@ -273,7 +273,7 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
             arrayNode.add(arrayElement);
         }
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("myRootVariable", arrayNode);
         return variables;
     }
