@@ -60,7 +60,8 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "List case instances", nickname ="listCaseInstances", tags = { "Case Instances" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return case instances with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "ids", dataType = "string", value = "Only return case instances with the given comma-separated ids.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return case instances like given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like given case definition key, ignoring case.", paramType = "query"),
@@ -114,6 +115,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
         if (allRequestParams.containsKey("id")) {
             queryRequest.setCaseInstanceId(allRequestParams.get("id"));
+        }
+
+        if (allRequestParams.containsKey("ids")) {
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("ids")));
         }
 
         if (allRequestParams.containsKey("caseDefinitionKey")) {

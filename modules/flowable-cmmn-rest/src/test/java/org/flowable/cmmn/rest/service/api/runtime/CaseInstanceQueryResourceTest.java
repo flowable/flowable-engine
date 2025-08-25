@@ -66,6 +66,20 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
 
         ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceIds").add(caseInstance.getId()).add(caseInstance2.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId(), caseInstance2.getId());
+
+        runtimeService.terminateCaseInstance(caseInstance2.getId());
+        runtimeService.terminateCaseInstance(caseInstance3.getId());
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceBusinessKey", "myBusinessKey");
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
         

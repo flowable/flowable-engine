@@ -16,8 +16,10 @@ package org.flowable.common.rest.api;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -107,6 +109,16 @@ public class RequestUtil {
         }
         String[] valueParts = value.split(",");
         List<String> values = new ArrayList<>(valueParts.length);
+        Collections.addAll(values, valueParts);
+        return values;
+    }
+
+    public static Set<String> parseToSet(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        String[] valueParts = value.split(",");
+        Set<String> values = new HashSet<>(valueParts.length);
         Collections.addAll(values, valueParts);
         return values;
     }
