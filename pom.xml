@@ -320,7 +320,6 @@
 				<module>modules/flowable-camel</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-http-common</module>
-				<module>modules/flowable-mail</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-cmmn-cdi</module>
 				<module>modules/flowable-ldap</module>
@@ -345,6 +344,29 @@
 				</plugins>
 			</build>
 		</profile>
+        <profile>
+            <id>flowable5-test</id>
+            <modules>
+                <module>modules/flowable-camel</module>
+                <module>modules/flowable-cxf</module>
+                <module>modules/flowable-event-registry-spring-configurator</module>
+                <module>modules/flowable-event-registry-spring</module>
+                <module>modules/flowable-idm-spring</module>
+                <module>modules/flowable-idm-spring-configurator</module>
+                <module>modules/flowable-job-spring-service</module>
+                <module>modules/flowable-spring-common</module>
+                <module>modules/flowable-spring</module>
+                <module>modules/flowable5-camel-test</module>
+                <module>modules/flowable5-compatibility-test</module>
+                <module>modules/flowable5-compatibility</module>
+                <module>modules/flowable5-cxf-test</module>
+                <module>modules/flowable5-engine</module>
+                <module>modules/flowable5-spring-compatibility</module>
+                <module>modules/flowable5-spring-test</module>
+                <module>modules/flowable5-spring</module>
+                <module>modules/flowable5-test</module>
+            </modules>
+        </profile>
 	</profiles>
 
 	<!-- Various information, not used by the build -->
