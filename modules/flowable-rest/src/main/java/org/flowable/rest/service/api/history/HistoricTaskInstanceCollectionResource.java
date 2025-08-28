@@ -14,7 +14,6 @@
 package org.flowable.rest.service.api.history;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 
 import org.flowable.common.rest.api.DataResponse;
@@ -327,8 +326,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
         }
 
         if (allRequestParams.get("scopeIds") != null) {
-            String[] scopeIds = allRequestParams.get("scopeIds").split(",");
-            queryRequest.setScopeIds(new HashSet<>(Arrays.asList(scopeIds)));
+            queryRequest.setScopeIds(RequestUtil.parseToSet(allRequestParams.get("scopeIds")));
         }
         
         if (allRequestParams.get("withoutScopeId") != null) {

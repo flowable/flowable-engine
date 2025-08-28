@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -316,8 +315,7 @@ public class TaskCollectionResource extends TaskBaseResource {
         }
 
         if (requestParams.containsKey("scopeIds")) {
-            String[] scopeIdsSplit = requestParams.get("scopeIds").split(",");
-            request.setScopeIds(new HashSet<>(Arrays.asList(scopeIdsSplit)));
+            request.setScopeIds(RequestUtil.parseToSet(requestParams.get("scopeIds")));
         }
         
         if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {

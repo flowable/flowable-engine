@@ -13,14 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,8 +52,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
         mapping.put("caseDefinitionId", HistoricPlanItemInstanceQueryRequest::setCaseDefinitionId);
         mapping.put("caseInstanceId", HistoricPlanItemInstanceQueryRequest::setCaseInstanceId);
         mapping.put("caseInstanceIds", (req, value) -> {
-            String[] csv = StringUtils.split(value, ","); // split by comma
-            req.setCaseInstanceIds(new HashSet<>(Arrays.asList(csv)));
+            req.setCaseInstanceIds(RequestUtil.parseToSet(value));
         });
         mapping.put("stageInstanceId", HistoricPlanItemInstanceQueryRequest::setStageInstanceId);
         mapping.put("elementId", HistoricPlanItemInstanceQueryRequest::setElementId);

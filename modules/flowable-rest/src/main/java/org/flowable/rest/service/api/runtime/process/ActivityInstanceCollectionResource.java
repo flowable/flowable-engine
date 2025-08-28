@@ -13,12 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -104,8 +102,7 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
         }
 
         if (allRequestParams.get("processInstanceIds") != null) {
-            String[] csv = StringUtils.split(allRequestParams.get("processInstanceIds"), ","); // split by comma
-            query.setProcessInstanceIds(new HashSet<>(Arrays.asList(csv)));
+            query.setProcessInstanceIds(RequestUtil.parseToSet(allRequestParams.get("processInstanceIds")));
         }
 
         if (allRequestParams.get("processDefinitionId") != null) {

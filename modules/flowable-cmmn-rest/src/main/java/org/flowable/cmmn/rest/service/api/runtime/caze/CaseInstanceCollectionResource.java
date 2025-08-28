@@ -13,12 +13,9 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -65,7 +62,6 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return case instances with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "ids", dataType = "string", value = "Only return case instances with the given comma-separated ids.", paramType = "query"),
-            @ApiImplicitParam(name = "ids", dataType = "string", value = "Only return models with the given versions.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "Only return case instances with the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return case instances like given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return case instances like given case definition key, ignoring case.", paramType = "query"),
@@ -236,8 +232,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         }
         
         if (allRequestParams.containsKey("callbackIds")) {
-            String[] list = StringUtils.split(allRequestParams.get("callbackIds"), ","); // split by comma
-            queryRequest.setCaseInstanceCallbackIds(new HashSet<>(Arrays.asList(list)));
+            queryRequest.setCaseInstanceCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
         }
 
         if (allRequestParams.containsKey("callbackType")) {

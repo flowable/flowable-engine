@@ -110,7 +110,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         }
 
         if (allRequestParams.get("caseInstanceIds") != null) {
-            queryRequest.setCaseInstanceIds(RequestUtil.parseToList(allRequestParams.get("caseInstanceIds")));
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.get("caseDefinitionKey") != null) {
@@ -210,8 +210,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         }
 
         if (allRequestParams.containsKey("callbackIds")) {
-            String[] list = StringUtils.split(allRequestParams.get("callbackIds"), ","); // split by comma
-            queryRequest.setCaseInstanceCallbackIds(new HashSet<>(Arrays.asList(list)));
+            queryRequest.setCaseInstanceCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
         }
 
         if (allRequestParams.get("callbackType") != null) {

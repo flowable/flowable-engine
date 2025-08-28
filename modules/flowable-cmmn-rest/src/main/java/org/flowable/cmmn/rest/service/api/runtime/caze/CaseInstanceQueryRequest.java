@@ -473,14 +473,6 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
         this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
     }
 
-    public Set<String> getCaseInstanceIds() {
-        return caseInstanceIds;
-    }
-
-    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
-        this.caseInstanceIds = caseInstanceIds;
-    }
-
     public Set<String> getCaseInstanceCallbackIds() {
         return caseInstanceCallbackIds;
     }

@@ -14,10 +14,8 @@
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -83,8 +81,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
         }
 
         if (allRequestParams.containsKey("caseInstanceIds")) {
-            String[] csv = StringUtils.split(allRequestParams.get("caseInstanceIds"), ","); // split by comma
-            queryRequest.setCaseInstanceIds(new HashSet<>(Arrays.asList(csv)));
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.containsKey("caseDefinitionId")) {
