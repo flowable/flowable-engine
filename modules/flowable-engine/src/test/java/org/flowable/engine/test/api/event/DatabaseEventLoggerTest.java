@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.entry;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -83,13 +82,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(null, null);
 
         String processDefinitionId = processInstance.getProcessDefinitionId();
-        Iterator<EventLogEntry> iterator = eventLogEntries.iterator();
-        while (iterator.hasNext()) {
-            EventLogEntry entry = iterator.next();
-            if (entry.getProcessDefinitionId() != null && !entry.getProcessDefinitionId().equals(processDefinitionId)) {
-                iterator.remove();
-            }
-        }
+        eventLogEntries.removeIf(entry -> entry.getProcessDefinitionId() != null && !entry.getProcessDefinitionId().equals(processDefinitionId));
 
         assertThat(eventLogEntries).hasSize(15);
 
@@ -501,13 +494,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(null, null);
 
         String processDefinitionId = processInstance.getProcessDefinitionId();
-        Iterator<EventLogEntry> iterator = eventLogEntries.iterator();
-        while (iterator.hasNext()) {
-            EventLogEntry entry = iterator.next();
-            if (entry.getProcessDefinitionId() != null && !entry.getProcessDefinitionId().equals(processDefinitionId)) {
-                iterator.remove();
-            }
-        }
+        eventLogEntries.removeIf(entry -> entry.getProcessDefinitionId() != null && !entry.getProcessDefinitionId().equals(processDefinitionId));
 
         assertThat(eventLogEntries).hasSize(15);
 
