@@ -90,6 +90,7 @@ public final class RestUrls {
     public static final String SEGMENT_SOURCE = "source";
     public static final String SEGMENT_SOURCE_EXTRA = "source-extra";
     public static final String SEGMENT_DIAGRAM = "diagram";
+    public static final String SEGMENT_CHANGE_STATE = "change-state";
     public static final String SEGMENT_SIGNALS = "signals";
     public static final String SEGMENT_IMAGE = "image";
     public static final String SEGMENT_START_FORM = "start-form";
@@ -341,6 +342,11 @@ public final class RestUrls {
      * URL template for a single process instance: <i>runtime/process-instances/{0:processInstanceId}</i>
      */
     public static final String[] URL_PROCESS_INSTANCE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}" };
+    
+    /**
+     * URL template for changing the activity state for a process instance: <i>runtime/process-instances/{0:processInstanceId}/change-state</i>
+     */
+    public static final String[] URL_PROCESS_INSTANCE_CHANGE_STATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_CHANGE_STATE};
 
     /**
      * URL template for the diagram for a single process instance: <i>runtime/process-instances/{0:processInstanceId}/diagram</i>
