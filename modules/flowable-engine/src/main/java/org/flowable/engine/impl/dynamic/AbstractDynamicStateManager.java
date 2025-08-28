@@ -221,10 +221,10 @@ public abstract class AbstractDynamicStateManager {
                             }
                         }
 
-                        //If inside a multiInstance, we create one container for each execution
+                        // If inside a multiInstance, we create one container for each execution
                         if (isInsideMultiInstance) {
 
-                            //We group by the parentId (executions belonging to the same parent execution instance
+                            // We group by the parentId (executions belonging to the same parent execution instance
                             // i.e. gateways nested in MultiInstance subProcesses, need to be in the same move container)
                             Stream<ExecutionEntity> executionEntitiesStream = activityExecutions.stream();
                             if (miExecution != null) {
@@ -244,10 +244,27 @@ public abstract class AbstractDynamicStateManager {
                     }
                 }
 
-                //Create a move container for each execution group (executionList)
-                Stream.concat(activitiesExecutionsByMultiInstanceParentId.values().stream(), Stream.of(activitiesExecutionsNotInMultiInstanceParent))
-                    .filter(executions -> executions != null && !executions.isEmpty())
-                    .forEach(executions -> moveExecutionEntityContainerList.add(createMoveExecutionEntityContainer(activityContainer, executions, commandContext)));
+                List<ExecutionEntity> combinedExecutions = new ArrayList<>();
+                if (!activitiesExecutionsByMultiInstanceParentId.isEmpty()) {
+                    for (String parentId : activitiesExecutionsByMultiInstanceParentId.keySet()) {
+                        List<ExecutionEntity> miExecutions = activitiesExecutionsByMultiInstanceParentId.get(parentId);
+                        if (!miExecutions.isEmpty()) {
+                            if (isTopLevelMultiInstanceRoot(miExecutions.get(0))) {
+                                combinedExecutions.addAll(miExecutions);
+                            } else {
+                                moveExecutionEntityContainerList.add(createMoveExecutionEntityContainer(activityContainer, miExecutions, commandContext));
+                            }
+                        }
+                    }
+                }
+                
+                if (!activitiesExecutionsNotInMultiInstanceParent.isEmpty()) {
+                    combinedExecutions.addAll(activitiesExecutionsNotInMultiInstanceParent);
+                }
+                
+                if (!combinedExecutions.isEmpty()) {
+                    moveExecutionEntityContainerList.add(createMoveExecutionEntityContainer(activityContainer, combinedExecutions, commandContext));
+                }
             }
         }
 
@@ -1452,6 +1469,24 @@ public abstract class AbstractDynamicStateManager {
             return ((Activity) flowElement).getLoopCharacteristics() != null;
         }
         return false;
+    }
+    
+    protected boolean isTopLevelMultiInstanceRoot(ExecutionEntity execution) {
+        boolean topLevelMultiInstanceRoot = false;
+        if (execution.isMultiInstanceRoot()) {
+            topLevelMultiInstanceRoot = true;
+            ExecutionEntity parentExecution = execution.getParent();
+            while (parentExecution != null) {
+                if (parentExecution.isMultiInstanceRoot()) {
+                    topLevelMultiInstanceRoot = false;
+                    break;
+                }
+                
+                parentExecution = parentExecution.getParent();
+            }
+        }
+        
+        return topLevelMultiInstanceRoot;
     }
     
     protected boolean hasSameMultiInstanceConfig(FlowElement sourceElement, FlowElement targetElement) {
