@@ -44,6 +44,7 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "Only return plan item instances with the given case definition id.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return plan item instances which are part of the case instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "Only return plan item instances which are part of the case instance with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "Only return plan item instances which are part of the given stage instance.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "Only return plan item instances which have the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionType", dataType = "string", value = "Only return plan item instances which have the given plan item definition type.", paramType = "query"),
@@ -77,6 +78,10 @@ public class PlanItemInstanceCollectionResource extends PlanItemInstanceBaseReso
 
         if (allRequestParams.containsKey("caseInstanceId")) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("caseInstanceIds")) {
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.containsKey("caseDefinitionId")) {

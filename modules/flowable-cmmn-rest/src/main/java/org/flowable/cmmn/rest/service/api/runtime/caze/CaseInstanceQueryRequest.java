@@ -62,6 +62,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceState;
     private String involvedUser;
     private String caseInstanceCallbackId;
+    private Set<String> caseInstanceCallbackIds;
     private String caseInstanceCallbackType;
     private String parentCaseInstanceId;
     private String caseInstanceReferenceId;
@@ -470,5 +471,13 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
         this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+    }
+
+    public Set<String> getCaseInstanceCallbackIds() {
+        return caseInstanceCallbackIds;
+    }
+
+    public void setCaseInstanceCallbackIds(Set<String> caseInstanceCallbackIds) {
+        this.caseInstanceCallbackIds = caseInstanceCallbackIds;
     }
 }

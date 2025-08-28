@@ -570,10 +570,15 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
     /**
-     * Only select process instances with the given callback identifier. 
+     * Only select process instances with the given callback identifier.
      */
     HistoricProcessInstanceQuery processInstanceCallbackId(String callbackId);
-    
+
+    /**
+     * Only select process instances with the given callback identifiers.
+     */
+    HistoricProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
+
     /**
      * Only select process instances with the given callback type. 
      */

@@ -73,7 +73,7 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
-        if (queryRequest.getCaseInstanceIds() != null) {
+        if (queryRequest.getCaseInstanceIds() != null && !queryRequest.getCaseInstanceIds().isEmpty()) {
             query.caseInstanceIds(queryRequest.getCaseInstanceIds());
         }
         if (queryRequest.getCaseDefinitionKey() != null) {
@@ -168,6 +168,9 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getCaseInstanceCallbackId() != null) {
             query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
+        }
+        if (queryRequest.getCaseInstanceCallbackIds() != null && !queryRequest.getCaseInstanceCallbackIds().isEmpty()) {
+            query.caseInstanceCallbackIds(queryRequest.getCaseInstanceCallbackIds());
         }
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());

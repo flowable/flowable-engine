@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -189,6 +190,8 @@ public class RuntimeActivityInstanceTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createActivityInstanceQuery().processInstanceId("nonExistingProcessInstanceId").list()).isEmpty();
 
         assertThat(runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(5);
+
+        assertThat(runtimeService.createActivityInstanceQuery().processInstanceIds(Set.of("someId", processInstance.getId())).list()).hasSize(5);
 
         assertThat(runtimeService.createActivityInstanceQuery().processDefinitionId("nonExistingProcessDefinitionId").list()).isEmpty();
 

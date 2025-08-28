@@ -301,6 +301,9 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?scopeId=" + caseInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());
 
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?scopeIds=someId," + caseInstance.getId();
+            assertResultsPresentInDataResponse(url, caseTask.getId());
+
             // Sub scope id id filtering
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?subScopeId=" + planItemInstance.getId();
             assertResultsPresentInDataResponse(url, caseTask.getId());

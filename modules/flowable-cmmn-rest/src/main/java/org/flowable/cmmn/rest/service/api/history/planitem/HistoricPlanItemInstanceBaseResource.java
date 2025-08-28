@@ -60,6 +60,7 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getPlanItemInstanceState()).ifPresent(query::planItemInstanceState);
         Optional.ofNullable(queryRequest.getCaseDefinitionId()).ifPresent(query::planItemInstanceCaseDefinitionId);
         Optional.ofNullable(queryRequest.getCaseInstanceId()).ifPresent(query::planItemInstanceCaseInstanceId);
+        Optional.ofNullable(queryRequest.getCaseInstanceIds()).ifPresent(query::planItemInstanceCaseInstanceIds);
         Optional.ofNullable(queryRequest.getStageInstanceId()).ifPresent(query::planItemInstanceStageInstanceId);
         Optional.ofNullable(queryRequest.getElementId()).ifPresent(query::planItemInstanceElementId);
         Optional.ofNullable(queryRequest.getPlanItemDefinitionId()).ifPresent(query::planItemInstanceDefinitionId);

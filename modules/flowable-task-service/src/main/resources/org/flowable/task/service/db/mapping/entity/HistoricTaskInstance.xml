@@ -1223,6 +1223,19 @@
       <if test="scopeId != null">
         and ${queryTablePrefix}SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
       </if>
+      <if test="scopeIds != null &amp;&amp; !scopeIds.empty">
+          and (
+          <foreach item="scopeIdListItem" index="groupIndex" collection="safeScopeIds">
+              <if test="groupIndex &gt; 0">
+                  or
+              </if>
+              ${queryTablePrefix}SCOPE_ID_ IN
+              <foreach item="scopeId" index="index" collection="scopeIdListItem" open="(" separator="," close=")">
+                  #{scopeId, jdbcType=NVARCHAR}
+              </foreach>
+          </foreach>
+          )
+      </if>
       <if test="subScopeId != null">
         and ${queryTablePrefix}SUB_SCOPE_ID_ = #{subScopeId, jdbcType=NVARCHAR}
       </if>
@@ -1570,6 +1583,19 @@
       </if>
       <if test="orQueryObject.scopeId != null">
         or ${queryTablePrefix}SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
+      </if>
+      <if test="orQueryObject.scopeIds != null &amp;&amp; !orQueryObject.scopeIds.empty">
+          or (
+          <foreach item="scopeIdListItem" index="groupIndex" collection="orQueryObject.safeScopeIds">
+              <if test="groupIndex &gt; 0">
+                  or
+              </if>
+              ${queryTablePrefix}SCOPE_ID_ IN
+              <foreach item="scopeId" index="index" collection="scopeIdListItem" open="(" separator="," close=")">
+                  #{scopeId, jdbcType=NVARCHAR}
+              </foreach>
+          </foreach>
+          )
       </if>
       <if test="orQueryObject.subScopeId != null">
         or ${queryTablePrefix}SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}

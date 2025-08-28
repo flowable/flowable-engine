@@ -475,6 +475,28 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
+
+
+        httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl
+                + "?caseInstanceIds=someCaseInstance," + caseInstance1.getId()
+        );
+        response = executeRequest(httpGet, HttpStatus.SC_OK);
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        assertThatJson(responseNode.get("data")).when(Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS).isEqualTo(
+                """
+                        [
+                            {
+                            caseInstanceId: "%s", "elementId": "planItemStageOne"},
+                            {
+                            caseInstanceId: "%s",  "elementId": "planItemAbortStage"},
+                            {
+                            caseInstanceId: "%s",  "elementId": "planItemTask"}
+                        ]
+                        """.replace("%s",caseInstance1.getId())
+        );
+
+
     }
 
     /**
@@ -659,6 +681,29 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
+
+        httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY));
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceIds").add("someCaseInstanceID").add(caseInstance1.getId());
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+        assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode.get("data")).when(Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS).isEqualTo(
+                """
+                        [
+                            {
+                            caseInstanceId: "%s", "elementId": "planItemStageOne"},
+                            {
+                            caseInstanceId: "%s",  "elementId": "planItemAbortStage"},
+                            {
+                            caseInstanceId: "%s",  "elementId": "planItemTask"}
+                        ]
+                        """.replace("%s",caseInstance1.getId())
+        );
+
+
     }
 
     private Map<String, JsonNode> mapNodesBy(String attribute, JsonNode array) {

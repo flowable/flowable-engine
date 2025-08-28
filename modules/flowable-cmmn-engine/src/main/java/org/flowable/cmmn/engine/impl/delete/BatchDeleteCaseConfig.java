@@ -243,6 +243,8 @@ public class BatchDeleteCaseConfig {
                     break;
                 case "callbackId":
                     query.caseInstanceCallbackId(value.textValue());
+                case "callbackIds":
+                    query.caseInstanceCallbackIds(asStringSet(value));
                     break;
                 case "callbackType":
                     query.caseInstanceCallbackType(value.textValue());
