@@ -469,6 +469,49 @@ public class ChangeStateForMultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
     }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/parallelTaskWithMI.bpmn20.xml")
+    public void testMoveFromParallelMultiInstanceTasksToOneActivity() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("startParallelProcess")
+                .start();
+
+        completeTask(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult());
+
+        List<Execution> parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(parallelExecutions).hasSize(6);
+        List<Task> activeParallelTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().list();
+        assertThat(activeParallelTasks).hasSize(4);
+        
+        List<String> currentActivityIds = new ArrayList<>();
+        currentActivityIds.add("task1");
+        currentActivityIds.add("task2");
+
+        runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstance.getId())
+                .moveActivityIdsToSingleActivityId(currentActivityIds, "taskBefore")
+                .changeState();
+
+        parallelExecutions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(parallelExecutions).hasSize(1);
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskBefore");
+        taskService.complete(task.getId());
+        
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count()).isEqualTo(6);
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).active().count()).isEqualTo(4);
+        
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (Task parallelTask : tasks) {
+            taskService.complete(parallelTask.getId());
+        }
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("taskAfter");
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/multiInstanceParallelSubProcess.bpmn20.xml")
