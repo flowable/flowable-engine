@@ -23,7 +23,7 @@ import org.flowable.common.engine.impl.javax.el.ELContext;
 
 public class AstBinary extends AstRightValue {
 	public interface Operator {
-		public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right);		
+		Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right);
 	}
 	public abstract static class SimpleOperator implements Operator {
         @Override

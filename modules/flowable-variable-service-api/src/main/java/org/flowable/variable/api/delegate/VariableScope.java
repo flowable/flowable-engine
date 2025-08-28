@@ -35,7 +35,7 @@ public interface VariableScope extends VariableContainer {
     /**
      * @return an empty (null object) variable scope.
      */
-    public static VariableScope empty() {
+    static VariableScope empty() {
         return EmptyVariableScope.INSTANCE;
     }
 
