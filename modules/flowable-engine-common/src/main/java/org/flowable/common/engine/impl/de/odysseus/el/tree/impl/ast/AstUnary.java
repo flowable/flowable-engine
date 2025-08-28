@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.javax.el.ELException;
 
 public class AstUnary extends AstRightValue {
 	public interface Operator {
-		public Object eval(Bindings bindings, ELContext context, AstNode node);		
+		Object eval(Bindings bindings, ELContext context, AstNode node);
 	}
 	public abstract static class SimpleOperator implements Operator {
         @Override
