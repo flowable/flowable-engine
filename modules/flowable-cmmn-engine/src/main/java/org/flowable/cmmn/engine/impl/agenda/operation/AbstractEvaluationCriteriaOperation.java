@@ -143,7 +143,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion.getId(),
                 satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
-        } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+        } else if (planItem.getPlanItemDefinition() instanceof Stage stage) {
 
             if (PlanItemInstanceState.ACTIVE.equals(state)) {
 
@@ -153,7 +153,6 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         evaluationResult.markCriteriaChanged();
                         planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
                     } else {
-                        Stage stage = (Stage) planItem.getPlanItemDefinition();
                         if (isStageCompletable(planItemInstanceEntity, stage)) {
                             evaluationResult.markCriteriaChanged();
                             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
@@ -203,11 +202,10 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
         
         // needed because when doing case instance migration the child plan item instances can be null
-        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) && 
-                planItemInstanceContainer instanceof CaseInstanceEntity) {
+        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) &&
+                planItemInstanceContainer instanceof CaseInstanceEntity caseInstance) {
             
             PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-            CaseInstanceEntity caseInstance = (CaseInstanceEntity) planItemInstanceContainer;
             planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
             planItemInstanceContainer.setChildPlanItemInstances(planItemInstances);
             
@@ -693,8 +691,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         if (entityWithSentryPartInstances instanceof CaseInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(((CaseInstanceEntity) entityWithSentryPartInstances).getId());
             sentryPartInstanceEntity.setCaseDefinitionId(((CaseInstanceEntity) entityWithSentryPartInstances).getCaseDefinitionId());
-        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) entityWithSentryPartInstances;
+        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             sentryPartInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             sentryPartInstanceEntity.setPlanItemInstanceId(planItemInstanceEntity.getId());

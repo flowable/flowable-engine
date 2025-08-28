@@ -372,8 +372,7 @@ public class ActivityInstanceEntityManagerImpl
             activityInstanceEntity.setActivityId(execution.getActivityId());
         } else {
             // sequence flow activity id can be null
-            if (execution.getCurrentFlowElement() instanceof SequenceFlow) {
-                SequenceFlow currentFlowElement = (SequenceFlow) execution.getCurrentFlowElement();
+            if (execution.getCurrentFlowElement() instanceof SequenceFlow currentFlowElement) {
                 activityInstanceEntity.setActivityId(getArtificialSequenceFlowId(currentFlowElement));
             }
         }

@@ -25,11 +25,10 @@ public abstract class AbstractPlanItemParseHandler<T extends BaseElement> extend
 
     @Override
     protected void executeParse(CmmnParserImpl cmmnParser, CmmnParseResult cmmnParseResult, T element) {
-        if (!(element instanceof PlanItem)) {
+        if (!(element instanceof PlanItem planItem)) {
             throw new FlowableException("Programmatic error: passed element is not a PlanItem instance, but an instance of " + element.getClass());
         }
 
-        PlanItem planItem = (PlanItem) element;
         executePlanItemParse(cmmnParser, cmmnParseResult, planItem, (T) planItem.getPlanItemDefinition());
     }
 
