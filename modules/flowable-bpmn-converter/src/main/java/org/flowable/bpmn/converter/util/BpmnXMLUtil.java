@@ -144,6 +144,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             if (xtr.isStartElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = true;
+                    
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {
                     BaseChildElementParser childParser = localParserMap.get(xtr.getLocalName());
                     // if we're into an extension element but the current element is not accepted by this parentElement then is read as a custom extension element
@@ -153,6 +154,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                         continue;
                     }
                     localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, model);
+                    
                 } else if (inExtensionElements) {
                     ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
                     parentElement.addExtensionElement(extensionElement);
@@ -199,11 +201,17 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
                 if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-                    extensionElement.setElementText(xtr.getText().trim());
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
                 }
             } else if (xtr.isStartElement()) {
                 ExtensionElement childExtensionElement = parseExtensionElement(xtr);
                 extensionElement.addChildElement(childExtensionElement);
+                
             } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
                 readyWithExtensionElement = true;
             }

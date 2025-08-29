@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/DMN/20130901" xmlns:yourco="http://yourco/bpmn" xmlns:flowable="http://flowable.org/dmn" id="extensions" name="Extension">
+	<description>DMN description</description>
+	<extensionElements>
+        <yourco:i18n>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</yourco:i18n>
+    </extensionElements>
+    <decision id="decision" name="Simple decision">
+        <decisionTable id="decisionTable" name="Simple decision table" isComplete="true" isConsistent="true">
+            <description>Decision table description</description>
+            <extensionElements>
+                <yourco:i18n>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</yourco:i18n>
+            </extensionElements>
+            <input id="input1" label="Input 1">
+                <inputExpression id="inputExpression1" typeRef="string">
+                    <text>inputVariable1</text>
+                </inputExpression>
+            </input>
+            <input id="input1" label="Input 2">
+                <inputExpression id="inputExpression2" typeRef="double">
+                    <text>inputVariable2</text>
+                </inputExpression>
+            </input>
+            <input id="input1" label="Input 3">
+                <inputExpression id="inputExpression3" typeRef="date">
+                    <text>inputVariable3</text>
+                </inputExpression>
+            </input>
+            <input id="input1" label="Input 4">
+                <inputExpression id="inputExpression4" typeRef="collection">
+                    <text>inputVariable4</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="outputVariable1" typeRef="string" />
+            <rule id="rule1">
+                <inputEntry id="inputEntry1">
+                    <text><![CDATA[>10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry2">
+                    <text><![CDATA[<10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry3">
+                    <text><![CDATA[10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4">
+                    <text><![CDATA[${collection:notContains(input1, '20, 13')}]]></text>
+                     <extensionElements>
+                        <flowable:operator xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[NOT IN]]></flowable:operator>
+                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[20, 13]]></flowable:expression>
+                     </extensionElements>
+                </inputEntry>
+                <outputEntry id="outputEntry1">
+                    <text><![CDATA[== 'result1']]></text>
+                </outputEntry>
+            </rule>
+            <rule id="rule2">
+                <inputEntry id="inputEntry4">
+                    <text><![CDATA[>10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry5">
+                    <text><![CDATA[<10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry6">
+                    <text><![CDATA[10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4">
+                    <text><![CDATA[${collection:containsAny(input1, '"20", "13"')}]]></text>
+                     <extensionElements>
+                        <flowable:operator xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[ANY]]></flowable:operator>
+                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA["20", "13"]]></flowable:expression>
+                     </extensionElements>
+                </inputEntry>
+                <outputEntry id="outputEntry2">
+                    <text><![CDATA[== 'result2']]></text>
+                </outputEntry>
+            </rule>
+            <rule id="rule3">
+                <inputEntry id="inputEntry7">
+                    <text><![CDATA[>10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry8">
+                    <text><![CDATA[<10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry9">
+                    <text><![CDATA[10]]></text>
+                </inputEntry>
+                <inputEntry id="inputEntry4">
+                    <text><![CDATA[${collection:contains(input1, 20)}]]></text>
+                     <extensionElements>
+                        <flowable:operator xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[IN]]></flowable:operator>
+                        <flowable:expression xmlns:flowable="http://www.flowable.org/dmn"><![CDATA[20]]></flowable:expression>
+                     </extensionElements>
+                </inputEntry>
+                <outputEntry id="outputEntry3">
+                    <text><![CDATA[== 'result3']]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>
