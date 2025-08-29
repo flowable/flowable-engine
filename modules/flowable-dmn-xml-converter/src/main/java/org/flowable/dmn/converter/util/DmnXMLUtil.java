@@ -143,11 +143,13 @@ public class DmnXMLUtil implements DmnXMLConstants {
         while (!readyWithExtensionElement && xtr.hasNext()) {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
-                if (extensionElement.getElementText() != null) {
-                    extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
-                    
-                } else {
-                    extensionElement.setElementText(xtr.getText().trim());
+                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
                 }
                 
             } else if (xtr.isStartElement()) {
