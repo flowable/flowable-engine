@@ -1,9 +1,14 @@
-/*
- * Copyright 2025, Flowable Licences AG.
- * This license is based on the software license agreement and terms and conditions in effect between the parties
- * at the time of purchase of the Flowable software product.
- * Your agreement to these terms and conditions is required to install or use the Flowable software product and/or this file.
- * Flowable is a trademark of Flowable AG registered in several countries.
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.flowable.editor.language.xml;
 
