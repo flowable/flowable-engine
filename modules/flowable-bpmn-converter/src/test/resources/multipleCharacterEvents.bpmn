@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test">
+  <process id="test" name="test" isExecutable="true">
+    <serviceTask id="task" flowable:delegateExpression="${test}">
+      <extensionElements>
+        <design:data>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</design:data>
+      </extensionElements>
+    </serviceTask>
+    <startEvent id="start" flowable:initiator="initiator" />
+    <endEvent id="end">
+      <extensionElements>
+        <design:data>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</design:data>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="task" />
+    <sequenceFlow id="flow2" sourceRef="task" targetRef="end">
+      <extensionElements>
+        <design:data>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</design:data>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+</definitions>

@@ -21,7 +21,7 @@ import org.flowable.engine.impl.cmd.SetProcessDefinitionVersionCmd;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MigrateProcessInstanceTest extends AbstractFlowable6CompatibilityTest {
 

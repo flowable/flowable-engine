@@ -102,6 +102,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").list()).hasSize(NR_CASE_INSTANCES);
     }
 
+    @Test
     public void testQueryByCaseDefinitionKeyLikeIgnoreCase() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertThat(caseDefinition).isNotNull();
@@ -334,6 +335,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
     public void testHistoricTaskQueryByCaseDefinitionKeyLikeIgnoreCase() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertThat(caseDefinition).isNotNull();

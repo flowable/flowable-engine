@@ -22,7 +22,7 @@ public interface VariableContainer {
     /**
      * @return an empty (null object) variable container.
      */
-    public static VariableContainer empty(){
+    static VariableContainer empty(){
         return EmptyVariableContainer.INSTANCE;
     }
 
