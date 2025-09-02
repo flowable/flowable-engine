@@ -183,6 +183,10 @@ public class EndExecutionOperation extends AbstractOperation {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
+        if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeProcessProcessInstance(execution);
+        }
+
         // There will be a parent execution (or else we would be in the process instance handling method)
         ExecutionEntity parentExecution = executionEntityManager.findById(execution.getParentId());
 

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -34,6 +35,16 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
 
     public CompleteCaseInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
         super(commandContext, caseInstanceEntity);
+    }
+
+    @Override
+    public void internalExecute() {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
+            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().beforeEndCaseInstance(caseInstanceEntity);
+        }
+
+        super.internalExecute();
     }
 
     @Override
