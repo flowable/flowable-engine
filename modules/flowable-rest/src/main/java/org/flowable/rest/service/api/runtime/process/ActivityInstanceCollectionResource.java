@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import java.util.Map;
 
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +50,7 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the activity instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the activity instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIds", dataType = "string", value = "The process instance ids of the activity instances.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
@@ -97,6 +99,10 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
 
         if (allRequestParams.get("processInstanceId") != null) {
             query.setProcessInstanceId(allRequestParams.get("processInstanceId"));
+        }
+
+        if (allRequestParams.get("processInstanceIds") != null) {
+            query.setProcessInstanceIds(RequestUtil.parseToSet(allRequestParams.get("processInstanceIds")));
         }
 
         if (allRequestParams.get("processDefinitionId") != null) {

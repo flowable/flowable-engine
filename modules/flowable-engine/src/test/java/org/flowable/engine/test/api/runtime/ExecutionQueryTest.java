@@ -176,6 +176,20 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testQueryByProcessInstanceIds() {
+        assertThat(runtimeService.createExecutionQuery().processInstanceIds(Set.of(concurrentProcessInstanceIds.get(0), concurrentProcessInstanceIds.get(1), "someId")).list()).extracting(Execution::getProcessInstanceId, Execution::getActivityId).containsExactlyInAnyOrder(
+                tuple(concurrentProcessInstanceIds.get(0), "shipOrder"),
+                tuple(concurrentProcessInstanceIds.get(0), null),
+                tuple(concurrentProcessInstanceIds.get(0), "receivePayment"),
+                tuple(concurrentProcessInstanceIds.get(1), null),
+                tuple(concurrentProcessInstanceIds.get(1), "receivePayment"),
+                tuple(concurrentProcessInstanceIds.get(1), "shipOrder")
+        );
+
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(sequentialProcessInstanceIds.get(0)).list()).hasSize(2);
+    }
+
+    @Test
     public void testQueryByRootProcessInstanceId() {
         for (String processInstanceId : concurrentProcessInstanceIds) {
             ExecutionQuery query = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstanceId);

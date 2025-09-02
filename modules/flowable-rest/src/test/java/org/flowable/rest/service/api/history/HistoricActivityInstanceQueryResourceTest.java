@@ -118,6 +118,11 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
         assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
 
         requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("processInstanceIds").add("someId").add(processInstance2.getId());
+
+        assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processInstance.getProcessDefinitionId());
         assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "processTask", "flow2", "processTask2");
 

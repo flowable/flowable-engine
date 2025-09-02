@@ -230,6 +230,9 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
         }
+        if(planItemInstanceQuery.getCaseInstanceIds() != null) {
+            planItemInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(planItemInstanceQuery.getCaseInstanceIds()));
+        }
 
         if (planItemInstanceQuery.getOrQueryObjects() != null && !planItemInstanceQuery.getOrQueryObjects().isEmpty()) {
             for (PlanItemInstanceQueryImpl oInstanceQuery : planItemInstanceQuery.getOrQueryObjects()) {

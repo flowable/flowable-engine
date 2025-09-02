@@ -89,6 +89,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "startedAfter", dataType = "string", format = "date-time", value = "Only return case instances started after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "state", dataType = "string", value = "Only return case instances with the given state.", paramType = "query"),
             @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return case instances which have the given callback id.", paramType = "query"),
+            @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return case instances which have the given callback ids.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return case instances which have the given callback type.", paramType = "query"),
             @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return case instances which have the given parent case instance id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return case instances which have the given reference id.", paramType = "query"),
@@ -230,6 +231,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
         }
         
+        if (allRequestParams.containsKey("callbackIds")) {
+            queryRequest.setCaseInstanceCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
+        }
+
         if (allRequestParams.containsKey("callbackType")) {
             queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
         }
@@ -237,7 +242,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("parentCaseInstanceId")) {
             queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
         }
-        
+
         if (allRequestParams.containsKey("referenceId")) {
             queryRequest.setCaseInstanceReferenceId(allRequestParams.get("referenceId"));
         }
@@ -265,7 +270,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         if (allRequestParams.containsKey("includeCaseVariablesNames")) {
             queryRequest.setIncludeCaseVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeCaseVariablesNames")));
         }
-        
+
         if (allRequestParams.containsKey("activePlanItemDefinitionId")) {
             queryRequest.setActivePlanItemDefinitionId(allRequestParams.get("activePlanItemDefinitionId"));
         }

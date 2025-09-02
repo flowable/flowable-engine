@@ -767,6 +767,12 @@
         <if test="callbackId != null">
             and ${queryTablePrefix}CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR}
         </if>
+        <if test="callbackIds != null">
+            and ${queryTablePrefix}CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="callbackIds" open="(" separator="," close=")">
+                #{callbackId, jdbcType=VARCHAR}
+            </foreach>
+        </if>
         <if test="callbackType != null">
             and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
         </if>
@@ -935,6 +941,11 @@
         </if>
         <if test="orQueryObject.callbackId != null">
             or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=VARCHAR}
+        </if>
+        <if test="orQueryObject.callbackIds != null">
+            or ${queryTablePrefix}CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="orQueryObject.callbackIds" open="(" separator="," close=")">#{callbackId, jdbcType=VARCHAR}
+            </foreach>
         </if>
         <if test="orQueryObject.callbackType != null">
             or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=VARCHAR}

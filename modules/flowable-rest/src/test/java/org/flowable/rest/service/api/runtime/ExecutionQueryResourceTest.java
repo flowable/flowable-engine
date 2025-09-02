@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import org.flowable.engine.runtime.Execution;
@@ -189,5 +190,28 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("value", "Azerty");
         variableNode.put("operation", "equals");
         assertResultsPresentInPostDataResponse(url, requestNode, childExecution.getId(), subProcessExecution.getId(), parentExecution.getId());
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml"})
+    public void testQueryExecution() throws IOException {
+        Execution parentExecution = runtimeService.startProcessInstanceByKey("processOne");
+
+        Execution subProcessExecution = runtimeService.createExecutionQuery().activityId("subProcess").singleResult();
+        assertThat(subProcessExecution).isNotNull();
+
+        Execution childExecution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
+        assertThat(childExecution).isNotNull();
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("processInstanceId", parentExecution.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, childExecution.getId(), subProcessExecution.getId(), parentExecution.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("processInstanceIds").add("someId").add(parentExecution.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, childExecution.getId(), subProcessExecution.getId(), parentExecution.getId());
+
     }
 }

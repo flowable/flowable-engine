@@ -281,6 +281,29 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         httpPost.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
+
+    /**
+     * Test getting a list of process instance by callback id
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
+    public void testGetProcessInstancesByCallbackId() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().callbackId("callBackId1").processDefinitionKey("oneTaskProcess").start();
+        runtimeService.createProcessInstanceBuilder().callbackId("callBackId2").processDefinitionKey("oneTaskProcess").start();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        String id = processInstance.getId();
+        // Process instance id
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?callbackId=callBackId1";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?callbackIds=someOtherId,callBackId1";
+        assertResultsPresentInDataResponse(url, id);
+
+    }
     
     @Override
     protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {

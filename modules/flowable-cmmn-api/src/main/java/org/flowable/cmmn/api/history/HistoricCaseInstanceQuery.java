@@ -261,6 +261,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have the provided callback identifier.
      */
     HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId);
+
+    /**
+     * Only select historic case instances that have the provided callback identifiers.
+     */
+    HistoricCaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackId);
     
     /**
      * Only select historic case instances that have the provided callback type.

@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -473,4 +475,26 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
                 );
     }
 
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testQueryByScopeIds() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackId(caseInstance.getId()).list();
+        List<PlanItemInstance> mainCasePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        Set<String> callbackIds = mainCasePlanItemInstances.stream().map(PlanItemInstance::getId).collect(Collectors.toSet());
+        List<CaseInstance> subCases = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callbackIds).list();
+
+        List<Task> taskList = cmmnTaskService.createTaskQuery().scopeIds(subCases.stream().map(CaseInstance::getId).collect(Collectors.toSet())).list();
+
+        assertThat(taskList).extracting(Task::getScopeId, Task::getName, Task::getTaskDefinitionKey).containsExactlyInAnyOrder(
+                tuple(subCases.get(0).getId(), "The Task", "theTask"),
+                tuple(subCases.get(1).getId(), "Human task", "humanTask1")
+        );
+    }
 }
