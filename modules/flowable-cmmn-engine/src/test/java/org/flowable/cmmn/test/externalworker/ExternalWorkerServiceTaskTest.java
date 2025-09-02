@@ -1082,6 +1082,62 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
         assertThat(caseInstance.getLockTime()).isNotNull();
     }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleExclusive.cmmn")
+    public void testCaseInstanceIsUnlockedWhenUnacquiringAllExclusiveJobs() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        CaseInstanceEntity caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        cmmnManagementService.unacquireAllExternalWorkerJobsForWorker("worker1");
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isNull();
+        assertThat(caseInstance.getLockTime()).isNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
+    }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimple.cmmn")
