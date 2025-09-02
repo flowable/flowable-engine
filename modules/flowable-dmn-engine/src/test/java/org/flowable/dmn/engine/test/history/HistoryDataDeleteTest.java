@@ -19,17 +19,31 @@ import java.util.HashSet;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
-import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
+import org.flowable.dmn.api.DmnHistoryService;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.junit.Rule;
+import org.junit.Test;
 
 /**
  * @author Filip Hrisafov
  */
-public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
+public class HistoryDataDeleteTest {
 
+	@Rule
+    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+	
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteById() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -72,8 +86,13 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-2");
     }
 
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByIds() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -109,11 +128,17 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-3");
     }
 
+	@Test
     @DmnDeployment(resources = {
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn",
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple2.dmn"
     })
     public void testDeleteByDecisionDefinitionId() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+    	DmnRepositoryService repositoryService = dmnEngine.getDmnRepositoryService();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -158,11 +183,16 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-4", "execution-5");
     }
 
+	@Test
     @DmnDeployment(resources = {
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn",
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple2.dmn"
     })
     public void testDeleteByDecisionKey() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -205,8 +235,13 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-4", "execution-5");
     }
 
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByInstanceIdAndScopeType() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -252,8 +287,13 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-3", "execution-4");
     }
 
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByInstanceIdAndWithoutScopeType() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -291,8 +331,13 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-1", "execution-3", "execution-4");
     }
 
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByActivityId() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")
@@ -325,8 +370,13 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-1", "execution-3");
     }
 
+	@Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByTenantId() {
+    	DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
+        DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
+        DmnHistoryService historyService = dmnEngine.getDmnHistoryService();
+        
         ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
                 .activityId("execution-1")

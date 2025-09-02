@@ -16,17 +16,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
-import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
+import org.flowable.dmn.api.DmnManagementService;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.test.FlowableDmnRule;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author Joram Barrez
  */
-public class DmnEngineDropScriptsTest extends PluggableFlowableDmnTestCase {
+public class DmnEngineDropScriptsTest {
+	
+	@Rule
+    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
     public void testDropSchema() {
-
+    	DmnEngineConfiguration dmnEngineConfiguration = flowableDmnRule.getDmnEngine().getDmnEngineConfiguration();
         // Dropping and recreating the schema should not have an impact on other tests
         long originalTableCount = countTables();
         assertThat(originalTableCount).isGreaterThan(0);
@@ -38,8 +44,9 @@ public class DmnEngineDropScriptsTest extends PluggableFlowableDmnTestCase {
     }
 
     private long countTables() {
-        return dmnEngineConfiguration.getDmnManagementService().getTableCount().
-                keySet().stream().filter(tableName -> tableName.toLowerCase().startsWith("act_dmn")).count();
+    	DmnManagementService dmnManagementService = flowableDmnRule.getDmnEngine().getDmnManagementService();
+        return dmnManagementService.getTableCount().keySet().stream().filter(
+        		tableName -> tableName.toLowerCase().startsWith("act_dmn")).count();
     }
 
 }
