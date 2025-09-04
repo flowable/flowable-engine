@@ -108,7 +108,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
     protected void handleOwnerChange(ProcessEngineConfigurationImpl processEngineConfiguration) {
         IdentityLinkInterceptor identityLinkInterceptor = processEngineConfiguration.getIdentityLinkInterceptor();
-        if (identityLinkInterceptor != null) {
+        if (identityLinkInterceptor != null && task.getOwner() != null) {
             identityLinkInterceptor.handleAddOwnerIdentityLinkToTask(task, task.getOwner());
         }
     }
@@ -117,7 +117,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
         IdentityLinkInterceptor identityLinkInterceptor = processEngineConfiguration.getIdentityLinkInterceptor();
-        if (identityLinkInterceptor != null) {
+        if (identityLinkInterceptor != null && task.getAssignee() != null) {
             identityLinkInterceptor.handleAddAssigneeIdentityLinkToTask(task, task.getAssignee());
         }
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();

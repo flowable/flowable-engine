@@ -130,6 +130,20 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    void testRemoveAssigneeViaSaveTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        testInterceptor.assigneeIdentityLinks.clear();
+
+        task.setAssignee(null);
+        cmmnTaskService.saveTask(task);
+
+        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(0);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
     void testClaimTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -154,8 +168,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
         cmmnTaskService.unclaim(task.getId());
 
-        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(1).extracting(data -> data.taskId, data -> data.assignee)
-                .containsExactly(tuple(task.getId(), null));
+        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(0);
     }
 
     @Test
@@ -185,6 +198,20 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
         assertThat(testInterceptor.ownerIdentityLinks).hasSize(1).extracting(data -> data.taskId, data -> data.owner)
                 .containsExactly(tuple(task.getId(), "newOwner"));
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    void testRemoveOwnerViaSaveTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        assertThat(testInterceptor.ownerIdentityLinks).isEmpty();
+
+        task.setOwner(null);
+        cmmnTaskService.saveTask(task);
+
+        assertThat(testInterceptor.ownerIdentityLinks).hasSize(0);
     }
 
     @Test

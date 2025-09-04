@@ -143,6 +143,20 @@ public class IdentityLinkInterceptorTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    void testRemoveAssigneeViaSaveTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        testInterceptor.assigneeIdentityLinks.clear();
+
+        task.setAssignee(null);
+        taskService.saveTask(task);
+
+        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(0);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
     void testClaimTask() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -168,9 +182,8 @@ public class IdentityLinkInterceptorTest extends PluggableFlowableTestCase {
 
         taskService.unclaim(task.getId());
 
-        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(1)
-                .extracting(data -> data.taskId, data -> data.assignee)
-                .containsExactly(tuple(task.getId(), null));
+        // unclaiming the task should not trigger the interceptor
+        assertThat(testInterceptor.assigneeIdentityLinks).hasSize(0);
     }
 
     @Test
@@ -202,6 +215,20 @@ public class IdentityLinkInterceptorTest extends PluggableFlowableTestCase {
         assertThat(testInterceptor.ownerIdentityLinks).hasSize(1)
                 .extracting(data -> data.taskId, data -> data.owner)
                 .containsExactly(tuple(task.getId(), "newOwner"));
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    void testRemoveOwnerViaSaveTask() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        assertThat(testInterceptor.ownerIdentityLinks).isEmpty();
+
+        task.setOwner(null);
+        taskService.saveTask(task);
+
+        assertThat(testInterceptor.ownerIdentityLinks).hasSize(0);
     }
 
     @Test

@@ -78,7 +78,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
 
                 CmmnIdentityLinkInterceptor identityLinkInterceptor = cmmnEngineConfiguration.getIdentityLinkInterceptor();
-                if (identityLinkInterceptor != null) {
+                if (identityLinkInterceptor != null && task.getAssignee() != null) {
                     identityLinkInterceptor.handleAddAssigneeIdentityLinkToTask(task, task.getAssignee());
                 }
 
@@ -93,7 +93,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
 
             String originalOwner = originalTaskEntity.getOwner();
 
-            if (!StringUtils.equals(originalOwner, task.getOwner())) {
+            if (!StringUtils.equals(originalOwner, task.getOwner()) && task.getOwner() != null) {
                 CmmnIdentityLinkInterceptor identityLinkInterceptor = cmmnEngineConfiguration.getIdentityLinkInterceptor();
                 if (identityLinkInterceptor != null) {
                     identityLinkInterceptor.handleAddOwnerIdentityLinkToTask(task, task.getOwner());
