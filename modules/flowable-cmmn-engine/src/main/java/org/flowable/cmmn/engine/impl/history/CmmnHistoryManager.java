@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -50,6 +51,8 @@ public interface CmmnHistoryManager {
     void recordBulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds);
 
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
+
+    void recordIdentityLinkCreated(CaseInstanceEntity caseInstance, IdentityLinkEntity identityLink);
 
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
     

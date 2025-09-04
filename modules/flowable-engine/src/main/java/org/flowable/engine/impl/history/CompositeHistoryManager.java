@@ -289,6 +289,13 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
+    public void recordIdentityLinkCreated(ExecutionEntity processInstance, IdentityLinkEntity identityLink) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.recordIdentityLinkCreated(processInstance,identityLink);
+        }
+    }
+
+    @Override
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.recordIdentityLinkDeleted(identityLink);

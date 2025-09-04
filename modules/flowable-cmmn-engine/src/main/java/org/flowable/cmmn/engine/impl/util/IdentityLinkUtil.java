@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -33,14 +34,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class IdentityLinkUtil {
 
-    public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstance caseInstance, String userId, String groupId, String type,
+    public static IdentityLinkEntity createCaseInstanceIdentityLink(CaseInstanceEntity caseInstanceEntity, String userId, String groupId, String type,
             CmmnEngineConfiguration cmmnEngineConfiguration) {
         
         IdentityLinkEntity identityLinkEntity = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
-                .getIdentityLinkService().createScopeIdentityLink(null, caseInstance.getId(), ScopeTypes.CMMN, userId, groupId, type);
-        
-        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
-        
+                .getIdentityLinkService().createScopeIdentityLink(null, caseInstanceEntity.getId(), ScopeTypes.CMMN, userId, groupId, type);
+
+        CommandContextUtil.getCmmnHistoryManager().recordIdentityLinkCreated(caseInstanceEntity, identityLinkEntity);
         return identityLinkEntity;
     }
     

@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -106,6 +107,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordIdentityLinkCreated(identityLink);
+        }
+    }
+
+    @Override
+    public void recordIdentityLinkCreated(CaseInstanceEntity caseInstance, IdentityLinkEntity identityLink) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordIdentityLinkCreated(caseInstance, identityLink);
         }
     }
 

@@ -119,6 +119,16 @@ class CompositeCmmnHistoryManagerTest {
     }
 
     @Test
+    void recordIdentityLinkCreatedWithCaseInstance() {
+        CaseInstanceEntity caseInstance = new CaseInstanceEntityImpl();
+        IdentityLinkEntity identityLink = new IdentityLinkEntityImpl();
+        compositeHistoryManager.recordIdentityLinkCreated(caseInstance, identityLink);
+
+        verify(historyManager1).recordIdentityLinkCreated(same(caseInstance), same(identityLink));
+        verify(historyManager2).recordIdentityLinkCreated(same(caseInstance), same(identityLink));
+    }
+
+    @Test
     void recordIdentityLinkDeleted() {
         IdentityLinkEntity identityLink = new IdentityLinkEntityImpl();
         compositeHistoryManager.recordIdentityLinkDeleted(identityLink);

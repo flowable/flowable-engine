@@ -389,6 +389,16 @@ class CompositeHistoryManagerTest {
     }
 
     @Test
+    void recordIdentityLinkCreatedWithProcessInstance() {
+        ExecutionEntity processInstance = new ExecutionEntityImpl();
+        IdentityLinkEntity identityLink = new IdentityLinkEntityImpl();
+        compositeHistoryManager.recordIdentityLinkCreated(processInstance, identityLink);
+
+        verify(historyManager1).recordIdentityLinkCreated(same(processInstance), same(identityLink));
+        verify(historyManager2).recordIdentityLinkCreated(same(processInstance), same(identityLink));
+    }
+
+    @Test
     void recordIdentityLinkDeleted() {
         IdentityLinkEntity identityLink = new IdentityLinkEntityImpl();
         compositeHistoryManager.recordIdentityLinkDeleted(identityLink);
