@@ -184,7 +184,7 @@ public class EndExecutionOperation extends AbstractOperation {
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
-            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeProcessProcessInstance(execution);
+            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(execution, false);
         }
 
         // There will be a parent execution (or else we would be in the process instance handling method)
@@ -246,7 +246,6 @@ public class EndExecutionOperation extends AbstractOperation {
                     
                     agenda.planEndExecutionOperation(subProcessParentExecution);
                 }
-
                 return;
             }
         }
@@ -308,6 +307,10 @@ public class EndExecutionOperation extends AbstractOperation {
                 }
             }
 
+        }
+
+        if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            processEngineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(execution.getId(), false);
         }
     }
 

@@ -20,6 +20,7 @@ import static org.flowable.cmmn.model.PlanItemTransition.TERMINATE;
 import java.util.HashMap;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
@@ -52,6 +53,19 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         this.exitCriterionId = exitCriterionId;
         this.exitType = exitType;
         this.exitEventType = exitEventType;
+    }
+
+    @Override
+    public void internalExecute() {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
+            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().beforeEndCaseInstance(caseInstanceEntity, true);
+        }
+        super.internalExecute();
+
+        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
+            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().afterEndCaseInstance(caseInstanceEntity.getId(), true);
+        }
     }
 
     /**

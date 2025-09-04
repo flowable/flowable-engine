@@ -16,5 +16,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public interface EndProcessInstanceInterceptor {
 
-    void beforeProcessProcessInstance(ExecutionEntity processInstance);
+    void beforeEndProcessInstance(ExecutionEntity processInstance, boolean isTerminated);
+
+    void afterEndProcessInstance(String processInstanceId, boolean isTerminated);
 }

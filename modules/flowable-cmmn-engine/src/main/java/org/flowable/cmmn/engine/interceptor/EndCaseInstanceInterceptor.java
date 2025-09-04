@@ -16,5 +16,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 
 public interface EndCaseInstanceInterceptor {
 
-    void beforeEndCaseInstance(CaseInstanceEntity caseInstance);
+    void beforeEndCaseInstance(CaseInstanceEntity caseInstance, boolean isTerminated);
+
+    void afterEndCaseInstance(String caseInstanceId, boolean isTerminated);
 }

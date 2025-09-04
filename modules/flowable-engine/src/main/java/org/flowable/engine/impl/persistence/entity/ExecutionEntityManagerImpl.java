@@ -448,6 +448,10 @@ public class ExecutionEntityManagerImpl
     public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean directDeleteInDatabase) {
         ExecutionEntity processInstanceExecution = findById(processInstanceId);
 
+        if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            engineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(processInstanceExecution, true);
+        }
+
         if (processInstanceExecution == null) {
             throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
         }
@@ -472,6 +476,10 @@ public class ExecutionEntityManagerImpl
                                 + processInstanceExecution, e);
                 }
             }
+        }
+
+        if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            engineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(processInstanceId, true);
         }
     }
 

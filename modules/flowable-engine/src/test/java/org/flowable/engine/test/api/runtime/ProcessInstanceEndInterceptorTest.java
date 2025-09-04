@@ -11,7 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.engine.test.api.runtime;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -37,7 +36,11 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
 
             runtimeService.startProcessInstanceByKey("oneTaskProcess");
             taskService.complete(taskService.createTaskQuery().singleResult().getId());
-            assertThat(testEndProcessInstanceInterceptor.isCalled).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.beforeIsCalled).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.beforeIsTerminated).isFalse();
+
+            assertThat(testEndProcessInstanceInterceptor.afterIsCalled).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.afterIsTerminated).isFalse();
         } finally {
             processEngineConfiguration.setEndProcessInstanceInterceptor(null);
         }
@@ -53,7 +56,10 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.deleteProcessInstance(processInstance.getId(), "test");
-            assertThat(testEndProcessInstanceInterceptor.isCalled).isFalse();
+            assertThat(testEndProcessInstanceInterceptor.beforeIsCalled).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.beforeIsTerminated).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.afterIsCalled).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.afterIsTerminated).isTrue();
         } finally {
             processEngineConfiguration.setEndProcessInstanceInterceptor(null);
         }
@@ -61,11 +67,21 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
 
     public static class TestEndProcessInstanceInterceptor implements EndProcessInstanceInterceptor {
 
-        protected boolean isCalled = false;
+        protected boolean beforeIsCalled = false;
+        protected boolean beforeIsTerminated = false;
+
+        protected boolean afterIsCalled = false;
+        protected boolean afterIsTerminated = false;
+        @Override
+        public void beforeEndProcessInstance(ExecutionEntity processInstance, boolean isTerminated) {
+            beforeIsCalled = true;
+            beforeIsTerminated= isTerminated;
+        }
 
         @Override
-        public void beforeProcessProcessInstance(ExecutionEntity processInstance) {
-            isCalled=true;
+        public void afterEndProcessInstance(String processInstanceId, boolean isTerminated) {
+            afterIsCalled = true;
+            afterIsTerminated = isTerminated;
         }
     }
 }
