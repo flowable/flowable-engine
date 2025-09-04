@@ -166,12 +166,18 @@ public class TaskHelper {
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (taskEntity.getAssignee() == null) {
+            return;
+        }
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddAssigneeIdentityLinkToTask(taskEntity, taskEntity.getAssignee());
         }
     }
 
     protected static void addOwnerIdentityLink(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (taskEntity.getOwner() == null) {
+            return;
+        }
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddOwnerIdentityLinkToTask(taskEntity, taskEntity.getOwner());
         }

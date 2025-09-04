@@ -293,6 +293,9 @@ public class TaskHelper {
     }
 
     public static void addAssigneeIdentityLinks(TaskEntity taskEntity) {
+        if (taskEntity.getAssignee() == null) {
+            return;
+        }
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleAddAssigneeIdentityLinkToTask(taskEntity, taskEntity.getAssignee());
