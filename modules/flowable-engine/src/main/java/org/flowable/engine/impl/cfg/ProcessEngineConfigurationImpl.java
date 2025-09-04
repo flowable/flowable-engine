@@ -348,6 +348,7 @@ import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.impl.variable.ParallelMultiInstanceLoopVariableType;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
+import org.flowable.engine.interceptor.EndProcessInstanceInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
@@ -753,6 +754,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected EndProcessInstanceInterceptor endProcessInstanceInterceptor;
+
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
     protected UserTaskStateInterceptor userTaskStateInterceptor;
     protected CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor;
@@ -3351,6 +3354,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setStartProcessInstanceInterceptor(StartProcessInstanceInterceptor startProcessInstanceInterceptor) {
         this.startProcessInstanceInterceptor = startProcessInstanceInterceptor;
+        return this;
+    }
+
+    public EndProcessInstanceInterceptor getEndProcessInstanceInterceptor() {
+        return endProcessInstanceInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setEndProcessInstanceInterceptor(EndProcessInstanceInterceptor endProcessInstanceInterceptor) {
+        this.endProcessInstanceInterceptor = endProcessInstanceInterceptor;
         return this;
     }
     
