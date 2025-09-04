@@ -109,6 +109,9 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=" + caseInstance.getId(), 2, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=nonexisting", 0);
+
+            assertResultsPresentInDataResponse(url + "?scopeId=" + caseInstance.getId(), 2, task1.getId(), task.getId());
+            assertResultsPresentInDataResponse(url + "?scopeIds=someId," + caseInstance.getId(), 2, task1.getId(), task.getId());
             
             // Without scope id
             assertResultsPresentInDataResponse(url + "?withoutScopeId=true", 0);

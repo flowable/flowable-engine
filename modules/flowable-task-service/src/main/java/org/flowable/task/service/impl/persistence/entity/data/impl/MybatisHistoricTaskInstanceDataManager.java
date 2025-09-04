@@ -151,6 +151,10 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
         if (historicTaskInstanceQuery.getInvolvedGroups() != null) {
             historicTaskInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(historicTaskInstanceQuery.getInvolvedGroups()));
         }
+
+        if (historicTaskInstanceQuery.getScopeIds() != null) {
+            historicTaskInstanceQuery.setSafeScopeIds(createSafeInValuesList(historicTaskInstanceQuery.getScopeIds()));
+        }
         
         if (historicTaskInstanceQuery.getOrQueryObjects() != null && !historicTaskInstanceQuery.getOrQueryObjects().isEmpty()) {
             for (HistoricTaskInstanceQueryImpl orHistoricTaskInstanceQuery : historicTaskInstanceQuery.getOrQueryObjects()) {

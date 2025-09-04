@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
@@ -107,7 +110,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         }
 
         if (allRequestParams.get("caseInstanceIds") != null) {
-            queryRequest.setCaseInstanceIds(RequestUtil.parseToList(allRequestParams.get("caseInstanceIds")));
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.get("caseDefinitionKey") != null) {
@@ -205,7 +208,11 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.get("callbackId") != null) {
             queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
         }
-        
+
+        if (allRequestParams.containsKey("callbackIds")) {
+            queryRequest.setCaseInstanceCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
+        }
+
         if (allRequestParams.get("callbackType") != null) {
             queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
         }
@@ -213,7 +220,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.containsKey("parentCaseInstanceId")) {
             queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
         }
-        
+
         if (allRequestParams.get("referenceId") != null) {
             queryRequest.setCaseInstanceReferenceId(allRequestParams.get("referenceId"));
         }

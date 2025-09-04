@@ -105,6 +105,12 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getPropagatedStageInstanceId() != null) {
             query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
         }
+        if (queryRequest.getScopeId() != null) {
+            query.scopeId(queryRequest.getScopeId());
+        }
+        if (queryRequest.getScopeIds() != null && !queryRequest.getScopeIds().isEmpty()) {
+            query.scopeIds(queryRequest.getScopeIds());
+        }
         if (Boolean.TRUE.equals(queryRequest.getWithoutScopeId())) {
             query.withoutScopeId();
         }

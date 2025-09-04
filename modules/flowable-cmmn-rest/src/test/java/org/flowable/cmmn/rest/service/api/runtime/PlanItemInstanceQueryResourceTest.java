@@ -79,6 +79,14 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
                 planItemInstanceList.get(1).getId(),
                 planItemInstanceList.get(2).getId(),
                 planItemInstanceList.get(3).getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceIds").add(caseInstance.getId()).add("someOtherIds");
+        assertResultsPresentInPostDataResponse(url, requestNode,
+                planItemInstanceList.get(0).getId(),
+                planItemInstanceList.get(1).getId(),
+                planItemInstanceList.get(2).getId(),
+                planItemInstanceList.get(3).getId());
     }
 
     /**

@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +37,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     private static final long serialVersionUID = 1L;
     protected String activityInstanceId;
     protected String processInstanceId;
+    protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String executionId;
     protected String processDefinitionId;
     protected String activityId;
@@ -56,6 +59,8 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected List<String> tenantIds;
+    protected Set<String> calledProcessInstanceIds;
+    private List<List<String>> safeCalledProcessInstanceIds;
 
     public HistoricActivityInstanceQueryImpl() {
     }
@@ -81,6 +86,18 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQueryImpl processInstanceIds(Set<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is null");
+        }
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is empty");
+        }
+        this.processInstanceIds = processInstanceIds;
         return this;
     }
 
@@ -137,6 +154,18 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public HistoricActivityInstanceQuery activityTypes(Set<String> activityTypes) {
         this.activityTypes=activityTypes;
+        return this;
+    }
+
+    @Override
+    public HistoricActivityInstanceQuery calledProcessInstanceIds(Set<String> calledProcessInstanceIds) {
+        if (calledProcessInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of called process instance ids is null");
+        }
+        if (calledProcessInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of called process instance ids is empty");
+        }
+        this.calledProcessInstanceIds = calledProcessInstanceIds;
         return this;
     }
 
@@ -387,5 +416,33 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     
     public List<String> getTenantIds() {
         return tenantIds;
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getProcessInstanceIds() {
+        return processInstanceIds;
+    }
+
+    public Set<String> getCalledProcessInstanceIds() {
+        return calledProcessInstanceIds;
+    }
+
+    public void setCalledProcessInstanceIds(Set<String> calledProcessInstanceIds) {
+        this.calledProcessInstanceIds = calledProcessInstanceIds;
+    }
+
+    public List<List<String>> getSafeCalledProcessInstanceIds() {
+        return safeCalledProcessInstanceIds;
+    }
+
+    public void setSafeCalledProcessInstanceIds(List<List<String>> safeCalledProcessInstanceIds) {
+        this.safeCalledProcessInstanceIds = safeCalledProcessInstanceIds;
     }
 }

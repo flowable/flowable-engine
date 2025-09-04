@@ -384,6 +384,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with the given callback id. 
      */
     ProcessInstanceQuery processInstanceCallbackId(String callbackId);
+
+    /**
+     * Only select process instances with the given callback ids.
+     */
+    ProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
     
     /**
      * Only select process instances with the given callback type.

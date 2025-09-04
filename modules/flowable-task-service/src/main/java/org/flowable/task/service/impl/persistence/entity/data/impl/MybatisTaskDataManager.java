@@ -176,6 +176,10 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         if (taskQuery.getInvolvedGroups() != null) {
             taskQuery.setSafeInvolvedGroups(createSafeInValuesList(taskQuery.getInvolvedGroups()));
         }
+
+        if (taskQuery.getScopeIds() != null) {
+            taskQuery.setSafeScopeIds(createSafeInValuesList(taskQuery.getScopeIds()));
+        }
         
         if (taskQuery.getOrQueryObjects() != null && !taskQuery.getOrQueryObjects().isEmpty()) {
             for (TaskQueryImpl orTaskQuery : taskQuery.getOrQueryObjects()) {

@@ -228,6 +228,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "nameLike", query.getNameLike());
         putIfNotNull(queryNode, "nameLikeIgnoreCase", query.getNameLikeIgnoreCase());
         putIfNotNull(queryNode, "callbackId", query.getCallbackId());
+        putIfNotNullOrEmpty(queryNode, "callbackIds", query.getCallbackIds());
         putIfNotNull(queryNode, "callbackType", query.getCallbackType());
         putIfTrue(queryNode, "withoutCallbackId", query.isWithoutCallbackId());
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -77,6 +78,24 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                     .list()).hasSize(4);
         }
     }
+
+    @Test
+    public void testByCaseInstanceIds() {
+        List<String> caseInstanceIds = startInstances(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceIds(Set.of(caseInstanceIds.get(0), caseInstanceIds.get(1), "someId")).list()).extracting(PlanItemInstance::getCaseInstanceId, PlanItemInstance::getElementId).containsExactlyInAnyOrder(
+                tuple(caseInstanceIds.get(0), "planItem1"),
+                tuple(caseInstanceIds.get(0), "planItem2"),
+                tuple(caseInstanceIds.get(0), "planItem3"),
+                tuple(caseInstanceIds.get(0), "planItem7"),
+                tuple(caseInstanceIds.get(1), "planItem1"),
+                tuple(caseInstanceIds.get(1), "planItem2"),
+                tuple(caseInstanceIds.get(1), "planItem3"),
+                tuple(caseInstanceIds.get(1), "planItem7")
+
+        );
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().or().caseDefinitionId("undefinedId").caseInstanceIds(Set.of(caseInstanceIds.get(0), caseInstanceIds.get(1), "someId")).endOr().list()).hasSize(8);
+    }
+
 
     @Test
     public void testByStageInstanceId() {
@@ -1607,7 +1626,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void testIncludeLocalVariables() {
         CaseInstance caseWithStringValue = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testPlanItemInstanceQuery")
-                .variable("caseVar","caseVarValur")
+                .variable("caseVar", "caseVarValur")
                 .name("With string value")
                 .start();
 
