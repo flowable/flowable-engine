@@ -908,10 +908,8 @@ public abstract class AbstractCmmnDynamicStateManager {
                             task.setScopeDefinitionId(caseDefinition.getId());
                             PlanItemDefinition originalTaskDef = originalCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
                             PlanItemDefinition targetTaskDef = targetCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
-                            if (originalTaskDef != null && targetTaskDef != null && originalTaskDef instanceof HumanTask && targetTaskDef instanceof HumanTask) {
-                                HumanTask originalHumanTask = (HumanTask) originalTaskDef;
-                                HumanTask targetHumanTask = (HumanTask) targetTaskDef;
-                                
+                            if (originalTaskDef != null && targetTaskDef != null && originalTaskDef instanceof HumanTask originalHumanTask && targetTaskDef instanceof HumanTask targetHumanTask) {
+
                                 if (taskPropertyValueIsDifferent(originalHumanTask.getName(), targetHumanTask.getName())) {
                                     task.setName(targetHumanTask.getName());
                                 }
