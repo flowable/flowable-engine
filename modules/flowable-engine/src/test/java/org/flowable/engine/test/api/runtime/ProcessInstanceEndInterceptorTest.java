@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.interceptor.EndProcessInstanceInterceptor;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -37,10 +38,10 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
             runtimeService.startProcessInstanceByKey("oneTaskProcess");
             taskService.complete(taskService.createTaskQuery().singleResult().getId());
             assertThat(testEndProcessInstanceInterceptor.beforeIsCalled).isTrue();
-            assertThat(testEndProcessInstanceInterceptor.beforeIsTerminated).isFalse();
+            assertThat(testEndProcessInstanceInterceptor.beforeState).isEqualTo(ProcessInstanceState.COMPLETED);
 
             assertThat(testEndProcessInstanceInterceptor.afterIsCalled).isTrue();
-            assertThat(testEndProcessInstanceInterceptor.afterIsTerminated).isFalse();
+            assertThat(testEndProcessInstanceInterceptor.afterState).isEqualTo(ProcessInstanceState.COMPLETED);
         } finally {
             processEngineConfiguration.setEndProcessInstanceInterceptor(null);
         }
@@ -57,9 +58,9 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             runtimeService.deleteProcessInstance(processInstance.getId(), "test");
             assertThat(testEndProcessInstanceInterceptor.beforeIsCalled).isTrue();
-            assertThat(testEndProcessInstanceInterceptor.beforeIsTerminated).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.beforeState).isEqualTo(ProcessInstanceState.CANCELLED);
             assertThat(testEndProcessInstanceInterceptor.afterIsCalled).isTrue();
-            assertThat(testEndProcessInstanceInterceptor.afterIsTerminated).isTrue();
+            assertThat(testEndProcessInstanceInterceptor.afterState).isEqualTo(ProcessInstanceState.CANCELLED);
         } finally {
             processEngineConfiguration.setEndProcessInstanceInterceptor(null);
         }
@@ -68,20 +69,20 @@ public class ProcessInstanceEndInterceptorTest extends PluggableFlowableTestCase
     public static class TestEndProcessInstanceInterceptor implements EndProcessInstanceInterceptor {
 
         protected boolean beforeIsCalled = false;
-        protected boolean beforeIsTerminated = false;
+        protected String beforeState;
 
         protected boolean afterIsCalled = false;
-        protected boolean afterIsTerminated = false;
+        protected String afterState;
         @Override
-        public void beforeEndProcessInstance(ExecutionEntity processInstance, boolean isTerminated) {
+        public void beforeEndProcessInstance(ExecutionEntity processInstance, String state) {
             beforeIsCalled = true;
-            beforeIsTerminated= isTerminated;
+            beforeState = state;
         }
 
         @Override
-        public void afterEndProcessInstance(String processInstanceId, boolean isTerminated) {
+        public void afterEndProcessInstance(String processInstanceId, String state) {
             afterIsCalled = true;
-            afterIsTerminated = isTerminated;
+            afterState = state;
         }
     }
 }

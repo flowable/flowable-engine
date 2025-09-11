@@ -43,6 +43,7 @@ import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.service.JobService;
@@ -184,7 +185,7 @@ public class EndExecutionOperation extends AbstractOperation {
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
         if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
-            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(execution, false);
+            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(execution, ProcessInstanceState.COMPLETED);
         }
 
         // There will be a parent execution (or else we would be in the process instance handling method)
@@ -310,7 +311,7 @@ public class EndExecutionOperation extends AbstractOperation {
         }
 
         if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
-            processEngineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(execution.getId(), false);
+            processEngineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(execution.getId(), ProcessInstanceState.COMPLETED);
         }
     }
 

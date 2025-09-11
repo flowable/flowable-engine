@@ -16,6 +16,7 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.interceptor.EndCaseInstanceInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -37,10 +38,10 @@ public class CaseInstanceEndInterceptorTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
             cmmnTaskService.complete(cmmnTaskService.createTaskQuery().singleResult().getId());
             assertThat(testEndCaseInstanceInterceptor.beforeIsCalled).isTrue();
-            assertThat(testEndCaseInstanceInterceptor.beforeIsTerminated).isFalse();
+            assertThat(testEndCaseInstanceInterceptor.beforeState).isEqualTo(CaseInstanceState.COMPLETED);
 
             assertThat(testEndCaseInstanceInterceptor.afterIsCalled).isTrue();
-            assertThat(testEndCaseInstanceInterceptor.afterIsTerminated).isFalse();
+            assertThat(testEndCaseInstanceInterceptor.afterState).isEqualTo(CaseInstanceState.COMPLETED);
         } finally {
             cmmnEngineConfiguration.setEndCaseInstanceInterceptor(null);
         }
@@ -55,10 +56,10 @@ public class CaseInstanceEndInterceptorTest extends FlowableCmmnTestCase {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
             cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
             assertThat(testEndCaseInstanceInterceptor.beforeIsCalled).isTrue();
-            assertThat(testEndCaseInstanceInterceptor.beforeIsTerminated).isTrue();
+            assertThat(testEndCaseInstanceInterceptor.beforeState).isEqualTo(CaseInstanceState.TERMINATED);
 
             assertThat(testEndCaseInstanceInterceptor.afterIsCalled).isTrue();
-            assertThat(testEndCaseInstanceInterceptor.afterIsTerminated).isTrue();
+            assertThat(testEndCaseInstanceInterceptor.afterState).isEqualTo(CaseInstanceState.TERMINATED);
         } finally {
             cmmnEngineConfiguration.setEndCaseInstanceInterceptor(null);
         }
@@ -67,21 +68,21 @@ public class CaseInstanceEndInterceptorTest extends FlowableCmmnTestCase {
     public static class TestEndCaseInstanceInterceptor implements EndCaseInstanceInterceptor {
 
         protected boolean beforeIsCalled = false;
-        protected boolean beforeIsTerminated = false;
+        protected String beforeState = null;
 
         protected boolean afterIsCalled = false;
-        protected boolean afterIsTerminated = false;
+        protected String afterState = null;
 
         @Override
-        public void beforeEndCaseInstance(CaseInstanceEntity caseInstance, boolean isTerminated) {
+        public void beforeEndCaseInstance(CaseInstanceEntity caseInstance, String endingState) {
             beforeIsCalled = true;
-            beforeIsTerminated= isTerminated;
+            beforeState = endingState;
         }
 
         @Override
-        public void afterEndCaseInstance(String caseInstanceId, boolean isTerminated) {
+        public void afterEndCaseInstance(String caseInstanceId, String endingState) {
             afterIsCalled = true;
-            afterIsTerminated = isTerminated;
+            afterState = endingState;
         }
     }
 }

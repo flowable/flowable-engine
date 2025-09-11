@@ -449,7 +449,7 @@ public class ExecutionEntityManagerImpl
         ExecutionEntity processInstanceExecution = findById(processInstanceId);
 
         if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
-            engineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(processInstanceExecution, true);
+            engineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(processInstanceExecution, ProcessInstanceState.CANCELLED);
         }
 
         if (processInstanceExecution == null) {
@@ -479,7 +479,7 @@ public class ExecutionEntityManagerImpl
         }
 
         if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
-            engineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(processInstanceId, true);
+            engineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(processInstanceId, ProcessInstanceState.CANCELLED);
         }
     }
 
