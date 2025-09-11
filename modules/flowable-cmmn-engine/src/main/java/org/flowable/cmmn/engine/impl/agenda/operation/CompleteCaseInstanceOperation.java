@@ -38,20 +38,6 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     }
 
     @Override
-    public void internalExecute() {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
-            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().beforeEndCaseInstance(caseInstanceEntity, false);
-        }
-
-        super.internalExecute();
-
-        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
-            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().afterEndCaseInstance(caseInstanceEntity.getId(), false);
-        }
-    }
-
-    @Override
     public String getNewState() {
         return CaseInstanceState.COMPLETED;
     }

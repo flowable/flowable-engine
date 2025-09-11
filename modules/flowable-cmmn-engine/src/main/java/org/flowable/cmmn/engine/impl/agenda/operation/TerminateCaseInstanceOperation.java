@@ -55,19 +55,6 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
         this.exitEventType = exitEventType;
     }
 
-    @Override
-    public void internalExecute() {
-        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
-            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().beforeEndCaseInstance(caseInstanceEntity, true);
-        }
-        super.internalExecute();
-
-        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
-            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().afterEndCaseInstance(caseInstanceEntity.getId(), true);
-        }
-    }
-
     /**
      * Overridden to check, if the optional exit event type is set to 'complete' and if so, throw an exception, if the case is not yet completable.
      */
