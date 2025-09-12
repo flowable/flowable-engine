@@ -199,6 +199,11 @@ public interface HistoryManager {
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
 
     /**
+     * Record the creation of a new {@link IdentityLink} for the processInstance, if audit history is enabled.
+     */
+    void recordIdentityLinkCreated(ExecutionEntity processInstance, IdentityLinkEntity identityLinkEntity);
+
+    /**
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
