@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
@@ -177,6 +178,11 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
+        this.recordIdentityLinkCreated(null, identityLink);
+    }
+
+    @Override
+    public void recordIdentityLinkCreated(CaseInstanceEntity caseInstance, IdentityLinkEntity identityLink) {
         if (getHistoryConfigurationSettings().isHistoryEnabledForIdentityLink(identityLink)
                 && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
