@@ -15,7 +15,6 @@ package org.flowable.common.engine.impl.db;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -206,12 +205,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
         // Remove entries which are already deleted
         if (!includeDeleted && result.size() > 0) {
-            Iterator<EntityImpl> resultIterator = result.iterator();
-            while (resultIterator.hasNext()) {
-                if (dbSqlSession.isEntityToBeDeleted(resultIterator.next())) {
-                    resultIterator.remove();
-                }
-            }
+            result.removeIf(dbSqlSession::isEntityToBeDeleted);
         }
 
         return new ArrayList<>(result);
