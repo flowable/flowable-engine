@@ -114,7 +114,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 eventRegistry.sendSystemEventOutbound(eventInstance);
             }
 
-            commandContext.addAttribute(AsyncSendEventJobHandler.TYPE, true);
+            if (executedAsAsyncJob) {
+                commandContext.addAttribute(AsyncSendEventJobHandler.TYPE, true);
+            }
         }
 
         if (sendEventServiceTask.isTriggerable() && !executedAsAsyncJob) {
