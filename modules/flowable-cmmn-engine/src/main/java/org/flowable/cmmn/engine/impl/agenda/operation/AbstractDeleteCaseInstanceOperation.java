@@ -40,7 +40,14 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
 
     @Override
     public void internalExecute() {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
+            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().beforeEndCaseInstance(caseInstanceEntity, getNewState());
+        }
         deleteCaseInstance();
+        if (cmmnEngineConfiguration.getEndCaseInstanceInterceptor() != null) {
+            cmmnEngineConfiguration.getEndCaseInstanceInterceptor().afterEndCaseInstance(caseInstanceEntity.getId(), getNewState());
+        }
     }
 
     protected void deleteCaseInstance() {
