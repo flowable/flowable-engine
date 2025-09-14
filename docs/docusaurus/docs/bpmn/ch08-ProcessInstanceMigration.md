@@ -21,7 +21,7 @@ In this simple example we use the following use case:
 
 To test if the process instance can be migrated without issues the following code can be used:
 
-    ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+    ProcessInstanceMigrationValidationResult validationResult = processMigrationService.createProcessInstanceMigrationBuilder()
         .migrateToProcessDefinition(version2ProcessDef.getId())
         .validateMigration(processInstanceToMigrate.getId());
 
@@ -30,9 +30,9 @@ To test if the process instance can be migrated without issues the following cod
 The process instance migration builder can be used to validate and, as we will see later on, migrate one or more process instances.
 In this case we test if the running process instance can be migrated to the new process definition version with 2 user tasks.
 Because the user task id didn’t change between the two process definition versions, the process instance can be migrated without any additional mapping configuration.
-Therefore the migration will have a migration valid boolean value of true. This means we can run the actual migration without to be expected issues.
+Therefore, the migration will have a migration valid boolean value of true. This means we can run the actual migration without to be expected issues.
 
-    ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+    processMigrationService.createProcessInstanceMigrationBuilder()
         .migrateToProcessDefinition(version2ProcessDef.getId())
         .migrate(processInstanceToMigrate.getId());
 
@@ -45,7 +45,7 @@ In the simple example user task 1 was automatically mapped to the same user task
 But in some cases the current activity of a running process instance doesn’t exist anymore in the new process definition, or the activity should be migrated to another activity for another reason.
 For this use case, the process instance migration builder allows you to specify a list of specific activity migration mappings.
 
-    ProcessInstanceMigrationValidationResult validationResult = runtimeService.createProcessInstanceMigrationBuilder()
+    processMigrationService.createProcessInstanceMigrationBuilder()
         .migrateToProcessDefinition(version2ProcessDef.getId())
         .addActivityMigrationMapping("userTask1Id", "userTask2Id")
         .migrate(processInstanceToMigrate.getId());
