@@ -2126,8 +2126,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             idGenerator = dbIdGenerator;
         }
 
-        if (idGenerator instanceof DbIdGenerator) {
-            DbIdGenerator dbIdGenerator = (DbIdGenerator) idGenerator;
+        if (idGenerator instanceof DbIdGenerator dbIdGenerator) {
             if (dbIdGenerator.getIdBlockSize() == 0) {
                 dbIdGenerator.setIdBlockSize(idBlockSize);
             }

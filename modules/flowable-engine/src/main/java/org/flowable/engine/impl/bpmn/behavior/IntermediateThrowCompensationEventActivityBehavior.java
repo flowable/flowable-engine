@@ -86,14 +86,12 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
 
                 String compensationActivityId = null;
                 FlowElement flowElement = process.getFlowElement(activityRef, true);
-                if (flowElement instanceof Activity) {
-                    Activity activity = (Activity) flowElement;
+                if (flowElement instanceof Activity activity) {
                     if (activity.isForCompensation()) {
                         List<Association> associations = process.findAssociationsWithTargetRefRecursive(activity.getId());
                         for (Association association : associations) {
                             FlowElement sourceElement = process.getFlowElement(association.getSourceRef(), true);
-                            if (sourceElement instanceof BoundaryEvent) {
-                                BoundaryEvent sourceBoundaryEvent = (BoundaryEvent) sourceElement;
+                            if (sourceElement instanceof BoundaryEvent sourceBoundaryEvent) {
                                 if (sourceBoundaryEvent.getAttachedToRefId() != null) {
                                     compensationActivityId = sourceBoundaryEvent.getAttachedToRefId();
                                     break;

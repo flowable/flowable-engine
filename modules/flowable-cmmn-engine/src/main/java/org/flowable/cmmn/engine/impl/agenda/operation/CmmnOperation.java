@@ -128,9 +128,8 @@ public abstract class CmmnOperation implements Runnable {
                         stagePlanItemInstanceEntity, tenantId, newPlanItemInstances);
                 }
 
-            } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment) {
+            } else if (planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof PlanFragment planFragment) {
                 // Some plan items (plan fragments) exist as plan item, but not as plan item instance
-                PlanFragment planFragment = (PlanFragment) planItem.getPlanItemDefinition();
                 List<PlanItem> planFragmentPlanItems = planFragment.getDirectChildPlanItemsWithLifecycleEnabled();
                 for (PlanItem planFragmentPlanItem : planFragmentPlanItems) {
                     createPlanItemInstanceIfNeeded(commandContext, planFragmentPlanItem, caseModel, caseInstanceEntity,
@@ -224,8 +223,7 @@ public abstract class CmmnOperation implements Runnable {
     }
 
     public boolean isEventListenerWithAvailableCondition(PlanItem planItem) {
-        if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener) {
-            EventListener eventListener = (EventListener) planItem.getPlanItemDefinition();
+        if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof EventListener eventListener) {
             return StringUtils.isNotEmpty(eventListener.getAvailableConditionExpression());
         }
         return false;

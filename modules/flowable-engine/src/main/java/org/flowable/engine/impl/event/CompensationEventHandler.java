@@ -92,8 +92,7 @@ public class CompensationEventHandler implements EventHandler {
                             List<Association> associations = process.findAssociationsWithSourceRefRecursive(boundaryEvent.getId());
                             for (Association association : associations) {
                                 FlowElement targetElement = process.getFlowElement(association.getTargetRef(), true);
-                                if (targetElement instanceof Activity) {
-                                    Activity targetActivity = (Activity) targetElement;
+                                if (targetElement instanceof Activity targetActivity) {
                                     if (targetActivity.isForCompensation()) {
                                         compensationActivity = targetActivity;
                                         break;

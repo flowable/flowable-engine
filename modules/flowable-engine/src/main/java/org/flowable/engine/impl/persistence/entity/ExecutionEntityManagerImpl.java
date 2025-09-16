@@ -399,8 +399,7 @@ public class ExecutionEntityManagerImpl
 
         // Inherits the 'count' feature from the parent.
         // If the parent was not 'counting', we can't make the child 'counting' again.
-        if (parentExecutionEntity instanceof CountingExecutionEntity) {
-            CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
+        if (parentExecutionEntity instanceof CountingExecutionEntity countingParentExecutionEntity) {
             ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
         }
 
@@ -461,8 +460,7 @@ public class ExecutionEntityManagerImpl
             ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
             if (superExecution != null
                     && superExecution.getCurrentFlowElement() instanceof FlowNode
-                    && ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior() instanceof SubProcessActivityBehavior) {
-                SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior();
+                    && ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior() instanceof SubProcessActivityBehavior subProcessActivityBehavior) {
                 try {
                     subProcessActivityBehavior.completing(superExecution, processInstanceExecution);
                     superExecution.setSubProcessInstance(null);
@@ -931,9 +929,8 @@ public class ExecutionEntityManagerImpl
                 
                 List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
                 for (VariableInstance variableInstance : executionVariables) {
-                    if (variableInstance instanceof VariableInstanceEntity) {
-                        VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-                        
+                    if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
+
                         if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
                             variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
                         }

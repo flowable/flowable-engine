@@ -492,13 +492,11 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
             String includeInStageOverviewValue = null;
             if (planItemInstanceEntity.isStage()) {
-                if (planItemDefinition instanceof Stage) {
-                    Stage stage = (Stage) planItemDefinition;
+                if (planItemDefinition instanceof Stage stage) {
                     includeInStageOverviewValue = stage.getIncludeInStageOverview();
                 }
                 
-            } else if (planItemDefinition instanceof Milestone) {
-                Milestone milestone = (Milestone) planItemDefinition;
+            } else if (planItemDefinition instanceof Milestone milestone) {
                 includeInStageOverviewValue = milestone.getIncludeInStageOverview();
             }
             

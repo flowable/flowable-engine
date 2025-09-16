@@ -67,8 +67,7 @@ public class OutParameterParser extends BaseChildElementParser {
                 ((HasOutParameters) parentElement).addOutParameter(parameter);
             }
 
-        } else if (parentElement instanceof CallActivity) {
-            CallActivity callActivity = (CallActivity) parentElement;
+        } else if (parentElement instanceof CallActivity callActivity) {
 
             String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
             if ("all".equalsIgnoreCase(variables)) {

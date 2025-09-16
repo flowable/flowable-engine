@@ -36,8 +36,7 @@ public class MessageImplicitDataInputAssociation extends AbstractDataAssociation
         if (StringUtils.isNotEmpty(this.source)) {
             Object value = execution.getVariable(this.source);
             MessageInstance message = (MessageInstance) execution.getTransientVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
-            if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
-                FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
+            if (message.getStructureInstance() instanceof FieldBaseStructureInstance structure) {
                 structure.setFieldValue(this.target, value);
             }
         }

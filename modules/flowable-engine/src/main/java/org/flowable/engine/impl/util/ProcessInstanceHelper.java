@@ -153,11 +153,10 @@ public class ProcessInstanceHelper {
 
         FlowElement initialFlowElement = null;
         for (FlowElement flowElement : process.getFlowElements()) {
-            if (flowElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) flowElement;
-                if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
+            if (flowElement instanceof StartEvent startEvent) {
+                if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions()
+                        .get(0) instanceof MessageEventDefinition messageEventDefinition) {
 
-                    MessageEventDefinition messageEventDefinition = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
                     String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
                     if (Objects.equals(actualMessageName, messageName)) {
                         initialFlowElement = flowElement;

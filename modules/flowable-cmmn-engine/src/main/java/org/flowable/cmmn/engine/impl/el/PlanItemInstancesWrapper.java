@@ -43,8 +43,7 @@ public class PlanItemInstancesWrapper {
     public PlanItemInstancesWrapper(VariableContainer variableContainer) {
         this.variableContainer = variableContainer;
 
-        if (variableContainer instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableContainer;
+        if (variableContainer instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstanceEntity.getCaseInstanceId());
 
         } else if (variableContainer instanceof CaseInstanceEntity) {
@@ -128,8 +127,7 @@ public class PlanItemInstancesWrapper {
 
     public PlanItemInstancesWrapper currentStage() {
         PlanItemInstanceContainer stageContainer = null;
-        if (variableContainer instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableContainer;
+        if (variableContainer instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             PlanItemInstanceEntity stagePlanItemInstanceEntity = planItemInstanceEntity.getStagePlanItemInstanceEntity();
             if (stagePlanItemInstanceEntity != null) {
                 stageContainer = stagePlanItemInstanceEntity;

@@ -67,11 +67,9 @@ public class FieldExtension extends BaseElement {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof FieldExtension)) {
+        if (!(o instanceof FieldExtension that)) {
             return false;
         }
-
-        FieldExtension that = (FieldExtension) o;
 
         if (!getFieldName().equals(that.getFieldName())) {
             return false;

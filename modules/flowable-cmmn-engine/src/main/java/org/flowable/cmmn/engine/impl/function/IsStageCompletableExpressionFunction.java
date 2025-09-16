@@ -73,8 +73,7 @@ public class IsStageCompletableExpressionFunction implements FlowableFunctionDel
     }
 
     public static boolean isStageCompletable(Object object) {
-        if (object instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) object;
+        if (object instanceof PlanItemInstanceEntity planItemInstanceEntity) {
 
             if (planItemInstanceEntity.isStage()) {
                 return planItemInstanceEntity.isCompletable();
@@ -104,8 +103,7 @@ public class IsStageCompletableExpressionFunction implements FlowableFunctionDel
 
             }
 
-        } else if (object instanceof CaseInstanceEntity) {
-            CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) object;
+        } else if (object instanceof CaseInstanceEntity caseInstanceEntity) {
             return caseInstanceEntity.isCompletable();
 
         }

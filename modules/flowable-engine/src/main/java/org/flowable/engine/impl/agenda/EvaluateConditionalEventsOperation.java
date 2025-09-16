@@ -58,8 +58,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
         for (ExecutionEntity childExecutionEntity : allExecutions) {
             String activityId = childExecutionEntity.getCurrentActivityId();
             FlowElement currentFlowElement = process.getFlowElement(activityId, true);
-            if (currentFlowElement instanceof Event) {
-                Event event = (Event) currentFlowElement;
+            if (currentFlowElement instanceof Event event) {
                 if (!event.getEventDefinitions().isEmpty() && event.getEventDefinitions().get(0) instanceof ConditionalEventDefinition) {
                 
                     ActivityBehavior activityBehavior = (ActivityBehavior) ((FlowNode) currentFlowElement).getBehavior();
@@ -68,8 +67,7 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                     }
                 }
             
-            } else if (currentFlowElement instanceof SubProcess) {
-                SubProcess subProcess = (SubProcess) currentFlowElement;
+            } else if (currentFlowElement instanceof SubProcess subProcess) {
                 List<EventSubProcess> childEventSubProcesses = subProcess.findAllSubFlowElementInFlowMapOfType(EventSubProcess.class);
                 evaluateEventSubProcesses(childEventSubProcesses, childExecutionEntity);
             }
@@ -83,12 +81,11 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                 if (startEvents != null) {
                     for (StartEvent startEvent : startEvents) {
                         
-                        if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty() && 
-                                        startEvent.getEventDefinitions().get(0) instanceof ConditionalEventDefinition) {
+                        if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty() &&
+                                startEvent.getEventDefinitions().get(0) instanceof ConditionalEventDefinition conditionalEventDefinition) {
                             
                             CommandContext commandContext = CommandContextUtil.getCommandContext();
-                            ConditionalEventDefinition conditionalEventDefinition = (ConditionalEventDefinition) startEvent.getEventDefinitions().get(0);
-                            
+
                             boolean conditionIsTrue = false;
                             String conditionExpression = conditionalEventDefinition.getConditionExpression();
                             if (StringUtils.isNotEmpty(conditionExpression)) {

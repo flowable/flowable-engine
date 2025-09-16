@@ -39,8 +39,7 @@ public class CaseRefExpressionXmlConverter extends CaseElementXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         try {
             String expression = xtr.getElementText();
-            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof CaseTask) {
-                CaseTask caseTask = (CaseTask) conversionHelper.getCurrentCmmnElement();
+            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof CaseTask caseTask) {
                 caseTask.setCaseRefExpression(expression);
             }
         } catch (XMLStreamException e) {

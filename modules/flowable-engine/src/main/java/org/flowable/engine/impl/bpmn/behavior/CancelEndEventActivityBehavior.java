@@ -50,9 +50,8 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
         ExecutionEntity parentScopeExecution = null;
         ExecutionEntity currentlyExaminedExecution = executionEntityManager.findById(executionEntity.getParentId());
         while (currentlyExaminedExecution != null && parentScopeExecution == null) {
-            if (currentlyExaminedExecution.getCurrentFlowElement() instanceof SubProcess) {
+            if (currentlyExaminedExecution.getCurrentFlowElement() instanceof SubProcess subProcess) {
                 parentScopeExecution = currentlyExaminedExecution;
-                SubProcess subProcess = (SubProcess) currentlyExaminedExecution.getCurrentFlowElement();
                 if (subProcess.getLoopCharacteristics() != null) {
                     ExecutionEntity miExecution = parentScopeExecution.getParent();
                     FlowElement miElement = miExecution.getCurrentFlowElement();

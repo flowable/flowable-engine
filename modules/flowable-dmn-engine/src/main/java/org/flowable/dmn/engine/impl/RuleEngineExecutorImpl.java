@@ -78,11 +78,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             throw new IllegalArgumentException("no decision provided");
         }
 
-        if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable)) {
+        if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable currentDecisionTable)) {
             throw new IllegalArgumentException("no decision table present in decision");
         }
-
-        DecisionTable currentDecisionTable = (DecisionTable) decision.getExpression();
 
         // create execution context and audit trail
         ELExecutionContext executionContext = ELExecutionContextBuilder.build(decision, executeDecisionInfo);

@@ -35,11 +35,10 @@ public class OutputEntryParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof DecisionRule)) {
+        if (!(parentElement instanceof DecisionRule rule)) {
             return;
         }
 
-        DecisionRule rule = (DecisionRule) parentElement;
         LiteralExpression outputEntry = new LiteralExpression();
         outputEntry.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
 

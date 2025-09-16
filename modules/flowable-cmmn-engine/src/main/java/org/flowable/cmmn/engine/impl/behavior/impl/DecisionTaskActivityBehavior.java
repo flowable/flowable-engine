@@ -135,8 +135,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
 
         if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 cmmnEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
@@ -146,8 +145,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), externalRef,
                     planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
             } else {

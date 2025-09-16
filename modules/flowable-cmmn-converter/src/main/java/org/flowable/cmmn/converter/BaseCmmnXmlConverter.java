@@ -43,13 +43,11 @@ public abstract class BaseCmmnXmlConverter {
             baseElement.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
             CmmnXmlUtil.addXMLLocation(baseElement, xtr);
 
-            if (baseElement instanceof CmmnElement) {
-                CmmnElement cmmnElement = (CmmnElement) baseElement;
+            if (baseElement instanceof CmmnElement cmmnElement) {
                 conversionHelper.setCurrentCmmnElement(cmmnElement);
             }
 
-            if (baseElement instanceof Criterion) {
-                Criterion criterion = (Criterion) baseElement;
+            if (baseElement instanceof Criterion criterion) {
                 conversionHelper.getCmmnModel().addCriterion(criterion.getId(), criterion);
             }
 

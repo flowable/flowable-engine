@@ -137,8 +137,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
 
     protected void executeOperation(CommandContext commandContext, boolean isStoreCaseInstanceIdOfNoOperation, Runnable runnable) {
 
-        if (runnable instanceof CmmnOperation) {
-            CmmnOperation operation = (CmmnOperation) runnable;
+        if (runnable instanceof CmmnOperation operation) {
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Executing agenda operation {}", runnable);

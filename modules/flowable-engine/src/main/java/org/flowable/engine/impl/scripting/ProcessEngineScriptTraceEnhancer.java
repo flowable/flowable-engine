@@ -35,14 +35,12 @@ public class ProcessEngineScriptTraceEnhancer implements ScriptTraceEnhancer {
     }
 
     protected void enhanceScriptTrace(ScriptTraceContext context, VariableContainer container) {
-        if (container instanceof DelegateExecution) {
+        if (container instanceof DelegateExecution execution) {
             context.addTraceTag("scopeType", ScopeTypes.BPMN);
-            DelegateExecution execution = (DelegateExecution) container;
             addScopeTags(execution.getProcessDefinitionId(), context);
             context.addTraceTag("subScopeDefinitionKey", execution.getCurrentActivityId());
             addTenantId(context, execution.getTenantId());
-        } else if (container instanceof DelegateTask) {
-            DelegateTask task = (DelegateTask) container;
+        } else if (container instanceof DelegateTask task) {
             if (task.getProcessInstanceId() != null) {
                 context.addTraceTag("scopeType", ScopeTypes.BPMN);
                 addScopeTags(task.getProcessDefinitionId(), context);

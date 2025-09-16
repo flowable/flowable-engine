@@ -325,11 +325,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         boolean hasCompensation = false;
         if (activity instanceof Transaction) {
             hasCompensation = true;
-        } else if (activity instanceof SubProcess) {
-            SubProcess subProcess = (SubProcess) activity;
+        } else if (activity instanceof SubProcess subProcess) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
-                if (subElement instanceof Activity) {
-                    Activity subActivity = (Activity) subElement;
+                if (subElement instanceof Activity subActivity) {
                     if (CollectionUtil.isNotEmpty(subActivity.getBoundaryEvents())) {
                         for (BoundaryEvent boundaryEvent : subActivity.getBoundaryEvents()) {
                             if (CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) &&

@@ -55,8 +55,7 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
     public void testCaseInstanceEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStartedEvent) {
-                FlowableCaseStartedEvent caseStartedEvent = (FlowableCaseStartedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStartedEvent caseStartedEvent) {
                 CaseInstance eventCaseInstance = caseStartedEvent.getEntity();
                 assertThat(eventCaseInstance.getBusinessKey()).isEqualTo("business key");
                 assertThat(eventCaseInstance.getName()).isEqualTo("name");
@@ -95,8 +94,7 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
     public void testSubCaseStartedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStartedEvent) {
-                FlowableCaseStartedEvent caseStartedEvent = (FlowableCaseStartedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStartedEvent caseStartedEvent) {
                 CaseInstance eventCaseInstance = caseStartedEvent.getEntity();
                 assertThat(caseStartedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStartedEvent.getExecutionId()).isNull();

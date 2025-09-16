@@ -57,11 +57,9 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         }
         
         FlowElement flowElement = execution.getCurrentFlowElement();
-        if (!(flowElement instanceof CaseServiceTask)) {
+        if (!(flowElement instanceof CaseServiceTask caseServiceTask)) {
             throw new FlowableException("No execution could be found with a case service task for " + execution);
         }
-        
-        CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
 
         Object behavior = caseServiceTask.getBehavior();
         if (behavior instanceof CaseTaskActivityBehavior) {

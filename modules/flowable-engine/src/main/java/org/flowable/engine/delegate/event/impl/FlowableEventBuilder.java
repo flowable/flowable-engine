@@ -233,8 +233,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -255,8 +254,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -283,8 +281,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -432,8 +429,7 @@ public class FlowableEventBuilder {
                 event.setProcessInstanceId(((DelegateExecution) persistedObject).getProcessInstanceId());
                 event.setProcessDefinitionId(((DelegateExecution) persistedObject).getProcessDefinitionId());
                 
-            } else if (persistedObject instanceof IdentityLinkEntity) {
-                IdentityLinkEntity idLink = (IdentityLinkEntity) persistedObject;
+            } else if (persistedObject instanceof IdentityLinkEntity idLink) {
                 if (idLink.getProcessDefinitionId() != null) {
                     event.setProcessDefinitionId(idLink.getProcessDefId());
                     

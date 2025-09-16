@@ -489,8 +489,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
 
-        if (planFragment instanceof Stage) {
-            Stage stage = (Stage) planFragment;
+        if (planFragment instanceof Stage stage) {
             for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
                 if (planItemDefinition instanceof PlanFragment) {
                     processPlanFragment(cmmnModel, (PlanFragment) planItemDefinition);
@@ -529,13 +528,11 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             resolveExitCriteriaSentry(planItem);
         }
 
-        if (planItemDefinition instanceof Stage) {
-            Stage planItemStage = (Stage) planItemDefinition;
+        if (planItemDefinition instanceof Stage planItemStage) {
             planItemStage.setPlanItem(planItem);
             processPlanFragment(cmmnModel, planItemStage);
 
-        } else if (planItemDefinition instanceof ProcessTask) {
-            ProcessTask processTask = (ProcessTask) planItemDefinition;
+        } else if (planItemDefinition instanceof ProcessTask processTask) {
             if (processTask.getProcessRef() != null) {
                 org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
                 if (process != null) {
@@ -543,8 +540,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof DecisionTask) {
-            DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+        } else if (planItemDefinition instanceof DecisionTask decisionTask) {
             if (decisionTask.getDecisionRef() != null) {
                 org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
                 if (decision != null) {
@@ -552,8 +548,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+        } else if (planItemDefinition instanceof TimerEventListener timerEventListener) {
             String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
             PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
             if (startTriggerPlanItem != null) {

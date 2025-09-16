@@ -182,8 +182,7 @@ public class CmmnLoggingSessionUtil {
         ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         
         String label = null;
-        if (instance instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+        if (instance instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             label = planItemInstanceEntity.getPlanItemDefinitionId();
             if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
                 label = planItemInstanceEntity.getPlanItemDefinition().getName();
@@ -252,8 +251,7 @@ public class CmmnLoggingSessionUtil {
     
     protected static String getActivitySubType(PlanItemDefinition planItemDefinition) {
         String activitySubType = null;
-        if (planItemDefinition instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) planItemDefinition;
+        if (planItemDefinition instanceof ServiceTask serviceTask) {
             activitySubType = serviceTask.getImplementation();
         }
         
@@ -290,8 +288,7 @@ public class CmmnLoggingSessionUtil {
     protected static ObjectNode fillEvaluateSentryInstanceEntity(EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
         ObjectNode loggingNode = null;
         String caseDefinitionId = null;
-        if (instance instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+        if (instance instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             String label = planItemInstanceEntity.getPlanItemDefinitionId();
             if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
                 label = planItemInstanceEntity.getPlanItemDefinition().getName();

@@ -102,8 +102,7 @@ public class ExecuteAsyncRunnable implements Runnable {
 
     protected void runInternally(JobExecutionObservation observation) {
 
-        if (job instanceof Job) {
-            Job jobObject = (Job) job;
+        if (job instanceof Job jobObject) {
             InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
             if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(jobObject)) {
                 internalJobCompatibilityManager.executeV5JobWithLockAndRetry(jobObject);

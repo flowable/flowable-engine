@@ -30,11 +30,10 @@ public class TypeRefParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof ItemDefinition)) {
+        if (!(parentElement instanceof ItemDefinition itemDefinition)) {
             return;
         }
 
-        ItemDefinition itemDefinition = (ItemDefinition) parentElement;
         itemDefinition.setTypeRef(xtr.getElementText());
     }
 }

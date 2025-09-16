@@ -140,8 +140,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
 
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 processEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
@@ -152,8 +151,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             } else {

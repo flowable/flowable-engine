@@ -317,8 +317,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
-                if (historicVariableInstance instanceof HistoricVariableInstanceEntity) {
-                    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
+                if (historicVariableInstance instanceof HistoricVariableInstanceEntity variableEntity) {
                     if (variableEntity.getVariableType() != null) {
                         variableEntity.getValue();
 

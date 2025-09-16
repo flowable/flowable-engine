@@ -101,15 +101,13 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             if (timerValue instanceof Date) {
                 timerDueDate = (Date) timerValue;
 
-            } else if (timerValue instanceof DateTime) {
+            } else if (timerValue instanceof DateTime timerDateTime) {
                 JodaDeprecationLogger.LOGGER.warn(
                         "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
                         timerEventListener.getTimerExpression(), planItemInstance);
-                DateTime timerDateTime = (DateTime) timerValue;
                 timerDueDate = timerDateTime.toDate();
 
-            } else if (timerValue instanceof String) {
-                String timerString = (String) timerValue;
+            } else if (timerValue instanceof String timerString) {
 
                 BusinessCalendarManager businessCalendarManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager();
                 if (isDurationString(timerString)) {
