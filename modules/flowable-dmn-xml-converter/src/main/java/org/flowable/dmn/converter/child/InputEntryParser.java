@@ -104,14 +104,14 @@ public class InputEntryParser extends BaseChildElementParser {
 
         String elementText = extensionElement.getElementText();
         String typeRef = inputClause.getInputExpression().getTypeRef();
-        String newElementText = null;
+        String newElementText;
         if ("collection".equalsIgnoreCase(typeRef)) {
             newElementText = switch (elementText) {
                 case "IN" -> "ALL OF";
                 case "NOT IN" -> "NONE OF";
                 case "ANY" -> "ANY OF";
                 case "NOT ANY" -> "NOT ALL OF";
-                default -> newElementText;
+                default -> null;
             };
         } else {
             newElementText = switch (elementText) {
@@ -119,7 +119,7 @@ public class InputEntryParser extends BaseChildElementParser {
                 case "NOT IN" -> "IS NOT IN";
                 case "ANY" -> "IS IN";
                 case "NOT ANY" -> "IS NOT IN";
-                default -> newElementText;
+                default -> null;
             };
         }
 

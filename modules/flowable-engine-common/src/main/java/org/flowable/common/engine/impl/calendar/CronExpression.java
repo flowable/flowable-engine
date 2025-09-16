@@ -21,6 +21,8 @@ package org.flowable.common.engine.impl.calendar;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.Month;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -1601,22 +1603,7 @@ public class CronExpression implements Serializable, Cloneable {
     }
 
     protected int getLastDayOfMonth(int monthNum, int year) {
-
-        return switch (monthNum) {
-            case 1 -> 31;
-            case 2 -> isLeapYear(year) ? 29 : 28;
-            case 3 -> 31;
-            case 4 -> 30;
-            case 5 -> 31;
-            case 6 -> 30;
-            case 7 -> 31;
-            case 8 -> 31;
-            case 9 -> 30;
-            case 10 -> 31;
-            case 11 -> 30;
-            case 12 -> 31;
-            default -> throw new IllegalArgumentException("Illegal month number: " + monthNum);
-        };
+        return Month.of(monthNum).length(Year.isLeap(year));
     }
 
     private void readObject(java.io.ObjectInputStream stream) throws java.io.IOException, ClassNotFoundException {
