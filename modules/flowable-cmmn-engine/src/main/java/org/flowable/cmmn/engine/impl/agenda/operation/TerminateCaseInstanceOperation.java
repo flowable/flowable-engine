@@ -20,7 +20,6 @@ import static org.flowable.cmmn.model.PlanItemTransition.TERMINATE;
 import java.util.HashMap;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.callback.CallbackConstants;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
