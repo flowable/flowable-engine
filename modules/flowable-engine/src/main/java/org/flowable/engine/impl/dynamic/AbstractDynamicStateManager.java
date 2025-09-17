@@ -511,7 +511,7 @@ public abstract class AbstractDynamicStateManager {
                             List<BoundaryEvent> boundaryEvents = ((Activity) execution.getCurrentFlowElement()).getBoundaryEvents();
                             if (boundaryEvents != null && !boundaryEvents.isEmpty()) {
                                 for (ExecutionEntity executionEntity : executionEntityManager.collectChildren(execution)) {
-                                    if (executionEntity.getCurrentFlowElement() != null && executionEntity.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
+                                    if (executionEntity.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
                                         if (newBoundaryEventMap.containsKey(boundaryEvent.getId()) && sameBoundaryEventDefinition(boundaryEvent, newBoundaryEventMap.get(boundaryEvent.getId()))) {
                                             
                                             boolean hasEventSubscriptions = false;
