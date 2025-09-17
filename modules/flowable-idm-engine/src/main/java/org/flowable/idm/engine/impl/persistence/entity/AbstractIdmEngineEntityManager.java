@@ -33,23 +33,13 @@ public abstract class AbstractIdmEngineEntityManager<EntityImpl extends Entity, 
 
     @Override
     protected FlowableEntityEvent createEntityEvent(FlowableEngineEventType eventType, Entity entity) {
-        FlowableIdmEventType idmEventType;
-        switch (eventType) {
-            case ENTITY_CREATED:
-                idmEventType = FlowableIdmEventType.ENTITY_CREATED;
-                break;
-            case ENTITY_INITIALIZED:
-                idmEventType = FlowableIdmEventType.ENTITY_INITIALIZED;
-                break;
-            case ENTITY_UPDATED:
-                idmEventType = FlowableIdmEventType.ENTITY_UPDATED;
-                break;
-            case ENTITY_DELETED:
-                idmEventType = FlowableIdmEventType.ENTITY_DELETED;
-                break;
-            default:
-                idmEventType = null;
-        }
+        FlowableIdmEventType idmEventType = switch (eventType) {
+            case ENTITY_CREATED -> FlowableIdmEventType.ENTITY_CREATED;
+            case ENTITY_INITIALIZED -> FlowableIdmEventType.ENTITY_INITIALIZED;
+            case ENTITY_UPDATED -> FlowableIdmEventType.ENTITY_UPDATED;
+            case ENTITY_DELETED -> FlowableIdmEventType.ENTITY_DELETED;
+            default -> null;
+        };
 
         if (idmEventType != null) {
             return FlowableIdmEventBuilder.createEntityEvent(idmEventType, entity);

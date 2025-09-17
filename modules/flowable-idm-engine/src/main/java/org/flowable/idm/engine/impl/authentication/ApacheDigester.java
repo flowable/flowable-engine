@@ -43,21 +43,14 @@ public class ApacheDigester implements PasswordEncoder {
 
     private String encodePassword(CharSequence rawPassword, PasswordSalt passwordSalt) {
         String salt = rawPassword + passwordSalt.getSource().getSalt();
-        switch (digester) {
-            case MD5:
-                return DigestUtils.md5Hex(salt);
-            case SHA:
-                return DigestUtils.sha1Hex(salt);
-            case SHA256:
-                return DigestUtils.sha256Hex(salt);
-            case SHA348:
-                return DigestUtils.sha384Hex(salt);
-            case SHA512:
-                return DigestUtils.sha512Hex(salt);
-            default:
-                break;
-        }
-        return null;
+        return switch (digester) {
+            case MD5 -> DigestUtils.md5Hex(salt);
+            case SHA -> DigestUtils.sha1Hex(salt);
+            case SHA256 -> DigestUtils.sha256Hex(salt);
+            case SHA348 -> DigestUtils.sha384Hex(salt);
+            case SHA512 -> DigestUtils.sha512Hex(salt);
+            default -> null;
+        };
     }
 
     public enum Digester {
