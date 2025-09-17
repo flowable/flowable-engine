@@ -459,8 +459,8 @@ public class ExecutionEntityManagerImpl
         if (processInstanceExecution.getSuperExecutionId() != null) {
             ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
             if (superExecution != null
-                    && superExecution.getCurrentFlowElement() instanceof FlowNode
-                    && ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior() instanceof SubProcessActivityBehavior subProcessActivityBehavior) {
+                    && superExecution.getCurrentFlowElement() instanceof FlowNode flowNode
+                    && flowNode.getBehavior() instanceof SubProcessActivityBehavior subProcessActivityBehavior) {
                 try {
                     subProcessActivityBehavior.completing(superExecution, processInstanceExecution);
                     superExecution.setSubProcessInstance(null);
