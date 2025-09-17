@@ -98,7 +98,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
             entityManagerSession.flush();
         }
 
-        if (value instanceof List<?> list && ((List<?>) value).size() > 0) {
+        if (value instanceof List<?> list && list.size() > 0) {
             List<String> ids = new ArrayList<>();
 
             String type = mappings.getJPAClassString(list.get(0));
