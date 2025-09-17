@@ -200,7 +200,7 @@ public class BaseDynamicSubProcessInjectUtil {
     protected static void processDecisionTask(FlowElement flowElement, ProcessDefinition originalProcessDefinitionEntity, 
                     DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
-        if (flowElement instanceof ServiceTask serviceTask && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType())) {
+        if (flowElement instanceof ServiceTask serviceTask && ServiceTask.DMN_TASK.equals(serviceTask.getType())) {
                     
             DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
             if (dmnRepositoryService != null) {
