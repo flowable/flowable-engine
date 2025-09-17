@@ -235,8 +235,7 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
         }
         if (value instanceof Collection) {
             return (Collection<String>) value;
-        } else if (value instanceof ArrayNode) {
-            ArrayNode arrayNode = (ArrayNode) value;
+        } else if (value instanceof ArrayNode arrayNode) {
             Collection<String> recipients = new ArrayList<>(arrayNode.size());
             for (JsonNode node : arrayNode) {
                 recipients.add(node.asText());

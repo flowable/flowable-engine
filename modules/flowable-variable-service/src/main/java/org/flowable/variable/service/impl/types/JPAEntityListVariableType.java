@@ -63,8 +63,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
     public boolean isAbleToStore(Object value) {
         boolean canStore = false;
 
-        if (value instanceof List<?>) {
-            List<?> list = (List<?>) value;
+        if (value instanceof List<?> list) {
             if (list.size() > 0) {
                 // We can only store the list if we are sure it's actually a
                 // list of JPA entities. In case the
@@ -99,8 +98,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
             entityManagerSession.flush();
         }
 
-        if (value instanceof List<?> && ((List<?>) value).size() > 0) {
-            List<?> list = (List<?>) value;
+        if (value instanceof List<?> list && list.size() > 0) {
             List<String> ids = new ArrayList<>();
 
             String type = mappings.getJPAClassString(list.get(0));

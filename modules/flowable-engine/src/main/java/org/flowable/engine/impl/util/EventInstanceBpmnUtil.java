@@ -47,8 +47,7 @@ public class EventInstanceBpmnUtil {
                 .stream()
                 .collect(Collectors.toMap(EventPayloadInstance::getDefinitionName, Function.identity()));
         
-        if (baseElement instanceof SendEventServiceTask) {
-            SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
+        if (baseElement instanceof SendEventServiceTask eventServiceTask) {
             if (!eventServiceTask.getEventOutParameters().isEmpty()) {
                 for (IOParameter parameter : eventServiceTask.getEventOutParameters()) {
                     setEventParameterVariable(parameter.getSource(), parameter.getTarget(), 
@@ -79,8 +78,7 @@ public class EventInstanceBpmnUtil {
             BaseElement baseElement, EventModel eventDefinition) {
 
         List<EventPayloadInstance> eventPayloadInstances = new ArrayList<>();
-        if (baseElement instanceof SendEventServiceTask) {
-            SendEventServiceTask eventServiceTask = (SendEventServiceTask) baseElement;
+        if (baseElement instanceof SendEventServiceTask eventServiceTask) {
             if (!eventServiceTask.getEventInParameters().isEmpty()) {
                 for (IOParameter parameter : eventServiceTask.getEventInParameters()) {
                     String sourceValue = null;

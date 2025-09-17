@@ -59,8 +59,7 @@ public class CaseEndedEventTests extends FlowableCmmnTestCase {
     public void testCaseInstanceEndedEvent() {
         List<FlowableCaseEndedEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseEndedEvent) {
-                FlowableCaseEndedEvent caseEndedEvent = (FlowableCaseEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseEndedEvent caseEndedEvent) {
                 CaseInstance eventCaseInstance = caseEndedEvent.getEntity();
                 assertThat(eventCaseInstance.getBusinessKey()).isEqualTo("business key");
                 assertThat(eventCaseInstance.getName()).isEqualTo("name");
@@ -105,8 +104,7 @@ public class CaseEndedEventTests extends FlowableCmmnTestCase {
     public void testCaseInstanceEndWithTerminationEvent() {
         List<FlowableCaseEndedEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseEndedEvent) {
-                FlowableCaseEndedEvent caseEndedEvent = (FlowableCaseEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseEndedEvent caseEndedEvent) {
                 CaseInstance eventCaseInstance = caseEndedEvent.getEntity();
                 assertThat(eventCaseInstance.getBusinessKey()).isEqualTo("business key");
                 assertThat(eventCaseInstance.getName()).isEqualTo("name");
@@ -151,8 +149,7 @@ public class CaseEndedEventTests extends FlowableCmmnTestCase {
     public void testSubCaseEndedEvents() {
         List<FlowableCaseEndedEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseEndedEvent) {
-                FlowableCaseEndedEvent caseEndedEvent = (FlowableCaseEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseEndedEvent caseEndedEvent) {
                 CaseInstance eventCaseInstance = caseEndedEvent.getEntity();
                 assertThat(caseEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseEndedEvent.getExecutionId()).isNull();
@@ -213,8 +210,7 @@ public class CaseEndedEventTests extends FlowableCmmnTestCase {
     public void testSubCaseEndedWithManualTriggerEvents() {
         List<FlowableCaseEndedEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseEndedEvent) {
-                FlowableCaseEndedEvent caseEndedEvent = (FlowableCaseEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseEndedEvent caseEndedEvent) {
                 CaseInstance eventCaseInstance = caseEndedEvent.getEntity();
                 assertThat(caseEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseEndedEvent.getExecutionId()).isNull();
@@ -269,8 +265,7 @@ public class CaseEndedEventTests extends FlowableCmmnTestCase {
     public void testSubCaseEndedWithTerminationEvents() {
         List<FlowableCaseEndedEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseEndedEvent) {
-                FlowableCaseEndedEvent caseEndedEvent = (FlowableCaseEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseEndedEvent caseEndedEvent) {
                 CaseInstance eventCaseInstance = caseEndedEvent.getEntity();
                 assertThat(caseEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseEndedEvent.getExecutionId()).isNull();

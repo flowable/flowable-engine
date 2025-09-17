@@ -92,7 +92,7 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
                     }
                     compensateBoundaryEventsCounts.put(boundaryEvent.getAttachedToRefId(), compensateBoundaryEventsCounts.get(boundaryEvent.getAttachedToRefId()) + 1);
 
-                } else if (eventDefinition instanceof MessageEventDefinition) {
+                } else if (eventDefinition instanceof MessageEventDefinition currentMessageEventDefinition) {
 
                     // Check if other message boundary events with same message id
                     for (int j = 0; j < boundaryEvents.size(); j++) {
@@ -101,9 +101,7 @@ public class BoundaryEventValidator extends ProcessLevelValidator {
                             if (otherBoundaryEvent.getAttachedToRefId() != null && otherBoundaryEvent.getAttachedToRefId().equals(boundaryEvent.getAttachedToRefId())) {
                                 if (otherBoundaryEvent.getEventDefinitions() != null && !otherBoundaryEvent.getEventDefinitions().isEmpty()) {
                                     EventDefinition otherEventDefinition = otherBoundaryEvent.getEventDefinitions().get(0);
-                                    if (otherEventDefinition instanceof MessageEventDefinition) {
-                                        MessageEventDefinition currentMessageEventDefinition = (MessageEventDefinition) eventDefinition;
-                                        MessageEventDefinition otherMessageEventDefinition = (MessageEventDefinition) otherEventDefinition;
+                                    if (otherEventDefinition instanceof MessageEventDefinition otherMessageEventDefinition) {
                                         if (otherMessageEventDefinition.getMessageRef() != null && otherMessageEventDefinition.getMessageRef().equals(currentMessageEventDefinition.getMessageRef())) {
                                             addError(errors, Problems.MESSAGE_EVENT_MULTIPLE_ON_BOUNDARY_SAME_MESSAGE_ID, process, boundaryEvent, "Multiple message events with same message id not supported");
                                         }

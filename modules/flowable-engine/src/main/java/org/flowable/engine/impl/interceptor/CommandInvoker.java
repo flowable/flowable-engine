@@ -175,8 +175,7 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     }
 
     public void executeOperation(CommandContext commandContext, Runnable runnable) {
-        if (runnable instanceof AbstractOperation) {
-            AbstractOperation operation = (AbstractOperation) runnable;
+        if (runnable instanceof AbstractOperation operation) {
 
             // Execute the operation if the operation has no execution (i.e. it's an operation not working on a process instance)
             // or the operation has an execution and it is not ended

@@ -152,8 +152,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         FormInfo formInfo = null;
         Map<String, Object> processVariables = null;
         if (hasStartFormData()) {
-            if (startElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) startElement;
+            if (startElement instanceof StartEvent startEvent) {
                 String startFormKey = startEvent.getFormKey();
                 if (StringUtils.isNotEmpty(startFormKey)) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);

@@ -45,8 +45,7 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
     public static boolean contains(VariableContainer variableContainer, String variableName, Object... values) {
         Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
-            if (variableValue instanceof String) {
-                String variableStringValue = (String) variableValue;
+            if (variableValue instanceof String variableStringValue) {
                 for (Object value : values) {
                     String stringValue = (String) value;
                     if (!StringUtils.contains(variableStringValue, stringValue)) {
@@ -55,8 +54,7 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
                 }
                 return true;
 
-            } else if (variableValue instanceof Collection) {
-                Collection collectionVariableValue = (Collection) variableValue;
+            } else if (variableValue instanceof Collection collectionVariableValue) {
                 for (Object value : values) {
                    if (!collectionContains(collectionVariableValue, value)) {
                        return false;
@@ -64,8 +62,7 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
                 }
                 return true;
 
-            } else if (variableValue instanceof ArrayNode) {
-                ArrayNode arrayNodeVariableValue = (ArrayNode) variableValue;
+            } else if (variableValue instanceof ArrayNode arrayNodeVariableValue) {
                 for (Object value : values) {
                    if (!arrayNodeContains(arrayNodeVariableValue, value)) {
                        return false;

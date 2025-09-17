@@ -389,11 +389,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             
             Object value = expressionManager.createExpression(activeCompletionCondition).getValue(execution);
             
-            if (!(value instanceof Boolean)) {
+            if (!(value instanceof Boolean booleanValue)) {
                 throw new FlowableIllegalArgumentException("completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
             }
 
-            Boolean booleanValue = (Boolean) value;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Completion condition of multi-instance satisfied: {}", booleanValue);
             }

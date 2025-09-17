@@ -69,12 +69,10 @@ public class TimerManager {
         List<TimerJobEntity> timers = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
-                if (element instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) element;
+                if (element instanceof StartEvent startEvent) {
                     if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-                        if (eventDefinition instanceof TimerEventDefinition) {
-                            TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                        if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
                             TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
                                     false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
                                             timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));

@@ -213,9 +213,8 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
     protected Map<String, List<Map<String, Object>>> composeDecisionServiceResult(ExecuteDecisionContext executeDecisionContext) {
         // check if execution was Decision or DecisionService
-        if (executeDecisionContext.getDmnElement() instanceof DecisionService) {
+        if (executeDecisionContext.getDmnElement() instanceof DecisionService decisionService) {
             Map<String, List<Map<String, Object>>> decisionServiceResult = new HashMap<>();
-            DecisionService decisionService = (DecisionService) executeDecisionContext.getDmnElement();
             DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) executeDecisionContext.getDecisionExecution();
 
             boolean multipleResults = decisionService.getOutputDecisions().size() > 1;

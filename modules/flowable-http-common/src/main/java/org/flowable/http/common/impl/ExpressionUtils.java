@@ -49,8 +49,7 @@ public abstract class ExpressionUtils {
 
     protected static boolean parseBoolean(Object value) {
         if (value != null) {
-            if (value instanceof String) {
-                String stringValue = (String) value;
+            if (value instanceof String stringValue) {
                 if ("true".equalsIgnoreCase(stringValue) || "false".equalsIgnoreCase(stringValue)) {
                     return Boolean.parseBoolean(value.toString());
                 }

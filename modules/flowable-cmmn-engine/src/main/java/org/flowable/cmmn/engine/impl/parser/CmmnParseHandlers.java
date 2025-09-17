@@ -53,9 +53,8 @@ public class CmmnParseHandlers {
     public void parseElement(CmmnParser cmmnParser, CmmnParseResult cmmnParseResult, BaseElement baseElement) {
 
         List<CmmnParseHandler> handlers = null;
-        if (baseElement instanceof PlanItem) {
+        if (baseElement instanceof PlanItem planItem) {
             // The plan item definition defines the actual behavior
-            PlanItem planItem = (PlanItem) baseElement;
             handlers = parseHandlers.get(planItem.getPlanItemDefinition().getClass());
 
             if (handlers == null) {

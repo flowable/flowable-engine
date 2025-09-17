@@ -39,8 +39,7 @@ public class FlowElementValidator extends ProcessLevelValidator {
     protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
         for (FlowElement flowElement : process.getFlowElements()) {
 
-            if (flowElement instanceof Activity) {
-                Activity activity = (Activity) flowElement;
+            if (flowElement instanceof Activity activity) {
                 handleConstraints(process, activity, errors);
                 handleMultiInstanceLoopCharacteristics(process, activity, errors);
                 handleDataAssociations(process, activity, errors);

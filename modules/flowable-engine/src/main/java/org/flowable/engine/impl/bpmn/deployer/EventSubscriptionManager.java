@@ -143,16 +143,13 @@ public class EventSubscriptionManager {
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
-                if (element instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) element;
+                if (element instanceof StartEvent startEvent) {
                     if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-                        if (eventDefinition instanceof SignalEventDefinition) {
-                            SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+                        if (eventDefinition instanceof SignalEventDefinition signalEventDefinition) {
                             insertSignalEvent(signalEventDefinition, startEvent, processDefinition, bpmnModel);
                         
-                        } else if (eventDefinition instanceof MessageEventDefinition) {
-                            MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                        } else if (eventDefinition instanceof MessageEventDefinition messageEventDefinition) {
                             insertMessageEvent(messageEventDefinition, startEvent, processDefinition, bpmnModel);
                         }
                         

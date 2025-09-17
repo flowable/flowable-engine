@@ -33,11 +33,10 @@ public class InputValuesParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof InputClause)) {
+        if (!(parentElement instanceof InputClause clause)) {
             return;
         }
 
-        InputClause clause = (InputClause) parentElement;
         UnaryTests inputValues = new UnaryTests();
 
         boolean readyWithInputValues = false;

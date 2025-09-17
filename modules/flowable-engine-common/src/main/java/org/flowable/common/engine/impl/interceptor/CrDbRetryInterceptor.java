@@ -78,8 +78,7 @@ public class CrDbRetryInterceptor extends AbstractCommandInterceptor {
     }
 
     protected boolean isTransactionRetryException(Throwable exception) {
-        if (exception instanceof SQLException) {
-            SQLException sqlException = (SQLException) exception;
+        if (exception instanceof SQLException sqlException) {
             if (sqlException.getErrorCode() == 40001 || (sqlException.getMessage() != null && sqlException.getMessage().contains("retry txn"))) {
                 return true;
             }

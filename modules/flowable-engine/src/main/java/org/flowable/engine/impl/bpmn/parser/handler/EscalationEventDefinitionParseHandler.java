@@ -30,9 +30,8 @@ public class EscalationEventDefinitionParseHandler extends AbstractBpmnParseHand
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, EscalationEventDefinition eventDefinition) {
-        if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
-            
+        if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
+
             Escalation escalation = null;
             if (bpmnParse.getBpmnModel().containsEscalationRef(eventDefinition.getEscalationCode())) {
                 escalation = bpmnParse.getBpmnModel().getEscalation(eventDefinition.getEscalationCode());

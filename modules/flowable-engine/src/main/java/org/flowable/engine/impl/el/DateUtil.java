@@ -18,8 +18,7 @@ public class DateUtil {
 
     public static String format(Object value) {
         String formattedString = null;
-        if (value instanceof Date) {
-            Date date = (Date) value;
+        if (value instanceof Date date) {
             formattedString = date.toInstant().toString();
         } else {
             formattedString = value.toString();

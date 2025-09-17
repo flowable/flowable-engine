@@ -52,10 +52,9 @@ public class DynamicSubProcessJoinInjectUtil extends BaseDynamicSubProcessInject
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         TaskEntity taskEntity = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(taskId);
         FlowElement taskFlowElement = process.getFlowElement(taskEntity.getTaskDefinitionKey(), true);
-        if (!(taskFlowElement instanceof UserTask)) {
+        if (!(taskFlowElement instanceof UserTask userTask)) {
             throw new FlowableException("No UserTask instance found for task definition key " + taskEntity.getTaskDefinitionKey());
         }
-        UserTask userTask = (UserTask) taskFlowElement;
 
         if (dynamicEmbeddedSubProcessBuilder.getId() != null && process.getFlowElement(dynamicEmbeddedSubProcessBuilder.getId(), true) != null) {
             throw new FlowableIllegalArgumentException("Invalid sub-process identifier: identifier already exists in host process definition");

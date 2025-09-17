@@ -90,8 +90,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
 
     protected void swapCommandInvoker(ProcessEngine processEngine, boolean debug) {
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
-        if (commandExecutor instanceof CommandExecutorImpl) {
-            CommandExecutorImpl commandExecutorImpl = (CommandExecutorImpl) commandExecutor;
+        if (commandExecutor instanceof CommandExecutorImpl commandExecutorImpl) {
 
             CommandInterceptor previousCommandInterceptor = null;
             CommandInterceptor commandInterceptor = commandExecutorImpl.getFirst();

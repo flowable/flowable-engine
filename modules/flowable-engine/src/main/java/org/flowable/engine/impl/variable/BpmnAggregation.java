@@ -156,12 +156,11 @@ public class BpmnAggregation {
     public static Object aggregateOverviewForMultiInstance(ExecutionEntity parentExecution, String targetVarName,
             ProcessEngineConfigurationImpl processEngineConfiguration) {
         FlowElement currentFlowElement = parentExecution.getCurrentFlowElement();
-        if (!(currentFlowElement instanceof Activity)) {
+        if (!(currentFlowElement instanceof Activity activity)) {
             // This should never happen as the parent execution is a multi instance root, but we are being extra safe
             return null;
         }
 
-        Activity activity = (Activity) currentFlowElement;
         MultiInstanceLoopCharacteristics loopCharacteristics = activity.getLoopCharacteristics();
         if (loopCharacteristics == null) {
             // This should never happen as the parent execution is a multi instance root, but we are being extra safe

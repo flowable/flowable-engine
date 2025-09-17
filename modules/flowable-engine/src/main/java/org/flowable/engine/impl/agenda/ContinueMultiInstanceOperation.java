@@ -127,10 +127,9 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     
     protected ActivityBehavior setLoopCounterVariable(FlowNode flowNode) {
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
-        if (!(activityBehavior instanceof MultiInstanceActivityBehavior)) {
+        if (!(activityBehavior instanceof MultiInstanceActivityBehavior multiInstanceActivityBehavior)) {
             throw new FlowableException("Programmatic error: expected multi instance activity behavior, but got " + activityBehavior.getClass());
         }
-        MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
         execution.setVariableLocal(elementIndexVariable, loopCounter);
         return activityBehavior;

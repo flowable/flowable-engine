@@ -292,8 +292,7 @@ public class DbSqlSession implements Session {
     public Object selectOne(String statement, Object parameter) {
         statement = dbSqlSessionFactory.mapStatement(statement);
         Object result = sqlSession.selectOne(statement, parameter);
-        if (result instanceof Entity) {
-            Entity loadedObject = (Entity) result;
+        if (result instanceof Entity loadedObject) {
             result = cacheLoadOrStore(loadedObject, parameter);
         }
         return result;

@@ -54,12 +54,11 @@ public class BPMNDIExport implements BpmnXMLConstants {
         for (String elementId : model.getLocationMap().keySet()) {
             FlowElement flowElement = model.getFlowElement(elementId);
 
-            if (flowElement instanceof SubProcess) {
+            if (flowElement instanceof SubProcess subProcess) {
                 String flowId = flowElement.getId();
                 GraphicInfo gi = model.getGraphicInfo(flowId);
                 Boolean isExpanded = gi.getExpanded();
                 if (isExpanded != null && isExpanded == false) {
-                    SubProcess subProcess = (SubProcess) flowElement;
                     for (FlowElement element : subProcess.getFlowElements()) {
                         // the key is the element. the value is the collapsed subprocess.
                         collapsedSubProcessChildren.put(element.getId(), elementId);
@@ -78,15 +77,13 @@ public class BPMNDIExport implements BpmnXMLConstants {
         for (String elementId : model.getFlowLocationMap().keySet()) {
             FlowElement flowElement = model.getFlowElement(elementId);
             String belongsTo = null;
-            if (flowElement instanceof SequenceFlow) {
-                SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+            if (flowElement instanceof SequenceFlow sequenceFlow) {
                 belongsTo = collapsedSubProcessChildren.get(sequenceFlow.getTargetRef());
 
             } else if (flowElement == null) {
                 // check if its an artifact
                 Artifact artifact = model.getArtifact(elementId);
-                if (artifact instanceof Association) {
-                    Association association = (Association) artifact;
+                if (artifact instanceof Association association) {
                     belongsTo = collapsedSubProcessChildren.get(association.getTargetRef());
                 }
             }

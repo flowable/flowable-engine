@@ -295,8 +295,7 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
 
         if (!excludeVariableInitialization) {
             for (VariableInstance variableInstance : variableInstances) {
-                if (variableInstance instanceof VariableInstanceEntity) {
-                    VariableInstanceEntity variableEntity = (VariableInstanceEntity) variableInstance;
+                if (variableInstance instanceof VariableInstanceEntity variableEntity) {
                     if (variableEntity.getType() != null) {
                         variableEntity.getValue();
 

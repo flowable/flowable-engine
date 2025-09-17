@@ -1415,8 +1415,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             ArrayNode arrayNode = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper().createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = planItemInstance.getVariable(variable.getSource());
-                if (sourceVariable instanceof ArrayNode) {
-                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                if (sourceVariable instanceof ArrayNode sourceArrayNode) {
                     for (int i = 0; i < sourceArrayNode.size(); i++) {
                         JsonNode node = arrayNode.get(i);
                         JsonNode sourceNode = sourceArrayNode.get(i);
