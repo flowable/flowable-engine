@@ -631,7 +631,7 @@ public abstract class AbstractDynamicStateManager {
                             continue;
                         }
                         
-                        if (newChildExecution.getCurrentFlowElement() instanceof Task task && ((Task) newChildExecution.getCurrentFlowElement()).isAsynchronous()) {
+                        if (newChildExecution.getCurrentFlowElement() instanceof Task task && task.isAsynchronous()) {
                             JobService jobService = CommandContextUtil.getJobService(commandContext);
                             
                             JobEntity job = JobUtil.createJob(newChildExecution, newChildExecution.getCurrentFlowElement(), AsyncContinuationJobHandler.TYPE, CommandContextUtil.getProcessEngineConfiguration(commandContext));
