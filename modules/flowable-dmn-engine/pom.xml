@@ -80,10 +80,6 @@
             <artifactId>spring-beans</artifactId>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
-        <dependency>
         	<groupId>com.fasterxml.uuid</groupId>
         	<artifactId>java-uuid-generator</artifactId>
       	</dependency>

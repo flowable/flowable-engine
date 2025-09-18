@@ -13,7 +13,6 @@
 package org.flowable.app.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,13 +20,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -50,8 +49,6 @@ import org.flowable.app.rest.util.TestServer;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.common.rest.util.RestUrlBuilder;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -271,19 +268,11 @@ public class BaseSpringRestTestCase {
      * Extract a date from the given string. Assertion fails when invalid date has been provided.
      */
     protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-        try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
-            return null;
-        }
+        return Date.from(Instant.parse(isoString));
     }
 
     protected String getISODateString(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        longDateFormat.setTimeZone(tz);
-        return longDateFormat.format(time);
+        return time.toInstant().toString();
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

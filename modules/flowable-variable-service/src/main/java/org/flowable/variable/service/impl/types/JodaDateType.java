@@ -12,10 +12,13 @@
  */
 package org.flowable.variable.service.impl.types;
 
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
-import org.joda.time.LocalDate;
 
 /**
  * @author Tijs Rademakers
@@ -36,17 +39,16 @@ public class JodaDateType implements VariableType {
 
     @Override
     public boolean isAbleToStore(Object value) {
-        if (value == null) {
-            return true;
-        }
-        return LocalDate.class.isAssignableFrom(value.getClass());
+        return false;
     }
 
     @Override
     public Object getValue(ValueFields valueFields) {
         Long longValue = valueFields.getLongValue();
         if (longValue != null) {
-            return new LocalDate(longValue);
+            // This is similar logic to what Joda LocalDate time did.
+            // The stored information is the number of milliseconds since the epoch at the start of the day in the server timezone.
+            return LocalDate.ofInstant(Instant.ofEpochMilli(longValue), ZoneId.systemDefault());
         }
         return null;
     }
@@ -54,20 +56,7 @@ public class JodaDateType implements VariableType {
     @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
-            if (valueFields.getTaskId() != null) {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Task Variable {} in task {} was a Joda-Time LocalDate. ",
-                        valueFields.getName(), valueFields.getTaskId());
-            } else if (valueFields.getProcessInstanceId() != null) {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Process Variable {} in process instance {} and execution {} was a Joda-Time LocalDate. ",
-                        valueFields.getName(), valueFields.getProcessInstanceId(), valueFields.getExecutionId());
-            } else {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Variable {} in {} instance {} and sub-scope {} was a Joda-Time LocalDate. ",
-                        valueFields.getName(), valueFields.getScopeType(), valueFields.getScopeId(), valueFields.getSubScopeId());
-            }
-            valueFields.setLongValue(((LocalDate) value).toDateTimeAtStartOfDay().getMillis());
+            throw new FlowableIllegalStateException("JodaDateType is not able to store values");
         } else {
             valueFields.setLongValue(null);
         }

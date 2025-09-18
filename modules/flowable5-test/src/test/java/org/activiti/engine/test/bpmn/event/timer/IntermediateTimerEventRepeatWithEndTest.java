@@ -13,6 +13,7 @@ package org.activiti.engine.test.bpmn.event.timer;
  * limitations under the License.
  */
 
+import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -24,9 +25,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * @author Vasile Dirla
@@ -36,24 +34,14 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
     @Deployment
     public void testRepeatWithEnd() throws Throwable {
         Clock clock = processEngineConfiguration.getClock();
-        Calendar calendar = Calendar.getInstance();
-        Date baseTime = calendar.getTime();
+        OffsetDateTime now = OffsetDateTime.now();
+        Date baseTime = Date.from(now.toInstant());
 
-        // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+        // after 10 minutes the end Date will be reached but the intermediate timers will ignore it
+        // since the end date is validated only when a new timer is going to be created
 
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.HOUR, 2);
-        // expect to wait after competing task B for 1 hour even I set the end date for 2 hours (the expression will trigger the execution)
-        DateTime dt = new DateTime(calendar.getTime());
-        String dateStr1 = fmt.print(dt);
-
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.HOUR, 1);
-        calendar.add(Calendar.MINUTE, 30);
-        // expect to wait after competing task B for 1 hour and 30 minutes (the end date will be reached, the expression will not be considered)
-        dt = new DateTime(calendar.getTime());
-        String dateStr2 = fmt.print(dt);
+        String dateStr1 = now.plusMinutes(10).toString();
+        String dateStr2 = now.plusHours(1).plusMinutes(30).toString();
 
         // reset the timer
         Calendar nextTimeCal = Calendar.getInstance();
