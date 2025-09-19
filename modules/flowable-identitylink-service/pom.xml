@@ -39,10 +39,6 @@
 			<artifactId>spring-beans</artifactId>
 		</dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
-        <dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
             <scope>provided</scope>

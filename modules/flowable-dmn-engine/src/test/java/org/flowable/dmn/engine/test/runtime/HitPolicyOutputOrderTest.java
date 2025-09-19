@@ -14,6 +14,9 @@ package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +24,6 @@ import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -99,7 +101,11 @@ class HitPolicyOutputOrderTest extends BaseFlowableDmnTest {
 
         assertThat(result)
                 .extracting("outputVariable1")
-                .containsExactly(new DateTime("2000-01-01").toDate(), new DateTime("2020-01-01").toDate(), new DateTime("2010-01-01").toDate());
+                .containsExactly(
+                        Date.from(LocalDate.parse("2000-01-01").atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        Date.from(LocalDate.parse("2020-01-01").atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                        Date.from(LocalDate.parse("2010-01-01").atStartOfDay(ZoneId.systemDefault()).toInstant())
+                );
     }
 
     @Test

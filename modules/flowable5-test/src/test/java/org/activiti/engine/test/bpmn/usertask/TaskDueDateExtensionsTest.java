@@ -13,7 +13,10 @@
 
 package org.activiti.engine.test.bpmn.usertask;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -24,7 +27,6 @@ import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.joda.time.Period;
 
 /**
  * @author Frederik Heremans
@@ -80,10 +82,11 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertNotNull(task.getDueDate());
-        Period period = new Period(task.getCreateTime().getTime(), task.getDueDate().getTime());
-        assertEquals(2, period.getDays());
-        assertEquals(5, period.getHours());
-        assertEquals(40, period.getMinutes());
+        Duration duration = Duration.between(task.getCreateTime().toInstant(), task.getDueDate().toInstant());
+        assertThat(duration)
+                .hasDays(2)
+                .hasHours(5)
+                .hasMinutes(40);
         clock.reset();
     }
 

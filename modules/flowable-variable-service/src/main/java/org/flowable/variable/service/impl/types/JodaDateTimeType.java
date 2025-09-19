@@ -12,10 +12,11 @@
  */
 package org.flowable.variable.service.impl.types;
 
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
+import java.time.Instant;
+
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
-import org.joda.time.DateTime;
 
 /**
  * @author Tijs Rademakers
@@ -36,17 +37,14 @@ public class JodaDateTimeType implements VariableType {
 
     @Override
     public boolean isAbleToStore(Object value) {
-        if (value == null) {
-            return true;
-        }
-        return DateTime.class.isAssignableFrom(value.getClass());
+        return false;
     }
 
     @Override
     public Object getValue(ValueFields valueFields) {
         Long longValue = valueFields.getLongValue();
         if (longValue != null) {
-            return new DateTime(longValue);
+            return Instant.ofEpochMilli(longValue);
         }
         return null;
     }
@@ -54,20 +52,7 @@ public class JodaDateTimeType implements VariableType {
     @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
-            if (valueFields.getTaskId() != null) {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Task Variable {} in task {} was a Joda-Time DateTime. ",
-                        valueFields.getName(), valueFields.getTaskId());
-            } else if (valueFields.getProcessInstanceId() != null) {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Process Variable {} in process instance {} and execution {} was a Joda-Time DateTime. ",
-                        valueFields.getName(), valueFields.getProcessInstanceId(), valueFields.getExecutionId());
-            } else {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Variable {} in {} instance {} and sub-scope {} was a Joda-Time DateTime. ",
-                        valueFields.getName(), valueFields.getScopeType(), valueFields.getScopeId(), valueFields.getSubScopeId());
-            }
-            valueFields.setLongValue(((DateTime) value).getMillis());
+            throw new FlowableIllegalStateException("JodaDateTimeType is not able to store values");
         } else {
             valueFields.setLongValue(null);
         }

@@ -13,7 +13,6 @@
 package org.flowable.cmmn.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -21,6 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,9 +59,6 @@ import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -336,19 +333,11 @@ public abstract class BaseSpringRestTestCase {
      * Extract a date from the given string. Assertion fails when invalid date has been provided.
      */
     protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-        try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
-            return null;
-        }
+        return Date.from(Instant.parse(isoString));
     }
 
     protected String getISODateString(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        longDateFormat.setTimeZone(tz);
-        return longDateFormat.format(time);
+        return time.toInstant().toString();
     }
 
     protected String getIsoDateStringWithoutSeconds(Date time) {
@@ -361,13 +350,6 @@ public abstract class BaseSpringRestTestCase {
         TimeZone tz = TimeZone.getTimeZone("UTC");
         formatWithMS.setTimeZone(tz);
         return formatWithMS.format(time);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

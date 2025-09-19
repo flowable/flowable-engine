@@ -14,6 +14,9 @@ package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
@@ -21,9 +24,6 @@ import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnConfigurationResource;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -45,12 +45,12 @@ public class CustomConfigRuntimeTest {
         public void postCustomExpressionFunction() {
             DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
-            DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-            LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+            LocalDate localDate = LocalDate.parse("2015-09-18");
+            Date input1 = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
             Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                     .decisionKey("decision")
-                    .variable("input1", localDate.toDate())
+                    .variable("input1", input1)
                     .executeWithSingleResult();
 
             assertThat(result).containsEntry("output1", "test2");
@@ -67,12 +67,12 @@ public class CustomConfigRuntimeTest {
         public void customExpressionFunctionMissingDefaultFunction() {
             DmnDecisionService ruleService = dmnEngine.getDmnDecisionService();
 
-            DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-            LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+            LocalDate localDate = LocalDate.parse("2015-09-18");
+            Date input1 = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
             DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
                     .decisionKey("decision")
-                    .variable("input1", localDate.toDate())
+                    .variable("input1", input1)
                     .executeWithAuditTrail();
 
             assertThat(result.getDecisionResult()).isEmpty();

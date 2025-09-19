@@ -42,7 +42,6 @@
         <jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>
         <java-uuid-generator.version>5.1.0</java-uuid-generator.version>
         <jaxb-glassfish.version>4.0.5</jaxb-glassfish.version>
-        <joda-time.version>2.14.0</joda-time.version>
         <mybatis.version>3.5.19</mybatis.version>
         <nashorn-core.version>15.4</nashorn-core.version>
         <osgi-core.version>8.0.0</osgi-core.version>
@@ -143,11 +142,6 @@
                 <version>${jackson.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>${joda-time.version}</version>
             </dependency>
 
             <!-- Logging -->

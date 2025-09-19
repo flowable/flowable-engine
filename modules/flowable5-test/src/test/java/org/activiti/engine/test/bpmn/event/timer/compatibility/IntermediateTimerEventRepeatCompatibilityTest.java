@@ -13,7 +13,8 @@ package org.activiti.engine.test.bpmn.event.timer.compatibility;
  * limitations under the License.
  */
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,6 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
@@ -33,29 +31,17 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
     public void testRepeatWithEnd() throws Throwable {
         Clock clock = processEngineConfiguration.getClock();
 
-        Calendar calendar = Calendar.getInstance();
-        Date baseTime = calendar.getTime();
+        Instant baseTime = Instant.now();
 
-        // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.HOUR, 2);
         // expect to wait after completing task A for 1 hour even I set the end date for 2 hours (the expression will trigger the execution)
-        DateTime dt = new DateTime(calendar.getTime());
-        String endDateForIntermediate1 = fmt.print(dt);
+        String endDateForIntermediate1 = baseTime.plus(2, ChronoUnit.HOURS).toString();
 
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.HOUR, 1);
-        calendar.add(Calendar.MINUTE, 30);
         // expect to wait after completing task B for 1 hour and 30 minutes (the end date will be reached, the expression will not be considered)
-        dt = new DateTime(calendar.getTime());
-        String endDateForIntermediate2 = fmt.print(dt);
+        String endDateForIntermediate2 = baseTime.plus(1, ChronoUnit.HOURS).plus(30, ChronoUnit.MINUTES).toString();
 
         // reset the timer
-        Calendar nextTimeCal = Calendar.getInstance();
-        nextTimeCal.setTime(baseTime);
-        clock.setCurrentCalendar(nextTimeCal);
+        Instant nextTime = baseTime;
+        clock.setCurrentTime(Date.from(nextTime));
         processEngineConfiguration.setClock(clock);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithEnd");
@@ -77,8 +63,8 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
         // Expected that job isn't executed because the timer is in t0");
 
-        nextTimeCal.add(Calendar.HOUR, 1); // after 1 hour the event must be triggered and the flow will go to the next step
-        clock.setCurrentCalendar(nextTimeCal);
+        nextTime = nextTime.plus(1, ChronoUnit.HOURS); // after 1 hour the event must be triggered and the flow will go to the next step
+        clock.setCurrentTime(Date.from(nextTime));
         processEngineConfiguration.setClock(clock);
 
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
@@ -94,8 +80,8 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task C
         taskService.complete(task.getId());
-        nextTimeCal.add(Calendar.HOUR, 1); // after 1H 40 minutes from process start, the timer will trigger because of the endDate
-        clock.setCurrentCalendar(nextTimeCal);
+        nextTime = nextTime.plus(1, ChronoUnit.HOURS); // after 1H 40 minutes from process start, the timer will trigger because of the endDate
+        clock.setCurrentTime(Date.from(nextTime));
         processEngineConfiguration.setClock(clock);
 
         waitForJobExecutorToProcessAllJobs(2000, 200);
