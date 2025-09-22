@@ -255,6 +255,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
@@ -304,6 +305,7 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.JodaTimeVariableSupport;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.types.BigDecimalType;
 import org.flowable.variable.service.impl.types.BigIntegerType;
@@ -315,8 +317,6 @@ import org.flowable.variable.service.impl.types.DoubleType;
 import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
-import org.flowable.variable.service.impl.types.JodaDateTimeType;
-import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.flowable.variable.service.impl.types.LocalDateTimeType;
 import org.flowable.variable.service.impl.types.LocalDateType;
@@ -513,6 +513,8 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
      * And the changes to the JsonNode will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
      */
     protected boolean jsonVariableTypeTrackObjects = true;
+
+    protected JodaTimeVariableSupport jodaTimeVariableSupport = JodaTimeVariableSupport.READ_AS_JAVA_TIME;
 
     protected List<CaseInstanceMigrationCallback> caseInstanceMigrationCallbacks;
 
@@ -1408,8 +1410,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
             variableTypes.addType(new InstantType());
             variableTypes.addType(new LocalDateType());
             variableTypes.addType(new LocalDateTimeType());
-            variableTypes.addType(new JodaDateType());
-            variableTypes.addType(new JodaDateTimeType());
+            jodaTimeVariableSupport.registerJodaTypes(variableTypes);
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
@@ -2964,6 +2965,19 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    public JodaTimeVariableSupport getJodaTimeVariableSupport() {
+        return jodaTimeVariableSupport;
+    }
+
+    public CmmnEngineConfiguration setJodaTimeVariableSupport(JodaTimeVariableSupport jodaTimeVariableSupport) {
+        //noinspection deprecation
+        if (JodaTimeVariableSupport.WRITE == jodaTimeVariableSupport) {
+            JodaDeprecationLogger.LOGGER.warn("Using deprecated joda time write support for the CMMN engine configuration");
+        }
+        this.jodaTimeVariableSupport = jodaTimeVariableSupport;
         return this;
     }
 

@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -201,8 +200,8 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
                             + "tenantId: 'myTenant',"
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").textValue()) + "',"
                             + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime()))
+                            + "createTime: '" + getISODateString(createTime.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(createTime.getTime()) + "'"
                             + "}");
 
             model = repositoryService.createModelQuery().modelId(responseNode.get("id").textValue()).singleResult();

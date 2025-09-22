@@ -125,7 +125,6 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-annotations").versionAsInProject(),
                 mavenBundle().groupId("jakarta.activation").artifactId("jakarta.activation-api").versionAsInProject(),
                 mavenBundle().groupId("jakarta.mail").artifactId("jakarta.mail-api").versionAsInProject(),
-                mavenBundle().groupId("joda-time").artifactId("joda-time").versionAsInProject(),
                 mavenBundle().groupId("com.h2database").artifactId("h2").versionAsInProject(),
                 mavenBundle().groupId("org.eclipse.angus").artifactId("angus-mail").versionAsInProject(),
                 mavenBundle().groupId("org.mybatis").artifactId("mybatis").versionAsInProject(),

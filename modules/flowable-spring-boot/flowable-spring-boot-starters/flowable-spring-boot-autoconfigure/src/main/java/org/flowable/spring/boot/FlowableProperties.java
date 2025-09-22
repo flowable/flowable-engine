@@ -136,6 +136,12 @@ public class FlowableProperties {
     private Duration historyCleaningAfter = Duration.ofDays(365);
     private int historyCleaningBatchSize = 100;
 
+    /**
+     * Indicates how joda time variables should be supported.
+     * By default old joda time variables are read as Java Time.
+     */
+    private JodaTimeVariableSupport jodaTimeVariableSupport;
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -398,5 +404,31 @@ public class FlowableProperties {
 
     public void setHistoryCleaningBatchSize(int historyCleaningBatchSize) {
         this.historyCleaningBatchSize = historyCleaningBatchSize;
+    }
+
+    public JodaTimeVariableSupport getJodaTimeVariableSupport() {
+        return jodaTimeVariableSupport;
+    }
+
+    public void setJodaTimeVariableSupport(JodaTimeVariableSupport jodaTimeVariableSupport) {
+        this.jodaTimeVariableSupport = jodaTimeVariableSupport;
+    }
+
+    public enum JodaTimeVariableSupport {
+        /**
+         * Disable all Joda Time support.
+         * Also disables reading joda variables.
+         */
+        DISABLE,
+        /**
+         * Support for reading Joda time variables as Java time variables.
+         * Joda variables cannot be saved
+         */
+        READ_AS_JAVA_TIME,
+        /**
+         * Support for writing and reading Joda time variables.
+         * This requires having joda-time as a dependency.
+         */
+        WRITE
     }
 }

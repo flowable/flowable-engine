@@ -14,13 +14,13 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
@@ -28,7 +28,6 @@ import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DecisionTable;
 import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.OutputClause;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,14 +119,7 @@ public class ELExecutionContextBuilder {
             try {
                 Object inputVariableValue = inputVariable.getValue();
                 if (inputVariableValue instanceof LocalDate) {
-                    JodaDeprecationLogger.LOGGER.warn(
-                            "Using Joda-Time LocalDate has been deprecated and will be removed in a future version."
-                                    + " Input variable {} from {} {} for decision table {} is a Joda-Time LocalDate. ",
-                            inputVariableName, executeDecisionInfo.getScopeType(), executeDecisionInfo.getInstanceId(), decisionTable.getId());
-                    Date transformedDate = ((LocalDate) inputVariableValue).toDate();
-                    inputVariables.put(inputVariableName, transformedDate);
-                } else if (inputVariableValue instanceof java.time.LocalDate) {
-                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariableValue).atStartOfDay()
+                    Date transformedDate = Date.from(((LocalDate) inputVariableValue).atStartOfDay()
                             .atZone(ZoneId.systemDefault())
                             .toInstant());
                     inputVariables.put(inputVariableName, transformedDate);

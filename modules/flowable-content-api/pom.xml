@@ -25,10 +25,6 @@
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine-common-api</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
 	</dependencies>
 
 </project>

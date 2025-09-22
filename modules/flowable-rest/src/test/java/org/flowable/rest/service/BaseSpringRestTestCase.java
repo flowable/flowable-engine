@@ -64,9 +64,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
 import org.flowable.rest.util.TestServer;
 import org.flowable.spring.impl.test.InternalFlowableSpringExtension;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -460,28 +457,8 @@ public class BaseSpringRestTestCase {
         closeResponse(executeRequest(post, statusCode));
     }
 
-    /**
-     * Extract a date from the given string. Assertion fails when invalid date has been provided.
-     */
-    protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-        try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
-            return null;
-        }
-    }
-
     protected String getISODateString(Date time) {
-        return dateFormat.format(time);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
+        return time.toInstant().toString();
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

@@ -47,7 +47,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -107,8 +106,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                             + " executionId: '" + task.getExecutionId() + "',"
                             + " description: '" + task.getDescription() + "',"
                             + " name: '" + task.getName() + "',"
-                            + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                            + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                             + " priority: " + task.getPriority() + ","
                             + " endTime: null,"
                             + " parentTaskId: null,"
@@ -160,8 +159,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                                 + " owner: '" + task.getOwner() + "',"
                                 + " description: '" + task.getDescription() + "',"
                                 + " name: '" + task.getName() + "',"
-                                + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                                + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                                + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                                + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                                 + " priority: " + task.getPriority() + ","
                                 + " parentTaskId: '" + task.getParentTaskId() + "',"
                                 + " executionId: null,"
