@@ -51,12 +51,6 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
 
-        <!-- Joda time -->
-        <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-        </dependency>
-
         <!--- Commons -->
         <dependency>
             <groupId>org.apache.commons</groupId>

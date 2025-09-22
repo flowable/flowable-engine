@@ -20,9 +20,10 @@ import org.joda.time.DateTime;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated
 public class JodaDateTimeType implements VariableType {
 
-    public static final String TYPE_NAME = "jodadatetime";
+    public static final String TYPE_NAME = JodaDateTimeFallbackType.TYPE_NAME;
 
     @Override
     public String getTypeName() {

@@ -16,6 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +26,6 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -51,12 +51,11 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_1.dmn")
     public void staticDates() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        Date date = Date.from(LocalDate.parse("2015-09-18").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variable("input1", localDate.toDate())
+                .variable("input1", date)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
         assertThat(result).containsEntry("output1", "test2");
@@ -65,12 +64,11 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_2.dmn")
     public void dynamicDatesAdd() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        Date date = Date.from(LocalDate.parse("2015-09-18").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variable("input1", localDate.toDate())
+                .variable("input1", date)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
         assertThat(result).containsEntry("output1", "test2");
@@ -79,12 +77,11 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_3.dmn")
     public void dynamicDatesSubtract() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2025-09-18");
+        Date date = Date.from(LocalDate.parse("2025-09-18").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variable("input1", localDate.toDate())
+                .variable("input1", date)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
         assertThat(result).containsEntry("output1", "test2");
@@ -93,12 +90,11 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_5.dmn")
     public void datesEquals() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        Date date = Date.from(LocalDate.parse("2015-09-18").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variable("input1", localDate.toDate())
+                .variable("input1", date)
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
         assertThat(result).containsEntry("output1", "test2");
@@ -107,8 +103,7 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_5.dmn")
     public void localDatesEquals() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        LocalDate localDate = LocalDate.parse("2015-09-18");
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
@@ -285,12 +280,11 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/reservered_word.dmn")
     public void reservedWord() {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2025-09-18");
+        Date date = Date.from(LocalDate.parse("2025-09-18").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
-                .variable("date", localDate.toDate())
+                .variable("date", date)
                 .executeWithSingleResult();
         assertThat(result).containsEntry("output1", "test2");
     }

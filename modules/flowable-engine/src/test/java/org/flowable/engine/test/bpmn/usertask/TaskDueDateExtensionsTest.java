@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,7 +33,6 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.joda.time.Period;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -121,10 +121,9 @@ public class TaskDueDateExtensionsTest extends ResourceFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertThat(task.getDueDate()).isNotNull();
-        Period period = new Period(task.getCreateTime().getTime(), task.getDueDate().getTime());
-        assertThat(period.getDays()).isEqualTo(2);
-        assertThat(period.getHours()).isEqualTo(5);
-        assertThat(period.getMinutes()).isEqualTo(40);
+        Duration duration = Duration.between(task.getCreateTime().toInstant(), task.getDueDate().toInstant());
+        assertThat(duration)
+                .isEqualTo(Duration.ofDays(2).plusHours(5).plusMinutes(40));
         clock.reset();
     }
 

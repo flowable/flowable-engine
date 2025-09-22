@@ -53,6 +53,7 @@ import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
+import org.flowable.variable.service.impl.JodaTimeVariableSupport;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -238,6 +239,11 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configuration.setHistoryCleaningTimeCycleConfig(flowableProperties.getHistoryCleaningCycle());
         configuration.setCleanInstancesEndedAfter(flowableProperties.getHistoryCleaningAfter());
         configuration.setCleanInstancesBatchSize(flowableProperties.getHistoryCleaningBatchSize());
+
+        FlowableProperties.JodaTimeVariableSupport jodaTimeVariableSupport = flowableProperties.getJodaTimeVariableSupport();
+        if (jodaTimeVariableSupport != null) {
+            configuration.setJodaTimeVariableSupport(JodaTimeVariableSupport.valueOf(jodaTimeVariableSupport.name()));
+        }
 
         return configuration;
     }

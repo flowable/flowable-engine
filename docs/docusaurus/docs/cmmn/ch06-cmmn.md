@@ -929,7 +929,7 @@ Properties:
 
 -   **Timer expression**: an expression that defines when the timer should occur. The following options are possible:
 
-    -   An expression resolving to a java.util.Date or org.joda.time.DateTime instance (for example, \_${someBean.calculateNextDate(someCaseInstanceVariable)})
+    -   An expression resolving to a java.util.Date, java.time.Instant, java.time.LocalDate or java.time.LocalDateTime instance (for example, \_${someBean.calculateNextDate(someCaseInstanceVariable)})
 
     -   An ISO8601 date
 

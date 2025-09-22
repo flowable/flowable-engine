@@ -13,7 +13,6 @@
 package org.flowable.eventregistry.rest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,10 +22,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,9 +56,6 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -328,32 +322,6 @@ public abstract class BaseSpringRestTestCase {
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
         post.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(post, statusCode));
-    }
-
-    /**
-     * Extract a date from the given string. Assertion fails when invalid date has been provided.
-     */
-    protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
-        try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
-            return null;
-        }
-    }
-
-    protected String getISODateString(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        longDateFormat.setTimeZone(tz);
-        return longDateFormat.format(time);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

@@ -40,6 +40,26 @@
         Date properties e.g., Process Instance start time will be returned as an ISO 8601 in the UTC timezone.
         E.g., if the start time was returned as <code>2025-09-24T09:58:12.609+02:00</code> now it is returned as <code>2025-09-24T07:58:12.609Z</code>.
     </li>
+    <li>
+        Remove Joda Time support.
+        If Joda Time variables were being used, then the Joda LocalDate variable is now an instance of java.time.LocalDate
+        and the Joda DateTime variable is now an instance of java.time.Instant.
+        If variables should keep being read as Joda Time (e.g., for custom scripts etc.), then with Spring Boot the property <code>flowable.joda-time-variable-support</code>
+        can be set to <code>WRITE</code>.
+        The available values for <code>flowable.joda-time-variable-support</code> are:
+        <ul>
+            <li><code>DISABLE</code> - Completely disables Joda Time. If you have Joda Time variables in the database then reading those variables will fail.
+            </li>
+            <li><code>READ_AS_JAVA_TIME</code> - Reads Joda Time variables from the database as Java LocalDate and DateTime. This is the default configuration.
+            </li>
+            <li><code>WRITE</code> - Reads and Writes Joda Time variables. This is the same as prior to Flowable 8. The joda-time dependency has to be available
+                on the classpath.
+            </li>
+        </ul>
+        Keep in mind that this only works for variables, Flowable itself no longer supports Joda Time, i.e., due dates, timers, etc. no longer support Joda Time
+        values.
+    </li>
+
 </ul>
 <h3>Release Notes - Flowable - 7.2.0</h3>
 

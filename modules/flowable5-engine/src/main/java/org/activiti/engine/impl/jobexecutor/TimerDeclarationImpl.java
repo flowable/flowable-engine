@@ -14,6 +14,7 @@ package org.activiti.engine.impl.jobexecutor;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
 import org.activiti.engine.ActivitiException;
@@ -26,7 +27,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.jobexecutor.TimerDeclarationType;
 import org.flowable.variable.api.delegate.VariableScope;
-import org.joda.time.DateTime;
 
 /**
  * @author Tom Baeyens
@@ -145,9 +145,8 @@ public class TimerDeclarationImpl implements Serializable {
                 endDateString = (String) endDateValue;
             } else if (endDateValue instanceof Date) {
                 endDate = (Date) endDateValue;
-            } else if (endDateValue instanceof DateTime) {
-                // Joda DateTime support
-                duedate = ((DateTime) endDateValue).toDate();
+            } else if (endDateValue instanceof Instant endDateInstant) {
+                duedate = Date.from(endDateInstant);
             } else {
                 throw new ActivitiException("Timer '" + executionEntity.getActivityId() + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
             }
@@ -162,9 +161,8 @@ public class TimerDeclarationImpl implements Serializable {
             dueDateString = (String) dueDateValue;
         } else if (dueDateValue instanceof Date) {
             duedate = (Date) dueDateValue;
-        } else if (dueDateValue instanceof DateTime) {
-            // Joda DateTime support
-            duedate = ((DateTime) dueDateValue).toDate();
+        } else if (dueDateValue instanceof Instant dueDateInstant) {
+            duedate = Date.from(dueDateInstant);
         } else if (dueDateValue != null) {
             // dueDateValue==null is OK - but unexpected class type must throw an error.
             throw new ActivitiException("Timer '" + executionEntity.getActivityId() + "' was not configured with a valid duration/time, either hand in a java.util.Date or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");

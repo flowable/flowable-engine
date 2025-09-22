@@ -12,18 +12,17 @@
  */
 package org.flowable.common.engine.impl.logging;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -134,23 +133,28 @@ public class LoggingSessionUtil {
 
     public static String formatDate(Date date) {
         if (date != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-            dateFormat.setTimeZone(utcTimeZone);
-            return dateFormat.format(date);
+            return date.toInstant().toString();
         }
         return null;
     }
     
-    public static String formatDate(DateTime date) {
+    public static String formatDate(Instant date) {
         if (date != null) {
-            return date.toString("yyyy-MM-dd'T'hh:mm:ss.sss'Z'");
+            return date.toString();
         }
         return null;
     }
     
     public static String formatDate(LocalDate date) {
         if (date != null) {
-            return date.toString("yyyy-MM-dd");
+            return date.toString();
+        }
+        return null;
+    }
+
+    public static String formatDate(LocalDateTime date) {
+        if (date != null) {
+            return date.toString();
         }
         return null;
     }

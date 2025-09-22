@@ -49,6 +49,7 @@ import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
+import org.flowable.variable.service.impl.JodaTimeVariableSupport;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -285,6 +286,11 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy(deploymentProperties));
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy(deploymentProperties));
         conf.setDeploymentStrategies(deploymentStrategies);
+
+        FlowableProperties.JodaTimeVariableSupport jodaTimeVariableSupport = flowableProperties.getJodaTimeVariableSupport();
+        if (jodaTimeVariableSupport != null) {
+            conf.setJodaTimeVariableSupport(JodaTimeVariableSupport.valueOf(jodaTimeVariableSupport.name()));
+        }
 
         return conf;
     }
