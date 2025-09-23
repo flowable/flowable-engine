@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Identity Links" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get a single identity link on a task", tags = { "Task Identity Links" }, nickname = "getTaskInstanceIdentityLinks")

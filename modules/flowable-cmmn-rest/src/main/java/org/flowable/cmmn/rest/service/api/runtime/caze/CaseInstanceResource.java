@@ -50,7 +50,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceResource extends BaseCaseInstanceResource {
     
     @Autowired

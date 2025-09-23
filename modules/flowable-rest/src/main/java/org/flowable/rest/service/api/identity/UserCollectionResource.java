@@ -51,7 +51,7 @@ import io.swagger.annotations.Authorization;
  * @author Filip Hrisafov
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Users" }, authorizations = { @Authorization(value = "basicAuth") })
 public class UserCollectionResource {
 
     protected static HashMap<String, QueryProperty> properties = new HashMap<>();

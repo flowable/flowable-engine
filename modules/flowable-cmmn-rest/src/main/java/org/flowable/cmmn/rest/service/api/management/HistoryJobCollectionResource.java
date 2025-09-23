@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Jobs" }, description = "Manage history Jobs", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Jobs" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoryJobCollectionResource {
 
     @Autowired

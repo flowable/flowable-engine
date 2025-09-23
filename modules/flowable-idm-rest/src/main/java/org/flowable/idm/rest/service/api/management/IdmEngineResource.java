@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage IDM Engine", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Engine" }, authorizations = { @Authorization(value = "basicAuth") })
 public class IdmEngineResource {
     
     @Autowired(required=false)

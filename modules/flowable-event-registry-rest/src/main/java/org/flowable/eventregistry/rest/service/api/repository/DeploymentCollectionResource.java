@@ -59,7 +59,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Deployment" }, description = "Manage Event Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentCollectionResource {
 
     protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";

@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Plan Item Instances" }, description = "Manage Plan Item Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Plan Item Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceResource extends PlanItemInstanceBaseResource {
 
     @ApiOperation(value = "Get an plan item instance", tags = { "Plan Item Instances" })

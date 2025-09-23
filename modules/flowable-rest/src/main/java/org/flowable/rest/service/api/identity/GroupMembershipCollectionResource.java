@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Groups" }, authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipCollectionResource extends BaseGroupResource {
 
     @ApiOperation(value = "Add a member to a group", tags = { "Groups" }, code = 201)

@@ -50,7 +50,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Privileges" }, description = "Manage Privileges", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Privileges" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PrivilegeCollectionResource {
     
     @Autowired

@@ -45,7 +45,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
     public ProcessInstanceVariableCollectionResource() {

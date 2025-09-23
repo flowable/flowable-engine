@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "Batch parts" }, description = "Manage Batch parts", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Batch parts" }, authorizations = { @Authorization(value = "basicAuth") })
 public class BatchPartCollectionResource {
 
     @Autowired

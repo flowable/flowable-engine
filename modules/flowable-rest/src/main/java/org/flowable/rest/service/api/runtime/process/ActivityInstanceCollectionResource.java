@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
 /**
  * @author Tijs Rademakers
  */
-@Api(tags = { "Activity Instances" }, description = "Manage Activity Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Activity Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 @RestController
 public class ActivityInstanceCollectionResource extends ActivityInstanceBaseResource {
 

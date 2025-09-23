@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Registry Engine" }, description = "Manage Event Registry Engine", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Registry Engine" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventRegistryEngineResource {
     
     @Autowired(required=false)

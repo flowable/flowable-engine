@@ -50,7 +50,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableResource extends BaseExecutionVariableResource {
 
     @Autowired

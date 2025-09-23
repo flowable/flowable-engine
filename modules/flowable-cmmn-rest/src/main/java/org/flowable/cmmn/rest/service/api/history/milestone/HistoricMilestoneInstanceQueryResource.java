@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Dennis Federico
  */
 @RestController
-@Api(tags = {"History Milestone"}, description = "Manage History Milestone Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History Milestone"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricMilestoneInstanceQueryResource extends HistoricMilestoneInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic milestone instances", tags = {"History Milestone", "Query"}, nickname = "queryHistoricMilestoneInstance",
