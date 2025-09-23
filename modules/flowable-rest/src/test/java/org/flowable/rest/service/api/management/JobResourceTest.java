@@ -27,7 +27,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -42,7 +41,6 @@ import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -85,7 +83,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + timerJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(timerJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(timerJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
         assertThat(responseNode.path("url").asText(null))
@@ -141,7 +139,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + suspendedJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(suspendedJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(suspendedJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
         assertThat(responseNode.path("url").asText(null))
@@ -197,7 +195,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + deadLetterJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(deadLetterJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(deadLetterJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
         assertThat(responseNode.path("url").asText(null))
@@ -271,9 +269,9 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + lockedJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(lockedJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(lockedJob.getDuedate()) + "',"
                         + "lockOwner: 'test',"
-                        + "lockExpirationTime: " + new TextNode(getISODateStringWithTZ(lockedJob.getLockExpirationTime())) + ","
+                        + "lockExpirationTime: '" + getISODateString(lockedJob.getLockExpirationTime()) + "',"
                         + "tenantId: ''"
                         + "}");
         assertThat(responseNode.path("url").asText(null))

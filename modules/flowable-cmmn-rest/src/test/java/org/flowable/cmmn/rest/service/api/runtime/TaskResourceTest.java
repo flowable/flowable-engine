@@ -119,8 +119,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + " parentTaskId: null,"
                         + " delegationState: null,"
                         + " tenantId: \"\","
-                        + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                        + " createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                        + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                        + " createTime: '" + getISODateString(task.getCreateTime()) + "',"
                         + " caseInstanceUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, task.getScopeId()) + "',"
                         + " caseDefinitionUrl: '" + buildUrl(CmmnRestUrls.URL_CASE_DEFINITION, task.getScopeDefinitionId()) + "',"
                         + " url: '" + url + "'"
@@ -166,8 +166,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + " owner: '" + task.getOwner() + "',"
                             + " description: '" + task.getDescription() + "',"
                             + " name: '" + task.getName() + "',"
-                            + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + " createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                            + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + " createTime: '" + getISODateString(task.getCreateTime()) + "',"
                             + " priority: " + task.getPriority() + ","
                             + " delegationState: 'resolved',"
                             + " caseInstanceId: null,"
@@ -272,7 +272,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(longDateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {

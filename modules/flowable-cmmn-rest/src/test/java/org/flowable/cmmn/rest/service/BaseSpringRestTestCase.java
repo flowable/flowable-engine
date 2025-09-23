@@ -19,14 +19,15 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,9 +60,6 @@ import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,9 +116,8 @@ public abstract class BaseSpringRestTestCase {
     @Autowired
     protected TestServer server;
 
-    protected DateFormat longDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    protected DateFormat formatWithoutSeconds = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
-    protected DateFormat formatWithMS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    protected DateTimeFormatter formatWithoutSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'").withZone(ZoneOffset.UTC);
+    protected DateTimeFormatter formatWithoutMilliseconds = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC);
 
     @BeforeEach
     void init(@CmmnDeploymentId String deploymentId) {
@@ -336,38 +333,27 @@ public abstract class BaseSpringRestTestCase {
      * Extract a date from the given string. Assertion fails when invalid date has been provided.
      */
     protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
         try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
+            return Date.from(Instant.parse(isoString));
+        } catch (DateTimeParseException iae) {
+            fail("Illegal date provided: " + isoString, iae);
             return null;
         }
     }
 
     protected String getISODateString(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        longDateFormat.setTimeZone(tz);
-        return longDateFormat.format(time);
+        if (time == null) {
+            return null;
+        }
+        return time.toInstant().toString();
     }
 
     protected String getIsoDateStringWithoutSeconds(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        formatWithoutSeconds.setTimeZone(tz);
-        return formatWithoutSeconds.format(time);
+        return formatWithoutSeconds.format(time.toInstant());
     }
 
-    protected String getIsoDateStringWithMS(Date time) {
-        TimeZone tz = TimeZone.getTimeZone("UTC");
-        formatWithMS.setTimeZone(tz);
-        return formatWithMS.format(time);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
+    protected String getIsoDateStringWithoutMS(Date time) {
+        return formatWithoutMilliseconds.format(time.toInstant());
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

@@ -28,6 +28,19 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 8.0.0</h3>
+
+<ul>
+    <li>
+        Date variables will now include the milliseconds when they are returned over REST.
+        E.g., up to now a date variable with the value of <code>2020-05-04T09:25:45.583Z</code> would have been returned as <code>2020-05-04T09:25:45Z</code>.
+        However, now it would be returned as <code>2020-05-04T09:25:45.583Z</code> which is still ISO 8601 compliant.
+    </li>
+    <li>
+        Date properties e.g., Process Instance start time will be returned as an ISO 8601 in the UTC timezone.
+        E.g., if the start time was returned as <code>2025-09-24T09:58:12.609+02:00</code> now it is returned as <code>2025-09-24T07:58:12.609Z</code>.
+    </li>
+</ul>
 <h3>Release Notes - Flowable - 7.2.0</h3>
 
 <ul>

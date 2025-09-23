@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -283,7 +282,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                         + "    id: '" + caseInstance1.getId() + "',"
                         + "    caseDefinitionName: 'One Human Task Case',"
                         + "    caseDefinitionDescription: 'A human task case',"
-                        + "    startTime: " + new TextNode(getISODateStringWithTZ(caseInstance1.getStartTime())) + ","
+                        + "    startTime: '" + getISODateString(caseInstance1.getStartTime()) + "',"
                         + "    startUserId: 'queryCaseUser'"
                         + "  }"
                         + "]");

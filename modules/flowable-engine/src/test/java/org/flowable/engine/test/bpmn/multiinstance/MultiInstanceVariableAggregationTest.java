@@ -1928,10 +1928,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                             arrayNode.add(sourceNode.deepCopy());
                         } else if (node.isObject()) {
                             ObjectNode objectNode = (ObjectNode) node;
-                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
-                            while (fieldsIterator.hasNext()) {
-                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
-                                objectNode.set(field.getKey(), field.getValue());
+                            for (Map.Entry<String, JsonNode> propertyEntry : sourceNode.properties()) {
+                                String propertyName = propertyEntry.getKey();
+                                JsonNode value = propertyEntry.getValue();
+                                objectNode.set(propertyName, value);
                             }
                         }
                     }

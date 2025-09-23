@@ -109,14 +109,14 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
         processEngineConfiguration.getClock().reset();
 
         JsonNode listAfter = queryTaskLogEntries(
-                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + dateFormat.format(startTime.getTime()));
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + getISODateString(startTime.getTime()));
         expectSequence(listAfter,
                 asList(task1.getId()),
                 asList("USER_TASK_OWNER_CHANGED"));
 
         startTime.add(Calendar.DAY_OF_YEAR, -1);
         JsonNode listBefore = queryTaskLogEntries(
-                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + dateFormat.format(startTime.getTime()));
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + getISODateString(startTime.getTime()));
         expectSequence(listBefore,
                 asList(task1.getId(), task1.getId()),
                 asList("USER_TASK_CREATED", "USER_TASK_DUEDATE_CHANGED"));

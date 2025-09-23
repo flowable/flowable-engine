@@ -152,7 +152,7 @@ public class CmmnEngineConfiguratorExtension implements AfterTestExecutionCallba
         return context.getRoot().getStore(NAMESPACE);
     }
 
-    protected static class CloseableEngine implements ExtensionContext.Store.CloseableResource {
+    protected static class CloseableEngine implements AutoCloseable {
 
         protected final ProcessEngine processEngine;
 
@@ -161,7 +161,7 @@ public class CmmnEngineConfiguratorExtension implements AfterTestExecutionCallba
         }
 
         @Override
-        public void close() throws Throwable {
+        public void close() {
             if (processEngine != null) {
                 CmmnEngine cmmnEngine = CmmnEngines.getCmmnEngine(processEngine.getName());
                 if (cmmnEngine != null) {

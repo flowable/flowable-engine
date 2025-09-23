@@ -58,7 +58,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -129,8 +128,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + "processInstanceUrl: '" + buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
                         + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
                         + "url: '" + url + "',"
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                        + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                        + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                        + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                         + "}");
 
         // Set tenant on deployment
@@ -189,8 +188,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + "processDefinitionId: null,"
                             + "url: '" + url + "',"
                             + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "',"
-                            + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                            + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                             + "}");
 
         } finally {
@@ -289,7 +288,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
