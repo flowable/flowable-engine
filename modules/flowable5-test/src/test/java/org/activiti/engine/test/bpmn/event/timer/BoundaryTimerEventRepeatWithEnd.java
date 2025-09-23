@@ -13,6 +13,7 @@ package org.activiti.engine.test.bpmn.event.timer;
  * limitations under the License.
  */
 
+import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,9 +22,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * @author Vasile Dirla
@@ -33,14 +31,11 @@ public class BoundaryTimerEventRepeatWithEnd extends PluggableFlowableTestCase {
     @Deployment
     public void testRepeatWithEnd() throws Throwable {
 
-        Calendar calendar = Calendar.getInstance();
-        Date baseTime = calendar.getTime();
+        OffsetDateTime now = OffsetDateTime.now();
+        Date baseTime = Date.from(now.toInstant());
 
-        calendar.add(Calendar.MINUTE, 20);
         // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        DateTime dt = new DateTime(calendar.getTime());
-        String dateStr = fmt.print(dt);
+        String dateStr = now.plusMinutes(20).toString();
 
         // reset the timer
         Calendar nextTimeCal = Calendar.getInstance();

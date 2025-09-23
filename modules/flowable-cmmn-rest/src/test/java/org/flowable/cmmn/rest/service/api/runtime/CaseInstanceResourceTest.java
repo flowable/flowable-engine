@@ -41,7 +41,6 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -90,7 +89,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
                         + " callbackId: 'testCallbackId',"
                         + " callbackType: 'testCallbackType',"
                         + " tenantId: '',"
-                        + " startTime: " + new TextNode(getISODateStringWithTZ(caseInstance.getStartTime())) + ","
+                        + " startTime: '" + getISODateString(caseInstance.getStartTime()) + "',"
                         + " startUserId: 'getCaseUser',"
                         + " url: '" + url + "',"
                         + " caseDefinitionUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls

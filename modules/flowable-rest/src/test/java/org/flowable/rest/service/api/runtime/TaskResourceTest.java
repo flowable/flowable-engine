@@ -129,8 +129,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + "processInstanceUrl: '" + buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
                         + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
                         + "url: '" + url + "',"
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                        + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                        + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                        + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                         + "}");
 
         // Set tenant on deployment
@@ -189,8 +189,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + "processDefinitionId: null,"
                             + "url: '" + url + "',"
                             + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "',"
-                            + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                            + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                             + "}");
 
         } finally {

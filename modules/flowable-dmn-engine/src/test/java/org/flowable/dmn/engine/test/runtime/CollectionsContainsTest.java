@@ -15,6 +15,8 @@ package org.flowable.dmn.engine.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,9 +27,6 @@ import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +42,6 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
     public void testContainsTrue() {
         Map<String, Object> processVariablesInput = new HashMap<>();
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         List inputVariable1 = Arrays.asList("test1", "test2", "test3");
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
@@ -53,7 +51,7 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
         List inputVariable6 = Arrays.asList("tes,t6", "te,st5");
         List inputVariable7 = Arrays.asList(BigInteger.valueOf(100), BigInteger.valueOf(101));
         List inputVariable8 = Arrays.asList("100", "101");
-        LocalDate date1 = dtf.parseLocalDate("2021-02-02");
+        Date date1 = Date.from(LocalDate.parse("2021-02-02").atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         ObjectMapper objectMapper = dmnEngineConfiguration.getObjectMapper();
         ArrayNode arrayNode1 = objectMapper.createArrayNode().add("test1").add("test2").add("test3");
@@ -78,7 +76,7 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
         processVariablesInput.put("arrayNode5", arrayNode5);
         processVariablesInput.put("nestedArrayNode1", nestedArrayNode1);
         processVariablesInput.put("bigInteger1", BigInteger.valueOf(101));
-        processVariablesInput.put("date1", date1.toDate());
+        processVariablesInput.put("date1", date1);
 
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
@@ -119,7 +117,6 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_IN.dmn")
     public void testContainsFalse() {
         Map<String, Object> processVariablesInput = new HashMap<>();
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
 
         List inputVariable1 = Arrays.asList("test1", "test2", "test3");
         List inputVariable2 = Arrays.asList("test1", "test2", "test3");
@@ -137,7 +134,7 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
         ArrayNode arrayNode4 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F).add(20.5555F).add(50.5555F);
         ArrayNode arrayNode5 = objectMapper.createArrayNode().add(5.5555F).add(10.5555F);
         ObjectNode nestedArrayNode1 = objectMapper.createObjectNode().putPOJO("property1", arrayNode1);
-        LocalDate date1 = dtf.parseLocalDate("2021-02-02");
+        LocalDate date1 = LocalDate.parse("2021-02-02");
 
         processVariablesInput.put("collection1", inputVariable1);
         processVariablesInput.put("collection2", inputVariable2);
@@ -176,17 +173,14 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
     public void testContainsTypeCheck() {
         Map<String, Object> processVariablesInput = new HashMap<>();
 
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate date1 = dtf.parseLocalDate("2017-12-25");
-        LocalDate date2 = dtf.parseLocalDate("2018-12-25");
-
-        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        java.time.LocalDate date3 = java.time.LocalDate.parse("2017-12-25", formatter);
+        LocalDate date1 = LocalDate.parse("2017-12-25");
+        LocalDate date2 = LocalDate.parse("2018-12-25");
 
         List<String> collectionString = Arrays.asList("test1", "test2", "test3");
         List<Boolean> collectionBoolean = Arrays.asList(Boolean.TRUE, Boolean.FALSE);
-        List<Date> collectionDate = Arrays.asList(date1.toDate(), date2.toDate());
         List<LocalDate> collectionLocalDate = Arrays.asList(date1, date2);
+        List<Date> collectionDate = collectionLocalDate.stream().map(localDate -> Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                .toList();
         List<Integer> collectionInteger = Arrays.asList(5, 10, 20, 50);
         List<Long> collectionLong = Arrays.asList(5L, 10L, 20L, 50L);
         List<Float> collectionFloat = Arrays.asList(5F, 10F, 20F, 50F);
@@ -201,8 +195,7 @@ class CollectionsContainsTest extends BaseFlowableDmnTest {
         processVariablesInput.put("collectionFloat", collectionFloat);
         processVariablesInput.put("collectionDouble", collectionDouble);
         processVariablesInput.put("stringLocalDate", "2017-12-25");
-        processVariablesInput.put("jodaLocalDate", date1);
-        processVariablesInput.put("javaLocalDate", date3);
+        processVariablesInput.put("javaLocalDate", date1);
 
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 

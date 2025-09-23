@@ -303,7 +303,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(actual.get("id").textValue()).isEqualTo(expected.getId());
         assertThat(actual.get("name").textValue()).isEqualTo(expected.getName());
         assertThat(actual.get("elementId").textValue()).isEqualTo(expected.getElementId());
-        assertThat(actual.get("timestamp").asText()).isEqualTo(getISODateStringWithTZ(expected.getTimeStamp()));
+        assertThat(actual.get("timestamp").asText()).isEqualTo(getISODateString(expected.getTimeStamp()));
         assertThat(actual.get("caseInstanceId").textValue()).isEqualTo(expected.getCaseInstanceId());
         assertThat(actual.get("caseDefinitionId").textValue()).isEqualTo(expected.getCaseDefinitionId());
 

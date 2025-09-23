@@ -35,8 +35,8 @@ import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
-import org.flowable.variable.service.impl.types.JodaDateTimeType;
-import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.JodaDateTimeFallbackType;
+import org.flowable.variable.service.impl.types.JodaDateFallbackType;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.flowable.variable.service.impl.types.LocalDateTimeType;
 import org.flowable.variable.service.impl.types.LocalDateType;
@@ -140,8 +140,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                         case InstantType.TYPE_NAME:
                         case LocalDateType.TYPE_NAME:
                         case LocalDateTimeType.TYPE_NAME:
-                        case JodaDateType.TYPE_NAME:
-                        case JodaDateTimeType.TYPE_NAME:
+                        case JodaDateFallbackType.TYPE_NAME:
+                        case JodaDateTimeFallbackType.TYPE_NAME:
                         case UUIDType.TYPE_NAME:
                             // For all these types it is OK to use toString as their string representation is what we want to have
                             objectNode.put(targetVarName, varInstance.getValue().toString());
