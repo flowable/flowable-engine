@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskSubTaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of sub tasks for a task", nickname="listTaskSubtasks", tags = { "Tasks" })

@@ -30,7 +30,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Historic Decision Executions" }, description = "Manage Historic Decision Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Historic Decision Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricDecisionExecutionResourceDataResource extends BaseHistoricDecisionExecutionResource {
 
     @ApiOperation(value = "Get a historic decision execution audit content", tags = { "Historic Decision Executions" })

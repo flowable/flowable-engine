@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Models" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ModelCollectionResource extends BaseModelResource {
 
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();

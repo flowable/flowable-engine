@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Users" }, authorizations = { @Authorization(value = "basicAuth") })
 public class UserInfoCollectionResource extends BaseUserResource {
 
     @Autowired

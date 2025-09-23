@@ -38,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "List candidate starters for a process-definition", nickname = "listProcessDefinitionIdentityLinks", tags = { "Process Definitions" })

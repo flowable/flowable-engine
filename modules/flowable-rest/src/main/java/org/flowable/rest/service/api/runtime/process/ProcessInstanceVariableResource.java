@@ -50,7 +50,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableResource extends BaseExecutionVariableResource {
 
     @Autowired

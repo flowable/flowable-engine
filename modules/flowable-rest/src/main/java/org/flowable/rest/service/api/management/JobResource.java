@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Jobs" }, authorizations = { @Authorization(value = "basicAuth") })
 public class JobResource extends JobBaseResource {
 
     private static final String EXECUTE_ACTION = "execute";

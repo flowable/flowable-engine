@@ -49,7 +49,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceResource extends BaseProcessInstanceResource {
     
     @Autowired

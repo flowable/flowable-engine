@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instance Variables" }, description = "Manage Case Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceVariableCollectionResource extends BaseVariableResource {
 
     @ApiOperation(value = "List variables for a case instance", nickname="listCaseInstanceVariables", tags = {"Case Instance Variables" },

@@ -42,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Historic Decision Executions" }, description = "Query Historic Decision Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Historic Decision Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoryDecisionExecutionCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();

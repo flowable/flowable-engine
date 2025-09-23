@@ -43,7 +43,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Definitions" }, description = "Manage Event Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventDefinitionCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();

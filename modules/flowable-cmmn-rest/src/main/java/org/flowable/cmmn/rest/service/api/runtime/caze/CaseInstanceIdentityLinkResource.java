@@ -38,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instance Identity Links" }, description = "Manage Case Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
 
 

@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision" }, description = "Manage Decisions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Decision" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionImageResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision requirements diagram image", tags = { "Decisions" })

@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceQueryResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "Query case instances", tags = {"Case Instances", "Query" },

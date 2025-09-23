@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "List form definitions for a process-definition", nickname = "listProcessDefinitionFormDefinitions", tags = { "Process Definitions" })

@@ -56,7 +56,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentCollectionResource {
 
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();

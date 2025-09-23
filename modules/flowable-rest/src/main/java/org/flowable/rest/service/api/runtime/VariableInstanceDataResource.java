@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Runtime" }, authorizations = { @Authorization(value = "basicAuth") })
 public class VariableInstanceDataResource {
 
     @Autowired

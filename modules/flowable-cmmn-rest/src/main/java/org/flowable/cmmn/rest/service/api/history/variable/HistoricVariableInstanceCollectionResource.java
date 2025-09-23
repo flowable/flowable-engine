@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricVariableInstanceCollectionResource extends HistoricVariableInstanceBaseResource {
 
     @ApiOperation(value = "List of historic variable instances", tags = { "History" }, nickname = "listHistoricVariableInstances")

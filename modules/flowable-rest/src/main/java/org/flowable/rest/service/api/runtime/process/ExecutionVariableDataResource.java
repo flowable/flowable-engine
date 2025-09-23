@@ -41,7 +41,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableDataResource extends BaseExecutionVariableResource {
 
     public ExecutionVariableDataResource() {
