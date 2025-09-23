@@ -22,6 +22,7 @@ import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttp
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 
 /**
  * @author Filip Hrisafov
@@ -29,7 +30,7 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 public class FlowableHttpClientArgumentProvider implements ArgumentsProvider {
 
     @Override
-    public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
+    public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
         HttpClientConfig config = createClientConfig();
         return Stream.of(
                 Arguments.of(new SpringWebClientFlowableHttpClient(config)),

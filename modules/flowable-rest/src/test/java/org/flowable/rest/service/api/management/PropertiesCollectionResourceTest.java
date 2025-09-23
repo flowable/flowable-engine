@@ -14,7 +14,6 @@ package org.flowable.rest.service.api.management;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.HttpStatus;
@@ -47,13 +46,11 @@ public class PropertiesCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertThat(responseNode).hasSize(properties.size());
 
-        Iterator<Map.Entry<String, JsonNode>> nodes = responseNode.fields();
-        Map.Entry<String, JsonNode> node = null;
-        while (nodes.hasNext()) {
-            node = nodes.next();
-            String propValue = properties.get(node.getKey());
+        for (Map.Entry<String, JsonNode> propertyEntry : responseNode.properties()) {
+
+            String propValue = properties.get(propertyEntry.getKey());
             assertThat(propValue).isNotNull();
-            assertThat(node.getValue().textValue()).isEqualTo(propValue);
+            assertThat(propertyEntry.getValue().textValue()).isEqualTo(propValue);
         }
     }
 }

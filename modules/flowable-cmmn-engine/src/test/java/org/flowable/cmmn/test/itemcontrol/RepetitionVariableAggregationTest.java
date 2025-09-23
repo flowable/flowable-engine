@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1423,10 +1422,10 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                             arrayNode.add(sourceNode.deepCopy());
                         } else if (node.isObject()) {
                             ObjectNode objectNode = (ObjectNode) node;
-                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
-                            while (fieldsIterator.hasNext()) {
-                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
-                                objectNode.set(field.getKey(), field.getValue());
+                            for (Map.Entry<String, JsonNode> property : sourceNode.properties()) {
+                                String propertyName = property.getKey();
+                                JsonNode value = property.getValue();
+                                objectNode.set(propertyName, value);
                             }
                         }
                     }

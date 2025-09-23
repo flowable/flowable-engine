@@ -53,7 +53,7 @@ public class PluggableFlowableDmnExtension extends InternalFlowableDmnExtension 
         return context.getRoot().getStore(NAMESPACE);
     }
 
-    protected static class CloseableEngine implements ExtensionContext.Store.CloseableResource {
+    protected static class CloseableEngine implements AutoCloseable {
 
         protected final DmnEngine dmnEngine;
 
@@ -62,7 +62,7 @@ public class PluggableFlowableDmnExtension extends InternalFlowableDmnExtension 
         }
 
         @Override
-        public void close() throws Throwable {
+        public void close() {
             if (dmnEngine != null) {
                 dmnEngine.close();
             }

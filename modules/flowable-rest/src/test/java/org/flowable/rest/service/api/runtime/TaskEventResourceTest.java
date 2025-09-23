@@ -30,7 +30,6 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -98,7 +97,7 @@ public class TaskEventResourceTest extends BaseSpringRestTestCase {
                             + "userId: " + event.getUserId() + ","
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_EVENT, task.getId(), event.getId()) + "',"
                             + "taskUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, task.getId()) + "',"
-                            + "time: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "time: '" + getISODateString(now.getTime()) + "'"
                             + "}");
 
         } finally {

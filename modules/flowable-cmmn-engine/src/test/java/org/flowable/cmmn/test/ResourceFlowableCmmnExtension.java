@@ -117,7 +117,7 @@ public class ResourceFlowableCmmnExtension extends InternalFlowableCmmnExtension
         return context.getStore(NAMESPACE);
     }
 
-    protected static class CloseableEngine implements ExtensionContext.Store.CloseableResource {
+    protected static class CloseableEngine implements AutoCloseable {
 
         protected final CmmnEngine cmmnEngine;
 

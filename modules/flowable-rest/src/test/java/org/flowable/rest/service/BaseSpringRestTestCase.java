@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -64,9 +68,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
 import org.flowable.rest.util.TestServer;
 import org.flowable.spring.impl.test.InternalFlowableSpringExtension;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +80,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 @SpringJUnitWebConfig(ApplicationConfiguration.class)
 @ExtendWith(InternalFlowableSpringExtension.class)
@@ -125,8 +125,6 @@ public class BaseSpringRestTestCase {
     @Autowired
     protected CloseableHttpClient client;
     protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
-
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
     @Autowired
     protected TestServer server;
@@ -464,24 +462,16 @@ public class BaseSpringRestTestCase {
      * Extract a date from the given string. Assertion fails when invalid date has been provided.
      */
     protected Date getDateFromISOString(String isoString) {
-        DateTimeFormatter dateFormat = ISODateTimeFormat.dateTime();
         try {
-            return dateFormat.parseDateTime(isoString).toDate();
-        } catch (IllegalArgumentException iae) {
-            fail("Illegal date provided: " + isoString);
+            return Date.from(Instant.parse(isoString));
+        } catch (DateTimeParseException e) {
+            fail("Illegal date provided: " + isoString, e);
             return null;
         }
     }
 
     protected String getISODateString(Date time) {
-        return dateFormat.format(time);
-    }
-
-    protected String getISODateStringWithTZ(Date date) {
-        if (date == null) {
-            return null;
-        }
-        return ISODateTimeFormat.dateTime().print(new DateTime(date));
+        return time.toInstant().toString();
     }
 
     protected String buildUrl(String[] fragments, Object... arguments) {

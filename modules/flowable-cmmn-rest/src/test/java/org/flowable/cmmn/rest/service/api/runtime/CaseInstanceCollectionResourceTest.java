@@ -614,7 +614,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
                         entry("longVariable", 4567890L),
                         entry("doubleVariable", 123.456),
                         entry("booleanVariable", Boolean.TRUE),
-                        entry("dateVariable", longDateFormat.parse(isoString))
+                        entry("dateVariable", getDateFromISOString(isoString))
                 );
     }
 

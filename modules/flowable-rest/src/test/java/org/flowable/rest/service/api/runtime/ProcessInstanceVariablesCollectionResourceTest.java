@@ -376,7 +376,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
                         entry("longVariable", 4567890L),
                         entry("doubleVariable", 123.456),
                         entry("booleanVariable", true),
-                        entry("dateVariable", dateFormat.parse(isoString))
+                        entry("dateVariable", getDateFromISOString(isoString))
                 );
     }
 
@@ -560,7 +560,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
                         entry("longVariable", 4567890L),
                         entry("doubleVariable", 123.456),
                         entry("booleanVariable", true),
-                        entry("dateVariable", dateFormat.parse(isoString))
+                        entry("dateVariable", getDateFromISOString(isoString))
                 );
     }
 
