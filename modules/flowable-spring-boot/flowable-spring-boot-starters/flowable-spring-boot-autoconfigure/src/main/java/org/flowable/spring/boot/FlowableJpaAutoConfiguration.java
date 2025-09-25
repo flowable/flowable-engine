@@ -19,7 +19,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -27,8 +26,8 @@ import org.springframework.context.annotation.Bean;
  */
 @ConditionalOnBean(type = "jakarta.persistence.EntityManagerFactory")
 @ConditionalOnClass(SpringProcessEngineConfiguration.class)
-@AutoConfiguration(after = {
-    HibernateJpaAutoConfiguration.class
+@AutoConfiguration(afterName = {
+    "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration"
 })
 public class FlowableJpaAutoConfiguration {
 

@@ -79,6 +79,11 @@ public class TestServer implements SmartLifecycle {
         return running;
     }
 
+    @Override
+    public boolean isPauseable() {
+        return false;
+    }
+
     public String getServerUrlPrefix() {
         return "http://localhost:" + server.getURI().getPort() + "/service/";
     }

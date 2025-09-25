@@ -20,7 +20,7 @@ import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -33,7 +33,7 @@ import org.springframework.kafka.core.KafkaTemplate;
  * @author Filip Hrisafov
  */
 @SpringBootTest(properties = "flowable.rest.app.jms-enabled=true")
-@AutoConfigureObservability
+@AutoConfigureMetrics
 public class FlowableRestApplicationWithEnabledJmsTest {
 
     @Autowired

@@ -34,7 +34,7 @@ public class PropertyBasedCorsFilter extends AbstractHttpConfigurer<PropertyBase
     }
 
     @Override
-    public void configure(HttpSecurity http) throws Exception {
+    public void configure(HttpSecurity http) {
         CorsFilter corsFilter = corsFilter(restAppProperties.getCors());
         http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
     }
