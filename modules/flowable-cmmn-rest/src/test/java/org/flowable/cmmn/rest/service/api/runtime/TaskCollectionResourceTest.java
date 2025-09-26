@@ -17,9 +17,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -63,8 +64,8 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            String dueDateString = Instant.now().with(ChronoField.MILLI_OF_SECOND, 83).toString();
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
