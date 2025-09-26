@@ -30,9 +30,9 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Roman Saratz
@@ -42,21 +42,21 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
     private TestCmmnIdentityLinkInterceptor testInterceptor;
     private CmmnIdentityLinkInterceptor originalInterceptor;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         testInterceptor = new TestCmmnIdentityLinkInterceptor();
         originalInterceptor = cmmnEngineConfiguration.getIdentityLinkInterceptor();
         cmmnEngineConfiguration.setIdentityLinkInterceptor(testInterceptor);
     }
 
-    @AfterEach
-    void tearDown() {
+    @After
+    public void tearDown() {
         cmmnEngineConfiguration.setIdentityLinkInterceptor(originalInterceptor);
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testCompleteTask() {
+    public void testCompleteTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -71,7 +71,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testAddCandidateUser() {
+    public void testAddCandidateUser() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -86,7 +86,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testAddCandidateGroup() {
+    public void testAddCandidateGroup() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -101,7 +101,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testSetAssignee() {
+    public void testSetAssignee() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -115,7 +115,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testChangeAssigneeViaSaveTask() {
+    public void testChangeAssigneeViaSaveTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -130,7 +130,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testRemoveAssigneeViaSaveTask() {
+    public void testRemoveAssigneeViaSaveTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -144,7 +144,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testClaimTask() {
+    public void testClaimTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -160,7 +160,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testUnclaimTask() {
+    public void testUnclaimTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -173,7 +173,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testSetOwner() {
+    public void testSetOwner() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -187,7 +187,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testChangeOwnerViaSaveTask() {
+    public void testChangeOwnerViaSaveTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -202,7 +202,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testRemoveOwnerViaSaveTask() {
+    public void testRemoveOwnerViaSaveTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -216,7 +216,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testCreateCaseInstance() {
+    public void testCreateCaseInstance() {
         assertThat(testInterceptor.createdCaseInstances).isEmpty();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
@@ -226,7 +226,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    void testMultipleIdentityLinkOperations() {
+    public void testMultipleIdentityLinkOperations() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
@@ -253,7 +253,7 @@ public class CmmnIdentityLinkInterceptorTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/reactivation/Reactivation_Test_Case.cmmn.xml")
-    void testReactivation() {
+    public void testReactivation() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("reactivationTestCase").start();
 
         Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
