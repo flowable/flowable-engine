@@ -38,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Identity Links" }, description = "Manage Process Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceResource {
 
 

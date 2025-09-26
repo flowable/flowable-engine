@@ -98,6 +98,8 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             jobService.scheduleAsyncJob(job);
 
         } else {
+            commandContext.removeAttribute(AsyncSendEventJobHandler.TYPE);
+
             Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
                     processEngineConfiguration.getExpressionManager(), execution.getCurrentFlowElement(), eventModel);
 
@@ -112,6 +114,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 eventRegistry.sendSystemEventOutbound(eventInstance);
             }
 
+            if (executedAsAsyncJob) {
+                commandContext.addAttribute(AsyncSendEventJobHandler.TYPE, true);
+            }
         }
 
         if (sendEventServiceTask.isTriggerable() && !executedAsAsyncJob) {

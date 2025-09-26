@@ -72,8 +72,7 @@ public class InParameterParser extends BaseChildElementParser {
 
             BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultInParameterAttributes);
 
-        } else if (parentElement instanceof CallActivity) {
-            CallActivity callActivity = (CallActivity) parentElement;
+        } else if (parentElement instanceof CallActivity callActivity) {
 
             String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
             if ("all".equalsIgnoreCase(variables)) {

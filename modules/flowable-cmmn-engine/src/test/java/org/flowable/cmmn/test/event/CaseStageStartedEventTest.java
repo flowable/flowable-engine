@@ -56,8 +56,7 @@ public class CaseStageStartedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageStartedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageStartedEvent) {
-                FlowableCaseStageStartedEvent caseStageStartedEvent = (FlowableCaseStageStartedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageStartedEvent caseStageStartedEvent) {
                 CaseInstance eventCaseInstance = caseStageStartedEvent.getCaseInstance();
                 assertThat(caseStageStartedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageStartedEvent.getExecutionId()).isNull();

@@ -266,8 +266,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
                 BpmnModel mappingModel = newModel;
                 if (mapping.isToCallActivity()) {
                     FlowElement callActivityFlowElement = newModel.getFlowElement(mapping.getToCallActivityId());
-                    if (callActivityFlowElement instanceof CallActivity) {
-                        CallActivity callActivity = (CallActivity) callActivityFlowElement;
+                    if (callActivityFlowElement instanceof CallActivity callActivity) {
                         String procDefKey = callActivity.getCalledElement();
                         if (isExpression(procDefKey)) {
                             Expression expression = expressionManager.createExpression(procDefKey);
@@ -555,9 +554,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
     protected boolean isDirectExternalWorkerServiceTaskExecutionMigration(FlowElement currentFlowElement, FlowElement newFlowElement) {
         //The current and new external worker service task must be equal to support direct execution migration
-        if (currentFlowElement instanceof ExternalWorkerServiceTask && newFlowElement instanceof ExternalWorkerServiceTask) {
-            ExternalWorkerServiceTask currentExternalWorkerServiceTask = (ExternalWorkerServiceTask) currentFlowElement;
-            ExternalWorkerServiceTask newExternalWorkerServiceTask = (ExternalWorkerServiceTask) newFlowElement;
+        if (currentFlowElement instanceof ExternalWorkerServiceTask currentExternalWorkerServiceTask && newFlowElement instanceof ExternalWorkerServiceTask newExternalWorkerServiceTask) {
             return currentExternalWorkerServiceTask.getLoopCharacteristics() == null &&
                     newExternalWorkerServiceTask.getLoopCharacteristics() == null &&
                     new EqualsBuilder()

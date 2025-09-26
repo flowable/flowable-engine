@@ -60,7 +60,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "CmmnDeployment" }, description = "Manage CmmnDeployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "CmmnDeployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentCollectionResource {
 
     protected static final String DEPRECATED_API_DEPLOYMENT_SEGMENT = "deployment";

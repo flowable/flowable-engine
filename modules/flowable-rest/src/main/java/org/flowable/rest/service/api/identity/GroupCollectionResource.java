@@ -50,7 +50,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Groups" }, authorizations = { @Authorization(value = "basicAuth") })
 public class GroupCollectionResource {
 
     protected static HashMap<String, QueryProperty> properties = new HashMap<>();

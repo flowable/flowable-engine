@@ -35,8 +35,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
                 Event event = (Event) flowElement;
                 if (!event.getEventDefinitions().isEmpty()) {
                     EventDefinition eventDefinition = event.getEventDefinitions().get(0);
-                    if (eventDefinition instanceof SignalEventDefinition) {
-                        SignalEventDefinition signalEvent = (SignalEventDefinition) eventDefinition;
+                    if (eventDefinition instanceof SignalEventDefinition signalEvent) {
                         if (StringUtils.isNotEmpty(signalEvent.getSignalRef())) {
                             if (!model.containsSignalId(signalEvent.getSignalRef())) {
                                 Signal signal = new Signal(signalEvent.getSignalRef(), signalEvent.getSignalRef());
@@ -44,8 +43,7 @@ public class SignalAndMessageDefinitionExport implements BpmnXMLConstants {
                             }
                         }
 
-                    } else if (eventDefinition instanceof MessageEventDefinition) {
-                        MessageEventDefinition messageEvent = (MessageEventDefinition) eventDefinition;
+                    } else if (eventDefinition instanceof MessageEventDefinition messageEvent) {
                         if (StringUtils.isNotEmpty(messageEvent.getMessageRef())) {
                             if (!model.containsMessageId(messageEvent.getMessageRef())) {
                                 Message message = new Message(messageEvent.getMessageRef(), messageEvent.getMessageRef(), null);

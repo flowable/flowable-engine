@@ -159,11 +159,10 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     }
 
     protected void readCompletionNeutralRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl planItemControl) {
             CompletionNeutralRule completionNeutralRule = new CompletionNeutralRule();
             completionNeutralRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
 
-            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setCompletionNeutralRule(completionNeutralRule);
 
             readCommonXmlInfo(completionNeutralRule, xtr);
@@ -205,12 +204,11 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     }
     
     protected void readParentCompletionRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl planItemControl) {
             ParentCompletionRule parentCompletionRule = new ParentCompletionRule();
             parentCompletionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
             parentCompletionRule.setType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TYPE));
 
-            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setParentCompletionRule(parentCompletionRule);
 
             readCommonXmlInfo(parentCompletionRule, xtr);
@@ -218,15 +216,13 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     }
 
     protected void readReactivationRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
-            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl planItemControl) {
             planItemControl.setReactivationRule(readReactivationRule(xtr));
         }
     }
 
     protected void readDefaultReactivationRule(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof ReactivateEventListener) {
-            ReactivateEventListener reactivateEventListener = (ReactivateEventListener) conversionHelper.getCurrentCmmnElement();
+        if (conversionHelper.getCurrentCmmnElement() instanceof ReactivateEventListener reactivateEventListener) {
             reactivateEventListener.setDefaultReactivationRule(readReactivationRule(xtr));
         }
     }
@@ -360,8 +356,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
         if (flowableListener != null) {
-            if (currentCmmnElement instanceof HumanTask) {
-                HumanTask humanTask = (HumanTask) currentCmmnElement;
+            if (currentCmmnElement instanceof HumanTask humanTask) {
                 humanTask.getTaskListeners().add(flowableListener);
             } else {
                 throw new FlowableException("Programmatic error: task listener added to an element that is not a human task, but a " + currentCmmnElement.getClass());
@@ -376,8 +371,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
 
         FlowableListener flowableListener = ListenerXmlConverterUtil.convertToListener(xtr);
         if (flowableListener != null) {
-            if (currentCmmnElement instanceof HasLifecycleListeners) {
-                HasLifecycleListeners lifecycleListenersElement = (HasLifecycleListeners) currentCmmnElement;
+            if (currentCmmnElement instanceof HasLifecycleListeners lifecycleListenersElement) {
                 lifecycleListenersElement.getLifecycleListeners().add(flowableListener);
             } else {
                 throw new FlowableException("Programmatic error: lifecycle listener added to an element that is not a plan item definition, but a " + currentCmmnElement.getClass());
@@ -413,16 +407,13 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             throw new FlowableException("Error while reading eventType element", e);
         }
 
-        if (currentCmmnElement instanceof Case) {
-            Case caze = (Case) currentCmmnElement;
+        if (currentCmmnElement instanceof Case caze) {
             caze.setStartEventType(eventType);
 
-        } else if (currentCmmnElement instanceof SendEventServiceTask) {
-            SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) currentCmmnElement;
+        } else if (currentCmmnElement instanceof SendEventServiceTask sendEventServiceTask) {
             sendEventServiceTask.setEventType(eventType);
 
-        } else if (currentCmmnElement instanceof GenericEventListener) {
-            GenericEventListener genericEventListener = (GenericEventListener) currentCmmnElement;
+        } else if (currentCmmnElement instanceof GenericEventListener genericEventListener) {
             genericEventListener.setEventType(eventType);
 
         } else {
@@ -433,8 +424,7 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     protected void readVariableAggregationDefinition(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
 
-        if (currentCmmnElement instanceof RepetitionRule) {
-            RepetitionRule repetitionRule = (RepetitionRule) currentCmmnElement;
+        if (currentCmmnElement instanceof RepetitionRule repetitionRule) {
 
             VariableAggregationDefinition aggregationDefinition = new VariableAggregationDefinition();
 

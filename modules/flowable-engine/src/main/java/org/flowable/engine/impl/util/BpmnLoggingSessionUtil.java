@@ -255,18 +255,15 @@ public class BpmnLoggingSessionUtil {
     
     protected static String getActivitySubType(FlowElement flowElement) {
         String activitySubType = null;
-        if (flowElement instanceof Event) {
-            Event event = (Event) flowElement;
+        if (flowElement instanceof Event event) {
             List<EventDefinition> eventDefinitions = event.getEventDefinitions();
             if (eventDefinitions != null && !eventDefinitions.isEmpty()) {
                 EventDefinition eventDefinition = eventDefinitions.get(0);
                 activitySubType = eventDefinition.getClass().getSimpleName();
             }
             
-        } else if (flowElement instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) flowElement;
-            if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ClassDelegate) {
-                ClassDelegate classDelegate = (ClassDelegate) serviceTask.getBehavior();
+        } else if (flowElement instanceof ServiceTask serviceTask) {
+            if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ClassDelegate classDelegate) {
                 activitySubType = classDelegate.getClassName();
                 
             } else if (serviceTask.getBehavior() != null && serviceTask.getBehavior() instanceof ServiceTaskExpressionActivityBehavior) {

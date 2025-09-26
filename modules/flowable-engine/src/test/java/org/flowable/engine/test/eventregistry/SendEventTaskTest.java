@@ -189,6 +189,42 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/eventregistry/SendEventTaskTest.testReceiveAndSendEvent.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendEventTaskTest.testSendEventOnSystemChannel.bpmn20.xml" })
+    public void testSendAsyncAndReceiveOnSystemChannelAndSendAsyncAgain() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("sendAndReceiveProcess");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+        assertThat(job.getElementId()).isEqualTo("sendEventTask");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+        managementService.executeJob(job.getId());
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        // Second send event task should also be handled async
+        job = managementService.createJobQuery().processInstanceId(processInstance2.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+        assertThat(job.getElementId()).isEqualTo("sendEventTask2");
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(2);
+    }
+
+    @Test
     @Deployment
     public void testSendEventSynchronously() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");

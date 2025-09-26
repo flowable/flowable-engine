@@ -71,8 +71,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
     }
 
     public boolean isAsync() {
-        if (planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Task) {
-            Task task = (Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        if (planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Task task) {
             if (task.isAsync()) {
                 return true;
             }

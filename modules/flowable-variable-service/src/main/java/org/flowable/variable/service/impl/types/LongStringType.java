@@ -49,6 +49,7 @@ public class LongStringType extends SerializableType {
         lengthVerifier.verifyLength(textValue.length(), valueFields, this);
         byte[] serializedValue = serialize(textValue, valueFields);
         valueFields.setBytes(serializedValue);
+        valueFields.setCachedValue(textValue);
     }
 
     @Override

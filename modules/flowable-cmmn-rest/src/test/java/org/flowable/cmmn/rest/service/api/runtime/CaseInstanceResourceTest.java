@@ -90,7 +90,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
                         + " callbackId: 'testCallbackId',"
                         + " callbackType: 'testCallbackType',"
                         + " tenantId: '',"
-                        + " startTime: " + new TextNode(getISODateStringWithTZ(caseInstance.getStartTime())) + ","
+                        + " startTime: '" + getISODateString(caseInstance.getStartTime()) + "',"
                         + " startUserId: 'getCaseUser',"
                         + " url: '" + url + "',"
                         + " caseDefinitionUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls

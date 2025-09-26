@@ -216,8 +216,7 @@ public class BpmnDeployer implements EngineDeployer {
             processDefinition.setId(getIdForNewProcessDefinition(processDefinition));
             Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
             FlowElement initialElement = process.getInitialFlowElement();
-            if (initialElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) initialElement;
+            if (initialElement instanceof StartEvent startEvent) {
                 if (startEvent.getFormKey() != null) {
                     processDefinition.setHasStartFormKey(true);
                 }
@@ -260,8 +259,7 @@ public class BpmnDeployer implements EngineDeployer {
 
             Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
             FlowElement initialElement = process.getInitialFlowElement();
-            if (initialElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) initialElement;
+            if (initialElement instanceof StartEvent startEvent) {
                 if (startEvent.getFormKey() != null) {
                     processDefinition.setHasStartFormKey(true);
                 }
@@ -449,8 +447,7 @@ public class BpmnDeployer implements EngineDeployer {
                     }
                 }
 
-                if (flowElement instanceof SubProcess) {
-                    SubProcess subprocess = (SubProcess) flowElement;
+                if (flowElement instanceof SubProcess subprocess) {
                     boolean isFlowElementLocalizationChanged = localizeFlowElements(subprocess.getFlowElements(), infoNode);
                     boolean isDataObjectLocalizationChanged = localizeDataObjectElements(subprocess.getDataObjects(), infoNode);
                     if (isFlowElementLocalizationChanged || isDataObjectLocalizationChanged) {

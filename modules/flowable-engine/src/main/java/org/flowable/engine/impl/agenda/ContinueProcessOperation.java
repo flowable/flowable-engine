@@ -291,8 +291,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         }
 
         try {
-            if (migrationContext != null && activityBehavior instanceof ActivityWithMigrationContextBehavior) {
-                ActivityWithMigrationContextBehavior activityWithMigrationContextBehavior = (ActivityWithMigrationContextBehavior) activityBehavior;
+            if (migrationContext != null && activityBehavior instanceof ActivityWithMigrationContextBehavior activityWithMigrationContextBehavior) {
                 activityWithMigrationContextBehavior.execute(execution, migrationContext);
             } else {
                 activityBehavior.execute(execution);

@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCommentCollectionResource extends HistoricProcessInstanceBaseResource {
 
     @Autowired

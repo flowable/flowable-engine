@@ -17,9 +17,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -63,8 +64,8 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            String dueDateString = Instant.now().with(ChronoField.MILLI_OF_SECOND, 83).toString();
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
@@ -93,7 +94,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(longDateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
             assertThat(task.getFormKey()).isEqualTo("testKey");
             assertThat(task.getTenantId()).isEqualTo("test");
@@ -332,7 +333,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getISODateString(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getIsoDateStringWithMS(
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getIsoDateStringWithoutMS(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdAfter=" + getIsoDateStringWithoutSeconds(
@@ -346,7 +347,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getIsoDateStringWithoutSeconds(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getIsoDateStringWithMS(
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?createdBefore=" + getIsoDateStringWithoutMS(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
@@ -368,7 +369,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithoutSeconds(
                     adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url);
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithMS(adhocTaskCreate.getTime());
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueDate=" + getIsoDateStringWithoutMS(adhocTaskCreate.getTime());
             assertResultsPresentInDataResponse(url, adhocTask.getId());
 
             // Due after filtering
@@ -378,7 +379,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
             assertResultsPresentInDataResponse(url, caseTask.getId());
-            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithMS(
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueAfter=" + getIsoDateStringWithoutMS(
                     inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, caseTask.getId());
 

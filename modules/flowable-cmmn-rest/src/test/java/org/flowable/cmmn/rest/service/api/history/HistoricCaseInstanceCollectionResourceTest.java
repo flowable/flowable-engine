@@ -148,12 +148,12 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         
         assertResultsPresentInDataResponse(url + "?startedBefore=" + getISODateString(futureCal.getTime()), caseInstance.getId(), caseInstance2.getId());
         assertResultsPresentInDataResponse(url + "?startedBefore=" + getIsoDateStringWithoutSeconds(futureCal.getTime()), caseInstance.getId(), caseInstance2.getId());
-        assertResultsPresentInDataResponse(url + "?startedBefore=" + getIsoDateStringWithMS(futureCal.getTime()), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?startedBefore=" + getISODateString(futureCal.getTime()), caseInstance.getId(), caseInstance2.getId());
         assertResultsPresentInDataResponse(url + "?startedBefore=" + getISODateString(historicCal.getTime()));
         
         assertResultsPresentInDataResponse(url + "?startedAfter=" + getISODateString(historicCal.getTime()), caseInstance.getId(), caseInstance2.getId());
         assertResultsPresentInDataResponse(url + "?startedAfter=" + getIsoDateStringWithoutSeconds(historicCal.getTime()), caseInstance.getId(), caseInstance2.getId());
-        assertResultsPresentInDataResponse(url + "?startedAfter=" + getIsoDateStringWithMS(historicCal.getTime()), caseInstance.getId(), caseInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?startedAfter=" + getIsoDateStringWithoutMS(historicCal.getTime()), caseInstance.getId(), caseInstance2.getId());
 
         assertResultsPresentInDataResponse(url + "?startedAfter=" + getISODateString(futureCal.getTime()));
         

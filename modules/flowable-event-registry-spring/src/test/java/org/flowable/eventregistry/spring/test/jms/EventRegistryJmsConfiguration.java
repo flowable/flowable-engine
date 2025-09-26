@@ -94,7 +94,7 @@ public class EventRegistryJmsConfiguration {
         configuration.getAcceptorConfigurations().add(transportConfiguration);
         configuration.setClusterPassword("flowable");
         AddressSettings deadLetterSetting = new AddressSettings();
-        deadLetterSetting.setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ"));
+        deadLetterSetting.setDeadLetterAddress(SimpleString.of("ActiveMQ.DLQ"));
         deadLetterSetting.setAutoCreateDeadLetterResources(true);
         deadLetterSetting.setMaxDeliveryAttempts(3);
         configuration.addAddressSetting("#", deadLetterSetting);

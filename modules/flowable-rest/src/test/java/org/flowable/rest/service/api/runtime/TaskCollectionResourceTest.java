@@ -17,6 +17,8 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +31,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
-import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -64,8 +65,8 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
+            String dueDateString = Instant.now().with(ChronoField.MILLI_OF_SECOND, 83).toString();
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
@@ -94,7 +95,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
             assertThat(task.getFormKey()).isEqualTo("testKey");
             assertThat(task.getTenantId()).isEqualTo("test");

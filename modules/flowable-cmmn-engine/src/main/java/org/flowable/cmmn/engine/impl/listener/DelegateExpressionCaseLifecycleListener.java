@@ -55,8 +55,7 @@ public class DelegateExpressionCaseLifecycleListener implements CaseInstanceLife
         CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) caseInstance;
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, caseInstanceEntity, fieldExtensions);
 
-        if (delegate instanceof CaseInstanceLifecycleListener) {
-            CaseInstanceLifecycleListener listener = (CaseInstanceLifecycleListener) delegate;
+        if (delegate instanceof CaseInstanceLifecycleListener listener) {
             listener.stateChanged(caseInstanceEntity, oldState, newState);
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + CaseInstanceLifecycleListener.class);

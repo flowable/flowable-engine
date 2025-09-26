@@ -43,7 +43,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Instances" }, description = "Manage Event Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventInstanceCollectionResource {
     
     @Autowired

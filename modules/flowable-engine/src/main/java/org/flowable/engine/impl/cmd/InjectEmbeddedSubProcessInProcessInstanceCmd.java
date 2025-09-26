@@ -73,8 +73,7 @@ public class InjectEmbeddedSubProcessInProcessInstanceCmd extends AbstractDynami
         
         StartEvent initialEvent = null;
         for (FlowElement subElement : subProcess.getFlowElements()) {
-            if (subElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) subElement;
+            if (subElement instanceof StartEvent startEvent) {
                 if (startEvent.getEventDefinitions().size() == 0) {
                     initialEvent = startEvent;
                     break;

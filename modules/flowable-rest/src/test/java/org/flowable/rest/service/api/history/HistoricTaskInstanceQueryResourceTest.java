@@ -48,8 +48,6 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
  */
 public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
-
     /**
      * Test querying historic task instance. POST query/historic-task-instances
      */
@@ -197,35 +195,35 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateAfter", dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()));
+        requestNode.put("dueDateAfter", getISODateString(new GregorianCalendar(2010, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateAfter", dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()));
+        requestNode.put("dueDateAfter", getISODateString(new GregorianCalendar(2013, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateBefore", dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()));
+        requestNode.put("dueDateBefore", getISODateString(new GregorianCalendar(2010, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateBefore", dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()));
+        requestNode.put("dueDateBefore", getISODateString(new GregorianCalendar(2013, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2010, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskProcess1.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2013, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedBefore", dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()));
+        requestNode.put("taskCompletedBefore", getISODateString(new GregorianCalendar(2010, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", dateFormat.format(new GregorianCalendar(2010, 3, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2010, 3, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskProcess1.getId());
 
         requestNode = objectMapper.createObjectNode();

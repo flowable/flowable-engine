@@ -39,8 +39,7 @@ public class TimerExpressionXmlConverter extends CaseElementXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         try {
             String expression = xtr.getElementText();
-            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-                TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
+            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener timerEventListener) {
                 timerEventListener.setTimerExpression(expression);
             }
         } catch (XMLStreamException e) {

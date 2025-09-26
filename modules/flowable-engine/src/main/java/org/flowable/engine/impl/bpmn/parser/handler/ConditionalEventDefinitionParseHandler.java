@@ -30,14 +30,12 @@ public class ConditionalEventDefinitionParseHandler extends AbstractBpmnParseHan
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, ConditionalEventDefinition eventDefinition) {
-        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent intermediateCatchEvent) {
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchConditionalEventActivityBehavior(
                             intermediateCatchEvent, eventDefinition, eventDefinition.getConditionExpression(), eventDefinition.getConditionLanguage()));
             
-        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
-            
+        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
+
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryConditionalEventActivityBehavior(boundaryEvent, 
                                 eventDefinition, eventDefinition.getConditionExpression(), eventDefinition.getConditionLanguage(), boundaryEvent.isCancelActivity()));
         }

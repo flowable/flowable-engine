@@ -79,8 +79,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
     protected FlowElement getStartElement(SubProcess subProcess) {
         if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
-                if (subElement instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) subElement;
+                if (subElement instanceof StartEvent startEvent) {
                     if (isOnlyNoneStartEventAllowed) {
                         if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
                             return startEvent;

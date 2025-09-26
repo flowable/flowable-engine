@@ -45,7 +45,7 @@ import io.swagger.annotations.Authorization;
  */
 @Deprecated
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Decision Tables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();

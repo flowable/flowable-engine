@@ -27,8 +27,7 @@ public class CandidateUtil {
     public static Collection<String> extractCandidates(Object value) {
         if (value instanceof Collection) {
             return (Collection<String>) value;
-        } else if (value instanceof ArrayNode) {
-            ArrayNode valueArrayNode = (ArrayNode) value;
+        } else if (value instanceof ArrayNode valueArrayNode) {
             Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
             for (JsonNode node : valueArrayNode) {
                 candidates.add(node.asText());

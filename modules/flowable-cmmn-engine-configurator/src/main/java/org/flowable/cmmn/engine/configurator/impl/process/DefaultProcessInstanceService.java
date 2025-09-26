@@ -125,15 +125,14 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
         }
         
         FlowElement flowElement = execution.getCurrentFlowElement();
-        if (!(flowElement instanceof CaseServiceTask)) {
+        if (!(flowElement instanceof CaseServiceTask caseServiceTask)) {
             // The execution already processed this stage, there is no need to copy parameters anymore.
             // One possible reason for this is that the case task was terminated by a boundary event.
             return Collections.emptyList();
         }
         
         List<IOParameter> cmmnParameters = new ArrayList<>();
-        
-        CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
+
         List<org.flowable.bpmn.model.IOParameter> parameters = caseServiceTask.getOutParameters();
         for (org.flowable.bpmn.model.IOParameter ioParameter : parameters) {
             IOParameter parameter = new IOParameter();

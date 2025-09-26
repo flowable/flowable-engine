@@ -42,8 +42,7 @@ public class FlowableTaskEventBuilder {
     protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
-            if (persistedObject instanceof Task) {
-                Task taskObject = (Task) persistedObject;
+            if (persistedObject instanceof Task taskObject) {
                 if (taskObject.getScopeType() == null) {
                     event.setProcessInstanceId(taskObject.getProcessInstanceId());
                     event.setExecutionId(taskObject.getExecutionId());

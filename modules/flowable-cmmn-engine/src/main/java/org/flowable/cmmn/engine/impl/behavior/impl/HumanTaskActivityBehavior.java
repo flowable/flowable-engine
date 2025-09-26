@@ -290,8 +290,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 if (dueDate instanceof Date) {
                     taskEntity.setDueDate((Date) dueDate);
 
-                } else if (dueDate instanceof String) {
-                    String dueDateString = (String) dueDate;
+                } else if (dueDate instanceof String dueDateString) {
                     Date resolvedDuedate = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager()
                             .getBusinessCalendar(DueDateBusinessCalendar.NAME)
                             .resolveDuedate(dueDateString);

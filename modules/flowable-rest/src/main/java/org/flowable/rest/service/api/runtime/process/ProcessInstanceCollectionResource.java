@@ -57,7 +57,7 @@ import io.swagger.annotations.Authorization;
  * @author Zheng Ji
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceCollectionResource extends BaseProcessInstanceResource {
 
     @Autowired

@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  */
 
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionActiveActivitiesCollectionResource extends ExecutionBaseResource {
 
     @ApiOperation(value = "List active activities in an execution", nickname="listExecutionActiveActivities", tags = { "Executions" },

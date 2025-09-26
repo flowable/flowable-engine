@@ -38,8 +38,7 @@ public class TextXmlConverter extends BaseCmmnXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
         try {
-            if (currentCmmnElement instanceof TextAnnotation) {
-                TextAnnotation textAnnotation = (TextAnnotation) currentCmmnElement;
+            if (currentCmmnElement instanceof TextAnnotation textAnnotation) {
                 textAnnotation.setText(xtr.getElementText());
             }
         } catch (XMLStreamException e) {

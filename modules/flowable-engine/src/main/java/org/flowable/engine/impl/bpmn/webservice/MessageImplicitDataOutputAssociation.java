@@ -38,8 +38,7 @@ public class MessageImplicitDataOutputAssociation extends AbstractDataAssociatio
     @Override
     public void evaluate(DelegateExecution execution) {
         MessageInstance message = (MessageInstance) execution.getTransientVariable(WebServiceActivityBehavior.CURRENT_MESSAGE);
-        if (message.getStructureInstance() instanceof FieldBaseStructureInstance) {
-            FieldBaseStructureInstance structure = (FieldBaseStructureInstance) message.getStructureInstance();
+        if (message.getStructureInstance() instanceof FieldBaseStructureInstance structure) {
             execution.setVariable(this.getTarget(), structure.getFieldValue(this.getSource()));
         }
     }

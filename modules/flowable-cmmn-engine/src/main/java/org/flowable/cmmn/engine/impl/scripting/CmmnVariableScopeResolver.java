@@ -90,14 +90,12 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (scopeContainer instanceof CaseInstance) {
                 return scopeContainer;
 
-            } else if (scopeContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) scopeContainer;
+            } else if (scopeContainer instanceof PlanItemInstance planItemInstance) {
                 if (StringUtils.isNotEmpty(planItemInstance.getCaseInstanceId())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
                 }
 
-            } else if (scopeContainer instanceof Task) {
-                Task task = (Task) scopeContainer;
+            } else if (scopeContainer instanceof Task task) {
                 if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
                 }
@@ -110,8 +108,7 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (scopeContainer instanceof PlanItemInstance) {
                 return scopeContainer;
 
-            }  else if (scopeContainer instanceof Task) {
-                Task task = (Task) scopeContainer;
+            }  else if (scopeContainer instanceof Task task) {
                 if (StringUtils.isNotEmpty(task.getSubScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getPlanItemInstanceEntityManager().findById(task.getSubScopeId());
                 }
@@ -124,8 +121,7 @@ public class CmmnVariableScopeResolver implements Resolver {
             if (scopeContainer instanceof Task) {
                 return scopeContainer;
 
-            } else  if (scopeContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) scopeContainer;
+            } else  if (scopeContainer instanceof PlanItemInstance planItemInstance) {
                 return CommandContextUtil.getTaskService().findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
 
             } else {

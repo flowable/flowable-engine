@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Activity Instances" }, description = "Manage Activity Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Activity Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ActivityInstanceQueryResource extends ActivityInstanceBaseResource {
 
     @ApiOperation(value = "Query for activity instances", tags = {"Runtime", "Query" },

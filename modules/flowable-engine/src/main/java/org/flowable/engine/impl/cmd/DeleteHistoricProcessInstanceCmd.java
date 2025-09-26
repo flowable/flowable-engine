@@ -22,6 +22,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 
@@ -43,10 +44,13 @@ public class DeleteHistoricProcessInstanceCmd implements Command<Object>, Serial
             throw new FlowableIllegalArgumentException("processInstanceId is null");
         }
         // Check if process instance is still running
-        HistoricProcessInstance instance = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findById(processInstanceId);
+        HistoricProcessInstanceEntity instance = CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findById(processInstanceId);
 
         if (instance == null) {
             throw new FlowableObjectNotFoundException("No historic process instance found with id: " + processInstanceId, HistoricProcessInstance.class);
+        }
+        if (instance.isDeleted()) {
+            return null;
         }
         if (instance.getEndTime() == null) {
             throw new FlowableException("Process instance is still running, cannot delete " + instance);

@@ -142,11 +142,9 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static void populateQuery(JsonNode queryNode, HistoricProcessInstanceQuery query, ProcessEngineConfigurationImpl engineConfiguration) {
-        Iterator<Map.Entry<String, JsonNode>> fieldIterator = queryNode.fields();
-        while (fieldIterator.hasNext()) {
-            Map.Entry<String, JsonNode> field = fieldIterator.next();
-            String property = field.getKey();
-            JsonNode value = field.getValue();
+        for (Map.Entry<String, JsonNode> propertyEntry : queryNode.properties()) {
+            String property = propertyEntry.getKey();
+            JsonNode value = propertyEntry.getValue();
             switch (property) {
                 case "processInstanceId":
                     query.processInstanceId(value.textValue());

@@ -1920,8 +1920,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             ArrayNode arrayNode = objectMapper.createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = execution.getVariable(variable.getSource());
-                if (sourceVariable instanceof ArrayNode) {
-                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                if (sourceVariable instanceof ArrayNode sourceArrayNode) {
                     for (int i = 0; i < sourceArrayNode.size(); i++) {
                         JsonNode node = arrayNode.get(i);
                         JsonNode sourceNode = sourceArrayNode.get(i);
@@ -1929,10 +1928,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                             arrayNode.add(sourceNode.deepCopy());
                         } else if (node.isObject()) {
                             ObjectNode objectNode = (ObjectNode) node;
-                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
-                            while (fieldsIterator.hasNext()) {
-                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
-                                objectNode.set(field.getKey(), field.getValue());
+                            for (Map.Entry<String, JsonNode> propertyEntry : sourceNode.properties()) {
+                                String propertyName = propertyEntry.getKey();
+                                JsonNode value = propertyEntry.getValue();
+                                objectNode.set(propertyName, value);
                             }
                         }
                     }

@@ -39,8 +39,7 @@ public class ProcessRefExpressionXmlConverter extends CaseElementXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         try {
             String expression = xtr.getElementText();
-            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof ProcessTask) {
-                ProcessTask processTask = (ProcessTask) conversionHelper.getCurrentCmmnElement();
+            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof ProcessTask processTask) {
                 processTask.setProcessRefExpression(expression);
             }
         } catch (XMLStreamException e) {

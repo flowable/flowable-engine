@@ -92,15 +92,13 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         List<DataAssociation> dataInputAssociations = null;
         List<DataAssociation> dataOutputAssociations = null;
 
-        if (flowElement instanceof SendTask) {
-            SendTask sendTask = (SendTask) flowElement;
+        if (flowElement instanceof SendTask sendTask) {
             ioSpecification = sendTask.getIoSpecification();
             operationRef = sendTask.getOperationRef();
             dataInputAssociations = sendTask.getDataInputAssociations();
             dataOutputAssociations = sendTask.getDataOutputAssociations();
 
-        } else if (flowElement instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) flowElement;
+        } else if (flowElement instanceof ServiceTask serviceTask) {
             ioSpecification = serviceTask.getIoSpecification();
             operationRef = serviceTask.getOperationRef();
             dataInputAssociations = serviceTask.getDataInputAssociations();

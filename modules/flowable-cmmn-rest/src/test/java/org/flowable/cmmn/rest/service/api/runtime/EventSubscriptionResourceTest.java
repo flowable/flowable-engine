@@ -30,7 +30,6 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -113,7 +112,7 @@ public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
                         + "eventName: '" + eventSubscription.getEventName() + "',"
                         + "caseInstanceId: '" + eventSubscription.getScopeId() + "',"
                         + "caseDefinitionId: '" + eventSubscription.getScopeDefinitionId() + "',"
-                        + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
+                        + "created: '" + getISODateString(eventSubscription.getCreated()) + "',"
                         + "tenantId: 'acme'"
                         + "}");
     }

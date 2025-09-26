@@ -133,8 +133,7 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
      * equals is not implemented.
      */
     private boolean isEqual(FlowableEntityEvent event1, FlowableEvent flowableEvent) {
-        if (flowableEvent instanceof FlowableEntityEvent && event1.getType().equals(flowableEvent.getType())) {
-            FlowableEntityEvent flowableEntityEvent = (FlowableEntityEvent) flowableEvent;
+        if (flowableEvent instanceof FlowableEntityEvent flowableEntityEvent && event1.getType().equals(flowableEvent.getType())) {
             if (flowableEntityEvent.getEntity().getClass().equals(event1.getEntity().getClass())) {
                 return true;
             }

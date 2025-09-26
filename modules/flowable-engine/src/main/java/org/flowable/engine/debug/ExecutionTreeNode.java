@@ -109,8 +109,7 @@ public class ExecutionTreeNode implements Iterable<ExecutionTreeNode> {
 
     protected String getCurrentFlowElementId() {
         FlowElement flowElement = getExecutionEntity().getCurrentFlowElement();
-        if (flowElement instanceof SequenceFlow) {
-            SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+        if (flowElement instanceof SequenceFlow sequenceFlow) {
             return sequenceFlow.getSourceRef() + " -> " + sequenceFlow.getTargetRef();
         } else if (flowElement != null) {
             return flowElement.getId() + " (" + flowElement.getClass().getSimpleName();

@@ -118,8 +118,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         if (currentFlowElement instanceof FlowNode) {
             sourceFlowNode = (FlowNode) currentFlowElement;
 
-        } else if (currentFlowElement instanceof SequenceFlow){
-            SequenceFlow sequenceFlow = (SequenceFlow) currentFlowElement;
+        } else if (currentFlowElement instanceof SequenceFlow sequenceFlow){
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             if (sourceFlowElement instanceof FlowNode) {
                 sourceFlowNode = (FlowNode) sourceFlowElement;
@@ -370,11 +369,10 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             agenda.planDestroyScopeOperation(execution);
 
-        } else if (currentFlowElement instanceof Activity) {
+        } else if (currentFlowElement instanceof Activity activity) {
 
             // If the current activity is an activity, we need to remove any currently active boundary events
 
-            Activity activity = (Activity) currentFlowElement;
             if (CollectionUtil.isNotEmpty(activity.getBoundaryEvents())) {
 
                 // Cancel events are not removed

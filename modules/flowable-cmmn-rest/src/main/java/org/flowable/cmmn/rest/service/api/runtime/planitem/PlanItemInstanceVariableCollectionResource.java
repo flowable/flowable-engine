@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Christopher Welsch
  */
 @RestController
-@Api(tags = { "Plan Item Instance" }, description = "Manage Plan Item Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Plan Item Instance" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceVariableCollectionResource extends BaseVariableResource {
 
     @Autowired

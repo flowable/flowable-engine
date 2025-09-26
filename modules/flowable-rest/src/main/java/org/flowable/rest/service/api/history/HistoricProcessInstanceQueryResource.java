@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceQueryResource extends HistoricProcessInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic process instances", tags = {"History Process", "Query" }, nickname = "queryHistoricProcessInstance",

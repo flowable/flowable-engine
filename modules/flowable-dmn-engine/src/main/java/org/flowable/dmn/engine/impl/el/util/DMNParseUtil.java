@@ -116,8 +116,7 @@ public class DMNParseUtil {
     }
 
     protected static Object formatElementValue(Object value, Class<?> collectionType) {
-        if (value instanceof String) {
-            String stringValue = (String) value;
+        if (value instanceof String stringValue) {
             if (stringValue.isEmpty()) {
                 return null;
             }

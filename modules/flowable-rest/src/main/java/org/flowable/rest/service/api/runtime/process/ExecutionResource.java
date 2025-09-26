@@ -35,7 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionResource extends ExecutionBaseResource {
 
     @ApiOperation(value = "Get an execution", tags = { "Executions" })

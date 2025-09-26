@@ -30,7 +30,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentResourceDataResource extends BaseDmnDeploymentResourceDataResource {
 
     @ApiOperation(value = "Get a decision deployment resource content", tags = {"Deployment" }, nickname = "getDecisionTableDeploymentResource",
