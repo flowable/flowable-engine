@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -264,8 +264,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            Instant dueDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            String dueDateString = getISODateString(Date.from(dueDate));
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
