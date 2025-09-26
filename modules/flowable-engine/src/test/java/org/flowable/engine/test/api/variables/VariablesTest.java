@@ -18,6 +18,10 @@ import static org.assertj.core.api.Assertions.entry;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -28,7 +32,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.RuntimeService;
@@ -50,6 +58,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Testing various constructs with variables.
@@ -812,6 +825,82 @@ public class VariablesTest extends PluggableFlowableTestCase {
         for (String variableName : variables.keySet()) {
             assertThat(variables.get(variableName)).isNotNull();
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("accessingVariableShouldReturnCachedValueParameters")
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void accessingVariableShouldReturnCachedValue(String typeName, Object initialValue, Object newValue) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("variablesTest")
+                .variable("testVar", initialValue)
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "testVar");
+        assertThat(variableInstance.getTypeName()).isEqualTo(typeName);
+
+        Pair<Object, Object> variables = managementService.executeCommand(commandContext -> {
+            Object variableBeforeUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            runtimeService.setVariable(processInstance.getId(), "testVar", newValue);
+            Object variableAfterUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            return Pair.of(variableBeforeUpdate, variableAfterUpdate);
+        });
+
+        Object variableBeforeUpdate = variables.getLeft();
+        Object variableAfterUpdate = variables.getRight();
+        assertThat(variableBeforeUpdate).as(typeName + " variable before update").isEqualTo(initialValue);
+        assertThat(variableAfterUpdate).as(typeName + " variable after update").isEqualTo(newValue);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void accessingJsonVariableShouldReturnCachedValue() {
+        ObjectNode initialValue = processEngineConfiguration.getObjectMapper()
+                .createObjectNode()
+                .put("name", "Kermit");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("variablesTest")
+                .variable("testVar", initialValue)
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "testVar");
+        assertThat(variableInstance.getTypeName()).isEqualTo("json");
+
+        ObjectNode newValue = processEngineConfiguration.getObjectMapper()
+                .createObjectNode()
+                .put("name", "Fozzie");
+
+        Pair<Object, Object> variables = managementService.executeCommand(commandContext -> {
+            Object variableBeforeUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            runtimeService.setVariable(processInstance.getId(), "testVar", newValue);
+            Object variableAfterUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            return Pair.of(variableBeforeUpdate, variableAfterUpdate);
+        });
+
+        Object variableBeforeUpdate = variables.getLeft();
+        Object variableAfterUpdate = variables.getRight();
+        assertThat(variableBeforeUpdate).as("json variable before update").isEqualTo(initialValue);
+        assertThat(variableAfterUpdate).as("json variable after update").isEqualTo(newValue);
+    }
+
+    static Stream<Arguments> accessingVariableShouldReturnCachedValueParameters() {
+        return Stream.of(
+                Arguments.of("string", "Test String", "Test String v2"),
+                Arguments.of("longString", RandomStringUtils.insecure().nextAlphanumeric(4500), RandomStringUtils.insecure().nextAlphanumeric(6500)),
+                Arguments.of("integer", 10, 42),
+                Arguments.of("long", 150L, 420L),
+                Arguments.of("localdatetime", LocalDateTime.of(2025, Month.SEPTEMBER, 26, 10, 10), LocalDateTime.of(2024, Month.DECEMBER, 15, 18, 45)),
+                Arguments.of("localdate", java.time.LocalDate.of(2025, Month.APRIL, 10), java.time.LocalDate.of(2026, Month.JANUARY, 5)),
+                Arguments.of("instant", Instant.parse("2025-07-16T14:24:45.583Z"), Instant.parse("2026-02-21T08:56:18.163Z")),
+                Arguments.of("date", Date.from(Instant.parse("2025-07-16T14:24:45.583Z")), Date.from(Instant.parse("2026-02-21T08:56:18.163Z"))),
+                Arguments.of("double", 45.5d, 142.6d),
+                Arguments.of("uuid", UUID.fromString("239969dd-3310-4068-b558-e4cbce5650ea"), UUID.fromString("c5b16e77-0c15-4d7b-ac12-15352af76355")),
+                Arguments.of("short", (short) 8, (short) 12),
+                Arguments.of("boolean", true, false),
+                Arguments.of("bytes", "Initial".getBytes(StandardCharsets.UTF_8), "Updated".getBytes(StandardCharsets.UTF_8)),
+                Arguments.of("biginteger", BigInteger.valueOf(1450), BigInteger.valueOf(9568)),
+                Arguments.of("bigdecimal", BigDecimal.valueOf(5896.48), BigDecimal.valueOf(4886.79))
+        );
     }
 
     // Class to test variable serialization
