@@ -394,6 +394,12 @@ public class ContinueProcessOperation extends AbstractOperation {
 
             while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
                 BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
+                if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
+                    if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                            || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                        continue;
+                    }
+                }
                 ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
