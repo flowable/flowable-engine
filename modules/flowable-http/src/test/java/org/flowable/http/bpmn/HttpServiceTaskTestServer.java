@@ -98,11 +98,12 @@ public class HttpServiceTaskTestServer {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             MultipartConfigElement multipartConfig = new MultipartConfigElement((String) null);
-            ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet());
+            ObjectMapper mapper = new ObjectMapper();
+            ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet(mapper));
             httpServiceTaskServletHolder.getRegistration().setMultipartConfig(multipartConfig);
             contextHandler.addServlet(httpServiceTaskServletHolder, "/api/*");
-            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
-            contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
+            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet(mapper)), "/test");
+            contextHandler.addServlet(new ServletHolder(new HelloServlet(mapper)), "/hello");
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
             contextHandler.addServlet(new ServletHolder(new ClasspathResourceServlet()), "/resource");
@@ -135,9 +136,10 @@ public class HttpServiceTaskTestServer {
         public static Map<String, String> headerMap = new HashMap<>();
 
         private String name = "test servlet";
-        private ObjectMapper mapper = new ObjectMapper();
+        private ObjectMapper mapper;
 
-        public HttpServiceTaskTestServlet() {
+        public HttpServiceTaskTestServlet(ObjectMapper mapper) {
+            this.mapper = mapper;
         }
 
         public HttpServiceTaskTestServlet(String name) {
@@ -280,7 +282,11 @@ public class HttpServiceTaskTestServer {
 
         private static final long serialVersionUID = 1L;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper;
+
+        private SimpleHttpServiceTaskTestServlet(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -300,8 +306,12 @@ public class HttpServiceTaskTestServer {
 
         private static final long serialVersionUID = 1L;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
-        
+        private final ObjectMapper objectMapper;
+
+        private HelloServlet(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setStatus(200);

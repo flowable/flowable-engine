@@ -36,7 +36,7 @@ public class EventJsonConverterTest {
     private static final String JSON_RESOURCE_1 = "org/flowable/eventregistry/converter/simpleEvent.json";
     private static final String JSON_RESOURCE_2 = "org/flowable/eventregistry/converter/simpleEventCorrelationPayload.json";
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    protected EventJsonConverter converter = new EventJsonConverter();
 
     @Test
     public void testConvertJsonToModel() {
@@ -94,12 +94,12 @@ public class EventJsonConverterTest {
 
     protected EventModel readJson(String resource) {
         String modelJson = readJsonToString(resource);
-        return new EventJsonConverter().convertToEventModel(modelJson);
+        return converter.convertToEventModel(modelJson);
     }
 
     protected EventModel exportAndReadModel(EventModel eventModel) {
-        String modelJson = new EventJsonConverter().convertToJson(eventModel);
-        return new EventJsonConverter().convertToEventModel(modelJson);
+        String modelJson = converter.convertToJson(eventModel);
+        return converter.convertToEventModel(modelJson);
     }
 
 }

@@ -33,8 +33,7 @@ public class ParallelMultiInstanceAsyncTest extends PluggableFlowableTestCase {
                 .deploy();
 
         Map<String, Object> variables = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = processEngineConfiguration.getObjectMapper().createArrayNode();
         for (int i = 0; i < 10; i++) {
             ObjectNode varNode = arrayNode.addObject();
             varNode.put("value", i + "");

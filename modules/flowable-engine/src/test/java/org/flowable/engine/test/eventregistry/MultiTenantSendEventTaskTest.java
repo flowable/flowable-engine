@@ -240,7 +240,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
 
         // Triggering
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myTriggerEvent");

@@ -68,7 +68,7 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
     }
     
     protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(processEngineConfiguration.getObjectMapper());
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
             .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
         
@@ -395,6 +395,11 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -411,8 +416,6 @@ public class EventRegistryEventSubprocessTest extends FlowableEventRegistryBpmnT
         }
 
         public void triggerTestEvent(String customerId, String orderId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "myEvent");
             if (customerId != null) {

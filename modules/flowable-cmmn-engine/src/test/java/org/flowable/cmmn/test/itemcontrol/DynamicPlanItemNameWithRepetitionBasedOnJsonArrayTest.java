@@ -37,8 +37,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment
     public void testDynamicNameWithRepetitionCollection() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("foo", "a");
         arrayNode.addObject().put("name", "B").put("foo", "b");
@@ -60,8 +59,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment
     public void testDynamicNameWithRepetitionCollectionNoFallbackExpression() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("bar", "a");
         arrayNode.addObject().put("name", "B").put("bar", "b");
@@ -83,8 +81,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest.testDynamicNameWithRepetitionCollectionNoFallbackExpression.cmmn")
     public void testDynamicNameWithRepetitionCollectionNoFallbackExpressionWithAvailablePlanItem() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("bar", "a");
         arrayNode.addObject().put("name", "B").put("bar", "b");

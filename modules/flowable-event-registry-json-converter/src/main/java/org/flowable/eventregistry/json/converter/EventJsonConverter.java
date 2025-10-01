@@ -28,7 +28,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventJsonConverter {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
+
+    public EventJsonConverter() {
+        this(new ObjectMapper());
+    }
+
+    public EventJsonConverter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     public EventModel convertToEventModel(String modelJson) {
         try {

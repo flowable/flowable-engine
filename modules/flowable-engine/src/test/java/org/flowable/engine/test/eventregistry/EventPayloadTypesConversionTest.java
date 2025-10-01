@@ -71,7 +71,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
     }
 
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(processEngineConfiguration.getObjectMapper());
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
             .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -287,6 +287,11 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -299,7 +304,6 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
         }
 
         public void testTriggerEvent() {
-            ObjectMapper objectMapper = new ObjectMapper();
 
             ObjectNode json = objectMapper.createObjectNode();
 

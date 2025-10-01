@@ -26,6 +26,7 @@ public class TestInboundEventChannelAdapter implements InboundEventChannelAdapte
 
     public InboundChannelModel inboundChannelModel;
     public EventRegistry eventRegistry;
+    protected final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -50,8 +51,6 @@ public class TestInboundEventChannelAdapter implements InboundEventChannelAdapte
     }
 
     public void triggerTestEvent(String customerId, String orderId) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myEvent");
         if (customerId != null) {

@@ -40,18 +40,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ChannelJsonConverter {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
     protected List<ChannelValidator> validators = new ArrayList<>();
     protected Map<String, Class<? extends ChannelModel>> channelModelClasses = new HashMap<>();
 
     public ChannelJsonConverter() {
+        this(new ObjectMapper());
+    }
+
+    public ChannelJsonConverter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         addValidator(new OutboundChannelModelValidator());
         addValidator(new InboundChannelModelValidator());
         addDefaultChannelModelClasses();
     }
 
     public ChannelJsonConverter(Collection<ChannelValidator> validators) {
+        this(validators, new ObjectMapper());
+    }
+
+    public ChannelJsonConverter(Collection<ChannelValidator> validators, ObjectMapper objectMapper) {
+        this(objectMapper);
         this.validators = new ArrayList<>(validators);
         addDefaultChannelModelClasses();
     }

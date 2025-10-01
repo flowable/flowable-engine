@@ -780,11 +780,10 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         @Override
         protected void registerChannelModel(InboundChannelModel inboundChannelModel,
-                EventRepositoryService eventRepositoryService,
-                ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+                EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
 
             registeredChannelModels.add(inboundChannelModel);
-            super.registerChannelModel(inboundChannelModel, eventRepositoryService, objectMapper, fallbackToDefaultTenant);
+            super.registerChannelModel(inboundChannelModel, eventRepositoryService, fallbackToDefaultTenant);
         }
 
         @Override

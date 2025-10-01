@@ -35,7 +35,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventPayloadToJsonStringSerializer implements OutboundEventSerializer {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper;
+
+    public EventPayloadToJsonStringSerializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public String serialize(EventInstance eventInstance) {

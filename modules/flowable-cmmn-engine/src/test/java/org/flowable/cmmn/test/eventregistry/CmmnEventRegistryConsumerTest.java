@@ -38,8 +38,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryConsumerTest {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
-
     @Test
     @CmmnDeployment
     public void testGenericEventListenerNoCorrelation() {
@@ -583,6 +581,7 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
                 .caseDefinitionKey("testEventListenerInRepeatableStage")
                 .start();
 
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         ObjectNode eventJson = objectMapper.createObjectNode();
         eventJson.put("type", "startEvent");
         eventJson.put("eventField1", "abc");
@@ -634,6 +633,8 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
                 .caseDefinitionKey("testEventListenerInRepeatableStage")
                 .start()
                 .getId();
+
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
 
         inboundEventChannelAdapter.triggerTestEventWithJson(objectMapper.createObjectNode().put("type", "startEvent").put("eventField1", "a"));
         inboundEventChannelAdapter.triggerTestEventWithJson(objectMapper.createObjectNode().put("type", "startEvent").put("eventField1", "b"));
