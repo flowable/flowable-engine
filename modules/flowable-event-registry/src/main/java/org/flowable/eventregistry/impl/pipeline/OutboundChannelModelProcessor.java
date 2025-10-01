@@ -70,7 +70,7 @@ public class OutboundChannelModelProcessor implements ChannelModelProcessor {
                 eventProcessingPipeline = resolveExpression(outboundChannelModel.getPipelineDelegateExpression(), OutboundEventProcessingPipeline.class);
                 
             } else if ("json".equals(outboundChannelModel.getSerializerType())) {
-                OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer();
+                OutboundEventSerializer eventSerializer = new EventPayloadToJsonStringSerializer(objectMapper);
                 eventProcessingPipeline = new DefaultOutboundEventProcessingPipeline(eventSerializer);
                 
             } else if ("xml".equals(outboundChannelModel.getSerializerType())) {

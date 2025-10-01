@@ -71,10 +71,11 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
     public void setup() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
-        beans.put("inboundChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("sharedInboundChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("tenantAChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("tenantBChannelAdapter", new TestInboundChannelAdapter());
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+        beans.put("inboundChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("sharedInboundChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("tenantAChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("tenantBChannelAdapter", new TestInboundChannelAdapter(objectMapper));
 
         // Shared channel and event in default tenant
         getEventRepositoryService().createInboundChannelModelBuilder()
@@ -394,6 +395,11 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -406,8 +412,6 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         }
 
         public void triggerEventWithoutTenantId(String customerId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "tenantAKey");
             if (customerId != null) {
@@ -424,8 +428,6 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         }
 
         public void triggerEventForTenantId(String customerId, String tenantId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "tenantAKey");
             if (customerId != null) {

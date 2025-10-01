@@ -59,8 +59,6 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
-    private ObjectMapper mapper = new ObjectMapper();
-
     @Test
     @Deployment
     public void testSimpleGetOnly() {
@@ -390,6 +388,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String body = (String) runtimeService.getVariable(process.getId(), "resultResponseBody");
         assertThat(body).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(body, JsonNode.class);
         mapper.convertValue(jsonNode, HttpTestData.class);
         continueProcess(process);
@@ -504,6 +503,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);
@@ -624,6 +624,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPatchResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);

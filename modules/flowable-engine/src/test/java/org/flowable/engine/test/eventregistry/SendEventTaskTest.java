@@ -384,7 +384,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   eventProperty: 'test'"
                         + " }");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -414,7 +414,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -454,7 +454,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(jsonNode).hasSize(1);
         assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -509,7 +509,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   eventProperty: 'test'"
                         + " }");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();

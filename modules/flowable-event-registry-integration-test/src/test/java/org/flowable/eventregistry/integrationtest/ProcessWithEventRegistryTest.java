@@ -639,8 +639,7 @@ public class ProcessWithEventRegistryTest {
             "org/flowable/eventregistry/integrationtest/issueEvent.event"})
     public void testMultiInstanceSendSystemEvent() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ArrayNode issueArray = objectMapper.createArrayNode();
+            ArrayNode issueArray = eventEngineConfiguration.getObjectMapper().createArrayNode();
             addIssue(issueArray, "1", "bug");
             addIssue(issueArray, "2", "task");
             addIssue(issueArray, "3", "question");

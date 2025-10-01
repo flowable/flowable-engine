@@ -41,7 +41,7 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
     @BeforeEach
     public void registerEventDefinition() {
-        inboundEventChannelAdapter = setupTestChannel();
+        inboundEventChannelAdapter = setupTestChannel(cmmnEngineConfiguration.getObjectMapper());
 
         getEventRepositoryService().createEventModelBuilder()
                 .key("myEvent")
@@ -53,8 +53,8 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
                 .deploy();
     }
 
-    protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+    protected TestInboundEventChannelAdapter setupTestChannel(ObjectMapper objectMapper) {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(objectMapper);
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
         beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -83,7 +83,11 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
-        protected ObjectMapper objectMapper = new ObjectMapper();
+        protected final ObjectMapper objectMapper;
+
+        protected TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
