@@ -18,13 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        oracle: [ "18-slim-faststart", "21-slim-faststart", "23-slim-faststart" ]
+        oracle: [ "21-slim-faststart", "23-slim-faststart" ]
         include:
-          - oracle: 18-slim-faststart
-            driverVersion: 18.3.0.0
-            driverArtifact: ojdbc8
-            serviceName: XEPDB1
-            type: xe
           - oracle: 21-slim-faststart
             driverVersion: 21.6.0.0.1
             driverArtifact: ojdbc8
