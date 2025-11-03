@@ -63,7 +63,7 @@
         <h2.version>2.3.232</h2.version>
         <hsqldb.version>2.7.2</hsqldb.version>
         <mariadb.version>3.5.5</mariadb.version>
-        <mssql-jdbc.version>12.10.1.jre11</mssql-jdbc.version>
+        <mssql-jdbc.version>12.10.2.jre11</mssql-jdbc.version>
         <mysql-connector.version>9.4.0</mysql-connector.version>
         <oracle.jdbc.version>23.7.0.25.01</oracle.jdbc.version>
         <oracle.jdbc.artifact>ojdbc17</oracle.jdbc.artifact>
