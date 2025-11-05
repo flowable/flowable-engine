@@ -13,6 +13,7 @@
 package org.flowable.eventregistry.json.converter;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
@@ -28,19 +29,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventJsonConverter {
 
-    protected ObjectMapper objectMapper;
+    protected Supplier<ObjectMapper> objectMapperSupplier;
 
     public EventJsonConverter() {
-        this(new ObjectMapper());
+        ObjectMapper objectMapper = new ObjectMapper();
+        this.objectMapperSupplier = () -> objectMapper;
     }
 
-    public EventJsonConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public EventJsonConverter(Supplier<ObjectMapper> objectMapperSupplier) {
+        this.objectMapperSupplier = objectMapperSupplier;
     }
 
     public EventModel convertToEventModel(String modelJson) {
         try {
-            JsonNode modelNode = objectMapper.readTree(modelJson);
+            JsonNode modelNode = objectMapperSupplier.get().readTree(modelJson);
             EventModel eventModel = new EventModel();
 
             eventModel.setKey(modelNode.path("key").asText(null));
@@ -83,6 +85,7 @@ public class EventJsonConverter {
     }
 
     public String convertToJson(EventModel definition) {
+        ObjectMapper objectMapper = objectMapperSupplier.get();
         ObjectNode modelNode = objectMapper.createObjectNode();
 
         if (definition.getKey() != null) {
