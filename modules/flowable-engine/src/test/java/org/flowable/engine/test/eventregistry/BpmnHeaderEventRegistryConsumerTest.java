@@ -35,6 +35,7 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,6 +113,32 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
             );
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnHeaderEventRegistryConsumerTest.testProcessStartWithHeaders.bpmn20.xml")
+    public void testProcessStartWithCaseInsensitiveEventHeaders() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+        assertThat(processDefinition).isNotNull();
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+            .processDefinitionId(processDefinition.getId())
+            .scopeType(ScopeTypes.BPMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+        inboundEventChannelAdapter.triggerTestEventWithCaseInsensitiveHeaders("payloadStartCustomer", "testHeader", 1234);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+            .containsOnly(
+                entry("customerIdVar", "payloadStartCustomer"),
+                entry("payload1", "Hello World"),
+                entry("myHeaderValue1", "testHeader"),
+                entry("myHeaderValue2", 1234)
+            );
+    }
+
     private static class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
         public InboundChannelModel inboundChannelModel;
@@ -137,6 +164,19 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
             Map<String, Object> headers = new HashMap<>();
             headers.put("headerProperty1", headerValue1);
             headers.put("headerProperty2", headerValue2);
+            try {
+                String event = objectMapper.writeValueAsString(eventNode);
+                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void triggerTestEventWithCaseInsensitiveHeaders(String customerId, String headerValue1, Integer headerValue2) {
+            ObjectNode eventNode = createTestEventNode(customerId, null);
+            Map<String, Object> headers = new LinkedCaseInsensitiveMap<>();
+            headers.put("HeaderProperty1", headerValue1);
+            headers.put("HeaderProperty2", headerValue2);
             try {
                 String event = objectMapper.writeValueAsString(eventNode);
                 eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
