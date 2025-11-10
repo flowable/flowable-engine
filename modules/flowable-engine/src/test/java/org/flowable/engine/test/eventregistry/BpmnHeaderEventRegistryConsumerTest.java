@@ -115,6 +115,32 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnHeaderEventRegistryConsumerTest.testProcessStartWithHeaders.bpmn20.xml")
+    public void testProcessStartWithMissingHeaders() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
+        assertThat(processDefinition).isNotNull();
+
+        EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+            .processDefinitionId(processDefinition.getId())
+            .scopeType(ScopeTypes.BPMN)
+            .singleResult();
+        assertThat(eventSubscription).isNotNull();
+        assertThat(eventSubscription.getEventType()).isEqualTo("myEvent");
+
+        assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+
+        inboundEventChannelAdapter.triggerTestEventWithHeaders("payloadStartCustomer", null, null);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").singleResult();
+        assertThat(runtimeService.getVariables(processInstance.getId()))
+            .containsOnly(
+                entry("customerIdVar", "payloadStartCustomer"),
+                entry("payload1", "Hello World"),
+                entry("myHeaderValue1", null),
+                entry("myHeaderValue2", null)
+            );
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/BpmnHeaderEventRegistryConsumerTest.testProcessStartWithHeaders.bpmn20.xml")
     public void testProcessStartWithCaseInsensitiveEventHeaders() {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("process").singleResult();
         assertThat(processDefinition).isNotNull();
@@ -162,8 +188,12 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
         public void triggerTestEventWithHeaders(String customerId, String headerValue1, Integer headerValue2) {
             ObjectNode eventNode = createTestEventNode(customerId, null);
             Map<String, Object> headers = new HashMap<>();
-            headers.put("headerProperty1", headerValue1);
-            headers.put("headerProperty2", headerValue2);
+            if (headerValue1 != null) {
+                headers.put("headerProperty1", headerValue1);
+            }
+            if (headerValue2 != null) {
+                headers.put("headerProperty2", headerValue2);
+            }
             try {
                 String event = objectMapper.writeValueAsString(eventNode);
                 eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
