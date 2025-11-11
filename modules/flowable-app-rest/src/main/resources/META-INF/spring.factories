@@ -1,4 +1,4 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
+org.springframework.boot.EnvironmentPostProcessor=\
   org.flowable.rest.app.properties.BackwardsCompatiblePropertiesLoader
 
 # Auto Configuration Import Filters

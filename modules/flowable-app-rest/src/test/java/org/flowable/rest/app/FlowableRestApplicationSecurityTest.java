@@ -28,10 +28,10 @@ import org.flowable.rest.security.SecurityConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -46,7 +46,7 @@ import org.springframework.http.ResponseEntity;
  * @author Filip Hrisafov
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebClient(registerRestTemplate = true)
+@AutoConfigureTestRestTemplate
 @Import(FlowableRestApplicationSecurityTest.TestBootstrapConfiguration.class)
 public class FlowableRestApplicationSecurityTest {
 
@@ -68,8 +68,6 @@ public class FlowableRestApplicationSecurityTest {
             "metrics-requiredMetricName",
             "scheduledtasks",
             "mappings",
-            "caches",
-            "caches-cache",
             "health-path",
             "configprops-prefix",
             "sbom",

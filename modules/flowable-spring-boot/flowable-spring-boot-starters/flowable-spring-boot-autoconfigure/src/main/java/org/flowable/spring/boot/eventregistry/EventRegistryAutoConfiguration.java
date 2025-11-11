@@ -51,12 +51,9 @@ import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -84,12 +81,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfiguration(after = {
     AppEngineAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class,
-    KafkaAutoConfiguration.class,
-    JmsAutoConfiguration.class,
-    RabbitAutoConfiguration.class,
 }, before = {
     AppEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class,
+},
+        afterName = {
+                "org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
+                "org.springframework.boot.jms.autoconfigure.JmsAutoConfiguration",
+                "org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration"
 })
 public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 

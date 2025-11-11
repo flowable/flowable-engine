@@ -66,10 +66,10 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
+import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
@@ -222,7 +222,7 @@ public class CmmnEngineAutoConfigurationTest {
     @Test
     public void standaloneCmmnEngineWithJackson() {
         contextRunner
-                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(Jackson2AutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).as("Cmmn engine")
                             .hasSingleBean(CmmnEngine.class)
@@ -398,7 +398,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .withConfiguration(AutoConfigurations.of(
                         ProcessEngineServicesAutoConfiguration.class,
                         ProcessEngineAutoConfiguration.class,
-                        JacksonAutoConfiguration.class
+                        Jackson2AutoConfiguration.class
                 ))
                 .run(context -> {
                     assertThat(context)
