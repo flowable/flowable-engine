@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.flowable.eventregistry.model.CamelInboundChannelModel;
 import org.flowable.eventregistry.model.CamelOutboundChannelModel;
@@ -40,12 +41,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class ChannelJsonConverter {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected Supplier<ObjectMapper> objectMapperSupplier;
 
     protected List<ChannelValidator> validators = new ArrayList<>();
     protected Map<String, Class<? extends ChannelModel>> channelModelClasses = new HashMap<>();
 
     public ChannelJsonConverter() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        this.objectMapperSupplier = () -> objectMapper;
+        addValidator(new OutboundChannelModelValidator());
+        addValidator(new InboundChannelModelValidator());
+        addDefaultChannelModelClasses();
+    }
+
+    public ChannelJsonConverter(Supplier<ObjectMapper> objectMapperSupplier) {
+        this.objectMapperSupplier = objectMapperSupplier;
         addValidator(new OutboundChannelModelValidator());
         addValidator(new InboundChannelModelValidator());
         addDefaultChannelModelClasses();
@@ -53,6 +63,14 @@ public class ChannelJsonConverter {
 
     public ChannelJsonConverter(Collection<ChannelValidator> validators) {
         this.validators = new ArrayList<>(validators);
+        ObjectMapper objectMapper = new ObjectMapper();
+        this.objectMapperSupplier = () -> objectMapper;
+        addDefaultChannelModelClasses();
+    }
+
+    public ChannelJsonConverter(Collection<ChannelValidator> validators, Supplier<ObjectMapper> objectMapperSupplier) {
+        this.validators = new ArrayList<>(validators);
+        this.objectMapperSupplier = objectMapperSupplier;
         addDefaultChannelModelClasses();
     }
 
@@ -72,6 +90,7 @@ public class ChannelJsonConverter {
 
     public ChannelModel convertToChannelModel(String modelJson) {
         try {
+            ObjectMapper objectMapper = objectMapperSupplier.get();
             JsonNode channelNode = objectMapper.readTree(modelJson);
             Class<? extends ChannelModel> channelClass = determineChannelModelClass(channelNode);
 
@@ -107,7 +126,7 @@ public class ChannelJsonConverter {
 
     public String convertToJson(ChannelModel definition) {
         try {
-            return objectMapper.writeValueAsString(definition);
+            return objectMapperSupplier.get().writeValueAsString(definition);
         } catch (Exception e) {
             throw new FlowableEventJsonException("Error writing channel json", e);
         }

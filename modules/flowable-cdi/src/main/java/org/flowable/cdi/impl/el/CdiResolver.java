@@ -83,7 +83,7 @@ public class CdiResolver extends ELResolver {
 
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return getWrappedResolver().getFeatureDescriptors(this.context, base);
+        return null;
     }
 
     @Override

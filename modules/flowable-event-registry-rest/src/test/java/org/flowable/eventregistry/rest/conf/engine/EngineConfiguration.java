@@ -41,6 +41,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration(proxyBeanMethods = false)
@@ -175,8 +176,8 @@ public class EngineConfiguration {
     }
     
     @Bean(name = "testInboundEventChannelAdapter")
-    public TestInboundEventChannelAdapter testInboundEventChannelAdapter() {
-        return new TestInboundEventChannelAdapter();
+    public TestInboundEventChannelAdapter testInboundEventChannelAdapter(ObjectMapper objectMapper) {
+        return new TestInboundEventChannelAdapter(objectMapper);
     }
     
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(ProcessEngine processEngine) {

@@ -316,7 +316,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(eventEngineConfiguration.getObjectMapper());
         eventEngineConfiguration.getExpressionManager().getBeans()
                 .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -344,7 +344,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 .jsonFieldsMapDirectlyToPayload()
                 .deploy();
 
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(eventEngineConfiguration.getObjectMapper());
         InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService()
                 .getChannelModelByKey("test-channel");
         DefaultInboundEventProcessingPipeline<Customer> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<Customer>) inboundChannelModel
@@ -354,7 +354,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
             @Override
             public Customer deserialize(Object rawEvent) {
                 try {
-                    return new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
+                    return eventEngineConfiguration.getObjectMapper().readValue(rawEvent.toString(), Customer.class);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
@@ -422,6 +422,11 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -434,8 +439,6 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         }
 
         public void triggerTestEvent() {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "myEvent");
             json.put("customerId", "test");

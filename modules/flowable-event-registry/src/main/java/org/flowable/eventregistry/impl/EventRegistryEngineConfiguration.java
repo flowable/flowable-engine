@@ -124,8 +124,8 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
     protected Collection<ELResolver> preBeanELResolvers;
     protected Collection<ELResolver> postDefaultELResolvers;
 
-    protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
-    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
+    protected EventJsonConverter eventJsonConverter = new EventJsonConverter(this::getObjectMapper);
+    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter(this::getObjectMapper);
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
@@ -501,7 +501,7 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
             inboundChannelModelCacheManager = new DefaultInboundChannelModelCacheManager(this);
         }
     }
-    
+
     public void initEventRegistry() {
         if (this.eventRegistry == null) {
             this.eventRegistry = new DefaultEventRegistry(this);

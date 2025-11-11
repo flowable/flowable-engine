@@ -68,19 +68,19 @@ public class FlowableRestAppEventRegistryCondition extends SpringBootCondition
         Map<String, ConditionOutcome> conditions = new HashMap<>();
 
         if (!jmsEnabled) {
-            conditions.put("org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration",
+            conditions.put("org.springframework.boot.artemis.autoconfigure.ArtemisAutoConfiguration",
                 ConditionOutcome.noMatch("Property flowable.task.app.jms-enabled was not set to true")
             );
         }
 
         if (!kafkaEnabled) {
-            conditions.put("org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration",
+            conditions.put("org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
                 ConditionOutcome.noMatch("Property flowable.task.app.kafka-enabled was not set to true")
             );
         }
 
         if (!rabbitEnabled) {
-            conditions.put("org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration",
+            conditions.put("org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration",
                 ConditionOutcome.noMatch("Property flowable.task.app.rabbit-enabled was not set to true")
             );
         }

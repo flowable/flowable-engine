@@ -63,7 +63,6 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.BeforeEach;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -488,9 +487,9 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     }
 
     protected String getJobActivityId(Job job) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Map<String, Object> jobConfigurationMap = objectMapper.readValue(job.getJobHandlerConfiguration(), new TypeReference<>() {
+            Map<String, Object> jobConfigurationMap = processEngineConfiguration.getObjectMapper()
+                    .readValue(job.getJobHandlerConfiguration(), new TypeReference<>() {
 
             });
             return (String) jobConfigurationMap.get("activityId");

@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.kafka;
 
 import java.lang.reflect.Field;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,6 +61,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
+import org.springframework.core.retry.RetryPolicy;
 import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProcessor;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -96,11 +98,6 @@ import org.springframework.kafka.support.converter.ConversionException;
 import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.invocation.MethodArgumentResolutionException;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.backoff.SleepingBackOffPolicy;
-import org.springframework.retry.backoff.UniformRandomBackOffPolicy;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.Assert;
@@ -123,6 +120,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 
     protected static final int DEFAULT_PARTITION_FOR_MANUAL_ASSIGNMENT = 0;
+    protected static final long DEFAULT_RETRY_DELAY = 1000L;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -1076,51 +1074,33 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return resolvedRetryConfiguration;
     }
 
-    protected SleepingBackOffPolicy<?> createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
+    protected BackOff createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
         if (backOff == null) {
-            return new FixedBackOffPolicy();
+            return new FixedBackOff(DEFAULT_RETRY_DELAY);
         }
         // This code is the same as the one from Spring Kafka
         Long delay = resolveExpressionAsLong(backOff.getDelay(), "retry.nonBlockingBackOff.delay");
-        // Same default as Spring Retry
-        Long min = delay;
+        if (delay == null) {
+            delay = DEFAULT_RETRY_DELAY;
+        }
+        //TODO support java.time.Duration
         Long max = resolveExpressionAsLong(backOff.getMaxDelay(), "retry.nonBlockingBackOff.maxDelay");
         Double multiplier = resolveExpressionAsDouble(backOff.getMultiplier(), "retry.nonBlockingBackOff.multiplier");
         if (multiplier != null && multiplier > 0) {
-            ExponentialBackOffPolicy policy;
-            Boolean random = resolveExpressionAsBoolean(backOff.getRandom(), "retry.nonBlockingBackOff.random");
-            if (Boolean.TRUE.equals(random)) {
-                policy = new ExponentialRandomBackOffPolicy();
-            } else {
-                policy = new ExponentialBackOffPolicy();
+            RetryPolicy.Builder retryPolicyBuilder = RetryPolicy.builder().maxAttempts(Long.MAX_VALUE);
+            retryPolicyBuilder.delay(Duration.ofMillis(delay));
+            //TODO add jitter instead of random
+
+            retryPolicyBuilder.multiplier(multiplier);
+
+            if (max != null && max > delay) {
+                retryPolicyBuilder.maxDelay(Duration.ofMillis(max));
             }
 
-            if (min != null) {
-                policy.setInitialInterval(min);
-            }
-
-            policy.setMultiplier(multiplier);
-
-            if (max != null && max > policy.getInitialInterval()) {
-                policy.setMaxInterval(max);
-            }
-
-            return policy;
+            return retryPolicyBuilder.build().getBackOff();
         }
 
-        if (max != null && min != null && max > min) {
-            UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
-            policy.setMinBackOffPeriod(min);
-            policy.setMaxBackOffPeriod(max);
-            return policy;
-        }
-
-        FixedBackOffPolicy policy = new FixedBackOffPolicy();
-        if (min != null) {
-            policy.setBackOffPeriod(min);
-        }
-
-        return policy;
+        return new FixedBackOff(delay);
     }
 
     protected static class ResolvedRetryConfiguration {
@@ -1130,7 +1110,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         protected String retryTopicSuffix;
         protected SameIntervalTopicReuseStrategy sameIntervalTopicReuseStrategy;
         protected TopicSuffixingStrategy topicSuffixingStrategy;
-        protected SleepingBackOffPolicy<?> nonBlockingBackOff;
+        protected BackOff nonBlockingBackOff;
         protected boolean autoCreateTopics;
         protected int numPartitions;
         protected short replicationFactor;

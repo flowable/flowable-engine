@@ -88,9 +88,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @AutoConfiguration(after = {
     FlowableJpaAutoConfiguration.class,
     AppEngineAutoConfiguration.class,
-    TaskExecutionAutoConfiguration.class
 }, before = {
     AppEngineServicesAutoConfiguration.class,
+}, afterName = {
+    "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @Import({
     FlowableJobConfiguration.class

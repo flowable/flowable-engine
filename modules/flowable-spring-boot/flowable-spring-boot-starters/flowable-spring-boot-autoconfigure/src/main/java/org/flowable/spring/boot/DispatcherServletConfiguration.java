@@ -12,14 +12,12 @@
  */
 package org.flowable.spring.boot;
 
-import java.util.List;
-
 import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -39,14 +37,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     protected ObjectMapper objectMapper;
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                break;
-            }
-        }
+    protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.jsonMessageConverter(new MappingJackson2HttpMessageConverter(objectMapper));
     }
 }

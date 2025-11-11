@@ -257,7 +257,7 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
 
     protected org.flowable.http.common.api.HttpHeaders toFlowableHeaders(HttpHeaders httpHeaders) {
         org.flowable.http.common.api.HttpHeaders headers = new org.flowable.http.common.api.HttpHeaders();
-        for (Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : httpHeaders.headerSet()) {
             String headerName = entry.getKey();
             List<String> headerValues = entry.getValue();
             for (String headerValue : headerValues) {

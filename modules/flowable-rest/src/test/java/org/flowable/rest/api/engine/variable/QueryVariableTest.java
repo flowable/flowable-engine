@@ -20,11 +20,8 @@ import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class QueryVariableTest extends BaseSpringRestTestCase {
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     public void testSerializeQueryVariable() throws Exception {

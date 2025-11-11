@@ -13,11 +13,10 @@
 package org.flowable.eventregistry.impl.payload;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.FlowableEventInfo;
 import org.flowable.eventregistry.api.InboundEventInfoAwarePayloadExtractor;
@@ -35,52 +34,42 @@ public class HeadersPayloadExtractor<T> implements InboundEventInfoAwarePayloadE
         if (headers.isEmpty()) {
             return Collections.emptyList();
         }
-        Map<String, Object> filteredHeaders = convertHeaderValues(event, eventModel);
-        return headers.stream()
-                .filter(headerDefinition -> filteredHeaders.containsKey(headerDefinition.getName()))
-                .map(headerDefinition -> new EventPayloadInstanceImpl(headerDefinition, filteredHeaders.get(headerDefinition.getName())))
-                .collect(Collectors.toList());
-    }
-
-    protected Map<String, Object> convertHeaderValues(FlowableEventInfo<T> eventInfo, EventModel eventModel) {
-        Map<String, Object> filteredHeaders = new HashMap<>();
-        if (eventInfo.getHeaders() != null) {
-            Map<String, Object> headers = eventInfo.getHeaders();
-            for (String headerName : headers.keySet()) {
-                EventPayload eventHeaderDef = eventModel.getPayload(headerName);
-                if (eventHeaderDef != null && eventHeaderDef.isHeader()) {
-                    Object headerValueObject = headers.get(headerName);
-                    if (headerValueObject instanceof byte[]) {
-                        byte[] headerValue = (byte[]) headers.get(headerName);
-                        convertBytesHeaderValue(headerName, headerValue, filteredHeaders, eventHeaderDef);
-                    } else {
-                        filteredHeaders.put(headerName, headerValueObject);
-                    }
+        Map<String, Object> eventHeaders = event.getHeaders();
+        if (eventHeaders == null || eventHeaders.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Collection<EventPayloadInstance> eventPayloadHeaderInstances = new ArrayList<>(headers.size());
+        for (EventPayload header : headers) {
+            if (eventHeaders.containsKey(header.getName())) {
+                Object headerValueObject = eventHeaders.get(header.getName());
+                Object headerValue = headerValueObject;
+                if (headerValueObject instanceof byte[] headerValueBytes) {
+                    headerValue = convertBytesHeaderValue(headerValueBytes, header);
                 }
+                eventPayloadHeaderInstances.add(new EventPayloadInstanceImpl(header, headerValue));
             }
         }
-        
-        return filteredHeaders;
+        return eventPayloadHeaderInstances;
     }
-    
-    protected void convertBytesHeaderValue(String headerName, byte[] headerValue, Map<String, Object> filteredHeaders, EventPayload eventHeaderDef) {
+
+    protected Object convertBytesHeaderValue(byte[] headerValue, EventPayload eventHeaderDef) {
         if (EventPayloadTypes.STRING.equals(eventHeaderDef.getType())) {
-            filteredHeaders.put(headerName, convertBytesToString(headerValue));
+            return convertBytesToString(headerValue);
 
         } else if (EventPayloadTypes.DOUBLE.equals(eventHeaderDef.getType())) {
-            filteredHeaders.put(headerName, Double.valueOf(convertBytesToString(headerValue)));
+            return Double.valueOf(convertBytesToString(headerValue));
 
         } else if (EventPayloadTypes.INTEGER.equals(eventHeaderDef.getType())) {
-            filteredHeaders.put(headerName, Integer.valueOf(convertBytesToString(headerValue)));
+            return Integer.valueOf(convertBytesToString(headerValue));
 
         } else if (EventPayloadTypes.LONG.equals(eventHeaderDef.getType())) {
-            filteredHeaders.put(headerName, Long.valueOf(convertBytesToString(headerValue)));
+            return Long.valueOf(convertBytesToString(headerValue));
 
         } else if (EventPayloadTypes.BOOLEAN.equals(eventHeaderDef.getType())) {
-            filteredHeaders.put(headerName, Boolean.valueOf(convertBytesToString(headerValue))); 
+            return Boolean.valueOf(convertBytesToString(headerValue));
             
         } else {
-            filteredHeaders.put(headerName, headerValue);
+            return headerValue;
         }
     }
     

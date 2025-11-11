@@ -187,7 +187,7 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
     public void testDynamicRecipientsArrayNode() throws MessagingException {
-        ArrayNode recipients = new ObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
+        ArrayNode recipients = cmmnEngineConfiguration.getObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
         testDynamicRecipientsInternal(recipients);
     }
 

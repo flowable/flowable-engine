@@ -23,7 +23,7 @@ import org.flowable.external.job.rest.conf.BpmnEngineTestConfiguration;
 import org.flowable.external.job.rest.conf.ExternalJobRestTestApplication;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -41,7 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(FlowableSpringExtension.class)
 @SpringBootTest(classes = ExternalJobRestTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebClient(registerRestTemplate = true)
+@AutoConfigureTestRestTemplate
 @Import({
         BpmnEngineTestConfiguration.class,
 })
