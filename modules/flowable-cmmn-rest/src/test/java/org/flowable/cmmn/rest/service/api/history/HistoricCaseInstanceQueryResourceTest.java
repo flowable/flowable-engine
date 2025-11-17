@@ -689,6 +689,7 @@ public class HistoricCaseInstanceQueryResourceTest extends BaseSpringRestTestCas
                 .isEqualTo("[]");
     }
 
+    @Test
     @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
     public void testQueryHistoricCaseInstancesByCaseInstanceCallbackIds() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().callbackId("callBackId1").caseDefinitionKey("oneHumanTaskCase").start();

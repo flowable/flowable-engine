@@ -125,6 +125,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting case instance.
      */
+    @Test
     public void testGetUnexistingCaseInstance() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexistingpi")),
                 HttpStatus.SC_NOT_FOUND));
@@ -133,6 +134,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test terminating a single case instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testTerminateCaseInstance() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -147,6 +149,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test terminating an unexisting case instance.
      */
+    @Test
     public void testTerminateUnexistingCaseInstance() {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexisting")),
                 HttpStatus.SC_NOT_FOUND));
@@ -155,6 +158,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single case instance.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteCaseInstance() {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -169,11 +173,13 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting case instance.
      */
+    @Test
     public void testDeleteUnexistingCaseInstance() {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE, "unexisting", "delete")),
                 HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/testManualEvaluateCriteria.cmmn" })
     public void testEvaluateCriteria() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -198,6 +204,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverview() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -234,6 +241,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(2), "Stage four", false, false);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverviewWithExclusions() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
@@ -263,6 +271,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(1), "Stage four", false, false);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverviewWithoutDisplayOrder() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverview").start();
@@ -298,6 +307,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(3), "Stage four", false, false);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageAndMilestoneOverview() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -343,6 +353,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(5), "Stage four", false, false);
     }
 
+    @Test
     @CmmnDeployment
     public void testStageOverviewWithRepetition() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageOverviewWithRepetition").start();
@@ -375,6 +386,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertStage(stageOverviewResponse.get(2), "Stage three", false, true);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
     public void testUpdateCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -410,7 +422,8 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getBusinessKey())
                 .isEqualTo("test business key");
     }
-    
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/changeStateCase.cmmn" })
     public void testChangeStateCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -501,7 +514,8 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("stage1").planItemInstanceState(PlanItemInstanceState.ACTIVE).list()).hasSize(2);
         assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("stageTask").planItemInstanceState(PlanItemInstanceState.ACTIVE).list()).hasSize(2);
     }
-    
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/changeStateRepetitionCase.cmmn" })
     public void testChangeStateCaseInstanceWithRepetition() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
