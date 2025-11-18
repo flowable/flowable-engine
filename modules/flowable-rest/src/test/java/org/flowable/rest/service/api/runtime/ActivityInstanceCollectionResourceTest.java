@@ -33,8 +33,7 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Test for REST-operation related to the activity instance query resource.
@@ -109,7 +108,7 @@ public class ActivityInstanceCollectionResourceTest extends BaseSpringRestTestCa
         assertResultsPresentInDataResponse(url + "?tenantIdLike=anotherTenant");
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedActivityIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedActivityIds) throws IOException {
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");

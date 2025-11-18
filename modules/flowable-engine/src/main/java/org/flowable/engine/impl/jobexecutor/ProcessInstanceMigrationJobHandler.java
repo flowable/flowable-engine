@@ -31,7 +31,7 @@ import org.flowable.engine.migration.ProcessInstanceMigrationManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceMigrationJobHandler extends AbstractProcessInstanceMigrationJobHandler {
 

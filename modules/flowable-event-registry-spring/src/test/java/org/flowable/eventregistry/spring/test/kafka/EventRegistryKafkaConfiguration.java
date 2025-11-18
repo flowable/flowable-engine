@@ -45,7 +45,8 @@ import org.springframework.kafka.support.LoggingProducerListener;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Filip Hrisafov
@@ -67,7 +68,7 @@ public class EventRegistryKafkaConfiguration {
     
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return JsonMapper.shared();
     }
 
     @Bean

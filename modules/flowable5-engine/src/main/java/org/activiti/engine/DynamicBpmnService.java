@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Service providing access to the repository of process definitions and deployments.

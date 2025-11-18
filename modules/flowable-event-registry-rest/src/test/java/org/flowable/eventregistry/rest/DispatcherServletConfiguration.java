@@ -17,19 +17,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan({ "org.flowable.eventregistry.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     @Bean
     public MultipartResolver multipartResolver() {
@@ -38,7 +38,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        builder.withJsonConverter(new MappingJackson2HttpMessageConverter(objectMapper));
+        builder.withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
     }
 
 }

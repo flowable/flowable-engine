@@ -28,7 +28,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 public class EvaluateVariableEventListenersOperation extends AbstractEvaluationCriteriaOperation {
 

@@ -19,7 +19,7 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 public class QueryVariableTest extends BaseSpringRestTestCase {
 

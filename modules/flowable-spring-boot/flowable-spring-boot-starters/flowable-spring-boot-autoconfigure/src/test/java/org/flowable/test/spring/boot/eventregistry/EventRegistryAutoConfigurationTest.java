@@ -57,7 +57,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration;
 import org.springframework.boot.artemis.autoconfigure.ArtemisAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.jms.autoconfigure.JmsAutoConfiguration;
@@ -78,7 +78,7 @@ public class EventRegistryAutoConfigurationTest {
             DataSourceTransactionManagerAutoConfiguration.class,
             EventRegistryServicesAutoConfiguration.class,
             EventRegistryAutoConfiguration.class,
-                Jackson2AutoConfiguration.class
+            JacksonAutoConfiguration.class
         ))
         .withUserConfiguration(CustomUserEngineConfigurerConfiguration.class);
 

@@ -42,7 +42,7 @@ import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens

@@ -21,8 +21,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers

@@ -35,7 +35,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN extension Variable Event Listener.

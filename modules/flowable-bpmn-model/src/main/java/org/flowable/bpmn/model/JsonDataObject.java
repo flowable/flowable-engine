@@ -12,16 +12,13 @@
  */
 package org.flowable.bpmn.model;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Christophe DENEUX
@@ -31,23 +28,18 @@ public class JsonDataObject extends ValuedDataObject {
     @Override
     public void setValue(Object value) {
     	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
-            final ObjectMapper mapper = new ObjectMapper();
             try {
-                this.value = mapper.readTree((String) value);
-            } catch (final IOException e) {
+                this.value = JsonMapper.shared().readTree((String) value);
+            } catch (JacksonException e) {
                 throw new IllegalArgumentException("Invalid JSON expression to parse", e);
             }
         } else if (value instanceof JsonNode) {
     		this.value = value;
         } else {
-            final ObjectMapper mapper = new ObjectMapper();
-
-            // By default, Jackson serializes only public fields, we force to use all fields of the Java Bean
-            mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-
-            // By default, Jackson serializes java.util.Date as timestamp, we force ISO-8601
-            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
+            JsonMapper mapper = JsonMapper.builder()
+                    // By default, Jackson serializes only public fields, we force to use all fields of the Java Bean
+                    .changeDefaultVisibility(visibilityChecker -> visibilityChecker.withFieldVisibility(Visibility.ANY))
+                    .build();
 
             this.value = mapper.convertValue(value, JsonNode.class);
     	}

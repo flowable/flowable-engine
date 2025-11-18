@@ -68,9 +68,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrationTest {
 
@@ -4512,8 +4512,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         processMigrationService.createProcessInstanceMigrationBuilder().preUpgradeScript(new Script("groovy",
                         """
-                                import com.fasterxml.jackson.databind.ObjectMapper
-                                import com.fasterxml.jackson.databind.node.ArrayNode
+                                import tools.jackson.databind.ObjectMapper
+                                import tools.jackson.databind.node.ArrayNode
                                 import org.flowable.engine.impl.context.Context
 
                                 List<String> list  = execution.getVariable('listVariable')
@@ -4621,8 +4621,8 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
         processMigrationService.createProcessInstanceMigrationBuilder().postUpgradeScript(new Script("groovy",
                         """
-                                import com.fasterxml.jackson.databind.ObjectMapper
-                                import com.fasterxml.jackson.databind.node.ArrayNode
+                                import tools.jackson.databind.ObjectMapper
+                                import tools.jackson.databind.node.ArrayNode
                                 import org.flowable.engine.impl.context.Context
 
                                 List<String> list  = execution.getVariable('listVariable')

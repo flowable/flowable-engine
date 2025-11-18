@@ -19,7 +19,7 @@ import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Service providing access to the repository of process definitions and deployments.

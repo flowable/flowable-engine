@@ -23,7 +23,7 @@ import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 

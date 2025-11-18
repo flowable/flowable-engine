@@ -67,7 +67,7 @@ import org.springframework.kafka.listener.KafkaConsumerBackoffManager;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Auto configuration for the event registry.

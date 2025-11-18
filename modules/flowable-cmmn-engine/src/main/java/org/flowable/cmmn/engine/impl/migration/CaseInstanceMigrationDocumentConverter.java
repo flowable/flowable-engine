@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.migration;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -28,13 +27,14 @@ import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Valentin Zickner
@@ -42,10 +42,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigrationDocumentConstants {
 
     protected static Predicate<JsonNode> isNotNullNode = jsonNode -> jsonNode != null && !jsonNode.isNull();
-    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isTextual();
+    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isString();
     protected static Predicate<JsonNode> isMultiValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isArray();
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    protected static ObjectMapper objectMapper = JsonMapper.shared();
 
     public static JsonNode convertToJson(CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         ObjectNode documentNode = objectMapper.createObjectNode();
@@ -127,7 +127,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         try {
             return objectWriter.writeValueAsString(jsonNode);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return jsonNode.toString();
         }
     }
@@ -374,7 +374,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
             return documentBuilder.build();
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Error parsing Case Instance Migration Document", e);
         }
 

@@ -57,7 +57,7 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobData
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * This service configuration contains all settings and instances around job execution and management. Note that a {@link JobServiceConfiguration} is

@@ -34,9 +34,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -133,12 +132,8 @@ public class CmmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryCm
             Map<String, Object> headers = new HashMap<>();
             headers.put("headerProperty1", headerValue1);
             headers.put("headerProperty2", headerValue2);
-            try {
-                String event = objectMapper.writeValueAsString(eventNode);
-                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            String event = objectMapper.writeValueAsString(eventNode);
+            eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
         }
 
         protected ObjectNode createTestEventNode(String customerId, String orderId) {

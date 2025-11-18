@@ -16,12 +16,13 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class SimpleHttpResponseHandler implements HttpResponseHandler {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
     @Override
     public void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse) {
