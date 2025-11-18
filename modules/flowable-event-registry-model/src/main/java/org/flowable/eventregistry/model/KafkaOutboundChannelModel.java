@@ -122,7 +122,7 @@ public class KafkaOutboundChannelModel extends OutboundChannelModel {
         }
 
         // backward compatibility
-        @JsonCreator
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
         public static RecordKey fromFixedValue(String fixedValue) {
             RecordKey recordKey = new RecordKey();
             recordKey.setFixedValue(fixedValue);
