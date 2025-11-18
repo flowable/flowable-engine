@@ -10,26 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.mail.common.impl;
+package org.flowable.common.engine.impl.mail;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 import jakarta.activation.DataSource;
 import jakarta.activation.FileDataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.mail.common.api.MailMessage;
@@ -37,11 +35,9 @@ import org.flowable.mail.common.api.MailResponse;
 import org.flowable.mail.common.api.SendMailRequest;
 import org.flowable.mail.common.api.client.ExecutableSendMailRequest;
 import org.flowable.mail.common.api.client.FlowableMailClient;
+import org.flowable.mail.common.impl.FlowableMailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @param <V> The type of the variable container
@@ -230,24 +226,7 @@ public abstract class BaseMailActivityDelegate<V extends VariableContainer> {
             return Collections.emptyList();
         }
         Object value = expression.getValue(variableContainer);
-        if (value == null) {
-            return Collections.emptyList();
-        }
-        if (value instanceof Collection) {
-            return (Collection<String>) value;
-        } else if (value instanceof ArrayNode arrayNode) {
-            Collection<String> recipients = new ArrayList<>(arrayNode.size());
-            for (JsonNode node : arrayNode) {
-                recipients.add(node.asText());
-            }
-            return recipients;
-        } else {
-            String str = value.toString();
-            if (StringUtils.isNotEmpty(str)) {
-                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
-            }
-        }
-        return Collections.emptyList();
+        return CandidateUtil.extractCandidates(value);
     }
 
     protected boolean fileExists(File file) {

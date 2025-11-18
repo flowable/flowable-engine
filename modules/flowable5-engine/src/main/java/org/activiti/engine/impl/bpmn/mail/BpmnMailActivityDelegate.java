@@ -20,7 +20,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.mail.common.api.client.FlowableMailClient;
-import org.flowable.mail.common.impl.BaseMailActivityDelegate;
+import org.flowable.common.engine.impl.mail.BaseMailActivityDelegate;
 
 public class BpmnMailActivityDelegate extends BaseMailActivityDelegate<DelegateExecution>
         implements JavaDelegate {
