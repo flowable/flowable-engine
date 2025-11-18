@@ -60,10 +60,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @SpringJUnitWebConfig(ApplicationConfiguration.class)
 @ExtendWith(InternalFlowableAppSpringExtension.class)
@@ -186,7 +185,7 @@ public class BaseSpringRestTestCase {
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
      */
-    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 
         // Do the actual call
@@ -207,7 +206,7 @@ public class BaseSpringRestTestCase {
         assertThat(toBeFound).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
-    protected void assertEmptyResultsPresentInDataResponse(String url) throws JsonProcessingException, IOException {
+    protected void assertEmptyResultsPresentInDataResponse(String url) throws IOException {
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
 
@@ -220,11 +219,11 @@ public class BaseSpringRestTestCase {
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a POST on the given url) contains entries with the given ID's.
      */
-    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, String... expectedResourceIds) throws IOException {
         assertResultsPresentInPostDataResponseWithStatusCheck(url, body, HttpStatus.SC_OK, expectedResourceIds);
     }
 
-    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = 0;
         if (expectedResourceIds != null) {
             numberOfResultsExpected = expectedResourceIds.length;

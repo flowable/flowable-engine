@@ -42,7 +42,7 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.task.service.delegate.DelegateTask;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.

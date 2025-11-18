@@ -16,8 +16,6 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,9 +47,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -353,11 +350,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
             @Override
             public Customer deserialize(Object rawEvent) {
-                try {
-                    return eventEngineConfiguration.getObjectMapper().readValue(rawEvent.toString(), Customer.class);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                return eventEngineConfiguration.getObjectMapper().readValue(rawEvent.toString(), Customer.class);
             }
 
         });
@@ -444,11 +437,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
             json.put("customerId", "test");
             json.put("payload1", "Hello World");
             json.put("payload2", 123);
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
     }
     

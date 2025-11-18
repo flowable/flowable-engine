@@ -23,10 +23,10 @@ import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.PropertyNotWritableException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeCreator;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeCreator;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Defines property resolution behavior on JsonNodes.
@@ -87,7 +87,7 @@ public class JsonNodeELResolver extends ELResolver {
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         if (isResolvable(base)) {
             JsonNode node = (JsonNode) base;
-            final Iterator<String> keys = node.fieldNames();
+            final Iterator<String> keys = node.propertyNames().iterator();
             return new Iterator<>() {
                 @Override
                 public boolean hasNext() {

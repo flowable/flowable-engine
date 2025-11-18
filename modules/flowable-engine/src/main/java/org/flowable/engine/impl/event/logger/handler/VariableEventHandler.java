@@ -32,8 +32,9 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Joram Barrez
@@ -138,13 +139,13 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
         } else if (variableType instanceof SerializableType || (variableEvent.getVariableValue() != null && (variableEvent.getVariableValue() instanceof Object))) {
 
             // Last try: serialize it to json
-            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectMapper objectMapper = JsonMapper.shared();
             try {
                 String value = objectMapper.writeValueAsString(variableEvent.getVariableValue());
                 putInMapIfNotNull(data, Fields.VALUE_JSON, value);
                 putInMapIfNotNull(data, Fields.VARIABLE_TYPE, TYPE_JSON);
                 putInMapIfNotNull(data, Fields.VALUE, value);
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 // Nothing to do about it
                 LOGGER.debug("Could not serialize variable value {}", variableEvent.getVariableValue());
             }

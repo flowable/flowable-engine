@@ -15,7 +15,7 @@ package org.flowable.engine.test.bpmn.multiinstance;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class TestJsonDelegate implements JavaDelegate {
 

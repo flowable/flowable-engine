@@ -29,8 +29,7 @@ import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -60,8 +59,7 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         closeResponse(response);
         assertThat(content).isNotNull();
 
-        JsonNode auditNode = new ObjectMapper().readTree(content);
-        assertThatJson(auditNode)
+        assertThatJson(content)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "   decisionKey: 'decision',"
@@ -92,8 +90,7 @@ public class HistoricDecisionExecutionAuditDataResourceTest extends BaseSpringDm
         closeResponse(response);
         assertThat(content).isNotNull();
 
-        JsonNode auditNode = new ObjectMapper().readTree(content);
-        assertThatJson(auditNode)
+        assertThatJson(content)
                 .when(Option.IGNORING_EXTRA_FIELDS)
                 .isEqualTo("{"
                         + "   decisionKey: 'evaluateMortgageRequestService',"

@@ -44,7 +44,7 @@ import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public class DeploymentTest extends AbstractFlowableEventTest {
 
