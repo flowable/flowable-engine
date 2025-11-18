@@ -26,7 +26,7 @@ import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 

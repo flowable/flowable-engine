@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public interface DecisionTableVariableManager {
 

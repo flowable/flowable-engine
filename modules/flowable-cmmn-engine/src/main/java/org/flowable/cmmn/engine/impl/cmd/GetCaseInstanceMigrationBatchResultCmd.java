@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.engine.impl.cmd;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.flowable.batch.api.Batch;
@@ -27,8 +26,9 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Valentin Zickner
@@ -105,7 +105,7 @@ public class GetCaseInstanceMigrationBatchResultCmd implements Command<CaseInsta
                     partResult.setMigrationStacktrace(resultStacktrace);
                 }
 
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 throw new FlowableException("Error reading batch part " + batchPart.getId());
             }
         }

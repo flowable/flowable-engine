@@ -66,11 +66,11 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -78,7 +78,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -222,7 +222,7 @@ public class CmmnEngineAutoConfigurationTest {
     @Test
     public void standaloneCmmnEngineWithJackson() {
         contextRunner
-                .withConfiguration(AutoConfigurations.of(Jackson2AutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).as("Cmmn engine")
                             .hasSingleBean(CmmnEngine.class)
@@ -398,7 +398,7 @@ public class CmmnEngineAutoConfigurationTest {
                 .withConfiguration(AutoConfigurations.of(
                         ProcessEngineServicesAutoConfiguration.class,
                         ProcessEngineAutoConfiguration.class,
-                        Jackson2AutoConfiguration.class
+                        JacksonAutoConfiguration.class
                 ))
                 .run(context -> {
                     assertThat(context)

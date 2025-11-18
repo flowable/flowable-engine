@@ -71,7 +71,7 @@ import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguratio
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
@@ -84,7 +84,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -231,7 +231,7 @@ public class ProcessEngineAutoConfigurationTest {
     @Test
     public void standaloneProcessEngineWithJackson() {
         contextRunner
-                .withConfiguration(AutoConfigurations.of(Jackson2AutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context).as("Process engine")
                             .hasSingleBean(ProcessEngine.class)
@@ -412,7 +412,7 @@ public class ProcessEngineAutoConfigurationTest {
                         IdmEngineAutoConfiguration.class,
                         IdmEngineServicesAutoConfiguration.class,
 
-                        Jackson2AutoConfiguration.class
+                        JacksonAutoConfiguration.class
                 ))
                 .run(context -> {
                     assertThat(context).as("Process engine")

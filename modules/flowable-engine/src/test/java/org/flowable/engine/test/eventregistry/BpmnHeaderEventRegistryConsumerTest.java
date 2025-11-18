@@ -37,9 +37,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBpmnTestCase {
 
@@ -194,12 +193,8 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
             if (headerValue2 != null) {
                 headers.put("headerProperty2", headerValue2);
             }
-            try {
-                String event = objectMapper.writeValueAsString(eventNode);
-                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            String event = objectMapper.writeValueAsString(eventNode);
+            eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
         }
 
         public void triggerTestEventWithCaseInsensitiveHeaders(String customerId, String headerValue1, Integer headerValue2) {
@@ -207,12 +202,8 @@ public class BpmnHeaderEventRegistryConsumerTest extends FlowableEventRegistryBp
             Map<String, Object> headers = new LinkedCaseInsensitiveMap<>();
             headers.put("HeaderProperty1", headerValue1);
             headers.put("HeaderProperty2", headerValue2);
-            try {
-                String event = objectMapper.writeValueAsString(eventNode);
-                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            String event = objectMapper.writeValueAsString(eventNode);
+            eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
         }
 
         protected ObjectNode createTestEventNode(String customerId, String orderId) {

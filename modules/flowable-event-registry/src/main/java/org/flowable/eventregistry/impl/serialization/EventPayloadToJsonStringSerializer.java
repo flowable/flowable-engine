@@ -17,15 +17,16 @@ import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Simple {@link EventInstance} serialization that maps all {@link org.flowable.eventregistry.api.runtime.EventPayloadInstance}'s
@@ -114,7 +115,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
                         JsonNode jsonNode;
                         try {
                             jsonNode = objectMapper.readTree((String) jsonValue);
-                        } catch (JsonProcessingException e) {
+                        } catch (JacksonException e) {
                             throw new FlowableIllegalArgumentException("Could not read json event payload", e);
                         }
                         objectNode.set(payloadInstance.getDefinitionName(), jsonNode);
@@ -133,7 +134,7 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
         try {
             return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Could not serialize event to json string for " + eventInstance, e);
         }
     }

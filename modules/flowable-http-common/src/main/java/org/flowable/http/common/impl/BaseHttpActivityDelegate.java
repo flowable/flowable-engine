@@ -12,7 +12,6 @@
  */
 package org.flowable.http.common.impl;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,8 +28,8 @@ import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
 import org.flowable.http.common.api.client.ExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.MissingNode;
 
 /**
  * @author Filip Hrisafov
@@ -146,8 +145,7 @@ public abstract class BaseHttpActivityDelegate {
         return requestData;
     }
 
-    protected void saveResponseFields(VariableContainer variableContainer, RequestData request, HttpResponse response, ObjectMapper objectMapper)
-            throws IOException {
+    protected void saveResponseFields(VariableContainer variableContainer, RequestData request, HttpResponse response, ObjectMapper objectMapper) {
         // Save response fields
         if (response != null) {
             // Save response body only by default

@@ -32,6 +32,7 @@
         <httpcore.version>4.4.16</httpcore.version>
         <httpclient5.version>5.5.1</httpclient5.version>
         <jackson.version>2.20.1</jackson.version>
+        <jackson3.version>3.0.1</jackson3.version>
         <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
         <jakarta.enterprise.concurrent-api.version>3.1.1</jakarta.enterprise.concurrent-api.version>
         <jakarta.inject-api.version>2.0.1</jakarta.inject-api.version>
@@ -141,6 +142,13 @@
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson3.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

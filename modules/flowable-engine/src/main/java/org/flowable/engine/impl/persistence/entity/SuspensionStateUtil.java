@@ -27,7 +27,7 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for suspension state

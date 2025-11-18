@@ -24,7 +24,7 @@ import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatch
 import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatchPartDataManager;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers

@@ -140,6 +140,7 @@
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
+            tools.jackson*;resolution:=optional,
             jakarta.transaction;resolution:=optional,
             jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>

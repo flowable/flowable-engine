@@ -21,7 +21,6 @@ import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -29,10 +28,9 @@ import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -122,10 +120,6 @@ public class DeleteHistoricCaseInstanceIdsStatusJobHandler implements JobHandler
         if (json == null) {
             return null;
         }
-        try {
-            return objectMapper.readTree(json);
-        } catch (JsonProcessingException e) {
-            throw new FlowableException("Failed to read json", e);
-        }
+        return objectMapper.readTree(json);
     }
 }

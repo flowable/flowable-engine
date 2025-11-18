@@ -32,7 +32,7 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Luis Belloch
@@ -132,9 +132,9 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
 
     protected void expectSequence(JsonNode list, List<String> ids, List<String> types) {
         assertThat(list).hasSameSizeAs(ids);
-        List<String> resultingIds = list.findValuesAsText("taskId");
+        List<String> resultingIds = list.findValuesAsString("taskId");
         assertThat(resultingIds).isEqualTo(ids);
-        List<String> resultingTypes = list.findValuesAsText("type");
+        List<String> resultingTypes = list.findValuesAsString("type");
         assertThat(resultingTypes).isEqualTo(types);
     }
 }

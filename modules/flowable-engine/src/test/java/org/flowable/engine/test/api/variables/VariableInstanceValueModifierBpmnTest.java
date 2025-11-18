@@ -53,8 +53,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Arthur Hupka-Merle
@@ -485,12 +485,7 @@ public class VariableInstanceValueModifierBpmnTest extends PluggableFlowableTest
                 if (value instanceof String) {
                     VariableMeta variableMeta = new VariableMeta();
                     variableMeta.byteLength = String.valueOf(((String) value).getBytes().length);
-                    String metaInfo;
-                    try {
-                        metaInfo = objectMapper.writeValueAsString(variableMeta);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
+                    String metaInfo = objectMapper.writeValueAsString(variableMeta);
                     return Pair.of(value + "Enhanced", metaInfo);
                 }
 

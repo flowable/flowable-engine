@@ -54,7 +54,7 @@ import org.flowable.spring.boot.dmn.DmnEngineServicesAutoConfiguration;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
@@ -65,7 +65,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public class DmnEngineAutoConfigurationTest {
 
@@ -136,7 +136,7 @@ public class DmnEngineAutoConfigurationTest {
     @Test
     public void standaloneDmnEngineWithJackson() {
         contextRunner
-                .withConfiguration(AutoConfigurations.of(Jackson2AutoConfiguration.class))
+                .withConfiguration(AutoConfigurations.of(JacksonAutoConfiguration.class))
                 .run(context -> {
                     assertThat(context)
                             .doesNotHaveBean(AppEngine.class)
@@ -310,7 +310,7 @@ public class DmnEngineAutoConfigurationTest {
                 .withConfiguration(AutoConfigurations.of(
                         ProcessEngineServicesAutoConfiguration.class,
                         ProcessEngineAutoConfiguration.class,
-                        Jackson2AutoConfiguration.class
+                        JacksonAutoConfiguration.class
                 ))
                 .run(context -> {
                     assertThat(context)

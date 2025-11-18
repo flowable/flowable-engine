@@ -18,10 +18,11 @@ import java.util.function.Supplier;
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -32,8 +33,7 @@ public class EventJsonConverter {
     protected Supplier<ObjectMapper> objectMapperSupplier;
 
     public EventJsonConverter() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.objectMapperSupplier = () -> objectMapper;
+        this(JsonMapper::shared);
     }
 
     public EventJsonConverter(Supplier<ObjectMapper> objectMapperSupplier) {

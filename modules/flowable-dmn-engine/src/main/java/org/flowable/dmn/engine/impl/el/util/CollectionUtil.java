@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens

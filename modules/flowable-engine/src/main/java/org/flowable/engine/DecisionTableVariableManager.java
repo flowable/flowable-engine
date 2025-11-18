@@ -17,7 +17,7 @@ import java.util.Map;
 
 import org.flowable.engine.delegate.DelegateExecution;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public interface DecisionTableVariableManager {
 

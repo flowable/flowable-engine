@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Checks if the value of a variable (fetched using the variableName through the variable scope) is empty.

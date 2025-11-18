@@ -40,10 +40,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
@@ -168,7 +167,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
         validateEventSent(instanceB, "tenantBProperty");
     }
 
-    private void validateEventSent(ProcessInstance processInstance, String property) throws JsonProcessingException {
+    private void validateEventSent(ProcessInstance processInstance, String property) {
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());

@@ -12,14 +12,14 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.io.IOException;
-
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractProcessInstanceMigrationJobHandler implements JobHandler {
 
@@ -37,7 +37,7 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
                 return cfgAsJson.get(CFG_LABEL_BATCH_ID).asText();
             }
             return null;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -49,7 +49,7 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
                 return cfgAsJson.get(CFG_LABEL_BATCH_PART_ID).asText();
             }
             return null;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -70,7 +70,7 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
         if (CommandContextUtil.getCommandContext() != null) {
             return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
         } else {
-            return new ObjectMapper();
+            return JsonMapper.shared();
         }
     }
 }

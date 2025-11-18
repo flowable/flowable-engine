@@ -23,7 +23,8 @@ import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecution
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityManager;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Yvo Swillens
@@ -65,7 +66,7 @@ public class PersistHistoricDecisionExecutionCmd implements Command<Void> {
 
             ObjectMapper objectMapper = engineConfiguration.getObjectMapper();
             if (objectMapper == null) {
-                objectMapper = new ObjectMapper();
+                objectMapper = JsonMapper.shared();
             }
 
             try {

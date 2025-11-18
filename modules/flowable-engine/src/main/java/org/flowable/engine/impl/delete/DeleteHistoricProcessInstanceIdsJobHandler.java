@@ -24,7 +24,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,10 +33,9 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -147,13 +145,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
     }
 
     protected JsonNode getBatchPartResult(BatchPart batchPart, ProcessEngineConfigurationImpl engineConfiguration) {
-        try {
-            return engineConfiguration.getObjectMapper()
-                    .readTree(batchPart.getResultDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
-            
-        } catch (JsonProcessingException e) {
-            ExceptionUtil.sneakyThrow(e);
-            return null;
-        }
+        return engineConfiguration.getObjectMapper()
+                .readTree(batchPart.getResultDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
     }
 }
