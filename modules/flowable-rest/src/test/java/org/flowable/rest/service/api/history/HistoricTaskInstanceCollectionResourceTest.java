@@ -17,6 +17,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -38,8 +41,6 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
@@ -50,8 +51,6 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTestCase {
-
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
     /**
      * Test querying historic task instance. GET history/historic-task-instances
@@ -130,21 +129,22 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         assertResultsPresentInDataResponse(url + "?taskDefinitionKeys=processTask,processTask2", 3, task.getId(), task1.getId(), task2.getId());
 
-        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
+        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + LocalDate.of(2010, Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 1, task.getId());
 
-        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 0);
+        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + LocalDate.of(2013, Month.MAY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 0);
 
-        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + LocalDate.of(2010, Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(),
+                0);
 
-        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 1, task.getId());
+        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + LocalDate.of(2013, Month.MAY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 1, task.getId());
 
-        assertResultsPresentInDataResponse(url + "?taskCreatedOn=" + dateFormat.format(created.getTime()), 1, task1.getId());
+        assertResultsPresentInDataResponse(url + "?taskCreatedOn=" + created.toInstant().toString(), 1, task1.getId());
 
         created.set(Calendar.YEAR, 2002);
-        assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + dateFormat.format(created.getTime()), 1, task1.getId());
+        assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + created.toInstant().toString(), 1, task1.getId());
 
         created.set(Calendar.YEAR, 2000);
-        assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + dateFormat.format(created.getTime()), 3, task1.getId(), task2.getId());
+        assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + created.toInstant().toString(), 3, task1.getId(), task2.getId());
 
         // Without tenant id
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 2, task.getId(), task1.getId());
