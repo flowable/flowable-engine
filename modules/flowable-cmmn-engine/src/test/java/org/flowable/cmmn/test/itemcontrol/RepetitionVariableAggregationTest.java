@@ -148,7 +148,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ userId: 'userOne', approved : false, description : 'description task 0' },"
                     + "{ userId: 'userTwo', approved : true, description : 'description task 1' },"
                     + "{ userId: 'userThree', approved : false, description : 'description task 2' }"
-                    + "]]");
+                    + "]");
 
         assertNoAggregatedVariables();
         VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
@@ -630,7 +630,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ userId: 'userOne', approved : true, description : 'description task 1' },"
                     + "{ userId: 'userTwo', approved : false, description : 'description task 2' },"
                     + "{ userId: 'userThree', approved : true, description : 'description task 3' }"
-                    + "]]");
+                    + "]");
 
         assertNoAggregatedVariables();
         VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
@@ -969,7 +969,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ score: 100, approved : true, description : 'description task 0' },"
                     + "{ score: 101, approved : false, description : 'description task 1' },"
                     + "{ score: 102, approved : true, description : 'description task 2' }"
-                    + "]]");
+                    + "]");
 
         assertNoAggregatedVariables();
         VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
@@ -1099,7 +1099,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
                     + "{ score: 11, approved : false, description : 'description task 1' },"
                     + "{ score: 12, approved : true, description : 'description task 2' },"
                     + "{ score: 13, approved : false, description : 'description task 3' }"
-                    + "]]");
+                    + "]");
 
         assertNoAggregatedVariables();
         VariableInstance reviewsVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "reviews");
