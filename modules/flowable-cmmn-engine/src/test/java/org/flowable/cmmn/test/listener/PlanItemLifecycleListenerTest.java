@@ -40,7 +40,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez

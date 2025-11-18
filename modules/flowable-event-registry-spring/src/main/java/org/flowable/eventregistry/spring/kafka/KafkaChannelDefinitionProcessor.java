@@ -107,7 +107,7 @@ import org.springframework.util.StringValueResolver;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A {@link ChannelModelProcessor} which is responsible for configuring Kafka Event registry integration.

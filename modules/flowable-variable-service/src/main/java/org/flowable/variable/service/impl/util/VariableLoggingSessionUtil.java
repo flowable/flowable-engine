@@ -37,9 +37,9 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class VariableLoggingSessionUtil {
     

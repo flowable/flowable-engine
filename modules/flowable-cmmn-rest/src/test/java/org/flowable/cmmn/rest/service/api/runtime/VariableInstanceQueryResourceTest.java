@@ -30,10 +30,9 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the variable instance query resource.
@@ -131,7 +130,7 @@ public class VariableInstanceQueryResourceTest extends BaseSpringRestTestCase {
     }
 
     protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String variableName, Object variableValue)
-            throws JsonProcessingException, IOException {
+            throws IOException {
 
         // Do the actual call
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);

@@ -29,7 +29,7 @@ import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.w3c.dom.Document;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez

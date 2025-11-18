@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Parent class for all BPMN 2.0 task types such as ServiceTask, ScriptTask, UserTask, etc.

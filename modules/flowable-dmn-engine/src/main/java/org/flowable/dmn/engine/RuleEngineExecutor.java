@@ -20,7 +20,7 @@ import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.model.Decision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens

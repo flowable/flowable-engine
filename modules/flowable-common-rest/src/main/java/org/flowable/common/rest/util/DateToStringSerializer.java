@@ -12,19 +12,17 @@
  */
 package org.flowable.common.rest.util;
 
-import java.io.IOException;
 import java.util.Date;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-public class DateToStringSerializer extends JsonSerializer<Date> {
+public class DateToStringSerializer extends ValueSerializer<Date> {
 
     @Override
-    public void serialize(Date tmpDate, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-
+    public void serialize(Date tmpDate, JsonGenerator jsonGenerator, SerializationContext ctxt) throws JacksonException {
         if (tmpDate != null) {
             jsonGenerator.writeString(tmpDate.toInstant().toString());
         } else {

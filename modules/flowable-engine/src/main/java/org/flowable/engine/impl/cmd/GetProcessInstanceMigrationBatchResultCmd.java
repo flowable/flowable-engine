@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.flowable.batch.api.Batch;
@@ -27,8 +26,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationPartResult;
 import org.flowable.engine.migration.ProcessInstanceBatchMigrationResult;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class GetProcessInstanceMigrationBatchResultCmd implements Command<ProcessInstanceBatchMigrationResult> {
 
@@ -104,7 +104,7 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
                     partResult.setMigrationStacktrace(resultStacktrace);
                 }
                 
-            } catch (IOException e) {
+            } catch (JacksonException e) {
                 throw new FlowableException("Error reading batch part " + batchPart.getId());
             }
         }
