@@ -868,7 +868,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                     variableInstance, variableServiceConfiguration.getObjectMapper());
             addLoggingSessionInfo(loggingNode);
             loggingNode.put("oldVariableType", oldVariableType);
-            VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
+            VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode,
+                    variableServiceConfiguration.getObjectMapper());
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
     }

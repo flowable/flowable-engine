@@ -17,9 +17,9 @@ import java.util.Iterator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.variable.VariableContainer;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableJsonNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 /**
  * Checks if the value of a variable (fetched using the variableName through the variable scope) contains all of the provided values.
@@ -28,7 +28,7 @@ import tools.jackson.databind.node.ArrayNode;
  * 
  * - {@link String}: following {@link StringUtils#contains(CharSequence, CharSequence)} semantics for all passed values
  * - {@link Collection}: following the {@link Collection#contains(Object)} for all passed values
- * - {@link ArrayNode}: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
+ * - {@code Json Array}: supports checking if the array contains a JsonNode for the types that are supported as variable type
  * 
  * When the variable value is null, false is returned in all cases.
  * When the variable value is not null, and the instance type is not one of the cases above, false will be returned.
@@ -62,7 +62,8 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
                 }
                 return true;
 
-            } else if (variableValue instanceof ArrayNode arrayNodeVariableValue) {
+            } else if (JsonUtil.isArrayNode(variableValue)) {
+                FlowableArrayNode arrayNodeVariableValue = JsonUtil.asFlowableArrayNode(variableValue);
                 for (Object value : values) {
                    if (!arrayNodeContains(arrayNodeVariableValue, value)) {
                        return false;
@@ -100,14 +101,14 @@ public class VariableContainsExpressionFunction extends AbstractFlowableVariable
         }
     }
     
-    public static boolean arrayNodeContains(ArrayNode arrayNode, Object value) {
-        Iterator<JsonNode> iterator = arrayNode.iterator();
+    public static boolean arrayNodeContains(FlowableArrayNode arrayNode, Object value) {
+        Iterator<FlowableJsonNode> iterator = arrayNode.iterator();
         while (iterator.hasNext()) {
-            JsonNode jsonNode = iterator.next();
+            FlowableJsonNode jsonNode = iterator.next();
             if (value == null && jsonNode.isNull()) {
                 return true;
             } else if (value != null) {
-                if (value instanceof String && jsonNode.isTextual() && StringUtils.equals(jsonNode.asText(), (String) value)) {
+                if (value instanceof String && jsonNode.isString() && StringUtils.equals(jsonNode.asString(), (String) value)) {
                     return true;
                 } else if (value instanceof Number && jsonNode.isLong() && jsonNode.longValue() == ((Number) value).longValue()) {
                     return true;

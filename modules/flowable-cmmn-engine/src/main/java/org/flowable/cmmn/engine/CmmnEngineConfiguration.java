@@ -255,6 +255,8 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
@@ -513,6 +515,8 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
      * And the changes to the JsonNode will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
      */
     protected boolean jsonVariableTypeTrackObjects = true;
+
+    protected VariableJsonMapper variableJsonMapper;
 
     protected List<CaseInstanceMigrationCallback> caseInstanceMigrationCallbacks;
 
@@ -824,6 +828,14 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
     
+    @Override
+    public void initObjectMapper() {
+        super.initObjectMapper();
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
+        }
+    }
+
     public void initFunctionDelegates() {
         if (flowableFunctionDelegates == null) {
             flowableFunctionDelegates = new ArrayList<>();
@@ -1414,9 +1426,9 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new CmmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
@@ -1466,6 +1478,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setVariableJsonMapper(this.variableJsonMapper);
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
         this.variableServiceConfiguration.setConfigurators(variableServiceConfigurators);
     }
@@ -2964,6 +2977,17 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    @Override
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    @Override
+    public CmmnEngineConfiguration setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
         return this;
     }
 

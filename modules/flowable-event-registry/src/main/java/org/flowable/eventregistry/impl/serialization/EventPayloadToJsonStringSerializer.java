@@ -105,8 +105,14 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
                     Object jsonValue = payloadInstanceValue;
                     if (payloadInstanceValue instanceof Supplier<?>) {
                         Object suppliedValue = ((Supplier<?>) payloadInstanceValue).get();
-                        if (suppliedValue instanceof JsonNode) {
-                            jsonValue = suppliedValue;
+                        JsonNode jsonNode = JsonUtil.asJsonNode(suppliedValue, objectMapper, true);
+                        if (jsonNode != null) {
+                            jsonValue = jsonNode;
+                        }
+                    } else {
+                        JsonNode jsonNode = JsonUtil.asJsonNode(jsonValue, objectMapper, true);
+                        if (jsonNode != null) {
+                            jsonValue = jsonNode;
                         }
                     }
                     if (jsonValue instanceof JsonNode) {

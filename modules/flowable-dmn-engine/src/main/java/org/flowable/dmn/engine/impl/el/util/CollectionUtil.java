@@ -15,9 +15,8 @@ package org.flowable.dmn.engine.impl.el.util;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.springframework.util.CollectionUtils;
-
-import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens
@@ -50,7 +49,7 @@ public class CollectionUtil {
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return targetCollection.containsAll((Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode(JsonUtil.asFlowableArrayNode(value));
             return valueCollection != null && targetCollection.containsAll(valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
@@ -92,7 +91,7 @@ public class CollectionUtil {
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode(JsonUtil.asFlowableArrayNode(value));
             return !CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
@@ -134,7 +133,7 @@ public class CollectionUtil {
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return CollectionUtils.containsAny(targetCollection, (Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode(JsonUtil.asFlowableArrayNode(value));
             return CollectionUtils.containsAny(targetCollection, valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
@@ -176,7 +175,7 @@ public class CollectionUtil {
         } else if (DMNParseUtil.isJavaCollection(value)) {
             return !targetCollection.containsAll((Collection) value);
         } else if (DMNParseUtil.isArrayNode(value)) {
-            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) value);
+            Collection valueCollection = DMNParseUtil.getCollectionFromArrayNode(JsonUtil.asFlowableArrayNode(value));
             return valueCollection == null || !targetCollection.containsAll(valueCollection);
         } else {
             Object formattedValue = DMNParseUtil.getFormattedValue(value, targetCollection);
@@ -201,7 +200,7 @@ public class CollectionUtil {
                 targetCollection = Arrays.asList(collection);
             }
         } else if (DMNParseUtil.isArrayNode(collection)) {
-            targetCollection = DMNParseUtil.getCollectionFromArrayNode((ArrayNode) collection);
+            targetCollection = DMNParseUtil.getCollectionFromArrayNode(JsonUtil.asFlowableArrayNode(collection));
         } else {
             targetCollection = (Collection) collection;
         }
