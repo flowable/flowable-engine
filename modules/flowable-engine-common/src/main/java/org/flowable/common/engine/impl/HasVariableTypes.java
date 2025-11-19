@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl;
 
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.variable.api.types.VariableTypes;
 
 /**
@@ -22,5 +23,9 @@ public interface HasVariableTypes {
     VariableTypes getVariableTypes();
 
     AbstractEngineConfiguration setVariableTypes(VariableTypes variableTypes);
+
+    VariableJsonMapper getVariableJsonMapper();
+
+    AbstractEngineConfiguration setVariableJsonMapper(VariableJsonMapper variableJsonMapper);
 
 }

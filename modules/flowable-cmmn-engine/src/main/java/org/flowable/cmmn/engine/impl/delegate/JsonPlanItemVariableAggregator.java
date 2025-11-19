@@ -24,6 +24,10 @@ import org.flowable.cmmn.api.delegate.PlanItemVariableAggregatorContext;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableObjectNode;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -47,11 +51,6 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
-
 /**
  * @author Filip Hrisafov
  */
@@ -65,7 +64,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
 
     @Override
     public Object aggregateSingleVariable(DelegatePlanItemInstance planItemInstance, PlanItemVariableAggregatorContext context) {
-        ObjectNode objectNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+        VariableJsonMapper jsonMapper = cmmnEngineConfiguration.getVariableJsonMapper();
+        FlowableObjectNode objectNode = jsonMapper.createObjectNode();
 
         VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
         VariableService variableService = variableServiceConfiguration.getVariableService();
@@ -108,7 +108,7 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                             objectNode.put(targetVarName, (String) varInstance.getValue());
                             break;
                         case JsonType.TYPE_NAME:
-                            objectNode.set(targetVarName, (JsonNode) varInstance.getValue());
+                            objectNode.set(targetVarName, JsonUtil.asFlowableJsonNode(varInstance.getValue()));
                             break;
                         case BooleanType.TYPE_NAME:
                             objectNode.put(targetVarName, (Boolean) varInstance.getValue());
@@ -153,8 +153,8 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                             if (PlanItemVariableAggregatorContext.OVERVIEW.equals(context.getState())) {
                                 // We can only use the aggregated variable if we are in an overview state
                                 Object value = varInstance.getValue();
-                                if (value instanceof JsonNode) {
-                                    objectNode.set(targetVarName, (JsonNode) value);
+                                if (jsonMapper.isJsonNode(value)) {
+                                    objectNode.set(targetVarName, JsonUtil.asFlowableJsonNode(value));
                                 } else {
                                     throw new FlowableException("Cannot aggregate overview variable: " + varInstance);
                                 }
@@ -167,18 +167,18 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
             }
         }
 
-        return objectNode;
+        return objectNode.getImplementationValue();
     }
 
     @Override
     public Object aggregateMultiVariables(DelegatePlanItemInstance planItemInstance, List<? extends VariableInstance> instances,
             PlanItemVariableAggregatorContext context) {
-        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        VariableJsonMapper objectMapper = cmmnEngineConfiguration.getVariableJsonMapper();
+        FlowableArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {
-            arrayNode.add((JsonNode) instance.getValue());
+            arrayNode.add(JsonUtil.asFlowableJsonNode(instance.getValue()));
         }
 
-        return arrayNode;
+        return arrayNode.getImplementationValue();
     }
 }

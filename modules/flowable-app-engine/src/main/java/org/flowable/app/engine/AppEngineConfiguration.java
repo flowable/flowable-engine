@@ -69,6 +69,8 @@ import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
@@ -156,6 +158,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
      */
     protected boolean jsonVariableTypeTrackObjects = true;
 
+    protected VariableJsonMapper variableJsonMapper;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -255,6 +258,14 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
     public void initMybatisTypeHandlers(Configuration configuration) {
         super.initMybatisTypeHandlers(configuration);
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
+    }
+
+    @Override
+    public void initObjectMapper() {
+        super.initObjectMapper();
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
+        }
     }
 
     public void initExpressionManager() {
@@ -408,9 +419,9 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
             variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
@@ -432,6 +443,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setVariableJsonMapper(this.variableJsonMapper);
     }
 
     public void initVariableServiceConfiguration() {
@@ -737,6 +749,17 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     public AppEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    @Override
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    @Override
+    public AppEngineConfiguration setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
         return this;
     }
 

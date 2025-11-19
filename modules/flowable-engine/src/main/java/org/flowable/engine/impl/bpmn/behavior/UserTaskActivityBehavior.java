@@ -17,9 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +29,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -62,8 +61,6 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -489,24 +486,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
     }
 
     protected Collection<String> extractCandidates(Object value) {
-        if (value instanceof Collection) {
-            return (Collection<String>) value;
-        } else if (value instanceof ArrayNode valueArrayNode) {
-            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
-            for (JsonNode node : valueArrayNode) {
-                candidates.add(node.asText());
-            }
-
-            return candidates;
-        } else if (value != null) {
-            String str = value.toString();
-            if (StringUtils.isNotEmpty(str)) {
-                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
-            }
-        }
-
-        return Collections.emptyList();
-
+        return CandidateUtil.extractCandidates(value);
     }
     
     protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {

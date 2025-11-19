@@ -28,6 +28,7 @@ import org.flowable.cmmn.spring.autodeployment.SingleResourceAutoDeploymentStrat
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
 import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
@@ -51,6 +52,7 @@ import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.springframework.beans.factory.ObjectProvider;
@@ -94,7 +96,8 @@ import tools.jackson.databind.ObjectMapper;
     ProcessEngineServicesAutoConfiguration.class
 })
 @Import({
-    FlowableJobConfiguration.class
+    FlowableJobConfiguration.class,
+    FlowableVariableJackson2JsonMapperConfiguration.class,
 })
 public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
@@ -145,6 +148,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
     @ConditionalOnMissingBean
     public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         ObjectProvider<ObjectMapper> objectMapperProvider,
+        ObjectProvider<VariableJsonMapper> variableJsonMapperProvider,
         @Cmmn ObjectProvider<AsyncExecutor> asyncExecutorProvider,
         ObjectProvider<org.springframework.core.task.AsyncTaskExecutor> taskExecutor,
         @Cmmn ObjectProvider<org.springframework.core.task.AsyncTaskExecutor> cmmnTaskExecutor,
@@ -189,6 +193,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configureSpringEngine(configuration, platformTransactionManager);
         configureEngine(configuration, dataSource);
         objectMapperProvider.ifAvailable(configuration::setObjectMapper);
+        variableJsonMapperProvider.ifAvailable(configuration::setVariableJsonMapper);
 
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 

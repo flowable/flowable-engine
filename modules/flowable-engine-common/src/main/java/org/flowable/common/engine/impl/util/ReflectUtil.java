@@ -91,6 +91,15 @@ public abstract class ReflectUtil {
         return clazz;
     }
 
+    public static boolean isClassPresent(String className) {
+        try {
+            loadClass(className);
+            return true;
+        } catch (FlowableClassLoadingException ignored) {
+            return false;
+        }
+    }
+
     public static InputStream getResourceAsStream(String name) {
         InputStream resourceStream = null;
         ClassLoader classLoader = getCustomClassLoader();
