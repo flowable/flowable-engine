@@ -370,6 +370,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * A change tenant id was executed.
      */
     CHANGE_TENANT_ID,
+
+    /**
+     * The business status was updated
+     */
+    BUSINESS_STATUS_UPDATED
     ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};
