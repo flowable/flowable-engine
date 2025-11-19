@@ -1105,6 +1105,28 @@ public class JsonTest extends PluggableFlowableTestCase {
                         + "}]");
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testJackson2JsonNodeVariable() {
+        com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.node.ObjectNode customer = jackson2ObjectMapper.createObjectNode()
+                .put("name", "Kermit");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", customer)
+                .start();
+
+        Object customerVariable = runtimeService.getVariable(processInstance.getId(), "customer");
+        assertThat(customerVariable).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVariable)
+                .isEqualTo("""
+                        {
+                          name: 'Kermit'
+                        }
+                        """);
+    }
+
     protected ObjectNode createBigJsonObject() {
         ObjectNode valueNode = objectMapper.createObjectNode();
         for (int i = 0; i < 1000; i++) {

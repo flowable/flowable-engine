@@ -18,8 +18,7 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-
-import tools.jackson.databind.node.ArrayNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 /**
  * Checks if the value of a variable (fetched using the variableName through the variable scope) is empty.
@@ -28,7 +27,7 @@ import tools.jackson.databind.node.ArrayNode;
  * 
  * - {@link String}: following {@link StringUtils#isEmpty(CharSequence)} semantics 
  * - {@link Collection}: if the collection has no elements
- * - {@link ArrayNode}: if the json array has no elements.
+ * - {@code Json Array}: if the json array has no elements.
  * 
  * When the variable value is null, true is returned in all cases.
  * When the variable value is not null, and the instance type is not one of the cases above, false will be returned.
@@ -53,8 +52,8 @@ public class VariableIsEmptyExpressionFunction extends AbstractFlowableVariableE
         } else if  (variableValue instanceof Collection) {
             return CollectionUtil.isEmpty((Collection) variableValue);
             
-        } else if (variableValue instanceof ArrayNode) {
-            return ((ArrayNode) variableValue).size() == 0;
+        } else if (JsonUtil.isArrayNode(variableValue)) {
+            return JsonUtil.asFlowableArrayNode(variableValue).size() == 0;
             
         } else {
             return false;

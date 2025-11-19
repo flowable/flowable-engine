@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableJsonNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Yvo Swillens
@@ -45,7 +45,7 @@ public class DMNParseUtil {
     }
 
     public static boolean isArrayNode(Object collection) {
-        return ArrayNode.class.isAssignableFrom(collection.getClass());
+        return JsonUtil.isArrayNode(collection);
     }
 
     public static boolean isParseableCollection(Object value) {
@@ -67,33 +67,33 @@ public class DMNParseUtil {
         return items;
     }
 
-    public static Collection getCollectionFromArrayNode(ArrayNode arrayNode) {
+    public static Collection getCollectionFromArrayNode(FlowableArrayNode arrayNode) {
         List<Object> values = new ArrayList<>();
-        for (JsonNode node : arrayNode) {
+        for (FlowableJsonNode node : arrayNode) {
             values.add(getJsonValue(node));
         }
         return values;
     }
 
-    protected static Object getJsonValue(JsonNode jsonNode) {
-        switch (jsonNode.getNodeType()) {
-            case ARRAY:
-                LOGGER.warn("Nested ArrayNodes not supported");
-            case BINARY:
-                LOGGER.warn("Nested BinaryNodes not supported");
-            case OBJECT:
-                LOGGER.warn("Nested ObjectNodes not supported");
-            case POJO:
-                LOGGER.warn("Nested PojoNodes not supported");
-            case BOOLEAN:
-                return jsonNode.booleanValue();
-            case NULL:
-                return null;
-            case NUMBER:
-                return getNumberValue(jsonNode.numberValue().toString());
-            default:
-                return jsonNode.textValue();
+    protected static Object getJsonValue(FlowableJsonNode jsonNode) {
+        if (jsonNode.isBoolean()) {
+            return jsonNode.booleanValue();
         }
+
+        if (jsonNode.isNull()) {
+            return null;
+        }
+
+        if (jsonNode.isNumber()) {
+            return getNumberValue(jsonNode.asString());
+        }
+
+        if (jsonNode.isString()) {
+            return jsonNode.asString();
+        }
+
+        LOGGER.warn("Json Node {} is not supported", jsonNode.getImplementationValue().getClass());
+        return null;
     }
 
     protected static List<Object> split(String str, Class<?> collectionType) {

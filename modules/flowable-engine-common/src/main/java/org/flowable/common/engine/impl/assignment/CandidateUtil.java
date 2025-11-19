@@ -18,19 +18,20 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.commons.lang3.StringUtils;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableJsonNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 public class CandidateUtil {
 
     public static Collection<String> extractCandidates(Object value) {
         if (value instanceof Collection) {
             return (Collection<String>) value;
-        } else if (value instanceof ArrayNode valueArrayNode) {
+        } else if (JsonUtil.isArrayNode(value)) {
+            FlowableArrayNode valueArrayNode = JsonUtil.asFlowableArrayNode(value);
             Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
-            for (JsonNode node : valueArrayNode) {
-                candidates.add(node.asText());
+            for (FlowableJsonNode node : valueArrayNode) {
+                candidates.add(node.asString());
             }
 
             return candidates;

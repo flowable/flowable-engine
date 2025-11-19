@@ -20,6 +20,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableObjectNode;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.delegate.variable.VariableAggregatorContext;
@@ -47,11 +50,6 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
-
 /**
  * @author Filip Hrisafov
  */
@@ -65,7 +63,8 @@ public class JsonVariableAggregator implements VariableAggregator {
 
     @Override
     public Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context) {
-        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        VariableJsonMapper jsonMapper = processEngineConfiguration.getVariableJsonMapper();
+        FlowableObjectNode objectNode = jsonMapper.createObjectNode();
 
         VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
         VariableService variableService = variableServiceConfiguration.getVariableService();
@@ -109,7 +108,7 @@ public class JsonVariableAggregator implements VariableAggregator {
                             objectNode.put(targetVarName, (String) varInstance.getValue());
                             break;
                         case JsonType.TYPE_NAME:
-                            objectNode.set(targetVarName, (JsonNode) varInstance.getValue());
+                            objectNode.setJsonNode(targetVarName, varInstance.getValue());
                             break;
                         case BooleanType.TYPE_NAME:
                             objectNode.put(targetVarName, (Boolean) varInstance.getValue());
@@ -154,8 +153,8 @@ public class JsonVariableAggregator implements VariableAggregator {
                             if (VariableAggregatorContext.OVERVIEW.equals(context.getState())) {
                                 // We can only use the aggregated variable if we are in an overview state
                                 Object value = varInstance.getValue();
-                                if (value instanceof JsonNode) {
-                                    objectNode.set(targetVarName, (JsonNode) value);
+                                if (jsonMapper.isJsonNode(value)) {
+                                    objectNode.setJsonNode(targetVarName, value);
                                 } else {
                                     throw new FlowableException("Cannot aggregate overview variable: " + varInstance);
                                 }
@@ -168,17 +167,17 @@ public class JsonVariableAggregator implements VariableAggregator {
             }
         }
 
-        return objectNode;
+        return objectNode.getImplementationValue();
     }
 
     @Override
     public Object aggregateMultiVariables(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
-        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        VariableJsonMapper objectMapper = processEngineConfiguration.getVariableJsonMapper();
+        FlowableArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {
-            arrayNode.add((JsonNode) instance.getValue());
+            arrayNode.addJsonNode(instance.getValue());
         }
 
-        return arrayNode;
+        return arrayNode.getImplementationValue();
     }
 }

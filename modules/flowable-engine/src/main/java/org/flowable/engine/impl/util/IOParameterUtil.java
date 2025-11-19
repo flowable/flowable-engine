@@ -23,10 +23,9 @@ import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import tools.jackson.databind.JsonNode;
 
 /**
  * @author Filip Hrisafov
@@ -77,8 +76,8 @@ public class IOParameterUtil {
                 value = sourceContainer.getVariable(parameter.getSource());
             }
             
-            if (value != null && value instanceof JsonNode) {
-                value = ((JsonNode) value).deepCopy();
+            if (value != null) {
+                value = JsonUtil.deepCopyIfJson(value);
             }
 
             String variableName = null;
