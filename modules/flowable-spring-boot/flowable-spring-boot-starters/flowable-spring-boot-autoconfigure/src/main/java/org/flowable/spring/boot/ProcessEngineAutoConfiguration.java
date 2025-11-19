@@ -22,6 +22,7 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
@@ -39,6 +40,7 @@ import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnProcessEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.flowable.spring.boot.process.FlowableProcessProperties;
 import org.flowable.spring.boot.process.Process;
 import org.flowable.spring.boot.process.ProcessAsync;
@@ -55,7 +57,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -94,7 +95,8 @@ import tools.jackson.databind.ObjectMapper;
     "org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration"
 })
 @Import({
-    FlowableJobConfiguration.class
+    FlowableJobConfiguration.class,
+    FlowableVariableJackson2JsonMapperConfiguration.class
 })
 public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
@@ -171,6 +173,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
     @ConditionalOnMissingBean
     public SpringProcessEngineConfiguration springProcessEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
             ObjectProvider<ObjectMapper> objectMapperProvider,
+            ObjectProvider<VariableJsonMapper> variableJsonMapperProvider,
             @Process ObjectProvider<IdGenerator> processIdGenerator,
             ObjectProvider<IdGenerator> globalIdGenerator,
             @ProcessAsync ObjectProvider<AsyncExecutor> asyncExecutorProvider,
@@ -221,6 +224,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
         asyncTaskInvokerTaskExecutor.ifAvailable(conf::setAsyncTaskInvokerTaskExecutor);
 
         objectMapperProvider.ifAvailable(conf::setObjectMapper);
+        variableJsonMapperProvider.ifAvailable(conf::setVariableJsonMapper);
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 

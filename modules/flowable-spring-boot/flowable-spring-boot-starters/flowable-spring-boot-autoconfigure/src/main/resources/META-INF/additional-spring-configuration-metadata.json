@@ -784,6 +784,17 @@
           "description": "App engine."
         }
       ]
+    },
+    {
+      "name": "flowable.variable-json-mapper",
+      "values": [
+        {
+          "value": "jackson"
+        },
+        {
+          "value": "jackson2"
+        }
+      ]
     }
   ]
 }
