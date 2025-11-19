@@ -18,8 +18,11 @@ import java.io.Serializable;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -38,7 +41,7 @@ public class SetProcessInstanceBusinessStatusCmd implements Command<Void>, Seria
     private final String businessStatus;
 
     public SetProcessInstanceBusinessStatusCmd(String processInstanceId, String businessStatus) {
-        if (processInstanceId == null || processInstanceId.length() < 1) {
+        if (processInstanceId == null || processInstanceId.isEmpty()) {
             throw new FlowableIllegalArgumentException("The process instance id is mandatory, but '" + processInstanceId + "' has been provided.");
         }
         if (businessStatus == null) {
@@ -61,8 +64,13 @@ public class SetProcessInstanceBusinessStatusCmd implements Command<Void>, Seria
                     + processInstance.getProcessInstanceId() + "'. " + "Please invoke the " + getClass().getSimpleName() + " with a root execution id.");
         }
 
+        String oldBusinessStatus = processInstance.getBusinessStatus();
         executionManager.updateProcessInstanceBusinessStatus(processInstance, businessStatus);
 
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessBusinessStatusUpdatedEvent(processInstance, oldBusinessStatus, businessStatus), EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+        }
         return null;
     }
 }
