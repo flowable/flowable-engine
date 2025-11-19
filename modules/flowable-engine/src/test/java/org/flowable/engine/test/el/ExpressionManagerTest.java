@@ -339,6 +339,7 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         objectNode.put("firstAttribute", "foo");
         objectNode.put("secondAttribute", "bar");
         objectNode.put("thirdAttribute", 42);
+        objectNode.putNull("nullAttribute");
 
         vars.put("object", objectNode);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
@@ -356,6 +357,12 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
         assertThat(getExpressionValue("${object.get(\"dummyAttribute\")}", processInstance)).isNull();
         assertThat(getExpressionValue("${object.path(\"dummyAttribute\").isMissingNode()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.path(\"dummyAttribute\").asString()}", processInstance)).isEqualTo("");
+        assertThat(getExpressionValue("${object.path(\"dummyAttribute\").asText()}", processInstance)).isEqualTo("");
+
+        assertThat(getExpressionValue("${object.path(\"nullAttribute\").isNull()}", processInstance)).isEqualTo(true);
+        assertThat(getExpressionValue("${object.path(\"nullAttribute\").asString()}", processInstance)).isEqualTo("null");
+        assertThat(getExpressionValue("${object.path(\"nullAttribute\").asText()}", processInstance)).isEqualTo("null");
     }
   
     private Object getExpressionValue(String expressionStr, ProcessInstance processInstance) {

@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.BigDecimalType;
 import org.flowable.variable.service.impl.types.BigIntegerType;
@@ -72,14 +73,15 @@ public class VariableLoggingSessionUtil {
                 loggingNode.putNull("variableValue");
                 
             } else {
-                addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode);
+                addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode, objectMapper);
             }
         }
         
         return loggingNode;
     }
     
-    public static void addVariableValue(Object variableValue, String variableTypeName, String variableRawValueName, String variableValueName, ObjectNode loggingNode) {
+    public static void addVariableValue(Object variableValue, String variableTypeName, String variableRawValueName, String variableValueName,
+            ObjectNode loggingNode, ObjectMapper objectMapper) {
         if (LongType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Long) variableValue);
         } else if (IntegerType.TYPE_NAME.equals(variableTypeName)) {
@@ -101,7 +103,8 @@ public class VariableLoggingSessionUtil {
         } else if (BooleanType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Boolean) variableValue);
         } else if (JsonType.TYPE_NAME.equals(variableTypeName)) {
-            loggingNode.set(variableRawValueName, (JsonNode) variableValue);
+            JsonNode jsonNode = JsonUtil.asJsonNode(variableValue, objectMapper);
+            loggingNode.set(variableRawValueName, jsonNode);
         } else if (UUIDType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put("variableRawValue", ((UUID) variableValue).toString());
         } else if (NullType.TYPE_NAME.equals(variableTypeName)) {

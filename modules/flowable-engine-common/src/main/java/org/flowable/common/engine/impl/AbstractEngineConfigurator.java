@@ -330,6 +330,7 @@ public abstract class AbstractEngineConfigurator<E extends Engine> implements En
     protected void initVariableTypes(AbstractEngineConfiguration engineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         if (engineConfiguration instanceof HasVariableTypes && targetEngineConfiguration instanceof HasVariableTypes) {
             ((HasVariableTypes) targetEngineConfiguration).setVariableTypes(((HasVariableTypes) engineConfiguration).getVariableTypes());
+            ((HasVariableTypes) targetEngineConfiguration).setVariableJsonMapper(((HasVariableTypes) engineConfiguration).getVariableJsonMapper());
         }
     }
 

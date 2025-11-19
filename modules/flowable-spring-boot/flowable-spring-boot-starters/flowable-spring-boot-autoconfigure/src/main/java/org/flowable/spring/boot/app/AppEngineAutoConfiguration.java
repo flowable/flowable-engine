@@ -22,6 +22,7 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.app.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.spring.AutoDeploymentStrategy;
 import org.flowable.common.spring.CommonAutoDeploymentProperties;
@@ -31,11 +32,13 @@ import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -54,6 +57,9 @@ import tools.jackson.databind.ObjectMapper;
     FlowableAppProperties.class,
     FlowableIdmProperties.class,
     FlowableEventRegistryProperties.class,
+})
+@Import({
+    FlowableVariableJackson2JsonMapperConfiguration.class,
 })
 public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
@@ -75,6 +81,7 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
     @ConditionalOnMissingBean
     public SpringAppEngineConfiguration springAppEngineConfiguration(DataSource dataSource, PlatformTransactionManager platformTransactionManager,
         ObjectProvider<ObjectMapper> objectMapperProvider,
+        ObjectProvider<VariableJsonMapper> variableJsonMapperProvider,
         ObjectProvider<AutoDeploymentStrategy<AppEngine>> appAutoDeploymentStrategies) throws IOException {
 
         SpringAppEngineConfiguration conf = new SpringAppEngineConfiguration();
@@ -92,6 +99,7 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
         objectMapperProvider.ifAvailable(conf::setObjectMapper);
+        variableJsonMapperProvider.ifAvailable(conf::setVariableJsonMapper);
 
         conf.setIdGenerator(new StrongUuidGenerator());
 

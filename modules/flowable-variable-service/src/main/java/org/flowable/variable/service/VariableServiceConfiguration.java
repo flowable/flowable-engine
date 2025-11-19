@@ -14,6 +14,7 @@ package org.flowable.variable.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.DefaultVariableInstanceValueModifier;
@@ -67,6 +68,8 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration<V
      * compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+
+    protected VariableJsonMapper variableJsonMapper;
 
     public VariableServiceConfiguration(String engineName) {
         super(engineName);
@@ -229,6 +232,14 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration<V
 
     public void setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    public void setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
     }
 
     public VariableInstanceValueModifier getVariableInstanceValueModifier() {

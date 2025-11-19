@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.external.job.rest.service.api.ExternalJobRestResponseFactory;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
+import org.flowable.spring.boot.json.Jackson2JsonRestConverterConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,16 +31,16 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Filip Hrisafov
  */
-@Import(DispatcherServletConfiguration.class)
+@Import({
+        DispatcherServletConfiguration.class,
+        Jackson2JsonRestConverterConfiguration.class,
+})
 @ComponentScan("org.flowable.external.job.rest.service.api")
 public class ExternalJobRestConfiguration {
 
-    @Autowired
-    protected ObjectMapper objectMapper;
-
     @Bean
     @ConditionalOnMissingBean //If we don't include this annotation, we cannot override the RestResponseFactory bean
-    public ExternalJobRestResponseFactory restResponseFactory(ObjectProvider<RestVariableConverter> variableConverters) {
+    public ExternalJobRestResponseFactory restResponseFactory(ObjectMapper objectMapper, ObjectProvider<RestVariableConverter> variableConverters) {
         return new ExternalJobRestResponseFactory(objectMapper, variableConverters.orderedStream().collect(Collectors.toList()));
     }
 }

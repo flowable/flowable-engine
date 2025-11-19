@@ -136,6 +136,13 @@ public class FlowableProperties {
     private Duration historyCleaningAfter = Duration.ofDays(365);
     private int historyCleaningBatchSize = 100;
 
+    /**
+     * Preferred JSON mapper to use for variables.
+     * The options are jackson and jackson2.
+     * Jackson is the default and jackson2 is deprecated for removal.
+     */
+    private String variableJsonMapper = "jackson";
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -398,5 +405,13 @@ public class FlowableProperties {
 
     public void setHistoryCleaningBatchSize(int historyCleaningBatchSize) {
         this.historyCleaningBatchSize = historyCleaningBatchSize;
+    }
+
+    public String getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    public void setVariableJsonMapper(String variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
     }
 }

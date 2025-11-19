@@ -210,6 +210,8 @@ import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
@@ -242,6 +244,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Tom Baeyens
@@ -535,7 +538,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper;
+    protected VariableJsonMapper variableJsonMapper;
 
     protected boolean enableEventDispatcher = true;
     protected FlowableEventDispatcher eventDispatcher;
@@ -577,6 +581,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initConfigurators();
         configuratorsBeforeInit();
         initClock();
+        initObjectMapper();
         initProcessDiagramGenerator();
         initHistoryLevel();
         initExpressionManager();
@@ -1284,6 +1289,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    protected void initObjectMapper() {
+        if (objectMapper == null) {
+            objectMapper = JsonMapper.builder().build();
+        }
+
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
+        }
+    }
+
     protected void initProcessDiagramGenerator() {
         if (processDiagramGenerator == null) {
             processDiagramGenerator = new DefaultProcessDiagramGenerator();
@@ -1378,9 +1393,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new DateType());
             variableTypes.addType(new DoubleType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(maxLengthStringVariableType, objectMapper, false));
+            variableTypes.addType(new JsonType(maxLengthStringVariableType, variableJsonMapper, false));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, objectMapper, false));
+            variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, variableJsonMapper, false));
             variableTypes.addType(new ByteArrayType());
             variableTypes.addType(new SerializableType());
             if (customPostVariableTypes != null) {
@@ -2314,6 +2329,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
         return this;
     }
 

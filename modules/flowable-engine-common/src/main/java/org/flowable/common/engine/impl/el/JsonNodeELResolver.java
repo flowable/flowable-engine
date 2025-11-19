@@ -20,11 +20,10 @@ import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.PropertyNotWritableException;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.JsonNodeCreator;
-import tools.jackson.databind.node.ObjectNode;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableJsonNode;
+import org.flowable.common.engine.impl.json.FlowableObjectNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 /**
  * Defines property resolution behavior on JsonNodes.
@@ -121,42 +120,43 @@ public class JsonNodeELResolver extends ELResolver {
         }
         Object result = null;
         if (isResolvable(base)) {
-            JsonNode resultNode = getResultNode((JsonNode) base, property, context);
+            FlowableJsonNode baseNode = JsonUtil.asFlowableJsonNode(base);
+            FlowableJsonNode resultNode = getResultNode(baseNode, property, context);
             if (resultNode != null && resultNode.isValueNode()) {
                 if (resultNode.isBoolean()) {
-                    result = resultNode.asBoolean();
+                    result = resultNode.booleanValue();
                 } else if (resultNode.isShort() || resultNode.isInt()) {
-                    result = resultNode.asInt();
+                    result = resultNode.intValue();
                 } else if (resultNode.isLong()) {
-                    result = resultNode.asLong();
+                    result = resultNode.longValue();
                 } else if (resultNode.isBigDecimal() || resultNode.isDouble() || resultNode.isFloat()) {
-                    result = resultNode.asDouble();
-                } else if (resultNode.isTextual()) {
-                    result = resultNode.asText();
+                    result = resultNode.doubleValue();
+                } else if (resultNode.isString()) {
+                    result = resultNode.asString();
                 } else if (resultNode.isNull()) {
                     result = null;
                 } else {
-                    result = resultNode.toString();
+                    result = resultNode.getImplementationValue().toString();
                 }
 
-            } else {
-                result = resultNode;
+            } else if (resultNode != null) {
+                result = resultNode.getImplementationValue();
             }
             context.setPropertyResolved(true);
         }
         return result;
     }
 
-    protected JsonNode getResultNode(JsonNode base, Object property, ELContext context) {
+    protected FlowableJsonNode getResultNode(FlowableJsonNode base, Object property, ELContext context) {
         if (property instanceof String) {
-            JsonNode propertyNode = base.get((String) property);
+            FlowableJsonNode propertyNode = base.get((String) property);
             if (propertyNode != null) {
                 return propertyNode;
             }
 
-            if (!readOnly && base instanceof ObjectNode && context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
+            if (!readOnly && base instanceof FlowableObjectNode && context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
                 // The base does not have the requested property, so add it and return it, only if we are in write evaluation state
-                return ((ObjectNode) base).putObject((String) property);
+                return ((FlowableObjectNode) base).putObject((String) property);
             }
             return null;
         } else if (property instanceof Number) {
@@ -212,7 +212,16 @@ public class JsonNodeELResolver extends ELResolver {
         if (method == null) {
             return null;
         }
-        if (params.length != 1) {
+        if (params.length == 0) {
+            String methodName = method.toString();
+            if (methodName.equals("asString") || methodName.equals("asText")) {
+                String value = JsonUtil.asFlowableJsonNode(base).asString();
+                context.setPropertyResolved(true);
+                return value;
+            }
+            return null;
+
+        } else if (params.length != 1) {
             return null;
         }
         Object param = params[0];
@@ -222,15 +231,14 @@ public class JsonNodeELResolver extends ELResolver {
 
         int index = ((Long) param).intValue();
         String methodName = method.toString();
-        JsonNode node = (JsonNode) base;
         if (methodName.equals("path")) {
-            JsonNode valueNode = node.path(index);
+            FlowableJsonNode valueNode = JsonUtil.asFlowableJsonNode(base).path(index);
             context.setPropertyResolved(true);
-            return valueNode;
+            return valueNode.getImplementationValue();
         } else if (methodName.equals("get")) {
-            JsonNode valueNode = node.get(index);
+            FlowableJsonNode valueNode = JsonUtil.asFlowableJsonNode(base).get(index);
             context.setPropertyResolved(true);
-            return valueNode;
+            return valueNode != null ? valueNode.getImplementationValue() : null;
         }
 
         return null;
@@ -267,64 +275,85 @@ public class JsonNodeELResolver extends ELResolver {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
-        if (base instanceof ObjectNode) {
-            setValue(context, (ObjectNode) base, property, value);
-        } else if (base instanceof ArrayNode) {
-            setValue(context, (ArrayNode) base, property, value);
+        if (isResolvable(base)) {
+            FlowableJsonNode baseNode = JsonUtil.asFlowableJsonNode(base);
+            if (baseNode instanceof FlowableObjectNode objectNode) {
+                setValue(context, objectNode, property, value);
+            } else if (baseNode instanceof FlowableArrayNode arrayNode) {
+                setValue(context, arrayNode, property, value);
+            }
         }
     }
 
-    protected void setValue(ELContext context, ObjectNode node, Object property, Object value) {
+    protected void setValue(ELContext context, FlowableObjectNode node, Object property, Object value) {
         if (readOnly) {
             throw new PropertyNotWritableException("resolver is read-only");
         }
-        JsonNode jsonNode = createNode(node, value);
-        node.set(property.toString(), jsonNode);
+
+        String propertyName = property.toString();
+        if (value instanceof BigDecimal bigDecimal) {
+            node.put(propertyName, bigDecimal);
+
+        } else if (value instanceof Boolean booleanValue) {
+            node.put(propertyName, booleanValue);
+
+        } else if (value instanceof Integer integerValue) {
+            node.put(propertyName, integerValue);
+        } else if (value instanceof Long longValue) {
+            node.put(propertyName, longValue);
+
+        } else if (value instanceof Double doubleValue) {
+            node.put(propertyName, doubleValue);
+
+        } else if (JsonUtil.isJsonNode(value)) {
+            node.set(propertyName, JsonUtil.asFlowableJsonNode(value));
+        } else if (value instanceof CharSequence charSequence) {
+            node.put(propertyName, charSequence.toString());
+        } else if (value instanceof Date date) {
+            node.put(propertyName, date.toInstant().toString());
+        } else if (value != null) {
+            node.put(propertyName, value.toString());
+
+        } else {
+            node.putNull(propertyName);
+        }
         context.setPropertyResolved(true);
     }
 
-    protected void setValue(ELContext context, ArrayNode node, Object property, Object value) {
+    protected void setValue(ELContext context, FlowableArrayNode node, Object property, Object value) {
         if (readOnly) {
             throw new PropertyNotWritableException("resolver is read-only");
         }
 
         int index = toIndex(property);
-        JsonNode jsonNode = createNode(node, value);
-        node.set(index, jsonNode);
-        context.setPropertyResolved(true);
-    }
+        if (value instanceof BigDecimal bigDecimal) {
+            node.set(index, bigDecimal);
 
-    protected JsonNode createNode(JsonNodeCreator nodeCreator, Object value) {
-        JsonNode jsonNode;
-        if (value instanceof BigDecimal) {
-            jsonNode = nodeCreator.numberNode((BigDecimal) value);
+        } else if (value instanceof Boolean booleanValue) {
+            node.set(index, booleanValue);
 
-        } else if (value instanceof Boolean) {
-            jsonNode = nodeCreator.booleanNode((Boolean) value);
+        } else if (value instanceof Integer integerValue) {
+            node.set(index, integerValue);
+        } else if (value instanceof Long longValue) {
+            node.set(index, longValue);
 
-        } else if (value instanceof Integer) {
-            jsonNode = nodeCreator.numberNode((Integer) value);
-        } else if (value instanceof Long) {
-            jsonNode = nodeCreator.numberNode((Long) value);
+        } else if (value instanceof Double doubleValue) {
+            node.set(index, doubleValue);
 
-        } else if (value instanceof Double) {
-            jsonNode = nodeCreator.numberNode((Double) value);
-
-        } else if (value instanceof JsonNode) {
-            jsonNode = (JsonNode) value;
-        } else if (value instanceof CharSequence) {
-            jsonNode = nodeCreator.textNode(value.toString());
-        } else if (value instanceof Date) {
-            jsonNode = nodeCreator.textNode(((Date) value).toInstant().toString());
+        } else if (JsonUtil.isJsonNode(value)) {
+            node.set(index, JsonUtil.asFlowableJsonNode(value));
+        } else if (value instanceof CharSequence charSequence) {
+            node.set(index, charSequence.toString());
+        } else if (value instanceof Date date) {
+            node.set(index, date.toInstant().toString());
         } else if (value != null) {
-            jsonNode = nodeCreator.textNode(value.toString());
+            node.set(index, value.toString());
 
         } else {
-            jsonNode = nodeCreator.nullNode();
-
+            node.setNull(index);
         }
 
-        return jsonNode;
+        context.setPropertyResolved(true);
     }
 
     protected int toIndex(Object property) {
@@ -352,6 +381,6 @@ public class JsonNodeELResolver extends ELResolver {
      * @return base != null
      */
     private final boolean isResolvable(Object base) {
-        return base instanceof JsonNode;
+        return JsonUtil.isJsonNode(base);
     }
 }

@@ -40,6 +40,53 @@
         Date properties e.g., Process Instance start time will be returned as an ISO 8601 in the UTC timezone.
         E.g., if the start time was returned as <code>2025-09-24T09:58:12.609+02:00</code> now it is returned as <code>2025-09-24T07:58:12.609Z</code>.
     </li>
+    <li>
+        Jackson 3 is used for Flowable internal json manipulation.
+        There is still support for Jackson 2 variables.
+        With Spring Boot this can be enabled by setting <code>flowable.variable-json-mapper</code> to <code>jackson2</code>.
+        By default, Jackson 3 is being used for variables.
+        When configuring Flowable without Spring Boot then the <code>variableJsonMapper</code> on the process, cmmn and app engine configurations
+        should be set to be <code>org.flowable.common.engine.impl.json.jackson2.Jackson2VariableJsonMapper</code>
+        and the <code>org.flowable.common.rest.variable.Jackson2JsonObjectRestVariableConverter</code> should be added to the appropriate rest response factories.
+    </li>
+    <li>
+        Notable changes when using JSON in expressions / scripts:
+        <ul>
+            <li>Packages have changed from <code>com.fasterxml.jackson.databind</code> and <code>com.fasterxml.jackson.core</code> to <code>tools.jackson.databind</code> and <code>tools.jackson.core</code> </li>
+            <li><code>elements()</code> no longer returns <code>Iterator&lt;JsonNode&gt;</code> and instead returns <code>Collection&lt;JsonNode&gt;</code></li>
+            <li><code>values()</code> no longer returns <code>Iterator&lt;JsonNode&gt;</code> and instead returns <code>Collection&lt;JsonNode&gt;</code></li>
+            <li><code>Iterator&lt;String&gt; fieldNames()</code> replaced by <code>Collection&lt;String&gt; propertyNames()</code></li>
+            <li><code>Iterator&lt;Map.Entry&lt;String, JsonNode&gt;&gt; fields()</code> replaced by <code>Set&lt;Map.Entry&lt;String, JsonNode&gt;&gt; properties()</code></li>
+            <li><code>JsonNode with(String)</code> replaced by <code>ObjectNode withObject(String)</code>, and if not using a pointer then it is better to use <code>ObjectNode withProperty(String)</code></li>
+            <li><code>TextNode textNode(String)</code> replaced by <code>StringNode stringNode(String)</code></li>
+            <li><code>List&lt;String&gt; findValuesAsText(String)</code> replaced by <code>List&lt;String&gt; findValuesAsString(String)</code></li>
+            <li><code>List&lt;String&gt; findValuesAsText(String, List&lt;String&gt;)</code> replaced by <code>List&lt;String&gt; findValuesAsString(String, List&lt;String&gt;)</code></li>
+            <li><code>boolean isContainerNode()</code> replaced by <code>boolean isContainer()</code></li>
+            <li><code>boolean isEmpty(SerializerProvider)</code> replaced by <code>boolean isEmpty(SerializationContext)</code></li>
+            <li><code>JsonNode put(String, JsonNode)</code> replaced by <code>JsonNode replace(String, JsonNode)</code></li>
+            <li><code>JsonNode putAll(Map&lt;String, ? extends JsonNode&gt;)</code> replaced by <code>JsonNode setAll(Map&lt;String, ? extends JsonNode&gt;)</code></li>
+            <li><code>JsonNode putAll(ObjectNode)</code> replaced by <code>JsonNode setAll(ObjectNode)></code></li>
+            <li><code>JsonParser traverse()</code> removed without replacement</li>
+            <li><code>JsonParser traverse(ObjectCodec)</code> replaced by <code>JsonParser traverse(ObjectReadContext)</code></li>
+            <li><code>void serialize(JsonGenerator, SerializerProvider)</code> replaced by <code>void serialize(JsonGenerator, SerializationContext)</code></li>
+            <li><code>void serializeWithType(JsonGenerator, SerializerProvider, TypeSerializer)</code> replaced by <code>void serializeWithType(JsonGenerator, SerializationContext, TypeSerializer)</code></li>
+        </ul>
+        Methods deprecated in Jackson 3:
+        <ul>
+            <li><code>String asText()</code> replaced by <code>String asString()</code></li>
+            <li><code>String asText(String)</code> replaced by <code>String asString(String)</code></li>
+            <li><code>boolean isTextual()</code> replaced by <code>boolean isString()</code></li>
+            <li><code>String textValue()</code> replaced by <code>String stringValue()</code></li>
+        </ul>
+        There is also a behaviour change in the different <code>xxxValue</code> and <code>asXXX</code> methods.
+        In Jackson 3 those methods would fail if the node is not of the appropriate type and / or if it cannot coerce the value to the requested type.
+        e.g.
+        <ul>
+            <li>When using <code>stringValue</code> on a non <code>StringNode</code> or <code>NullNode</code> it would fail, in Jackson 2 it would return <code>null</code>.</li>
+            <li>When using <code>asString</code> on a <code>ObjectNode</code> or <code>ArrayNode</code> it would fail, in Jackson 2 it would return an empty string.</li>
+        </ul>
+
+    </li>
 </ul>
 <h3>Release Notes - Flowable - 7.2.0</h3>
 
