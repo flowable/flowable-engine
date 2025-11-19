@@ -35,6 +35,7 @@
 
 	<modules>
 		<module>modules/flowable-bom</module>
+		<module>build-tools</module>
 		<module>modules/flowable-parent</module>
 		<module>modules/flowable-dependencies</module>
 		<module>modules/flowable-bpmn-model</module>
@@ -170,7 +171,33 @@
                     <version>${central-publishing-maven-plugin.version}</version>
                     <extensions>true</extensions>
                 </plugin>
-			</plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.6.0</version>
+                    <configuration>
+                        <configLocation>build-config/checkstyle.xml</configLocation>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <violationSeverity>error</violationSeverity>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <propertyExpansion>basedir=${basedir}</propertyExpansion>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>12.1.2</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.flowable</groupId>
+                            <artifactId>flowable-build-tools</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+            </plugins>
 		</pluginManagement>
 	</build>
 
@@ -366,6 +393,13 @@
                 <module>modules/flowable5-spring</module>
                 <module>modules/flowable5-test</module>
             </modules>
+        </profile>
+        <profile>
+            <id>quick</id>
+            <properties>
+                <checkstyle.skip>true</checkstyle.skip>
+                <skipTests>true</skipTests>
+            </properties>
         </profile>
 	</profiles>
 
