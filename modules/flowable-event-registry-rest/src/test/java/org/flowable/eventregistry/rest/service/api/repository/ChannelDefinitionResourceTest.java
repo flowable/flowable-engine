@@ -27,7 +27,7 @@ import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 

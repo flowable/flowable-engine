@@ -14,8 +14,8 @@ package org.flowable.engine.dynamic;
 
 import org.flowable.bpmn.model.FlowElement;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Used for {@link FlowElement} currently not supported by the {@link org.flowable.engine.DynamicBpmnService} and elements who are not parsed.

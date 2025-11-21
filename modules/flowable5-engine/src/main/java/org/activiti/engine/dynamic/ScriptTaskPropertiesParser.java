@@ -15,8 +15,8 @@ package org.activiti.engine.dynamic;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.ScriptTask;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Created by Pardo David on 5/12/2016.

@@ -17,9 +17,9 @@ import java.io.IOException;
 import org.activiti.engine.impl.context.Context;
 import org.flowable.common.engine.api.delegate.Expression;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class TimerEventHandler {
 
@@ -171,7 +171,7 @@ public class TimerEventHandler {
         if (Context.getCommandContext() != null) {
             return Context.getProcessEngineConfiguration().getObjectMapper().readTree(config);
         } else {
-            return new ObjectMapper().readTree(config);
+            return JsonMapper.shared().readTree(config);
         }
     }
 }

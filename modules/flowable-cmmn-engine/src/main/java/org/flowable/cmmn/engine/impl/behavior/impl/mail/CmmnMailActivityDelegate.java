@@ -18,9 +18,9 @@ import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.mail.BaseMailActivityDelegate;
 import org.flowable.content.api.ContentService;
 import org.flowable.mail.common.api.client.FlowableMailClient;
-import org.flowable.mail.common.impl.BaseMailActivityDelegate;
 
 /**
  * @author Filip Hrisafov

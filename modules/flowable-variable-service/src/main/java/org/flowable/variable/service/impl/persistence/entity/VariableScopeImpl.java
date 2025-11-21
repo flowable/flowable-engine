@@ -37,7 +37,7 @@ import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.VariableInstanceValueModifier;
 import org.flowable.variable.service.impl.util.VariableLoggingSessionUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -868,7 +868,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
                     variableInstance, variableServiceConfiguration.getObjectMapper());
             addLoggingSessionInfo(loggingNode);
             loggingNode.put("oldVariableType", oldVariableType);
-            VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode);
+            VariableLoggingSessionUtil.addVariableValue(oldVariableValue, oldVariableType, "oldVariableRawValue", "oldVariableValue", loggingNode,
+                    variableServiceConfiguration.getObjectMapper());
             LoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_VARIABLE_UPDATE, loggingNode, variableServiceConfiguration.getEngineName());
         }
     }

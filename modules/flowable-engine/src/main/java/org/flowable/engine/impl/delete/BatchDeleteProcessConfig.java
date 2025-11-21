@@ -14,7 +14,6 @@ package org.flowable.engine.impl.delete;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
@@ -34,9 +32,8 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.QueryOperator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -432,13 +429,8 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static JsonNode getBatchConfiguration(Batch batch, ProcessEngineConfigurationImpl engineConfiguration) {
-        try {
-            return engineConfiguration.getObjectMapper()
-                    .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
-        } catch (JsonProcessingException e) {
-            ExceptionUtil.sneakyThrow(e);
-            return null;
-        }
+        return engineConfiguration.getObjectMapper()
+                .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
     }
 
     protected static String prepareFailedResultAsJsonString(String errorMessage, ProcessEngineConfigurationImpl engineConfiguration) {

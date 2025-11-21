@@ -28,7 +28,7 @@ import org.flowable.eventregistry.rest.service.api.repository.DeploymentResource
 import org.flowable.eventregistry.rest.service.api.repository.EventDefinitionResponse;
 import org.flowable.eventregistry.rest.service.api.repository.EventDeploymentResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Default implementation of a {@link EventRegistryRestResponseFactory}.

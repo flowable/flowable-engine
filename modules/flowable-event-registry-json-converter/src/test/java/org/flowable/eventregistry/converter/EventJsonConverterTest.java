@@ -26,8 +26,6 @@ import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  */

@@ -29,7 +29,7 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 

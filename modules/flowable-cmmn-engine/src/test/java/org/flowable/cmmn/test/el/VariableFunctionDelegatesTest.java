@@ -27,8 +27,8 @@ import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
