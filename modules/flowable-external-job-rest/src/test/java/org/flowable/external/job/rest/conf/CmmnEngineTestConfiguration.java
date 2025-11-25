@@ -83,7 +83,7 @@ public class CmmnEngineTestConfiguration {
     public RestTemplateCustomizer jackson2RestTemplate(ObjectMapper objectMapper) {
         return restTemplate -> {
             HttpMessageConverters httpMessageConverters = HttpMessageConverters.forClient().registerDefaults()
-                    .jsonMessageConverter(new MappingJackson2HttpMessageConverter(objectMapper))
+                    .withJsonConverter(new MappingJackson2HttpMessageConverter(objectMapper))
                     .build();
             restTemplate.setMessageConverters(StreamSupport.stream(httpMessageConverters.spliterator(), false)
                     .toList());

@@ -80,7 +80,7 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/dates_3.dmn")
     public void dynamicDatesSubtract() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        LocalDate localDate = dateTimeFormatter.parseLocalDate("2025-09-18");
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")
@@ -286,7 +286,7 @@ public class RuntimeTest extends BaseFlowableDmnTest {
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/reservered_word.dmn")
     public void reservedWord() {
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-        LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
+        LocalDate localDate = dateTimeFormatter.parseLocalDate("2025-09-18");
 
         Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
                 .decisionKey("decision")

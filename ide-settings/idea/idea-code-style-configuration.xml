@@ -17,6 +17,8 @@
           <emptyLine />
           <package name="com" withSubpackages="true" static="false" />
           <emptyLine />
+          <package name="tools" withSubpackages="true" static="false" />
+          <emptyLine />
           <package name="liquibase" withSubpackages="true" static="false" />
           <emptyLine />
           <package name="" withSubpackages="true" static="false" />

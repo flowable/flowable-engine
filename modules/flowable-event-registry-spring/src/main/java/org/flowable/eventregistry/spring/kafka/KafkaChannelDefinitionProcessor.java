@@ -1087,7 +1087,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         Long max = resolveExpressionAsLong(backOff.getMaxDelay(), "retry.nonBlockingBackOff.maxDelay");
         Double multiplier = resolveExpressionAsDouble(backOff.getMultiplier(), "retry.nonBlockingBackOff.multiplier");
         if (multiplier != null && multiplier > 0) {
-            RetryPolicy.Builder retryPolicyBuilder = RetryPolicy.builder().maxAttempts(Long.MAX_VALUE);
+            RetryPolicy.Builder retryPolicyBuilder = RetryPolicy.builder().maxRetries(Long.MAX_VALUE);
             retryPolicyBuilder.delay(Duration.ofMillis(delay));
             //TODO add jitter instead of random
 

@@ -637,6 +637,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
     }
 
+    @Test
     @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
     public void testQueryCaseInstancesByCaseInstanceIds() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -669,6 +670,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
     }
 
+    @Test
     @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
     public void testQueryCaseInstancesByCaseInstanceCallbackIds() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().callbackId("callBackId1").caseDefinitionKey("oneHumanTaskCase").start();

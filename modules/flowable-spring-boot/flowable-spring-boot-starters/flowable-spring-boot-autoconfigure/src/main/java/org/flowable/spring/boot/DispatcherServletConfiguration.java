@@ -38,6 +38,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        builder.jsonMessageConverter(new MappingJackson2HttpMessageConverter(objectMapper));
+        builder.withJsonConverter(new MappingJackson2HttpMessageConverter(objectMapper));
     }
 }
