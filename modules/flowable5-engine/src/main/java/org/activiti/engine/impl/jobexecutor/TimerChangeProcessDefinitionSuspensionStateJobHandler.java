@@ -14,8 +14,8 @@ package org.activiti.engine.impl.jobexecutor;
 
 import org.activiti.engine.impl.context.Context;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

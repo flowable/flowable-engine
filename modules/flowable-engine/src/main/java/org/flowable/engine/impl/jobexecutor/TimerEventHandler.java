@@ -12,13 +12,12 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.io.IOException;
-
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class TimerEventHandler {
 
@@ -43,7 +42,7 @@ public class TimerEventHandler {
             ObjectNode cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, activityId);
             return cfgJson.toString();
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             return jobHandlerConfiguration;
         }
     }
@@ -58,7 +57,7 @@ public class TimerEventHandler {
                 return jobHandlerConfiguration;
             }
             
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             return jobHandlerConfiguration;
         }
     }
@@ -73,7 +72,7 @@ public class TimerEventHandler {
                 return "";
             }
             
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             // calendar name is not specified
             return "";
         }
@@ -83,7 +82,7 @@ public class TimerEventHandler {
         ObjectNode cfgJson = null;
         try {
             cfgJson = readJsonValueAsObjectNode(jobHandlerConfiguration);
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             // create the json config
             cfgJson = createObjectNode();
             cfgJson.put(PROPERTYNAME_TIMER_ACTIVITY_ID, jobHandlerConfiguration);
@@ -106,7 +105,7 @@ public class TimerEventHandler {
                 return null;
             }
             
-        } catch (IOException ex) {
+        } catch (JacksonException ex) {
             return null;
         }
     }
@@ -115,15 +114,15 @@ public class TimerEventHandler {
         return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
     }
     
-    protected static ObjectNode readJsonValueAsObjectNode(String config) throws IOException {
+    protected static ObjectNode readJsonValueAsObjectNode(String config) throws JacksonException {
         return (ObjectNode) readJsonValue(config);
     }
     
-    protected static JsonNode readJsonValue(String config) throws IOException {
+    protected static JsonNode readJsonValue(String config) throws JacksonException {
         if (CommandContextUtil.getCommandContext() != null) {
             return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().readTree(config);
         } else {
-            return new ObjectMapper().readTree(config);
+            return JsonMapper.shared().readTree(config);
         }
     }
 

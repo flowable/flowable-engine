@@ -33,8 +33,9 @@ import org.flowable.eventregistry.model.OutboundChannelModel;
 import org.flowable.eventregistry.model.RabbitInboundChannelModel;
 import org.flowable.eventregistry.model.RabbitOutboundChannelModel;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Tijs Rademakers
@@ -47,11 +48,7 @@ public class ChannelJsonConverter {
     protected Map<String, Class<? extends ChannelModel>> channelModelClasses = new HashMap<>();
 
     public ChannelJsonConverter() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.objectMapperSupplier = () -> objectMapper;
-        addValidator(new OutboundChannelModelValidator());
-        addValidator(new InboundChannelModelValidator());
-        addDefaultChannelModelClasses();
+        this(JsonMapper::shared);
     }
 
     public ChannelJsonConverter(Supplier<ObjectMapper> objectMapperSupplier) {
@@ -62,10 +59,7 @@ public class ChannelJsonConverter {
     }
 
     public ChannelJsonConverter(Collection<ChannelValidator> validators) {
-        this.validators = new ArrayList<>(validators);
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.objectMapperSupplier = () -> objectMapper;
-        addDefaultChannelModelClasses();
+        this(validators, JsonMapper::shared);
     }
 
     public ChannelJsonConverter(Collection<ChannelValidator> validators, Supplier<ObjectMapper> objectMapperSupplier) {

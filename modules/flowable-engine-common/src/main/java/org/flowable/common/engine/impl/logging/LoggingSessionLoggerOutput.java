@@ -18,7 +18,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class LoggingSessionLoggerOutput {
     

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.BeforeEach;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Tom Baeyens
@@ -487,15 +486,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     }
 
     protected String getJobActivityId(Job job) {
-        try {
-            Map<String, Object> jobConfigurationMap = processEngineConfiguration.getObjectMapper()
-                    .readValue(job.getJobHandlerConfiguration(), new TypeReference<>() {
+        Map<String, Object> jobConfigurationMap = processEngineConfiguration.getObjectMapper()
+                .readValue(job.getJobHandlerConfiguration(), new TypeReference<>() {
 
-            });
-            return (String) jobConfigurationMap.get("activityId");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        });
+        return (String) jobConfigurationMap.get("activityId");
     }
 
     protected ProcessDefinition deployProcessDefinition(String name, String path) {

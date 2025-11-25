@@ -12,20 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.migration;
 
-import java.io.IOException;
-
 import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
 import org.flowable.common.engine.api.FlowableException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class HistoricCaseInstanceMigrationDocumentConverter implements CaseInstanceMigrationDocumentConstants {
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    protected static ObjectMapper objectMapper = JsonMapper.shared();
     
     public static JsonNode convertToJson(HistoricCaseInstanceMigrationDocument historicCaseInstanceMigrationDocument) {
         ObjectNode documentNode = objectMapper.createObjectNode();
@@ -54,7 +53,7 @@ public class HistoricCaseInstanceMigrationDocumentConverter implements CaseInsta
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         try {
             return objectWriter.writeValueAsString(jsonNode);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return jsonNode.toString();
         }
     }
@@ -75,7 +74,7 @@ public class HistoricCaseInstanceMigrationDocumentConverter implements CaseInsta
 
             return documentBuilder.build();
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Error parsing Historic Case Instance Migration Document", e);
         }
 

@@ -14,6 +14,7 @@ package org.flowable.eventregistry.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Joram Barrez
@@ -23,6 +24,7 @@ public class ChannelEventTenantIdDetection {
 
     protected String fixedValue;
     protected String jsonPointerExpression;
+    @JsonProperty("xPathExpression")
     protected String xPathExpression;
     protected String delegateExpression;
 

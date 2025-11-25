@@ -43,10 +43,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -58,7 +59,7 @@ public class JsonTest extends PluggableFlowableTestCase {
     public static final String MY_JSON_OBJ = "myJsonObj";
     public static final String BIG_JSON_OBJ = "bigJsonObj";
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/json/JsonTest.testUpdateJsonValueDuringExecution.bpmn20.xml")
@@ -1102,6 +1103,28 @@ public class JsonTest extends PluggableFlowableTestCase {
                         + "    street: 'Sesame Street'"
                         + "  }"
                         + "}]");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testJackson2JsonNodeVariable() {
+        com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.node.ObjectNode customer = jackson2ObjectMapper.createObjectNode()
+                .put("name", "Kermit");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", customer)
+                .start();
+
+        Object customerVariable = runtimeService.getVariable(processInstance.getId(), "customer");
+        assertThat(customerVariable).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVariable)
+                .isEqualTo("""
+                        {
+                          name: 'Kermit'
+                        }
+                        """);
     }
 
     protected ObjectNode createBigJsonObject() {
