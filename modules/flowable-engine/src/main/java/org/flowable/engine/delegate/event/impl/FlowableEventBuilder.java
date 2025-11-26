@@ -416,6 +416,10 @@ public class FlowableEventBuilder {
         return newEvent;
     }
 
+    public static FlowableEntityEvent createProcessBusinessStatusUpdatedEvent(ExecutionEntity execution, String oldBusinessStatus, String newBusinessStatus) {
+        return new FlowableProcessBusinessStatusUpdatedEventImpl(execution, oldBusinessStatus, newBusinessStatus);
+    }
+
     protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
