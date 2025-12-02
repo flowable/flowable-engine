@@ -16,7 +16,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -28,8 +30,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -165,12 +165,10 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
 
         ObjectNode requestNode = objectMapper.createObjectNode();
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 2);
+        Instant suspensionTime = Instant.now().plus(2, ChronoUnit.HOURS);
 
         // Format the date using ISO date format
-        DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-        String dateString = formatter.print(cal.getTimeInMillis());
+        String dateString = suspensionTime.toString();
 
         requestNode.put("action", "suspend");
         requestNode.put("date", dateString);
@@ -193,8 +191,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThat(processDefinition.isSuspended()).isFalse();
 
         // Force suspension by altering time
-        cal.add(Calendar.HOUR, 1);
-        processEngineConfiguration.getClock().setCurrentTime(cal.getTime());
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(suspensionTime.plus(1, ChronoUnit.HOURS)));
         waitForJobExecutorToProcessAllJobs(7000, 100);
 
         // Check if process-definition is suspended
@@ -270,12 +267,10 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
 
         ObjectNode requestNode = objectMapper.createObjectNode();
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 2);
+        Instant activationTime = Instant.now().plus(2, ChronoUnit.HOURS);
 
         // Format the date using ISO date format
-        DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-        String dateString = formatter.print(cal.getTimeInMillis());
+        String dateString = activationTime.toString();
 
         requestNode.put("action", "activate");
         requestNode.put("date", dateString);
@@ -298,8 +293,7 @@ public class ProcessDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThat(processDefinition.isSuspended()).isTrue();
 
         // Force activation by altering time
-        cal.add(Calendar.HOUR, 1);
-        processEngineConfiguration.getClock().setCurrentTime(cal.getTime());
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(activationTime.plus(1, ChronoUnit.HOURS)));
         waitForJobExecutorToProcessAllJobs(7000, 100);
 
         // Check if process-definition is activated

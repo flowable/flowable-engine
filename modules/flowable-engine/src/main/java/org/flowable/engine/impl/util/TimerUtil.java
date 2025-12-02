@@ -37,7 +37,6 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -49,7 +48,6 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
-import org.joda.time.DateTime;
 
 /**
  * @author Joram Barrez
@@ -116,13 +114,6 @@ public class TimerUtil {
         } else if (dueDateValue instanceof Date) {
             duedate = (Date) dueDateValue;
 
-        } else if (dueDateValue instanceof DateTime) {
-            JodaDeprecationLogger.LOGGER.warn(
-                    "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
-                    expression.getExpressionText(), scopeForExpression);
-            // JodaTime support
-            duedate = ((DateTime) dueDateValue).toDate();
-
         } else if (dueDateValue instanceof Duration) {
         	dueDateString = ((Duration) dueDateValue).toString();
 
@@ -137,7 +128,7 @@ public class TimerUtil {
 
         } else if (dueDateValue != null) {
             throw new FlowableException("Timer '" + executionEntity.getActivityId()
-                    + "' in " + executionEntity + " was not configured with a valid duration/time, either hand in a java.util.Date, java.time.LocalDate, java.time.LocalDateTime or a java.time.Instant or a org.joda.time.DateTime or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
+                    + "' in " + executionEntity + " was not configured with a valid duration/time, either hand in a java.util.Date, java.time.LocalDate, java.time.LocalDateTime or a java.time.Instant or a String in format 'yyyy-MM-dd'T'hh:mm:ss'");
         }
 
         if (duedate == null && dueDateString != null) {

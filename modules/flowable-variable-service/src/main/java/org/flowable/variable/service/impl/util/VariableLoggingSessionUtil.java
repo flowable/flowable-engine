@@ -14,6 +14,9 @@ package org.flowable.variable.service.impl.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -25,17 +28,18 @@ import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
-import org.flowable.variable.service.impl.types.JodaDateTimeType;
-import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.JodaDateTimeFallbackType;
+import org.flowable.variable.service.impl.types.JodaDateFallbackType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LocalDateTimeType;
+import org.flowable.variable.service.impl.types.LocalDateType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,10 +98,12 @@ public class VariableLoggingSessionUtil {
             loggingNode.put(variableRawValueName, (Short) variableValue);
         } else if (DateType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, LoggingSessionUtil.formatDate((Date) variableValue));
-        } else if (JodaDateTimeType.TYPE_NAME.equals(variableTypeName)) {
-            loggingNode.put(variableRawValueName, LoggingSessionUtil.formatDate((DateTime) variableValue));
-        } else if (JodaDateType.TYPE_NAME.equals(variableTypeName)) {
+        } else if (InstantType.TYPE_NAME.equals(variableTypeName) || JodaDateTimeFallbackType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, LoggingSessionUtil.formatDate((Instant) variableValue));
+        } else if (LocalDateType.TYPE_NAME.equals(variableTypeName) || JodaDateFallbackType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, LoggingSessionUtil.formatDate((LocalDate) variableValue));
+        } else if (LocalDateTimeType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, LoggingSessionUtil.formatDate((LocalDateTime) variableValue));
         } else if (BooleanType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Boolean) variableValue);
         } else if (JsonType.TYPE_NAME.equals(variableTypeName)) {
@@ -114,10 +120,6 @@ public class VariableLoggingSessionUtil {
         
         if (DateType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableValueName, LoggingSessionUtil.formatDate((Date) variableValue));
-        } else if (JodaDateTimeType.TYPE_NAME.equals(variableTypeName)) {
-            loggingNode.put(variableValueName, LoggingSessionUtil.formatDate((DateTime) variableValue));
-        } else if (JodaDateType.TYPE_NAME.equals(variableTypeName)) {
-            loggingNode.put(variableValueName, LoggingSessionUtil.formatDate((LocalDate) variableValue));
         } else {
             loggingNode.put(variableValueName, String.valueOf(variableValue));
         }

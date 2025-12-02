@@ -13,7 +13,8 @@ package org.activiti.engine.test.bpmn.event.timer.compatibility;
  * limitations under the License.
  */
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +22,6 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
@@ -31,19 +29,14 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
     public void testRepeatWithoutEnd() throws Throwable {
         Clock clock = processEngineConfiguration.getClock();
 
-        Calendar calendar = Calendar.getInstance();
-        Date baseTime = calendar.getTime();
+        Instant baseTime = Instant.now();
 
-        calendar.add(Calendar.MINUTE, 20);
         // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        DateTime dt = new DateTime(calendar.getTime());
-        String dateStr = fmt.print(dt);
+        String dateStr = baseTime.plus(30, ChronoUnit.MINUTES).toString();
 
         // reset the timer
-        Calendar nextTimeCal = Calendar.getInstance();
-        nextTimeCal.setTime(baseTime);
-        clock.setCurrentCalendar(nextTimeCal);
+        Instant nextTime = baseTime;
+        clock.setCurrentTime(Date.from(nextTime));
         processEngineConfiguration.setClock(clock);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithEnd");
@@ -69,14 +62,14 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         // a new job must be prepared because there are 10 repeats 2 seconds interval
 
         for (int i = 0; i < 9; i++) {
-            nextTimeCal.add(Calendar.SECOND, 2);
-            clock.setCurrentCalendar(nextTimeCal);
+            nextTime = nextTime.plus(2, ChronoUnit.SECONDS);
+            clock.setCurrentTime(Date.from(nextTime));
             processEngineConfiguration.setClock(clock);
             waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
         }
 
-        nextTimeCal.add(Calendar.SECOND, 2);
-        clock.setCurrentCalendar(nextTimeCal);
+        nextTime = nextTime.plus(2, ChronoUnit.SECONDS);
+        clock.setCurrentTime(Date.from(nextTime));
         processEngineConfiguration.setClock(clock);
 
         waitForJobExecutorToProcessAllJobs(2000, 200);

@@ -40,14 +40,12 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
-import org.joda.time.DateTime;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN Timer Event Listener.
@@ -101,12 +99,6 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             if (timerValue instanceof Date) {
                 timerDueDate = (Date) timerValue;
 
-            } else if (timerValue instanceof DateTime timerDateTime) {
-                JodaDeprecationLogger.LOGGER.warn(
-                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
-                        timerEventListener.getTimerExpression(), planItemInstance);
-                timerDueDate = timerDateTime.toDate();
-
             } else if (timerValue instanceof String timerString) {
 
                 BusinessCalendarManager businessCalendarManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager();
@@ -146,7 +138,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         }
 
         if (timerDueDate == null) {
-            throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
+            throw new FlowableException("Timer expression '" + timerEventListener.getTimerExpression() + "' did not resolve to java.util.Date, "
                     + "java.time.Instant, java.time.LocalDate, java.time.LocalDateTime or "
                     + "an ISO8601 date/duration/repetition string or a cron expression for " + planItemInstance);
         }

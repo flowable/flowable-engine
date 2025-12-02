@@ -12,13 +12,10 @@
  */
 package org.flowable.dmn.engine.impl.el.util;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
-
-import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
-import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 /**
  * @author Yvo Swillens
@@ -33,41 +30,36 @@ public class DateUtil {
         if (dateObject instanceof Date) {
             return (Date) dateObject;
         } else if (dateObject instanceof LocalDate) {
-            JodaDeprecationLogger.LOGGER.warn("Using Joda-Time LocalDate has been deprecated and will be removed in a future version.");
-            return ((LocalDate) dateObject).toDate();
-        } else if (dateObject instanceof java.time.LocalDate) {
-            return Date.from(((java.time.LocalDate) dateObject).atStartOfDay()
+            return Date.from(((LocalDate) dateObject).atStartOfDay()
                     .atZone(ZoneId.systemDefault())
                     .toInstant());
         } else {
-            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
-            LocalDate dateTime = dtf.parseLocalDate((String) dateObject);
-            return dateTime.toDate();
+            return Date.from(LocalDate.parse((String) dateObject)
+                    .atStartOfDay(ZoneId.systemDefault())
+                    .toInstant());
         }
     }
 
     public static Date addDate(Object startDate, Object years, Object months, Object days) {
-        LocalDate currentDate = new LocalDate(startDate);
-        
-        currentDate = currentDate.plusYears(intValue(years));
-        currentDate = currentDate.plusMonths(intValue(months));
-        currentDate = currentDate.plusDays(intValue(days));
-
-        return currentDate.toDate();
+        Date currentDate = toDate(startDate);
+        return Date.from(ZonedDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault())
+                .plusYears(intValue(years))
+                .plusMonths(intValue(months))
+                .plusDays(intValue(days))
+                .toInstant());
     }
 
     public static Date subtractDate(Object startDate, Object years, Object months, Object days) {
-        LocalDate currentDate = new LocalDate(startDate);
-
-        currentDate = currentDate.minusYears(intValue(years));
-        currentDate = currentDate.minusMonths(intValue(months));
-        currentDate = currentDate.minusDays(intValue(days));
-
-        return currentDate.toDate();
+        Date currentDate = toDate(startDate);
+        return Date.from(ZonedDateTime.ofInstant(currentDate.toInstant(), ZoneId.systemDefault())
+                .minusYears(intValue(years))
+                .minusMonths(intValue(months))
+                .minusDays(intValue(days))
+                .toInstant());
     }
 
     public static Date now() {
-        return new LocalDate().toDate();
+        return Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
     
     protected static Integer intValue(Object value) {

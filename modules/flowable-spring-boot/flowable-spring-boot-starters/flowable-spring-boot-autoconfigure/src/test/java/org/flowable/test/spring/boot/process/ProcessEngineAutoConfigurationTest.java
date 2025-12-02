@@ -34,6 +34,7 @@ import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -68,6 +69,13 @@ import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.impl.types.JodaDateFallbackType;
+import org.flowable.variable.service.impl.types.JodaDateTimeFallbackType;
+import org.flowable.variable.service.impl.types.JodaDateTimeType;
+import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
@@ -839,6 +847,83 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(executor.getAsyncJobsGlobalLockPollRate()).isEqualTo(Duration.ofSeconds(1));
                     assertThat(executor.getResetExpiredJobsInterval()).isEqualTo(Duration.ofMinutes(5).toMillis());
                     assertThat(executor.getResetExpiredJobsPageSize()).isEqualTo(5);
+                });
+    }
+
+    @Test
+    void disableJodaTimeSupport() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.joda-time-variable-support=disable"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    VariableTypes variableTypes = configuration.getVariableTypes();
+                    assertThat(variableTypes.findVariableType(new org.joda.time.LocalDate())).isInstanceOf(SerializableType.class);
+                    assertThat(variableTypes.findVariableType(new org.joda.time.DateTime())).isInstanceOf(SerializableType.class);
+                    assertThat(variableTypes.getVariableType(JodaDateFallbackType.TYPE_NAME)).isNull();
+                    assertThat(variableTypes.getVariableType(JodaDateTimeFallbackType.TYPE_NAME)).isNull();
+                });
+    }
+
+    @Test
+    void defaultJodaTimeSupport() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    VariableTypes variableTypes = configuration.getVariableTypes();
+                    assertThat(variableTypes.findVariableType(new org.joda.time.LocalDate())).isInstanceOf(SerializableType.class);
+                    assertThat(variableTypes.findVariableType(new org.joda.time.DateTime())).isInstanceOf(SerializableType.class);
+                    assertThat(variableTypes.getVariableType(JodaDateFallbackType.TYPE_NAME)).isInstanceOf(JodaDateFallbackType.class);
+                    assertThat(variableTypes.getVariableType(JodaDateTimeFallbackType.TYPE_NAME)).isInstanceOf(JodaDateTimeFallbackType.class);
+                });
+    }
+
+    @Test
+    @Deprecated
+    void writeJodaTimeSupport() {
+        contextRunner
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.joda-time-variable-support=write"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class);
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+                    VariableTypes variableTypes = configuration.getVariableTypes();
+                    assertThat(variableTypes.findVariableType(new org.joda.time.LocalDate())).isInstanceOf(JodaDateType.class);
+                    assertThat(variableTypes.findVariableType(new org.joda.time.DateTime())).isInstanceOf(JodaDateTimeType.class);
+                    assertThat(variableTypes.getVariableType(JodaDateFallbackType.TYPE_NAME)).isInstanceOf(JodaDateType.class);
+                    assertThat(variableTypes.getVariableType(JodaDateTimeFallbackType.TYPE_NAME)).isInstanceOf(JodaDateTimeType.class);
+                });
+    }
+
+    @Test
+    @Deprecated
+    void writeJodaTimeSupportWithoutJodaPresent() {
+        contextRunner
+                .withClassLoader(new FilteredClassLoader(DateTime.class))
+                .withPropertyValues(
+                        "flowable.check-process-definitions=false",
+                        "flowable.joda-time-variable-support=write"
+                )
+                .run(context -> {
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure())
+                            .hasRootCauseMessage("Cannot use write JodaTimeVariable support when joda-time is not present")
+                            .hasRootCauseInstanceOf(FlowableIllegalStateException.class);
                 });
     }
 

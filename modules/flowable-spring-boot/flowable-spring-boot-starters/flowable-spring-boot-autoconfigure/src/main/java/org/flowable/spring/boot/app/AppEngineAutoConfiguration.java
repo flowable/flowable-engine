@@ -31,6 +31,7 @@ import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.variable.service.impl.JodaTimeVariableSupport;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -103,6 +104,11 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         // Always add the out of the box auto deployment strategies as last
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy(deploymentProperties));
         conf.setDeploymentStrategies(deploymentStrategies);
+
+        FlowableProperties.JodaTimeVariableSupport jodaTimeVariableSupport = flowableProperties.getJodaTimeVariableSupport();
+        if (jodaTimeVariableSupport != null) {
+            conf.setJodaTimeVariableSupport(JodaTimeVariableSupport.valueOf(jodaTimeVariableSupport.name()));
+        }
 
         return conf;
     }
