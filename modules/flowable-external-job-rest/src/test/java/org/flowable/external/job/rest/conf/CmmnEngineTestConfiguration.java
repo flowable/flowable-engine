@@ -12,8 +12,6 @@
  */
 package org.flowable.external.job.rest.conf;
 
-import java.util.stream.StreamSupport;
-
 import javax.sql.DataSource;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
@@ -26,14 +24,9 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.springframework.boot.restclient.RestTemplateCustomizer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.PlatformTransactionManager;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -79,15 +72,5 @@ public class CmmnEngineTestConfiguration {
         return cmmnEngine.getCmmnManagementService();
     }
 
-    @Bean
-    public RestTemplateCustomizer jackson2RestTemplate(ObjectMapper objectMapper) {
-        return restTemplate -> {
-            HttpMessageConverters httpMessageConverters = HttpMessageConverters.forClient().registerDefaults()
-                    .withJsonConverter(new MappingJackson2HttpMessageConverter(objectMapper))
-                    .build();
-            restTemplate.setMessageConverters(StreamSupport.stream(httpMessageConverters.spliterator(), false)
-                    .toList());
-        };
-    }
 
 }

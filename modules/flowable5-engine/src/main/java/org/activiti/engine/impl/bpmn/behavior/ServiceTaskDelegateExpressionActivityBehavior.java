@@ -34,7 +34,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link ActivityBehavior} used when 'delegateExpression' is used for a serviceTask.

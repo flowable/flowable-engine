@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE import-control PUBLIC
+        "-//Puppy Crawl//DTD Import Control 1.4//EN"
+        "http://www.puppycrawl.com/dtds/import_control_1_4.dtd">
+<import-control pkg="org">
+
+    <subpackage name="flowable">
+        <allow pkg="com.fasterxml.jackson.annotation"/>
+        <allow pkg="com.fasterxml.uuid"/>
+        <disallow pkg="com.fasterxml"/>
+        <disallow pkg="org.activiti"/>
+
+        <allow pkg=".*" regex="true"/>
+
+        <file name=".*Jackson2.*" regex="true">
+            <allow pkg="com.fasterxml.jackson.databind"/>
+            <allow pkg="com.fasterxml.jackson.core"/>
+        </file>
+
+        <subpackage name="common.engine.impl.json.jackson2">
+            <allow pkg="com.fasterxml.jackson.databind"/>
+            <allow pkg="com.fasterxml.jackson.core"/>
+        </subpackage>
+        
+        <subpackage name="compatibility">
+            <allow pkg="org.activiti" />
+        </subpackage>
+    </subpackage>
+
+    <subpackage name="activiti">
+
+        <allow pkg="com.fasterxml.jackson.annotation"/>
+        <allow pkg="com.fasterxml.uuid"/>
+        <disallow pkg="com.fasterxml"/>
+
+        <allow pkg=".*" regex="true"/>
+
+    </subpackage>
+
+</import-control>

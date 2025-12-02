@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class BpmnOverrideContext {
 

@@ -15,6 +15,7 @@
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
         <skip.test.db.drop>false</skip.test.db.drop>
+        <checkstyle.skip>true</checkstyle.skip>
     </properties>
 
     <packaging>pom</packaging>

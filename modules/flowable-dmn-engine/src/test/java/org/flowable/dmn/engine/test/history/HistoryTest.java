@@ -25,7 +25,7 @@ import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 

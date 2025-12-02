@@ -40,9 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
@@ -98,7 +99,7 @@ public class HttpServiceTaskTestServer {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             MultipartConfigElement multipartConfig = new MultipartConfigElement((String) null);
-            ObjectMapper mapper = new ObjectMapper();
+            ObjectMapper mapper = JsonMapper.shared();
             ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet(mapper));
             httpServiceTaskServletHolder.getRegistration().setMultipartConfig(multipartConfig);
             contextHandler.addServlet(httpServiceTaskServletHolder, "/api/*");

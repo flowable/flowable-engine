@@ -15,7 +15,6 @@ package org.flowable.engine.test.api.event;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Joram Barrez
@@ -45,7 +43,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -65,7 +63,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml" })
-    public void testDatabaseEvents() throws IOException {
+    public void testDatabaseEvents() {
 
         String testTenant = "testTenant";
 
@@ -481,7 +479,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testDatabaseEventsNoTenant() throws IOException {
+    public void testDatabaseEventsNoTenant() {
 
         String deploymentId = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/event/DatabaseEventLoggerProcess.bpmn20.xml").deploy().getId();
@@ -592,7 +590,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testStandaloneTaskEvents() throws JsonParseException, JsonMappingException, IOException {
+    public void testStandaloneTaskEvents() {
 
         org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");

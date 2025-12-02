@@ -18,11 +18,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Base dispatcher configuration that can be used to configure context for the REST API.
@@ -34,10 +34,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
-    protected ObjectMapper objectMapper;
+    protected JsonMapper jsonMapper;
 
     @Override
     protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        builder.withJsonConverter(new MappingJackson2HttpMessageConverter(objectMapper));
+        builder.withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
     }
 }

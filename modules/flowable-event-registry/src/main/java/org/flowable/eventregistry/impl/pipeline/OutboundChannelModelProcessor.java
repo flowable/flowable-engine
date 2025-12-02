@@ -28,7 +28,7 @@ import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.OutboundChannelModel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov

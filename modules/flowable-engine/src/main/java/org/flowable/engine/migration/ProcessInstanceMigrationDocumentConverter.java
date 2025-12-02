@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.migration;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,13 +21,14 @@ import java.util.function.Predicate;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentBuilderImpl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Dennis
@@ -40,7 +40,7 @@ public class ProcessInstanceMigrationDocumentConverter {
     protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isTextual();
     protected static Predicate<JsonNode> isMultiValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isArray();
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    protected static ObjectMapper objectMapper = JsonMapper.shared();
 
     protected static Map<Class<? extends ActivityMigrationMapping>, BaseActivityMigrationMappingConverter> activityMigrationMappingConverters = new HashMap<>();
 
@@ -125,7 +125,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         try {
             return objectWriter.writeValueAsString(jsonNode);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return jsonNode.toString();
         }
     }
@@ -249,7 +249,7 @@ public class ProcessInstanceMigrationDocumentConverter {
             }
             return documentBuilder.build();
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Error parsing Process Instance Migration Document", e);
         }
 

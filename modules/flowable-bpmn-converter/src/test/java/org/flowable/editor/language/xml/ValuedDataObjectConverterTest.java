@@ -32,7 +32,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @see {https://activiti.atlassian.net/browse/ACT-1847}.

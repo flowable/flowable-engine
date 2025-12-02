@@ -22,7 +22,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.MybatisEventSubscriptionDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers

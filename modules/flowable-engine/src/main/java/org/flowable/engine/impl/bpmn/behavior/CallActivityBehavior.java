@@ -58,7 +58,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).

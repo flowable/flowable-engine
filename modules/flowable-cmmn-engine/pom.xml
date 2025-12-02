@@ -190,6 +190,11 @@
             <artifactId>nashorn-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -210,6 +215,7 @@
             org.apache.xerces*;resolution:=optional,
             org.springframework*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
+            tools.jackson*;resolution:=optional,
             jakarta.transaction;resolution:=optional,
             jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>

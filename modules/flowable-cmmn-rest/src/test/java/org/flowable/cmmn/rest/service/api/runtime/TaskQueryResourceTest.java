@@ -29,8 +29,8 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Task collection resource.

@@ -22,7 +22,7 @@ import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import groovy.lang.MissingPropertyException;
 

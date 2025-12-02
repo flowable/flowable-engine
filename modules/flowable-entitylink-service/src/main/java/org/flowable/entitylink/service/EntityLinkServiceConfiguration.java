@@ -26,7 +26,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEnti
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.MybatisEntityLinkDataManager;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.MybatisHistoricEntityLinkDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
