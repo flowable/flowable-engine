@@ -45,6 +45,10 @@ public class FlowableCmmnEventBuilder {
         return new FlowableCaseStageEndedEventImpl(caseInstance, stageInstance, endingState);
     }
 
+    public static FlowableEntityEvent createCaseBusinessStatusUpdatedEvent(CaseInstance caseInstance, String oldBusinessStatus, String newBusinessStatus) {
+        return new FlowableCaseBusinessStatusUpdatedEventImpl(caseInstance, oldBusinessStatus, newBusinessStatus);
+    }
+
     public static FlowableEntityEvent createTaskCreatedEvent(Task task) {
         FlowableEntityEventImpl event = new FlowableEntityEventImpl(task, FlowableEngineEventType.TASK_CREATED);
 

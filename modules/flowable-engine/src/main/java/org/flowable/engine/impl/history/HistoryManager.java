@@ -218,8 +218,14 @@ public interface HistoryManager {
      */
     void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
+    /**
+     * Record the update of the business key of a process instance in history, if history is enabled.
+     */
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
-    
+
+    /**
+     * Record the update of the business status of a process instance in history, if history is enabled.
+     */
     void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance);
 
     /**
