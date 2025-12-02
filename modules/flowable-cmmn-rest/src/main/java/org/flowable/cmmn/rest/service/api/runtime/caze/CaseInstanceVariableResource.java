@@ -69,7 +69,6 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
 
     @ApiOperation(value = "Update a single variable on a case instance", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the case instance and existing ones are overridden without any error.\n"
                     + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
@@ -123,7 +122,6 @@ public class CaseInstanceVariableResource extends BaseVariableResource {
     
     @ApiOperation(value = "Update a single variable on a case instance asynchronously", tags = { "Case Instance Variables" }, nickname = "updateCaseInstanceVariableAsync",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the case instance and existing ones are overridden without any error.\n"
                     + "Note that scope is ignored, only global variables can be set in a case instance.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({

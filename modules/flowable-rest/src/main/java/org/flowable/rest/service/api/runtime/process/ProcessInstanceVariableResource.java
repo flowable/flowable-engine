@@ -75,7 +75,6 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
 
     @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instance Variables" }, nickname = "updateProcessInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Note that scope is ignored, only local variables can be set in a process instance.\n"
                     + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
@@ -128,7 +127,6 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
     
     @ApiOperation(value = "Update a single variable on a process instance asynchronously", tags = { "Process Instance Variables" }, nickname = "updateProcessInstanceVariableAsync",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
-                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Note that scope is ignored, only local variables can be set in a process instance.\n"
                     + "NB: Swagger V2 specification does not support this use case that is why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({
