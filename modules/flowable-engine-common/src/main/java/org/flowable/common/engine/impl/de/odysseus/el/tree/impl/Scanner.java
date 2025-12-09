@@ -309,10 +309,10 @@ public class Scanner {
 					throw new ScanException(position, "unterminated string", quote + " or \\");
 				} else {
 					c = input.charAt(i++);
-					if (c == '\\' || c == quote) {
+					if (c == '\\' || c == '\'' || c == '\"') {
 						builder.append(c);
 					} else {
-						throw new ScanException(position, "invalid escape sequence \\" + c, "\\" + quote + " or \\\\");
+						throw new ScanException(position, "invalid escape sequence \\" + c, "\\', \\\" or \\\\");
 					}
 				}
 			} else if (c == quote) {

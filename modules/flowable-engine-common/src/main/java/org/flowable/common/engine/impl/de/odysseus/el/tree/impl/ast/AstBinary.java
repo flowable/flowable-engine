@@ -40,8 +40,8 @@ public class AstBinary extends AstRightValue {
 	public static final Operator AND = new Operator() {
         @Override
 		public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
-			Boolean l = bindings.convert(left.eval(bindings, context), Boolean.class);
-			return Boolean.TRUE.equals(l) ? bindings.convert(right.eval(bindings, context), Boolean.class) : Boolean.FALSE;
+			Boolean l = bindings.convert(left.eval(bindings, context), boolean.class);
+			return Boolean.TRUE.equals(l) ? bindings.convert(right.eval(bindings, context), boolean.class) : Boolean.FALSE;
 		}
 		@Override public String toString() { return "&&"; }
 	};
@@ -84,8 +84,8 @@ public class AstBinary extends AstRightValue {
 	public static final Operator OR = new Operator() {
         @Override
 		public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
-			Boolean l = bindings.convert(left.eval(bindings, context), Boolean.class);
-			return Boolean.TRUE.equals(l) ? Boolean.TRUE : bindings.convert(right.eval(bindings, context), Boolean.class);
+			Boolean l = bindings.convert(left.eval(bindings, context), boolean.class);
+			return Boolean.TRUE.equals(l) ? Boolean.TRUE : bindings.convert(right.eval(bindings, context), boolean.class);
 		}
 		@Override public String toString() { return "||"; }
 	};
