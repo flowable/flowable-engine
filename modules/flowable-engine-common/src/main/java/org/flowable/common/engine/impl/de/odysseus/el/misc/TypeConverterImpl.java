@@ -305,8 +305,15 @@ public class TypeConverterImpl implements TypeConverter {
 
 	@SuppressWarnings("unchecked")
 	protected Object coerceToType(Object value, Class<?> type) {
+		if (type == null || Object.class.equals(type)) {
+			return value;
+		}
+
 		if (type == String.class) {
 			return coerceToString(value);
+		}
+		if (value == null && !type.isPrimitive()) {
+			return null;
 		}
 		if (type == Long.class || type == long.class) {
 			return coerceToLong(value);

@@ -39,6 +39,8 @@ import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.S
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.TEXT;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.TRUE;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -191,8 +193,16 @@ public class Parser {
 	 */
 	protected Number parseInteger(String string) throws ParseException {
 		try {
-			return Long.valueOf(string);
-		} catch (NumberFormatException e) {
+			try {
+				return Long.valueOf(string);
+			} catch (NumberFormatException e) {
+				// Too large for Long. Try BigInteger.
+				return new BigInteger(string);
+			}
+		} catch (ArithmeticException | NumberFormatException exception) {
+			// Too big for BigInteger.
+			// Catch NumberFormatException as well here just in case the
+			// parser provides invalid input.
 			fail(INTEGER);
 			return null;
 		}
@@ -205,7 +215,11 @@ public class Parser {
 	 */
 	protected Number parseFloat(String string) throws ParseException {
 		try {
-			return Double.valueOf(string);
+			Double value = Double.valueOf(string);
+			if (value.isInfinite() || value.isNaN()) {
+				return new BigDecimal(string);
+			}
+			return value;
 		} catch (NumberFormatException e) {
 			fail(FLOAT);
 			return null;
