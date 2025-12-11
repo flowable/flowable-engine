@@ -28,6 +28,7 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 import org.flowable.common.engine.impl.javax.el.ListELResolver;
 import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.engine.impl.javax.el.RecordELResolver;
 import org.flowable.common.engine.impl.javax.el.ValueExpression;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
@@ -135,6 +136,7 @@ public class DefaultExpressionManager implements ExpressionManager {
         elResolvers.add(new ArrayELResolver());
         elResolvers.add(new ListELResolver());
         elResolvers.add(new MapELResolver());
+        elResolvers.add(new RecordELResolver());
         ELResolver jsonNodeElResolver = createJsonNodeElResolver();
         if (jsonNodeElResolver != null) {
             elResolvers.add(jsonNodeElResolver);
