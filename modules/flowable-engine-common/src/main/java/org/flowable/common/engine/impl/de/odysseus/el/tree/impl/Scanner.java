@@ -93,6 +93,7 @@ public class Scanner {
 		DOT("'.'"), LBRACK("'['"), RBRACK("']'"),
 		COMMA("','"),
 		START_EVAL_DEFERRED("'#{'"), START_EVAL_DYNAMIC("'${'"), END_EVAL("'}'"),
+		ARROW("'->'"),
 		EXTENSION; // used in syntax extensions
 		private final String string;
 		private Symbol() {
@@ -148,6 +149,7 @@ public class Scanner {
 		addFixToken(new Token(Symbol.RBRACK, "]"));
 		addFixToken(new Token(Symbol.START_EVAL_DEFERRED, "#{"));
 		addFixToken(new Token(Symbol.START_EVAL_DYNAMIC, "${"));
+		addFixToken(new Token(Symbol.ARROW, "->"));
 		addFixToken(new Token(Symbol.END_EVAL, "}"));
 		addFixToken(new Token(Symbol.EOF, null, 0));
 		
@@ -372,7 +374,12 @@ public class Scanner {
 			case '/': return fixed(Symbol.DIV);
 			case '%': return fixed(Symbol.MOD);
 			case '+': return fixed(Symbol.PLUS);
-			case '-': return fixed(Symbol.MINUS);
+			case '-': {
+				if (c2 == '>') {
+					return fixed(Symbol.ARROW);
+				}
+				return fixed(Symbol.MINUS);
+			}
 			case '?': return fixed(Symbol.QUESTION);
 			case ':': return fixed(Symbol.COLON);
 			case '[': return fixed(Symbol.LBRACK);

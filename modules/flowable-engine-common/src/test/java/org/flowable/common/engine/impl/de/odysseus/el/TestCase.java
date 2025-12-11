@@ -55,7 +55,7 @@ public abstract class TestCase {
             context = new SimpleContext();
         }
         ValueExpression valueExpression = getExpressionFactory().createValueExpression(context, expression, expectedType);
-        return (T) valueExpression.getValue(context);
+        return valueExpression.getValue(context);
     }
 
     protected ExpressionFactory getExpressionFactory() {

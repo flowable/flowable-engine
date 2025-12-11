@@ -17,10 +17,15 @@ package org.flowable.common.engine.impl.de.odysseus.el.misc;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.function.Supplier;
 
 import org.flowable.common.engine.impl.javax.el.ELException;
+import org.flowable.common.engine.impl.javax.el.LambdaExpression;
 
 /**
  * Type Conversions as described in EL 2.1 specification (section 1.17).
@@ -303,11 +308,47 @@ public class TypeConverterImpl implements TypeConverter {
 		}
 	}
 
+	protected <T> T coerceToFunctionalInterface(LambdaExpression lambdaExpression, Class<T> type) {
+		Supplier<T> proxy = () -> {
+			// Create a dynamic proxy for the functional interface
+			@SuppressWarnings("unchecked")
+			T result = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type },
+					(Object obj, Method method, Object[] args) -> {
+						// Functional interfaces have a single, abstract method
+						if (!Modifier.isAbstract(method.getModifiers())) {
+							throw new ELException(LocalMessages.get("error.coerce.nonAbstract", type, method));
+						}
+						return lambdaExpression.invoke(args);
+					});
+			return result;
+		};
+		return proxy.get();
+	}
+
 	@SuppressWarnings("unchecked")
 	protected Object coerceToType(Object value, Class<?> type) {
-		if (type == null || Object.class.equals(type)) {
+		if (type == null) {
 			return value;
 		}
+
+		if (value instanceof LambdaExpression lambdaExpression) {
+			if (LambdaExpression.class == type) {
+				return lambdaExpression;
+			}
+			if (isFunctionalInterface(type)) {
+				return coerceToFunctionalInterface(lambdaExpression, (Class<?>) type);
+			}
+
+			if (lambdaExpression.getFormalParameters().isEmpty()) {
+				// If the value is a LambdaExpression without formal parameters we need to resolve its value
+				value = coerceToType(lambdaExpression.invoke(), type);
+			}
+		}
+
+		if (Object.class.equals(type)) {
+			return value;
+		}
+
 
 		if (type == String.class) {
 			return coerceToString(value);
@@ -371,5 +412,54 @@ public class TypeConverterImpl implements TypeConverter {
     @Override
 	public <T> T convert(Object value, Class<T> type) throws ELException {
 		return (T)coerceToType(value, type);
+	}
+
+	// Copied from Tomcat org.apache.el.lang.ELSupport
+	static boolean isFunctionalInterface(Class<?> type) {
+
+		if (!type.isInterface()) {
+			return false;
+		}
+
+		boolean foundAbstractMethod = false;
+		Method[] methods = type.getMethods();
+		for (Method method : methods) {
+			if (Modifier.isAbstract(method.getModifiers())) {
+				// Abstract methods that override one of the public methods
+				// of Object don't count
+				if (overridesObjectMethod(method)) {
+					continue;
+				}
+				if (foundAbstractMethod) {
+					// Found more than one
+					return false;
+				} else {
+					foundAbstractMethod = true;
+				}
+			}
+		}
+		return foundAbstractMethod;
+	}
+
+	// Copied from Tomcat org.apache.el.lang.ELSupport
+	private static boolean overridesObjectMethod(Method method) {
+		// There are three methods that can be overridden
+		if ("equals".equals(method.getName())) {
+			if (method.getReturnType().equals(boolean.class)) {
+				if (method.getParameterCount() == 1) {
+					return method.getParameterTypes()[0].equals(Object.class);
+				}
+			}
+		} else if ("hashCode".equals(method.getName())) {
+			if (method.getReturnType().equals(int.class)) {
+				return method.getParameterCount() == 0;
+			}
+		} else if ("toString".equals(method.getName())) {
+			if (method.getReturnType().equals(String.class)) {
+				return method.getParameterCount() == 0;
+			}
+		}
+
+		return false;
 	}
 }

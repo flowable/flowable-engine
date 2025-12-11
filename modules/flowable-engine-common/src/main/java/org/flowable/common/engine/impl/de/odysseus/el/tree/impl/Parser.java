@@ -17,6 +17,7 @@ package org.flowable.common.engine.impl.de.odysseus.el.tree.impl;
 
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Builder.Feature.METHOD_INVOCATIONS;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Builder.Feature.NULL_PROPERTIES;
+import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.ARROW;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.COLON;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.COMMA;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.EMPTY;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.de.odysseus.el.misc.LocalMessages;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.Bindings;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.FunctionNode;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.IdentifierNode;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.Tree;
@@ -65,6 +67,9 @@ import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstDot;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstEval;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstFunction;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstIdentifier;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstLambdaExpression;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstLambdaInvocation;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstLambdaParameters;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstMethod;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstNested;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstNode;
@@ -75,6 +80,9 @@ import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstProperty;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstString;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstText;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.ast.AstUnary;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.MethodInfo;
+import org.flowable.common.engine.impl.javax.el.ValueReference;
 
 /**
  * Handcrafted top-down parser.
@@ -226,15 +234,22 @@ public class Parser {
 		}
 	}
 
-	protected AstBinary createAstBinary(AstNode left, AstNode right, AstBinary.Operator operator) {
+	protected AstBinary createAstBinary(AstNode left, AstNode right, AstBinary.Operator operator) throws ParseException {
+		left = unpackIfLambdaParametersMarker(left);
+		right = unpackIfLambdaParametersMarker(right);
 		return new AstBinary(left, right, operator);
 	}
 	
-	protected AstBracket createAstBracket(AstNode base, AstNode property, boolean lvalue, boolean strict) {
+	protected AstBracket createAstBracket(AstNode base, AstNode property, boolean lvalue, boolean strict) throws ParseException {
+		base = unpackIfLambdaParametersMarker(base);
+		property = unpackIfLambdaParametersMarker(property);
 		return new AstBracket(base, property, lvalue, strict, context.isEnabled(Feature.IGNORE_RETURN_TYPE));
 	}
 	
-	protected AstChoice createAstChoice(AstNode question, AstNode yes, AstNode no) {
+	protected AstChoice createAstChoice(AstNode question, AstNode yes, AstNode no) throws ParseException {
+		question = unpackIfLambdaParametersMarker(question);
+		yes = unpackIfLambdaParametersMarker(yes);
+		no = unpackIfLambdaParametersMarker(no);
 		return new AstChoice(question, yes, no);
 	}
 	
@@ -242,7 +257,8 @@ public class Parser {
 		return new AstComposite(nodes);
 	}
 	
-	protected AstDot createAstDot(AstNode base, String property, boolean lvalue) {
+	protected AstDot createAstDot(AstNode base, String property, boolean lvalue) throws ParseException {
+		base = unpackIfLambdaParametersMarker(base);
 		return new AstDot(base, property, lvalue, context.isEnabled(Feature.IGNORE_RETURN_TYPE));
 	}
 	
@@ -258,8 +274,127 @@ public class Parser {
 		return new AstMethod(property, params);
 	}
 	
-	protected AstUnary createAstUnary(AstNode child, AstUnary.Operator operator) {
+	protected AstUnary createAstUnary(AstNode child, AstUnary.Operator operator) throws ParseException {
+		child = unpackIfLambdaParametersMarker(child);
 		return new AstUnary(child, operator);
+	}
+
+	protected AstLambdaExpression createAstLambdaExpression(AstLambdaParameters parameters, AstNode body) {
+		return new AstLambdaExpression(parameters, body);
+	}
+
+	protected AstLambdaInvocation createAstLambdaInvocation(AstNode lambdaNode, AstParameters params) {
+		return new AstLambdaInvocation(lambdaNode, params);
+	}
+
+	/**
+	 * Extract lambda parameters from an AST node.
+	 * Supports:
+	 * - Single identifier: x -> x + 1
+	 * - Lambda parameter marker: (x) or (x, y) parsed as lambda params
+	 */
+	protected AstLambdaParameters extractLambdaParameters(AstNode node) throws ParseException {
+		List<String> paramNames = new ArrayList<>();
+
+		if (node instanceof AstIdentifier) {
+			// Single parameter: x -> x + 1
+			paramNames.add(((AstIdentifier) node).getName());
+		} else if (node instanceof AstLambdaParametersMarker) {
+			// Parameters already parsed: (x) or (x, y)
+			return new AstLambdaParameters(((AstLambdaParametersMarker) node).getParameterNames());
+		} else {
+			fail("lambda parameters (identifier or parenthesized identifiers)");
+		}
+
+		return new AstLambdaParameters(paramNames);
+	}
+
+	/**
+	 * Marker node to indicate lambda parameters parsed in parentheses.
+	 * This is not a real AST node but a temporary marker during parsing.
+	 */
+	private static class AstLambdaParametersMarker extends AstNode {
+
+		private final List<String> parameterNames;
+
+		public AstLambdaParametersMarker(List<String> parameterNames) {
+			this.parameterNames = parameterNames;
+		}
+
+		public List<String> getParameterNames() {
+			return parameterNames;
+		}
+
+		@Override
+		public void appendStructure(StringBuilder builder, Bindings bindings) {
+			builder.append("(");
+			for (int i = 0; i < parameterNames.size(); i++) {
+				if (i > 0)
+					builder.append(", ");
+				builder.append(parameterNames.get(i));
+			}
+			builder.append(")");
+		}
+
+		@Override
+		public Object eval(Bindings bindings, ELContext context) {
+			throw new UnsupportedOperationException("Lambda parameters marker should not be evaluated");
+		}
+
+		@Override
+		public boolean isLiteralText() {
+			return false;
+		}
+
+		@Override
+		public boolean isLeftValue() {
+			return false;
+		}
+
+		@Override
+		public boolean isMethodInvocation() {
+			return false;
+		}
+
+		@Override
+		public ValueReference getValueReference(Bindings bindings, ELContext context) {
+			return null;
+		}
+
+		@Override
+		public Class<?> getType(Bindings bindings, ELContext context) {
+			return null;
+		}
+
+		@Override
+		public boolean isReadOnly(Bindings bindings, ELContext context) {
+			return true;
+		}
+
+		@Override
+		public void setValue(Bindings bindings, ELContext context, Object value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
+			return null;
+		}
+
+		@Override
+		public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getCardinality() {
+			return 0;
+		}
+
+		@Override
+		public AstNode getChild(int i) {
+			return null;
+		}
 	}
 
 	protected final List<FunctionNode> getFunctions() {
@@ -412,13 +547,16 @@ public class Parser {
 	}
 
 	/**
-	 * expr := or (&lt;QUESTION&gt; expr &lt;COLON&gt; expr)?
+	 * expr := lambda
+	 * lambda := ternary (&lt;ARROW&gt; lambda)?
+	 * ternary := or (&lt;QUESTION&gt; expr &lt;COLON&gt; expr)?
 	 */
 	protected AstNode expr(boolean required) throws ScanException, ParseException {
 		AstNode v = or(required);
 		if (v == null) {
 			return null;
 		}
+		// Handle ternary operator
 		if (token.getSymbol() == QUESTION) {
 			consumeToken();
 			AstNode a = expr(true);
@@ -426,7 +564,33 @@ public class Parser {
 			AstNode b = expr(true);
 			v = createAstChoice(v, a, b);
 		}
+		// Handle lambda expression (lowest precedence)
+		if (token.getSymbol() == ARROW) {
+			consumeToken();
+			// Convert left side to lambda parameters
+			AstLambdaParameters params = extractLambdaParameters(v);
+			// Parse right side as lambda body (right-associative)
+			AstNode body = expr(true);
+			v = createAstLambdaExpression(params, body);
+		} else {
+			v = unpackIfLambdaParametersMarker(v);
+		}
 		return v;
+	}
+
+	protected AstNode unpackIfLambdaParametersMarker(AstNode node) throws ParseException {
+		if (node instanceof AstLambdaParametersMarker parametersMarker) {
+			List<String> parameterNames = parametersMarker.getParameterNames();
+			if (parameterNames.isEmpty()) {
+				fail(ARROW);
+			} else if (parameterNames.size() == 1) {
+				return new AstNested(identifier(parameterNames.get(0)));
+			} else {
+				fail(ARROW);
+			}
+		}
+
+		return node;
 	}
 
 	/**
@@ -640,7 +804,7 @@ public class Parser {
 	}
 
 	/**
-	 * value := (nonliteral | literal) (&lt;DOT&gt; &lt;IDENTIFIER&gt; | &lt;LBRACK&gt; expr &lt;RBRACK&gt;)*
+	 * value := (nonliteral | literal) (&lt;DOT&gt; &lt;IDENTIFIER&gt; | &lt;LBRACK&gt; expr &lt;RBRACK&gt; | &lt;LPAREN&gt; args &lt;RPAREN&gt;)*
 	 */
 	protected AstNode value() throws ScanException, ParseException {
 		boolean lvalue = true;
@@ -676,6 +840,14 @@ public class Parser {
 						v = bracket;
 					}
 					break;
+				case LPAREN:
+					// Lambda invocation: ((x, y) -> x + y)(args...)
+					if (isLambdaNode(v)) {
+						v = createAstLambdaInvocation(v, params());
+					} else {
+						return v;
+					}
+					break;
 				default:
 					return v;
 			}
@@ -683,8 +855,26 @@ public class Parser {
 	}
 
 	/**
-	 * nonliteral := &lt;IDENTIFIER&gt; | function | &lt;LPAREN&gt; expr &lt;RPAREN&gt;
+	 * Check if a node is or contains a lambda expression.
+	 * Also returns true for lambda invocations since they can return lambdas (multi-level lambdas).
+	 */
+	protected boolean isLambdaNode(AstNode node) {
+		if (node instanceof AstLambdaExpression) {
+			return true;
+		}
+		if (node instanceof AstLambdaInvocation) {
+			return true;
+		}
+		if (node instanceof AstNested) {
+			return isLambdaNode((AstNode) node.getChild(0));
+		}
+		return false;
+	}
+
+	/**
+	 * nonliteral := &lt;IDENTIFIER&gt; | function | &lt;LPAREN&gt; (lambdaParams | expr) &lt;RPAREN&gt;
 	 * function   := (&lt;IDENTIFIER&gt; &lt;COLON&gt;)? &lt;IDENTIFIER&gt; &lt;LPAREN&gt; list? &lt;RPAREN&gt;
+	 * lambdaParams := &lt;IDENTIFIER&gt; (&lt;COMMA&gt; &lt;IDENTIFIER&gt;)*
 	 */
 	protected AstNode nonliteral() throws ScanException, ParseException {
 		AstNode v = null;
@@ -704,12 +894,78 @@ public class Parser {
 				break;
 			case LPAREN:
 				consumeToken();
-				v = expr(true);
-				consumeToken(RPAREN);
-				v = new AstNested(v);
+				// Check if this might be lambda parameters: (), (x), (x, y), etc.
+				// Lambda params are identifiers separated by commas, followed by ')'
+				if (token.getSymbol() == RPAREN) {
+					// Empty parameter list: () -> ...
+					v = parseLambdaParamsOrExpr();
+				} else if (token.getSymbol() == IDENTIFIER) {
+					// Look ahead to see if this is lambda params or a regular expression
+					Token next = lookahead(0);
+					if (next.getSymbol() == COMMA || next.getSymbol() == RPAREN) {
+						// Might be lambda params - try to parse as such
+						v = parseLambdaParamsOrExpr();
+					} else {
+						// Regular expression
+						v = expr(true);
+						consumeToken(RPAREN);
+						v = new AstNested(v);
+					}
+				} else {
+					// Not starting with identifier or rparen, must be expression
+					v = expr(true);
+					consumeToken(RPAREN);
+					v = new AstNested(v);
+				}
 				break;
 		}
 		return v;
+	}
+
+	/**
+	 * Parse what could be lambda parameters in parentheses or a regular expression.
+	 * Called after seeing '(' IDENTIFIER or '(' ')', tries to parse as lambda params first.
+	 */
+	protected AstNode parseLambdaParamsOrExpr() throws ScanException, ParseException {
+		// Save the current position
+		List<String> paramNames = new ArrayList<>();
+		boolean isLambdaParams = true;
+
+		// Check for empty parameter list: () -> ...
+		if (token.getSymbol() == RPAREN) {
+			consumeToken();
+			return new AstLambdaParametersMarker(paramNames);
+		}
+
+		// First identifier
+		if (token.getSymbol() == IDENTIFIER) {
+			paramNames.add(token.getImage());
+			consumeToken();
+
+			// Check what follows
+			while (token.getSymbol() == COMMA) {
+				consumeToken();
+				if (token.getSymbol() == IDENTIFIER) {
+					paramNames.add(token.getImage());
+					consumeToken();
+				} else {
+					isLambdaParams = false;
+					break;
+				}
+			}
+
+			// If we end with RPAREN and everything was identifiers, treat as lambda params
+			if (isLambdaParams && token.getSymbol() == RPAREN) {
+				consumeToken();
+				// Wrap in a special marker node that will be recognized as lambda params
+				return new AstLambdaParametersMarker(paramNames);
+			}
+		}
+
+		// Not lambda params - this shouldn't happen given our lookahead check
+		// Fall back to treating as error
+		fail("lambda parameters or expression");
+		return null;
 	}
 
 	/**

@@ -54,11 +54,10 @@ class AstNestedTest extends TestCase {
     void testInvalid() {
         assertThatThrownBy(() -> parseNode("${(a, ab)}"))
                 .isInstanceOf(TreeBuilderException.class)
-                .hasMessage("Error parsing '${(a, ab)}': syntax error at position 4, encountered ',', expected ')'");
+                .hasMessage("Error parsing '${(a, ab)}': syntax error at position 9, encountered '}', expected '->'");
 
         assertThatThrownBy(() -> parseNode("${()}"))
                 .isInstanceOf(TreeBuilderException.class)
-                .hasMessage(
-                        "Error parsing '${()}': syntax error at position 3, encountered ')', expected <IDENTIFIER>|<STRING>|<FLOAT>|<INTEGER>|'true'|'false'|'null'|'-'|'!'|'not'|'empty'|'('");
+                .hasMessage("Error parsing '${()}': syntax error at position 4, encountered '}', expected '->'");
     }
 }

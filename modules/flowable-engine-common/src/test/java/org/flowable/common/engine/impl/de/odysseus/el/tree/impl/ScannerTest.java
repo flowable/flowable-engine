@@ -18,6 +18,7 @@ package org.flowable.common.engine.impl.de.odysseus.el.tree.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.AND;
+import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.ARROW;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.COLON;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.COMMA;
 import static org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Scanner.Symbol.DIV;
@@ -169,7 +170,8 @@ class ScannerTest extends TestCase {
                 Arguments.of("${==}", EQ),
                 Arguments.of("${!=}", NE),
                 Arguments.of("${>=}", GE),
-                Arguments.of("${>}", GT)
+                Arguments.of("${>}", GT),
+                Arguments.of("${->}", ARROW)
         );
     }
 

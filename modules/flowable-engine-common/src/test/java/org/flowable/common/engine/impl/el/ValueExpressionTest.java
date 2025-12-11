@@ -49,7 +49,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanB.name}", String.class);
 
         // First check the basics work
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         assertThat(result).isEqualTo("Tomcat");
 
         // Now check the value reference
@@ -100,7 +100,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.bean.name}", String.class);
 
         // First check the basics work
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         assertThat(result).isEqualTo("Tomcat");
 
         // Now check the value reference
@@ -123,11 +123,11 @@ class ValueExpressionTest extends ELBaseTest {
 
         // When coercing an Enum to a String, name() should always be used.
         ValueExpression ve1 = factory.createValueExpression(context, "${testEnum}", String.class);
-        String result1 = (String) ve1.getValue(context);
+        String result1 = ve1.getValue(context);
         assertThat(result1).isEqualTo("APPLE");
 
         ValueExpression ve2 = factory.createValueExpression(context, "foo${testEnum}bar", String.class);
-        String result2 = (String) ve2.getValue(context);
+        String result2 = ve2.getValue(context);
         assertThat(result2).isEqualTo("fooAPPLEbar");
     }
 
@@ -195,7 +195,7 @@ class ValueExpressionTest extends ELBaseTest {
 
         ValueExpression ve = factory.createValueExpression(context, "${beanA.valList.size()}", Integer.class);
 
-        Integer result = (Integer) ve.getValue(context);
+        Integer result = ve.getValue(context);
         assertThat(result).isEqualTo(Integer.valueOf(0));
     }
 
@@ -214,7 +214,7 @@ class ValueExpressionTest extends ELBaseTest {
 
         ValueExpression ve = factory.createValueExpression(context, "${list.size()}", Integer.class);
 
-        Integer result = (Integer) ve.getValue(context);
+        Integer result = ve.getValue(context);
         assertThat(result).isEqualTo(Integer.valueOf(0));
     }
 
@@ -231,7 +231,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanB.name}", String.class);
 
         // First check the basics work
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         assertThat(result).isEqualTo("Tomcat");
 
         // Now set the value to null
@@ -261,8 +261,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.map(b -> b.data)}",
                 Optional.class);
 
-        @SuppressWarnings("unchecked")
-        Optional<String> result = (Optional<String>) ve.getValue(context);
+        Optional<String> result = ve.getValue(context);
         assertThat(result).hasValue(data);
     }
 
@@ -280,8 +279,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.map(b -> b.data)}",
                 Optional.class);
 
-        @SuppressWarnings("unchecked")
-        Optional<String> result = (Optional<String>) ve.getValue(context);
+        Optional<String> result = ve.getValue(context);
         assertThat(result).isEmpty();
     }
 
@@ -303,7 +301,7 @@ class ValueExpressionTest extends ELBaseTest {
 
         ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.get().data}", String.class);
 
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         assertThat(result).isEqualTo(data);
     }
 
@@ -321,7 +319,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context,
                 "${beanJ.optionalBean.map(b -> b.data).orElse(null)}", String.class);
 
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         // Result is null but is coerced to String which makes it ""
         assertThat(result)
                 .isNotNull()
@@ -329,7 +327,6 @@ class ValueExpressionTest extends ELBaseTest {
     }
 
     @Test
-    @Disabled("Not yet supported")
     void testArrayLength01() {
         ExpressionFactory factory = createExpressionFactory();
         ELContext context = new SimpleContext();
@@ -343,12 +340,11 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
 
         // Check the result
-        Integer result = (Integer) ve.getValue(context);
+        Integer result = ve.getValue(context);
         assertThat(result).isEqualTo(Integer.valueOf(3));
     }
 
     @Test
-    @Disabled("Not yet supported")
     void testArrayLength02() {
         ExpressionFactory factory = createExpressionFactory();
         ELContext context = new SimpleContext();
@@ -362,12 +358,11 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
 
         // Check the result
-        Integer result = (Integer) ve.getValue(context);
+        Integer result = ve.getValue(context);
         assertThat(result).isEqualTo(Integer.valueOf(0));
     }
 
     @Test
-    @Disabled("Not yet supported")
     void testArrayLength03() {
         ExpressionFactory factory = createExpressionFactory();
         ELContext context = new SimpleContext();
@@ -380,7 +375,7 @@ class ValueExpressionTest extends ELBaseTest {
         ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
 
         // Check the result
-        Integer result = (Integer) ve.getValue(context);
+        Integer result = ve.getValue(context);
         assertThat(result).isNull();
     }
 }

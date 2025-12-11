@@ -18,8 +18,6 @@
  */
 package org.flowable.osgi.blueprint;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -80,11 +78,6 @@ public class BlueprintContextELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
-        return null;
     }
 
     @Override

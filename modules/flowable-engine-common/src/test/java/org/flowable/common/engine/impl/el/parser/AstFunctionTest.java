@@ -18,12 +18,8 @@ package org.flowable.common.engine.impl.el.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.reflect.Method;
-
-import org.flowable.common.engine.impl.de.odysseus.el.util.SimpleResolver;
+import org.flowable.common.engine.impl.de.odysseus.el.util.SimpleContext;
 import org.flowable.common.engine.impl.el.BaseElTest;
-import org.flowable.common.engine.impl.el.FlowableElContext;
-import org.flowable.common.engine.impl.el.FlowableFunctionResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
 import org.junit.jupiter.api.Test;
@@ -49,16 +45,9 @@ class AstFunctionTest extends BaseElTest {
     @Test
     void testVarargMethod() throws NoSuchMethodException, SecurityException {
         ExpressionFactory factory = createExpressionFactory();
-        ELContext context = new FlowableElContext(new SimpleResolver(), new FlowableFunctionResolver() {
-
-            @Override
-            public Method resolveFunction(String prefix, String localName) throws NoSuchMethodException {
-                if ("fn".equals(prefix) && "format".equals(localName)) {
-                    return String.class.getMethod("format", String.class, Object[].class);
-                }
-                return null;
-            }
-        });
+        ELContext context = new SimpleContext();
+        context.getFunctionMapper().mapFunction("fn", "format",
+                String.class.getMethod("format", String.class, Object[].class));
 
         Object result = factory.createValueExpression(context, "${fn:format('%s-%s','one','two')}", String.class)
                 .getValue(context);

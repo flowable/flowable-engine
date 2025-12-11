@@ -13,8 +13,6 @@
 
 package org.flowable.common.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -63,11 +61,6 @@ public class ReadOnlyMapELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
-        return null;
     }
 
     @Override
