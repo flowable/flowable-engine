@@ -16,16 +16,19 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
-// This class is copied from https://github.com/apache/tomcat/tree/febda9acf2a9d6ed833382c4c49eec8964bc1431/java/jakarta/el
+// This class is copied from https://github.com/apache/tomcat/blob/97f157af6d750a644a3d1c26e2d6af0d59d7b553/java/jakarta/el/Util.java
 // This class has been slightly modified in order to support the use cases for Flowable.
 // The following modifications have been done:
 // Remove getExpressionFactory static method -> We are instead passing the expression Factory to the appropriate methods in this class
@@ -38,7 +41,7 @@ import java.util.Set;
 // Remove message static method -> we are not using it
 // Add ExpressionFactory as last method parameter to findMethod, findWrapper, isCoercibleFrom and buildParameters
 // Make public methods accessible if they aren't
-// The findWrapper method has been enhanced with the implementation from https://github.com/eclipse-ee4j/el-ri/blob/4e7c61bce9e7750c2fa6fb85476e33f17b0246b4/api/src/main/java/jakarta/el/ELUtil.java
+// The findWrapper method has been enhanced to use findMostSpecificWrapper from the implementation from https://github.com/eclipse-ee4j/el-ri/blob/4e7c61bce9e7750c2fa6fb85476e33f17b0246b4/api/src/main/java/jakarta/el/ELUtil.java
 // This method follows the JLS more closely and allows picking of ambiguous overloaded methods better.
 // The code in findWrapper is not identical to the one from ELUtil in order to make it more readable for the maintainers of Flowable
 
@@ -86,11 +89,7 @@ class Util {
     private static <T> Wrapper<T> findWrapper(Class<?> clazz, List<Wrapper<T>> wrappers,
             String name, Class<?>[] paramTypes, Object[] paramValues, ExpressionFactory factory) {
 
-        // Flowable comment: The implementation in ELUtil has 3 candidates lists.
-        // This is changed here to have one list and tracking the current candidates type.
-        // Since only the most specific one will be used
-        List<Wrapper<T>> candidates = new ArrayList<>();
-        CandidatesType candidatesType = CandidatesType.UNKNOWN;
+        Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
         int paramCount = paramTypes.length;
 
@@ -109,17 +108,16 @@ class Util {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (w.isVarArgs() && paramCount < mParamCount -1) {
+            if (w.isVarArgs() && paramCount < mParamCount - 1) {
                 // Method has wrong number of parameters
                 continue;
             }
-            if (w.isVarArgs() && paramCount == mParamCount && paramValues != null &&
-                    paramValues.length > paramCount && !paramTypes[mParamCount -1].isArray()) {
+            if (w.isVarArgs() && paramCount == mParamCount && paramValues != null && paramValues.length > paramCount &&
+                    !paramTypes[mParamCount - 1].isArray()) {
                 // Method arguments don't match
                 continue;
             }
-            if (w.isVarArgs() && paramCount > mParamCount && paramValues != null &&
-                    paramValues.length != paramCount) {
+            if (w.isVarArgs() && paramCount > mParamCount && paramValues != null && paramValues.length != paramCount) {
                 // Might match a different varargs method
                 continue;
             }
@@ -129,52 +127,55 @@ class Util {
             }
 
             // Check the parameters match
-            boolean assignable = false;
-            boolean coercible = false;
-            boolean varArgs = false;
             int exactMatch = 0;
+            int assignableMatch = 0;
+            int coercibleMatch = 0;
+            int varArgsMatch = 0;
             boolean noMatch = false;
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
                 if (w.isVarArgs() && i == (mParamCount - 1)) {
-                    varArgs = true;
-                    // exact var array type match
-                    if (mParamCount == paramCount) {
-                        if (mParamTypes[i] == paramTypes[i]) {
-                            continue;
-                        }
-                    }
-
                     if (i == paramCount || (paramValues != null && paramValues.length == i)) {
-                        // Nothing is passed as varargs
+                        // Var args defined but nothing is passed as varargs
+                        // Use MAX_VALUE so this matches only if nothing else does
+                        varArgsMatch = Integer.MAX_VALUE;
                         break;
                     }
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
-                        if (!isAssignableFrom(paramTypes[j], varType)) {
+                        if (isAssignableFrom(paramTypes[j], varType)) {
+                            assignableMatch++;
+                            varArgsMatch++;
+                        } else {
                             if (paramValues == null) {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (!isCoercibleFrom(paramValues[j], varType, factory)) {
+                                if (isCoercibleFrom(paramValues[j], varType, factory)) {
+                                    coercibleMatch++;
+                                    varArgsMatch++;
+                                } else {
                                     noMatch = true;
                                     break;
                                 }
                             }
                         }
+                        // Don't treat a varArgs match as an exact match, it can
+                        // lead to a varArgs method matching when the result
+                        // should be ambiguous
                     }
                 } else {
                     if (mParamTypes[i].equals(paramTypes[i])) {
                         exactMatch++;
                     } else if (paramTypes[i] != null && isAssignableFrom(paramTypes[i], mParamTypes[i])) {
-                        assignable = true;
+                        assignableMatch++;
                     } else {
                         if (paramValues == null) {
                             noMatch = true;
                             break;
                         } else {
                             if (isCoercibleFrom(paramValues[i], mParamTypes[i], factory)) {
-                                coercible = true;
+                                coercibleMatch++;
                             } else {
                                 noMatch = true;
                                 break;
@@ -188,50 +189,64 @@ class Util {
             }
 
             // If a method is found where every parameter matches exactly,
-            // return it
-            if (exactMatch == paramCount) {
+            // and no vars args are present, return it
+            if (exactMatch == paramCount && varArgsMatch == 0) {
                 return w;
             }
 
-            if (varArgs) {
-                if (candidatesType == CandidatesType.VAR_ARGS) {
-                    candidates.add(w);
-                } else if (candidatesType.compareTo(CandidatesType.VAR_ARGS) < 0) {
-                    candidatesType = CandidatesType.VAR_ARGS;
-                    candidates.clear();
-                    candidates.add(w);
-                }
-            } else if (coercible) {
-                if (candidatesType == CandidatesType.COERCIBLE) {
-                    candidates.add(w);
-                } else if (candidatesType.compareTo(CandidatesType.COERCIBLE) < 0) {
-                    candidatesType = CandidatesType.COERCIBLE;
-                    candidates.clear();
-                    candidates.add(w);
-                }
-            } else if (assignable) {
-                if (candidatesType == CandidatesType.ASSIGNABLE) {
-                    candidates.add(w);
-                } else if (candidatesType.compareTo(CandidatesType.ASSIGNABLE) < 0) {
-                    candidatesType = CandidatesType.ASSIGNABLE;
-                    candidates.clear();
-                    candidates.add(w);
-                }
+            candidates.put(w, new MatchResult(w.isVarArgs(), exactMatch, assignableMatch, coercibleMatch, varArgsMatch,
+                    w.isBridge()));
+        }
+
+        // Look for the method that has the highest number of parameters where
+        // the type matches exactly
+        MatchResult bestMatch = new MatchResult(true, 0, 0, 0, 0, true);
+        Wrapper<T> match = null;
+        boolean multiple = false;
+        // We collect all the candidates that match the most and we try to find the most specific one
+        List<Wrapper<T>> ambiguousCandidates = new ArrayList<>();
+        for (Map.Entry<Wrapper<T>,MatchResult> entry : candidates.entrySet()) {
+            int cmp = entry.getValue().compareTo(bestMatch);
+            if (cmp > 0 || match == null) {
+                bestMatch = entry.getValue();
+                match = entry.getKey();
+                ambiguousCandidates.clear();
+                ambiguousCandidates.add(match);
+                multiple = false;
+            } else if (cmp == 0) {
+                ambiguousCandidates.add(entry.getKey());
+                multiple = true;
+            }
+        }
+        if (multiple) {
+            if (bestMatch.getExactCount() == paramCount - 1) {
+                // Only one parameter is not an exact match - try using the
+                // super class
+                String errorMsg = "Unable to find unambiguous method: " + clazz + "." + name + "(" + paramString(paramTypes) + ")";
+                match = findMostSpecificWrapper(ambiguousCandidates, paramTypes, bestMatch.getAssignableCount() > 0, errorMsg);
+            } else {
+                match = null;
+            }
+
+            if (match == null) {
+                // If multiple methods have the same matching number of parameters
+                // the match is ambiguous so throw an exception
+                throw new MethodNotFoundException("Unable to find unambiguous method: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
             }
         }
 
-        if (!candidates.isEmpty()) {
-            String errorMsg = "Unable to find unambiguous method: " + clazz + "." + name + "(" + paramString(paramTypes) + ")";
-            return findMostSpecificWrapper(candidates, paramTypes, candidatesType == CandidatesType.ASSIGNABLE, errorMsg);
+        // Handle case where no match at all was found
+        if (match == null) {
+            throw new MethodNotFoundException("Method not found: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
         }
 
-        throw new MethodNotFoundException("Method not found: " + clazz + "." + name + "(" + paramString(paramTypes) + ")");
+        return match;
     }
 
     /*
      * This method duplicates code in com.sun.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private static <T> Wrapper<T> findMostSpecificWrapper(List<Wrapper<T>> candidates, Class<?>[] matchingTypes, boolean elSpecific, String errorMsg) {
+    private static <T> Wrapper<T> findMostSpecificWrapper(Collection<Wrapper<T>> candidates, Class<?>[] matchingTypes, boolean elSpecific, String errorMsg) {
         List<Wrapper<T>> ambiguouses = new ArrayList<>();
         for (Wrapper<T> candidate : candidates) {
             boolean lessSpecific = false;
@@ -393,8 +408,7 @@ class Util {
         return result;
     }
 
-
-    private static final String paramString(Class<?>[] types) {
+    private static String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuilder sb = new StringBuilder();
             for (Class<?> type : types) {
@@ -417,74 +431,6 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When
      * making changes keep the code in sync.
      */
-    private static <T> Wrapper<T> resolveAmbiguousWrapper(Set<Wrapper<T>> candidates,
-            Class<?>[] paramTypes) {
-        // Identify which parameter isn't an exact match
-        Wrapper<T> w = candidates.iterator().next();
-
-        int nonMatchIndex = 0;
-        Class<?> nonMatchClass = null;
-
-        for (int i = 0; i < paramTypes.length; i++) {
-            if (w.getParameterTypes()[i] != paramTypes[i]) {
-                nonMatchIndex = i;
-                nonMatchClass = paramTypes[i];
-                break;
-            }
-        }
-
-        if (nonMatchClass == null) {
-            // Null will always be ambiguous
-            return null;
-        }
-
-        for (Wrapper<T> c : candidates) {
-            if (c.getParameterTypes()[nonMatchIndex] ==
-                    paramTypes[nonMatchIndex]) {
-                // Methods have different non-matching parameters
-                // Result is ambiguous
-                return null;
-            }
-        }
-
-        // Can't be null
-        Class<?> superClass = nonMatchClass.getSuperclass();
-        while (superClass != null) {
-            for (Wrapper<T> c : candidates) {
-                if (c.getParameterTypes()[nonMatchIndex].equals(superClass)) {
-                    // Found a match
-                    return c;
-                }
-            }
-            superClass = superClass.getSuperclass();
-        }
-
-        // Treat instances of Number as a special case
-        Wrapper<T> match = null;
-        if (Number.class.isAssignableFrom(nonMatchClass)) {
-            for (Wrapper<T> c : candidates) {
-                Class<?> candidateType = c.getParameterTypes()[nonMatchIndex];
-                if (Number.class.isAssignableFrom(candidateType) ||
-                        candidateType.isPrimitive()) {
-                    if (match == null) {
-                        match = c;
-                    } else {
-                        // Match still ambiguous
-                        match = null;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return match;
-    }
-
-
-    /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
-     */
     static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
         // Short-cut. null is always assignable to an object and in EL null
@@ -493,28 +439,7 @@ class Util {
             return true;
         }
 
-        Class<?> targetClass;
-        if (target.isPrimitive()) {
-            if (target == Boolean.TYPE) {
-                targetClass = Boolean.class;
-            } else if (target == Character.TYPE) {
-                targetClass = Character.class;
-            } else if (target == Byte.TYPE) {
-                targetClass = Byte.class;
-            } else if (target == Short.TYPE) {
-                targetClass = Short.class;
-            } else if (target == Integer.TYPE) {
-                targetClass = Integer.class;
-            } else if (target == Long.TYPE) {
-                targetClass = Long.class;
-            } else if (target == Float.TYPE) {
-                targetClass = Float.class;
-            } else {
-                targetClass = Double.class;
-            }
-        } else {
-            targetClass = target;
-        }
+        Class<?> targetClass = getBoxingTypeIfPrimitive(target);
         return targetClass.isAssignableFrom(src);
     }
 
@@ -557,17 +482,16 @@ class Util {
      * making changes keep the code in sync.
      */
     static Method getMethod(Class<?> type, Object base, Method m) {
-        JreCompat jreCompat = JreCompat.getInstance();
         // If base is null, method MUST be static
         // If base is non-null, method may be static or non-static
         if (m == null ||
                 (Modifier.isPublic(type.getModifiers()) &&
-                        (jreCompat.canAccess(base, m) || base != null && jreCompat.canAccess(null, m)))) {
+                        (canAccess(base, m) || base != null && canAccess(null, m)))) {
             return m;
         }
 
         if (Modifier.isPublic(m.getModifiers())) {
-            if (jreCompat.trySetAccessible(m)) {
+            if (m.trySetAccessible()) {
                 return m;
             }
         }
@@ -600,6 +524,13 @@ class Util {
         return null;
     }
 
+    static boolean canAccess(Object base, AccessibleObject accessibleObject) {
+        try {
+            return accessibleObject.canAccess(base);
+        } catch (IllegalArgumentException iae) {
+            return false;
+        }
+    }
 
     static Object[] buildParameters(Class<?>[] parameterTypes,
             boolean isVarArgs,Object[] params, ExpressionFactory factory) {
@@ -730,12 +661,87 @@ class Util {
         }
     }
 
-    private enum CandidatesType {
-        UNKNOWN,
-        VAR_ARGS,
-        COERCIBLE,
-        ASSIGNABLE,
+    /*
+     * This class duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
+     */
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount,
+                               int varArgsCount, boolean bridge) implements Comparable<MatchResult> {
 
+        public boolean isVarArgs() {
+            return varArgs;
+        }
+
+        public int getExactCount() {
+            return exactCount;
+        }
+
+        public int getAssignableCount() {
+            return assignableCount;
+        }
+
+        public int getCoercibleCount() {
+            return coercibleCount;
+        }
+
+        public int getVarArgsCount() {
+            return varArgsCount;
+        }
+
+        public boolean isBridge() {
+            return bridge;
+        }
+
+        @Override
+        public int compareTo(MatchResult o) {
+            // Non-varArgs always beats varArgs
+            int cmp = Boolean.compare(o.isVarArgs(), this.isVarArgs());
+            if (cmp == 0) {
+                cmp = Integer.compare(this.getExactCount(), o.getExactCount());
+                if (cmp == 0) {
+                    cmp = Integer.compare(this.getAssignableCount(), o.getAssignableCount());
+                    if (cmp == 0) {
+                        cmp = Integer.compare(this.getCoercibleCount(), o.getCoercibleCount());
+                        if (cmp == 0) {
+                            // Fewer var args matches are better
+                            cmp = Integer.compare(o.getVarArgsCount(), this.getVarArgsCount());
+                            if (cmp == 0) {
+                                // The nature of bridge methods is such that it actually
+                                // doesn't matter which one we pick as long as we pick
+                                // one. That said, pick the 'right' one (the non-bridge
+                                // one) anyway.
+                                cmp = Boolean.compare(o.isBridge(), this.isBridge());
+                            }
+                        }
+                    }
+                }
+            }
+            return cmp;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o == this || (null != o && this.getClass().equals(o.getClass()) &&
+                    ((MatchResult) o).getExactCount() == this.getExactCount() &&
+                    ((MatchResult) o).getAssignableCount() == this.getAssignableCount() &&
+                    ((MatchResult) o).getCoercibleCount() == this.getCoercibleCount() &&
+                    ((MatchResult) o).getVarArgsCount() == this.getVarArgsCount() &&
+                    ((MatchResult) o).isVarArgs() == this.isVarArgs() &&
+                    ((MatchResult) o).isBridge() == this.isBridge());
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getAssignableCount();
+            result = prime * result + (isBridge() ? 1231 : 1237);
+            result = prime * result + getCoercibleCount();
+            result = prime * result + getExactCount();
+            result = prime * result + (isVarArgs() ? 1231 : 1237);
+            result = prime * result + getVarArgsCount();
+            return result;
+        }
     }
+
 
 }
