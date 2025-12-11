@@ -175,7 +175,7 @@ class ELParserTest extends ELBaseTest {
                 + '}';
         ValueExpression ve = factory.createValueExpression(context, expr, String.class);
 
-        String result = (String) ve.getValue(context);
+        String result = ve.getValue(context);
         assertThat(result).isEqualTo("true");
     }
 

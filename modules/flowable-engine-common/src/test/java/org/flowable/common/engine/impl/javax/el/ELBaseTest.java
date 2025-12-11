@@ -16,11 +16,43 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.flowable.common.engine.impl.el.BaseElTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Base class for tests that (indirectly) use BeanSupport and want to test both implementations.
  */
+@ParameterizedClass(name = "[{index}] useStandalone={0}")
+@ValueSource(booleans = { true, false })
 public abstract class ELBaseTest extends BaseElTest {
 
+    @Parameter(0)
+    public boolean useStandalone;
+
+    @BeforeEach
+    public void setupBase() {
+        // Disable caching so we can switch implementations within a JVM instance.
+        System.setProperty("jakarta.el.BeanSupport.doNotCacheInstance", "true");
+        // Set up the implementation for this test run
+        System.setProperty("jakarta.el.BeanSupport.useStandalone", Boolean.toString(useStandalone));
+        BeanSupport.beanSupport = null;
+    }
+
+    /*
+     * Double check test has been configured as expected
+     */
+    @Test
+    public void testImplementation() {
+        if (useStandalone) {
+            assertThat(BeanSupport.getInstance()).isInstanceOf(BeanSupportStandalone.class);
+        } else {
+            assertThat(BeanSupport.getInstance()).isInstanceOf(BeanSupportFull.class);
+        }
+    }
 }

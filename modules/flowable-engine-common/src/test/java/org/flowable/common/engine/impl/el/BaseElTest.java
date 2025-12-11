@@ -39,7 +39,7 @@ public class BaseElTest {
     protected <T> T eval(String expression, Class<T> expectedType) {
         ELContext context = new SimpleContext();
         ValueExpression valueExpression = getExpressionFactory().createValueExpression(context, "${" + expression + "}", expectedType);
-        return (T) valueExpression.getValue(context);
+        return valueExpression.getValue(context);
     }
 
     protected <T> T eval(String expression, ELContext context, Class<T> expectedType) {
@@ -47,7 +47,7 @@ public class BaseElTest {
             context = new SimpleContext();
         }
         ValueExpression valueExpression = getExpressionFactory().createValueExpression(context, "${" + expression + "}", expectedType);
-        return (T) valueExpression.getValue(context);
+        return valueExpression.getValue(context);
     }
 
     protected ExpressionFactory getExpressionFactory() {

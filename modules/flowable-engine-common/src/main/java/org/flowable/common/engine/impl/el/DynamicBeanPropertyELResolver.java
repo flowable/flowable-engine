@@ -12,9 +12,6 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
@@ -53,11 +50,6 @@ public class DynamicBeanPropertyELResolver extends ELResolver {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
     @Override

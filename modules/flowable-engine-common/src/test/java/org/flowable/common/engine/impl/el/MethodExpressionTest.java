@@ -86,8 +86,8 @@ class MethodExpressionTest extends ELBaseTest {
         MethodExpression me2 = expressionFactory.createMethodExpression(context, "${beanB.sayHello('JUnit')}", String.class,
                 new Class<?>[] { String.class });
 
-        assertThat(me1.isParmetersProvided()).isFalse();
-        assertThat(me2.isParmetersProvided()).isTrue();
+        assertThat(me1.isParametersProvided()).isFalse();
+        assertThat(me2.isParametersProvided()).isTrue();
     }
 
     @Test
@@ -328,14 +328,14 @@ class MethodExpressionTest extends ELBaseTest {
     @Test
     void testBug50790a() {
         ValueExpression ve = expressionFactory.createValueExpression(context, "#{beanAA.name.contains(beanA.name)}", Boolean.class);
-        Boolean actual = (Boolean) ve.getValue(context);
+        Boolean actual = ve.getValue(context);
         assertThat(actual).isTrue();
     }
 
     @Test
     void testBug50790b() {
         ValueExpression ve = expressionFactory.createValueExpression(context, "#{beanA.name.contains(beanAA.name)}", Boolean.class);
-        Boolean actual = (Boolean) ve.getValue(context);
+        Boolean actual = ve.getValue(context);
         assertThat(actual).isFalse();
     }
 
@@ -357,7 +357,7 @@ class MethodExpressionTest extends ELBaseTest {
         me.invoke(context, null);
 
         ValueExpression ve = expressionFactory.createValueExpression(context, "#{beanEnum.lastSubmitted}", TesterEnum.class);
-        TesterEnum actual = (TesterEnum) ve.getValue(context);
+        TesterEnum actual = ve.getValue(context);
         assertThat(actual).isEqualTo(TesterEnum.APPLE);
 
     }
@@ -372,7 +372,7 @@ class MethodExpressionTest extends ELBaseTest {
         me.invoke(context, null);
 
         ValueExpression ve = expressionFactory.createValueExpression(context, "#{beanA.getBean().name}", String.class);
-        String actual = (String) ve.getValue(context);
+        String actual = ve.getValue(context);
         assertThat(actual).isEqualTo(BUG53792);
     }
 
@@ -386,7 +386,7 @@ class MethodExpressionTest extends ELBaseTest {
         me.invoke(context, null);
 
         ValueExpression ve = expressionFactory.createValueExpression(context, "#{beanA.getBean().name.length()}", Integer.class);
-        Integer actual = (Integer) ve.getValue(context);
+        Integer actual = ve.getValue(context);
         assertThat(actual).isEqualTo(BUG53792.length());
     }
 

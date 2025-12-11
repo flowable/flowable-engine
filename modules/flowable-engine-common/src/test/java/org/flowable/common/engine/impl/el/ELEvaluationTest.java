@@ -269,7 +269,7 @@ class ELEvaluationTest extends BaseElTest {
     private String evaluateExpression(String expression) {
         ExpressionFactory exprFactory = createExpressionFactory();
         TesterFunctions.FMapper mapper = new TesterFunctions.FMapper();
-        FlowableElContext context = new FlowableElContext(new SimpleResolver(), mapper::resolveFunction);
+        FlowableElContext context = new FlowableElContext(new SimpleResolver(), mapper::resolveFunction, expressionFactory);
         ValueExpression ve = exprFactory.createValueExpression(context, expression, String.class);
         return ve.getValue(context).toString();
     }

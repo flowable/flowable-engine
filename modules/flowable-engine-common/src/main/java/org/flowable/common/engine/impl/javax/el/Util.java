@@ -39,9 +39,8 @@ import java.util.Map;
 // Remove findConstructor static method -> We are not using it
 // Throw fixed error messages instead of using LocalString resource bundle
 // Remove message static method -> we are not using it
-// Add ExpressionFactory as last method parameter to findMethod, findWrapper, isCoercibleFrom and buildParameters
 // Make public methods accessible if they aren't
-// The findWrapper method has been enhanced to use findMostSpecificWrapper from the implementation from https://github.com/eclipse-ee4j/el-ri/blob/4e7c61bce9e7750c2fa6fb85476e33f17b0246b4/api/src/main/java/jakarta/el/ELUtil.java
+// The findWrapper method has been enhanced to use findMostSpecificWrapper from the implementation from https://github.com/jakartaee/expression-language/blob/38694bc161ea8f8608bfb99b612e6d1d71a2b1ea/api/src/main/java/jakarta/el/ELUtil.java
 // This method follows the JLS more closely and allows picking of ambiguous overloaded methods better.
 // The code in findWrapper is not identical to the one from ELUtil in order to make it more readable for the maintainers of Flowable
 
@@ -52,12 +51,24 @@ class Util {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+    /**
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
+     * @param t the Throwable to check
      */
-    static Method findMethod(Class<?> clazz, Object base, String methodName,
-            Class<?>[] paramTypes, Object[] paramValues, ExpressionFactory factory) {
+    static void handleThrowable(Throwable t) {
+        if (t instanceof VirtualMachineError) {
+            throw (VirtualMachineError) t;
+        }
+        // All other instances of Throwable will be silently swallowed
+    }
+
+
+    /*
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
+     */
+    static Method findMethod(ELContext context, Class<?> clazz, Object base, String methodName, Class<?>[] paramTypes,
+            Object[] paramValues) {
 
         if (clazz == null || methodName == null) {
             throw new MethodNotFoundException("Method not found: " + clazz + "." + methodName + "(" + paramString(paramTypes) + ")");
@@ -67,11 +78,21 @@ class Util {
             paramTypes = getTypesFromValues(paramValues);
         }
 
+        // Fast path: when no arguments exist, there can only be one matching method and no need for coercion.
+        if (paramTypes.length == 0) {
+            try {
+                Method method = clazz.getMethod(methodName, paramTypes);
+                return getMethod(clazz, base, method);
+            } catch (NoSuchMethodException | SecurityException ignore) {
+                // Fall through to broader, slower logic
+            }
+        }
+
         Method[] methods = clazz.getMethods();
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
 
-        Wrapper<Method> result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues, factory);
+        Wrapper<Method> result = findWrapper(context, clazz, wrappers, methodName, paramTypes, paramValues);
 
         return getMethod(clazz, base, result.unWrap());
     }
@@ -86,8 +107,8 @@ class Util {
      * Copyright 2004 The Apache Software Foundation
      */
     @SuppressWarnings("null")
-    private static <T> Wrapper<T> findWrapper(Class<?> clazz, List<Wrapper<T>> wrappers,
-            String name, Class<?>[] paramTypes, Object[] paramValues, ExpressionFactory factory) {
+    private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers,
+            String name, Class<?>[] paramTypes, Object[] paramValues) {
 
         Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
@@ -151,7 +172,7 @@ class Util {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (isCoercibleFrom(paramValues[j], varType, factory)) {
+                                if (isCoercibleFrom(context, paramValues[j], varType)) {
                                     coercibleMatch++;
                                     varArgsMatch++;
                                 } else {
@@ -174,7 +195,7 @@ class Util {
                             noMatch = true;
                             break;
                         } else {
-                            if (isCoercibleFrom(paramValues[i], mParamTypes[i], factory)) {
+                            if (isCoercibleFrom(context, paramValues[i], mParamTypes[i])) {
                                 coercibleMatch++;
                             } else {
                                 noMatch = true;
@@ -428,8 +449,7 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     static boolean isAssignableFrom(Class<?> src, Class<?> target) {
         // src will always be an object
@@ -445,14 +465,15 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private static boolean isCoercibleFrom(Object src, Class<?> target, ExpressionFactory factory) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        //       be required to avoid the exception.
+    private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
+        /*
+         * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
+         * also OptionalELResolver.convertToType().
+         */
         try {
-            factory.coerceToType(src, target);
+            context.convertToType(src, target);
         } catch (ELException e) {
             return false;
         }
@@ -465,7 +486,7 @@ class Util {
             return EMPTY_CLASS_ARRAY;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;
@@ -478,8 +499,7 @@ class Util {
 
 
     /*
-     * This method duplicates code in org.apache.el.util.ReflectionUtil. When
-     * making changes keep the code in sync.
+     * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     static Method getMethod(Class<?> type, Object base, Method m) {
         // If base is null, method MUST be static
@@ -491,8 +511,12 @@ class Util {
         }
 
         if (Modifier.isPublic(m.getModifiers())) {
-            if (m.trySetAccessible()) {
-                return m;
+            try {
+                if (m.trySetAccessible()) {
+                    return m;
+                }
+            } catch (SecurityException ignored) {
+                // ignore
             }
         }
 
@@ -532,8 +556,8 @@ class Util {
         }
     }
 
-    static Object[] buildParameters(Class<?>[] parameterTypes,
-            boolean isVarArgs,Object[] params, ExpressionFactory factory) {
+    static Object[] buildParameters(ELContext context, Class<?>[] parameterTypes,
+            boolean isVarArgs, Object[] params) {
         Object[] parameters = null;
         if (parameterTypes.length > 0) {
             parameters = new Object[parameterTypes.length];
@@ -546,32 +570,28 @@ class Util {
                 int varArgIndex = parameterTypes.length - 1;
                 // First argCount-1 parameters are standard
                 for (int i = 0; (i < varArgIndex); i++) {
-                    parameters[i] = coerceValue(params[i], parameterTypes[i], factory);
+                    parameters[i] = coerceValue(params[i], parameterTypes[i], context);
                 }
                 // Last parameter is the varargs
-                Class<?> varArgClass =
-                        parameterTypes[varArgIndex].getComponentType();
-                final Object varargs = Array.newInstance(
-                        varArgClass,
-                        (paramCount - varArgIndex));
+                Class<?> varArgClass = parameterTypes[varArgIndex].getComponentType();
+                final Object varargs = Array.newInstance(varArgClass, (paramCount - varArgIndex));
                 for (int i = (varArgIndex); i < paramCount; i++) {
-                    Array.set(varargs, i - varArgIndex,
-                            coerceValue(params[i], varArgClass, factory));
+                    Array.set(varargs, i - varArgIndex, coerceValue(params[i], varArgClass, context));
                 }
                 parameters[varArgIndex] = varargs;
             } else {
                 parameters = new Object[parameterTypes.length];
                 for (int i = 0; i < parameterTypes.length; i++) {
-                    parameters[i] = coerceValue(params[i], parameterTypes[i], factory);
+                    parameters[i] = coerceValue(params[i], parameterTypes[i], context);
                 }
             }
         }
         return parameters;
     }
 
-    static Object coerceValue(Object value, Class<?> type, ExpressionFactory factory) {
+    static Object coerceValue(Object value, Class<?> type, ELContext context) {
         if (value != null || type.isPrimitive()) {
-            return factory.coerceToType(value, type);
+            return context.convertToType(value, type);
         }
 
         return null;
@@ -608,7 +628,7 @@ class Util {
     private static class MethodWrapper extends Wrapper<Method> {
         private final Method m;
 
-        public MethodWrapper(Method m) {
+        MethodWrapper(Method m) {
             this.m = m;
         }
 
@@ -636,7 +656,7 @@ class Util {
     private static class ConstructorWrapper extends Wrapper<Constructor<?>> {
         private final Constructor<?> c;
 
-        public ConstructorWrapper(Constructor<?> c) {
+        ConstructorWrapper(Constructor<?> c) {
             this.c = c;
         }
 

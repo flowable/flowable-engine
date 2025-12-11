@@ -111,7 +111,7 @@ public class DefaultExpressionManager implements ExpressionManager {
     @Override
     public ELContext getElContext(VariableContainer variableContainer) {
         ELResolver elResolver = getOrCreateStaticElResolver();
-        return new FlowableElContext(elResolver, functionResolver);
+        return new FlowableElContext(elResolver, functionResolver, expressionFactory);
     }
     
     protected ELResolver getOrCreateStaticElResolver() {

@@ -13,9 +13,6 @@
 
 package org.activiti.spring;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.activiti.engine.ActivitiException;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
@@ -66,11 +63,6 @@ public class ApplicationContextElResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object arg) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
-        return null;
     }
 
     @Override

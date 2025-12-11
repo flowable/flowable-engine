@@ -12,9 +12,6 @@
  */
 package org.flowable.cdi.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import jakarta.el.FunctionMapper;
 import jakarta.el.VariableMapper;
 import jakarta.enterprise.inject.spi.BeanManager;
@@ -79,11 +76,6 @@ public class CdiResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return getWrappedResolver().getCommonPropertyType(this.context, base);
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
     @Override

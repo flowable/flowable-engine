@@ -28,7 +28,7 @@ class ExpressionFactoryTest extends BaseElTest {
     void testCoerceToTypeString() {
         ExpressionFactory factory = createExpressionFactory();
         TestObject testObjectA = new TestObject();
-        String result = (String) factory.coerceToType(testObjectA, String.class);
+        String result = factory.coerceToType(testObjectA, String.class);
         assertThat(result).isEqualTo(TestObject.OK);
     }
 
