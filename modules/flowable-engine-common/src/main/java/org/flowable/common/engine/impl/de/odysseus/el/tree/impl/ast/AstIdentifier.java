@@ -85,8 +85,13 @@ public class AstIdentifier extends AstNode implements IdentifierNode {
 		return new ValueReference(null, name);
 	}
 	
-	@Override 
+	@Override
 	public Object eval(Bindings bindings, ELContext context) {
+		// Check for lambda parameters first
+		if (context.isLambdaArgument(name)) {
+			return context.getLambdaArgument(name);
+		}
+
 		ValueExpression expression = bindings.getVariable(index);
 		if (expression != null) {
 			return expression.getValue(context);

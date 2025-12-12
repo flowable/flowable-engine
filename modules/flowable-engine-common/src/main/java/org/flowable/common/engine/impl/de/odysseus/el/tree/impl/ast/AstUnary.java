@@ -43,7 +43,7 @@ public class AstUnary extends AstRightValue {
 		@Override public String toString() { return "-"; }
 	};
 	public static final Operator NOT = new SimpleOperator() {
-		@Override public Object apply(TypeConverter converter, Object o) { return !converter.convert(o, Boolean.class); }
+		@Override public Object apply(TypeConverter converter, Object o) { return !converter.convert(o, boolean.class); }
 		@Override public String toString() { return "!"; }
 	};
 

@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2009 Odysseus Software GmbH
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,49 +16,25 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
-/**
- * Thrown when a property could not be written to while setting the value on a
- * {@link ValueExpression}. For example, this could be triggered by trying to set a map value on an
- * unmodifiable map.
- */
-public class PropertyNotWritableException extends ELException {
-	private static final long serialVersionUID = 1L;
+import java.io.Serial;
 
-	/**
-	 * Creates a PropertyNotWritableException with no detail message.
-	 */
+public class PropertyNotWritableException extends ELException {
+
+    @Serial
+    private static final long serialVersionUID = 827987155471214717L;
+
 	public PropertyNotWritableException() {
 		super();
 	}
 
-	/**
-	 * Creates a PropertyNotWritableException with the provided detail message.
-	 * 
-	 * @param message
-	 *            the detail message
-	 */
 	public PropertyNotWritableException(String message) {
 		super(message);
 	}
 
-	/**
-	 * Creates a PropertyNotWritableException with the given root cause.
-	 * 
-	 * @param cause
-	 *            the originating cause of this exception
-	 */
 	public PropertyNotWritableException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * Creates a PropertyNotWritableException with the given detail message and root cause.
-	 * 
-	 * @param message
-	 *            the detail message
-	 * @param cause
-	 *            the originating cause of this exception
-	 */
 	public PropertyNotWritableException(String message, Throwable cause) {
 		super(message, cause);
 	}

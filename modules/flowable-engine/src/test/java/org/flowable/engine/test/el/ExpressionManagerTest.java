@@ -278,6 +278,34 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testResolveRecordProperties() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Object value = managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("#{bean.name}");
+            ExecutionEntity executionEntity = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables().singleResult();
+            executionEntity.setTransientVariable("bean", new TestRecord("kermit", 30));
+            return expression.getValue(executionEntity);
+        });
+
+        assertThat(value).isEqualTo("kermit");
+
+        value = managementService.executeCommand(commandContext -> {
+            Expression expression = processEngineConfiguration.getExpressionManager().createExpression("#{bean.age}");
+            ExecutionEntity executionEntity = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables().singleResult();
+            executionEntity.setTransientVariable("bean", new TestRecord("kermit", 30));
+            return expression.getValue(executionEntity);
+        });
+
+        assertThat(value).isEqualTo(30);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
     public void testInvokeOnArrayNode() {
         Map<String, Object> vars = new HashMap<>();
         ArrayNode arrayNode = processEngineConfiguration.getObjectMapper().createArrayNode();
@@ -397,5 +425,8 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
         public String nonPrimitiveInteger(Integer value) {
             return value == null ? null : value.toString();
         }
+    }
+
+    record TestRecord(String name, int age) {
     }
 }

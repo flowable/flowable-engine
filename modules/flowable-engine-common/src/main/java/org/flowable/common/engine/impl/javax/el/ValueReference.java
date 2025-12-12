@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009 Odysseus Software GmbH
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -15,18 +16,19 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * This class encapsulates a base model object and one of its properties.
- * 
- * @since 2.2
+ * @since EL 2.2
  */
 public class ValueReference implements Serializable {
+
+    @Serial
 	private static final long serialVersionUID = 1L;
 
-	private Object base;
-	private Object property;
+    private final Object base;
+    private final Object property;
 
 	public ValueReference(Object base, Object property) {
 		this.base = base;

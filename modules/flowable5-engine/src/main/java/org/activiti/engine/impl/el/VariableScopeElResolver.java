@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
@@ -93,11 +90,6 @@ public class VariableScopeElResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
-        return null;
     }
 
     @Override

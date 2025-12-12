@@ -144,7 +144,7 @@ public final class TreeMethodExpression extends MethodExpression {
 	 * @return <code>true</code> if this is a method invocation expression
 	 */
 	@Override
-	public boolean isParmetersProvided() {
+	public boolean isParametersProvided() {
 		return node.isMethodInvocation();
 	}
 	

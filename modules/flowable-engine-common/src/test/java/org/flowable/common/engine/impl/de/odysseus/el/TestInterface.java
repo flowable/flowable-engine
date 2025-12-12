@@ -13,17 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.javax.el;
+package org.flowable.common.engine.impl.de.odysseus.el;
 
-/**
- * The listener interface for receiving notification when an {@link ELContext} is created.
- */
-public interface ELContextListener extends java.util.EventListener {
-	/**
-	 * Invoked when a new ELContext has been created.
-	 * 
-	 * @param ece
-	 *            the notification event.
-	 */
-    void contextCreated(ELContextEvent ece);
+public interface TestInterface {
+
+    int fourtyTwo();
 }
