@@ -145,6 +145,18 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/el/PlanItemInstancesKeyWordInExpressionsTest.testWithName.cmmn")
+    public void testWithFilterUsingLambda() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(8);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.filter(inst -> inst.name eq 'A' or inst.name eq 'B').count()}")).isEqualTo(2);
+
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.filter(inst -> inst.name eq 'invalid').count()}")).isEqualTo(0);
+    }
+
+    @Test
     @CmmnDeployment
     public void testWithStateAndId() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

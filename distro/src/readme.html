@@ -32,6 +32,17 @@
 
 <ul>
     <li>
+        The method `stream()` can be used to obtain a <code>java.util.stream.Stream</code> from a collection.
+    </li>
+    <li>
+        Lambda expressions can be used in expressions. e.g. if you have a transient list of customers you can do something like:
+        <code>${customers.stream().filter(customer -> customer.type eq 'premium').toList()}</code> to get a list of premium customers
+        or <code>${customers.stream().map(customer -> customer.name).toList()</code> to get the names of all the customers.
+    </li>
+    <li>
+        The <code>planItemInstances</code> now expose a <code>filter(Predicate&lt;DelegatePlanItemInstance&gt; predicate)</code> method that can be used to provide custom filter options.
+    </li>
+    <li>
         Date variables will now include the milliseconds when they are returned over REST.
         E.g., up to now a date variable with the value of <code>2020-05-04T09:25:45.583Z</code> would have been returned as <code>2020-05-04T09:25:45Z</code>.
         However, now it would be returned as <code>2020-05-04T09:25:45.583Z</code> which is still ISO 8601 compliant.
@@ -45,7 +56,7 @@
         There is still support for Jackson 2 variables.
         With Spring Boot this can be enabled by setting <code>flowable.variable-json-mapper</code> to <code>jackson2</code>.
         By default, Jackson 3 is being used for variables.
-        When configuring Flowable without Spring Boot then the <code>variableJsonMapper</code> on the process, cmmn and app engine configurations
+        When configuring Flowable without Spring Boot then the <code>variableJsonMapper</code> on the process, cmmn, and app engine configurations
         should be set to be <code>org.flowable.common.engine.impl.json.jackson2.Jackson2VariableJsonMapper</code>
         and the <code>org.flowable.common.rest.variable.Jackson2JsonObjectRestVariableConverter</code> should be added to the appropriate rest response factories.
     </li>

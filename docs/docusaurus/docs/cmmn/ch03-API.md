@@ -234,6 +234,10 @@ To filter based on the name:
 
 -   names('name1', 'name2', 'name3')
 
+To filter using a lambda expression:
+
+-   filter(planItemInstance -> planItemInstance.name.startsWith('Service')
+
 For some use cases, the plan item instances that should be filtered should only be part of the current stage. The 'current stage' is either the parent stage of a plan item or the case instance when there’s no parent stage.
 
 -   currentStage()

@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -78,16 +80,10 @@ public class PlanItemInstancesWrapper {
     }
 
     public PlanItemInstancesWrapper definitionIds(String...ids) {
-        ensurePlanItemInstanceInitialized();
-
         List<String> list = Arrays.asList(ids);
-        List<PlanItemInstanceEntity> filteredPlanItemInstances = planItemInstances.stream()
-            .filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
+        return filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
-                && list.contains(planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getId()))
-            .collect(Collectors.toList());
-
-        return new PlanItemInstancesWrapper(variableContainer, caseInstanceEntity, filteredPlanItemInstances);
+                && list.contains(planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getId()));
     }
 
     public List<String> getDefinitionId() {
@@ -104,16 +100,11 @@ public class PlanItemInstancesWrapper {
     }
 
     public PlanItemInstancesWrapper names(String...names) {
-        ensurePlanItemInstanceInitialized();
 
         List<String> list = Arrays.asList(names);
-        List<PlanItemInstanceEntity> filteredPlanItemInstances = planItemInstances.stream()
-            .filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
+        return filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
-                && list.contains(planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getName()))
-            .collect(Collectors.toList());
-
-        return new PlanItemInstancesWrapper(variableContainer, caseInstanceEntity, filteredPlanItemInstances);
+                && list.contains(planItemInstanceEntity.getPlanItem().getPlanItemDefinition().getName()));
     }
 
     public List<String> getDefinitionName() {
@@ -193,25 +184,23 @@ public class PlanItemInstancesWrapper {
     }
 
     public PlanItemInstancesWrapper onlyTerminal() {
-        ensurePlanItemInstanceInitialized();
-
-        List<PlanItemInstanceEntity> filteredPlanItemInstances = planItemInstances.stream()
-            .filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
+        return filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
-                && PlanItemInstanceState.isInTerminalState(planItemInstanceEntity))
-            .collect(Collectors.toList());
-
-        return new PlanItemInstancesWrapper(variableContainer, caseInstanceEntity, filteredPlanItemInstances);
+                && PlanItemInstanceState.isInTerminalState(planItemInstanceEntity));
     }
 
     public PlanItemInstancesWrapper onlyNonTerminal() {
+        return filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
+                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
+                && !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity));
+    }
+
+    public PlanItemInstancesWrapper filter(Predicate<DelegatePlanItemInstance> filter) {
         ensurePlanItemInstanceInitialized();
 
         List<PlanItemInstanceEntity> filteredPlanItemInstances = planItemInstances.stream()
-            .filter(planItemInstanceEntity -> planItemInstanceEntity.getPlanItem() != null
-                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
-                && !PlanItemInstanceState.isInTerminalState(planItemInstanceEntity))
-            .collect(Collectors.toList());
+                .filter(filter)
+                .collect(Collectors.toList());
 
         return new PlanItemInstancesWrapper(variableContainer, caseInstanceEntity, filteredPlanItemInstances);
     }
@@ -224,13 +213,7 @@ public class PlanItemInstancesWrapper {
     // Helper methods
 
     protected PlanItemInstancesWrapper getPlanItemInstancesWithState(String state) {
-        ensurePlanItemInstanceInitialized();
-
-        List<PlanItemInstanceEntity> filteredPlanItemInstances = planItemInstances.stream()
-            .filter(planItemInstanceEntity -> Objects.equals(state, planItemInstanceEntity.getState()))
-            .collect(Collectors.toList());
-
-        return new PlanItemInstancesWrapper(variableContainer, caseInstanceEntity, filteredPlanItemInstances);
+        return filter(planItemInstanceEntity -> Objects.equals(state, planItemInstanceEntity.getState()));
     }
 
     protected List<PlanItemInstanceEntity> collectAllChildPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer) {
