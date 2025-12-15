@@ -1,5 +1,11 @@
 package org.flowable.engine.test.api.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
@@ -13,16 +19,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Matthias Stöckli
  */
 public class FlowableProcessBusinessStatusUpdatedEventTest extends PluggableFlowableTestCase {
+
     protected CustomEventListener businessStatusUpdatedEventListener;
 
     @BeforeEach
@@ -59,6 +60,7 @@ public class FlowableProcessBusinessStatusUpdatedEventTest extends PluggableFlow
 
         // Set business status for the first time
         runtimeService.updateBusinessStatus(processInstance.getId(), "newStatus");
+        assertThat(events).hasSize(1);
     }
 
     @Test
@@ -81,12 +83,13 @@ public class FlowableProcessBusinessStatusUpdatedEventTest extends PluggableFlow
                 .businessStatus("oldStatus")
                 .start();
 
-
         // Update the business status
         runtimeService.updateBusinessStatus(processInstance.getId(), "newStatus");
+        assertThat(events).hasSize(1);
     }
 
     public static class CustomEventListener extends AbstractFlowableEventListener {
+
         private Consumer<FlowableEvent> eventConsumer;
 
         @Override

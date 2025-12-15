@@ -14,7 +14,6 @@ package org.flowable.cmmn.api.event;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 
-
 /**
  * An event representing a CMMN case business status being updated.
  *

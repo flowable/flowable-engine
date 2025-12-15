@@ -53,7 +53,7 @@ public class SetCaseInstanceBusinessStatusCmd implements Command<Void>, Serializ
         String oldBusinessStatus = caseInstanceEntity.getBusinessStatus();
         caseInstanceEntityManager.updateCaseInstanceBusinessStatus(caseInstanceEntity, businessStatus);
 
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseBusinessStatusUpdatedEvent(caseInstanceEntity, oldBusinessStatus, businessStatus), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
         }

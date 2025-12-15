@@ -14,7 +14,6 @@ package org.flowable.engine.delegate.event;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 
-
 /**
  * An event representing a process business status being updated.
  *

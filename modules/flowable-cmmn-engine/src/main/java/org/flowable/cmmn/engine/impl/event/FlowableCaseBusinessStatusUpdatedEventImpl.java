@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.event.FlowableEngineEventImpl;
 
 public class FlowableCaseBusinessStatusUpdatedEventImpl extends FlowableEngineEventImpl implements FlowableCaseBusinessStatusUpdatedEvent {
+
     protected CaseInstance caseInstance;
     protected String oldBusinessStatus;
     protected String newBusinessStatus;

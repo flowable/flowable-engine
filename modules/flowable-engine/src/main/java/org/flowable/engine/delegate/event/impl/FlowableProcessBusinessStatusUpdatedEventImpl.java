@@ -19,6 +19,7 @@ import org.flowable.engine.delegate.event.FlowableProcessBusinessStatusUpdatedEv
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 public class FlowableProcessBusinessStatusUpdatedEventImpl extends FlowableEngineEventImpl implements FlowableProcessBusinessStatusUpdatedEvent {
+
     protected ExecutionEntity execution;
     protected String oldBusinessStatus;
     protected String newBusinessStatus;

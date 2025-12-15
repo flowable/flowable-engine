@@ -12,6 +12,12 @@
  */
 package org.flowable.cmmn.test.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import org.flowable.cmmn.api.event.FlowableCaseBusinessStatusUpdatedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -24,16 +30,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
  * @author Matthias Stöckli
  */
 public class CaseBusinessStatusUpdatedEventTest extends FlowableCmmnTestCase {
+
     protected CustomEventListener businessStatusUpdatedEventListener;
 
     @BeforeEach
@@ -70,8 +71,8 @@ public class CaseBusinessStatusUpdatedEventTest extends FlowableCmmnTestCase {
 
         // Set business status for the first time
         cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "newStatus");
+        assertThat(events).hasSize(1);
     }
-
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
@@ -96,10 +97,11 @@ public class CaseBusinessStatusUpdatedEventTest extends FlowableCmmnTestCase {
 
         // Update the business status
         cmmnRuntimeService.updateBusinessStatus(caseInstance.getId(), "newStatus");
+        assertThat(events).hasSize(1);
     }
 
-
     public static class CustomEventListener extends AbstractFlowableEventListener {
+
         private Consumer<FlowableEvent> eventConsumer;
 
         @Override
