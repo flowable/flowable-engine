@@ -139,7 +139,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(responseNode.get("tenantId").asText()).isEqualTo("myTenant");
+        assertThat(responseNode.get("tenantId").asString()).isEqualTo("myTenant");
     }
 
     /**
@@ -729,7 +729,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
 
-        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
+        String taskId = ((ArrayNode) dataNode).get(0).get("id").asString();
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));

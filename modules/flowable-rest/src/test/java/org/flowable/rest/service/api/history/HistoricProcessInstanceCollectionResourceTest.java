@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -319,9 +318,8 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+        for (JsonNode jsonNode : dataNode) {
+            String id = jsonNode.get("id").stringValue();
             toBeFound.remove(id);
         }
         assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
@@ -347,13 +345,13 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
-            String variableName = variableNode.get("name").textValue();
+            String variableName = variableNode.get("name").stringValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
             assertThat(expectedVariables).containsKey(variableName);
             assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
-            assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
-            assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
+            assertThat(variableNode.get("type").stringValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
+            assertThat(variableNode.get("scope").stringValue()).isEqualTo("local");
         }
 
     }

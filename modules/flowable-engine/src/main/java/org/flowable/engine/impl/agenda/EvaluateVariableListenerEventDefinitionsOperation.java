@@ -95,7 +95,7 @@ public class EvaluateVariableListenerEventDefinitionsOperation extends AbstractO
                     try {
                         JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
                         if (configNode.has(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY) && !configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).isNull()) {
-                            changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asText();
+                            changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asString();
                         }
                     } catch (Exception e) {
                         LOGGER.error("Error reading variable listener configuration value for {}", eventSubscription.getActivityId(), e);

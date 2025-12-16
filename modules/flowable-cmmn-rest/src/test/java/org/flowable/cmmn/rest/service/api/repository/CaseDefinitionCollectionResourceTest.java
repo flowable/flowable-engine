@@ -78,7 +78,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             for (int i = 0; i < dataNode.size(); i++) {
                 JsonNode caseDefinitionJson = dataNode.get(i);
 
-                String key = caseDefinitionJson.get("key").asText();
+                String key = caseDefinitionJson.get("key").asString();
                 JsonNode graphicalNotationNode = caseDefinitionJson.get("graphicalNotationDefined");
                 if ("testRepeatingStage".equals(key)) {
                     assertThat(graphicalNotationNode.asBoolean()).isTrue();

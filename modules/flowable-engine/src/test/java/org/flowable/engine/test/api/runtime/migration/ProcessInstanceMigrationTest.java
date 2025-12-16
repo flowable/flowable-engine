@@ -4721,13 +4721,13 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
 
     private void assertThatProcessVariableConverted(ProcessInstance processInstanceToMigrate, Execution execution) {
         assertThat((ArrayNode) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable"))
-                .extracting(jsonNode -> jsonNode.asText())
+                .extracting(jsonNode -> jsonNode.asString())
                 .containsExactly("new value");
 
         runtimeService.trigger(execution.getId());
 
         assertThat((ArrayNode) runtimeService.getVariable(processInstanceToMigrate.getId(), "listVariable"))
-                .extracting(jsonNode -> jsonNode.asText())
+                .extracting(jsonNode -> jsonNode.asString())
                 .containsExactly("new value", "new value 2");
 
         runtimeService.trigger(execution.getId());

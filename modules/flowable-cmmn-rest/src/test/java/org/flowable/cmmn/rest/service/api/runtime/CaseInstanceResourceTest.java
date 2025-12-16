@@ -579,7 +579,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     protected void assertStage(JsonNode jsonNode, String name, boolean isEnded, boolean isCurrent) {
-        assertThat(jsonNode.get("name").asText()).isEqualTo(name);
+        assertThat(jsonNode.get("name").asString()).isEqualTo(name);
         assertThat(jsonNode.get("ended").asBoolean()).as("'ended' boolean is wrong").isEqualTo(isEnded);
         assertThat(jsonNode.get("current").asBoolean()).as("'current' boolean is wrong").isEqualTo(isCurrent);
     }

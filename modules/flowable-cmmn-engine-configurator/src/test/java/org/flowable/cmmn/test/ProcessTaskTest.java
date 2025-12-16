@@ -2216,7 +2216,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             // The variable at this point should not have changed at this point.
             for (ProcessInstance processInstance : processInstances) {
                 JsonNode inMappedJsonNodeVariable = (JsonNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myInMappedVariable");
-                assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("value-");
+                assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("value-");
             }
 
             // Executing the async job should now change the variable in the child process instances
@@ -2228,14 +2228,14 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
             for (ProcessInstance processInstance : processInstances) {
                 JsonNode inMappedJsonNodeVariable = (JsonNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myInMappedVariable");
-                assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("CHANGED");
+                assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
             }
 
             // The variable should not have changed on the root process instance level
             ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
             assertThat(rootArrayNode).hasSize(10);
             for (JsonNode rootArrayNodeElement : rootArrayNode) {
-                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+                assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
             }
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
@@ -2274,14 +2274,14 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
             for (ProcessInstance processInstance : processInstances) {
                 JsonNode inMappedJsonNodeVariable = (JsonNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myInMappedVariable");
-                assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("CHANGED");
+                assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
             }
 
             // The variable should not have changed on the root process instance level
             ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
             assertThat(rootArrayNode).hasSize(10);
             for (JsonNode rootArrayNodeElement : rootArrayNode) {
-                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+                assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
             }
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);

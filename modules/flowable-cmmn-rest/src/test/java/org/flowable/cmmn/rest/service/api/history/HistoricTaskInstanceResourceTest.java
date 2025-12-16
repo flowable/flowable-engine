@@ -110,8 +110,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                             + " url: '" + url + "'"
                             + "}");
 
-            assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-            assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
+            assertThat(getDateFromISOString(responseNode.get("dueDate").asString())).isEqualTo(task.getDueDate());
+            assertThat(getDateFromISOString(responseNode.get("startTime").asString())).isEqualTo(task.getCreateTime());
         }
     }
 
@@ -162,8 +162,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                                 + " url: '" + url + "'"
                                 + "}");
 
-                assertThat(getDateFromISOString(responseNode.get("dueDate").asText())).isEqualTo(task.getDueDate());
-                assertThat(getDateFromISOString(responseNode.get("startTime").asText())).isEqualTo(task.getCreateTime());
+                assertThat(getDateFromISOString(responseNode.get("dueDate").asString())).isEqualTo(task.getDueDate());
+                assertThat(getDateFromISOString(responseNode.get("startTime").asString())).isEqualTo(task.getCreateTime());
 
             } finally {
 

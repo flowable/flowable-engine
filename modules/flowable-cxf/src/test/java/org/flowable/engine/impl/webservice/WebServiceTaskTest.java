@@ -338,9 +338,9 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         final Object currentStructure = histProcInst.getProcessVariables().get("currentStructure");
         assertThat(currentStructure).isInstanceOf(JsonNode.class);
         final JsonNode currentStructureJson = (JsonNode) currentStructure;
-        assertThat(currentStructureJson.findValue("eltString").asText()).isEqualTo(myString);
+        assertThat(currentStructureJson.findValue("eltString").asString()).isEqualTo(myString);
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        final String myDateJson = currentStructureJson.findValue("eltDate").asText();
+        final String myDateJson = currentStructureJson.findValue("eltDate").asString();
         assertThat(sdf.parse(myDateJson)).isEqualTo(myDate);
     }
 

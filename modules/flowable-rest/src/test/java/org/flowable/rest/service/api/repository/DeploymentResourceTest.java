@@ -63,7 +63,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -122,7 +122,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -187,7 +187,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
                             + "tenantId: 'myTenant'"
                             + "}");
 
-            String id = responseNode.get("id").textValue();
+            String id = responseNode.get("id").stringValue();
             Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(id).singleResult();
             assertThat(deployment).isNotNull();
             assertThat(deployment.getTenantId()).isEqualTo("myTenant");

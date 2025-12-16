@@ -52,7 +52,7 @@ public class TimerEventHandler {
             JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
             JsonNode activityIdNode = cfgJson.get(PROPERTYNAME_TIMER_ACTIVITY_ID);
             if (activityIdNode != null) {
-                return activityIdNode.asText();
+                return activityIdNode.asString();
             } else {
                 return jobHandlerConfiguration;
             }
@@ -67,7 +67,7 @@ public class TimerEventHandler {
             JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
             JsonNode calendarNameNode = cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION);
             if (calendarNameNode != null) {
-                return calendarNameNode.asText();
+                return calendarNameNode.asString();
             } else {
                 return "";
             }
@@ -100,7 +100,7 @@ public class TimerEventHandler {
             JsonNode cfgJson = readJsonValue(jobHandlerConfiguration);
             JsonNode endDateNode = cfgJson.get(PROPERTYNAME_END_DATE_EXPRESSION);
             if (endDateNode != null) {
-                return endDateNode.asText();
+                return endDateNode.asString();
             } else {
                 return null;
             }

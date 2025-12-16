@@ -77,7 +77,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
 
         if (idsToDelete.isArray()) {
             for (JsonNode idNode : idsToDelete) {
-                processInstanceIdsToDelete.add(idNode.textValue());
+                processInstanceIdsToDelete.add(idNode.stringValue());
             }
         }
 

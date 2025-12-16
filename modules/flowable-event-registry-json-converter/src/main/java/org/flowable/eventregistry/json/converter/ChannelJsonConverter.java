@@ -101,8 +101,8 @@ public class ChannelJsonConverter {
     }
 
     protected Class<? extends ChannelModel> determineChannelModelClass(JsonNode channelNode) {
-        String channelType = channelNode.path("channelType").asText(null);
-        String type = channelNode.path("type").asText(null);
+        String channelType = channelNode.path("channelType").stringValue(null);
+        String type = channelNode.path("type").stringValue(null);
 
         Class<? extends ChannelModel> channelClass = channelModelClasses.get(channelType + "-" + type);
         if (channelClass != null) {

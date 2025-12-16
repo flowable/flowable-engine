@@ -463,7 +463,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected boolean isEqualToCurrentLocalizationValue(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
         boolean isEqual = false;
         JsonNode localizationNode = infoNode.path("localization").path(language).path(id).path(propertyName);
-        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asText().equals(propertyValue)) {
+        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asString().equals(propertyValue)) {
             isEqual = true;
         }
         return isEqual;

@@ -68,7 +68,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(jsonResponse.get("data")).isNotNull();
         JsonNode jsonData = jsonResponse.get("data");
         assertThat(jsonData).hasSize(3);
-        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.AVAILABLE));
+        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asString()).isEqualTo(PlanItemInstanceState.AVAILABLE));
 
         //Trigger the event and check the history after the case ends
         PlanItemInstance activateMilestoneEvent = runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("activateMilestoneEvent")
@@ -78,32 +78,32 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
 
         //Check each planItem individually
         Map<String, JsonNode> planItemsByElementId = mapNodesBy("elementId", jsonData);
-        String planItemInstanceId = planItemsByElementId.get("activateMilestoneEvent").get("id").asText();
+        String planItemInstanceId = planItemsByElementId.get("activateMilestoneEvent").get("id").asString();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         JsonNode planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(planItemInstanceNode).isNotNull();
-        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED);
+        assertThat(planItemInstanceNode.get("state").asString()).isEqualTo(PlanItemInstanceState.COMPLETED);
 
-        planItemInstanceId = planItemsByElementId.get("milestonePlanItem1").get("id").asText();
+        planItemInstanceId = planItemsByElementId.get("milestonePlanItem1").get("id").asString();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(planItemInstanceNode).isNotNull();
-        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED);
+        assertThat(planItemInstanceNode.get("state").asString()).isEqualTo(PlanItemInstanceState.COMPLETED);
 
-        planItemInstanceId = planItemsByElementId.get("finishCaseEvent").get("id").asText();
+        planItemInstanceId = planItemsByElementId.get("finishCaseEvent").get("id").asString();
         httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, planItemInstanceId));
         response = executeRequest(httpGet, HttpStatus.SC_OK);
         assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
         planItemInstanceNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(planItemInstanceNode).isNotNull();
-        assertThat(planItemInstanceNode.get("state").asText()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        assertThat(planItemInstanceNode.get("state").asString()).isEqualTo(PlanItemInstanceState.AVAILABLE);
 
         //Finish the case
         runtimeService.triggerPlanItemInstance(runtimeService.createPlanItemInstanceQuery().planItemInstanceElementId("finishCaseEvent").singleResult().getId());
@@ -117,7 +117,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(jsonResponse.get("data")).isNotNull();
         jsonData = jsonResponse.get("data");
         assertThat(jsonData).hasSize(3);
-        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.COMPLETED));
+        StreamSupport.stream(jsonData.spliterator(), false).forEach(n -> assertThat(n.get("state").asString()).isEqualTo(PlanItemInstanceState.COMPLETED));
     }
 
     @Test
@@ -394,7 +394,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(3);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance1.getId()));
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance2.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
@@ -404,7 +404,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(3);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance2.getId()));
 
         //End case instance one "normally"
         calendar.set(Calendar.HOUR_OF_DAY, 3);
@@ -455,7 +455,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.TERMINATED));
+                .forEach(n -> assertThat(n.get("state").asString()).isEqualTo(PlanItemInstanceState.TERMINATED));
 
         //For the sake of completeness, fetch all the planItems in "complete" state
         //and compare each with the result of the api call, default sort is by creation timestamp
@@ -594,7 +594,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(3);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance1.getId()));
 
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
@@ -607,7 +607,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(3);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance2.getId()));
 
         //End case instance one "normally"
         calendar.set(Calendar.HOUR_OF_DAY, 3);
@@ -660,7 +660,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("state").asText()).isEqualTo(PlanItemInstanceState.TERMINATED));
+                .forEach(n -> assertThat(n.get("state").asString()).isEqualTo(PlanItemInstanceState.TERMINATED));
 
         //For the sake of completeness, fetch all the planItems in "complete" state
         //and compare each with the result of the api call, default sort is by creation timestamp
@@ -708,7 +708,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
 
     private Map<String, JsonNode> mapNodesBy(String attribute, JsonNode array) {
         return StreamSupport.stream(array.spliterator(), false)
-                .collect(Collectors.toMap(o -> o.get(attribute).asText(), o -> o));
+                .collect(Collectors.toMap(o -> o.get(attribute).asString(), o -> o));
     }
 
     protected JsonNode getHistoricPlanItemInstanceResponse(String planItemInstanceId) {
@@ -765,22 +765,22 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
                         + "}");
 
         assertThatCode(() -> {
-            assertThat(actual.get("url").textValue()).isNotNull();
+            assertThat(actual.get("url").stringValue()).isNotNull();
             String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCE, expected.getId()))
                     .toURL().toString();
-            assertThat(actual.get("url").textValue()).isEqualTo(url);
+            assertThat(actual.get("url").stringValue()).isEqualTo(url);
         }).doesNotThrowAnyException();
 
         assertThatCode(() -> {
-            assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
-            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
+            assertThat(actual.get("historicCaseInstanceUrl").stringValue()).isNotNull();
+            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").stringValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         }).doesNotThrowAnyException();
 
         assertThatCode(() -> {
-            assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
-            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
+            assertThat(actual.get("caseDefinitionUrl").stringValue()).isNotNull();
+            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").stringValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         }).doesNotThrowAnyException();

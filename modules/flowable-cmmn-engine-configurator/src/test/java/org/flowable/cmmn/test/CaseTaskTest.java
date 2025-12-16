@@ -1390,7 +1390,7 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             // The script task is async, so the change will only have happened after the job is executed
             for (CaseInstance caseInstance : caseInstances) {
                 JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
-                assertThat(jsonNode.path("field").asText()).startsWith("value-");
+                assertThat(jsonNode.path("field").asString()).startsWith("value-");
             }
 
             for (Job job : cmmnManagementService.createJobQuery().list()) {
@@ -1399,13 +1399,13 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             for (CaseInstance caseInstance : caseInstances) {
                 JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
-                assertThat(jsonNode.path("field").asText()).startsWith("CHANGED");
+                assertThat(jsonNode.path("field").asString()).startsWith("CHANGED");
             }
 
             ArrayNode rootArrayNode = (ArrayNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myRootVariable");
             assertThat(rootArrayNode).hasSize(10);
             for (JsonNode rootArrayNodeElement : rootArrayNode) {
-                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+                assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
             }
 
         } finally {
@@ -1440,13 +1440,13 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
 
             for (CaseInstance caseInstance : caseInstances) {
                 JsonNode jsonNode = (JsonNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "myInMappedVariable");
-                assertThat(jsonNode.path("field").asText()).startsWith("CHANGED");
+                assertThat(jsonNode.path("field").asString()).startsWith("CHANGED");
             }
 
             ArrayNode rootArrayNode = (ArrayNode) processEngineRuntimeService.getVariable(processInstance.getId(), "myRootVariable");
             assertThat(rootArrayNode).hasSize(10);
             for (JsonNode rootArrayNodeElement : rootArrayNode) {
-                assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+                assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
             }
 
         } finally {

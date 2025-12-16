@@ -625,7 +625,7 @@ public class DefaultJobManager implements JobManager {
                 JsonNode jobConfigNode = jobServiceConfiguration.getObjectMapper().readTree(timerEntity.getJobHandlerConfiguration());
                 JsonNode calendarNameNode = jobConfigNode.get("calendarName");
                 if (calendarNameNode != null && !calendarNameNode.isNull()) {
-                    calendarValue = calendarNameNode.asText();
+                    calendarValue = calendarNameNode.asString();
                 }
 
             } catch (Exception e) {

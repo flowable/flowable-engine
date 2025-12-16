@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -255,11 +254,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode dataElementNode = it.next();
+            for (JsonNode dataElementNode : dataNode) {
                 JsonNode variableNode = dataElementNode.get("variable");
-                String name = variableNode.get("name").textValue();
+                String name = variableNode.get("name").stringValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -267,7 +264,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

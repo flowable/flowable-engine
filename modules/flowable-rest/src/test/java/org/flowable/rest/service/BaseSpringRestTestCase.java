@@ -373,7 +373,7 @@ public class BaseSpringRestTestCase {
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
         Iterator<JsonNode> it = dataNode.iterator();
         while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+            String id = it.next().get("id").stringValue();
             toBeFound.remove(id);
         }
         assertThat(toBeFound).as("Not all expected ids have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
@@ -390,7 +390,7 @@ public class BaseSpringRestTestCase {
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
         assertThat(dataNode)
-            .extracting(node -> node.get("id").textValue())
+            .extracting(node -> node.get("id").stringValue())
             .as("Expected result ids")
             .containsExactly(expectedResourceIds);
     }
@@ -433,9 +433,8 @@ public class BaseSpringRestTestCase {
             // Check presence of ID's
             if (expectedResourceIds != null) {
                 List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-                Iterator<JsonNode> it = dataNode.iterator();
-                while (it.hasNext()) {
-                    String id = it.next().get("id").textValue();
+                for (JsonNode jsonNode : dataNode) {
+                    String id = jsonNode.get("id").stringValue();
                     toBeFound.remove(id);
                 }
                 assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

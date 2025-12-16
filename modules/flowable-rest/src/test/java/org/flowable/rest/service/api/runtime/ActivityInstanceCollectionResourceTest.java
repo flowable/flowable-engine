@@ -120,7 +120,7 @@ public class ActivityInstanceCollectionResourceTest extends BaseSpringRestTestCa
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
-                String activityId = it.next().get("activityId").textValue();
+                String activityId = it.next().get("activityId").stringValue();
                 toBeFound.remove(activityId);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

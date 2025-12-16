@@ -461,10 +461,10 @@ public class DmnTaskTest {
         JsonNode decisionResult = resultNode.get("decision3");
         assertThat(decisionResult).isInstanceOf(ArrayNode.class);
         assertThat(decisionResult.size()).isEqualTo(4);
-        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1000");
-        assertThat(decisionResult.get(1).get("g").asText()).isEqualTo("100");
-        assertThat(decisionResult.get(2).get("g").asText()).isEqualTo("10");
-        assertThat(decisionResult.get(3).get("g").asText()).isEqualTo("1");
+        assertThat(decisionResult.get(0).get("g").asString()).isEqualTo("1000");
+        assertThat(decisionResult.get(1).get("g").asString()).isEqualTo("100");
+        assertThat(decisionResult.get(2).get("g").asString()).isEqualTo("10");
+        assertThat(decisionResult.get(3).get("g").asString()).isEqualTo("1");
     }
 
     @Test
@@ -487,7 +487,7 @@ public class DmnTaskTest {
         JsonNode decisionResult = resultNode.get("decision3");
         assertThat(decisionResult).isInstanceOf(ArrayNode.class);
         assertThat(decisionResult.size()).isEqualTo(1);
-        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1");
+        assertThat(decisionResult.get(0).get("g").asString()).isEqualTo("1");
     }
 
     @Test

@@ -206,7 +206,7 @@ public class MultiInstanceNoWaitStatesTest extends PluggableFlowableTestCase {
         JsonNode persistedCustomer1Object = persistedCustomerArray.get(0);
         
         assertThat(persistedCustomer1Object.has("newProperty")).isTrue();
-        assertThat(persistedCustomer1Object.get("newProperty").asText()).isEqualTo("test");
+        assertThat(persistedCustomer1Object.get("newProperty").asString()).isEqualTo("test");
     }
 
     protected void assertNoJobsAndNoProcessInstances() {

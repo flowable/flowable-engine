@@ -35,38 +35,38 @@ public class LoggingSessionLoggerOutput {
         
         StringBuilder logBuilder = new StringBuilder("\n");
         for (ObjectNode logNode : logNodes) {
-            logBuilder.append(logNode.get(LoggingSessionUtil.TIMESTAMP).asText()).append(": ");
+            logBuilder.append(logNode.get(LoggingSessionUtil.TIMESTAMP).asString()).append(": ");
             
             String scopeType = null;
             if (logNode.has("scopeType")) {
-                scopeType = logNode.get("scopeType").asText();
+                scopeType = logNode.get("scopeType").asString();
                 if (ScopeTypes.BPMN.equals(scopeType)) {
-                    logBuilder.append("(").append(logNode.get("scopeId").asText());
+                    logBuilder.append("(").append(logNode.get("scopeId").asString());
                     if (logNode.has("subScopeId")) {
-                        logBuilder.append(",").append(logNode.get("subScopeId").asText());
+                        logBuilder.append(",").append(logNode.get("subScopeId").asString());
                     }
                     logBuilder.append(") ");
                 }
             }
             
-            logBuilder.append(logNode.get("message").asText());
+            logBuilder.append(logNode.get("message").asString());
             
             if (ScopeTypes.BPMN.equals(scopeType)) {
-                logBuilder.append(" (processInstanceId: '").append(logNode.get("scopeId").asText());
+                logBuilder.append(" (processInstanceId: '").append(logNode.get("scopeId").asString());
                 if (logNode.has("subScopeId")) {
-                    logBuilder.append("', executionId: '").append(logNode.get("subScopeId").asText());
+                    logBuilder.append("', executionId: '").append(logNode.get("subScopeId").asString());
                 }
                 
-                logBuilder.append("', processDefinitionId: '").append(logNode.get("scopeDefinitionId").asText()).append("'");
+                logBuilder.append("', processDefinitionId: '").append(logNode.get("scopeDefinitionId").asString()).append("'");
             }
             
             if (logNode.has("elementId")) {
-                logBuilder.append(", elementId: '").append(logNode.get("elementId").asText());
+                logBuilder.append(", elementId: '").append(logNode.get("elementId").asString());
                 if (logNode.has("elementName")) {
-                    logBuilder.append("', elementName: '").append(logNode.get("elementName").asText());
+                    logBuilder.append("', elementName: '").append(logNode.get("elementName").asString());
                 }
                 
-                logBuilder.append("', elementType: '").append(logNode.get("elementType").asText()).append("'");
+                logBuilder.append("', elementType: '").append(logNode.get("elementType").asString()).append("'");
             }
             
             logBuilder.append(")\n");

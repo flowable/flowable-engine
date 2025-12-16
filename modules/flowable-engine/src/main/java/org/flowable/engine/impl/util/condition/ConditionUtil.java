@@ -69,7 +69,7 @@ public class ConditionUtil {
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

@@ -28,8 +28,8 @@ public class SimpleHttpResponseHandler implements HttpResponseHandler {
     public void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse) {
         try {
             JsonNode responseNode = objectMapper.readTree(httpResponse.getBody());
-            execution.setVariable("firstName", responseNode.get("name").get("firstName").asText());
-            execution.setVariable("lastName", responseNode.get("name").get("lastName").asText());
+            execution.setVariable("firstName", responseNode.get("name").get("firstName").asString());
+            execution.setVariable("lastName", responseNode.get("name").get("lastName").asString());
             httpResponse.setBodyResponseHandled(true);
 
         } catch (Exception e) {

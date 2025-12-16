@@ -386,7 +386,7 @@ class HistoryTest extends BaseFlowableDmnTest {
         assertThat(decisionExecution.getExecutionJson()).isNotNull();
 
         JsonNode executionNode = dmnEngineConfiguration.getObjectMapper().readTree(decisionExecution.getExecutionJson());
-        assertThat(executionNode.get("decisionKey").asText()).isEqualTo("expandedDecisionService");
+        assertThat(executionNode.get("decisionKey").asString()).isEqualTo("expandedDecisionService");
 
         JsonNode decisionServiceResult =  executionNode.get("decisionServiceResult");
         assertThat(decisionServiceResult.get("decision1").isArray()).isTrue();
@@ -431,7 +431,7 @@ class HistoryTest extends BaseFlowableDmnTest {
         assertThat(decisionExecution.getExecutionJson()).isNotNull();
 
         JsonNode executionNode = dmnEngineConfiguration.getObjectMapper().readTree(decisionExecution.getExecutionJson());
-        assertThat(executionNode.get("decisionKey").asText()).isEqualTo("expandedDecisionService");
+        assertThat(executionNode.get("decisionKey").asString()).isEqualTo("expandedDecisionService");
 
         JsonNode decisionServiceResult = executionNode.get("decisionServiceResult");
         assertThat(decisionServiceResult.get("decision1").isArray()).isTrue();

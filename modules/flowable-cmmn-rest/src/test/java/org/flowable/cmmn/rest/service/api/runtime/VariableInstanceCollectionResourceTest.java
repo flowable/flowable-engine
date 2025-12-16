@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -96,7 +95,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                 .caseInstanceId(caseInstance.getId()).singleResult();
 
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        taskService.setVariableLocal(task.getId(),"localTaskVariable","localTaskVarValue");
+        taskService.setVariableLocal(task.getId(), "localTaskVariable", "localTaskVarValue");
 
         runtimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
 
@@ -202,11 +201,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode dataElementNode = it.next();
+            for (JsonNode dataElementNode : dataNode) {
                 JsonNode variableNode = dataElementNode.get("variable");
-                String name = variableNode.get("name").textValue();
+                String name = variableNode.get("name").stringValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -214,7 +211,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

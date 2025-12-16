@@ -110,10 +110,10 @@ class ValuedDataObjectConverterTest {
         assertThat(dataObj.getName()).isEqualTo("JsonTest");
         assertThat(dataObj.getItemSubjectRef().getStructureRef()).isEqualTo("xsd:json");
         assertThat(dataObj.getValue()).isInstanceOf(JsonNode.class);
-        assertThat(((JsonNode) dataObj.getValue()).get("eltString").asText()).isEqualTo("my-string");
+        assertThat(((JsonNode) dataObj.getValue()).get("eltString").asString()).isEqualTo("my-string");
         final GregorianCalendar myCalendar = new GregorianCalendar(2020, 1, 21, 10, 25, 23);
         final Date myDate = myCalendar.getTime();
-        final String myDateJson = ((JsonNode) dataObj.getValue()).get("eltDate").asText();
+        final String myDateJson = ((JsonNode) dataObj.getValue()).get("eltDate").asString();
         assertThat(sdf.parse(myDateJson)).isEqualTo(myDate);
 
         dataObj = objectMap.get("NoData");

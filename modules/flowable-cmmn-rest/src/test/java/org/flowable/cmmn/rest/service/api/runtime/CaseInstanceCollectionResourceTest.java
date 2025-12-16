@@ -1212,7 +1212,7 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
 
-        String instanceId = responseNode.get("id").asText();
+        String instanceId = responseNode.get("id").asString();
         assertThat(runtimeService.getVariables(instanceId).entrySet()).extracting(Map.Entry::getKey, Map.Entry::getValue).containsExactlyInAnyOrder(
                 tuple("user", "simple string value return"),
                 tuple("number", 1234L),

@@ -319,7 +319,7 @@ public class HttpServiceTaskTestServer {
             resp.setContentType("application/json");
             
             JsonNode body = objectMapper.readTree(req.getInputStream());
-            String name = body.get("name").asText();
+            String name = body.get("name").asString();
 
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.put("result", "Hello " + name);

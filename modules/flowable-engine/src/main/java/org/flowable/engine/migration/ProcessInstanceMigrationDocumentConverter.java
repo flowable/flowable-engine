@@ -37,7 +37,7 @@ import tools.jackson.databind.node.ObjectNode;
 public class ProcessInstanceMigrationDocumentConverter {
 
     protected static Predicate<JsonNode> isNotNullNode = jsonNode -> jsonNode != null && !jsonNode.isNull();
-    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isTextual();
+    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isString();
     protected static Predicate<JsonNode> isMultiValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isArray();
 
     protected static ObjectMapper objectMapper = JsonMapper.shared();
@@ -162,48 +162,42 @@ public class ProcessInstanceMigrationDocumentConverter {
             JsonNode rootNode = objectMapper.readTree(jsonProcessInstanceMigrationDocument);
             ProcessInstanceMigrationDocumentBuilderImpl documentBuilder = new ProcessInstanceMigrationDocumentBuilderImpl();
 
-            String processDefinitionId = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_ID_JSON_PROPERTY))
-                .map(JsonNode::textValue).orElse(null);
+            String processDefinitionId = rootNode.path(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_ID_JSON_PROPERTY).stringValue(null);
             documentBuilder.setProcessDefinitionToMigrateTo(processDefinitionId);
 
-            String processDefinitionKey = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_KEY_JSON_PROPERTY))
-                .map(JsonNode::textValue).orElse(null);
+            String processDefinitionKey = rootNode.path(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_KEY_JSON_PROPERTY).stringValue(null);
             Integer processDefinitionVersion = (Integer) Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_VERSION_JSON_PROPERTY))
                 .map(JsonNode::numberValue).orElse(null);
             documentBuilder.setProcessDefinitionToMigrateTo(processDefinitionKey, processDefinitionVersion);
 
-            String processDefinitionTenantId = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_TENANT_ID_JSON_PROPERTY))
-                .map(JsonNode::textValue).orElse(null);
+            String processDefinitionTenantId = rootNode.path(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_TENANT_ID_JSON_PROPERTY)
+                    .stringValue(null);
             documentBuilder.setTenantId(processDefinitionTenantId);
 
             JsonNode preUpgradeScriptNode = rootNode.get(ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_SCRIPT);
             if (preUpgradeScriptNode != null) {
-                String language = Optional.ofNullable(preUpgradeScriptNode.get(ProcessInstanceMigrationDocumentConstants.LANGUAGE)).map(JsonNode::asText).orElse("javascript");
-                String script = Optional.ofNullable(preUpgradeScriptNode.get(ProcessInstanceMigrationDocumentConstants.SCRIPT)).map(JsonNode::asText).orElse("javascript");
+                String language = preUpgradeScriptNode.path(ProcessInstanceMigrationDocumentConstants.LANGUAGE).stringValue("javascript");
+                String script = preUpgradeScriptNode.path(ProcessInstanceMigrationDocumentConstants.SCRIPT).stringValue("javascript");
                 documentBuilder.setPreUpgradeScript(new Script(language, script));
             }
 
-            String javaDelegateClassName = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE))
-                .map(JsonNode::textValue).orElse(null);
+            String javaDelegateClassName = rootNode.path(ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE).stringValue(null);
             documentBuilder.setPreUpgradeJavaDelegate(javaDelegateClassName);
 
-            String expression = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE_EXPRESSION))
-                .map(JsonNode::textValue).orElse(null);
+            String expression = rootNode.path(ProcessInstanceMigrationDocumentConstants.PRE_UPGRADE_JAVA_DELEGATE_EXPRESSION).stringValue(null);
             documentBuilder.setPreUpgradeJavaDelegateExpression(expression);
 
             JsonNode postUpgradeScriptNode = rootNode.get(ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_SCRIPT);
             if (postUpgradeScriptNode != null) {
-                String language = Optional.ofNullable(postUpgradeScriptNode.get(ProcessInstanceMigrationDocumentConstants.LANGUAGE)).map(JsonNode::asText).orElse("javascript");
-                String script = Optional.ofNullable(postUpgradeScriptNode.get(ProcessInstanceMigrationDocumentConstants.SCRIPT)).map(JsonNode::asText).orElse("javascript");
+                String language = postUpgradeScriptNode.path(ProcessInstanceMigrationDocumentConstants.LANGUAGE).stringValue("javascript");
+                String script = postUpgradeScriptNode.path(ProcessInstanceMigrationDocumentConstants.SCRIPT).stringValue("javascript");
                 documentBuilder.setPostUpgradeScript(new Script(language, script));
             }
 
-            String postJavaDelegateClassName = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE))
-                .map(JsonNode::textValue).orElse(null);
+            String postJavaDelegateClassName = rootNode.path(ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE).stringValue(null);
             documentBuilder.setPostUpgradeJavaDelegate(postJavaDelegateClassName);
 
-            String postExpression = Optional.ofNullable(rootNode.get(ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE_EXPRESSION))
-                .map(JsonNode::textValue).orElse(null);
+            String postExpression = rootNode.path(ProcessInstanceMigrationDocumentConstants.POST_UPGRADE_JAVA_DELEGATE_EXPRESSION).stringValue(null);
             documentBuilder.setPostUpgradeJavaDelegateExpression(postExpression);
 
             JsonNode activityMigrationMappings = rootNode.get(ProcessInstanceMigrationDocumentConstants.ACTIVITY_MAPPINGS_JSON_SECTION);
@@ -236,7 +230,7 @@ public class ProcessInstanceMigrationDocumentConverter {
                 for (JsonNode mappingNode : enableActivityMappings) {
                     if (mappingNode.hasNonNull(ProcessInstanceMigrationDocumentConstants.ACTIVITY_ID_JSON_PROPERTY)) {
                         EnableActivityMapping.EnableMapping enableMapping = new EnableActivityMapping.EnableMapping(
-                                mappingNode.get(ProcessInstanceMigrationDocumentConstants.ACTIVITY_ID_JSON_PROPERTY).asText());
+                                mappingNode.get(ProcessInstanceMigrationDocumentConstants.ACTIVITY_ID_JSON_PROPERTY).asString());
                         documentBuilder.addEnableActivityMapping(enableMapping);
                     }
                 }
@@ -309,19 +303,19 @@ public class ProcessInstanceMigrationDocumentConverter {
         public abstract T convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper);
 
         protected <M extends ActivityMigrationMappingOptions<T>> void convertAdditionalMappingInfoFromJson(M mapping, JsonNode jsonNode) {
-            Optional<JsonNode> callActivityOfParentProcess = Optional.ofNullable(jsonNode.get(ProcessInstanceMigrationDocumentConstants.IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY));
-            if (callActivityOfParentProcess.isPresent()) {
-                callActivityOfParentProcess.map(JsonNode::textValue).ifPresent(mapping::inParentProcessOfCallActivityId);
+            JsonNode callActivityOfParentProcess = jsonNode.get(ProcessInstanceMigrationDocumentConstants.IN_PARENT_PROCESS_OF_CALL_ACTIVITY_JSON_PROPERTY);
+            if (callActivityOfParentProcess != null) {
+                mapping.inParentProcessOfCallActivityId(callActivityOfParentProcess.stringValue());
                 return; //if its a move to parent, it cannot be also a move to subProcess
             }
 
-            Optional<JsonNode> ofCallActivityId = Optional.ofNullable(jsonNode.get(ProcessInstanceMigrationDocumentConstants.IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY));
-            Optional<JsonNode> subProcDefVer = Optional.ofNullable(jsonNode.get(ProcessInstanceMigrationDocumentConstants.CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY));
-            if (ofCallActivityId.isPresent()) {
-                if (subProcDefVer.isPresent()) {
-                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue(), subProcDefVer.get().intValue());
+            JsonNode ofCallActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY);
+            JsonNode subProcDefVer = jsonNode.get(ProcessInstanceMigrationDocumentConstants.CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY);
+            if (ofCallActivityId != null) {
+                if (subProcDefVer != null) {
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.stringValue(), subProcDefVer.intValue());
                 } else {
-                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.get().textValue());
+                    mapping.inSubProcessOfCallActivityId(ofCallActivityId.stringValue());
                 }
             }
 
@@ -336,10 +330,7 @@ public class ProcessInstanceMigrationDocumentConverter {
         }
 
         protected String getNewAssigneeFromJson(JsonNode jsonNode) {
-            if (isSingleTextValue.test(jsonNode.get(ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY))) {
-                return jsonNode.get(ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY).textValue();
-            }
-            return null;
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY).stringValue(null);
         }
 
     }
@@ -371,8 +362,8 @@ public class ProcessInstanceMigrationDocumentConverter {
 
         @Override
         public ActivityMigrationMapping.OneToOneMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
-            String fromActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY).textValue();
-            String toActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
+            String fromActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY).stringValue();
+            String toActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY).stringValue();
 
             ActivityMigrationMapping.OneToOneMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityId, toActivityId);
             convertAdditionalMappingInfoFromJson(oneToOneMapping, jsonNode);
@@ -422,7 +413,7 @@ public class ProcessInstanceMigrationDocumentConverter {
             List<String> fromActivityIds = objectMapper.convertValue(fromActivityIdsNode, new TypeReference<>() {
 
             });
-            String toActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY).textValue();
+            String toActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_ID_JSON_PROPERTY).stringValue();
 
             ActivityMigrationMapping.ManyToOneMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityIds, toActivityId);
             convertAdditionalMappingInfoFromJson(manyToOneMapping, jsonNode);
@@ -467,7 +458,7 @@ public class ProcessInstanceMigrationDocumentConverter {
 
         @Override
         public ActivityMigrationMapping.OneToManyMapping convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
-            String fromActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY).textValue();
+            String fromActivityId = jsonNode.get(ProcessInstanceMigrationDocumentConstants.FROM_ACTIVITY_ID_JSON_PROPERTY).stringValue();
             JsonNode toActivityIdsNode = jsonNode.get(ProcessInstanceMigrationDocumentConstants.TO_ACTIVITY_IDS_JSON_PROPERTY);
             List<String> toActivityIds = objectMapper.convertValue(toActivityIdsNode, new TypeReference<>() {
 

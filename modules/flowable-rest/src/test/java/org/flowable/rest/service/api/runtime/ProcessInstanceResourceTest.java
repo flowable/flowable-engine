@@ -101,7 +101,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("tenantId").textValue()).isEqualTo("myTenant");
+        assertThat(responseNode.get("tenantId").stringValue()).isEqualTo("myTenant");
     }
     
     @Test

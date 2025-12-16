@@ -105,7 +105,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("tenantACustomerId").asText()).isEqualTo("Hello tenantA");
+        assertThat(jsonNode.get("tenantACustomerId").asString()).isEqualTo("Hello tenantA");
 
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testSendEvent")
@@ -116,7 +116,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
         jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(1));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("tenantBCustomerId").asText())
+        assertThat(jsonNode.get("tenantBCustomerId").asString())
                 .isEqualTo("Hello tenantB"); // Note: a different json (different event definition for different tenant)
     }
 

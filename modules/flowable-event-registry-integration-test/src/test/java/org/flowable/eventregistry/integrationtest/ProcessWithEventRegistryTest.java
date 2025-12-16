@@ -290,7 +290,7 @@ public class ProcessWithEventRegistryTest {
                 });
             
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
@@ -334,7 +334,7 @@ public class ProcessWithEventRegistryTest {
                 });
             
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
@@ -393,7 +393,7 @@ public class ProcessWithEventRegistryTest {
                 });
 
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {

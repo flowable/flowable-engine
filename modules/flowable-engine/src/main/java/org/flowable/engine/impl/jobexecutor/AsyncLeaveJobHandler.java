@@ -103,7 +103,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
         String sequenceFlowId = null;
         JsonNode sequenceFlowIdJsonNode = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_ID);
         if (sequenceFlowIdJsonNode != null && !sequenceFlowIdJsonNode.isNull() && !sequenceFlowIdJsonNode.isMissingNode()) {
-            sequenceFlowId = sequenceFlowIdJsonNode.asText();
+            sequenceFlowId = sequenceFlowIdJsonNode.asString();
         }
 
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(executionEntity.getProcessDefinitionId());
@@ -117,8 +117,8 @@ public class AsyncLeaveJobHandler implements JobHandler {
         }
 
         if (sequenceFlow == null) {
-            String source = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_SOURCE).asText();
-            String target = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_TARGET).asText();
+            String source = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_SOURCE).asString(null);
+            String target = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_TARGET).asString(null);
             int lineNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_NR).asInt();
             int columnNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_COLUMN_NR).asInt();
 

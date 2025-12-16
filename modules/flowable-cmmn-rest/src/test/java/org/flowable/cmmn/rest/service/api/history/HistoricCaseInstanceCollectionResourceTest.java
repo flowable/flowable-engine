@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -219,15 +218,13 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            JsonNode jsonNodeEntry = it.next();
-            String id = jsonNodeEntry.get("id").textValue();
-            String state = jsonNodeEntry.get("state").textValue();
+        for (JsonNode jsonNodeEntry : dataNode) {
+            String id = jsonNodeEntry.get("id").stringValue();
+            String state = jsonNodeEntry.get("state").stringValue();
             assertThat(state).as("state is missing on the historic case instance").isNotEmpty();
             toBeFound.remove(id);
         }
-        assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
+        assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
     }
 
     @Test
@@ -705,20 +702,20 @@ public class HistoricCaseInstanceCollectionResourceTest extends BaseSpringRestTe
         closeResponse(response);
         assertThat(dataNode).hasSize(1);
         JsonNode valueNode = dataNode.get(0);
-        assertThat(valueNode.get("id").asText()).isEqualTo(caseInstanceId);
+        assertThat(valueNode.get("id").asString()).isEqualTo(caseInstanceId);
 
         // Check expected variables
         assertThat(valueNode.get("variables")).hasSize(expectedVariables.size());
 
         for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
-            String variableName = variableNode.get("name").textValue();
+            String variableName = variableNode.get("name").stringValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
             assertThat(expectedVariables).containsKey(variableName);
             assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
-            assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
-            assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
+            assertThat(variableNode.get("type").stringValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
+            assertThat(variableNode.get("scope").stringValue()).isEqualTo("local");
         }
     }
 }

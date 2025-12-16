@@ -61,8 +61,8 @@ public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
     public void testGetAllProperties() throws Exception {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_ENGINE_PROPERTIES)), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        assertThat(responseNode.get("schema.version").asText()).isNotNull();
-        assertThat(responseNode.get("common.schema.version").asText()).isNotNull();
+        assertThat(responseNode.get("schema.version").asString()).isNotNull();
+        assertThat(responseNode.get("common.schema.version").asString()).isNotNull();
     }
 
     @Test

@@ -52,19 +52,19 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
             try {
                 JsonNode jsonConfiguration = cmmnEngineConfiguration.getObjectMapper().readTree(configuration);
 
-                String transition = jsonConfiguration.get(OperationSerializationMetadata.OPERATION_TRANSITION).asText();
+                String transition = jsonConfiguration.get(OperationSerializationMetadata.OPERATION_TRANSITION).asString();
                 if (PlanItemTransition.COMPLETE.equals(transition)) {
                     CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
 
                 } else if (PlanItemTransition.EXIT.equals(transition)) {
-                    String exitCriterionId = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_CRITERION_ID).asText(null);
-                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).asText(null);
-                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).asText(null);
+                    String exitCriterionId = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_CRITERION_ID).stringValue(null);
+                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).stringValue(null);
+                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId, exitType, exitEventType);
 
                 } else if (PlanItemTransition.TERMINATE.equals(transition)) {
-                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).asText(null);
-                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).asText(null);
+                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).stringValue(null);
+                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, exitType, exitEventType);
 
                 } else {

@@ -123,7 +123,7 @@ public class AsyncHistoryJsonUtil {
     
     public static String getStringFromJson(ObjectNode objectNode, String fieldName) {
         if (objectNode.has(fieldName)) {
-            return objectNode.get(fieldName).asText();
+            return objectNode.get(fieldName).asString();
         }
         return null;
     }

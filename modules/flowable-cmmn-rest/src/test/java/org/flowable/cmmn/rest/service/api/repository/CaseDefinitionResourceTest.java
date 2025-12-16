@@ -96,7 +96,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         assertThat(responseNode.get("graphicalNotationDefined").booleanValue()).isFalse();
 
         // Check URL's
-        assertThat(URLDecoder.decode(responseNode.get("resource").textValue(), "UTF-8")).endsWith(CmmnRestUrls
+        assertThat(URLDecoder.decode(responseNode.get("resource").stringValue(), StandardCharsets.UTF_8)).endsWith(CmmnRestUrls
                 .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, caseDefinition.getDeploymentId(), caseDefinition.getResourceName()));
     }
 
@@ -188,7 +188,7 @@ public class CaseDefinitionResourceTest extends BaseSpringRestTestCase {
         // Check "OK" status
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(responseNode.get("category").textValue()).isEqualTo("updatedcategory");
+        assertThat(responseNode.get("category").stringValue()).isEqualTo("updatedcategory");
 
         // Check actual entry in DB
         assertThat(repositoryService.createCaseDefinitionQuery().caseDefinitionCategory("updatedcategory").count()).isEqualTo(1);

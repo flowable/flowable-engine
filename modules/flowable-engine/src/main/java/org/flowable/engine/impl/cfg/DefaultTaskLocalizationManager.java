@@ -47,12 +47,12 @@ public class DefaultTaskLocalizationManager implements InternalTaskLocalizationM
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        task.setLocalizedName(languageNameNode.asText());
+                        task.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        task.setLocalizedDescription(languageDescriptionNode.asText());
+                        task.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }
@@ -72,12 +72,12 @@ public class DefaultTaskLocalizationManager implements InternalTaskLocalizationM
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        taskEntity.setLocalizedName(languageNameNode.asText());
+                        taskEntity.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        taskEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                        taskEntity.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }

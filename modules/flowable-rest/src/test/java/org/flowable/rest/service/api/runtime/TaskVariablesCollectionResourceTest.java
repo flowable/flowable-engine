@@ -143,10 +143,10 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         boolean foundOverlapping = false;
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            if (var.get("name") != null && "overlappingVariable".equals(var.get("name").asText())) {
+            if (var.get("name") != null && "overlappingVariable".equals(var.get("name").asString())) {
                 foundOverlapping = true;
-                assertThat(var.get("value").asText()).isEqualTo("task-value");
-                assertThat(var.get("scope").asText()).isEqualTo("local");
+                assertThat(var.get("value").asString()).isEqualTo("task-value");
+                assertThat(var.get("scope").asString()).isEqualTo("local");
                 break;
             }
         }
@@ -165,7 +165,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
 
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            assertThat(var.get("scope").asText()).isEqualTo("local");
+            assertThat(var.get("scope").asString()).isEqualTo("local");
         }
 
         // Check global variables filtering
@@ -182,10 +182,10 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         foundOverlapping = false;
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            assertThat(var.get("scope").asText()).isEqualTo("global");
-            if ("overlappingVariable".equals(var.get("name").asText())) {
+            assertThat(var.get("scope").asString()).isEqualTo("global");
+            if ("overlappingVariable".equals(var.get("name").asString())) {
                 foundOverlapping = true;
-                assertThat(var.get("value").asText()).isEqualTo("process-value");
+                assertThat(var.get("value").asString()).isEqualTo("process-value");
             }
         }
         assertThat(foundOverlapping).isTrue();

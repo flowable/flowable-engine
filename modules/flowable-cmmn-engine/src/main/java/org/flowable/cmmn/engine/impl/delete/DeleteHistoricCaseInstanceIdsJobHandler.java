@@ -78,7 +78,7 @@ public class DeleteHistoricCaseInstanceIdsJobHandler implements JobHandler {
 
         if (idsToDelete.isArray()) {
             for (JsonNode idNode : idsToDelete) {
-                caseInstanceIdsToDelete.add(idNode.textValue());
+                caseInstanceIdsToDelete.add(idNode.stringValue());
             }
         }
 

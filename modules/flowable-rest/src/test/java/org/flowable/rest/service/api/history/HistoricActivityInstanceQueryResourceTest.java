@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -153,9 +152,8 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
         // Check presence of ID's
         if (expectedActivityIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String activityId = it.next().get("activityId").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String activityId = jsonNode.get("activityId").stringValue();
                 toBeFound.remove(activityId);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

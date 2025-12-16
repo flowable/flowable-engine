@@ -54,7 +54,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -68,7 +68,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -101,7 +101,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -115,7 +115,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);

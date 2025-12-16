@@ -44,8 +44,8 @@ public class JsonPointerBasedInboundEventTenantDetector implements InboundEventT
             return null;
         }
 
-        if (result.isTextual()) {
-            return result.asText();
+        if (result.isString()) {
+            return result.asString();
         }
 
         return null;

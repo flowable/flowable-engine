@@ -183,7 +183,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryBpmnTestC
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get(property).asText()).isEqualTo("test");
+        assertThat(jsonNode.get(property).asString()).isEqualTo("test");
         outboundEventChannelAdapter.receivedEvents.clear();
     }
 

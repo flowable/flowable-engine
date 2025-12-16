@@ -15,7 +15,6 @@ package org.flowable.cmmn.rest.service.api.management;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -77,7 +76,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: '" + getISODateString(timerJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TIMER_JOB, timerJob.getId()));
     }
 
@@ -118,7 +117,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: '" + getISODateString(deadLetterJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId()));
     }
 
@@ -179,7 +178,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "lockExpirationTime: '" + getISODateString(lockedJob.getLockExpirationTime()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_JOB, lockedJob.getId()));
     }
 

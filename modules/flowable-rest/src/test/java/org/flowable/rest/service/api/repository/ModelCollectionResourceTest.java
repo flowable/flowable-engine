@@ -198,13 +198,13 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
                             + "metaInfo: 'Model metainfo',"
                             + "deploymentId: '" + deploymentId + "',"
                             + "tenantId: 'myTenant',"
-                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").textValue()) + "',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").stringValue()) + "',"
                             + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
                             + "createTime: '" + getISODateString(createTime.getTime()) + "',"
                             + "lastUpdateTime: '" + getISODateString(createTime.getTime()) + "'"
                             + "}");
 
-            model = repositoryService.createModelQuery().modelId(responseNode.get("id").textValue()).singleResult();
+            model = repositoryService.createModelQuery().modelId(responseNode.get("id").stringValue()).singleResult();
             assertThat(model).isNotNull();
             assertThat(model.getCategory()).isEqualTo("Model category");
             assertThat(model.getName()).isEqualTo("Model name");

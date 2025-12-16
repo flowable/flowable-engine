@@ -45,15 +45,15 @@ public class EventJsonConverter {
             JsonNode modelNode = objectMapperSupplier.get().readTree(modelJson);
             EventModel eventModel = new EventModel();
 
-            eventModel.setKey(modelNode.path("key").asText(null));
-            eventModel.setName(modelNode.path("name").asText(null));
+            eventModel.setKey(modelNode.path("key").stringValue(null));
+            eventModel.setName(modelNode.path("name").stringValue(null));
             
             JsonNode payloadNode = modelNode.path("payload");
 
             if (payloadNode.isArray()) {
                 for (JsonNode node : payloadNode) {
-                    String name = node.path("name").asText(null);
-                    String type = node.path("type").asText(null);
+                    String name = node.path("name").stringValue(null);
+                    String type = node.path("type").stringValue(null);
 
                     EventPayload payload = new EventPayload(name, type);
                     if (node.path("isFullPayload").asBoolean(false)) {
@@ -71,8 +71,8 @@ public class EventJsonConverter {
             JsonNode correlationParameters = modelNode.path("correlationParameters");
             if (correlationParameters.isArray()) {
                 for (JsonNode correlationPayloadNode : correlationParameters) {
-                    String name = correlationPayloadNode.path("name").asText(null);
-                    String type = correlationPayloadNode.path("type").asText(null);
+                    String name = correlationPayloadNode.path("name").stringValue(null);
+                    String type = correlationPayloadNode.path("type").stringValue(null);
                     eventModel.addCorrelation(name, type);
                 }
             }

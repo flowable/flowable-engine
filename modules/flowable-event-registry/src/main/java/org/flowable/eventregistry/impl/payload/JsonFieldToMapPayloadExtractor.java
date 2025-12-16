@@ -51,26 +51,26 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
         Object value = null;
 
         if (EventPayloadTypes.STRING.equals(definitionType)) {
-            value = parameterNode.asText();
+            value = parameterNode.asString();
 
         } else if (EventPayloadTypes.BOOLEAN.equals(definitionType)) {
-            value = parameterNode.booleanValue();
+            value = parameterNode.booleanValue(false);
 
         } else if (EventPayloadTypes.INTEGER.equals(definitionType)) {
-            value = parameterNode.intValue();
+            value = parameterNode.intValue(0);
 
         } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
-            value = parameterNode.doubleValue();
+            value = parameterNode.doubleValue(0.0d);
 
         } else if (EventPayloadTypes.LONG.equals(definitionType)) {
-          value = parameterNode.longValue();
+          value = parameterNode.longValue(0L);
 
         } else if (EventPayloadTypes.JSON.equals(definitionType)) {
             value = parameterNode;
 
         } else {
             LOGGER.warn("Unsupported payload type: {} ", definitionType);
-            value = parameterNode.asText();
+            value = parameterNode.asString();
 
         }
 

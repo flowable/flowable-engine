@@ -34,7 +34,7 @@ public abstract class AbstractCaseInstanceMigrationJobHandler implements JobHand
         try {
             JsonNode cfgAsJson = getObjectMapper().readTree(handlerCfg);
             if (cfgAsJson.has(CFG_LABEL_BATCH_ID)) {
-                return cfgAsJson.get(CFG_LABEL_BATCH_ID).asText();
+                return cfgAsJson.get(CFG_LABEL_BATCH_ID).asString();
             }
             return null;
         } catch (JacksonException e) {
@@ -46,7 +46,7 @@ public abstract class AbstractCaseInstanceMigrationJobHandler implements JobHand
         try {
             JsonNode cfgAsJson = getObjectMapper().readTree(handlerCfg);
             if (cfgAsJson.has(CFG_LABEL_BATCH_PART_ID)) {
-                return cfgAsJson.get(CFG_LABEL_BATCH_PART_ID).asText();
+                return cfgAsJson.get(CFG_LABEL_BATCH_PART_ID).asString();
             }
             return null;
         } catch (JacksonException e) {

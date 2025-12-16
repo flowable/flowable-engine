@@ -100,8 +100,8 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         infoNode = dynamicBpmnService.getProcessDefinitionInfo(processDefinition.getId());
         assertThat(infoNode.get("bpmn").has(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES)).isTrue();
         assertThat(infoNode.get("bpmn").get(DynamicBpmnConstants.GLOBAL_PROCESS_DEFINITION_PROPERTIES).has(DynamicBpmnConstants.ENABLE_SKIP_EXPRESSION)).isTrue();
-        assertThat(infoNode.get("bpmn").get("flow1").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asText()).isEqualTo("${skipOtherLeftVar}");
-        assertThat(infoNode.get("bpmn").get("flow2").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asText()).isEqualTo("${skipOtherRightVar}");
+        assertThat(infoNode.get("bpmn").get("flow1").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asString()).isEqualTo("${skipOtherLeftVar}");
+        assertThat(infoNode.get("bpmn").get("flow2").get(DynamicBpmnConstants.TASK_SKIP_EXPRESSION).asString()).isEqualTo("${skipOtherRightVar}");
         
         variables = new HashMap<>();
         variables.put("input", "left");

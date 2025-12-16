@@ -93,7 +93,7 @@ public class SkipExpressionUtil {
     protected static boolean isEnableSkipExpression(ObjectNode globalProperties) {
         if (globalProperties != null) {
             JsonNode overrideValueNode = globalProperties.get(DynamicBpmnConstants.ENABLE_SKIP_EXPRESSION);
-            if (overrideValueNode != null && !overrideValueNode.isNull() && "true".equalsIgnoreCase(overrideValueNode.asText())) {
+            if (overrideValueNode != null && !overrideValueNode.isNull() && "true".equalsIgnoreCase(overrideValueNode.asString())) {
                 return true;
             }
         }

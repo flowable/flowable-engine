@@ -84,7 +84,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            String createdTaskId = responseNode.get("id").asText();
+            String createdTaskId = responseNode.get("id").asString();
 
             // Check if task is created with right arguments
             Task task = taskService.createTaskQuery().taskId(createdTaskId).singleResult();

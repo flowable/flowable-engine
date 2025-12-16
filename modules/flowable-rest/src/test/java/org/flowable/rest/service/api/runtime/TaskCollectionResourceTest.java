@@ -85,7 +85,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
-            String createdTaskId = responseNode.get("id").asText();
+            String createdTaskId = responseNode.get("id").asString();
 
             // Check if task is created with right arguments
             Task task = taskService.createTaskQuery().taskId(createdTaskId).singleResult();
@@ -415,7 +415,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             Map<String, JsonNode> taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
-                taskNodeMap.put(taskNode.get("id").asText(), taskNode);
+                taskNodeMap.put(taskNode.get("id").asString(), taskNode);
             }
 
             assertThat(taskNodeMap).containsKey(processTask.getId());
@@ -441,7 +441,7 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
 
             taskNodeMap = new HashMap<>();
             for (JsonNode taskNode : dataNode) {
-                taskNodeMap.put(taskNode.get("id").asText(), taskNode);
+                taskNodeMap.put(taskNode.get("id").asString(), taskNode);
             }
 
             assertThat(taskNodeMap).containsKey(processTask.getId());

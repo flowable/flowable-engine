@@ -286,7 +286,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
                         + "id: '${json-unit.any-string}',"
                         + "processDefinitionId: '" + processDefinitionId + "'"
                         + "}");
-        task = taskService.createTaskQuery().processInstanceId(responseNode.get("id").asText()).singleResult();
+        task = taskService.createTaskQuery().processInstanceId(responseNode.get("id").asString()).singleResult();
         assertThat(task).isNotNull();
     }
 }

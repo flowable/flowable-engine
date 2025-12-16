@@ -95,12 +95,12 @@ public class GetProcessInstanceMigrationBatchResultCmd implements Command<Proces
             try {
                 JsonNode resultNode = objectMapper.readTree(batchPart.getResultDocumentJson(processEngineConfiguration.getEngineCfgKey()));
                 if (resultNode.has(BATCH_RESULT_MESSAGE_LABEL)) {
-                    String resultMessage = resultNode.get(BATCH_RESULT_MESSAGE_LABEL).asText();
+                    String resultMessage = resultNode.get(BATCH_RESULT_MESSAGE_LABEL).asString();
                     partResult.setMigrationMessage(resultMessage);
                 }
                 
                 if (resultNode.has(BATCH_RESULT_STACKTRACE_LABEL)) {
-                    String resultStacktrace = resultNode.get(BATCH_RESULT_STACKTRACE_LABEL).asText();
+                    String resultStacktrace = resultNode.get(BATCH_RESULT_STACKTRACE_LABEL).asString();
                     partResult.setMigrationStacktrace(resultStacktrace);
                 }
                 

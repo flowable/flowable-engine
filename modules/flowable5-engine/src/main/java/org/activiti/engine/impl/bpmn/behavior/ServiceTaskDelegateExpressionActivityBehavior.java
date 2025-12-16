@@ -81,7 +81,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                 if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
                     ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
                     if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_DELEGATE_EXPRESSION)) {
-                        String overrideExpression = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_DELEGATE_EXPRESSION).asText();
+                        String overrideExpression = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_DELEGATE_EXPRESSION).asString();
                         if (StringUtils.isNotEmpty(overrideExpression) && !overrideExpression.equals(expression.getExpressionText())) {
                             expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(overrideExpression);
                         }

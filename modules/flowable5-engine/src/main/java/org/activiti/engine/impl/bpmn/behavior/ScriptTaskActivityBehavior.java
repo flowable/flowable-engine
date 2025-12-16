@@ -66,7 +66,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
-                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
+                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asString();
                 if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
                     script = overrideScript;
                 }

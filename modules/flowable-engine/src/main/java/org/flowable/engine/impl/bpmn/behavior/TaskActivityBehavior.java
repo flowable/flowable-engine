@@ -34,12 +34,12 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
         if (taskElementProperties != null) {
             JsonNode overrideValuesNode = taskElementProperties.get(propertyName);
             if (overrideValuesNode != null) {
-                if (overrideValuesNode.isNull() || !overrideValuesNode.isArray() || overrideValuesNode.size() == 0) {
+                if (overrideValuesNode.isNull() || !overrideValuesNode.isArray() || overrideValuesNode.isEmpty()) {
                     activeValues = null;
                 } else {
                     activeValues = new ArrayList<>();
                     for (JsonNode valueNode : overrideValuesNode) {
-                        activeValues.add(valueNode.asText());
+                        activeValues.add(valueNode.asString());
                     }
                 }
             }

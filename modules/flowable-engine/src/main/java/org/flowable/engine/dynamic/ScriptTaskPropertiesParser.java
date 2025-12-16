@@ -29,7 +29,7 @@ public class ScriptTaskPropertiesParser extends BasePropertiesParser {
 
         ObjectNode scriptTextNode = objectMapper.createObjectNode();
         putPropertyValue(BPMN_MODEL_VALUE, scriptTask.getScript(), scriptTextNode);
-        putPropertyValue(DYNAMIC_VALUE, flowElementNode.path(SCRIPT_TASK_SCRIPT).asText(null), scriptTextNode);
+        putPropertyValue(DYNAMIC_VALUE, flowElementNode.path(SCRIPT_TASK_SCRIPT).stringValue(null), scriptTextNode);
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         propertiesNode.set(SCRIPT_TASK_SCRIPT, scriptTextNode);

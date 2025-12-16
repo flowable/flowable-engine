@@ -74,7 +74,7 @@ public class ProcessDefinitionCollectionResourceTest extends BaseSpringRestTestC
             for (int i = 0; i < dataNode.size(); i++) {
                 JsonNode processDefinitionJson = dataNode.get(i);
 
-                String key = processDefinitionJson.get("key").asText();
+                String key = processDefinitionJson.get("key").asString();
                 JsonNode graphicalNotationNode = processDefinitionJson.get("graphicalNotationDefined");
                 if ("oneTaskProcessWithDi".equals(key)) {
                     assertThat(graphicalNotationNode.asBoolean()).isTrue();

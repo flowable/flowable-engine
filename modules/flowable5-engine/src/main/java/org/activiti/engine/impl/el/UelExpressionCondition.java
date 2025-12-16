@@ -69,7 +69,7 @@ public class UelExpressionCondition implements Condition {
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

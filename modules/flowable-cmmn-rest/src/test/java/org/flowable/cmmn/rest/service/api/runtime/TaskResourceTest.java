@@ -683,7 +683,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
         closeResponse(response);
-        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
+        String taskId = ((ArrayNode) dataNode).get(0).get("id").asString();
         assertThat(taskId).isNotNull();
 
         // Claim

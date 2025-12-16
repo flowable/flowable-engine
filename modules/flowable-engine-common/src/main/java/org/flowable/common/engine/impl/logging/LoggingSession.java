@@ -52,9 +52,9 @@ public class LoggingSession implements Session {
         
         String transactionId = null;
         if (loggingData.size() > 0) {
-            transactionId = loggingData.get(0).get(LoggingSessionUtil.TRANSACTION_ID).asText();
+            transactionId = loggingData.get(0).get(LoggingSessionUtil.TRANSACTION_ID).asString();
         } else {
-            transactionId = data.get(LoggingSessionUtil.ID).asText();
+            transactionId = data.get(LoggingSessionUtil.ID).asString();
         }
         
         data.put(LoggingSessionUtil.TRANSACTION_ID, transactionId);

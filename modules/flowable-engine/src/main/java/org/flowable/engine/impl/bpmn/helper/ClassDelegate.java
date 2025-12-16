@@ -181,7 +181,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asString();
                 if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
                     className = overrideClassName;
                     activityBehaviorInstance = null;

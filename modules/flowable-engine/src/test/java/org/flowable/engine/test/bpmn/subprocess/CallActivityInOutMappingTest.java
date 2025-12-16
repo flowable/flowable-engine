@@ -53,7 +53,7 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
         // The variable at this point should not have changed at this point.
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("value-");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("value-");
         }
 
         // Executing the async job should now change the variable in the child process instances
@@ -65,14 +65,14 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
 
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).isEqualTo("CHANGED");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).isEqualTo("CHANGED");
         }
 
         // The variable should not have changed on the root process instance level
         ArrayNode rootArrayNode = (ArrayNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "myRootVariable");
         assertThat(rootArrayNode).hasSize(10);
         for (JsonNode rootArrayNodeElement : rootArrayNode) {
-            assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
         }
 
     }
@@ -88,14 +88,14 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
         // There is no async step here, so the change to the variable happens immediately in the called child process instance
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).isEqualTo("CHANGED");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).isEqualTo("CHANGED");
         }
 
         // The variable should not have changed on the root process instance level
         ArrayNode rootArrayNode = (ArrayNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "myRootVariable");
         assertThat(rootArrayNode).hasSize(10);
         for (JsonNode rootArrayNodeElement : rootArrayNode) {
-            assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
         }
 
     }
@@ -109,7 +109,7 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
 
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             ObjectNode inMappedVariable = (ObjectNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedVariable.path("field").asText()).isEqualTo("Hello");
+            assertThat(inMappedVariable.path("field").asString()).isEqualTo("Hello");
         }
 
         // Executing the async job should now change the variable in the child process instances
@@ -118,12 +118,12 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
 
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             ObjectNode inMappedVariable = (ObjectNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedVariable.path("field").asText()).isEqualTo("TEST");
+            assertThat(inMappedVariable.path("field").asString()).isEqualTo("TEST");
         }
 
         // The variable should not have changed on the root process instance level
         ObjectNode rootDateVariable = (ObjectNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "myRootVariable");
-        assertThat(rootDateVariable.path("field").asText()).isEqualTo("Hello");
+        assertThat(rootDateVariable.path("field").asString()).isEqualTo("Hello");
     }
 
     @Test
@@ -135,12 +135,12 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
 
         for (ProcessInstance calledProcessInstance : processInstanceInfo.calledProcessInstances()) {
             ObjectNode inMappedVariable = (ObjectNode) runtimeService.getVariable(calledProcessInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedVariable.path("field").asText()).isEqualTo("TEST");
+            assertThat(inMappedVariable.path("field").asString()).isEqualTo("TEST");
         }
 
         // The variable should not have changed on the root process instance level
         ObjectNode rootVariable = (ObjectNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "myRootVariable");
-        assertThat(rootVariable.path("field").asText()).isEqualTo("Hello");
+        assertThat(rootVariable.path("field").asString()).isEqualTo("Hello");
     }
 
     @Test
@@ -156,10 +156,10 @@ public class CallActivityInOutMappingTest extends PluggableFlowableTestCase {
 
         // The variable should not have changed on the root process instance level
         ObjectNode originalRootVariable = (ObjectNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "myRootVariable");
-        assertThat(originalRootVariable.path("field").asText()).isEqualTo("Hello");
+        assertThat(originalRootVariable.path("field").asString()).isEqualTo("Hello");
 
         ObjectNode outMappedVariable = (ObjectNode) runtimeService.getVariable(processInstanceInfo.processInstance().getId(), "outMappedVariable");
-        assertThat(outMappedVariable.path("field").asText()).isEqualTo("TEST");
+        assertThat(outMappedVariable.path("field").asString()).isEqualTo("TEST");
     }
 
     @Test

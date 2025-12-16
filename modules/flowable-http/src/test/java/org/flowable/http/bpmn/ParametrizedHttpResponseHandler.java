@@ -39,7 +39,7 @@ public class ParametrizedHttpResponseHandler implements HttpResponseHandler {
             String variableNameEvaluated = getStringFromField(this.variableName, execution);
             Set<String> fields = getStringSetFromField(variableNameEvaluated);
             for (final String field : fields) {
-              execution.setVariable(field, responseNode.get("name").get(field).asText());
+              execution.setVariable(field, responseNode.get("name").get(field).asString());
             }
             httpResponse.setBodyResponseHandled(true);
 

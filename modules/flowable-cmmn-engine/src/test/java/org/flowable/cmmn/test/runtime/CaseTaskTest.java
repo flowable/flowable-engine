@@ -1408,7 +1408,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         // The variable at this point should not have changed at this point.
         for (CaseInstance childCaseInstance : childCaseInstances) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("value-");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("value-");
         }
 
         // Executing the async job should now change the variable in the child process instances
@@ -1420,14 +1420,14 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
 
         for (CaseInstance childCaseInstance : childCaseInstances) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("CHANGED");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
         }
 
         // The variable should not have changed on the root process instance level
         ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
         assertThat(rootArrayNode).hasSize(10);
         for (JsonNode rootArrayNodeElement : rootArrayNode) {
-            assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
         }
     }
 
@@ -1456,14 +1456,14 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
 
         for (CaseInstance childCaseInstance : childCaseInstances) {
             JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
-            assertThat(inMappedJsonNodeVariable.path("field").asText()).startsWith("CHANGED");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
         }
 
         // The variable should not have changed on the root process instance level
         ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
         assertThat(rootArrayNode).hasSize(10);
         for (JsonNode rootArrayNodeElement : rootArrayNode) {
-            assertThat(rootArrayNodeElement.path("field").asText()).startsWith("value-");
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
         }
     }
 

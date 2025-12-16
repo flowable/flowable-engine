@@ -82,7 +82,7 @@ public class HistoricCaseInstanceMigrationDocumentConverter implements CaseInsta
     
     protected static String getJsonProperty(String propertyName, JsonNode jsonNode) {
         if (jsonNode.has(propertyName) && !jsonNode.get(propertyName).isNull()) {
-            return jsonNode.get(propertyName).asText();
+            return jsonNode.get(propertyName).asString();
         }
         
         return null;

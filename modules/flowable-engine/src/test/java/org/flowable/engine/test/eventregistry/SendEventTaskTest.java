@@ -452,7 +452,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
+        assertThat(jsonNode.get("eventProperty").asString()).isEqualTo("test");
 
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 

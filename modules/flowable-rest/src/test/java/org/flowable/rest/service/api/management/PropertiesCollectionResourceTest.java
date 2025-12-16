@@ -50,7 +50,7 @@ public class PropertiesCollectionResourceTest extends BaseSpringRestTestCase {
 
             String propValue = properties.get(propertyEntry.getKey());
             assertThat(propValue).isNotNull();
-            assertThat(propertyEntry.getValue().textValue()).isEqualTo(propValue);
+            assertThat(propertyEntry.getValue().stringValue()).isEqualTo(propValue);
         }
     }
 }

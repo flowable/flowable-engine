@@ -56,7 +56,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
 
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)

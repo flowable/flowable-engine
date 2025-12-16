@@ -48,7 +48,7 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("tableName").textValue()).isEqualTo(tableName);
+        assertThat(responseNode.get("tableName").stringValue()).isEqualTo(tableName);
 
         ArrayNode names = (ArrayNode) responseNode.get("columnNames");
         ArrayNode types = (ArrayNode) responseNode.get("columnTypes");
@@ -59,8 +59,8 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
         assertThat(types).hasSameSizeAs(metaData.getColumnTypes());
 
         for (int i = 0; i < names.size(); i++) {
-            assertThat(metaData.getColumnNames().get(i)).isEqualTo(names.get(i).textValue());
-            assertThat(metaData.getColumnTypes().get(i)).isEqualTo(types.get(i).textValue());
+            assertThat(metaData.getColumnNames().get(i)).isEqualTo(names.get(i).stringValue());
+            assertThat(metaData.getColumnTypes().get(i)).isEqualTo(types.get(i).stringValue());
         }
     }
 

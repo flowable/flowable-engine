@@ -56,7 +56,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
 
             assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 
@@ -102,7 +102,7 @@ public class DeploymentResourceTest extends BaseSpringRestTestCase {
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
 
             assertThat(repositoryService.createDeploymentQuery().deploymentId(deploymentId).count()).isEqualTo(1L);
 

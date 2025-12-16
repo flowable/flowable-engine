@@ -40,7 +40,7 @@ public class JSONCollectionHandler implements FlowableCollectionHandler {
             ArrayList<String> collection = new ArrayList<>();
     
             for (JsonNode itemValue : jsonValue) {
-                collection.add(itemValue.get("principal").asText());
+                collection.add(itemValue.get("principal").asString());
             }
     
             return collection;

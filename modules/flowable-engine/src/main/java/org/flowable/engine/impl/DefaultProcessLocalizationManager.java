@@ -49,12 +49,12 @@ public class DefaultProcessLocalizationManager implements InternalProcessLocaliz
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        processInstanceExecution.setLocalizedName(languageNameNode.asText());
+                        processInstanceExecution.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        processInstanceExecution.setLocalizedDescription(languageDescriptionNode.asText());
+                        processInstanceExecution.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }
@@ -74,12 +74,12 @@ public class DefaultProcessLocalizationManager implements InternalProcessLocaliz
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        processInstanceEntity.setLocalizedName(languageNameNode.asText());
+                        processInstanceEntity.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        processInstanceEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                        processInstanceEntity.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }

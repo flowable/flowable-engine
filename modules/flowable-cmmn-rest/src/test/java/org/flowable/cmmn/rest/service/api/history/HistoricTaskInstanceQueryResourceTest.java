@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -346,12 +345,11 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         // Check presence of ID's
         if (expectedTaskIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String id = it.next().get("id").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String id = jsonNode.get("id").stringValue();
                 toBeFound.remove(id);
             }
-            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
         }
     }
 }

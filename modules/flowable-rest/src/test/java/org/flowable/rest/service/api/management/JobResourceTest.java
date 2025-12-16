@@ -86,7 +86,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: '" + getISODateString(timerJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
 
         // Set tenant on deployment
@@ -142,7 +142,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: '" + getISODateString(suspendedJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, suspendedJob.getId()));
 
         // Set tenant on deployment
@@ -198,7 +198,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "dueDate: '" + getISODateString(deadLetterJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId()));
 
         // Set tenant on deployment
@@ -274,7 +274,7 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "lockExpirationTime: '" + getISODateString(lockedJob.getLockExpirationTime()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB, lockedJob.getId()));
     }
 

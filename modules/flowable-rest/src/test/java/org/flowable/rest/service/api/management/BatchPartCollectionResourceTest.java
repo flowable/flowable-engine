@@ -56,12 +56,12 @@ public class BatchPartCollectionResourceTest extends BaseSpringRestTestCase {
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         JsonNode batchPartNode = responseNode.get(0);
         assertThat(batchPartNode).isNotNull();
-        assertThat(batchPartNode.get("id").asText()).isEqualTo(batchPart.getId());
-        assertThat(batchPartNode.get("batchId").asText()).isEqualTo(batchPart.getBatchId());
-        assertThat(batchPartNode.get("searchKey").asText()).isEqualTo(batchPart.getSearchKey());
-        assertThat(batchPartNode.get("searchKey2").asText()).isEqualTo(batchPart.getSearchKey2());
-        assertThat(batchPartNode.get("batchType").asText()).isEqualTo(batchPart.getBatchType());
-        assertThat(batchPartNode.get("status").asText()).isEqualTo(batchPart.getStatus());
+        assertThat(batchPartNode.get("id").asString()).isEqualTo(batchPart.getId());
+        assertThat(batchPartNode.get("batchId").asString()).isEqualTo(batchPart.getBatchId());
+        assertThat(batchPartNode.get("searchKey").asString()).isEqualTo(batchPart.getSearchKey());
+        assertThat(batchPartNode.get("searchKey2").asString()).isEqualTo(batchPart.getSearchKey2());
+        assertThat(batchPartNode.get("batchType").asString()).isEqualTo(batchPart.getBatchType());
+        assertThat(batchPartNode.get("status").asString()).isEqualTo(batchPart.getStatus());
 
         managementService.deleteBatch(batch.getId());
     }

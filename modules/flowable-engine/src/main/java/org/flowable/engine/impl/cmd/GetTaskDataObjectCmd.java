@@ -111,11 +111,11 @@ public class GetTaskDataObjectCmd implements Command<DataObject>, Serializable {
                 if (languageNode != null) {
                     JsonNode nameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (nameNode != null) {
-                        localizedName = nameNode.asText();
+                        localizedName = nameNode.asString();
                     }
                     JsonNode descriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (descriptionNode != null) {
-                        localizedDescription = descriptionNode.asText();
+                        localizedDescription = descriptionNode.asString();
                     }
                 }
             }

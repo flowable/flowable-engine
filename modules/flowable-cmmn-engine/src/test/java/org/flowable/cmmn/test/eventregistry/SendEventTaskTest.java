@@ -85,7 +85,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
+        assertThat(jsonNode.get("customerId").asString()).isEqualTo("Hello World!");
     }
     
     @Test
@@ -101,7 +101,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
+        assertThat(jsonNode.get("customerId").asString()).isEqualTo("Hello World!");
         
         Map<String, Object> headerMap = outboundEventChannelAdapter.headers.get(0);
         assertThat(headerMap.get("headerProperty1")).isEqualTo("test");

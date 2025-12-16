@@ -18,15 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -137,9 +134,8 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
         // Check presence of ID's
         if (expectedActivityIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String activityId = it.next().get("activityId").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String activityId = jsonNode.get("activityId").stringValue();
                 toBeFound.remove(activityId);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
