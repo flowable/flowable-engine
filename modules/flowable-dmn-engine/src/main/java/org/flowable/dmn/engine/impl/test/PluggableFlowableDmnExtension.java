@@ -31,7 +31,7 @@ public class PluggableFlowableDmnExtension extends InternalFlowableDmnExtension 
     @Override
     protected DmnEngine getDmnEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeDmnEngine, CloseableEngine.class).dmnEngine;
+        return getStore(context).computeIfAbsent(configurationResource, this::initializeDmnEngine, CloseableEngine.class).dmnEngine;
     }
 
     protected CloseableEngine initializeDmnEngine(String configurationResource) {

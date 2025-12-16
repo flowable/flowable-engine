@@ -27,7 +27,7 @@ public class InternalFlowableCmmnSpringExtension extends InternalFlowableCmmnExt
     @Override
     protected CmmnEngine getCmmnEngine(ExtensionContext context) {
         return getStore(context)
-                .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(CmmnEngine.class),
+                .computeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(CmmnEngine.class),
                         CmmnEngine.class);
     }
 

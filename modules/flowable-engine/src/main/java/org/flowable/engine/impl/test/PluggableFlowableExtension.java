@@ -65,7 +65,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
+        return getStore(context).computeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
     }
 
     protected ProcessEngine initializeProcessEngine(String configurationResource) {

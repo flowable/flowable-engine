@@ -44,7 +44,6 @@ import org.flowable.management.jmx.ManagementMBeanAssembler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
@@ -74,7 +73,6 @@ public class ProcessDefinitionsTest {
 
     @BeforeEach
     public void initMocks() throws MalformedObjectNameException {
-        MockitoAnnotations.initMocks(this);
         when(processEngineConfiguration.getRepositoryService()).thenReturn(repositoryService);
         processDefinitionsMBean = new ProcessDefinitionsMBean(processEngineConfiguration);
     }

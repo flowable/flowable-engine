@@ -31,7 +31,7 @@ public class PluggableFlowableCmmnExtension extends InternalFlowableCmmnExtensio
     @Override
     protected CmmnEngine getCmmnEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeCmmnEngine, CmmnEngine.class);
+        return getStore(context).computeIfAbsent(configurationResource, this::initializeCmmnEngine, CmmnEngine.class);
     }
 
     protected CmmnEngine initializeCmmnEngine(String configurationResource) {

@@ -63,7 +63,7 @@ public class ResourceFlowableExtension extends InternalFlowableExtension {
 
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
-        return getStore(context).getOrComputeIfAbsent(context.getUniqueId(), key -> initializeProcessEngine(), ProcessEngine.class);
+        return getStore(context).computeIfAbsent(context.getUniqueId(), key -> initializeProcessEngine(), ProcessEngine.class);
     }
 
     protected ProcessEngine initializeProcessEngine() {

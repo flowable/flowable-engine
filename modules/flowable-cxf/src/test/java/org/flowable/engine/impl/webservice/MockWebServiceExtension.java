@@ -62,7 +62,7 @@ public class MockWebServiceExtension implements BeforeEachCallback, AfterEachCal
     }
 
     private static MockWebServiceContext getMockWebServiceContext(ExtensionContext context) {
-        return getStore(context).getOrComputeIfAbsent(context.getUniqueId(), key -> create(), MockWebServiceContext.class);
+        return getStore(context).computeIfAbsent(context.getUniqueId(), key -> create(), MockWebServiceContext.class);
 
     }
 

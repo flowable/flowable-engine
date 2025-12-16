@@ -53,7 +53,7 @@ public class ResourceFlowableIdmExtension extends InternalFlowableIdmExtension {
 
     @Override
     protected IdmEngine getIdmEngine(ExtensionContext context) {
-        return getStore(context).getOrComputeIfAbsent(context.getUniqueId(), key -> initializeIdmEngine(), IdmEngine.class);
+        return getStore(context).computeIfAbsent(context.getUniqueId(), key -> initializeIdmEngine(), IdmEngine.class);
     }
 
     protected IdmEngine initializeIdmEngine() {

@@ -191,7 +191,7 @@ public class FlowableExtension implements ParameterResolver, BeforeEachCallback,
 
     protected FlowableTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableTestHelper(createProcessEngine(context)), FlowableTestHelper.class);
+            .computeIfAbsent(context.getRequiredTestClass(), key -> new FlowableTestHelper(createProcessEngine(context)), FlowableTestHelper.class);
     }
 
     protected ProcessEngine createProcessEngine(ExtensionContext context) {

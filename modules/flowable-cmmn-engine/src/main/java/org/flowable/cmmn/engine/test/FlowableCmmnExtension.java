@@ -166,7 +166,7 @@ public class FlowableCmmnExtension implements ParameterResolver, BeforeEachCallb
 
     protected FlowableCmmnTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(),
+            .computeIfAbsent(context.getRequiredTestClass(),
                 key -> new FlowableCmmnTestHelper(createCmmnEngine(context)), FlowableCmmnTestHelper.class);
     }
 

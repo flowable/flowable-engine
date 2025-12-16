@@ -117,7 +117,7 @@ public class CmmnEngineConfiguratorExtension implements AfterTestExecutionCallba
 
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        return getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, CloseableEngine.class).processEngine;
+        return getStore(context).computeIfAbsent(configurationResource, this::initializeProcessEngine, CloseableEngine.class).processEngine;
     }
 
     protected String getConfigurationResource(ExtensionContext context) {

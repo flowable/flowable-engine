@@ -42,7 +42,7 @@ public class ConvertBpmnModelResolver implements ParameterResolver {
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         ExtensionContext.Store store = extensionContext.getRoot().getStore(NAMESPACE);
 
-        return store.getOrComputeIfAbsent(extensionContext.getUniqueId(), key -> modelSupplier.get(), BpmnModel.class);
+        return store.computeIfAbsent(extensionContext.getUniqueId(), key -> modelSupplier.get(), BpmnModel.class);
     }
 
 }

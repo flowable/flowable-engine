@@ -141,7 +141,7 @@ public class FlowableAppExtension implements ParameterResolver, BeforeEachCallba
 
     protected FlowableAppTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-                .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableAppTestHelper(createAppEngine(context)), FlowableAppTestHelper.class);
+                .computeIfAbsent(context.getRequiredTestClass(), key -> new FlowableAppTestHelper(createAppEngine(context)), FlowableAppTestHelper.class);
     }
 
     protected AppEngine createAppEngine(ExtensionContext context) {

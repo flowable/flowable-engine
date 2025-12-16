@@ -27,7 +27,7 @@ public class InternalFlowableDmnSpringExtension extends InternalFlowableDmnExten
     @Override
     protected DmnEngine getDmnEngine(ExtensionContext context) {
         return getStore(context)
-                .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(DmnEngine.class),
+                .computeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(DmnEngine.class),
                         DmnEngine.class);
     }
 
