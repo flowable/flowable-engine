@@ -5,17 +5,17 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-dependencies</artifactId>
-        <version>8.1.0.0</version>
+        <version>8.1.0.1</version>
         <relativePath>../modules/flowable-dependencies</relativePath>
     </parent>
 
     <name>Flowable Distribution</name>
     <artifactId>flowable-distribution</artifactId>
     <packaging>jar</packaging>
-    <version>8.1.0.0</version>
+    <version>8.1.0.1</version>
 
     <properties>
-        <flowable.version>8.1.0.0</flowable.version>
+        <flowable.version>8.1.0.1</flowable.version>
     </properties>
 
     <dependencies>
