@@ -91,7 +91,7 @@ public class BatchDeleteProcessConfig {
 
         Batch batch = batchService.getBatch(batchPart.getBatchId());
         JsonNode batchConfiguration = getBatchConfiguration(batch, engineConfiguration);
-        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue();
+        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue(false);
 
         JsonNode queryNode = batchConfiguration.path("query");
         if (queryNode.isMissingNode()) {
@@ -127,7 +127,7 @@ public class BatchDeleteProcessConfig {
 
         populateQuery(queryNode, query, engineConfiguration);
 
-        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").asBoolean(false)) {
+        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").booleanValue(false)) {
             // When the query has finishedBefore, finishedAfter or finished then we need to order by the process instance end time
             // This is done in order to improve the performance when getting pages with large offsets.
             // When the properties are not set we cannot order on the end time
@@ -341,7 +341,7 @@ public class BatchDeleteProcessConfig {
                 }
 
                 QueryOperator operator = QueryOperator.valueOf(operatorString);
-                String variableName = variableValue.path("name").stringValue();
+                String variableName = variableValue.path("name").stringValue(null);
                 switch (operator) {
                     case EQUALS:
                         if (variableName != null) {
@@ -493,7 +493,7 @@ public class BatchDeleteProcessConfig {
 
         @Override
         public String getTextValue() {
-            return node.path("textValue").stringValue();
+            return node.path("textValue").stringValue(null);
         }
 
         @Override
@@ -503,7 +503,7 @@ public class BatchDeleteProcessConfig {
 
         @Override
         public String getTextValue2() {
-            return node.path("textValues").stringValue();
+            return node.path("textValues").stringValue(null);
         }
 
         @Override
