@@ -19,7 +19,7 @@
     <properties>
         <!-- External dependencies -->
         <angus-mail.version>2.0.4</angus-mail.version>
-        <artemis.version>2.42.0</artemis.version>
+        <artemis.version>2.44.0</artemis.version>
         <camel.version>4.8.0</camel.version>
         <commons-codec.version>1.19.0</commons-codec.version>
         <commons-io.version>2.20.0</commons-io.version>
@@ -437,13 +437,10 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
-                <artifactId>artemis-jakarta-client</artifactId>
+                <artifactId>artemis-bom</artifactId>
                 <version>${artemis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>artemis-jakarta-server</artifactId>
-                <version>${artemis.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
