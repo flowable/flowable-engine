@@ -7,6 +7,8 @@ Flowable (V7)
 
 ![Flowable Actions CI](https://github.com/flowable/flowable-engine/actions/workflows/main.yml/badge.svg?branch=main)
 
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20Flowable%20Guru-006BFF)](https://gurubase.io/g/flowable)
+
 Homepage: https://www.flowable.org/
 
 ## flowable / flowəb(ə)l /
