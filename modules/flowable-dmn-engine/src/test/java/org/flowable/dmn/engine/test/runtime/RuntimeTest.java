@@ -90,7 +90,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .variable("input1", localDate.toDate())
                 .executeWithSingleResult();
         assertThat(result.get("output1").getClass()).isSameAs(String.class);
-        assertThat(result).containsEntry("output1", "test2");
+        assertThat(result).containsEntry("output1", "test1");
     }
 
     @Test
@@ -295,7 +295,7 @@ public class RuntimeTest extends AbstractFlowableDmnTest {
                 .decisionKey("decision")
                 .variable("date", localDate.toDate())
                 .executeWithSingleResult();
-        assertThat(result).containsEntry("output1", "test2");
+        assertThat(result).containsEntry("output1", "test1");
     }
 
     @Test
