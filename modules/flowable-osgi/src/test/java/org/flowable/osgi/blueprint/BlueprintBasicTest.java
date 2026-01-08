@@ -132,6 +132,8 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-api").versionAsInProject(),
                 mavenBundle().groupId("org.slf4j").artifactId("slf4j-reload4j").versionAsInProject(),
                 mavenBundle().groupId("org.junit.jupiter").artifactId("junit-jupiter-api").versionAsInProject(),
+                mavenBundle().groupId("org.junit.platform").artifactId("junit-platform-commons").versionAsInProject(),
+                mavenBundle().groupId("org.opentest4j").artifactId("opentest4j").versionAsInProject(),
                 mavenBundle().groupId("org.apache.felix").artifactId("org.apache.felix.fileinstall").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries.blueprint").artifactId("org.apache.aries.blueprint.core").versionAsInProject(),
                 mavenBundle().groupId("org.apache.aries.proxy").artifactId("org.apache.aries.proxy").versionAsInProject(),

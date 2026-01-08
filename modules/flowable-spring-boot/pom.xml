@@ -27,6 +27,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--
+                Spring Boot 4.0 is using Artemis 2.43.0 which is not compatible with java 25.
+                Therefore, we override it like this.
+                Once we upgrade to a Spring Boot version that uses Artemis that supports Java 25 we can remove this artemis-bom import
+             -->
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>artemis-bom</artifactId>
+                <version>${artemis.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>

@@ -44,7 +44,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-
+                <version>${spring.boot.version}</version>
                 <configuration>
                     <jvmArguments>
                         -agentlib:native-image-agent=config-output-dir=target/native-image
@@ -134,6 +134,7 @@
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>${spring.boot.version}</version>
                         <executions>
                             <execution>
                                 <id>process-test-aot</id>

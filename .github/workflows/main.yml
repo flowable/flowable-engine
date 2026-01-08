@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: [17, 21]
+        java: [17, 21, 25]
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-java@v3
@@ -31,4 +31,16 @@ jobs:
       # Need to do install first in order for the OSGi tests to work
       run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true
     - name: Test
-      run: ./mvnw verify -Pdistro,errorLogging,include-spring-boot-samples ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+      run: ./mvnw verify -Pdistro,errorLogging,include-spring-boot-samples ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=true
+    - name: Publish Test Results
+      if: always()   # important: runs even if tests fail
+      uses: EnricoMi/publish-unit-test-result-action@v2.22.0
+      with:
+        files: |
+          **/target/surefire-reports/*.xml
+    - name: Upload Surefire reports
+      uses: actions/upload-artifact@v6.0.0
+      if: success() || failure() # always run even if the previous step fails
+      with:
+        name: surefire-${{matrix.java}}-txt
+        path: '**/target/surefire-reports/*-output.txt'

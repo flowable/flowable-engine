@@ -43,6 +43,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof String) {
 			return Boolean.valueOf((String)value);
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToBoolean(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Boolean.class));
 	}
 
@@ -59,6 +62,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof String) {
 			return Character.valueOf(((String)value).charAt(0));
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToCharacter(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Character.class));
 	}
 
@@ -85,6 +91,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return new BigDecimal((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToBigDecimal(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), BigDecimal.class));
 	}
 
@@ -111,6 +120,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return BigInteger.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToBigInteger(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), BigInteger.class));
 	}
 
@@ -134,6 +146,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Double.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToDouble(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Double.class));
 	}
 
@@ -157,6 +172,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Float.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToFloat(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Float.class));
 	}
 
@@ -180,6 +198,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Long.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToLong(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Long.class));
 	}
 
@@ -203,6 +224,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Integer.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToInteger(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Integer.class));
 	}
 
@@ -226,6 +250,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Short.valueOf((short)((Character)value).charValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToShort(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Short.class));
 	}
 
@@ -249,6 +276,9 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Character) {
 			return Byte.valueOf(Short.valueOf((short)((Character)value).charValue()).byteValue());
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToByte(resolveLambdaExpression(lambdaExpression));
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), Byte.class));
 	}
 
@@ -262,8 +292,19 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof Enum<?>) {
 			return ((Enum<?>)value).name();
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToString(resolveLambdaExpression(lambdaExpression));
+        }
 		return value.toString();
 	}
+
+    protected Object resolveLambdaExpression(LambdaExpression lambdaExpression) {
+        Object value = lambdaExpression;
+        while (value instanceof LambdaExpression expression && expression.getFormalParameters().isEmpty()) {
+            value = expression.invoke();
+        }
+        return value;
+    }
 
 	@SuppressWarnings("unchecked")
 	protected <T extends Enum<T>> T coerceToEnum(Object value, Class<T> type) {
@@ -280,6 +321,9 @@ public class TypeConverterImpl implements TypeConverter {
 				throw new ELException(LocalMessages.get("error.coerce.value", value, value.getClass(), type), e);
 			}
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            return coerceToEnum(resolveLambdaExpression(lambdaExpression), type);
+        }
 		throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), type));
 	}
 
@@ -325,59 +369,68 @@ public class TypeConverterImpl implements TypeConverter {
 		return proxy.get();
 	}
 
+    protected Object coerceToPrimitive(Object value, Class<?> type) {
+        if (type == long.class) {
+            return coerceToLong(value);
+        }
+        if (type == double.class) {
+            return coerceToDouble(value);
+        }
+        if (type == boolean.class) {
+            return coerceToBoolean(value);
+        }
+        if (type == int.class) {
+            return coerceToInteger(value);
+        }
+        if (type == float.class) {
+            return coerceToFloat(value);
+        }
+        if (type == short.class) {
+            return coerceToShort(value);
+        }
+        if (type == byte.class) {
+            return coerceToByte(value);
+        }
+        if (type == char.class) {
+            return coerceToCharacter(value);
+        }
+
+        throw new ELException(LocalMessages.get("error.coerce.type", value, value.getClass(), type));
+    }
+
 	@SuppressWarnings("unchecked")
 	protected Object coerceToType(Object value, Class<?> type) {
-		if (type == null) {
-			return value;
-		}
-
-		if (value instanceof LambdaExpression lambdaExpression) {
-			if (LambdaExpression.class == type) {
-				return lambdaExpression;
-			}
-			if (isFunctionalInterface(type)) {
-				return coerceToFunctionalInterface(lambdaExpression, (Class<?>) type);
-			}
-
-			if (lambdaExpression.getFormalParameters().isEmpty()) {
-				// If the value is a LambdaExpression without formal parameters we need to resolve its value
-				value = coerceToType(lambdaExpression.invoke(), type);
-			}
-		}
-
-		if (Object.class.equals(type)) {
-			return value;
-		}
-
-
 		if (type == String.class) {
 			return coerceToString(value);
 		}
-		if (value == null && !type.isPrimitive()) {
+        if (type.isPrimitive()) {
+            return coerceToPrimitive(value, type);
+        }
+		if (value == null) {
 			return null;
 		}
-		if (type == Long.class || type == long.class) {
+		if (type == Long.class) {
 			return coerceToLong(value);
 		}
-		if (type == Double.class || type == double.class) {
+		if (type == Double.class) {
 			return coerceToDouble(value);
 		}
-		if (type == Boolean.class || type == boolean.class) {
+		if (type == Boolean.class) {
 			return coerceToBoolean(value);
 		}
-		if (type == Integer.class || type == int.class) {
+		if (type == Integer.class) {
 			return coerceToInteger(value);
 		}
-		if (type == Float.class || type == float.class) {
+		if (type == Float.class) {
 			return coerceToFloat(value);
 		}
-		if (type == Short.class || type == short.class) {
+		if (type == Short.class) {
 			return coerceToShort(value);
 		}
-		if (type == Byte.class || type == byte.class) {
+		if (type == Byte.class) {
 			return coerceToByte(value);
 		}
-		if (type == Character.class || type == char.class) {
+		if (type == Character.class) {
 			return coerceToCharacter(value);
 		}
 		if (type == BigDecimal.class) {
@@ -389,9 +442,21 @@ public class TypeConverterImpl implements TypeConverter {
 		if (type.getSuperclass() == Enum.class) {
 			return coerceToEnum(value, (Class<? extends Enum>)type);
 		}
+        if (value instanceof LambdaExpression lambdaExpression) {
+            if (LambdaExpression.class == type) {
+                return lambdaExpression;
+            }
+
+            if (isFunctionalInterface(type)) {
+                return coerceToFunctionalInterface(lambdaExpression, (Class<?>) type);
+            }
+
+            value = resolveLambdaExpression(lambdaExpression);
+        }
 		if (value == null || value.getClass() == type || type.isInstance(value)) {
 			return value;
 		}
+
 		if (value instanceof String) {
 			return coerceStringToType((String)value, type);
 		}
