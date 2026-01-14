@@ -83,8 +83,22 @@ import org.flowable.task.service.TaskPostProcessor;
  */
 public abstract class ProcessEngineConfiguration extends AbstractBuildableEngineConfiguration<ProcessEngine> {
 
+    // Default configuration constants
+    protected static final int DEFAULT_ID_BLOCK_SIZE = 2500;
+    protected static final String DEFAULT_MAIL_SERVER_HOST = "localhost";
+    protected static final int DEFAULT_MAIL_SERVER_PORT = 25;
+    protected static final int DEFAULT_MAIL_SERVER_SSL_PORT = 465;
+    protected static final String DEFAULT_MAIL_SERVER_FROM = "flowable@localhost";
+    protected static final int DEFAULT_FAILED_JOB_WAIT_TIME = 10;
+    protected static final int DEFAULT_ASYNC_FAILED_JOB_WAIT_TIME = 10;
+    protected static final String DEFAULT_FONT_NAME = "Arial";
+    protected static final Duration DEFAULT_CLEAN_INSTANCES_ENDED_AFTER = Duration.ofDays(365);
+    protected static final int DEFAULT_CLEAN_INSTANCES_BATCH_SIZE = 100;
+    protected static final String DEFAULT_HISTORY_CLEANING_CYCLE = "0 0 1 * * ?";
+    protected static final String DEFAULT_CAMEL_CONTEXT = "camelContext";
+
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
-    protected int idBlockSize = 2500;
+    protected int idBlockSize = DEFAULT_ID_BLOCK_SIZE;
     protected String history = HistoryLevel.AUDIT.getKey();
     protected boolean asyncExecutorActivate;
     protected boolean asyncHistoryExecutorActivate;
@@ -119,9 +133,9 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
     protected boolean shutdownAsyncHistoryTaskExecutor;
 
     /** define the default wait time for a failed job in seconds */
-    protected int defaultFailedJobWaitTime = 10;
+    protected int defaultFailedJobWaitTime = DEFAULT_FAILED_JOB_WAIT_TIME;
     /** define the default wait time for a failed async job in seconds */
-    protected int asyncFailedJobWaitTime = 10;
+    protected int asyncFailedJobWaitTime = DEFAULT_ASYNC_FAILED_JOB_WAIT_TIME;
 
     /**
      * Process diagram generator. Default value is DefaultProcessDiagramGenerator
@@ -137,19 +151,19 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
      */
     protected boolean drawSequenceFlowNameWithNoLabelDI = false;
     
-    protected String defaultCamelContext = "camelContext";
+    protected String defaultCamelContext = DEFAULT_CAMEL_CONTEXT;
 
-    protected String activityFontName = "Arial";
-    protected String labelFontName = "Arial";
-    protected String annotationFontName = "Arial";
+    protected String activityFontName = DEFAULT_FONT_NAME;
+    protected String labelFontName = DEFAULT_FONT_NAME;
+    protected String annotationFontName = DEFAULT_FONT_NAME;
 
     protected boolean enableProcessDefinitionInfoCache;
 
     // History Cleanup
     protected boolean enableHistoryCleaning = false;
-    protected String historyCleaningTimeCycleConfig = "0 0 1 * * ?";
-    protected Duration cleanInstancesEndedAfter = Duration.ofDays(365);
-    protected int cleanInstancesBatchSize = 100;
+    protected String historyCleaningTimeCycleConfig = DEFAULT_HISTORY_CLEANING_CYCLE;
+    protected Duration cleanInstancesEndedAfter = DEFAULT_CLEAN_INSTANCES_ENDED_AFTER;
+    protected int cleanInstancesBatchSize = DEFAULT_CLEAN_INSTANCES_BATCH_SIZE;
     protected HistoryCleaningManager historyCleaningManager;
 
 
@@ -266,10 +280,10 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
     protected MailServerInfo getOrCreateDefaultMaiLServer() {
         if (defaultMailServer == null) {
             defaultMailServer = new MailServerInfo();
-            defaultMailServer.setMailServerHost("localhost");
-            defaultMailServer.setMailServerPort(25);
-            defaultMailServer.setMailServerSSLPort(465);
-            defaultMailServer.setMailServerDefaultFrom("flowable@localhost");
+            defaultMailServer.setMailServerHost(DEFAULT_MAIL_SERVER_HOST);
+            defaultMailServer.setMailServerPort(DEFAULT_MAIL_SERVER_PORT);
+            defaultMailServer.setMailServerSSLPort(DEFAULT_MAIL_SERVER_SSL_PORT);
+            defaultMailServer.setMailServerDefaultFrom(DEFAULT_MAIL_SERVER_FROM);
         }
         return defaultMailServer;
     }
