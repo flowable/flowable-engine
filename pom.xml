@@ -104,6 +104,11 @@
 				<artifactId>h2</artifactId>
 				<version>2.2.224 </version>
 			</dependency>
+            <dependency>
+                <groupId>cn.com.kingbase</groupId>
+                <artifactId>kingbase8</artifactId>
+                <version>9.0.1</version>
+            </dependency>
 			<!-- Logging -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
