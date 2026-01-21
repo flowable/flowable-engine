@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.payload;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
@@ -36,7 +37,10 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
     @Override
     public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, JsonNode payload) {
         return eventModel.getPayload().stream()
-            .filter(payloadDefinition -> payloadDefinition.isFullPayload() || payload.has(payloadDefinition.getName()))
+                .filter(payloadDefinition -> payloadDefinition.isFullPayload()
+                        || payload.has(payloadDefinition.getName())
+                        || (payloadDefinition.getName().startsWith("/")
+                            && !payload.at(JsonPointer.valueOf(payloadDefinition.getName())).isMissingNode()))
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(payload,
                     payloadDefinition.getName(), payloadDefinition.getType(), payloadDefinition.isFullPayload())))
             .collect(Collectors.toList());
@@ -46,8 +50,9 @@ public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtrac
         if (isFullPayload) {
             return event;
         }
-        
-        JsonNode parameterNode = event.get(definitionName);
+
+        JsonNode parameterNode = definitionName.startsWith("/")
+                ? event.at(JsonPointer.valueOf(definitionName)) : event.get(definitionName);
         Object value = null;
 
         if (EventPayloadTypes.STRING.equals(definitionType)) {
