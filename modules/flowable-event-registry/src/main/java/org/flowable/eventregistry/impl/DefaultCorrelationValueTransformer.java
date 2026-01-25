@@ -10,24 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.eventregistry.api;
+package org.flowable.eventregistry.impl;
 
-import java.util.Collection;
-
+import org.flowable.eventregistry.api.CorrelationValueTransformer;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.model.EventModel;
 
-/**
- * @author Joram Barrez
- * @author Filip Hrisafov
- */
-@FunctionalInterface
-public interface InboundEventPayloadExtractor<T> {
-
-    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload, String parentDeploymentId, String tenantId);
-
-    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
-        return extractPayload(eventModel, event.getPayload(), parentDeploymentId, tenantId);
+public class DefaultCorrelationValueTransformer implements CorrelationValueTransformer {
+    
+    public Object transformValue(EventPayloadInstance correlationParameterInstance) {
+        return correlationParameterInstance.getValue();
     }
-
+    
+    public Object transformRawValue(Object value) {
+        return value;
+    }
 }

@@ -47,10 +47,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import net.javacrumbs.jsonunit.core.Option;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
-
-import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * @author Joram Barrez
@@ -366,7 +365,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<>() {
 
             @Override
-            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer) {
+            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer, String parentDeploymentId, String tenantId) {
                 Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
                 for (EventPayload eventPayloadDefinition : eventModel.getPayload()) {
                     switch (eventPayloadDefinition.getName()) {
