@@ -373,7 +373,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<>() {
 
             @Override
-            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer) {
+            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer, String parentDeploymentId, String tenantId) {
                 Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
                 for (EventPayload eventPayloadDefinition : eventModel.getPayload()) {
                     switch (eventPayloadDefinition.getName()) {

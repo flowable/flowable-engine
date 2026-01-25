@@ -15,7 +15,13 @@ package org.flowable.eventregistry.impl.pipeline;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.eventregistry.api.EventDefinition;
+import org.flowable.eventregistry.api.EventDefinitionQuery;
+import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.FlowableEventInfo;
@@ -29,6 +35,7 @@ import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.flowable.eventregistry.api.InboundEventTransformer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.FlowableEventInfoImpl;
 import org.flowable.eventregistry.impl.runtime.EventInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
@@ -51,6 +58,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
     protected InboundEventTenantDetector<T> inboundEventTenantDetector;
     protected InboundEventPayloadExtractor<T> inboundEventPayloadExtractor;
     protected InboundEventTransformer inboundEventTransformer;
+    protected EventRegistryEngineConfiguration eventRegistryConfiguration;
 
     public DefaultInboundEventProcessingPipeline(EventRepositoryService eventRepositoryService,
             InboundEventDeserializer<T> inboundEventDeserializer,
@@ -58,7 +66,8 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
             InboundEventKeyDetector<T> inboundEventKeyDetector,
             InboundEventTenantDetector<T> inboundEventTenantDetector,
             InboundEventPayloadExtractor<T> inboundEventPayloadExtractor,
-            InboundEventTransformer inboundEventTransformer) {
+            InboundEventTransformer inboundEventTransformer,
+            EventRegistryEngineConfiguration eventRegistryConfiguration) {
         
         this.eventRepositoryService = eventRepositoryService;
         this.inboundEventDeserializer = inboundEventDeserializer;
@@ -67,6 +76,7 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         this.inboundEventTenantDetector = inboundEventTenantDetector;
         this.inboundEventPayloadExtractor = inboundEventPayloadExtractor;
         this.inboundEventTransformer = inboundEventTransformer;
+        this.eventRegistryConfiguration = eventRegistryConfiguration;
     }
 
     @Override
@@ -97,7 +107,9 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         String tenantId = AbstractEngineConfiguration.NO_TENANT_ID;
         if (inboundEventTenantDetector != null) {
             tenantId = inboundEventTenantDetector.detectTenantId(event);
-            multiTenant = true;
+            if (tenantId != null) {
+                multiTenant = true;
+            }
         }
 
         if (debugLoggingEnabled) {
@@ -105,11 +117,36 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
                     inboundChannel.getKey(), inboundEvent);
         }
 
-        EventModel eventModel = multiTenant ? eventRepositoryService.getEventModelByKey(eventKey, tenantId) : eventRepositoryService.getEventModelByKey(eventKey);
+        EventDefinitionQuery eventDefinitionQuery = eventRepositoryService.createEventDefinitionQuery().eventDefinitionKey(eventKey);
+        if (multiTenant) {
+            eventDefinitionQuery.tenantId(tenantId);
+        }
+        EventDefinition eventDefinition = eventDefinitionQuery.latestVersion().singleResult();
+        
+        if (eventDefinition == null) {
+            if (eventRegistryConfiguration.isFallbackToDefaultTenant()) {
+                String defaultTenant = eventRegistryConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, eventKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    eventDefinition = eventRepositoryService.createEventDefinitionQuery().eventDefinitionKey(eventKey).tenantId(defaultTenant).latestVersion().singleResult();
+                    
+                } else {
+                    eventDefinition = eventRepositoryService.createEventDefinitionQuery().eventDefinitionKey(eventKey).latestVersion().singleResult();
+                }
+            }
+        }
+        
+        if (eventDefinition == null) {
+            logger.error("No event model found for event key " + eventKey);
+            throw new FlowableException("No event model found for event key " + eventKey);
+        }
+        
+        EventDeployment eventDeployment = eventRepositoryService.createDeploymentQuery().deploymentId(eventDefinition.getDeploymentId()).singleResult();
+        
+        EventModel eventModel = eventRepositoryService.getEventModelById(eventDefinition.getId());
         
         EventInstanceImpl eventInstance = new EventInstanceImpl(
             eventModel.getKey(),
-            extractPayload(eventModel, event),
+            extractPayload(eventModel, event, eventDeployment.getParentDeploymentId(), tenantId),
             tenantId
         );
 
@@ -135,8 +172,8 @@ public class DefaultInboundEventProcessingPipeline<T> implements InboundEventPro
         return inboundEventKeyDetector.detectEventDefinitionKey(event);
     }
 
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<T> event) {
-        return inboundEventPayloadExtractor.extractPayload(eventDefinition, event);
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventDefinition, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
+        return inboundEventPayloadExtractor.extractPayload(eventDefinition, event, parentDeploymentId, tenantId);
     }
 
     public Collection<EventRegistryEvent> transform(EventInstance eventInstance) {

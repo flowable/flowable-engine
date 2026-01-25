@@ -78,6 +78,8 @@ public class JuelExpression implements Expression {
 
         try {
             resolveSetValueExpression(value, elContext);
+        } catch (FlowableException ex) {
+            throw ex;
         } catch (Exception e) {
             throw new FlowableException("Error while evaluating expression: " + expressionText + " with " + variableContainer, e);
         } finally {

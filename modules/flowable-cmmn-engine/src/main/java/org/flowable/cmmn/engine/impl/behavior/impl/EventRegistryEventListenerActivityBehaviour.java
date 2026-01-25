@@ -41,6 +41,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -161,20 +162,23 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             if (!eventCorrelations.isEmpty()) {
                 CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                 ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
-
+                
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
+                
                 Map<String, Object> correlationParameters = new HashMap<>();
                 for (ExtensionElement eventCorrelation : eventCorrelations) {
                     String name = eventCorrelation.getAttributeValue(null, "name");
                     String valueExpression = eventCorrelation.getAttributeValue(null, "value");
                     if (StringUtils.isNotEmpty(valueExpression)) {
                         Object value = expressionManager.createExpression(valueExpression).getValue(planItemInstanceEntity);
-                        correlationParameters.put(name, value);
+                        correlationParameters.put(name, eventRegistryEngineConfiguration.getCorrelationValueTransformer().transformRawValue(value));
                     } else {
                         correlationParameters.put(name, null);
                     }
                 }
 
-                correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
+                correlationKey = CommandContextUtil.getEventRegistry(commandContext).generateKey(correlationParameters);
+                
             } else {
                 correlationKey = null;
             }

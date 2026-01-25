@@ -46,12 +46,12 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
  */
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventConsumer {
 
-    protected AbstractEngineConfiguration engingeConfiguration;
+    protected AbstractEngineConfiguration engineConfiguration;
     protected CommandExecutor commandExecutor;
 
-    public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engingeConfiguration) {
-        this.engingeConfiguration = engingeConfiguration;
-        this.commandExecutor = engingeConfiguration.getCommandExecutor();
+    public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
+        this.commandExecutor = engineConfiguration.getCommandExecutor();
     }
 
     @Override
@@ -132,17 +132,12 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
     protected String generateCorrelationKey(Collection<EventPayloadInstance> correlationParameterInstances) {
         Map<String, Object> data = new HashMap<>();
+        EventRegistryEngineConfiguration eventRegistryConfiguration = getEventRegistryEngineConfiguration();
         for (EventPayloadInstance correlationParameterInstance : correlationParameterInstances) {
-            data.put(correlationParameterInstance.getDefinitionName(), correlationParameterInstance.getValue());
+            data.put(correlationParameterInstance.getDefinitionName(), eventRegistryConfiguration.getCorrelationValueTransformer().transformValue(correlationParameterInstance));
         }
 
         return getEventRegistry().generateKey(data);
-    }
-
-    protected EventRegistry getEventRegistry() {
-        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) 
-                        engingeConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        return eventRegistryEngineConfiguration.getEventRegistry();
     }
 
     protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys, EventInstance eventInstance) {
@@ -280,6 +275,14 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
         } else {
             return null;
         }
+    }
+    
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+    
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
     }
 
     public abstract String findDefinitionKeyById(String definitionId);

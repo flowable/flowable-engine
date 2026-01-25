@@ -15,7 +15,6 @@ package org.flowable.eventregistry.impl.pipeline;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -135,7 +134,8 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
         InboundEventTenantDetector<JsonNode> eventTenantDetector = null; // By default no multi-tenancy is applied
 
-        InboundEventPayloadExtractor<JsonNode> eventPayloadExtractor = createInboundEventPayloadExtractor(channelModel, JsonFieldToMapPayloadExtractor::new);
+        JsonFieldToMapPayloadExtractor jsonFieldToMapPayloadExtractor = new JsonFieldToMapPayloadExtractor(engineConfiguration.getJsonPayloadValueTransformer());
+        InboundEventPayloadExtractor<JsonNode> eventPayloadExtractor = createInboundEventPayloadExtractor(channelModel, jsonFieldToMapPayloadExtractor);
 
         InboundEventTransformer eventTransformer;
         if (StringUtils.isEmpty(channelModel.getEventTransformerDelegateExpression())) {
@@ -183,7 +183,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         }
 
         return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer, eventFilter,
-                eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+                eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer, engineConfiguration);
     }
 
     protected InboundEventProcessingPipeline createXmlEventProcessingPipeline(InboundChannelModel channelModel, 
@@ -205,7 +205,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
         InboundEventTenantDetector<Document> eventTenantDetector = null; // By default no multi-tenancy is applied
 
-        InboundEventPayloadExtractor<Document> eventPayloadExtractor = createInboundEventPayloadExtractor(channelModel, XmlElementsToMapPayloadExtractor::new);
+        InboundEventPayloadExtractor<Document> eventPayloadExtractor = createInboundEventPayloadExtractor(channelModel, new XmlElementsToMapPayloadExtractor());
 
         InboundEventTransformer eventTransformer;
         if (StringUtils.isEmpty(channelModel.getEventTransformerDelegateExpression())) {
@@ -251,14 +251,15 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         }
 
         return new DefaultInboundEventProcessingPipeline<>(eventRepositoryService, eventDeserializer, eventFilter,
-            eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+            eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer, engineConfiguration);
     }
 
     protected <T> InboundEventPayloadExtractor<T> createInboundEventPayloadExtractor(InboundChannelModel channelModel,
-            Supplier<InboundEventPayloadExtractor<T>> payloadExtractorProvider) {
+            InboundEventPayloadExtractor<T> payloadExtractorProvider) {
+        
         InboundEventPayloadExtractor<T> modelEventPayloadExtractor;
         if (StringUtils.isEmpty(channelModel.getPayloadExtractorDelegateExpression())) {
-            modelEventPayloadExtractor = payloadExtractorProvider.get();
+            modelEventPayloadExtractor = payloadExtractorProvider;
         } else {
             //noinspection unchecked
             modelEventPayloadExtractor = resolveExpression(channelModel.getPayloadExtractorDelegateExpression(), InboundEventPayloadExtractor.class);
@@ -361,7 +362,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
 
         //noinspection unchecked
         return new DefaultInboundEventProcessingPipeline(eventRepositoryService, eventDeserializer, eventFilter,
-            eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer);
+            eventKeyDetector, eventTenantDetector, eventPayloadExtractor, eventTransformer, engineConfiguration);
     }
 
     protected <T> T resolveExpression(String expression, Class<T> type) {
