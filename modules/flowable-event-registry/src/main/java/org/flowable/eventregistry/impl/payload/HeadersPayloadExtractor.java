@@ -30,7 +30,7 @@ import org.flowable.eventregistry.model.EventPayload;
 public class HeadersPayloadExtractor<T> implements InboundEventInfoAwarePayloadExtractor<T> {
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
         Collection<EventPayload> headers = eventModel.getHeaders();
         if (headers.isEmpty()) {
             return Collections.emptyList();

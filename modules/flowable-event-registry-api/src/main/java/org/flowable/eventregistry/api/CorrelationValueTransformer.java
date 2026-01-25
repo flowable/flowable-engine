@@ -12,23 +12,11 @@
  */
 package org.flowable.eventregistry.api;
 
-import java.util.Collection;
-
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.eventregistry.model.EventModel;
 
-/**
- * @author Filip Hrisafov
- */
-@FunctionalInterface
-public interface InboundEventInfoAwarePayloadExtractor<T> extends InboundEventPayloadExtractor<T> {
+public interface CorrelationValueTransformer {
 
-    @Override
-    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload, String parentDeploymentId, String tenantId) {
-        throw new UnsupportedOperationException("Payload extraction should never call this ");
-    }
-
-    @Override
-    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId);
-
+    Object transformValue(EventPayloadInstance correlationParameterInstance);
+    
+    Object transformRawValue(Object value);
 }
