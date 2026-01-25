@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
@@ -33,6 +34,7 @@ public class EventJsonConverterTest {
 
     private static final String JSON_RESOURCE_1 = "org/flowable/eventregistry/converter/simpleEvent.json";
     private static final String JSON_RESOURCE_2 = "org/flowable/eventregistry/converter/simpleEventCorrelationPayload.json";
+    private static final String JSON_RESOURCE_3 = "org/flowable/eventregistry/converter/simpleEventWithExtensionProperties.json";
 
     protected EventJsonConverter converter = new EventJsonConverter();
 
@@ -60,6 +62,50 @@ public class EventJsonConverterTest {
         EventModel eventModel = readJson(JSON_RESOURCE_2);
         EventModel parsedEventModel = exportAndReadModel(eventModel);
         validateSimpleEventModel(parsedEventModel);
+    }
+    
+    @Test
+    public void testExtensionProperties() {
+        EventModel eventModel = readJson(JSON_RESOURCE_3);
+        EventModel parsedEventModel = exportAndReadModel(eventModel);
+        
+        assertThat(parsedEventModel.getCorrelationParameters()).hasSize(1);
+        EventPayload correlationPayloadProperty = parsedEventModel.getCorrelationParameters().iterator().next();
+        assertThat(correlationPayloadProperty.getName()).isEqualTo("customerId");
+        assertThat(correlationPayloadProperty.getType()).isEqualTo("string");
+        assertThat(correlationPayloadProperty.getExtensionProperties()).hasSize(2);
+        
+        assertThat(correlationPayloadProperty.getExtensionProperties().get("prop1")).isEqualTo("test1");
+        assertThat(correlationPayloadProperty.getExtensionProperties().get("prop2")).isEqualTo("num2");
+
+        assertThat(parsedEventModel.getPayload())
+            .extracting(EventPayload::getName, EventPayload::getType)
+            .containsExactly(
+                    tuple("payload1", "string"),
+                    tuple("payload2", "integer"),
+                    tuple("customerId", "string")
+            );
+        
+        Iterator<EventPayload> itPayload = parsedEventModel.getPayload().iterator();
+        EventPayload payloadItem = itPayload.next();
+        assertThat(payloadItem.getName()).isEqualTo("payload1");
+        assertThat(payloadItem.getExtensionProperties()).hasSize(2);
+        
+        assertThat(payloadItem.getExtensionProperties().get("payload1Prop1")).isEqualTo("test3");
+        assertThat(payloadItem.getExtensionProperties().get("payload1Prop2")).isEqualTo("num4");
+        
+        payloadItem = itPayload.next();
+        assertThat(payloadItem.getName()).isEqualTo("payload2");
+        assertThat(payloadItem.getExtensionProperties()).hasSize(1);
+        
+        assertThat(payloadItem.getExtensionProperties().get("payload2Prop1")).isEqualTo("test5");
+        
+        payloadItem = itPayload.next();
+        assertThat(payloadItem.getName()).isEqualTo("customerId");
+        assertThat(payloadItem.getExtensionProperties()).hasSize(2);
+        
+        assertThat(payloadItem.getExtensionProperties().get("prop1")).isEqualTo("test1");
+        assertThat(payloadItem.getExtensionProperties().get("prop2")).isEqualTo("num2");
     }
 
     protected void validateSimpleEventModel(EventModel eventModel) {

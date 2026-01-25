@@ -16,12 +16,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
-import org.flowable.eventregistry.api.model.EventPayloadTypes;
+import org.flowable.eventregistry.api.JsonPayloadValueTransformer;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.runtime.EventPayloadInstanceImpl;
 import org.flowable.eventregistry.model.EventModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.flowable.eventregistry.model.EventPayload;
 
 import tools.jackson.databind.JsonNode;
 
@@ -31,50 +30,27 @@ import tools.jackson.databind.JsonNode;
  */
 public class JsonFieldToMapPayloadExtractor implements InboundEventPayloadExtractor<JsonNode> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JsonFieldToMapPayloadExtractor.class);
+    protected JsonPayloadValueTransformer payloadValueTransformer;
+    
+    public JsonFieldToMapPayloadExtractor(JsonPayloadValueTransformer payloadValueTransformer) {
+        this.payloadValueTransformer = payloadValueTransformer;
+    }
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, JsonNode payload) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, JsonNode payload, String parentDeploymentId, String tenantId) {
         return eventModel.getPayload().stream()
             .filter(payloadDefinition -> payloadDefinition.isFullPayload() || payload.has(payloadDefinition.getName()))
-            .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(payload,
-                    payloadDefinition.getName(), payloadDefinition.getType(), payloadDefinition.isFullPayload())))
+            .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(payload, payloadDefinition, parentDeploymentId, tenantId)))
             .collect(Collectors.toList());
     }
 
-    protected Object getPayloadValue(JsonNode event, String definitionName, String definitionType, boolean isFullPayload) {
-        if (isFullPayload) {
+    protected Object getPayloadValue(JsonNode event, EventPayload eventPayload, String parentDeploymentId, String tenantId) {
+        if (eventPayload.isFullPayload()) {
             return event;
         }
         
-        JsonNode parameterNode = event.get(definitionName);
-        Object value = null;
-
-        if (EventPayloadTypes.STRING.equals(definitionType)) {
-            value = parameterNode.asString();
-
-        } else if (EventPayloadTypes.BOOLEAN.equals(definitionType)) {
-            value = parameterNode.booleanValue(false);
-
-        } else if (EventPayloadTypes.INTEGER.equals(definitionType)) {
-            value = parameterNode.intValue(0);
-
-        } else if (EventPayloadTypes.DOUBLE.equals(definitionType)) {
-            value = parameterNode.doubleValue(0.0d);
-
-        } else if (EventPayloadTypes.LONG.equals(definitionType)) {
-          value = parameterNode.longValue(0L);
-
-        } else if (EventPayloadTypes.JSON.equals(definitionType)) {
-            value = parameterNode;
-
-        } else {
-            LOGGER.warn("Unsupported payload type: {} ", definitionType);
-            value = parameterNode.asString();
-
-        }
-
-        return value;
+        JsonNode parameterNode = event.get(eventPayload.getName());
+        return payloadValueTransformer.transformValue(parameterNode, eventPayload.getType(), eventPayload, parentDeploymentId, tenantId);
     }
 
 }

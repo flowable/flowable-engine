@@ -13,6 +13,8 @@
 package org.flowable.eventregistry.json.converter;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.flowable.eventregistry.model.EventModel;
@@ -63,6 +65,8 @@ public class EventJsonConverter {
                         payload.setHeader(node.path("header").asBoolean(false));
                         payload.setMetaParameter(node.path("metaParameter").asBoolean(false));
                     }
+                    
+                    processExtensionProperties(node, payload);
 
                     eventModel.addPayload(payload);
                 }
@@ -73,7 +77,9 @@ public class EventJsonConverter {
                 for (JsonNode correlationPayloadNode : correlationParameters) {
                     String name = correlationPayloadNode.path("name").stringValue(null);
                     String type = correlationPayloadNode.path("type").stringValue(null);
-                    eventModel.addCorrelation(name, type);
+                    EventPayload payload = eventModel.addCorrelation(name, type);
+                    
+                    processExtensionProperties(correlationPayloadNode, payload);
                 }
             }
 
@@ -124,6 +130,13 @@ public class EventJsonConverter {
                 if (eventPayload.isMetaParameter()) {
                     eventPayloadNode.put("metaParameter", true);
                 }
+                
+                if (eventPayload.getExtensionProperties() != null && !eventPayload.getExtensionProperties().isEmpty()) {
+                    ObjectNode extensionPropNode = eventPayloadNode.putObject("extensionProperties");
+                    for (String propName : eventPayload.getExtensionProperties().keySet()) {
+                        extensionPropNode.put(propName, eventPayload.getExtensionProperties().get(propName));
+                    }
+                }
             }
         }
 
@@ -131,6 +144,18 @@ public class EventJsonConverter {
             return objectMapper.writeValueAsString(modelNode);
         } catch (Exception e) {
             throw new FlowableEventJsonException("Error writing event json", e);
+        }
+    }
+    
+    protected void processExtensionProperties(JsonNode node, EventPayload payload) {
+        JsonNode extensionNodes = node.path("extensionProperties");
+        if (extensionNodes != null && !extensionNodes.isMissingNode()) {
+            Map<String, String> extensionPropertyMap = new HashMap<>();
+            for (String extensionName : extensionNodes.propertyNames()) {
+                extensionPropertyMap.put(extensionName, extensionNodes.get(extensionName).asString());
+            }
+            
+            payload.setExtensionProperties(extensionPropertyMap);
         }
     }
 }
