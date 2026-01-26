@@ -337,4 +337,11 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
+    @Deployment
+    public void testTwoBoundaryEventAndFirstIsCompensation() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+        assertThat(processInstance).isNotNull();
+    }
+
 }
