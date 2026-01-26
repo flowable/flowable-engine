@@ -35,6 +35,7 @@ import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
@@ -704,6 +705,86 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityCompletionConditionException.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
+    public void testCallActivityWithCompletionConditionException() {
+        testCallActivityWithCompletionConditionExceptionRealExecutor();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncCompleteCompletionConditionException.bpmn20.xml",
+            "org/flowable/engine/test/api/event/CallActivityTest.testCallActivityAsyncComplete_subprocess.bpmn20.xml"
+    })
+    @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
+    public void testCallActivityAsyncCompleteWithCompletionConditionException() {
+        testCallActivityWithCompletionConditionExceptionRealExecutor();
+    }
+
+    private void testCallActivityWithCompletionConditionExceptionRealExecutor() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testCompletionConditionException");
+        waitForJobExecutorOnCondition(20000L, 200L, () -> numberOfDeadLetterJobsWithException() == 3);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(4);
+
+        verifyFailingSubProcesses(processInstance);
+
+        // fix context
+        Execution multiInstanceRootExecution = runtimeService.createExecutionQuery()
+                .rootProcessInstanceId(processInstance.getId())
+                .variableExists("nrOfCompletedInstances")
+                .singleResult();
+        runtimeService.setVariableLocal(multiInstanceRootExecution.getId(), "approved", false);
+
+        // and retry
+        if ((Integer) runtimeService.getVariable(multiInstanceRootExecution.getId(), "nrOfCompletedInstances") > 0) {
+            // When flowable:completeAsync="true" the nrOfCompletedInstances is increased in case of failure too.
+            // We have to reset the nrOfCompletedInstances to 0, so that all jobs created from moveDeadLetterJobToExecutableJob are executed.
+            // Without this reset the process gets completed during the execution of the first job.
+            // The remaining activities are not executed. One test fails because of missing end time on the historic activities.
+            // This behavior can be observed independent of our fix.
+            // It was introduced by commit 65f81864904a2aa565adfa2a350a459d3bb0a893 Improve parallel multi instance leave to avoid optimistic locking exceptions
+            runtimeService.setVariableLocal(multiInstanceRootExecution.getId(), "nrOfCompletedInstances", 0);
+        }
+        List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().withException().list();
+        deadLetterJobs.forEach(job -> managementService.moveDeadLetterJobToExecutableJob(job.getId(), 2));
+
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
+        assertThat(managementService.createDeadLetterJobQuery().withException().count()).isZero();
+    }
+
+    private long numberOfDeadLetterJobsWithException() {
+        return managementService.createDeadLetterJobQuery().withException().count();
+    }
+
+    private void verifyFailingSubProcesses(ProcessInstance processInstance) {
+        assertThat(processInstance.isSuspended()).isFalse();
+
+        List<Job> deadLetterJobs = managementService.createDeadLetterJobQuery().withException().list();
+        List<Execution> subProcessExecutions = runtimeService.createExecutionQuery()
+                .rootProcessInstanceId(processInstance.getId())
+                .onlySubProcessExecutions()
+                .list();
+        assertThat(deadLetterJobs.size()).isEqualTo(subProcessExecutions.size());
+
+        List<String> subProcessInstanceIds = subProcessExecutions.stream().map(Execution::getProcessInstanceId).collect(Collectors.toList());
+
+        deadLetterJobs.forEach(job -> {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(job.getProcessDefinitionId())
+                    .singleResult();
+            assertThat(processDefinition.getKey()).isEqualTo("subProcess");
+
+            assertThat(job.getProcessInstanceId()).isNotEqualTo(processInstance.getId());
+            assertThat(job.getProcessInstanceId()).isIn(subProcessInstanceIds);
+
+            Execution subProcessChildExecution = runtimeService.createExecutionQuery().executionId(job.getExecutionId()).singleResult();
+            assertThat(subProcessChildExecution.getProcessInstanceId()).isIn(subProcessInstanceIds);
+        });
     }
 
     @Test
