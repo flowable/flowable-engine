@@ -8,13 +8,13 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>7.3.0.23</version>
+	<version>7.3.0.24</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
 		<jdk.version>17</jdk.version>
 		<!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
-		<spring.boot.version>3.5.9</spring.boot.version>
+		<spring.boot.version>3.5.10</spring.boot.version>
 		<spring.framework.version>6.2.15</spring.framework.version>
 		<spring.security.version>6.5.7</spring.security.version>
 		<spring.amqp.version>3.2.8</spring.amqp.version>
