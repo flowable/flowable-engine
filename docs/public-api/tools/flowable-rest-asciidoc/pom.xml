@@ -10,7 +10,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-parent</artifactId>
         <relativePath>../../../../modules/flowable-parent</relativePath>
-        <version>8.0.0.7</version>
+        <version>8.0.0.8</version>
     </parent>
 
 
