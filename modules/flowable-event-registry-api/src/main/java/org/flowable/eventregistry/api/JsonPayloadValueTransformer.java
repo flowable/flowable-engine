@@ -14,7 +14,7 @@ package org.flowable.eventregistry.api;
 
 import org.flowable.eventregistry.model.EventPayload;
 
-import tools.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface JsonPayloadValueTransformer {
 
