@@ -87,6 +87,8 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_FORM_DEFINITIONS = "form-definitions";
     public static final String SEGMENT_STAGE_OVERVIEW = "stage-overview";
     public static final String SEGMENT_CHANGE_STATE = "change-state";
+    public static final String SEGMENT_MIGRATE = "migrate";
+    public static final String SEGMENT_VALIDATE_MIGRATION = "validate-migration";
 
     /**
      * URL template for the deployment collection: <i>cmmn-repository/deployments</i>
@@ -273,6 +275,16 @@ public final class CmmnRestUrls {
      * URL template for a single case instance change state: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/change-state</i>
      */
     public static final String[] URL_CASE_INSTANCE_CHANGE_STATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_CHANGE_STATE};
+    
+    /**
+     * URL template for a single case instance migration: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/migrate</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_MIGRATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_MIGRATE};
+    
+    /**
+     * URL template for a validate case instance migration: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/validate-migration</i>
+     */
+    public static final String[] URL_CASE_INSTANCE_VALIDATE_MIGRATION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_VALIDATE_MIGRATION};
 
     /**
      * URL template for a case instance's identity links: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/identitylinks</i>

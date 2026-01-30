@@ -29,6 +29,7 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
@@ -1091,7 +1092,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .hasMessageContainingAll("name: Task 1", "definitionId: humanTask1", "state: active", "elementId: planItem1",
                         "caseInstanceId: " + caseInstance.getId(),
                         "caseDefinitionId: " + destinationDefinition.getId());
-
+        
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
                 .addChangePlanItemIdWithDefinitionIdMapping(new ChangePlanItemIdWithDefinitionIdMapping("humanTask1", "humanTask1"))

@@ -21,6 +21,8 @@ public interface CaseInstanceMigrationDocumentConstants {
     String TO_CASE_DEFINITION_KEY_JSON_PROPERTY = "toCaseDefinitionKey";
     String TO_CASE_DEFINITION_VERSION_JSON_PROPERTY = "toCaseDefinitionVersion";
     String TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY = "toCaseDefinitionTenantId";
+    String ENABLE_AUTOMATIC_PLAN_ITEM_INSTANCE_CREATION_JSON_PROPERTY = "enableAutomaticPlanItemInstanceCreation";
+    
 
     String PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY = "planItemDefinitionId";
     String EXISTING_PLAN_ITEM_ID_JSON_PROPERTY = "existingPlanItemId";
