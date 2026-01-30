@@ -22,6 +22,7 @@ import org.flowable.engine.impl.dynamic.DynamicEmbeddedSubProcessBuilder;
 import org.flowable.engine.impl.dynamic.DynamicUserTaskBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
+import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -212,6 +213,30 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
         migrationService.migrateProcessInstance(processInstanceId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Validate process instance migration", tags = { "Process Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and migration was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
+    })
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/validate-migration", produces = "application/json")
+    public ProcessInstanceMigrationValidationResponse validateProcessInstanceMigration(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
+            @RequestBody String migrationDocumentJson) {
+        
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateProcessInstance(processInstance, migrationDocumentJson);
+        }
+
+        ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        ProcessInstanceMigrationValidationResult validationResult = migrationService.validateMigrationForProcessInstance(processInstanceId, migrationDocument);
+        
+        ProcessInstanceMigrationValidationResponse validationResponse = new ProcessInstanceMigrationValidationResponse();
+        validationResponse.setValidationMessages(validationResult.getValidationMessages());
+        
+        return validationResponse;
     }
     
     @ApiOperation(value = "Inject activity in a process instance", tags = { "Process Instances" },

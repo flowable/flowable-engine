@@ -26,6 +26,8 @@ public interface CaseInstanceMigrationDocumentBuilder {
     CaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionKey, Integer caseDefinitionVersion);
 
     CaseInstanceMigrationDocumentBuilder setTenantId(String caseDefinitionTenantId);
+    
+    CaseInstanceMigrationDocumentBuilder setEnableAutomaticPlanItemInstanceCreation(Boolean automaticValue);
 
     CaseInstanceMigrationDocumentBuilder addActivatePlanItemDefinitionMappings(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings);
 

@@ -38,6 +38,7 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     protected String migrateToCaseDefinitionKey;
     protected Integer migrateToCaseDefinitionVersion;
     protected String migrateToCaseDefinitionTenantId;
+    protected Boolean enableAutomaticPlanItemInstanceCreation;
     protected List<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<MoveToAvailablePlanItemDefinitionMapping> moveToAvailablePlanItemDefinitionMappings = new ArrayList<>();
@@ -66,6 +67,13 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     @Override
     public CaseInstanceMigrationDocumentBuilder setTenantId(String caseDefinitionTenantId) {
         this.migrateToCaseDefinitionTenantId = caseDefinitionTenantId;
+        return this;
+    }
+    
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder setEnableAutomaticPlanItemInstanceCreation(Boolean automaticValue) {
+        this.enableAutomaticPlanItemInstanceCreation = automaticValue;
         return this;
     }
 
@@ -194,6 +202,7 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
         CaseInstanceMigrationDocumentImpl caseInstanceMigrationDocument = new CaseInstanceMigrationDocumentImpl();
         caseInstanceMigrationDocument.setMigrateToCaseDefinitionId(this.migrateToCaseDefinitionId);
         caseInstanceMigrationDocument.setMigrateToCaseDefinition(this.migrateToCaseDefinitionKey, this.migrateToCaseDefinitionVersion, this.migrateToCaseDefinitionTenantId);
+        caseInstanceMigrationDocument.setEnableAutomaticPlanItemInstanceCreation(this.enableAutomaticPlanItemInstanceCreation);
         caseInstanceMigrationDocument.setActivatePlanItemDefinitionMappings(this.activatePlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setTerminatePlanItemDefinitionMappings(this.terminatePlanItemDefinitionMappings);
         caseInstanceMigrationDocument.setMoveToAvailablePlanItemDefinitionMappings(this.moveToAvailablePlanItemDefinitionMappings);

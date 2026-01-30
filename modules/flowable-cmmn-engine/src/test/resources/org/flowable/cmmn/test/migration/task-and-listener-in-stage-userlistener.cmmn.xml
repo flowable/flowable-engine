@@ -20,7 +20,7 @@
       <userEventListener id="userEventListener1" />
     
       <stage id="expandedStage1">
-         <planItem id="planItem2" name="Cancel case" definitionRef="userEventListener2">
+          <planItem id="planItem2" name="Cancel case" definitionRef="userEventListener2">
             <itemControl>
               <extensionElements>
                 <flowable:completionNeutralRule></flowable:completionNeutralRule>

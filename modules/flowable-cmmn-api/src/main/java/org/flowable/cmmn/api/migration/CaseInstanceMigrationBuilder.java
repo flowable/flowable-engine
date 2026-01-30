@@ -60,6 +60,13 @@ public interface CaseInstanceMigrationBuilder {
      * @see org.flowable.cmmn.api.repository.CaseDefinition
      */
     CaseInstanceMigrationBuilder migrateToCaseDefinition(String caseDefinitionKey, int caseDefinitionVersion, String caseDefinitionTenantId);
+    
+    /**
+     * Enable the automatic creation of plan item instances for new plan item definitions
+     *
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder enableAutomaticPlanItemInstanceCreation();
 
     /**
      * Specifies the tenantId of the case definition to migrate to

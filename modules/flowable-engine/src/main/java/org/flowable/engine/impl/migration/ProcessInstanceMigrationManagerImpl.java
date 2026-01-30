@@ -183,7 +183,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         List<ExecutionEntity> activeMainProcessExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(processInstanceId);
 
-        //For each "running" active activity of the processInstance, check that there's a mapping defined or if it can be found in the new definition (auto-mapped by activity id)
+        // For each "running" active activity of the processInstance, check that there's a mapping defined or if it can be found in the new definition (auto-mapped by activity id)
         List<ExecutionEntity> mappableMainProcessExecutions = activeMainProcessExecutions.stream()
             .filter(executionHasCurrentActivityId)
             .filter(isActiveExecution)
