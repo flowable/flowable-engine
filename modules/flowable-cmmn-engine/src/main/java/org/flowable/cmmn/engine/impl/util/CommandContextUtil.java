@@ -319,8 +319,12 @@ public class CommandContextUtil {
     }
     
     public static EventRegistry getEventRegistry() {
+        return getEventRegistry(getCommandContext());
+    }
+    
+    public static EventRegistry getEventRegistry(CommandContext commandContext) {
         EventRegistry eventRegistry = null;
-        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration();
+        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = getEventRegistryEngineConfiguration(commandContext);
         if (eventRegistryEngineConfiguration != null) {
             eventRegistry = eventRegistryEngineConfiguration.getEventRegistry();
         }

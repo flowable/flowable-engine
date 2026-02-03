@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
@@ -249,5 +250,29 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
         CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
         cmmnMigrationService.migrateCaseInstance(caseInstanceId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Validate case instance migration", tags = { "Case Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and migration was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested case instance action cannot be executed since the case instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
+    })
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/validate-migration", produces = "application/json")
+    public CaseInstanceMigrationValidationResponse validateCaseInstanceMigration(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateCaseInstance(caseInstance, migrationDocumentJson);
+        }
+
+        CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        CaseInstanceMigrationValidationResult validationResult = cmmnMigrationService.validateMigrationForCaseInstance(caseInstanceId, migrationDocument);
+        
+        CaseInstanceMigrationValidationResponse validationResponse = new CaseInstanceMigrationValidationResponse();
+        validationResponse.setValidationMessages(validationResult.getValidationMessages());
+        
+        return validationResponse;
     }
 }

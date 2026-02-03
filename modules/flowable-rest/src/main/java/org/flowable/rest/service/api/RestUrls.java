@@ -91,6 +91,8 @@ public final class RestUrls {
     public static final String SEGMENT_SOURCE_EXTRA = "source-extra";
     public static final String SEGMENT_DIAGRAM = "diagram";
     public static final String SEGMENT_CHANGE_STATE = "change-state";
+    public static final String SEGMENT_MIGRATE = "migrate";
+    public static final String SEGMENT_VALIDATE_MIGRATION = "validate-migration";
     public static final String SEGMENT_SIGNALS = "signals";
     public static final String SEGMENT_IMAGE = "image";
     public static final String SEGMENT_START_FORM = "start-form";
@@ -347,6 +349,16 @@ public final class RestUrls {
      * URL template for changing the activity state for a process instance: <i>runtime/process-instances/{0:processInstanceId}/change-state</i>
      */
     public static final String[] URL_PROCESS_INSTANCE_CHANGE_STATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_CHANGE_STATE};
+    
+    /**
+     * URL template for migrating a process instance: <i>runtime/process-instances/{0:processInstanceId}/migrate</i>
+     */
+    public static final String[] URL_PROCESS_INSTANCE_MIGRATE = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_MIGRATE};
+    
+    /**
+     * URL template for validating the migration of a process instance: <i>runtime/process-instances/{0:processInstanceId}/migrate</i>
+     */
+    public static final String[] URL_PROCESS_INSTANCE_VALIDATE_MIGRATION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_PROCESS_INSTANCE_RESOURCE, "{0}", SEGMENT_VALIDATE_MIGRATION};
 
     /**
      * URL template for the diagram for a single process instance: <i>runtime/process-instances/{0:processInstanceId}/diagram</i>

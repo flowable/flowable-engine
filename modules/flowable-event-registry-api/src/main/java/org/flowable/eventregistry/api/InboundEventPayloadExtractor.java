@@ -24,10 +24,10 @@ import org.flowable.eventregistry.model.EventModel;
 @FunctionalInterface
 public interface InboundEventPayloadExtractor<T> {
 
-    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload);
+    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload, String parentDeploymentId, String tenantId);
 
-    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event) {
-        return extractPayload(eventModel, event.getPayload());
+    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
+        return extractPayload(eventModel, event.getPayload(), parentDeploymentId, tenantId);
     }
 
 }

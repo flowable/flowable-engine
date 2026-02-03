@@ -37,6 +37,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.CorrelationValueTransformer;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
@@ -45,6 +46,7 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessor;
+import org.flowable.eventregistry.api.JsonPayloadValueTransformer;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
@@ -157,6 +159,8 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
 
     protected Map<String, InboundEventPayloadExtractor<?>> inboundEventPayloadExtractorsByChannelType;
     protected InboundEventPayloadExtractor<?> defaultInboundEventPayloadExtractor;
+    protected JsonPayloadValueTransformer jsonPayloadValueTransformer;
+    protected CorrelationValueTransformer correlationValueTransformer;
     
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
@@ -252,6 +256,8 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
         initDataManagers();
         initEntityManagers();
         initEventRegistry();
+        initPayloadValueTransformer();
+        initCorrelationValueTransformer();
         initInboundEventProcessor();
         initOutboundEventProcessor();
         initSystemOutboundEventProcessor();
@@ -507,6 +513,18 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
             this.eventRegistry = new DefaultEventRegistry(this);
         }
     }
+    
+    public void initPayloadValueTransformer() {
+        if (this.jsonPayloadValueTransformer == null) {
+            this.jsonPayloadValueTransformer = new DefaultJsonPayloadValueTransformer();
+        }
+    }
+    
+    public void initCorrelationValueTransformer() {
+        if (this.correlationValueTransformer == null) {
+            this.correlationValueTransformer = new DefaultCorrelationValueTransformer();
+        }
+    }
 
     public void initInboundEventProcessor() {
         if (this.inboundEventProcessor == null) {
@@ -632,6 +650,24 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
 
     public EventRegistryEngineConfiguration setEventRegistry(EventRegistry eventRegistry) {
         this.eventRegistry = eventRegistry;
+        return this;
+    }
+
+    public JsonPayloadValueTransformer getJsonPayloadValueTransformer() {
+        return jsonPayloadValueTransformer;
+    }
+
+    public EventRegistryEngineConfiguration setJsonPayloadValueTransformer(JsonPayloadValueTransformer jsonPayloadValueTransformer) {
+        this.jsonPayloadValueTransformer = jsonPayloadValueTransformer;
+        return this;
+    }
+
+    public CorrelationValueTransformer getCorrelationValueTransformer() {
+        return correlationValueTransformer;
+    }
+
+    public EventRegistryEngineConfiguration setCorrelationValueTransformer(CorrelationValueTransformer correlationValueTransformer) {
+        this.correlationValueTransformer = correlationValueTransformer;
         return this;
     }
 

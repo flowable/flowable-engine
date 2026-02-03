@@ -23,6 +23,7 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 
 public class CorrelationUtil {
 
@@ -37,6 +38,8 @@ public class CorrelationUtil {
             if (eventCorrelations != null && !eventCorrelations.isEmpty()) {
                 ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
                 ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+                
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
 
                 Map<String, Object> correlationParameters = new HashMap<>();
                 for (ExtensionElement eventCorrelation : eventCorrelations) {
@@ -45,7 +48,8 @@ public class CorrelationUtil {
                     if (StringUtils.isNotEmpty(valueExpression)) {
                         if (executionEntity != null) {
                             Object value = expressionManager.createExpression(valueExpression).getValue(executionEntity);
-                            correlationParameters.put(name, value);
+                            correlationParameters.put(name, eventRegistryEngineConfiguration.getCorrelationValueTransformer().transformRawValue(value));
+                            
                         } else {
                             correlationParameters.put(name, valueExpression);
                         }
@@ -55,7 +59,7 @@ public class CorrelationUtil {
                     }
                 }
 
-                correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
+                correlationKey = CommandContextUtil.getEventRegistry(commandContext).generateKey(correlationParameters);
             }
         }
         

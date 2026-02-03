@@ -65,6 +65,10 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         if (caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId() != null) {
             documentNode.put(TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY, caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId());
         }
+        
+        if (caseInstanceMigrationDocument.getEnableAutomaticPlanItemInstanceCreation() != null) {
+            documentNode.put(ENABLE_AUTOMATIC_PLAN_ITEM_INSTANCE_CREATION_JSON_PROPERTY, caseInstanceMigrationDocument.getEnableAutomaticPlanItemInstanceCreation());
+        }
 
         ArrayNode activateMappingNodes = convertToJsonActivatePlanItemDefinitionMappings(caseInstanceMigrationDocument.getActivatePlanItemDefinitionMappings());
         if (activateMappingNodes != null && !activateMappingNodes.isNull()) {
@@ -261,6 +265,8 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             documentBuilder.setCaseDefinitionToMigrateTo(caseDefinitionKey, caseDefinitionVersion);
 
             documentBuilder.setTenantId(getJsonProperty(TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY, rootNode));
+            
+            documentBuilder.setEnableAutomaticPlanItemInstanceCreation(getJsonPropertyAsBoolean(ENABLE_AUTOMATIC_PLAN_ITEM_INSTANCE_CREATION_JSON_PROPERTY, rootNode));
 
             JsonNode activateMappingNodes = rootNode.get(ACTIVATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION);
             if (activateMappingNodes != null) {
@@ -397,6 +403,14 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
     protected static String getJsonProperty(String propertyName, JsonNode jsonNode) {
         if (jsonNode.has(propertyName) && !jsonNode.get(propertyName).isNull()) {
             return jsonNode.get(propertyName).asString();
+        }
+        
+        return null;
+    }
+    
+    protected static Boolean getJsonPropertyAsBoolean(String propertyName, JsonNode jsonNode) {
+        if (jsonNode.has(propertyName) && !jsonNode.get(propertyName).isNull()) {
+            return jsonNode.get(propertyName).asBoolean();
         }
         
         return null;

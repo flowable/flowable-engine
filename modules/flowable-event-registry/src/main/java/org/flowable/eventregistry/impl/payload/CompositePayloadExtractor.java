@@ -33,13 +33,13 @@ public class CompositePayloadExtractor<T> implements InboundEventInfoAwarePayloa
     }
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
         if (payloadExtractors.size() == 1) {
-            return payloadExtractors.iterator().next().extractPayload(eventModel, event);
+            return payloadExtractors.iterator().next().extractPayload(eventModel, event, parentDeploymentId, tenantId);
         } else {
             Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
             for (InboundEventPayloadExtractor<T> payloadExtractor : payloadExtractors) {
-                payloadInstances.addAll(payloadExtractor.extractPayload(eventModel, event));
+                payloadInstances.addAll(payloadExtractor.extractPayload(eventModel, event, parentDeploymentId, tenantId));
             }
 
             return payloadInstances;

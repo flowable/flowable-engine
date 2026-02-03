@@ -28,6 +28,8 @@ public interface CaseInstanceMigrationDocument {
     Integer getMigrateToCaseDefinitionVersion();
 
     String getMigrateToCaseDefinitionTenantId();
+    
+    Boolean getEnableAutomaticPlanItemInstanceCreation();
 
     List<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitionMappings();
     

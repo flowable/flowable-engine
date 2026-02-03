@@ -37,6 +37,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected String migrateToCaseDefinitionKey;
     protected Integer migrateToCaseDefinitionVersion;
     protected String migrateToCaseDefinitionTenantId;
+    protected Boolean enableAutomaticPlanItemInstanceCreation;
     protected List<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<MoveToAvailablePlanItemDefinitionMapping> moveToAvailablePlanItemDefinitionMappings = new ArrayList<>();
@@ -133,6 +134,15 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
         return this.migrateToCaseDefinitionTenantId;
     }
     
+    @Override
+    public Boolean getEnableAutomaticPlanItemInstanceCreation() {
+        return enableAutomaticPlanItemInstanceCreation;
+    }
+
+    public void setEnableAutomaticPlanItemInstanceCreation(Boolean enableAutomaticPlanItemInstanceCreation) {
+        this.enableAutomaticPlanItemInstanceCreation = enableAutomaticPlanItemInstanceCreation;
+    }
+
     @Override
     public List<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitionMappings() {
         return activatePlanItemDefinitionMappings;

@@ -47,6 +47,7 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
         this.caseInstanceMigrationDocumentDocumentBuilder.setCaseDefinitionToMigrateTo(caseInstanceMigrationDocument.getMigrateToCaseDefinitionId());
         this.caseInstanceMigrationDocumentDocumentBuilder.setCaseDefinitionToMigrateTo(caseInstanceMigrationDocument.getMigrateToCaseDefinitionKey(), caseInstanceMigrationDocument.getMigrateToCaseDefinitionVersion());
         this.caseInstanceMigrationDocumentDocumentBuilder.setTenantId(caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId());
+        this.caseInstanceMigrationDocumentDocumentBuilder.setEnableAutomaticPlanItemInstanceCreation(caseInstanceMigrationDocument.getEnableAutomaticPlanItemInstanceCreation());
         this.caseInstanceMigrationDocumentDocumentBuilder.addActivatePlanItemDefinitionMappings(caseInstanceMigrationDocument.getActivatePlanItemDefinitionMappings());
         this.caseInstanceMigrationDocumentDocumentBuilder.addTerminatePlanItemDefinitionMappings(caseInstanceMigrationDocument.getTerminatePlanItemDefinitionMappings());
         this.caseInstanceMigrationDocumentDocumentBuilder.addMoveToAvailablePlanItemDefinitionMappings(caseInstanceMigrationDocument.getMoveToAvailablePlanItemDefinitionMappings());
@@ -83,6 +84,12 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
     @Override
     public CaseInstanceMigrationBuilder withMigrateToCaseDefinitionTenantId(String caseDefinitionTenantId) {
         this.caseInstanceMigrationDocumentDocumentBuilder.setTenantId(caseDefinitionTenantId);
+        return this;
+    }
+
+    @Override
+    public CaseInstanceMigrationBuilder enableAutomaticPlanItemInstanceCreation() {
+        this.caseInstanceMigrationDocumentDocumentBuilder.setEnableAutomaticPlanItemInstanceCreation(true);
         return this;
     }
 
