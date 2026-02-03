@@ -21,14 +21,14 @@ import java.util.function.Consumer;
 import org.flowable.cmmn.api.event.FlowableCaseBusinessStatusUpdatedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Matthias Stöckli
@@ -37,13 +37,13 @@ public class CaseBusinessStatusUpdatedEventTest extends FlowableCmmnTestCase {
 
     protected CustomEventListener businessStatusUpdatedEventListener;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         businessStatusUpdatedEventListener = new CustomEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(businessStatusUpdatedEventListener, FlowableEngineEventType.BUSINESS_STATUS_UPDATED);
     }
 
-    @AfterEach
+    @After
     public void tearDown() {
         if (businessStatusUpdatedEventListener != null) {
             cmmnEngineConfiguration.getEventDispatcher().removeEventListener(businessStatusUpdatedEventListener);
