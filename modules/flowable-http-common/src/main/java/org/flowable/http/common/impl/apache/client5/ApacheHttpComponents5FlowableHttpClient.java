@@ -86,6 +86,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
 
     protected HttpAsyncClient client;
     protected boolean closeClient;
+    protected HttpMultipartMode multipartMode;
     protected int socketTimeout;
     protected int connectTimeout;
     protected int connectionRequestTimeout;
@@ -133,6 +134,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
         this.client = client;
         this.closeClient = true;
 
+        this.multipartMode = resolveMultipartMode(config.getMultipartMode());
         this.socketTimeout = config.getSocketTimeout();
         this.connectTimeout = config.getConnectTimeout();
         this.connectionRequestTimeout = config.getConnectionRequestTimeout();
@@ -141,9 +143,23 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
     public ApacheHttpComponents5FlowableHttpClient(HttpAsyncClient client, int socketTimeout, int connectTimeout,
             int connectionRequestTimeout) {
         this.client = client;
+        this.multipartMode = HttpMultipartMode.STRICT;
         this.socketTimeout = socketTimeout;
         this.connectTimeout = connectTimeout;
         this.connectionRequestTimeout = connectionRequestTimeout;
+    }
+
+    protected static HttpMultipartMode resolveMultipartMode(String mode) {
+        if (mode == null) {
+            return HttpMultipartMode.STRICT;
+        }
+        return switch (mode.toUpperCase()) {
+            case "BROWSER_COMPATIBLE", "LEGACY" -> HttpMultipartMode.LEGACY;
+            case "STRICT" -> HttpMultipartMode.STRICT;
+            case "EXTENDED" -> HttpMultipartMode.EXTENDED;
+            default -> throw new FlowableIllegalArgumentException("Unsupported multipart mode: " + mode
+                    + ". Supported values are: STRICT, BROWSER_COMPATIBLE, LEGACY, EXTENDED");
+        };
     }
 
     public void close() {
@@ -220,7 +236,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             }
         } else if (requestInfo.getMultiValueParts() != null) {
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-            entityBuilder.setMode(HttpMultipartMode.LEGACY);
+            entityBuilder.setMode(multipartMode);
             for (MultiValuePart part : requestInfo.getMultiValueParts()) {
                 String name = part.getName();
                 Object value = part.getBody();
@@ -231,7 +247,11 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                         entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
                     }
                 } else if (value instanceof String) {
-                    entityBuilder.addTextBody(name, (String) value);
+                    if (StringUtils.isNotBlank(part.getMimeType())) {
+                        entityBuilder.addTextBody(name, (String) value, ContentType.create(part.getMimeType()));
+                    } else {
+                        entityBuilder.addTextBody(name, (String) value);
+                    }
                 } else if (value != null) {
                     throw new FlowableIllegalArgumentException("Value of type " + value.getClass() + " is not supported as multi part content");
                 }

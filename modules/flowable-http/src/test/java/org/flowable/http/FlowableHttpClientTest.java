@@ -14,19 +14,25 @@ package org.flowable.http;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
 import org.flowable.http.common.api.HttpHeaders;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.MultiValuePart;
 import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.impl.HttpClientConfig;
+import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.apache.client5.ApacheHttpComponents5FlowableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.core.io.ClassPathResource;
@@ -226,6 +232,49 @@ class FlowableHttpClientTest {
 
     @ParameterizedTest
     @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithMultiPartTextWithMimeType(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartTextWithMimeType");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        request.addMultiValuePart(MultiValuePart.fromText("jsonData", "{\"value\":\"kermit\"}", "application/json"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Text With MimeType");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          args: {
+                            testArg: [ 'testMultiPartTextWithMimeType' ]
+                          },
+                          headers: {
+                            X-Test: [ 'Test MultiPart Text With MimeType' ]
+                          },
+                          parts: {
+                            name: [
+                              {
+                                content: 'kermit'
+                              }
+                            ],
+                            jsonData: [
+                              {
+                                content: '{"value":"kermit"}',
+                                contentType: 'application/json'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
     void postWithFormParameters(FlowableHttpClient httpClient) {
         HttpRequest request = new HttpRequest();
         request.setUrl("http://localhost:9798/api/test-form?queryArg=testFormParameters");
@@ -320,5 +369,96 @@ class FlowableHttpClientTest {
                 .isEqualTo("GET, HEAD, TRACE, OPTIONS");
     }
 
+    @ParameterizedTest
+    @ArgumentsSource(BrowserCompatibleApacheHttpClientArgumentProvider.class)
+    void postWithMultiPartTextWithMimeTypeWithBrowserCompatibleMode(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartTextBrowserCompat");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        request.addMultiValuePart(MultiValuePart.fromText("jsonData", "{\"value\":\"kermit\"}", "application/json"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Text Browser Compatible");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        // In BROWSER_COMPATIBLE mode, Content-Type headers are not written for text parts (parts without a filename),
+        // so the mime type set on the text part is not sent to the server
+        assertThatJson(response.getBody())
+                .whenIgnoringPaths("args", "code", "delay", "headers", "origin")
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          parts: {
+                            name: [
+                              {
+                                content: 'kermit'
+                              }
+                            ],
+                            jsonData: [
+                              {
+                                content: '{"value":"kermit"}'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(BrowserCompatibleApacheHttpClientArgumentProvider.class)
+    void postWithMultiPartFileMimeTypeWithBrowserCompatibleMode(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartFileBrowserCompat");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromFile("document", "kermit;gonzo".getBytes(StandardCharsets.UTF_8), "kermit.csv", "text/csv"));
+        request.addMultiValuePart(MultiValuePart.fromFile("myJson", "{'value':'kermit'}".getBytes(StandardCharsets.UTF_8), "kermit.json", "application/json"));
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        // In BROWSER_COMPATIBLE mode, Content-Type headers are still written for file parts (parts with a filename)
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          parts: {
+                            document: [
+                              {
+                                content: 'kermit;gonzo',
+                                filename: 'kermit.csv',
+                                contentType: 'text/csv'
+                              }
+                            ],
+                            myJson: [
+                              {
+                                content: "{'value':'kermit'}",
+                                filename: 'kermit.json',
+                                contentType: 'application/json'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void invalidMultipartModeForApacheHttpComponents() {
+        HttpClientConfig config = new HttpClientConfig();
+        config.setMultipartMode("INVALID");
+
+        assertThatThrownBy(() -> new ApacheHttpComponentsFlowableHttpClient(config))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Unsupported multipart mode: INVALID");
+    }
+
+    @Test
+    void invalidMultipartModeForApacheHttpComponents5() {
+        HttpClientConfig config = new HttpClientConfig();
+        config.setMultipartMode("INVALID");
+
+        assertThatThrownBy(() -> new ApacheHttpComponents5FlowableHttpClient(config))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Unsupported multipart mode: INVALID");
+    }
 
 }
