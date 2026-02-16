@@ -276,6 +276,14 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         if (xif.isPropertySupported(XMLInputFactory.SUPPORT_DTD)) {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
+        
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_DTD)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        }
+        
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        }
 
         if (validateSchema) {
             try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
