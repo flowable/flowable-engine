@@ -64,6 +64,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
 
 import tools.jackson.databind.node.ObjectNode;
 
@@ -157,7 +158,10 @@ public class ProcessInstanceHelper {
                 if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions()
                         .get(0) instanceof MessageEventDefinition messageEventDefinition) {
 
-                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+                    DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(), processDefinition.getDeploymentId(),
+                            ScopeTypes.BPMN, processDefinition.getTenantId());
+
+                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
                     if (Objects.equals(actualMessageName, messageName)) {
                         initialFlowElement = flowElement;
                         break;
@@ -461,7 +465,9 @@ public class ProcessInstanceHelper {
         signalExecution.setEventScope(true);
         signalExecution.setActive(false);
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(parentExecution.getProcessDefinitionId(),
+                parentExecution.getDeploymentId(), ScopeTypes.BPMN, parentExecution.getTenantId());
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
                 .getEventSubscriptionService().createEventSubscriptionBuilder()

@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
@@ -58,6 +59,34 @@ public class EventDefinitionExpressionUtil {
     }
 
     /**
+     * Determines signal name from definition or expression
+     */
+    public static String determineSignalName(CommandContext commandContext, SignalEventDefinition signalEventDefinition, BpmnModel bpmnModel,
+            VariableContainer definitionVariableContainer) {
+        String signalName = null;
+
+        if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
+            Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
+            if (signal != null) {
+                signalName = signal.getName();
+            } else {
+                signalName = signalEventDefinition.getSignalRef();
+            }
+
+        } else {
+            signalName = signalEventDefinition.getSignalExpression();
+
+        }
+
+        if (StringUtils.isNotEmpty(signalName)) {
+            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(signalName);
+            return expression.getValue(definitionVariableContainer).toString();
+        }
+
+        return signalName;
+    }
+
+    /**
      * Determines the event name of the {@link org.flowable.bpmn.model.MessageEventDefinition} that is passed:
      * - if a message ref is set, it has precedence
      * - if a messageExpression is set, it is returned
@@ -83,4 +112,26 @@ public class EventDefinitionExpressionUtil {
         return messageName;
     }
 
+    /**
+     * Determines message name from definition or expression
+     */
+    public static String determineMessageName(CommandContext commandContext, MessageEventDefinition messageEventDefinition,
+            VariableContainer definitionVariableContainer) {
+        String messageName = null;
+
+        if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
+            return messageEventDefinition.getMessageRef();
+
+        } else {
+            messageName = messageEventDefinition.getMessageExpression();
+
+        }
+
+        if (StringUtils.isNotEmpty(messageName)) {
+            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(messageName);
+            return expression.getValue(definitionVariableContainer).toString();
+        }
+
+        return messageName;
+    }
 }

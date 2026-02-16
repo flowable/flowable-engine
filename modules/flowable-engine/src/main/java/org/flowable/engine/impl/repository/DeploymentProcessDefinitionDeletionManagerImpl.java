@@ -50,6 +50,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
 
 /**
  * @author Filip Hrisafov
@@ -154,13 +155,17 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
     protected void restoreTimerStartEvent(ProcessDefinition previousProcessDefinition, StartEvent startEvent, EventDefinition eventDefinition) {
         TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(previousProcessDefinition.getId(),
+                previousProcessDefinition.getDeploymentId(), ScopeTypes.BPMN, previousProcessDefinition.getTenantId());
+
         TimerJobEntity timer = TimerUtil.createTimerEntityForTimerEventDefinition((TimerEventDefinition) eventDefinition, startEvent,
-                false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+                false, definitionVariableContainer, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                         timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
         if (timer != null) {
             TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                    false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+                    false, definitionVariableContainer, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                             timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
             timerJob.setProcessDefinitionId(previousProcessDefinition.getId());
@@ -178,7 +183,9 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         SignalEventSubscriptionEntity subscriptionEntity = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createSignalEventSubscription();
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(previousProcessDefinition.getId(),
+                previousProcessDefinition.getDeploymentId(), ScopeTypes.BPMN, previousProcessDefinition.getTenantId());
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
         subscriptionEntity.setEventName(eventName);
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(previousProcessDefinition.getId());
@@ -199,7 +206,9 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
         CommandContext commandContext = Context.getCommandContext();
         MessageEventSubscriptionEntity newSubscription = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createMessageEventSubscription();
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(previousProcessDefinition.getId(),
+                previousProcessDefinition.getDeploymentId(), ScopeTypes.BPMN, previousProcessDefinition.getTenantId());
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
         newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(previousProcessDefinition.getId());
