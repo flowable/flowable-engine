@@ -55,7 +55,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -1587,7 +1587,8 @@ public abstract class AbstractDynamicStateManager {
                         messageExecution.setActive(false);
 
                         DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(messageExecution.getProcessDefinitionId(),
-                                eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, messageExecution.getTenantId());
+                                messageExecution.getProcessDefinitionKey(), eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, messageExecution.getTenantId());
+
                         String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
                         EventSubscriptionEntity messageSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
@@ -1622,7 +1623,7 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setActive(false);
 
                         DefinitionVariableContainer signalDefinitionVariableContainer = new DefinitionVariableContainer(signalExecution.getProcessDefinitionId(),
-                                eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, signalExecution.getTenantId());
+                                signalExecution.getProcessDefinitionKey(), eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, signalExecution.getTenantId());
                         String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, signalDefinitionVariableContainer);
 
                         EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()

@@ -29,8 +29,9 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -43,6 +44,7 @@ import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.job.service.TimerJobService;
@@ -60,20 +62,23 @@ public class TimerUtil {
     /**
      * The event definition on which the timer is based.
      * <p>
-     * Takes in a {@link DefinitionVariableContainer} for expression evaluation at deployment time (eg Timer start event).
+     * Takes in a {@link ProcessDefinition} for expression evaluation at deployment time (eg Timer start event).
      */
     public static TimerJobEntity createTimerEntityForTimerEventDefinition(TimerEventDefinition timerEventDefinition,
-            FlowElement currentFlowElement, boolean isInterruptingTimer, DefinitionVariableContainer definitionVariableContainer,
+            FlowElement currentFlowElement, boolean isInterruptingTimer, ProcessDefinition processDefinition,
             String jobHandlerType, String jobHandlerConfig) {
+
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(),
+                processDefinition.getKey(), processDefinition.getDeploymentId(), ScopeTypes.BPMN, processDefinition.getTenantId());
 
         TimerJobEntity timer = createTimerEntity(timerEventDefinition, currentFlowElement, isInterruptingTimer,
                 definitionVariableContainer, jobHandlerType, jobHandlerConfig);
 
-        if (timer != null && definitionVariableContainer != null) {
-            timer.setProcessDefinitionId(definitionVariableContainer.getDefinitionId());
+        if (timer != null) {
+            timer.setProcessDefinitionId(processDefinition.getId());
 
-            if (definitionVariableContainer.getTenantId() != null) {
-                timer.setTenantId(definitionVariableContainer.getTenantId());
+            if (processDefinition.getTenantId() != null) {
+                timer.setTenantId(processDefinition.getTenantId());
             }
         }
 
@@ -107,12 +112,6 @@ public class TimerUtil {
             if (executionEntity.getTenantId() != null) {
                 timer.setTenantId(executionEntity.getTenantId());
             }
-
-            // ACT-1951: intermediate catching timer events shouldn't repeat according to spec
-            FlowElement currentElement = executionEntity.getCurrentFlowElement();
-            if (currentElement instanceof IntermediateCatchEvent) {
-                timer.setRepeat(null);
-            }
         }
 
         return timer;
@@ -127,9 +126,6 @@ public class TimerUtil {
         String businessCalendarRef = null;
         Expression expression = null;
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-
-        // ACT-1415: timer-declaration on start-event may contain expressions NOT
-        // evaluating variables but other context, evaluating should happen nevertheless
 
         if (StringUtils.isNotEmpty(timerEventDefinition.getTimeDate())) {
 
@@ -233,6 +229,11 @@ public class TimerUtil {
                 String prepared = prepareRepeat(dueDateString);
                 timer.setRepeat(prepared);
             }
+        }
+
+        // ACT-1951: intermediate catching timer events shouldn't repeat according to spec
+        if (currentFlowElement instanceof IntermediateCatchEvent) {
+            timer.setRepeat(null);
         }
 
         return timer;

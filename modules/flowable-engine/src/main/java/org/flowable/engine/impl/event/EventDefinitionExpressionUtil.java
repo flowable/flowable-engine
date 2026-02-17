@@ -18,10 +18,12 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.common.engine.api.delegate.Expression;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
@@ -35,36 +37,24 @@ public class EventDefinitionExpressionUtil {
      * - otherwise, the signal ref is used
      * - unless a signalExpression is set
      */
-    public static String determineSignalName(CommandContext commandContext, SignalEventDefinition signalEventDefinition, BpmnModel bpmnModel, DelegateExecution execution) {
-        String signalName = null;
-        if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
-            Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
-            if (signal != null) {
-                signalName = signal.getName();
-            } else {
-                signalName = signalEventDefinition.getSignalRef();
-            }
+    public static String determineSignalName(CommandContext commandContext, SignalEventDefinition signalEventDefinition,
+            BpmnModel bpmnModel, ProcessDefinition processDefinition) {
 
-        } else {
-            signalName = signalEventDefinition.getSignalExpression();
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(),
+                processDefinition.getKey(), processDefinition.getDeploymentId(), ScopeTypes.BPMN, processDefinition.getTenantId());
 
-        }
-
-        if (StringUtils.isNotEmpty(signalName)) {
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(signalName);
-            return expression.getValue(execution != null ? execution : NoExecutionVariableScope.getSharedInstance()).toString();
-        }
-
-        return signalName;
+        return determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
     }
 
     /**
-     * Determines signal name from definition or expression
+     * Determines the signal name of the {@link SignalEventDefinition} that is passed:
+     * - if a signal name is set, it has precedence
+     * - otherwise, the signal ref is used
+     * - unless a signalExpression is set
      */
-    public static String determineSignalName(CommandContext commandContext, SignalEventDefinition signalEventDefinition, BpmnModel bpmnModel,
-            VariableContainer definitionVariableContainer) {
+    public static String determineSignalName(CommandContext commandContext, SignalEventDefinition signalEventDefinition,
+            BpmnModel bpmnModel, VariableContainer variableContainer) {
         String signalName = null;
-
         if (StringUtils.isNotEmpty(signalEventDefinition.getSignalRef())) {
             Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
             if (signal != null) {
@@ -80,7 +70,7 @@ public class EventDefinitionExpressionUtil {
 
         if (StringUtils.isNotEmpty(signalName)) {
             Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(signalName);
-            return expression.getValue(definitionVariableContainer).toString();
+            return expression.getValue(variableContainer != null ? variableContainer : NoExecutionVariableScope.getSharedInstance()).toString();
         }
 
         return signalName;
@@ -90,35 +80,29 @@ public class EventDefinitionExpressionUtil {
      * Determines the event name of the {@link org.flowable.bpmn.model.MessageEventDefinition} that is passed:
      * - if a message ref is set, it has precedence
      * - if a messageExpression is set, it is returned
+     * <p>
+     * Note that, contrary to the determineSignalName method, the name of the message is never used.
+     * This is because of historical reasons (and it can't be changed now without breaking existing models/instances)
+     */
+    public static String determineMessageName(CommandContext commandContext, MessageEventDefinition messageEventDefinition,
+            ProcessDefinition processDefinition) {
+
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(),
+                processDefinition.getKey(), processDefinition.getDeploymentId(), ScopeTypes.BPMN, processDefinition.getTenantId());
+
+        return determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
+    }
+    /**
+     * Determines the event name of the {@link org.flowable.bpmn.model.MessageEventDefinition} that is passed:
+     * - if a message ref is set, it has precedence
+     * - if a messageExpression is set, it is returned
      *
      * Note that, contrary to the determineSignalName method, the name of the message is never used.
      * This is because of historical reasons (and it can't be changed now without breaking existing models/instances)
      */
-    public static String determineMessageName(CommandContext commandContext, MessageEventDefinition messageEventDefinition, DelegateExecution execution) {
-        String messageName = null;
-        if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
-            return messageEventDefinition.getMessageRef();
-
-        } else {
-            messageName = messageEventDefinition.getMessageExpression();
-
-        }
-
-        if (StringUtils.isNotEmpty(messageName)) {
-            Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(messageName);
-            return expression.getValue(execution != null ? execution : NoExecutionVariableScope.getSharedInstance()).toString();
-        }
-
-        return messageName;
-    }
-
-    /**
-     * Determines message name from definition or expression
-     */
     public static String determineMessageName(CommandContext commandContext, MessageEventDefinition messageEventDefinition,
-            VariableContainer definitionVariableContainer) {
+            VariableContainer variableContainer) {
         String messageName = null;
-
         if (StringUtils.isNotEmpty(messageEventDefinition.getMessageRef())) {
             return messageEventDefinition.getMessageRef();
 
@@ -129,7 +113,7 @@ public class EventDefinitionExpressionUtil {
 
         if (StringUtils.isNotEmpty(messageName)) {
             Expression expression = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager().createExpression(messageName);
-            return expression.getValue(definitionVariableContainer).toString();
+            return expression.getValue(variableContainer != null ? variableContainer : NoExecutionVariableScope.getSharedInstance()).toString();
         }
 
         return messageName;

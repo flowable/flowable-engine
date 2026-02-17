@@ -8,7 +8,7 @@
 
   <process id="messageExpressionProcess" name="Message Expression Process" isExecutable="true">
     <startEvent id="startEvent">
-      <messageEventDefinition flowable:messageExpression="${'my'}${'Message'}"/>
+      <messageEventDefinition flowable:messageExpression="${variableContainer.definitionKey}Message"/>
     </startEvent>
     <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1"/>
     <userTask id="task1" name="Task"/>

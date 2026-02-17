@@ -45,7 +45,7 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 
 /**
  * Manages event subscriptions for newly-deployed process definitions and their previous versions.
@@ -174,10 +174,7 @@ public class EventSubscriptionManager {
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         SignalEventSubscriptionEntity subscriptionEntity = eventSubscriptionService.createSignalEventSubscription();
 
-        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(), processDefinition.getDeploymentId(),
-                ScopeTypes.BPMN, processDefinition.getTenantId());
-
-        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, processDefinition);
         subscriptionEntity.setEventName(signalName);
 
         subscriptionEntity.setActivityId(startEvent.getId());
@@ -196,11 +193,8 @@ public class EventSubscriptionManager {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
 
-        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(), processDefinition.getDeploymentId(),
-                ScopeTypes.BPMN, processDefinition.getTenantId());
-
         // look for subscriptions for the same name in db:
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
                 .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 

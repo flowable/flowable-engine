@@ -20,7 +20,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -33,7 +32,6 @@ import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.cmd.CancelJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.common.engine.api.definition.DefinitionVariableContainer;
 
 /**
  * Manages timers for newly-deployed process definitions and their previous versions.
@@ -76,19 +74,10 @@ public class TimerManager {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                         if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
 
-                            DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(processDefinition.getId(),
-                                    processDefinition.getDeploymentId(),
-                                    ScopeTypes.BPMN, processDefinition.getTenantId());
-
                             TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                                    false, definitionVariableContainer, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+                                    false, processDefinition, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                                             timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
-                            timerJob.setProcessDefinitionId(processDefinition.getId());
-
-                            if (processDefinition.getTenantId() != null) {
-                                timerJob.setTenantId(processDefinition.getTenantId());
-                            }
                             timers.add(timerJob);
 
                         }

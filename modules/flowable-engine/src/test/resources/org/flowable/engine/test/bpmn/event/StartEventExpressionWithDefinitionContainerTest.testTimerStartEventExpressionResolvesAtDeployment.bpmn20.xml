@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
              xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
              xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
              xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
@@ -8,7 +9,7 @@
   <process id="timerExpressionProcess" name="Timer Expression Process" isExecutable="true">
     <startEvent id="startEvent">
       <timerEventDefinition>
-        <timeDuration>PT1H</timeDuration>
+        <timeDuration>${variableContainer.definitionKey == 'timerExpressionProcess' ? 'PT1H' : 'PT2H'}</timeDuration>
       </timerEventDefinition>
     </startEvent>
     <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1"/>

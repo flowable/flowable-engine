@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests that signal, message, and timer start events with expressions are correctly evaluated
- * at deployment time using a {@link org.flowable.common.engine.api.definition.DefinitionVariableContainer}.
+ * at deployment time using a {@link org.flowable.common.engine.impl.el.DefinitionVariableContainer}.
  *
  * @author Christopher Welsch
  */
@@ -38,16 +38,16 @@ public class StartEventExpressionWithDefinitionContainerTest extends PluggableFl
     @Test
     @Deployment
     public void testSignalStartEventExpressionResolvesAtDeployment() {
-        // The signal expression ${'my'}${'Signal'} should be evaluated at deployment time
-        // and create a signal event subscription with name "mySignal"
+        // The signal expression ${variableContainer.definitionKey}Signal should be evaluated at deployment time
+        // and create a signal event subscription with name "signalExpressionProcessSignal"
         List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
                 .eventType("signal")
                 .list();
         assertThat(subscriptions).hasSize(1);
-        assertThat(subscriptions.get(0).getEventName()).isEqualTo("mySignal");
+        assertThat(subscriptions.get(0).getEventName()).isEqualTo("signalExpressionProcessSignal");
 
         // Verify that sending the signal creates a process instance
-        runtimeService.signalEventReceived("mySignal");
+        runtimeService.signalEventReceived("signalExpressionProcessSignal");
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey("signalExpressionProcess")
                 .list();
@@ -57,16 +57,16 @@ public class StartEventExpressionWithDefinitionContainerTest extends PluggableFl
     @Test
     @Deployment
     public void testMessageStartEventExpressionResolvesAtDeployment() {
-        // The message expression ${'my'}${'Message'} should be evaluated at deployment time
-        // and create a message event subscription with name "myMessage"
+        // The message expression ${variableContainer.definitionKey}Message should be evaluated at deployment time
+        // and create a message event subscription with name "messageExpressionProcessMessage"
         List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
                 .eventType("message")
                 .list();
         assertThat(subscriptions).hasSize(1);
-        assertThat(subscriptions.get(0).getEventName()).isEqualTo("myMessage");
+        assertThat(subscriptions.get(0).getEventName()).isEqualTo("messageExpressionProcessMessage");
 
         // Verify that sending the message creates a process instance
-        ProcessInstance instance = runtimeService.startProcessInstanceByMessage("myMessage");
+        ProcessInstance instance = runtimeService.startProcessInstanceByMessage("messageExpressionProcessMessage");
         assertThat(instance).isNotNull();
         assertThat(instance.getProcessDefinitionKey()).isEqualTo("messageExpressionProcess");
     }
@@ -74,104 +74,69 @@ public class StartEventExpressionWithDefinitionContainerTest extends PluggableFl
     @Test
     @Deployment
     public void testTimerStartEventExpressionResolvesAtDeployment() {
-        try {
-            // The timer expression PT1H should be evaluated at deployment time
-            // and create a timer job
-            List<Job> timerJobs = managementService.createTimerJobQuery().list();
-            assertThat(timerJobs).hasSize(1);
+        // The timer expression ${variableContainer.definitionKey == 'timerExpressionProcess' ? 'PT1H' : 'PT2H'}
+        // should be evaluated at deployment time and create a timer job with PT1H duration
+        List<Job> timerJobs = managementService.createTimerJobQuery().list();
+        assertThat(timerJobs).hasSize(1);
 
-            Job timerJob = timerJobs.get(0);
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                    .processDefinitionKey("timerExpressionProcess")
-                    .singleResult();
-            assertThat(timerJob.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
+        Job timerJob = timerJobs.get(0);
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("timerExpressionProcess")
+                .singleResult();
+        assertThat(timerJob.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
 
-            // Move clock past the timer and execute it
-            Date futureDate = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
-            processEngineConfiguration.getClock().setCurrentTime(futureDate);
-            waitForJobExecutorToProcessAllJobs(5000L, 200L);
+        // Move clock past the timer and execute it
+        Date futureDate = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+        processEngineConfiguration.getClock().setCurrentTime(futureDate);
+        waitForJobExecutorToProcessAllJobs(5000L, 200L);
 
-            // Verify a process instance was created
-            List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery()
-                    .processDefinitionKey("timerExpressionProcess")
-                    .list();
-            assertThat(instances).hasSize(1);
-
-        } finally {
-            processEngineConfiguration.resetClock();
-        }
+        // Verify a process instance was created
+        List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey("timerExpressionProcess")
+                .list();
+        assertThat(instances).hasSize(1);
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testSignalStartEventExpressionResolvesAtDeployment.bpmn20.xml",
+            tenantId = "tenantA")
     public void testSignalStartEventExpressionWithTenantId() {
-        // Deploy the same signal expression process with a tenant ID
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource(
-                        "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testSignalStartEventExpressionResolvesAtDeployment.bpmn20.xml")
+        List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
+                .eventType("signal")
                 .tenantId("tenantA")
-                .deploy()
-                .getId();
-
-        try {
-            List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
-                    .eventType("signal")
-                    .tenantId("tenantA")
-                    .list();
-            assertThat(subscriptions).hasSize(1);
-            assertThat(subscriptions.get(0).getEventName()).isEqualTo("mySignal");
-            assertThat(subscriptions.get(0).getTenantId()).isEqualTo("tenantA");
-        } finally {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+                .list();
+        assertThat(subscriptions).hasSize(1);
+        assertThat(subscriptions.get(0).getEventName()).isEqualTo("signalExpressionProcessSignal");
+        assertThat(subscriptions.get(0).getTenantId()).isEqualTo("tenantA");
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testMessageStartEventExpressionResolvesAtDeployment.bpmn20.xml",
+            tenantId = "tenantA")
     public void testMessageStartEventExpressionWithTenantId() {
-        // Deploy the same message expression process with a tenant ID
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource(
-                        "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testMessageStartEventExpressionResolvesAtDeployment.bpmn20.xml")
+        List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
+                .eventType("message")
                 .tenantId("tenantA")
-                .deploy()
-                .getId();
-
-        try {
-            List<EventSubscription> subscriptions = runtimeService.createEventSubscriptionQuery()
-                    .eventType("message")
-                    .tenantId("tenantA")
-                    .list();
-            assertThat(subscriptions).hasSize(1);
-            assertThat(subscriptions.get(0).getEventName()).isEqualTo("myMessage");
-            assertThat(subscriptions.get(0).getTenantId()).isEqualTo("tenantA");
-        } finally {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+                .list();
+        assertThat(subscriptions).hasSize(1);
+        assertThat(subscriptions.get(0).getEventName()).isEqualTo("messageExpressionProcessMessage");
+        assertThat(subscriptions.get(0).getTenantId()).isEqualTo("tenantA");
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testTimerStartEventExpressionResolvesAtDeployment.bpmn20.xml",
+            tenantId = "tenantA")
     public void testTimerStartEventExpressionWithTenantId() {
-        // Deploy the same timer expression process with a tenant ID
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource(
-                        "org/flowable/engine/test/bpmn/event/StartEventExpressionWithDefinitionContainerTest.testTimerStartEventExpressionResolvesAtDeployment.bpmn20.xml")
-                .tenantId("tenantA")
-                .deploy()
-                .getId();
+        List<Job> timerJobs = managementService.createTimerJobQuery()
+                .jobTenantId("tenantA")
+                .list();
+        assertThat(timerJobs).hasSize(1);
+        assertThat(timerJobs.get(0).getTenantId()).isEqualTo("tenantA");
 
-        try {
-            List<Job> timerJobs = managementService.createTimerJobQuery()
-                    .jobTenantId("tenantA")
-                    .list();
-            assertThat(timerJobs).hasSize(1);
-            assertThat(timerJobs.get(0).getTenantId()).isEqualTo("tenantA");
-
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                    .processDefinitionKey("timerExpressionProcess")
-                    .processDefinitionTenantId("tenantA")
-                    .singleResult();
-            assertThat(timerJobs.get(0).getProcessDefinitionId()).isEqualTo(processDefinition.getId());
-        } finally {
-            repositoryService.deleteDeployment(deploymentId, true);
-        }
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("timerExpressionProcess")
+                .processDefinitionTenantId("tenantA")
+                .singleResult();
+        assertThat(timerJobs.get(0).getProcessDefinitionId()).isEqualTo(processDefinition.getId());
     }
 }

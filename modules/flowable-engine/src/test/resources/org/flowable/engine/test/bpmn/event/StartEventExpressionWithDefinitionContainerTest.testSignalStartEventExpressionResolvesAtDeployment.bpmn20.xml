@@ -8,7 +8,7 @@
 
   <process id="signalExpressionProcess" name="Signal Expression Process" isExecutable="true">
     <startEvent id="startEvent">
-      <signalEventDefinition flowable:signalExpression="${'my'}${'Signal'}"/>
+      <signalEventDefinition flowable:signalExpression="${variableContainer.definitionKey}Signal"/>
     </startEvent>
     <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1"/>
     <userTask id="task1" name="Task"/>
