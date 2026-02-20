@@ -517,6 +517,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
 
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
+                        && sentry.getSentryIfPart() != null
                         && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
 
                         sentryIfPartSatisfied = true;
