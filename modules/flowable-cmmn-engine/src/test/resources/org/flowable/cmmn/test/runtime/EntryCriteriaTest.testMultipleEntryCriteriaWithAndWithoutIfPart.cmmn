@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="A" definitionRef="taskA"/>
+            <planItem id="planItem2" name="B" definitionRef="taskB"/>
+            <planItem id="planItem3" name="Stage C" definitionRef="stageC">
+                <entryCriterion id="entry1" sentryRef="sentry1"/>
+                <entryCriterion id="entry2" sentryRef="sentry2"/>
+            </planItem>
+
+            <!-- Sentry with 2 onParts, NO ifPart -->
+            <sentry id="sentry1">
+                <planItemOnPart id="onPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <planItemOnPart id="onPart2" sourceRef="planItem2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <!-- Sentry with 1 onPart + ifPart event deferred -->
+            <sentry id="sentry2">
+                <planItemOnPart id="onPart3" sourceRef="planItem2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <ifPart>
+                    <condition><![CDATA[${myVar}]]></condition>
+                </ifPart>
+            </sentry>
+
+            <humanTask id="taskA" name="A"/>
+            <humanTask id="taskB" name="B"/>
+            <stage id="stageC" name="Stage C">
+                <planItem id="planItem4" name="C" definitionRef="taskC"/>
+                <humanTask id="taskC" name="C"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+</definitions>
