@@ -405,6 +405,39 @@ public class SimpleCaseReactivationTest extends FlowableCmmnTestCase {
                         tuple(null, "frogs", IdentityLinkType.OWNER)
                 );
     }
+    
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/reactivation/Parent_Case_Reactivation.cmmn.xml",
+            "org/flowable/cmmn/test/reactivation/Reactivation_With_Exit_Criterion_Test_Case.cmmn.xml"
+    })
+    public void reactivationWithParentCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("parentReactivationTestCase")
+                .start();
+        
+        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().parentCaseInstanceId(caseInstance.getId()).singleResult();
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(childCaseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(childCaseInstance.getId()).count()).isZero();
+        
+        CaseInstance reactivatedChildCase = cmmnHistoryService.createCaseReactivationBuilder(childCaseInstance.getId()).reactivate();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(reactivatedChildCase.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(reactivatedChildCase.getId()).count()).isZero();
+        
+        reactivatedChildCase = cmmnHistoryService.createCaseReactivationBuilder(childCaseInstance.getId()).reactivate();
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(reactivatedChildCase.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        Task parentTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(parentTask.getId());
+        
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
 
     protected HistoricCaseInstance createAndFinishSimpleCase(String caseDefinitionKey) {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
