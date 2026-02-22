@@ -13,11 +13,13 @@
 package org.flowable.dmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.engine.DecisionTableVariableManager;
@@ -567,6 +569,38 @@ public class DmnTaskTest {
         ObjectNode decisionServiceResult = (ObjectNode) decisionServiceResultObject;
         assertThat(decisionServiceResult.size()).isEqualTo(1);
         assertThat(decisionServiceResult.has("decision4")).isTrue();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/test/runtime/throwingBeanPropertyDecision.dmn" })
+    void beanPropertyExceptionCausePreservedInBpmnDmnTask() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Threshold value cannot be null.");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/test/runtime/throwingBeanMethodDecision.dmn" })
+    void beanMethodExceptionCausePreservedInBpmnDmnTask() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Invalid input: test");
     }
 
     protected void executeWithoutArrays(Runnable runnable) {

@@ -93,7 +93,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
         } catch (FlowableException fe) {
             LOGGER.error("decision table execution sanity check failed", fe);
-            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setFailedWithException(fe);
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(fe));
 
         } finally {
@@ -154,7 +154,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         } catch (FlowableException ade) {
             LOGGER.error("decision table execution failed", ade);
             executionContext.getRuleResults().clear();
-            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setFailedWithException(ade);
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
         }
 
@@ -299,13 +299,11 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     protected String getExceptionMessage(Exception exception) {
-        String exceptionMessage;
-        if (exception.getCause() != null && exception.getCause().getMessage() != null) {
-            exceptionMessage = exception.getCause().getMessage();
-        } else {
-            exceptionMessage = exception.getMessage();
+        Throwable rootCause = exception;
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
         }
-        return exceptionMessage;
+        return rootCause.getMessage();
     }
 
     protected AbstractHitPolicy getHitPolicyBehavior(HitPolicy hitPolicy) {

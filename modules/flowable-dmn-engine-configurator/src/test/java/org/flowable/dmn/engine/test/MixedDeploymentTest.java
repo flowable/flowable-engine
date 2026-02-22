@@ -28,6 +28,7 @@ import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -98,7 +99,15 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         try {
             assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess"))
                     .isInstanceOf(Exception.class)
-                    .hasMessageContaining("Unknown property used in expression: #{inputVariable1");
+                    .hasMessageContaining("execution failed")
+                    .cause()
+                    .isInstanceOf(FlowableDmnExpressionException.class)
+                    .hasMessage("error while executing input entry")
+                    .cause()
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessageContaining("Unknown property used in expression: #{inputVariable1 == 1}")
+                    .rootCause()
+                    .hasMessageContaining("Cannot resolve identifier 'inputVariable1'");
         } finally {
             deleteAllDmnDeployments();
         }

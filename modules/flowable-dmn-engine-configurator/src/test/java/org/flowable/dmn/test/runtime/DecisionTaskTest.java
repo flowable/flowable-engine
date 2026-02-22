@@ -34,6 +34,7 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,7 +94,15 @@ public class DecisionTaskTest {
                 .caseDefinitionKey("myCase")
                 .start())
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("DMN decision with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
+                .hasMessageContaining("DMN decision with key DecisionTable execution failed.")
+                .cause()
+                .isInstanceOf(FlowableDmnExpressionException.class)
+                .hasMessage("error while executing input entry")
+                .cause()
+                .isExactlyInstanceOf(FlowableException.class)
+                .hasMessageContaining("Unknown property used in expression: #{testVar == \"test2\"}")
+                .rootCause()
+                .hasMessageContaining("Cannot resolve identifier 'testVar'");
     }
 
     @Test
@@ -172,7 +181,7 @@ public class DecisionTaskTest {
                 .caseDefinitionKey("myCase")
                 .start())
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("DMN decision with key decisionTable did not hit any rules for the provided input.");
+                .hasMessageContaining("DMN decision with key DecisionTable did not hit any rules for the provided input.");
     }
 
     @Test
@@ -201,7 +210,7 @@ public class DecisionTaskTest {
         CaseInstance caseInstance = cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variable("testVar", "test2")
-                .variable("referenceKey", "decisionTable")
+                .variable("referenceKey", "DecisionTable")
                 .start();
 
         assertResultVariable(caseInstance);
@@ -261,7 +270,7 @@ public class DecisionTaskTest {
         CaseInstance caseInstance = cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variable("testVar", "test2")
-                .variable("referenceKey", "decisionTable")
+                .variable("referenceKey", "DecisionTable")
                 .start();
 
         assertResultVariable(caseInstance);
@@ -947,6 +956,38 @@ public class DecisionTaskTest {
         // Triggering the task should end the case instance
         cmmnEngine.getCmmnRuntimeService().triggerPlanItemInstance(planItemInstance.getId());
         assertThat(cmmnEngine.getCmmnRuntimeService().createCaseInstanceQuery().count()).isZero();
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.cmmn",
+            "org/flowable/dmn/test/runtime/throwingBeanPropertyDecision.dmn" })
+    public void beanPropertyExceptionCausePreservedInCmmnDecisionTask() {
+        assertThatThrownBy(() -> cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Threshold value cannot be null.");
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.cmmn",
+            "org/flowable/dmn/test/runtime/throwingBeanMethodDecision.dmn" })
+    public void beanMethodExceptionCausePreservedInCmmnDecisionTask() {
+        assertThatThrownBy(() -> cmmnEngine.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Invalid input: test");
     }
 
     protected void deleteAllDmnDeployments() {
