@@ -293,9 +293,23 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
 
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-            if (planItemDefinitionMapping.getNewAssignee() != null && planItem.getPlanItemDefinition() instanceof HumanTask) {
+            if (planItem.getPlanItemDefinition() instanceof HumanTask && 
+                    (planItemDefinitionMapping.getNewName() != null || planItemDefinitionMapping.getNewDueDate() != null || 
+                    planItemDefinitionMapping.getNewPriority() != null || planItemDefinitionMapping.getNewCategory() != null || 
+                    planItemDefinitionMapping.getNewFormKey() != null || planItemDefinitionMapping.getNewAssignee() != null || 
+                    planItemDefinitionMapping.getNewOwner() != null || planItemDefinitionMapping.getNewCandidateUsers() != null ||
+                    planItemDefinitionMapping.getNewCandidateGroups() != null)) {
+                
                 MigrationContext migrationContext = new MigrationContext();
+                migrationContext.setName(planItemDefinitionMapping.getNewName());
+                migrationContext.setDueDate(planItemDefinitionMapping.getNewDueDate());
+                migrationContext.setPriority(planItemDefinitionMapping.getNewPriority());
+                migrationContext.setCategory(planItemDefinitionMapping.getNewCategory());
+                migrationContext.setFormKey(planItemDefinitionMapping.getNewFormKey());
                 migrationContext.setAssignee(planItemDefinitionMapping.getNewAssignee());
+                migrationContext.setOwner(planItemDefinitionMapping.getNewOwner());
+                migrationContext.setCandidateUsers(planItemDefinitionMapping.getNewCandidateUsers());
+                migrationContext.setCandidateGroups(planItemDefinitionMapping.getNewCandidateGroups());
                 agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null, migrationContext);
                 
             } else if (caseInstanceChangeState.getChildInstanceTaskVariables().containsKey(planItemDefinitionMapping.getPlanItemDefinitionId()) && 

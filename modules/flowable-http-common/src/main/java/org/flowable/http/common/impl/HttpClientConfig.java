@@ -92,6 +92,22 @@ public class HttpClientConfig {
 
     protected boolean useSystemProperties = false;
 
+    /**
+     * The multipart mode to use when building multipart/form-data requests with the Apache HTTP client implementations.
+     * <p>
+     * Supported values:
+     * <ul>
+     *     <li>{@code "STRICT"} - RFC 2046 compliant. Always writes Content-Type headers for all parts,
+     *     including text parts. This is the default and is needed for text parts with a custom mime type to work correctly.</li>
+     *     <li>{@code "BROWSER_COMPATIBLE"} - Mimics browser behavior. Only writes Content-Type headers for parts with a filename.
+     *     This was the default before 8.0. Note that text parts with a custom mime type will not have their Content-Type sent
+     *     in this mode.</li>
+     * </ul>
+     * <p>
+     * This setting has no effect on the Spring WebClient implementation.
+     */
+    protected String multipartMode = "STRICT";
+
     protected FlowableHttpClient httpClient;
     protected Runnable closeRunnable;
 
@@ -148,6 +164,14 @@ public class HttpClientConfig {
         return useSystemProperties;
     }
 
+    public String getMultipartMode() {
+        return multipartMode;
+    }
+
+    public void setMultipartMode(String multipartMode) {
+        this.multipartMode = multipartMode;
+    }
+
     public void merge(HttpClientConfig other) {
         if (this.connectTimeout != other.getConnectTimeout()) {
             setConnectTimeout(other.getConnectTimeout());
@@ -171,6 +195,10 @@ public class HttpClientConfig {
 
         if (this.useSystemProperties != other.isUseSystemProperties()) {
             setUseSystemProperties(other.isUseSystemProperties());
+        }
+
+        if (!Objects.equals(this.multipartMode, other.getMultipartMode())) {
+            setMultipartMode(other.getMultipartMode());
         }
 
         if (!Objects.equals(this.httpClient, other.getHttpClient())) {

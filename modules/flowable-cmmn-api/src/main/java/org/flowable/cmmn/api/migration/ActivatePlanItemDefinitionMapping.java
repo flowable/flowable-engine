@@ -13,16 +13,24 @@
 package org.flowable.cmmn.api.migration;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ActivatePlanItemDefinitionMapping extends PlanItemDefinitionMapping {
 
+    protected String newName;
     protected String newAssignee;
+    protected String newOwner;
+    protected String newFormKey;
+    protected String newDueDate;
+    protected String newPriority;
+    protected String newCategory;
+    protected List<String> newCandidateUsers;
+    protected List<String> newCandidateGroups;
     protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
-    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String newAssignee, Map<String, Object> withLocalVariables) {
+    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, Map<String, Object> withLocalVariables) {
         super(planItemDefinitionId);
-        this.newAssignee = newAssignee;
         this.withLocalVariables = withLocalVariables;
     }
     
@@ -34,25 +42,98 @@ public class ActivatePlanItemDefinitionMapping extends PlanItemDefinitionMapping
         super(planItemDefinitionId, condition);
     }
 
-    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String newAssignee, String condition, Map<String, Object> withLocalVariables) {
+    public ActivatePlanItemDefinitionMapping(String planItemDefinitionId, String condition, Map<String, Object> withLocalVariables) {
         super(planItemDefinitionId, condition);
-        this.newAssignee = newAssignee;
         this.withLocalVariables = withLocalVariables;
+    }
+
+    public String getNewName() {
+        return newName;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewName(String newName) {
+        this.newName = newName;
+        return this;
     }
 
     public String getNewAssignee() {
         return newAssignee;
     }
 
-    public void setNewAssignee(String newAssignee) {
+    public ActivatePlanItemDefinitionMapping withNewAssignee(String newAssignee) {
         this.newAssignee = newAssignee;
+        return this;
+    }
+
+    public String getNewOwner() {
+        return newOwner;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewOwner(String newOwner) {
+        this.newOwner = newOwner;
+        return this;
+    }
+
+    public String getNewFormKey() {
+        return newFormKey;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewFormKey(String newFormKey) {
+        this.newFormKey = newFormKey;
+        return this;
+    }
+
+    public String getNewDueDate() {
+        return newDueDate;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewDueDate(String newDueDate) {
+        this.newDueDate = newDueDate;
+        return this;
+    }
+
+    public String getNewPriority() {
+        return newPriority;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewPriority(String newPriority) {
+        this.newPriority = newPriority;
+        return this;
+    }
+
+    public String getNewCategory() {
+        return newCategory;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewCategory(String newCategory) {
+        this.newCategory = newCategory;
+        return this;
+    }
+
+    public List<String> getNewCandidateUsers() {
+        return newCandidateUsers;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewCandidateUsers(List<String> newCandidateUsers) {
+        this.newCandidateUsers = newCandidateUsers;
+        return this;
+    }
+
+    public List<String> getNewCandidateGroups() {
+        return newCandidateGroups;
+    }
+
+    public ActivatePlanItemDefinitionMapping withNewCandidateGroups(List<String> newCandidateGroups) {
+        this.newCandidateGroups = newCandidateGroups;
+        return this;
     }
 
     public Map<String, Object> getWithLocalVariables() {
         return withLocalVariables;
     }
 
-    public void setWithLocalVariables(Map<String, Object> withLocalVariables) {
+    public ActivatePlanItemDefinitionMapping withLocalVariables(Map<String, Object> withLocalVariables) {
         this.withLocalVariables = withLocalVariables;
+        return this;
     }
 }

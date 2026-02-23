@@ -32,6 +32,16 @@ public class StringToXmlDocumentDeserializer implements InboundEventDeserializer
     public Document deserialize(Object rawEvent) {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            
+            documentBuilderFactory.setValidating(false);
+            documentBuilderFactory.setExpandEntityReferences(false);
+            documentBuilderFactory.setXIncludeAware(false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            
+            
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             try (InputStream inputStream = new ByteArrayInputStream(convertEventToBytes(rawEvent))) {
                 Document document = documentBuilder.parse(inputStream);

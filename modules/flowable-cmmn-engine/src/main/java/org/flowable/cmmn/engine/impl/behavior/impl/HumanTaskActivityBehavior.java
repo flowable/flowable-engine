@@ -113,14 +113,14 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 cmmnEngineConfiguration.getCreateHumanTaskInterceptor().beforeCreateHumanTask(beforeContext);
             }
             
-            handleTaskName(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
+            handleTaskName(planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
             handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
             handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity, planItemInstanceEntityManager, beforeContext, migrationContext);
-            handleOwner(planItemInstanceEntity, taskService, expressionManager, taskEntity, beforeContext);
-            handlePriority(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-            handleFormKey(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-            handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-            handleCategory(planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
+            handleOwner(planItemInstanceEntity, taskService, expressionManager, taskEntity, beforeContext, migrationContext);
+            handlePriority(planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
+            handleFormKey(planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
+            handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
+            handleCategory(planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
 
             TaskHelper.insertTask(taskEntity, true, cmmnEngineConfiguration);
             
@@ -143,8 +143,8 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 }
             }
 
-            handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
-            handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext);
+            handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
+            handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity, beforeContext, migrationContext);
             handleTaskIdVariableStorage(planItemInstanceEntity, humanTask, expressionManager, taskEntity);
 
             planItemInstanceEntity.setReferenceId(taskEntity.getId());
@@ -178,10 +178,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, 
-                    TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+                    TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
-        if (StringUtils.isNotEmpty(beforeContext.getName())) {
-            Object name = expressionManager.createExpression(beforeContext.getName()).getValue(planItemInstanceEntity);
+        String nameStringValue = null;
+        if (migrationContext != null && migrationContext.getName() != null) {
+            nameStringValue = migrationContext.getName();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getName())) {
+            nameStringValue = beforeContext.getName();
+        }
+        
+        if (StringUtils.isNotEmpty(nameStringValue)) {
+            Object name = expressionManager.createExpression(nameStringValue).getValue(planItemInstanceEntity);
             if (name != null) {
                 if (name instanceof String) {
                     taskEntity.setName((String) name);
@@ -232,10 +240,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleOwner(PlanItemInstanceEntity planItemInstanceEntity, TaskService taskService,
-            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
-        if (StringUtils.isNotEmpty(beforeContext.getOwner())) {
-            Object ownerExpressionValue = expressionManager.createExpression(beforeContext.getOwner()).getValue(planItemInstanceEntity);
+        String ownerStringValue = null;
+        if (migrationContext != null && migrationContext.getOwner() != null) {
+            ownerStringValue = migrationContext.getOwner();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getOwner())) {
+            ownerStringValue = beforeContext.getOwner();
+        }
+        
+        if (StringUtils.isNotEmpty(ownerStringValue)) {
+            Object ownerExpressionValue = expressionManager.createExpression(ownerStringValue).getValue(planItemInstanceEntity);
             String ownerValue = null;
             if (ownerExpressionValue != null) {
                 ownerValue = ownerExpressionValue.toString();
@@ -246,10 +262,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handlePriority(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, 
-                    TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
-        if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
-            Object priority = expressionManager.createExpression(beforeContext.getPriority()).getValue(planItemInstanceEntity);
+        String priorityStringValue = null;
+        if (migrationContext != null && migrationContext.getPriority() != null) {
+            priorityStringValue = migrationContext.getPriority();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getPriority())) {
+            priorityStringValue = beforeContext.getPriority();
+        }
+        
+        if (StringUtils.isNotEmpty(priorityStringValue)) {
+            Object priority = expressionManager.createExpression(priorityStringValue).getValue(planItemInstanceEntity);
             if (priority != null) {
                 if (priority instanceof String) {
                     try {
@@ -267,10 +291,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleFormKey(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
-            TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
 
-        if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
-            Object formKey = expressionManager.createExpression(beforeContext.getFormKey()).getValue(planItemInstanceEntity);
+        String formKeyStringValue = null;
+        if (migrationContext != null && migrationContext.getFormKey() != null) {
+            formKeyStringValue = migrationContext.getFormKey();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getFormKey())) {
+            formKeyStringValue = beforeContext.getFormKey();
+        }
+        
+        if (StringUtils.isNotEmpty(formKeyStringValue)) {
+            Object formKey = expressionManager.createExpression(formKeyStringValue).getValue(planItemInstanceEntity);
             if (formKey != null) {
                 if (formKey instanceof String) {
                     taskEntity.setFormKey((String) formKey);
@@ -282,10 +314,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleDueDate(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
-            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
-        if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
-            Object dueDate = expressionManager.createExpression(beforeContext.getDueDate()).getValue(planItemInstanceEntity);
+        String dueDateStringValue = null;
+        if (migrationContext != null && migrationContext.getDueDate() != null) {
+            dueDateStringValue = migrationContext.getDueDate();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getDueDate())) {
+            dueDateStringValue = beforeContext.getDueDate();
+        }
+        
+        if (StringUtils.isNotEmpty(dueDateStringValue)) {
+            Object dueDate = expressionManager.createExpression(dueDateStringValue).getValue(planItemInstanceEntity);
             if (dueDate != null) {
                 if (dueDate instanceof Date) {
                     taskEntity.setDueDate((Date) dueDate);
@@ -313,10 +353,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
     }
 
     protected void handleCategory(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
-            TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
-        if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
-            final Object category = expressionManager.createExpression(beforeContext.getCategory()).getValue(planItemInstanceEntity);
+        String categoryStringValue = null;
+        if (migrationContext != null && migrationContext.getCategory() != null) {
+            categoryStringValue = migrationContext.getCategory();
+            
+        } else if (StringUtils.isNotEmpty(beforeContext.getCategory())) {
+            categoryStringValue = beforeContext.getCategory();
+        }
+        
+        if (StringUtils.isNotEmpty(categoryStringValue)) {
+            final Object category = expressionManager.createExpression(categoryStringValue).getValue(planItemInstanceEntity);
             if (category != null) {
                 if (category instanceof String) {
                     taskEntity.setCategory((String) category);
@@ -329,10 +377,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateUsers(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
-            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        List<String> candidateUsers = beforeContext.getCandidateUsers();
+        
+        List<String> candidateUsers = null;
+        if (migrationContext != null && migrationContext.getCandidateUsers() != null) {
+            candidateUsers = migrationContext.getCandidateUsers();
+            
+        } else if (beforeContext.getCandidateUsers() != null) {
+            candidateUsers = beforeContext.getCandidateUsers();
+        }
+        
         if (candidateUsers != null && !candidateUsers.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
             for (String candidateUser : candidateUsers) {
@@ -360,10 +416,18 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected void handleCandidateGroups(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity,
-            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext) {
+            ExpressionManager expressionManager, TaskEntity taskEntity, CreateHumanTaskBeforeContext beforeContext, MigrationContext migrationContext) {
         
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        List<String> candidateGroups = beforeContext.getCandidateGroups();
+        
+        List<String> candidateGroups = null;
+        if (migrationContext != null && migrationContext.getCandidateGroups() != null) {
+            candidateGroups = migrationContext.getCandidateGroups();
+            
+        } else if (beforeContext.getCandidateGroups() != null) {
+            candidateGroups = beforeContext.getCandidateGroups();
+        }
+        
         if (candidateGroups != null && !candidateGroups.isEmpty()) {
             List<IdentityLinkEntity> allIdentityLinkEntities = new ArrayList<>();
             for (String candidateGroup : candidateGroups) {

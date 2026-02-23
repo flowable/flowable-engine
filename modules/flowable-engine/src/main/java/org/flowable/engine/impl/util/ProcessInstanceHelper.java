@@ -64,6 +64,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 
 import tools.jackson.databind.node.ObjectNode;
 
@@ -156,8 +157,7 @@ public class ProcessInstanceHelper {
             if (flowElement instanceof StartEvent startEvent) {
                 if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions()
                         .get(0) instanceof MessageEventDefinition messageEventDefinition) {
-
-                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
                     if (Objects.equals(actualMessageName, messageName)) {
                         initialFlowElement = flowElement;
                         break;
@@ -461,7 +461,9 @@ public class ProcessInstanceHelper {
         signalExecution.setEventScope(true);
         signalExecution.setActive(false);
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(parentExecution.getProcessDefinitionId(),
+                parentExecution.getProcessDefinitionKey(), parentExecution.getDeploymentId(), ScopeTypes.BPMN, parentExecution.getTenantId());
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
                 .getEventSubscriptionService().createEventSubscriptionBuilder()

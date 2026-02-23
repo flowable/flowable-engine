@@ -155,7 +155,7 @@ public class BeanELResolver extends ELResolver {
 		} catch (InvocationTargetException e) {
 			Throwable cause = e.getCause();
 			Util.handleThrowable(cause);
-			throw new ELException("Error reading '" + property + "' on type '" + base.getClass().getName() + "'");
+            throw new ELException("Error reading '" + property + "' on type '" + base.getClass().getName() + "'", cause);
 		} catch (Exception e) {
 			throw new ELException(e);
 		}

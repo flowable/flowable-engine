@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -34,6 +35,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -104,6 +106,30 @@ public class ReactivateHistoricCaseInstanceCmd implements Command<CaseInstance>,
             if (!Boolean.TRUE.equals(listenerAvailable)) {
                 throw new FlowableIllegalStateException("The case instance " + caseInstanceEntity.getId()
                     + " cannot be reactivated, as the available condition of its reactivate event listener did not evaluate to true.");
+            }
+        }
+        
+        if (StringUtils.isNotEmpty(instance.getCallbackId()) && ReferenceTypes.PLAN_ITEM_CHILD_CASE.equals(instance.getCallbackType())) {
+            PlanItemInstanceEntityManager planItemInstanceEntityManager = cmmnEngineConfiguration.getPlanItemInstanceEntityManager();
+            PlanItemInstance parentPlanItemInstance = planItemInstanceEntityManager.findById(instance.getCallbackId());
+            if (parentPlanItemInstance != null) {
+                Case parentCase = CaseDefinitionUtil.getCase(parentPlanItemInstance.getCaseDefinitionId());
+                PlanItem planItem = parentCase.getPlanModel().findPlanItemForPlanItemDefinitionInPlanFragmentOrDownwards(parentPlanItemInstance.getPlanItemDefinitionId());
+                PlanItemInstanceEntity toActivateParentPlanItemInstance = planItemInstanceEntityManager
+                        .createPlanItemInstanceEntityBuilder()
+                        .planItem(planItem)
+                        .caseDefinitionId(parentPlanItemInstance.getCaseDefinitionId())
+                        .caseInstanceId(parentPlanItemInstance.getCaseInstanceId())
+                        .tenantId(parentPlanItemInstance.getTenantId())
+                        .create();
+                
+                toActivateParentPlanItemInstance.setState(PlanItemInstanceState.ACTIVE);
+                toActivateParentPlanItemInstance.setReferenceId(caseInstanceEntity.getId());
+                toActivateParentPlanItemInstance.setReferenceType(ReferenceTypes.PLAN_ITEM_CHILD_CASE);
+                
+                cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceCreated(toActivateParentPlanItemInstance);
+                
+                caseInstanceEntity.setCallbackId(toActivateParentPlanItemInstance.getId());
             }
         }
 

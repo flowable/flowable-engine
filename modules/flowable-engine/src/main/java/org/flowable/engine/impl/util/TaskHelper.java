@@ -14,6 +14,7 @@ package org.flowable.engine.impl.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,8 @@ import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.DelegationState;
@@ -212,10 +215,49 @@ public class TaskHelper {
             }
         }
     }
+    
+    public static void updateTask(TaskEntity taskEntity, String name, Integer priority, String category, Date dueDate, String formKey) {
+        if ((name != null && !name.equals(taskEntity.getName())) || 
+                (priority != null && !priority.equals(taskEntity.getPriority())) ||
+                (category != null && !category.equals(taskEntity.getCategory())) ||
+                (dueDate != null && !dueDate.equals(taskEntity.getDueDate())) || 
+                (formKey != null && !formKey.equals(taskEntity.getFormKey()))) {
+         
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            TaskServiceConfiguration taskServiceConfiguration = processEngineConfiguration.getTaskServiceConfiguration();
+            TaskService taskService = taskServiceConfiguration.getTaskService();
+            
+            if (name != null && !name.equals(taskEntity.getName())) {
+                taskEntity.setName(name);
+            }
+            
+            if (priority != null && !priority.equals(taskEntity.getPriority())) {
+                taskEntity.setPriority(priority);
+            }
+            
+            if (category != null && !category.equals(taskEntity.getCategory())) {
+                taskEntity.setCategory(category);
+            }
+            
+            if (dueDate != null && !dueDate.equals(taskEntity.getDueDate())) {
+                taskEntity.setDueDate(dueDate);
+            }
+            
+            if (formKey != null && !formKey.equals(taskEntity.getFormKey())) {
+                taskEntity.setFormKey(formKey);
+            }
+            
+            taskService.updateTask(taskEntity, true);
+            
+            if (taskEntity.getId() != null) {
+                taskServiceConfiguration.getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity, processEngineConfiguration.getClock().getCurrentTime());
+            }
+        }
+    }
 
     public static void changeTaskAssignee(TaskEntity taskEntity, String assignee) {
-        if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee))
-                || (taskEntity.getAssignee() == null && assignee != null)) {
+        if ((taskEntity.getAssignee() != null && !taskEntity.getAssignee().equals(assignee)) || 
+                (taskEntity.getAssignee() == null && assignee != null)) {
 
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             processEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskAssignee(taskEntity, assignee);
@@ -228,13 +270,46 @@ public class TaskHelper {
     }
 
     public static void changeTaskOwner(TaskEntity taskEntity, String owner) {
-        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner))
-                || (taskEntity.getOwner() == null && owner != null)) {
+        if ((taskEntity.getOwner() != null && !taskEntity.getOwner().equals(owner)) || 
+                (taskEntity.getOwner() == null && owner != null)) {
 
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             processEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskOwner(taskEntity, owner);
             if (taskEntity.getId() != null) {
                 addOwnerIdentityLink(taskEntity, taskEntity.getOwner());
+            }
+        }
+    }
+    
+    public static void changeTaskCandidates(TaskEntity taskEntity, List<String> candidateUsers, List<String> candidateGroups) {
+        if ((candidateUsers != null && !candidateUsers.isEmpty()) || (candidateGroups != null && !candidateGroups.isEmpty())) {
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            IdentityLinkService identityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService();
+            List<IdentityLinkEntity> identityLinkEntities = identityLinkService.findIdentityLinksByTaskId(taskEntity.getId());
+            List<IdentityLinkEntity> deletedIdentityLinks = new ArrayList<>();
+            for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
+                if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType())) {
+                    identityLinkService.deleteIdentityLink(identityLinkEntity);
+                    deletedIdentityLinks.add(identityLinkEntity);
+                }
+            }
+            
+            if (candidateUsers != null && !candidateUsers.isEmpty()) {
+                List<IdentityLinkEntity> candidateUserIdentityLinkEntities = identityLinkService.addCandidateUsers(taskEntity.getId(), candidateUsers);
+                if (candidateUserIdentityLinkEntities != null && !candidateUserIdentityLinkEntities.isEmpty()) {
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, candidateUserIdentityLinkEntities);
+                }
+            }
+            
+            if (candidateGroups != null && !candidateGroups.isEmpty()) {
+                List<IdentityLinkEntity> candidateGroupIdentityLinkEntities = identityLinkService.addCandidateGroups(taskEntity.getId(), candidateGroups);
+                if (candidateGroupIdentityLinkEntities != null && !candidateGroupIdentityLinkEntities.isEmpty()) {
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(taskEntity, candidateGroupIdentityLinkEntities);
+                }
+            }
+            
+            if (!deletedIdentityLinks.isEmpty()) {
+                IdentityLinkUtil.handleTaskIdentityLinkDeletions(taskEntity, deletedIdentityLinks, true, true);
             }
         }
     }

@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -36,6 +37,7 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CorrelationUtil;
@@ -154,23 +156,12 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
     protected void restoreTimerStartEvent(ProcessDefinition previousProcessDefinition, StartEvent startEvent, EventDefinition eventDefinition) {
         TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-        TimerJobEntity timer = TimerUtil.createTimerEntityForTimerEventDefinition((TimerEventDefinition) eventDefinition, startEvent,
-                false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                false, previousProcessDefinition, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                         timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
-        if (timer != null) {
-            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                    false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
-                            timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
-            timerJob.setProcessDefinitionId(previousProcessDefinition.getId());
-
-            if (previousProcessDefinition.getTenantId() != null) {
-                timerJob.setTenantId(previousProcessDefinition.getTenantId());
-            }
-
-            engineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
-        }
+        engineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
     }
 
     protected void restoreSignalStartEvent(ProcessDefinition previousProcessDefinition, BpmnModel bpmnModel, StartEvent startEvent, EventDefinition eventDefinition) {
@@ -178,7 +169,7 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         SignalEventSubscriptionEntity subscriptionEntity = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createSignalEventSubscription();
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, previousProcessDefinition);
         subscriptionEntity.setEventName(eventName);
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(previousProcessDefinition.getId());
@@ -199,7 +190,7 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
         CommandContext commandContext = Context.getCommandContext();
         MessageEventSubscriptionEntity newSubscription = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createMessageEventSubscription();
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, previousProcessDefinition);
         newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(previousProcessDefinition.getId());

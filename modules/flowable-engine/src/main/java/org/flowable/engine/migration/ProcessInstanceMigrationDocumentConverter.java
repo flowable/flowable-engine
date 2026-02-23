@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.migration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,10 +269,50 @@ public class ProcessInstanceMigrationDocumentConverter {
 
         public ObjectNode convertToJson(T mapping, ObjectMapper objectMapper) {
             ObjectNode mappingNode = convertMappingInfoToJson(mapping, objectMapper);
+            
+            JsonNode newNameToJsonNode = convertNewNameToJson(mapping, objectMapper);
+            if (newNameToJsonNode != null && !newNameToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_NAME_JSON_PROPERTY, newNameToJsonNode);
+            }
+            
+            JsonNode newDueDateToJsonNode = convertNewDueDateToJson(mapping, objectMapper);
+            if (newDueDateToJsonNode != null && !newDueDateToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_DUE_DATE_JSON_PROPERTY, newDueDateToJsonNode);
+            }
+            
+            JsonNode newPriorityToJsonNode = convertNewPriorityToJson(mapping, objectMapper);
+            if (newPriorityToJsonNode != null && !newPriorityToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_PRIORITY_JSON_PROPERTY, newPriorityToJsonNode);
+            }
+            
+            JsonNode newCategoryToJsonNode = convertNewCategoryToJson(mapping, objectMapper);
+            if (newCategoryToJsonNode != null && !newCategoryToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_CATEGORY_JSON_PROPERTY, newCategoryToJsonNode);
+            }
+            
+            JsonNode newFormKeyToJsonNode = convertNewFormKeyToJson(mapping, objectMapper);
+            if (newFormKeyToJsonNode != null && !newFormKeyToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_FORM_KEY_JSON_PROPERTY, newFormKeyToJsonNode);
+            }
 
             JsonNode newAssigneeToJsonNode = convertNewAssigneeToJson(mapping, objectMapper);
             if (newAssigneeToJsonNode != null && !newAssigneeToJsonNode.isNull()) {
                 mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY, newAssigneeToJsonNode);
+            }
+            
+            JsonNode newOwnerToJsonNode = convertNewOwnerToJson(mapping, objectMapper);
+            if (newOwnerToJsonNode != null && !newOwnerToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_OWNER_JSON_PROPERTY, newOwnerToJsonNode);
+            }
+            
+            JsonNode newCandidateUsersToJsonNode = convertNewCandidateUsersToJson(mapping, objectMapper);
+            if (newCandidateUsersToJsonNode != null && !newCandidateUsersToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_CANDIDATE_USERS_JSON_PROPERTY, newCandidateUsersToJsonNode);
+            }
+            
+            JsonNode newCandidateGroupsToJsonNode = convertNewCandidateGroupsToJson(mapping, objectMapper);
+            if (newCandidateGroupsToJsonNode != null && !newCandidateGroupsToJsonNode.isNull()) {
+                mappingNode.set(ProcessInstanceMigrationDocumentConstants.NEW_CANDIDATE_GROUPS_JSON_PROPERTY, newCandidateGroupsToJsonNode);
             }
 
             JsonNode variablesToJsonNode = convertLocalVariablesToJson(mapping, objectMapper);
@@ -297,8 +338,24 @@ public class ProcessInstanceMigrationDocumentConverter {
         }
 
         protected abstract JsonNode convertLocalVariablesToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewNameToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewDueDateToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewPriorityToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewCategoryToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewFormKeyToJson(T mapping, ObjectMapper objectMapper);
 
         protected abstract JsonNode convertNewAssigneeToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewOwnerToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewCandidateUsersToJson(T mapping, ObjectMapper objectMapper);
+        
+        protected abstract JsonNode convertNewCandidateGroupsToJson(T mapping, ObjectMapper objectMapper);
 
         public abstract T convertFromJson(JsonNode jsonNode, ObjectMapper objectMapper);
 
@@ -328,11 +385,60 @@ public class ProcessInstanceMigrationDocumentConverter {
             }
             return null;
         }
+        
+        protected String getNewNameFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_NAME_JSON_PROPERTY).stringValue(null);
+        }
+        
+        protected String getNewDueDateFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_DUE_DATE_JSON_PROPERTY).stringValue(null);
+        }
+        
+        protected String getNewPriorityFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_PRIORITY_JSON_PROPERTY).stringValue(null);
+        }
+        
+        protected String getNewCategoryFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_CATEGORY_JSON_PROPERTY).stringValue(null);
+        }
+        
+        protected String getNewFormKeyFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_FORM_KEY_JSON_PROPERTY).stringValue(null);
+        }
 
         protected String getNewAssigneeFromJson(JsonNode jsonNode) {
             return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_ASSIGNEE_JSON_PROPERTY).stringValue(null);
         }
 
+        protected String getNewOwnerFromJson(JsonNode jsonNode) {
+            return jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_OWNER_JSON_PROPERTY).stringValue(null);
+        }
+        
+        protected List<String> getNewCandidateUsersFromJson(JsonNode jsonNode) {
+            List<String> candidateUsers = null;
+            JsonNode candidateUserArray = jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_CANDIDATE_USERS_JSON_PROPERTY);
+            if (candidateUserArray != null && candidateUserArray.isArray() && !candidateUserArray.isEmpty()) {
+                candidateUsers = new ArrayList<>();
+                for (JsonNode userNode : candidateUserArray) {
+                    candidateUsers.add(userNode.asString());
+                }
+            }
+            
+            return candidateUsers;
+        }
+        
+        protected List<String> getNewCandidateGroupsFromJson(JsonNode jsonNode) {
+            List<String> candidateGroups = null;
+            JsonNode candidateGroupArray = jsonNode.path(ProcessInstanceMigrationDocumentConstants.NEW_CANDIDATE_GROUPS_JSON_PROPERTY);
+            if (candidateGroupArray != null && candidateGroupArray.isArray() && !candidateGroupArray.isEmpty()) {
+                candidateGroups = new ArrayList<>();
+                for (JsonNode groupNode : candidateGroupArray) {
+                    candidateGroups.add(groupNode.asString());
+                }
+            }
+            
+            return candidateGroups;
+        }
     }
 
     public static class OneToOneMappingConverter extends BaseActivityMigrationMappingConverter<ActivityMigrationMapping.OneToOneMapping> {
@@ -354,10 +460,50 @@ public class ProcessInstanceMigrationDocumentConverter {
             }
             return null;
         }
+        
+        @Override
+        protected JsonNode convertNewNameToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewName());
+        }
+        
+        @Override
+        protected JsonNode convertNewDueDateToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewDueDate());
+        }
+        
+        @Override
+        protected JsonNode convertNewPriorityToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewPriority());
+        }
+        
+        @Override
+        protected JsonNode convertNewCategoryToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCategory());
+        }
+        
+        @Override
+        protected JsonNode convertNewFormKeyToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewFormKey());
+        }
 
         @Override
         protected JsonNode convertNewAssigneeToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
             return objectMapper.valueToTree(mapping.getWithNewAssignee());
+        }
+        
+        @Override
+        protected JsonNode convertNewOwnerToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewOwner());
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateUsersToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCandidateUsers());
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateGroupsToJson(ActivityMigrationMapping.OneToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCandidateGroups());
         }
 
         @Override
@@ -368,8 +514,15 @@ public class ProcessInstanceMigrationDocumentConverter {
             ActivityMigrationMapping.OneToOneMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityId, toActivityId);
             convertAdditionalMappingInfoFromJson(oneToOneMapping, jsonNode);
 
-            Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
-                .ifPresent(oneToOneMapping::withNewAssignee);
+            oneToOneMapping.withNewName(getNewNameFromJson(jsonNode));
+            oneToOneMapping.withNewDueDate(getNewDueDateFromJson(jsonNode));
+            oneToOneMapping.withNewPriority(getNewPriorityFromJson(jsonNode));
+            oneToOneMapping.withNewCategory(getNewCategoryFromJson(jsonNode));
+            oneToOneMapping.withNewFormKey(getNewFormKeyFromJson(jsonNode));
+            oneToOneMapping.withNewAssignee(getNewAssigneeFromJson(jsonNode));
+            oneToOneMapping.withNewOwner(getNewOwnerFromJson(jsonNode));
+            oneToOneMapping.withNewCandidateUsers(getNewCandidateUsersFromJson(jsonNode));
+            oneToOneMapping.withNewCandidateGroups(getNewCandidateGroupsFromJson(jsonNode));
 
             Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
             if (localVariables != null) {
@@ -401,10 +554,50 @@ public class ProcessInstanceMigrationDocumentConverter {
             }
             return null;
         }
+        
+        @Override
+        protected JsonNode convertNewNameToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewName());
+        }
+        
+        @Override
+        protected JsonNode convertNewDueDateToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewDueDate());
+        }
+        
+        @Override
+        protected JsonNode convertNewPriorityToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewPriority());
+        }
+        
+        @Override
+        protected JsonNode convertNewCategoryToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCategory());
+        }
+        
+        @Override
+        protected JsonNode convertNewFormKeyToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewFormKey());
+        }
 
         @Override
         protected JsonNode convertNewAssigneeToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
             return objectMapper.valueToTree(mapping.getWithNewAssignee());
+        }
+        
+        @Override
+        protected JsonNode convertNewOwnerToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewOwner());
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateUsersToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCandidateUsers());
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateGroupsToJson(ActivityMigrationMapping.ManyToOneMapping mapping, ObjectMapper objectMapper) {
+            return objectMapper.valueToTree(mapping.getWithNewCandidateGroups());
         }
 
         @Override
@@ -418,8 +611,15 @@ public class ProcessInstanceMigrationDocumentConverter {
             ActivityMigrationMapping.ManyToOneMapping manyToOneMapping = ActivityMigrationMapping.createMappingFor(fromActivityIds, toActivityId);
             convertAdditionalMappingInfoFromJson(manyToOneMapping, jsonNode);
 
-            Optional.ofNullable(getNewAssigneeFromJson(jsonNode))
-                .ifPresent(manyToOneMapping::withNewAssignee);
+            manyToOneMapping.withNewName(getNewNameFromJson(jsonNode));
+            manyToOneMapping.withNewDueDate(getNewDueDateFromJson(jsonNode));
+            manyToOneMapping.withNewPriority(getNewPriorityFromJson(jsonNode));
+            manyToOneMapping.withNewCategory(getNewCategoryFromJson(jsonNode));
+            manyToOneMapping.withNewFormKey(getNewFormKeyFromJson(jsonNode));
+            manyToOneMapping.withNewAssignee(getNewAssigneeFromJson(jsonNode));
+            manyToOneMapping.withNewOwner(getNewOwnerFromJson(jsonNode));
+            manyToOneMapping.withNewCandidateUsers(getNewCandidateUsersFromJson(jsonNode));
+            manyToOneMapping.withNewCandidateGroups(getNewCandidateGroupsFromJson(jsonNode));
 
             Map<String, Object> localVariables = getLocalVariablesFromJson(jsonNode, objectMapper);
             if (localVariables != null) {
@@ -450,9 +650,49 @@ public class ProcessInstanceMigrationDocumentConverter {
             }
             return null;
         }
+        
+        @Override
+        protected JsonNode convertNewNameToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewDueDateToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewPriorityToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewCategoryToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewFormKeyToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
 
         @Override
         protected JsonNode convertNewAssigneeToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewOwnerToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateUsersToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
+            return null;
+        }
+        
+        @Override
+        protected JsonNode convertNewCandidateGroupsToJson(ActivityMigrationMapping.OneToManyMapping mapping, ObjectMapper objectMapper) {
             return null;
         }
 

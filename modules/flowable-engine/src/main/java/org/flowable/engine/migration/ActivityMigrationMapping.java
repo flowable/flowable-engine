@@ -64,8 +64,15 @@ public abstract class ActivityMigrationMapping {
 
         public String fromActivityId;
         public String toActivityId;
+        protected String withNewName;
         protected String withNewAssignee;
         protected String withNewOwner;
+        protected String withNewFormKey;
+        protected String withNewDueDate;
+        protected String withNewPriority;
+        protected String withNewCategory;
+        protected List<String> withNewCandidateUsers;
+        protected List<String> withNewCandidateGroups;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public OneToOneMapping(String fromActivityId, String toActivityId) {
@@ -139,6 +146,83 @@ public abstract class ActivityMigrationMapping {
         @Override
         public String getWithNewOwner() {
             return this.withNewOwner;
+        }
+
+        @Override
+        public OneToOneMapping withNewName(String newName) {
+            this.withNewName = newName;
+            return this;
+        }
+
+        @Override
+        public String getWithNewName() {
+            return withNewName;
+        }
+
+        @Override
+        public OneToOneMapping withNewFormKey(String newFormKey) {
+            this.withNewFormKey = newFormKey;
+            return this;
+        }
+
+        @Override
+        public String getWithNewFormKey() {
+            return withNewFormKey;
+        }
+
+        @Override
+        public OneToOneMapping withNewDueDate(String newDueDate) {
+            this.withNewDueDate = newDueDate;
+            return this;
+        }
+
+        @Override
+        public String getWithNewDueDate() {
+            return withNewDueDate;
+        }
+
+        @Override
+        public OneToOneMapping withNewPriority(String newPriority) {
+            this.withNewPriority = newPriority;
+            return this;
+        }
+
+        @Override
+        public String getWithNewPriority() {
+            return withNewPriority;
+        }
+
+        @Override
+        public OneToOneMapping withNewCategory(String newCategory) {
+            this.withNewCategory = newCategory;
+            return this;
+        }
+
+        @Override
+        public String getWithNewCategory() {
+            return withNewCategory;
+        }
+
+        @Override
+        public OneToOneMapping withNewCandidateUsers(List<String> newCandidateUsers) {
+            this.withNewCandidateUsers = newCandidateUsers;
+            return this;
+        }
+
+        @Override
+        public List<String> getWithNewCandidateUsers() {
+            return withNewCandidateUsers;
+        }
+
+        @Override
+        public OneToOneMapping withNewCandidateGroups(List<String> newCandidateGroups) {
+            this.withNewCandidateGroups = newCandidateGroups;
+            return this;
+        }
+
+        @Override
+        public List<String> getWithNewCandidateGroups() {
+            return withNewCandidateGroups;
         }
 
         @Override
@@ -262,8 +346,15 @@ public abstract class ActivityMigrationMapping {
 
         public List<String> fromActivityIds;
         public String toActivityId;
+        protected String withNewName;
         protected String withNewAssignee;
         protected String withNewOwner;
+        protected String withNewFormKey;
+        protected String withNewDueDate;
+        protected String withNewPriority;
+        protected String withNewCategory;
+        protected List<String> withNewCandidateUsers;
+        protected List<String> withNewCandidateGroups;
         protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
         public ManyToOneMapping(List<String> fromActivityIds, String toActivityId) {
@@ -330,7 +421,84 @@ public abstract class ActivityMigrationMapping {
 
         @Override
         public String getWithNewOwner() {
-            return withNewOwner;
+            return this.withNewOwner;
+        }
+
+        @Override
+        public ManyToOneMapping withNewName(String newName) {
+            this.withNewName = newName;
+            return this;
+        }
+
+        @Override
+        public String getWithNewName() {
+            return withNewName;
+        }
+
+        @Override
+        public ManyToOneMapping withNewFormKey(String newFormKey) {
+            this.withNewFormKey = newFormKey;
+            return this;
+        }
+
+        @Override
+        public String getWithNewFormKey() {
+            return withNewFormKey;
+        }
+
+        @Override
+        public ManyToOneMapping withNewDueDate(String newDueDate) {
+            this.withNewDueDate = newDueDate;
+            return this;
+        }
+
+        @Override
+        public String getWithNewDueDate() {
+            return withNewDueDate;
+        }
+
+        @Override
+        public ManyToOneMapping withNewPriority(String newPriority) {
+            this.withNewPriority = newPriority;
+            return this;
+        }
+
+        @Override
+        public String getWithNewPriority() {
+            return withNewPriority;
+        }
+
+        @Override
+        public ManyToOneMapping withNewCategory(String newCategory) {
+            this.withNewCategory = newCategory;
+            return this;
+        }
+
+        @Override
+        public String getWithNewCategory() {
+            return withNewCategory;
+        }
+
+        @Override
+        public ManyToOneMapping withNewCandidateUsers(List<String> newCandidateUsers) {
+            this.withNewCandidateUsers = newCandidateUsers;
+            return this;
+        }
+
+        @Override
+        public List<String> getWithNewCandidateUsers() {
+            return withNewCandidateUsers;
+        }
+
+        @Override
+        public ManyToOneMapping withNewCandidateGroups(List<String> newCandidateGroups) {
+            this.withNewCandidateGroups = newCandidateGroups;
+            return this;
+        }
+
+        @Override
+        public List<String> getWithNewCandidateGroups() {
+            return withNewCandidateGroups;
         }
 
         @Override

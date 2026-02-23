@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="simpleReactivationTestCase" name="Simple Reactivation Test Case" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <planItem id="planItem1" name="Reactivate case" definitionRef="reactivateEventListener1" />
+      <planItem id="planItem2" name="Task A" definitionRef="humanTask1">
+        <itemControl>
+           <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1" />
+        </itemControl>
+      </planItem>
+      
+      <sentry id="sentrycmmnExitSentry">
+        <planItemOnPart id="sentryOnPartcmmnExitSentry" sourceRef="planItem2">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      
+      <eventListener id="reactivateEventListener1" name="Reactivate case" flowable:eventType="reactivate">
+        <extensionElements>
+          <flowable:defaultReactivationRule defaultCondition="true"/>
+        </extensionElements>
+      </eventListener>
+      
+      <humanTask id="humanTask1" name="Task A" />
+      
+      <exitCriterion id="cmmnExitSentry" sentryRef="sentrycmmnExitSentry" flowable:exitEventType="forceComplete" />
+    </casePlanModel>
+  </case>
+</definitions>

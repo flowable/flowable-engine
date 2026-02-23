@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.migration;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,10 @@ public interface ActivityMigrationMappingOptions<T extends ActivityMigrationMapp
 
     interface SingleToActivityOptions <T extends ActivityMigrationMapping> extends ActivityMigrationMappingOptions<T> {
 
+        T withNewName(String newName);
+        
+        String getWithNewName();
+        
         T withNewAssignee(String newAssigneeId);
 
         String getWithNewAssignee();
@@ -44,6 +50,30 @@ public interface ActivityMigrationMappingOptions<T extends ActivityMigrationMapp
         T withNewOwner(String newOwner);
 
         String getWithNewOwner();
+        
+        T withNewFormKey(String newFormKey);
+        
+        String getWithNewFormKey();
+        
+        T withNewDueDate(String newDueDate);
+
+        String getWithNewDueDate();
+        
+        T withNewPriority(String newPriority);
+
+        String getWithNewPriority();
+
+        T withNewCategory(String newCategory);
+
+        String getWithNewCategory();
+        
+        T withNewCandidateUsers(List<String> newCandidateUsers);
+
+        List<String> getWithNewCandidateUsers();
+
+        T withNewCandidateGroups(List<String> newCandidateGroups);
+
+        List<String> getWithNewCandidateGroups();
 
         T withLocalVariable(String variableName, Object variableValue);
 

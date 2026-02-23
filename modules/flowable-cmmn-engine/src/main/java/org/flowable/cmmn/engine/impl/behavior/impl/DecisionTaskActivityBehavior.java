@@ -115,7 +115,8 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
         
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + ". For " + planItemInstanceEntity);
+            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. For " + planItemInstanceEntity,
+                    decisionExecutionAuditContainer.getException());
         }
 
         /* Throw error if there were no rules hit when the flag indicates to do this. */
