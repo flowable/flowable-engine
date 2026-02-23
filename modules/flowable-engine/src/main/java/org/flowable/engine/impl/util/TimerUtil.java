@@ -227,7 +227,7 @@ public class TimerUtil {
 
             // ACT-1951: intermediate catching timer events shouldn't repeat according to spec
             if (currentFlowElement instanceof IntermediateCatchEvent) {
-                timer.setRepeat(null);
+                repeat = false;
             }
 
             if (repeat) {
