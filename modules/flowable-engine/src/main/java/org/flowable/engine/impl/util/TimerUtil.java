@@ -225,16 +225,18 @@ public class TimerUtil {
             // See ACT-1427: A boundary timer with a cancelActivity='true', doesn't need to repeat itself
             boolean repeat = !isInterruptingTimer;
 
+            // ACT-1951: intermediate catching timer events shouldn't repeat according to spec
+            if (currentFlowElement instanceof IntermediateCatchEvent) {
+                timer.setRepeat(null);
+            }
+
             if (repeat) {
                 String prepared = prepareRepeat(dueDateString);
                 timer.setRepeat(prepared);
             }
         }
 
-        // ACT-1951: intermediate catching timer events shouldn't repeat according to spec
-        if (currentFlowElement instanceof IntermediateCatchEvent) {
-            timer.setRepeat(null);
-        }
+
 
         return timer;
     }
