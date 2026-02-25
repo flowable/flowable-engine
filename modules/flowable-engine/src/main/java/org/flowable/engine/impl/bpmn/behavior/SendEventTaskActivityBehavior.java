@@ -37,6 +37,7 @@ import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
@@ -230,12 +231,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         if (sendEventServiceTask.isTriggerable()) {
             Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
-            if (eventInstance instanceof EventInstance) {
-                EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
-            }
-
             CommandContext commandContext = CommandContextUtil.getCommandContext();
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            if (eventInstance instanceof EventInstance) {
+                BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
+            }
+
             EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             ExecutionEntity executionEntity = (ExecutionEntity) execution;
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();

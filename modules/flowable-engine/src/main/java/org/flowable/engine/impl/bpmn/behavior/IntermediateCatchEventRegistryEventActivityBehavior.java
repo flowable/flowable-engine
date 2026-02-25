@@ -26,10 +26,10 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -103,14 +103,15 @@ public class IntermediateCatchEventRegistryEventActivityBehavior extends Interme
 
     protected ExecutionEntity deleteEventSubscription(DelegateExecution execution) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
         Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
-            EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
+            BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
         }
 
-        CommandContext commandContext = Context.getCommandContext();
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 
@@ -123,6 +124,4 @@ public class IntermediateCatchEventRegistryEventActivityBehavior extends Interme
         }
         return executionEntity;
     }
-
-
 }

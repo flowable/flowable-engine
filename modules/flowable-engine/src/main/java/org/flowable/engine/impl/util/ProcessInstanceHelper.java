@@ -42,6 +42,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
@@ -64,7 +65,6 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 
 import tools.jackson.databind.node.ObjectNode;
 
@@ -258,8 +258,8 @@ public class ProcessInstanceHelper {
             
             Object eventInstance = startInstanceBeforeContext.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
-                EventInstanceBpmnUtil.handleEventInstanceOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), 
-                                (EventInstance) eventInstance);
+                BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), (EventInstance) eventInstance);
             }
             
             for (String varName : startInstanceBeforeContext.getTransientVariables().keySet()) {

@@ -32,9 +32,9 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -80,7 +80,8 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
 
         Object eventInstance = execution.getTransientVariable(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
-            EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, startEvent, (EventInstance) eventInstance);
+            BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(execution, startEvent, (EventInstance) eventInstance);
         }
 
         if (startEvent.isInterrupting()) {

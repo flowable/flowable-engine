@@ -26,10 +26,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -76,14 +76,15 @@ public class BoundaryEventRegistryEventActivityBehavior extends BoundaryEventAct
     public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         BoundaryEvent boundaryEvent = (BoundaryEvent) execution.getCurrentFlowElement();
-        
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+
         Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
-            EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, boundaryEvent, (EventInstance) eventInstance);
+            BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(execution, boundaryEvent, (EventInstance) eventInstance);
         }
 
         if (boundaryEvent.isCancelActivity()) {
-            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
             EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
             

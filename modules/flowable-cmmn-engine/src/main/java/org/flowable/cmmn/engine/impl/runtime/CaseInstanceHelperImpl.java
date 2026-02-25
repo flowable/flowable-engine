@@ -38,10 +38,10 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
+import org.flowable.cmmn.engine.impl.util.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
-import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
@@ -368,7 +368,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
             Object eventInstance = caseInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
-                EventInstanceCmmnUtil.handleEventInstanceOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
+                CmmnEventInstanceOutParameterHandler outParameterHandler = cmmnEngineConfiguration.getCmmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
             }
         }
 
