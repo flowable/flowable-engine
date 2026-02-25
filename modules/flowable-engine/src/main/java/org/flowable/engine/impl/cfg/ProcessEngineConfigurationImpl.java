@@ -242,6 +242,7 @@ import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
@@ -995,7 +996,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initEventInstanceOutParameterHandler() {
         if (bpmnEventInstanceOutParameterHandler == null) {
-            bpmnEventInstanceOutParameterHandler = new BpmnEventInstanceOutParameterHandler();
+            bpmnEventInstanceOutParameterHandler = new BpmnEventInstanceOutParameterHandlerImpl();
         }
     }
 

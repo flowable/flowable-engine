@@ -84,6 +84,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
@@ -817,7 +818,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public void initEventInstanceOutParameterHandler() {
         if (cmmnEventInstanceOutParameterHandler == null) {
-            cmmnEventInstanceOutParameterHandler = new CmmnEventInstanceOutParameterHandler();
+            cmmnEventInstanceOutParameterHandler = new CmmnEventInstanceOutParameterHandlerImpl();
         }
     }
 
