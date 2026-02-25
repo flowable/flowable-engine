@@ -26,9 +26,9 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.ExtensionElement;
@@ -81,7 +81,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         EventInstance eventInstance = (EventInstance) planItemInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
         if (eventInstance != null) {
-            handleEventInstance(planItemInstanceEntity, eventInstance);
+            handleEventInstance(planItemInstanceEntity, eventInstance, commandContext);
         }
         
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
@@ -110,10 +110,12 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
         }
     }
 
-    protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance) {
+    protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance, CommandContext commandContext) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         if (planItemDefinition != null) {
-            EventInstanceCmmnUtil.handleEventInstanceOutParameters(planItemInstanceEntity, planItemDefinition, eventInstance);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            CmmnEventInstanceOutParameterHandler outParameterHandler = cmmnEngineConfiguration.getCmmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(planItemInstanceEntity, planItemDefinition, eventInstance);
         }
     }
 

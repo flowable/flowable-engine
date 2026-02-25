@@ -83,6 +83,7 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
@@ -680,6 +681,8 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
 
+    protected CmmnEventInstanceOutParameterHandler cmmnEventInstanceOutParameterHandler;
+
     // Localization support
     protected CaseDefinitionLocalizationManager caseDefinitionLocalizationManager;
     protected CaseLocalizationManager caseLocalizationManager;
@@ -809,6 +812,13 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
+        initEventInstanceOutParameterHandler();
+    }
+
+    public void initEventInstanceOutParameterHandler() {
+        if (cmmnEventInstanceOutParameterHandler == null) {
+            cmmnEventInstanceOutParameterHandler = new CmmnEventInstanceOutParameterHandler();
+        }
     }
 
     public void initCaseDiagramGenerator() {
@@ -4472,5 +4482,13 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     public CmmnEngineConfiguration setPlanItemLocalizationManager(PlanItemLocalizationManager planItemLocalizationManager) {
         this.planItemLocalizationManager = planItemLocalizationManager;
         return this;
+    }
+
+    public CmmnEventInstanceOutParameterHandler getCmmnEventInstanceOutParameterHandler() {
+        return cmmnEventInstanceOutParameterHandler;
+    }
+
+    public void setCmmnEventInstanceOutParameterHandler(CmmnEventInstanceOutParameterHandler cmmnEventInstanceOutParameterHandler) {
+        this.cmmnEventInstanceOutParameterHandler = cmmnEventInstanceOutParameterHandler;
     }
 }
