@@ -1,3 +1,5 @@
+drop index ACT_IDX_EXEC_REF_ID_;
+drop index ACT_IDX_EXEC_ROOT;
 drop index ACT_IDX_BYTEAR_DEPL;
 drop index ACT_IDX_EXE_PROCINST;
 drop index ACT_IDX_EXE_PARENT;
@@ -34,6 +36,7 @@ drop index ACT_IDX_RU_ACTI_PROC;
 drop index ACT_IDX_RU_ACTI_PROC_ACT;
 drop index ACT_IDX_RU_ACTI_EXEC;
 drop index ACT_IDX_RU_ACTI_EXEC_ACT;
+drop index ACT_IDX_RU_ACTI_TASK;
 
 alter table ACT_GE_BYTEARRAY 
     drop CONSTRAINT ACT_FK_BYTEARR_DEPL;

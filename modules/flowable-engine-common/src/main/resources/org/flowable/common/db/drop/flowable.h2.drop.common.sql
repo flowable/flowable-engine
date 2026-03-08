@@ -61,9 +61,9 @@ drop index if exists ACT_IDX_SJOB_SCOPE;
 drop index if exists ACT_IDX_SJOB_SUB_SCOPE;
 drop index if exists ACT_IDX_SJOB_SCOPE_DEF;
 
-drop index if exists ACT_IDX_DEADLETTERJOB_EXCEPTION_STACK_ID;
-drop index if exists ACT_IDX_DEADLETTERJOB_CUSTOM_VALUES_ID;
-drop index if exists ACT_IDX_DEADLETTERJOB_CORRELATION_ID;
+drop index if exists ACT_IDX_DEADLETTER_JOB_EXCEPTION_STACK_ID;
+drop index if exists ACT_IDX_DEADLETTER_JOB_CUSTOM_VALUES_ID;
+drop index if exists ACT_IDX_DEADLETTER_JOB_CORRELATION_ID;
 drop index if exists ACT_IDX_DJOB_SCOPE;
 drop index if exists ACT_IDX_DJOB_SUB_SCOPE;
 drop index if exists ACT_IDX_DJOB_SCOPE_DEF;

@@ -10,7 +10,7 @@ alter table ACT_CMMN_CASEDEF drop constraint ACT_FK_CASE_DEF_DPLY;
 alter table ACT_CMMN_DEPLOYMENT_RESOURCE drop constraint ACT_FK_CMMN_RSRC_DPL;
 
 drop index ACT_IDX_HI_PLAN_ITEM_INST_CASE;
-drop index ACT_IDX_HI_PLAN_ITEM_INST_CASE;
+drop index ACT_IDX_HI_CASE_INST_END;
 drop index ACT_IDX_CASE_INST_REF_ID_;
 drop index ACT_IDX_CASE_DEF_UNIQ;
 drop index ACT_IDX_PLAN_ITEM_STAGE_INST;
