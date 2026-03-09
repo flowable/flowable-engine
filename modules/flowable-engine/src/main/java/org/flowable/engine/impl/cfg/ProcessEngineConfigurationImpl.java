@@ -241,6 +241,8 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
@@ -850,6 +852,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
 
+    protected BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler;
+
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
     protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
@@ -987,6 +991,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         initHistoryCleaningManager();
         initLocalizationManagers();
+        initEventInstanceOutParameterHandler();
+    }
+
+    public void initEventInstanceOutParameterHandler() {
+        if (bpmnEventInstanceOutParameterHandler == null) {
+            bpmnEventInstanceOutParameterHandler = new BpmnEventInstanceOutParameterHandlerImpl();
+        }
     }
 
     // failedJobCommandFactory
@@ -5474,4 +5485,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.batchStatusTimeCycleConfig = batchStatusTimeCycleConfig;
     }
 
+    public BpmnEventInstanceOutParameterHandler getBpmnEventInstanceOutParameterHandler() {
+        return bpmnEventInstanceOutParameterHandler;
+    }
+
+    public void setBpmnEventInstanceOutParameterHandler(BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler) {
+        this.bpmnEventInstanceOutParameterHandler = bpmnEventInstanceOutParameterHandler;
+    }
 }

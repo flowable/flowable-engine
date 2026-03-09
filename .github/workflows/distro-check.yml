@@ -23,9 +23,7 @@ jobs:
     - name: Cache Maven Repository
       uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
-        path: |
-          ~/.m2/repository
-          !~/.m2/repository/org/flowable
+        path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-maven-
     - name: Verify Distribution
@@ -37,3 +35,5 @@ jobs:
         path: 'distro/target/flowable-*.zip'
         retention-days: 10
         if-no-files-found: 'error'
+    - name: Remove Flowable artifacts from cache
+      run: rm -rf ~/.m2/repository/org/flowable
