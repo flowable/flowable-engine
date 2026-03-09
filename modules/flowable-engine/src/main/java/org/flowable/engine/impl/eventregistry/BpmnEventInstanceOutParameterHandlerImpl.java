@@ -27,13 +27,12 @@ import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
-import org.flowable.variable.api.delegate.VariableScope;
 
 public class BpmnEventInstanceOutParameterHandlerImpl implements BpmnEventInstanceOutParameterHandler {
 
     /**
-     * Processes the 'out parameters' of an {@link EventInstance} and stores the corresponding variables on the {@link VariableScope}.
-     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableScope}).
+     * Processes the 'out parameters' of an {@link EventInstance} and stores the corresponding variables on the {@link VariableContainer}.
+     * Typically used when mapping incoming event payload into a runtime instance (the {@link VariableContainer}).
      */
     @Override
     public void handleOutParameters(VariableContainer variableContainer, BaseElement baseElement, EventInstance eventInstance) {
