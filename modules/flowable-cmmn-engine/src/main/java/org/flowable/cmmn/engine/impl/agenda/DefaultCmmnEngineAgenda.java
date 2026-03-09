@@ -42,6 +42,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOper
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.SuspendPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
@@ -253,6 +254,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
         addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType));
     }
+    
+    @Override
+    public void planSuspendPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new SuspendPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
 
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
@@ -262,6 +268,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planChangePlanItemInstanceToAvailableOperationAndEnableSuspendedJobs(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity, true));
     }
 
     @Override
