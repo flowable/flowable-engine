@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.runtime.Execution;
@@ -306,6 +307,23 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, execution.getId()));
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
+    public void testChangeExecutionActivityStateWithInvalidStartActivity() throws Exception {
+        runtimeService.startProcessInstanceByKey("processOne");
+        Execution execution = runtimeService.createExecutionQuery().activityId("processTask").singleResult();
+        assertThat(execution).isNotNull();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode startActivityArray = requestNode.putArray("startActivityIds");
+        startActivityArray.add("doesNotExist");
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, execution.getId()) + "/change-state");
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
     }
 }

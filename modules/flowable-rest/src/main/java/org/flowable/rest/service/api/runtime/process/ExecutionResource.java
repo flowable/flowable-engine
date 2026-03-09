@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.Execution;
 import org.springframework.http.HttpStatus;
@@ -113,6 +114,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             notes = "", nickname = "changeExecutionActivityState")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
+            @ApiResponse(code = 400, message = "Indicates an invalid activity id was supplied."),
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
     @PostMapping(value = "/runtime/executions/{executionId}/change-state", produces = "application/json")
@@ -125,8 +127,20 @@ public class ExecutionResource extends ExecutionBaseResource {
             restApiInterceptor.changeActivityState(execution, activityStateRequest);
         }
 
-        runtimeService.createChangeActivityStateBuilder()
-                .moveSingleExecutionToActivityIds(executionId, activityStateRequest.getStartActivityIds())
-                .changeState();
+        try {
+            runtimeService.createChangeActivityStateBuilder()
+                    .moveSingleExecutionToActivityIds(executionId, activityStateRequest.getStartActivityIds())
+                    .changeState();
+        } catch (FlowableException e) {
+            if (isInvalidChangeStateActivityIdException(e)) {
+                throw new FlowableIllegalArgumentException(e.getMessage(), e);
+            }
+            throw e;
+        }
+    }
+    
+    protected boolean isInvalidChangeStateActivityIdException(FlowableException e) {
+        String message = e.getMessage();
+        return message != null && (message.startsWith("Cannot find activity '"));
     }
 }

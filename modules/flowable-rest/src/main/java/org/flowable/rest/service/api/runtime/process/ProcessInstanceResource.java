@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.runtime.process;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.DynamicBpmnService;
@@ -152,6 +153,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
+            @ApiResponse(code = 400, message = "Indicates an invalid activity id was supplied."),
             @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
@@ -166,18 +168,38 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         }
 
         if (activityStateRequest.getCancelActivityIds() != null && activityStateRequest.getCancelActivityIds().size() == 1) {
-            runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstanceId)
-                .moveSingleActivityIdToActivityIds(activityStateRequest.getCancelActivityIds().get(0), activityStateRequest.getStartActivityIds())
-                .changeState();
+            try {
+                runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstanceId)
+                    .moveSingleActivityIdToActivityIds(activityStateRequest.getCancelActivityIds().get(0), activityStateRequest.getStartActivityIds())
+                    .changeState();
+            } catch (FlowableException e) {
+                if (isInvalidChangeStateActivityIdException(e)) {
+                    throw new FlowableIllegalArgumentException(e.getMessage(), e);
+                }
+                throw e;
+            }
         
         } else if (activityStateRequest.getStartActivityIds() != null && activityStateRequest.getStartActivityIds().size() == 1) {
-            runtimeService.createChangeActivityStateBuilder()
-                .processInstanceId(processInstanceId)
-                .moveActivityIdsToSingleActivityId(activityStateRequest.getCancelActivityIds(), activityStateRequest.getStartActivityIds().get(0))
-                .changeState();
+            try {
+                runtimeService.createChangeActivityStateBuilder()
+                    .processInstanceId(processInstanceId)
+                    .moveActivityIdsToSingleActivityId(activityStateRequest.getCancelActivityIds(), activityStateRequest.getStartActivityIds().get(0))
+                    .changeState();
+            } catch (FlowableException e) {
+                if (isInvalidChangeStateActivityIdException(e)) {
+                    throw new FlowableIllegalArgumentException(e.getMessage(), e);
+                }
+                throw e;
+            }
         }
         
+    }
+
+    protected boolean isInvalidChangeStateActivityIdException(FlowableException e) {
+        String message = e.getMessage();
+        return message != null && (message.startsWith("Active execution could not be found with activity id ")
+            || message.startsWith("Cannot find activity '"));
     }
     
     @ApiOperation(value = "Evaluate the conditions of a process instance", tags = { "Process Instances" }, notes = "")
