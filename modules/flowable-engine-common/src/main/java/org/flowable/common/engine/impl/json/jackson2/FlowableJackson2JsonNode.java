@@ -13,7 +13,6 @@
 package org.flowable.common.engine.impl.json.jackson2;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Spliterators;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
