@@ -82,7 +82,7 @@ public interface CmmnEngineAgenda extends Agenda {
     
     void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
-    void planChangePlanItemInstanceToAvailableOperationAndEnableSuspendedJobs(PlanItemInstanceEntity planItemInstanceEntity);
+    void planResumePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
     void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
 

@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanModelInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ResumePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.SuspendPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
@@ -271,8 +272,8 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
-    public void planChangePlanItemInstanceToAvailableOperationAndEnableSuspendedJobs(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity, true));
+    public void planResumePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ResumePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override

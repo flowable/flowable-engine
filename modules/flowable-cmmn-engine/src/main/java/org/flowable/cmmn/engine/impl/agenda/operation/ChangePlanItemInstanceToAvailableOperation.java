@@ -12,35 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.PlanItemTransition;
-import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.SuspendedJobQueryImpl;
-import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 
 /**
  * @author Tijs Rademakers
  */
 public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePlanItemInstanceStateOperation {
     
-    protected boolean enableSuspendedJobs;
-    
     public ChangePlanItemInstanceToAvailableOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
-    }
-    
-    public ChangePlanItemInstanceToAvailableOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, boolean enableSuspendedJobs) {
-        super(commandContext, planItemInstanceEntity);
-        
-        this.enableSuspendedJobs = enableSuspendedJobs;
     }
     
     @Override
@@ -56,20 +40,6 @@ public class ChangePlanItemInstanceToAvailableOperation extends AbstractChangePl
     @Override
     protected void internalExecute() {
         planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
-        
-        if (enableSuspendedJobs) {
-            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-            if (planItemDefinition instanceof TimerEventListener) {
-                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-                SuspendedJobQueryImpl suspendedJobQuery = new SuspendedJobQueryImpl(commandContext, cmmnEngineConfiguration.getJobServiceConfiguration());
-                suspendedJobQuery.subScopeId(planItemInstanceEntity.getId());
-                List<Job> suspendedJobs = cmmnEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().findJobsByQueryCriteria(suspendedJobQuery);
-                if (suspendedJobs != null && !suspendedJobs.isEmpty()) {
-                    cmmnEngineConfiguration.getJobServiceConfiguration().getJobService().activateSuspendedJob((SuspendedJobEntity) suspendedJobs.get(0));
-                }
-            }
-        }
-        
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
     }
 

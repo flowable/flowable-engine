@@ -24,7 +24,7 @@ public class ResumePlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd 
 
     @Override
     protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planChangePlanItemInstanceToAvailableOperationAndEnableSuspendedJobs(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planResumePlanItemInstanceOperation(planItemInstanceEntity);
     }
     
 }

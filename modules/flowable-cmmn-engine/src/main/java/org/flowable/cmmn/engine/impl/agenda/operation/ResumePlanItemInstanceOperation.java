@@ -23,50 +23,52 @@ import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 
-public class SuspendPlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
-
-    public SuspendPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+/**
+ * @author Tijs Rademakers
+ */
+public class ResumePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
+    
+    public ResumePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-
-    @Override
-    public String getNewState() {
-        return PlanItemInstanceState.SUSPENDED;
-    }
-
+    
     @Override
     public String getLifeCycleTransition() {
         return PlanItemTransition.SUSPEND;
     }
-
+    
+    @Override
+    public String getNewState() {
+        return PlanItemInstanceState.AVAILABLE;
+    }
+    
     @Override
     protected void internalExecute() {
-        planItemInstanceEntity.setLastSuspendedTime(getCurrentTime(commandContext));
+        planItemInstanceEntity.setLastAvailableTime(getCurrentTime(commandContext));
         
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof TimerEventListener) {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-            List<TimerJobEntity> timerJobs = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager().findJobsByScopeIdAndSubScopeId(
-                    planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
-            if (timerJobs != null && !timerJobs.isEmpty()) {
-                cmmnEngineConfiguration.getJobServiceConfiguration().getJobService().moveJobToSuspendedJob(timerJobs.get(0));
+            List<SuspendedJobEntity> suspendedJobs = cmmnEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager().findJobsBySubScopeId(planItemInstanceEntity.getId());
+            if (suspendedJobs != null && !suspendedJobs.isEmpty()) {
+                cmmnEngineConfiguration.getJobServiceConfiguration().getJobService().activateSuspendedJob(suspendedJobs.get(0));
             }
         }
         
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceSuspended(planItemInstanceEntity);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceAvailable(planItemInstanceEntity);
     }
     
     @Override
     public boolean isStateNotChanged(String oldState, String newState) {
-        if (oldState != null && oldState.equals(newState)) {
-            throw new FlowableIllegalStateException("plan item instance is already suspended");
+        if (oldState != null && !PlanItemInstanceState.SUSPENDED.equals(oldState)) {
+            throw new FlowableIllegalStateException("plan item instance can only be resumed if the state is suspended");
         }
         
-        return false;
+        return oldState != null && oldState.equals(newState) && abortOperationIfNewStateEqualsOldState();
     }
-
+    
     @Override
     public boolean abortOperationIfNewStateEqualsOldState() {
         return true;
@@ -74,6 +76,7 @@ public class SuspendPlanItemInstanceOperation extends AbstractChangePlanItemInst
 
     @Override
     public String getOperationName() {
-        return "[Suspend plan item]";
+        return null; // Default one is ok.
     }
+    
 }

@@ -39,6 +39,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -989,6 +990,11 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
             assertThat(historicTimerPlanItemInstance.getLastSuspendedTime()).isNotNull();
         }
         
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).suspend();
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("plan item instance is already suspended");
+        
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).resume();
         
         PlanItemInstance activatedPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
@@ -1010,6 +1016,11 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
             assertThat(historicTimerPlanItemInstance).isNotNull();
             assertThat(historicTimerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
         }
+        
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).resume();
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("plan item instance can only be resumed if the state is suspended");
         
         Job timerJob = cmmnManagementService.createTimerJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).singleResult();
         Job executableJob = cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
