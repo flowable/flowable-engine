@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.ExtensionElement;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -33,7 +34,7 @@ public class CmmnEventInstanceOutParameterHandlerImpl implements CmmnEventInstan
      * Typically used when mapping incoming event payload into a runtime instance.
      */
     @Override
-    public void handleOutParameters(VariableScope variableScope, BaseElement baseElement, EventInstance eventInstance) {
+    public void handleOutParameters(VariableContainer variableContainer, BaseElement baseElement, EventInstance eventInstance) {
         List<ExtensionElement> outParameters = baseElement.getExtensionElements()
                 .getOrDefault(CmmnXmlConstants.ELEMENT_EVENT_OUT_PARAMETER, Collections.emptyList());
         if (!outParameters.isEmpty()) {
@@ -49,9 +50,9 @@ public class CmmnEventInstanceOutParameterHandlerImpl implements CmmnEventInstan
                     boolean isTransient = Boolean.parseBoolean(outParameter.getAttributeValue(null, "transient"));
                     Object value = payloadInstance != null ? payloadInstance.getValue() : null;
                     if (isTransient) {
-                        variableScope.setTransientVariable(variableName, value);
+                        variableContainer.setTransientVariable(variableName, value);
                     } else {
-                        variableScope.setVariable(variableName, value);
+                        variableContainer.setVariable(variableName, value);
                     }
                 }
             }
