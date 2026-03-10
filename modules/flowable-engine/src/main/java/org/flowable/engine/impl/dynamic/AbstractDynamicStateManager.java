@@ -56,6 +56,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -325,7 +326,7 @@ public abstract class AbstractDynamicStateManager {
             .collect(Collectors.toList());
 
         if (executions.isEmpty()) {
-            throw new FlowableException("Active execution could not be found with activity id " + activityId);
+            throw new FlowableIllegalArgumentException("Active execution could not be found with activity id " + activityId);
         }
 
         return executions;
@@ -447,7 +448,7 @@ public abstract class AbstractDynamicStateManager {
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
         FlowElement flowElement = bpmnModel.getFlowElement(activityId);
         if (flowElement == null) {
-            throw new FlowableException("Cannot find activity '" + activityId + "' in process definition with id '" + bpmnModel.getMainProcess().getId() + "'");
+            throw new FlowableIllegalArgumentException("Cannot find activity '" + activityId + "' in process definition with id '" + bpmnModel.getMainProcess().getId() + "'");
         }
         return flowElement;
     }

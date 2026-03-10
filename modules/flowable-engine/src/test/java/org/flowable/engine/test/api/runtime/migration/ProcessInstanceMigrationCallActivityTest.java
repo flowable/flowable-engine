@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
@@ -274,7 +275,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                         "Invalid mapping for 'userTask1Id' to 'wrongActivityId', cannot be found in the process definition with id 'oneTaskProcess'"));
 
         assertThatThrownBy(() -> processInstanceMigrationBuilder.migrate(processInstance.getId()))
-                .isExactlyInstanceOf(FlowableException.class)
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("Cannot find activity 'wrongActivityId' in process definition with id 'oneTaskProcess'");
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -318,7 +319,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                         "There's no call activity element with id 'wrongCallActivity' in the process definition with id 'twoTasksParentProcess'"));
 
         assertThatThrownBy(() -> processInstanceMigrationBuilder.migrate(processInstance.getId()))
-                .isExactlyInstanceOf(FlowableException.class)
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("Cannot find activity 'wrongCallActivity' in process definition with id 'twoTasksParentProcess'");
 
         completeProcessInstanceTasks(processInstance.getId());
@@ -357,7 +358,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                 .isEqualTo(Collections.singletonList("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'"));
 
         assertThatThrownBy(() -> processInstanceMigrationBuilder.migrate(processInstance.getId()))
-                .isExactlyInstanceOf(FlowableException.class)
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("Cannot find activity 'userTask1Id' in process definition with id 'MP'");
 
         //Second migration attempt using and invalid "unExistent" version
@@ -371,7 +372,7 @@ public class ProcessInstanceMigrationCallActivityTest extends PluggableFlowableT
                 .isEqualTo(Collections.singletonList("Invalid mapping for 'theTask' to 'userTask1Id', cannot be found in the process definition with id 'MP'"));
 
         assertThatThrownBy(() -> processInstanceMigrationBuilder2.migrate(processInstance.getId()))
-                .isExactlyInstanceOf(FlowableException.class)
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("Cannot find activity 'userTask1Id' in process definition with id 'MP'");
 
         //Second migration attempt specifies the version of the call activity subProcess
