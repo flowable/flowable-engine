@@ -53,6 +53,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -420,6 +422,11 @@ public class PlanItemInstanceEntityManagerImpl
     public List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId) {
         return dataManager.findByCaseInstanceIdAndPlanItemId(caseInstanceId, planitemId);
     }
+    
+    @Override
+    public List<PlanItemInstanceEntity> findByReferenceId(String referenceId) {
+        return dataManager.findByReferenceId(referenceId);
+    }
 
     @Override
     public List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId) {
@@ -529,11 +536,21 @@ public class PlanItemInstanceEntityManagerImpl
         }
         
         if (planItemInstanceEntity.getPlanItemDefinitionType().equals(PlanItemDefinitionType.TIMER_EVENT_LISTENER)) {
-            TimerJobEntityManager timerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
-            List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
-                .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
-            for (TimerJobEntity timerJobEntity : timerJobsEntities) {
-                timerJobEntityManager.delete(timerJobEntity);
+            if (PlanItemInstanceState.SUSPENDED.equals(planItemInstanceEntity.getState())) {
+                SuspendedJobEntityManager suspendedJobEntityManager = engineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager();
+                List<SuspendedJobEntity> suspendedJobsEntities = suspendedJobEntityManager
+                        .findJobsBySubScopeId(planItemInstanceEntity.getId());
+                for (SuspendedJobEntity suspendedJobEntity : suspendedJobsEntities) {
+                    suspendedJobEntityManager.delete(suspendedJobEntity);
+                }
+            
+            } else {
+                TimerJobEntityManager timerJobEntityManager = engineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
+                List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
+                        .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+                for (TimerJobEntity timerJobEntity : timerJobsEntities) {
+                    timerJobEntityManager.delete(timerJobEntity);
+                }
             }
         }
 

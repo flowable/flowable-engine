@@ -15,12 +15,9 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.impl.db.SuspensionState;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -50,14 +47,10 @@ public class SuspendTaskCmd extends NeedsActiveTaskCmd<Void> {
         task.setState(Task.SUSPENDED);
         task.setSuspensionState(SuspensionState.SUSPENDED.getStateCode());
         
-        PlanItemInstanceQuery planItemInstanceQuery = new PlanItemInstanceQueryImpl(commandContext, cmmnEngineConfiguration);
-        planItemInstanceQuery.caseInstanceId(task.getScopeId())
-                .planItemDefinitionId(task.getTaskDefinitionKey())
-                .planItemInstanceReferenceId(task.getId());
-        List<PlanItemInstance> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(planItemInstanceQuery);
+        List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByReferenceId(task.getId());
         
         if (planItemInstances != null && !planItemInstances.isEmpty()) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstances.get(0);
+            PlanItemInstanceEntity planItemInstanceEntity = planItemInstances.get(0);
             planItemInstanceEntity.setState(PlanItemInstanceState.SUSPENDED);
             planItemInstanceEntity.setLastSuspendedTime(updateTime);
             
