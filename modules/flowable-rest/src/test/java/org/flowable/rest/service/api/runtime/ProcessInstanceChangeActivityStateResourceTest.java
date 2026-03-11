@@ -143,4 +143,52 @@ public class ProcessInstanceChangeActivityStateResourceTest extends BaseSpringRe
         
         assertProcessEnded(processInstance.getId());
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/parallelTask.bpmn20.xml" })
+    public void testChangeActivityStateManyToOneWithInvalidStartActivity() throws Exception {
+        Authentication.setAuthenticatedUserId("testUser");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("startParallelProcess")
+                .start();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        Authentication.setAuthenticatedUserId(null);
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode cancelActivityArray = requestNode.putArray("cancelActivityIds");
+        cancelActivityArray.add("task1");
+        cancelActivityArray.add("task2");
+        
+        ArrayNode startActivityArray = requestNode.putArray("startActivityIds");
+        startActivityArray.add("doesNotExist");
+
+        HttpPost httpPost = new HttpPost(buildUrl(RestUrls.URL_PROCESS_INSTANCE_CHANGE_STATE, processInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/parallelTask.bpmn20.xml" })
+    public void testChangeActivityStateOneToManyWithInvalidCancelActivity() throws Exception {
+        Authentication.setAuthenticatedUserId("testUser");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("startParallelProcess")
+                .start();
+        Authentication.setAuthenticatedUserId(null);
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode cancelActivityArray = requestNode.putArray("cancelActivityIds");
+        cancelActivityArray.add("doesNotExist");
+        
+        ArrayNode startActivityArray = requestNode.putArray("startActivityIds");
+        startActivityArray.add("task1");
+        startActivityArray.add("task2");
+
+        HttpPost httpPost = new HttpPost(buildUrl(RestUrls.URL_PROCESS_INSTANCE_CHANGE_STATE, processInstance.getId()));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST);
+        closeResponse(response);
+    }
 }
