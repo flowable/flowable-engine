@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
@@ -45,6 +46,8 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.joda.time.DateTime;
@@ -73,7 +76,12 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
                 || PlanItemTransition.TERMINATE.equals(transition)
                 || PlanItemTransition.EXIT.equals(transition)) {
             
-            removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+            if (PlanItemInstanceState.SUSPENDED.equals(planItemInstance.getState())) {
+                removeSuspendedJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+                
+            } else {
+                removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+            }
         }
     }
     
@@ -214,9 +222,18 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     protected void removeTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
         List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
-            .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+                .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
         for (TimerJobEntity timerJobEntity : timerJobsEntities) {
             timerJobEntityManager.delete(timerJobEntity);
+        }
+    }
+    
+    protected void removeSuspendedJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        SuspendedJobEntityManager suspendedJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getSuspendedJobEntityManager();
+        List<SuspendedJobEntity> suspendedJobsEntities = suspendedJobEntityManager
+                .findJobsBySubScopeId(planItemInstanceEntity.getId());
+        for (SuspendedJobEntity suspendedJobEntity : suspendedJobsEntities) {
+            suspendedJobEntityManager.delete(suspendedJobEntity);
         }
     }
 

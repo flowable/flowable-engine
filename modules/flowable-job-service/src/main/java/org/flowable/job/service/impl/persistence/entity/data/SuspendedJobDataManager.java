@@ -29,6 +29,8 @@ public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity>
     List<SuspendedJobEntity> findJobsByExecutionId(String executionId);
 
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String processInstanceId);
+    
+    List<SuspendedJobEntity> findJobsBySubScopeId(String subScopeId);
 
     List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
