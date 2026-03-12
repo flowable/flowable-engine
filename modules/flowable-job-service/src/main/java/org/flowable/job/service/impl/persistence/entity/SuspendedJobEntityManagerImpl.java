@@ -47,6 +47,11 @@ public class SuspendedJobEntityManagerImpl
     public List<SuspendedJobEntity> findJobsByProcessInstanceId(String id) {
         return dataManager.findJobsByProcessInstanceId(id);
     }
+    
+    @Override
+    public List<SuspendedJobEntity> findJobsBySubScopeId(String id) {
+        return dataManager.findJobsBySubScopeId(id);
+    }
 
     @Override
     public List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery) {

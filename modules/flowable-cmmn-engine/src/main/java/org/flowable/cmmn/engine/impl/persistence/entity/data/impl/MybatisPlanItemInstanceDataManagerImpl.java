@@ -43,6 +43,9 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
 
     protected PlanItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher planItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher =
         new PlanItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher();
+    
+    protected PlanItemInstanceByReferenceIdCachedEntityMatcher planItemInstanceByReferenceIdCachedEntityMatcher =
+            new PlanItemInstanceByReferenceIdCachedEntityMatcher();
 
     protected PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher planItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher =
         new PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher();
@@ -100,6 +103,11 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         params.put("caseInstanceId", caseInstanceId);
         params.put("planItemId", planitemId);
         return getList("selectPlanItemInstancesByCaseInstanceIdAndPlanItemId", params, planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher);
+    }
+    
+    @Override
+    public List<PlanItemInstanceEntity> findByReferenceId(String referenceId) {
+        return getList("selectPlanItemInstancesByReferenceId", referenceId, planItemInstanceByReferenceIdCachedEntityMatcher, true);
     }
 
     @Override
@@ -169,6 +177,16 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
             String caseInstanceId = (String) param;
             return caseInstanceId.equals(entity.getCaseInstanceId());
+        }
+        
+    }
+    
+    public static class PlanItemInstanceByReferenceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            String referenceId = (String) param;
+            return referenceId.equals(entity.getReferenceId());
         }
         
     }

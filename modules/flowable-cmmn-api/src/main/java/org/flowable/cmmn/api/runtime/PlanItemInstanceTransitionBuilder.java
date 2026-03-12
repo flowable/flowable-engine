@@ -113,6 +113,16 @@ public interface PlanItemInstanceTransitionBuilder {
      * Starts a plan item instance, this typically will executes it associated behavior.
      */
     void start();
+    
+    /**
+     * Suspend a plan item instance.
+     */
+    void suspend();
+    
+    /**
+     * Sets the plan item instance to available state.
+     */
+    void resume();
 
     /**
      * Manually terminates a plan item instance.

@@ -45,7 +45,6 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 
 /**
  * Manages event subscriptions for newly-deployed process definitions and their previous versions.
