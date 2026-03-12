@@ -230,7 +230,17 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                         caseInstance, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
                 caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
             }
-            
+
+            // This is not the regular termination through the agenda, but the historic plan item state still needs to be correct.
+            // The child case instance needs to be deleted synchronously (not deferred via the agenda) to preserve entity link cleanup ordering.
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
+            if (!PlanItemInstanceState.TERMINATED.equals(planItemInstanceEntity.getState())) {
+                planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                planItemInstanceEntity.setEndedTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+                planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+            }
+
         } else {
             throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE + " for " + delegatePlanItemInstance);
         }

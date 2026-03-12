@@ -2274,4 +2274,56 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         }
     }
 
+    @Test
+    @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+    public void testTerminateCaseInstanceWithBlockingProcessTaskHistoricPlanItemState() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        // Complete the human task so the process task becomes active
+        Task caseTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseTask).isNotNull();
+        assertThat(caseTask.getName()).isEqualTo("Task A");
+        cmmnTaskService.complete(caseTask.getId());
+
+        // Process task should now be active with a child process instance
+        PlanItemInstance processTaskPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        assertThat(processTaskPlanItem).isNotNull();
+
+        // The child process instance should have a user task
+        Task processTask = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertThat(processTask).isNotNull();
+        assertThat(processTask.getName()).isEqualTo("my task");
+
+        // Terminate the case instance
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        // Verify runtime data is cleaned up
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            // The historic case instance should be terminated
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+
+            // The historic plan item for the process task should be terminated, not active
+            HistoricPlanItemInstance historicProcessTaskPlanItem = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceId(processTaskPlanItem.getId())
+                    .singleResult();
+            assertThat(historicProcessTaskPlanItem).isNotNull();
+            assertThat(historicProcessTaskPlanItem.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+            assertThat(historicProcessTaskPlanItem.getEndedTime()).isNotNull();
+            assertThat(historicProcessTaskPlanItem.getTerminatedTime()).isNotNull();
+        }
+    }
+
 }
