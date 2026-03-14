@@ -93,9 +93,9 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
 
         int nbrOfExecutionsToJoin = parallelGateway.getIncomingFlows().size();
 
-        // Create new mutable HashSet to store list of all incoming sequenceFlow ids
         Set<String> unmatchedIncomingFlowIds = new HashSet<>();
 
+        // Add all incoming flows to the unmatchedIncomingFlowIds Set
         for (SequenceFlow incomingFlow : parallelGateway.getIncomingFlows()) {
             if (incomingFlow.getId() != null) {
                 unmatchedIncomingFlowIds.add(incomingFlow.getId());
@@ -118,9 +118,9 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         // Ignore the execution unless the most recent activity is the join gateway, and the previous activity was the relevant sequenceFlow
         joinedExecutions:
         for (ExecutionEntity joinedExecution : joinedExecutions) {
-            // Create new mutable ArrayList to store historic activity instances
             List<HistoricActivityInstance> latestActivities = new ArrayList<>();
 
+            // Add relevant latest activities (i.e. 2 most recent activities) to the latestActivities List & sort using most recent activity first
             latestActivities.addAll(historyService
                     .createHistoricActivityInstanceQuery()
                     .executionId(joinedExecution.getId())
@@ -134,23 +134,25 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
                 continue;
             }
 
-            // Walk back through the latest activities
+            // Walk back through the latest activities for this execution & check if they include a sequenceFlow that leads to this gateway
             latestActivities:
             for (int i = 0; i < latestActivities.size(); i++) {
+                HistoricActivityInstance latestActivity = latestActivities.get(i);
+
                 // Latest activity is parallelGateway, but not this parallelGateway - i.e. its not the execution we are looking for
-                if (Objects.equals(latestActivities.get(i).getActivityType(), "parallelGateway") && !Objects.equals(latestActivities.get(i).getActivityId(), parallelGateway.getId())) {
+                if (Objects.equals(latestActivity.getActivityType(), "parallelGateway") && !Objects.equals(latestActivity.getActivityId(), parallelGateway.getId())) {
                     continue joinedExecutions;
                 }
                 // Latest activity is parallelGateway && id matches. Its the execution we are looking for. Our sequenceFlow should be the next activity
-                if (Objects.equals(latestActivities.get(i).getActivityType(), "parallelGateway") && Objects.equals(latestActivities.get(i).getActivityId(), parallelGateway.getId())) {
+                if (Objects.equals(latestActivity.getActivityType(), "parallelGateway") && Objects.equals(latestActivity.getActivityId(), parallelGateway.getId())) {
                     continue;
                 }
                 // If we for some reason get to here and the activity is not a sequence flow, then we are in the wrong execution
-                if (!Objects.equals(latestActivities.get(i).getActivityType(), "sequenceFlow")) {
+                if (!Objects.equals(latestActivity.getActivityType(), "sequenceFlow")) {
                     continue joinedExecutions;
                 }
 
-                unmatchedIncomingFlowIds.remove(latestActivities.get(i).getActivityId());
+                unmatchedIncomingFlowIds.remove(latestActivity.getActivityId());
 
                 // Once the unmatchedIncomingFlowIds Set is empty, then break and avoid running unneeded historyService queries
                 if (unmatchedIncomingFlowIds.isEmpty()) {
@@ -167,7 +169,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         // Is needed to set the endTime for all historic activity joins
         CommandContextUtil.getActivityInstanceEntityManager().recordActivityEnd((ExecutionEntity) execution, null);
 
-        // if all incoming flows had an execution, then the gateway can continue
+        // if all incoming flows were executed, then the gateway can continue
         if (unmatchedIncomingFlowIds.isEmpty()) {
 
             // Fork
