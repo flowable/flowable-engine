@@ -57,16 +57,16 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
+    public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
             String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
 
-        return startProcessInstanceByKey(processDefinitionId, predefinedProcessInstanceId, null, stageInstanceId, tenantId,
+        return startProcessInstance(processDefinitionId, predefinedProcessInstanceId, null, stageInstanceId, tenantId,
                 inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+    public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
             String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
 

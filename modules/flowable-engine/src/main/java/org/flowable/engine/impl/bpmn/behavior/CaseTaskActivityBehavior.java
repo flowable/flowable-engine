@@ -116,7 +116,7 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
                     caseInstanceId, ScopeTypes.CMMN, createHistoricEntityLinks);
         }
 
-        caseInstanceService.startCaseInstanceByKey(caseDefinitionId, caseInstanceId,
+        caseInstanceService.startCaseInstance(caseDefinitionId, caseInstanceId,
                 caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), inParameters);
 
         // Bidirectional storing of reference to avoid queries later on

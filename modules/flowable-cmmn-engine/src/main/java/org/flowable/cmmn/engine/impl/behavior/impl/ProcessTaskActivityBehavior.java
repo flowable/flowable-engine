@@ -131,11 +131,11 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                         planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration, createHistoricEntityLinks);
             }
 
-            processInstanceService.startProcessInstanceByKey(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
+            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
                     planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
 
         } else {
-            processInstanceService.startProcessInstanceByKey(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
+            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
                     planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 

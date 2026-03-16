@@ -52,7 +52,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public String startCaseInstanceByKey(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
+    public String startCaseInstance(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
             String executionId, String tenantId, Map<String, Object> inParametersMap) {
 
         CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();

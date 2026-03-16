@@ -33,14 +33,14 @@ public interface ProcessInstanceService {
     /**
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
             String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
             String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
@@ -77,16 +77,12 @@ public interface ProcessInstanceService {
     /**
      * Resolves the process definition id from the given key and parameters.
      */
-    default String resolveProcessDefinitionId(String processDefinitionKey, String tenantId,
-            Boolean fallbackToDefaultTenant, String parentDeploymentId) {
-        return null;
-    }
+    String resolveProcessDefinitionId(String processDefinitionKey, String tenantId,
+            Boolean fallbackToDefaultTenant, String parentDeploymentId);
 
     /**
      * Checks whether history is enabled for the given process definition id.
      */
-    default boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId) {
-        return true;
-    }
+    boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId);
 
 }

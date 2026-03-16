@@ -254,7 +254,7 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
         // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
         String referenceScopeId = entityLink.getReferenceScopeId();
         String referenceScopeType = entityLink.getReferenceScopeType();
-        // Check that the scope type is CMMN because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
+        // Only for CMMN scope type because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
         if (referenceScopeId != null && ScopeTypes.CMMN.equals(referenceScopeType)) {
             CaseInstanceEntity referenceScopeInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(referenceScopeId);
             if (referenceScopeInstance != null) {

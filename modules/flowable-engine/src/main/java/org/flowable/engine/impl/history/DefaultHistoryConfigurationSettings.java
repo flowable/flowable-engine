@@ -320,7 +320,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
         // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
         String referenceScopeId = entityLink.getReferenceScopeId();
         String referenceScopeType = entityLink.getReferenceScopeType();
-        // Check that the scope type is BPMN because for a child case instance the entity links are created before the entity (see CaseTaskActivityBehavior)
+        // Only for BPMN scope type because for a child case instance the entity links are created before the entity (see CaseTaskActivityBehavior)
         if (referenceScopeId != null && ScopeTypes.BPMN.equals(referenceScopeType)) {
             ExecutionEntity referenceScopeExecution = processEngineConfiguration.getExecutionEntityManager().findById(referenceScopeId);
             if (referenceScopeExecution != null) {
