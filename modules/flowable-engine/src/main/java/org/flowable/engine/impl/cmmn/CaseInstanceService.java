@@ -28,15 +28,30 @@ public interface CaseInstanceService {
      */
     String generateNewCaseInstanceId();
 
-    String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
-            String executionId, String tenantId, boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap);
-    
+    String startCaseInstanceByKey(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
+            String executionId, String tenantId, Map<String, Object> inParametersMap);
+
     void handleSignalEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> variables);
 
     void deleteCaseInstance(String caseInstanceId);
 
     void deleteCaseInstancesForExecutionId(String executionId);
-    
+
     void deleteCaseInstanceWithoutAgenda(String caseInstanceId);
+
+    /**
+     * Resolves the case definition id from the given key and parameters.
+     */
+    default String resolveCaseDefinitionId(String caseDefinitionKey, String tenantId,
+            boolean fallbackToDefaultTenant, String parentDeploymentId) {
+        return null;
+    }
+
+    /**
+     * Checks whether history is enabled for the given case definition id.
+     */
+    default boolean isHistoryEnabledForCaseDefinitionId(String caseDefinitionId) {
+        return true;
+    }
 
 }

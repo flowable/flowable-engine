@@ -245,8 +245,24 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
 
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
+        // Check if history is enabled for the source scope
         String caseDefinitionId = getCaseDefinitionId(entityLink);
-        return isHistoryEnabled(caseDefinitionId);
+        if (!isHistoryEnabled(caseDefinitionId)) {
+            return false;
+        }
+
+        // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
+        String referenceScopeId = entityLink.getReferenceScopeId();
+        String referenceScopeType = entityLink.getReferenceScopeType();
+        // Check that the scope type is CMMN because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
+        if (referenceScopeId != null && ScopeTypes.CMMN.equals(referenceScopeType)) {
+            CaseInstanceEntity referenceScopeInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(referenceScopeId);
+            if (referenceScopeInstance != null) {
+                return isHistoryEnabled(referenceScopeInstance.getCaseDefinitionId());
+            }
+        }
+
+        return true;
     }
 
     @Override

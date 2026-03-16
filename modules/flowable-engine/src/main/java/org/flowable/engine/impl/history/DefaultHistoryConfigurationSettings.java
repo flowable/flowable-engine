@@ -311,8 +311,24 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
 
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
+        // Check if history is enabled for the source scope
         String processDefinitionId = getProcessDefinitionId(entityLink);
-        return isHistoryEnabled(processDefinitionId);
+        if (!isHistoryEnabled(processDefinitionId)) {
+            return false;
+        }
+
+        // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
+        String referenceScopeId = entityLink.getReferenceScopeId();
+        String referenceScopeType = entityLink.getReferenceScopeType();
+        // Check that the scope type is BPMN because for a child case instance the entity links are created before the entity (see CaseTaskActivityBehavior)
+        if (referenceScopeId != null && ScopeTypes.BPMN.equals(referenceScopeType)) {
+            ExecutionEntity referenceScopeExecution = processEngineConfiguration.getExecutionEntityManager().findById(referenceScopeId);
+            if (referenceScopeExecution != null) {
+                return isHistoryEnabled(referenceScopeExecution.getProcessDefinitionId());
+            }
+        }
+
+        return true;
     }
 
     @Override
