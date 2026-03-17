@@ -33,7 +33,9 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.mail.common.api.client.FlowableMailClient;
+import org.flowable.mail.common.api.client.MailClientProvider;
 import org.flowable.task.service.TaskPostProcessor;
 
 /**
@@ -89,11 +91,10 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
     protected boolean asyncExecutorActivate;
     protected boolean asyncHistoryExecutorActivate;
 
-    protected FlowableMailClient defaultMailClient;
+    protected MailClientProvider mailClientProvider = new DefaultMailClientProvider();
     protected MailServerInfo defaultMailServer;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
-    protected Map<String, FlowableMailClient> mailClients = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     // Set Http Client config defaults
@@ -245,12 +246,26 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
         return this;
     }
 
+    public MailClientProvider getMailClientProvider() {
+        return mailClientProvider;
+    }
+
+    public ProcessEngineConfiguration setMailClientProvider(MailClientProvider mailClientProvider) {
+        this.mailClientProvider = mailClientProvider;
+        return this;
+    }
+
     public FlowableMailClient getDefaultMailClient() {
-        return defaultMailClient;
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            return defaultProvider.getDefaultMailClient();
+        }
+        return null;
     }
 
     public ProcessEngineConfiguration setDefaultMailClient(FlowableMailClient defaultMailClient) {
-        this.defaultMailClient = defaultMailClient;
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.setDefaultMailClient(defaultMailClient);
+        }
         return this;
     }
 
@@ -387,15 +402,20 @@ public abstract class ProcessEngineConfiguration extends AbstractBuildableEngine
     }
 
     public FlowableMailClient getMailClient(String tenantId) {
-        return mailClients.get(tenantId);
+        return mailClientProvider.getMailClient(tenantId);
     }
 
     public Map<String, FlowableMailClient> getMailClients() {
-        return mailClients;
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            return defaultProvider.getMailClients();
+        }
+        return new HashMap<>();
     }
 
     public ProcessEngineConfiguration setMailClients(Map<String, FlowableMailClient> mailClients) {
-        this.mailClients.putAll(mailClients);
+        if (this.mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.getMailClients().putAll(mailClients);
+        }
         return this;
     }
 

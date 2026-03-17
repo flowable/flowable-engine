@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.mail.BaseMailActivityDelegate;
 import org.flowable.content.api.ContentService;
 import org.flowable.mail.common.api.client.FlowableMailClient;
+import org.flowable.mail.common.api.client.MailClientProvider;
 
 /**
  * @author Filip Hrisafov
@@ -37,12 +38,15 @@ public class CmmnMailActivityDelegate extends BaseMailActivityDelegate<DelegateP
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         String tenantId = planItemInstance.getTenantId();
         FlowableMailClient mailClient = null;
-        if (StringUtils.isNotBlank(tenantId)) {
-            mailClient = cmmnEngineConfiguration.getMailClient(tenantId);
-        }
 
-        if (mailClient == null) {
-            mailClient = cmmnEngineConfiguration.getDefaultMailClient();
+        MailClientProvider mailClientProvider = cmmnEngineConfiguration.getMailClientProvider();
+        if (mailClientProvider != null) {
+            if (StringUtils.isNotBlank(tenantId)) {
+                mailClient = mailClientProvider.getMailClient(tenantId);
+            }
+            if (mailClient == null) {
+                mailClient = mailClientProvider.getMailClient(null);
+            }
         }
 
         return mailClient;
