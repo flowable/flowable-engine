@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -42,20 +43,22 @@ import io.swagger.annotations.Authorization;
 public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
 
 
-    @ApiOperation(value = "Get a specific involved people from case instance", tags = { "Case Instance Identity Links" }, nickname = "getCaseInstanceIdentityLinks")
+    @ApiOperation(value = "Get a single identity link on a case instance", tags = { "Case Instance Identity Links" }, nickname = "getCaseInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the specified link is retrieved."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
-    @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/users/{identityId}/{type}", produces = "application/json")
-    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+    @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/{family}/{identityId}/{type}", produces = "application/json")
+    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, 
+            @ApiParam(name = "family") @PathVariable("family") String family,
+            @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
-        validateIdentityLinkArguments(identityId, type);
+        validateIdentityLinkArguments(family, identityId, type);
 
-        IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, family, type, caseInstance.getId());
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceIdentityLink(caseInstance, link);
@@ -64,30 +67,40 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
         return restResponseFactory.createRestIdentityLink(link);
     }
 
-    @ApiOperation(value = "Remove an involved user to from case instance", tags = { "Case Instance Identity Links" }, nickname = "deleteCaseInstanceIdentityLinks", code = 204)
+    @ApiOperation(value = "Delete an identity link on a case instance", tags = { "Case Instance Identity Links" }, nickname = "deleteCaseInstanceIdentityLinks", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and the link has been deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
-    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/users/{identityId}/{type}")
+    @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/identitylinks/{family}/{identityId}/{type}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+    public void deleteIdentityLink(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, 
+            @ApiParam(name = "family") @PathVariable("family") String family,
+            @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type) {
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
-        validateIdentityLinkArguments(identityId, type);
+        validateIdentityLinkArguments(family, identityId, type);
 
-        IdentityLink link = getIdentityLink(identityId, type, caseInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, family, type, caseInstance.getId());
 
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstanceIdentityLink(caseInstance, link);
         }
 
-        runtimeService.deleteUserIdentityLink(caseInstance.getId(), identityId, type);
+        if (CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family)) {
+            runtimeService.deleteGroupIdentityLink(caseInstance.getId(), identityId, type);
+            
+        } else {
+            runtimeService.deleteUserIdentityLink(caseInstance.getId(), identityId, type);
+        }
     }
 
-    protected void validateIdentityLinkArguments(String identityId, String type) {
+    protected void validateIdentityLinkArguments(String family, String identityId, String type) {
+        if (family == null || (!CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
+            throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
         if (identityId == null) {
             throw new FlowableIllegalArgumentException("IdentityId is required.");
         }
@@ -96,12 +109,15 @@ public class CaseInstanceIdentityLinkResource extends BaseCaseInstanceResource {
         }
     }
 
-    protected IdentityLink getIdentityLink(String identityId, String type, String caseInstanceId) {
+    protected IdentityLink getIdentityLink(String identityId, String family, String type, String caseInstanceId) {
         // Perhaps it would be better to offer getting a single identity link
         // from the API
         List<IdentityLink> allLinks = runtimeService.getIdentityLinksForCaseInstance(caseInstanceId);
         for (IdentityLink link : allLinks) {
-            if (identityId.equals(link.getUserId()) && link.getType().equals(type)) {
+            if (CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family) && identityId.equals(link.getUserId()) && link.getType().equals(type)) {
+                return link;
+            
+            } else if (CmmnRestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && identityId.equals(link.getGroupId()) && link.getType().equals(type)) {
                 return link;
             }
         }

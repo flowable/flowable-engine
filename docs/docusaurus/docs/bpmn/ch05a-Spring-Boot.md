@@ -11,7 +11,7 @@ The Spring Boot - Flowable integration has been developed together with Spring c
 
 ## Compatibility
 
-Flowable supports Spring Boot 3.x.
+Flowable supports Spring Boot 4.x.
 
 ## Getting started
 
@@ -46,35 +46,74 @@ You can now run your Spring Boot application:
 
 You will see an output like this:
 
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v3.1.3)
 
-2023-09-21T08:25:58.169+02:00  INFO 6126 --- [           main] org.flowable.example.MyApplication       : Starting MyApplication using Java 17.0.6 with PID 6126 (/Users/flowable/workspaces/flowable-engine-workspace/flowable-spring-boot-example/target/classes started by flowable in /Users/flowable/workspaces/flowable-engine-workspace/flowable-spring-boot-example)
-2023-09-21T08:25:58.171+02:00  INFO 6126 --- [           main] org.flowable.example.MyApplication       : No active profile set, falling back to 1 default profile: "default"
-2023-09-21T08:25:58.422+02:00  INFO 6126 --- [           main] o.f.s.b.app.AppEngineAutoConfiguration   : No deployment resources were found for autodeployment
-2023-09-21T08:25:58.454+02:00  INFO 6126 --- [           main] o.f.s.b.ProcessEngineAutoConfiguration   : No deployment resources were found for autodeployment
-2023-09-21T08:25:58.517+02:00  INFO 6126 --- [           main] o.f.s.b.c.CmmnEngineAutoConfiguration    : No deployment resources were found for autodeployment
-2023-09-21T08:25:58.546+02:00  INFO 6126 --- [           main] o.f.s.b.dmn.DmnEngineAutoConfiguration   : No deployment resources were found for autodeployment
-2023-09-21T08:25:58.615+02:00  INFO 6126 --- [           main] o.f.s.b.e.EventRegistryAutoConfiguration : No deployment resources were found for autodeployment
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Found 5 Engine Configurators in total:
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator (priority:50000)
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator (priority:100000)
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:150000)
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
-2023-09-21T08:25:58.624+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator (priority:50000)
-2023-09-21T08:25:58.635+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator (priority:100000)
-2023-09-21T08:25:58.636+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:150000)
-2023-09-21T08:25:58.638+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
-2023-09-21T08:25:58.639+02:00  INFO 6126 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
-2023-09-21T08:25:58.649+02:00  INFO 6126 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2023-09-21T08:25:58.715+02:00  INFO 6126 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:bbfb33f7-7e39-43be-a042-1a767c16ed70 user=SA
-2023-09-21T08:25:58.715+02:00  INFO 6126 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+.   ____          _            __ _ _
+/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+'  |____| .__|_| |_|_| |_\__, | / / / /
+=========|_|==============|___/=/_/_/_/
+
+:: Spring Boot ::                (v4.0.3)
+
+2026-03-16T22:21:06.576+01:00  INFO 43702 --- [           main] com.example.demo.Application             : Starting Application using Java 25 with PID 43702 (/Users/filiphr/Downloads/demo 31/target/classes started by filiphr in /Users/filiphr/Downloads/demo 31)
+2026-03-16T22:21:06.578+01:00  INFO 43702 --- [           main] com.example.demo.Application             : No active profile set, falling back to 1 default profile: "default"
+2026-03-16T22:21:07.054+01:00  INFO 43702 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-03-16T22:21:07.063+01:00  INFO 43702 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-03-16T22:21:07.063+01:00  INFO 43702 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-03-16T22:21:07.091+01:00  INFO 43702 --- [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 492 ms
+2026-03-16T22:21:07.267+01:00  INFO 43702 --- [           main] o.f.s.b.app.AppEngineAutoConfiguration   : No deployment resources were found for autodeployment
+2026-03-16T22:21:07.313+01:00  INFO 43702 --- [           main] o.f.s.b.ProcessEngineAutoConfiguration   : No deployment resources were found for autodeployment
+2026-03-16T22:21:07.323+01:00  INFO 43702 --- [           main] o.f.c.e.i.a.DefaultAsyncTaskExecutor     : Creating thread pool queue of size 100
+2026-03-16T22:21:07.324+01:00  INFO 43702 --- [           main] o.f.c.e.i.a.DefaultAsyncTaskExecutor     : Creating thread factory with naming pattern flowable-async-task-invoker-%d
+2026-03-16T22:21:07.324+01:00  INFO 43702 --- [           main] o.f.c.e.i.a.DefaultAsyncTaskExecutor     : Creating executor service with corePoolSize 8, maxPoolSize 8 and keepAliveTime 5000
+2026-03-16T22:21:07.361+01:00  INFO 43702 --- [           main] o.f.s.b.c.CmmnEngineAutoConfiguration    : No deployment resources were found for autodeployment
+2026-03-16T22:21:07.385+01:00  INFO 43702 --- [           main] o.f.s.b.dmn.DmnEngineAutoConfiguration   : No deployment resources were found for autodeployment
+2026-03-16T22:21:07.398+01:00  INFO 43702 --- [           main] o.f.s.b.e.EventRegistryAutoConfiguration : No deployment resources were found for autodeployment
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Found 5 Engine Configurators in total:
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator (priority:50000)
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator (priority:100000)
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:150000)
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+2026-03-16T22:21:07.420+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator (priority:50000)
+2026-03-16T22:21:07.436+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator (priority:100000)
+2026-03-16T22:21:07.438+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:150000)
+2026-03-16T22:21:07.439+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+2026-03-16T22:21:07.441+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing beforeInit() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+2026-03-16T22:21:07.454+01:00  INFO 43702 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-03-16T22:21:07.547+01:00  INFO 43702 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:09ef9a86-17d4-4411-bb28-88c57d6da066 user=SA
+2026-03-16T22:21:07.548+01:00  INFO 43702 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-03-16T22:21:07.968+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing configure() of class org.flowable.engine.spring.configurator.SpringProcessEngineConfigurator (priority:50000)
+2026-03-16T22:21:08.032+01:00  INFO 43702 --- [           main] o.f.engine.impl.ProcessEngineImpl        : ProcessEngine default created
+2026-03-16T22:21:08.032+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing configure() of class org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator (priority:100000)
+2026-03-16T22:21:08.038+01:00  INFO 43702 --- [           main] o.f.e.impl.EventRegistryEngineImpl       : EventRegistryEngine default created
+2026-03-16T22:21:08.039+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing configure() of class org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator (priority:150000)
+2026-03-16T22:21:08.041+01:00  INFO 43702 --- [           main] o.f.idm.engine.impl.IdmEngineImpl        : IdmEngine default created
+2026-03-16T22:21:08.042+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing configure() of class org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator (priority:200000)
+2026-03-16T22:21:08.047+01:00  INFO 43702 --- [           main] o.f.dmn.engine.impl.DmnEngineImpl        : DmnEngine default created
+2026-03-16T22:21:08.047+01:00  INFO 43702 --- [           main] o.f.a.s.SpringAppEngineConfiguration     : Executing configure() of class org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator (priority:500000)
+2026-03-16T22:21:08.072+01:00  INFO 43702 --- [           main] o.f.cmmn.engine.impl.CmmnEngineImpl      : CmmnEngine default created
+2026-03-16T22:21:08.085+01:00  INFO 43702 --- [           main] o.f.c.e.impl.db.CommonDbSchemaManager    : performing create on common with resource org/flowable/common/db/create/flowable.h2.create.common.sql
+2026-03-16T22:21:08.124+01:00  INFO 43702 --- [           main] o.f.a.engine.impl.db.AppDbSchemaManager  : performing create on app with resource org/flowable/app/db/create/flowable.h2.create.app.sql
+2026-03-16T22:21:08.129+01:00  INFO 43702 --- [           main] o.f.e.impl.db.ProcessDbSchemaManager     : performing create on engine with resource org/flowable/db/create/flowable.h2.create.engine.sql
+2026-03-16T22:21:08.145+01:00  INFO 43702 --- [           main] o.f.e.impl.db.ProcessDbSchemaManager     : performing create on history with resource org/flowable/db/create/flowable.h2.create.history.sql
+2026-03-16T22:21:08.148+01:00  INFO 43702 --- [           main] o.f.d.engine.impl.db.DmnDbSchemaManager  : performing create on dmn with resource org/flowable/dmn/db/create/flowable.h2.create.dmn.sql
+2026-03-16T22:21:08.150+01:00  INFO 43702 --- [           main] o.f.c.e.impl.db.CmmnDbSchemaManager      : performing create on cmmn with resource org/flowable/cmmn/db/create/flowable.h2.create.cmmn.sql
+2026-03-16T22:21:08.156+01:00  INFO 43702 --- [           main] o.f.i.engine.impl.db.IdmDbSchemaManager  : performing create on identity with resource org/flowable/idm/db/create/flowable.h2.create.identity.sql
+2026-03-16T22:21:08.160+01:00  INFO 43702 --- [           main] o.f.e.impl.db.EventDbSchemaManager       : performing create on eventregistry with resource org/flowable/eventregistry/db/create/flowable.h2.create.eventregistry.sql
+2026-03-16T22:21:08.162+01:00  INFO 43702 --- [           main] o.f.app.engine.impl.AppEngineImpl        : AppEngine default created
+2026-03-16T22:21:08.186+01:00  INFO 43702 --- [           main] o.f.e.impl.cmd.ValidateV5EntitiesCmd     : Total of v5 deployments found: 0
+2026-03-16T22:21:08.259+01:00  INFO 43702 --- [           main] o.f.j.s.i.a.AbstractAsyncExecutor        : Starting up the async job executor [org.flowable.spring.job.service.SpringAsyncExecutor] for engine cmmn
+2026-03-16T22:21:08.267+01:00  INFO 43702 --- [       Thread-3] o.f.j.s.i.a.ResetExpiredJobsRunnable     : starting to reset expired jobs for engine cmmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [           main] o.f.j.s.i.a.AbstractAsyncExecutor        : Starting up the async job executor [org.flowable.spring.job.service.SpringAsyncExecutor] for engine bpmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [       Thread-2] o.f.j.s.i.a.AcquireTimerJobsRunnable     : starting to acquire async jobs due for engine cmmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [       Thread-1] o.f.j.s.i.a.AcquireAsyncJobsDueRunnable  : starting to acquire async jobs due for engine cmmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [       Thread-4] o.f.j.s.i.a.AcquireAsyncJobsDueRunnable  : starting to acquire async jobs due for engine bpmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [       Thread-5] o.f.j.s.i.a.AcquireTimerJobsRunnable     : starting to acquire async jobs due for engine bpmn
+2026-03-16T22:21:08.268+01:00  INFO 43702 --- [       Thread-6] o.f.j.s.i.a.ResetExpiredJobsRunnable     : starting to reset expired jobs for engine bpmn
+2026-03-16T22:21:08.287+01:00  INFO 43702 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-03-16T22:21:08.290+01:00  INFO 43702 --- [           main] com.example.demo.Application             : Started Application in 1.885 seconds (process running for 2.062)
 
 So, by just adding the dependency to the classpath and using the *@SpringBootApplication* annotation a lot has happened behind the scenes:
 
@@ -160,9 +199,9 @@ For example, to switch to a MySQL database:
 Remove H2 from the Maven dependencies and add the MySQL driver to the classpath:
 
     <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.45</version>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>9.6.0</version>
     </dependency>
 
 When the app is now booted up, you’ll see it uses MySQL as database (and the HikariCP connection pooling framework):

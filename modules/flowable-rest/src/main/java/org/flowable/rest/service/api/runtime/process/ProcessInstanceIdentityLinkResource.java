@@ -19,6 +19,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,28 +35,28 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
-/**
- * @author Frederik Heremans
- */
+
 @RestController
 @Api(tags = { "Process Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceResource {
 
 
-    @ApiOperation(value = "Get a specific involved people from process instance", tags = { "Process Instance Identity Links" }, nickname = "getProcessInstanceIdentityLinks")
+    @ApiOperation(value = "Get a single identity link on a process instance", tags = { "Process Instance Identity Links" }, nickname = "getProcessInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the specified link is retrieved."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
-    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}", produces = "application/json")
-    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/{family}/{identityId}/{type}", produces = "application/json")
+    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, 
+            @ApiParam(name = "family") @PathVariable("family") String family,
+            @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
-        validateIdentityLinkArguments(identityId, type);
+        validateIdentityLinkArguments(family, identityId, type);
 
-        IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, family, type, processInstance.getId());
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessProcessInstanceIdentityLink(processInstance, link);
@@ -64,30 +65,40 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
         return restResponseFactory.createRestIdentityLink(link);
     }
 
-    @ApiOperation(value = "Remove an involved user to from process instance", tags = { "Process Instance Identity Links" }, nickname = "deleteProcessInstanceIdentityLinks", code = 204)
+    @ApiOperation(value = "Delete an identity link on a process instance", tags = { "Process Instance Identity Links" }, nickname = "deleteProcessInstanceIdentityLinks", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the process instance was found and the link has been deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the link to delete does not exist. The response status contains additional information about the error.")
     })
-    @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/users/{identityId}/{type}")
+    @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks/{family}/{identityId}/{type}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
+    public void deleteIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, 
+            @ApiParam(name = "family") @PathVariable("family") String family,
+            @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
             @ApiParam(name = "type") @PathVariable("type") String type) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
-        validateIdentityLinkArguments(identityId, type);
+        validateIdentityLinkArguments(family, identityId, type);
 
-        IdentityLink link = getIdentityLink(identityId, type, processInstance.getId());
+        IdentityLink link = getIdentityLink(identityId, family, type, processInstance.getId());
 
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteProcessInstanceIdentityLink(processInstance, link);
         }
 
-        runtimeService.deleteUserIdentityLink(processInstance.getId(), identityId, type);
+        if (RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family)) {
+            runtimeService.deleteGroupIdentityLink(processInstance.getId(), identityId, type);
+            
+        } else {
+            runtimeService.deleteUserIdentityLink(processInstance.getId(), identityId, type);
+        }
     }
 
-    protected void validateIdentityLinkArguments(String identityId, String type) {
+    protected void validateIdentityLinkArguments(String family, String identityId, String type) {
+        if (family == null || (!RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && !RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family))) {
+            throw new FlowableIllegalArgumentException("Identity link family should be 'users' or 'groups'.");
+        }
         if (identityId == null) {
             throw new FlowableIllegalArgumentException("IdentityId is required.");
         }
@@ -96,12 +107,15 @@ public class ProcessInstanceIdentityLinkResource extends BaseProcessInstanceReso
         }
     }
 
-    protected IdentityLink getIdentityLink(String identityId, String type, String processInstanceId) {
+    protected IdentityLink getIdentityLink(String identityId, String family, String type, String processInstanceId) {
         // Perhaps it would be better to offer getting a single identity link
         // from the API
         List<IdentityLink> allLinks = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
         for (IdentityLink link : allLinks) {
-            if (identityId.equals(link.getUserId()) && link.getType().equals(type)) {
+            if (RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS.equals(family) && identityId.equals(link.getUserId()) && link.getType().equals(type)) {
+                return link;
+            
+            } else if (RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS.equals(family) && identityId.equals(link.getGroupId()) && link.getType().equals(type)) {
                 return link;
             }
         }
