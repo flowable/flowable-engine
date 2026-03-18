@@ -90,6 +90,7 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
     @Deployment(resources = { "org/flowable/rest/api/history/HistoricTaskLogCollectionResourceTest.bpmn20.xml" })
     public void itCanQueryUsingFromToDates() throws IOException {
         Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.MILLISECOND, 0);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
 
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "testBusinessKey");
