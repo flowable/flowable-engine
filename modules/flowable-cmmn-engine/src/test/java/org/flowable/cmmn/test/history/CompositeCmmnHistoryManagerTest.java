@@ -14,9 +14,11 @@ package org.flowable.cmmn.test.history;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -32,6 +34,7 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -40,6 +43,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -102,11 +106,21 @@ class CompositeCmmnHistoryManagerTest {
     }
 
     @Test
-    void recordHistoricCaseInstanceDeleted() {
+    void recordHistoricCaseInstanceDeletedShouldIterateInReverseOrder() {
         compositeHistoryManager.recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
 
-        verify(historyManager1).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
-        verify(historyManager2).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
+        inOrder.verify(historyManager1).recordHistoricCaseInstanceDeleted("case-id", "tenant-1");
+    }
+
+    @Test
+    void recordBulkDeleteHistoricCaseInstancesShouldIterateInReverseOrder() {
+        compositeHistoryManager.recordBulkDeleteHistoricCaseInstances(Arrays.asList("id-1", "id-2"));
+
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordBulkDeleteHistoricCaseInstances(Arrays.asList("id-1", "id-2"));
+        inOrder.verify(historyManager1).recordBulkDeleteHistoricCaseInstances(Arrays.asList("id-1", "id-2"));
     }
 
     @Test
@@ -211,6 +225,15 @@ class CompositeCmmnHistoryManagerTest {
 
         verify(historyManager1).recordTaskInfoChange(same(task), eq(changeTime));
         verify(historyManager2).recordTaskInfoChange(same(task), eq(changeTime));
+    }
+
+    @Test
+    void recordHistoricTaskDeletedShouldIterateInReverseOrder(@Mock HistoricTaskInstance task) {
+        compositeHistoryManager.recordHistoricTaskDeleted(task);
+
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordHistoricTaskDeleted(same(task));
+        inOrder.verify(historyManager1).recordHistoricTaskDeleted(same(task));
     }
 
     @Test
