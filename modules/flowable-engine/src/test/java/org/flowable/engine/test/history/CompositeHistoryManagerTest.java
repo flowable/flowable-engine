@@ -15,11 +15,13 @@ package org.flowable.engine.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,14 +45,17 @@ import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskLogEntryBuilder;
 import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -165,19 +170,30 @@ class CompositeHistoryManagerTest {
     }
 
     @Test
-    void recordProcessInstanceDeleted() {
+    void recordProcessInstanceDeletedShouldIterateInReverseOrder() {
         compositeHistoryManager.recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
 
-        verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
-        verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
+        inOrder.verify(historyManager1).recordProcessInstanceDeleted("instance-id", "def-id", "tenant-1");
     }
 
     @Test
-    void recordDeleteHistoricProcessInstancesByProcessDefinitionId() {
+    void recordDeleteHistoricProcessInstancesByProcessDefinitionIdShouldIterateInReverseOrder() {
         compositeHistoryManager.recordDeleteHistoricProcessInstancesByProcessDefinitionId("def-4");
 
-        verify(historyManager1).recordDeleteHistoricProcessInstancesByProcessDefinitionId("def-4");
-        verify(historyManager2).recordDeleteHistoricProcessInstancesByProcessDefinitionId("def-4");
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordDeleteHistoricProcessInstancesByProcessDefinitionId("def-4");
+        inOrder.verify(historyManager1).recordDeleteHistoricProcessInstancesByProcessDefinitionId("def-4");
+    }
+
+    @Test
+    void recordBulkDeleteProcessInstancesShouldIterateInReverseOrder() {
+        compositeHistoryManager.recordBulkDeleteProcessInstances(Arrays.asList("id-1", "id-2"));
+
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordBulkDeleteProcessInstances(Arrays.asList("id-1", "id-2"));
+        inOrder.verify(historyManager1).recordBulkDeleteProcessInstances(Arrays.asList("id-1", "id-2"));
     }
 
     @Test
@@ -252,6 +268,16 @@ class CompositeHistoryManagerTest {
 
         verify(historyManager1).recordTaskInfoChange(same(task), eq("activity"), eq(changeTime));
         verify(historyManager2).recordTaskInfoChange(same(task), eq("activity"), eq(changeTime));
+    }
+
+    @Test
+    void recordHistoricTaskDeletedShouldIterateInReverseOrder() {
+        HistoricTaskInstance task = new HistoricTaskInstanceEntityImpl();
+        compositeHistoryManager.recordHistoricTaskDeleted(task);
+
+        InOrder inOrder = inOrder(historyManager1, historyManager2);
+        inOrder.verify(historyManager2).recordHistoricTaskDeleted(same(task));
+        inOrder.verify(historyManager1).recordHistoricTaskDeleted(same(task));
     }
 
     @Test
