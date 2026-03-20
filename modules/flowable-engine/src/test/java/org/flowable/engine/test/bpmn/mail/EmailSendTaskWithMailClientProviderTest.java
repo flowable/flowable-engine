@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.drools.util.StringUtils;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.engine.test.Deployment;
-import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.mail.common.api.client.MailClientProvider;
 import org.junit.jupiter.api.AfterEach;
@@ -33,7 +33,7 @@ import org.subethamail.wiser.WiserMessage;
  *
  * @author Valentin Zickner
  */
-public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
+class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
 
     protected MailClientProvider initialMailClientProvider;
 
@@ -49,60 +49,39 @@ public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
     }
 
     @Test
-    public void testProviderReturnsClientForTenant() throws Exception {
-        String tenantId = "providerTenant";
-
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml", tenantId = "providerTenant")
+    void testProviderReturnsClientForTenant() {
         FlowableMailClient tenantClient = createMailClient("provider-tenant@flowable.org");
         processEngineConfiguration.setMailClientProvider(requestedTenantId -> {
-            if (tenantId.equals(requestedTenantId)) {
+            if ("providerTenant".equals(requestedTenantId)) {
                 return tenantClient;
             }
             return null;
         });
 
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-                .tenantId(tenantId)
-                .deploy()
-                .getId();
+        runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", "providerTenant");
 
-        try {
-            runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId);
-
-            List<WiserMessage> messages = wiser.getMessages();
-            assertThat(messages).hasSize(1);
-            assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("provider-tenant@flowable.org");
-        } finally {
-            deleteDeployment(deploymentId);
-        }
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("provider-tenant@flowable.org");
     }
 
     @Test
-    public void testDefaultProviderResolvesTenantFromStaticConfig() throws Exception {
-        String tenantId = "staticTenant";
-        addMailServer(tenantId, "static-tenant@flowable.org", null);
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml", tenantId = "staticTenant")
+    void testDefaultProviderResolvesTenantFromStaticConfig() {
+        addMailServer("staticTenant", "static-tenant@flowable.org", null);
         reinitilizeMailClients();
 
-        String deploymentId = repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-                .tenantId(tenantId)
-                .deploy()
-                .getId();
+        runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", "staticTenant");
 
-        try {
-            runtimeService.startProcessInstanceByKeyAndTenantId("simpleTextOnly", tenantId);
-
-            List<WiserMessage> messages = wiser.getMessages();
-            assertThat(messages).hasSize(1);
-            assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("static-tenant@flowable.org");
-        } finally {
-            deleteDeployment(deploymentId);
-        }
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("static-tenant@flowable.org");
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-    public void testProviderReturnsClientForEmptyTenantId() throws Exception {
+    void testProviderReturnsClientForEmptyTenantId() {
         FlowableMailClient defaultProviderClient = createMailClient("provider-default@flowable.org");
         processEngineConfiguration.setMailClientProvider(requestedTenantId -> {
             if (StringUtils.isEmpty(requestedTenantId)) {
@@ -120,7 +99,7 @@ public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-    public void testDefaultProviderFallsBackToDefaultClient() throws Exception {
+    void testDefaultProviderFallsBackToDefaultClient() {
         runtimeService.startProcessInstanceByKey("simpleTextOnly");
 
         List<WiserMessage> messages = wiser.getMessages();
@@ -131,7 +110,7 @@ public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-    public void testDefaultMailClientProviderIsSetByDefault() throws Exception {
+    void testDefaultMailClientProviderIsSetByDefault() {
         assertThat(processEngineConfiguration.getMailClientProvider()).isInstanceOf(DefaultMailClientProvider.class);
 
         runtimeService.startProcessInstanceByKey("simpleTextOnly");

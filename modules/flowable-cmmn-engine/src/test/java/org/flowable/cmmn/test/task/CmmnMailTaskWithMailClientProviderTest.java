@@ -18,9 +18,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
-import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.mail.common.api.client.MailClientProvider;
 import org.junit.jupiter.api.Test;
@@ -31,13 +31,11 @@ import org.subethamail.wiser.WiserMessage;
  *
  * @author Valentin Zickner
  */
-public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
-
-    private static final String CMMN_RESOURCE = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn";
+class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
 
     @Test
-    @CmmnDeployment(resources = CMMN_RESOURCE)
-    public void testProviderReturnsClientForEmptyTenantId() {
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn")
+    void testProviderReturnsClientForEmptyTenantId() {
         FlowableMailClient providerClient = createMailClient("provider-default@flowable.org");
         cmmnEngineConfiguration.setMailClientProvider(requestedTenantId -> {
             if (StringUtils.isEmpty(requestedTenantId)) {
@@ -56,39 +54,29 @@ public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
     }
 
     @Test
-    public void testProviderReturnsClientForTenant() {
-        String tenantId = "providerTenant";
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn", tenantId = "providerTenant")
+    void testProviderReturnsClientForTenant() {
 
         FlowableMailClient tenantClient = createMailClient("provider-tenant@flowable.org");
         cmmnEngineConfiguration.setMailClientProvider(requestedTenantId -> {
-            if (tenantId.equals(requestedTenantId)) {
+            if ("providerTenant".equals(requestedTenantId)) {
                 return tenantClient;
             }
             return null;
         });
 
-        String deploymentId = cmmnRepositoryService.createDeployment()
-                .addClasspathResource(CMMN_RESOURCE)
-                .tenantId(tenantId)
-                .deploy()
-                .getId();
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testSimpleTextMail")
+                .tenantId("providerTenant")
+                .start();
 
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder()
-                    .caseDefinitionKey("testSimpleTextMail")
-                    .tenantId(tenantId)
-                    .start();
-
-            List<WiserMessage> messages = wiser.getMessages();
-            assertThat(messages).hasSize(1);
-            assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("provider-tenant@flowable.org");
-        } finally {
-            cmmnRepositoryService.deleteDeployment(deploymentId, true);
-        }
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("provider-tenant@flowable.org");
     }
 
     @Test
-    @CmmnDeployment(resources = CMMN_RESOURCE)
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn")
     public void testDefaultProviderFallsBackToDefaultClient() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testSimpleTextMail")
@@ -101,7 +89,7 @@ public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources = CMMN_RESOURCE, tenantId = "staticTenant")
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn", tenantId = "staticTenant")
     public void testDefaultProviderResolvesTenantFromStaticConfig() {
         addMailServer("staticTenant", "static-tenant@flowable.org", null);
         reinitializeMailClients();
@@ -117,7 +105,7 @@ public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources = CMMN_RESOURCE)
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskWithMailClientProviderTest.testSimpleTextMail.cmmn")
     public void testDefaultMailClientProviderIsSetByDefault() {
         assertThat(cmmnEngineConfiguration.getMailClientProvider()).isInstanceOf(DefaultMailClientProvider.class);
 
