@@ -22,13 +22,14 @@ package org.flowable.mail.common.api.client;
  *
  * @author Valentin Zickner
  */
+@FunctionalInterface
 public interface MailClientProvider {
 
     /**
      * Returns the mail client for the given tenant identifier.
      *
      * @param tenantId the tenant identifier, or {@code null} for the default (non-tenant) case
-     * @return the mail client, or {@code null} if this provider cannot resolve one
+     * @return the mail client for the given tenant
      */
     FlowableMailClient getMailClient(String tenantId);
 }

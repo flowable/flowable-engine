@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.cfg.mail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.mail.common.api.client.MailClientProvider;
 
@@ -35,7 +36,7 @@ public class DefaultMailClientProvider implements MailClientProvider {
 
     @Override
     public FlowableMailClient getMailClient(String tenantId) {
-        if (tenantId != null) {
+        if (StringUtils.isNotBlank(tenantId)) {
             FlowableMailClient client = tenantMailClients.get(tenantId);
             if (client != null) {
                 return client;

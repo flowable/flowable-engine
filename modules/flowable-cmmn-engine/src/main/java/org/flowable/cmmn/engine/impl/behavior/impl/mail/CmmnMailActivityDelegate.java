@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl.mail;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -21,7 +20,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.mail.BaseMailActivityDelegate;
 import org.flowable.content.api.ContentService;
 import org.flowable.mail.common.api.client.FlowableMailClient;
-import org.flowable.mail.common.api.client.MailClientProvider;
 
 /**
  * @author Filip Hrisafov
@@ -36,20 +34,7 @@ public class CmmnMailActivityDelegate extends BaseMailActivityDelegate<DelegateP
     @Override
     protected FlowableMailClient getMailClient(DelegatePlanItemInstance planItemInstance) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
-        String tenantId = planItemInstance.getTenantId();
-        FlowableMailClient mailClient = null;
-
-        MailClientProvider mailClientProvider = cmmnEngineConfiguration.getMailClientProvider();
-        if (mailClientProvider != null) {
-            if (StringUtils.isNotBlank(tenantId)) {
-                mailClient = mailClientProvider.getMailClient(tenantId);
-            }
-            if (mailClient == null) {
-                mailClient = mailClientProvider.getMailClient(null);
-            }
-        }
-
-        return mailClient;
+        return cmmnEngineConfiguration.getMailClientProvider().getMailClient(planItemInstance.getTenantId());
     }
 
     @Override

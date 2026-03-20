@@ -4095,16 +4095,24 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         return this;
     }
 
+    /**
+     * @deprecated use {@link #getMailClientProvider()} and {@link MailClientProvider#getMailClient(String)} with tenantId {@code null} instead
+     */
+    @Deprecated
     public FlowableMailClient getDefaultMailClient() {
-        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
-            return defaultProvider.getDefaultMailClient();
-        }
-        return null;
+        return mailClientProvider.getMailClient(null);
     }
 
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setDefaultMailClient(FlowableMailClient defaultMailClient) {
         if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
             defaultProvider.setDefaultMailClient(defaultMailClient);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
         }
         return this;
     }
@@ -4241,20 +4249,35 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         return mailServers.get(tenantId);
     }
 
+    /**
+     * @deprecated use {@link #getMailClientProvider()} instead
+     */
+    @Deprecated
     public Map<String, FlowableMailClient> getMailClients() {
         if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
             return defaultProvider.getMailClients();
         }
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setMailClients(Map<String, FlowableMailClient> mailClients) {
         if (this.mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
             defaultProvider.getMailClients().putAll(mailClients);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
         }
         return this;
     }
 
+    /**
+     * @deprecated use {@link #getMailClientProvider().getMailClient(String)} instead
+     */
+    @Deprecated
     public FlowableMailClient getMailClient(String tenantId) {
         return mailClientProvider.getMailClient(tenantId);
     }

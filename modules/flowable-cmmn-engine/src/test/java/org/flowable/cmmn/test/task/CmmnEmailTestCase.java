@@ -62,12 +62,12 @@ public abstract class CmmnEmailTestCase extends FlowableCmmnTestCase {
 
     @AfterEach
     public void tearDown() {
-        cmmnEngineConfiguration.setMailClientProvider(initialMailClientProvider);
         if (initialMailServers != null) {
             cmmnEngineConfiguration.getMailServers().clear();
             cmmnEngineConfiguration.getMailServers().putAll(initialMailServers);
         }
         reinitializeMailClients();
+        cmmnEngineConfiguration.setMailClientProvider(initialMailClientProvider);
     }
 
     @AfterAll
