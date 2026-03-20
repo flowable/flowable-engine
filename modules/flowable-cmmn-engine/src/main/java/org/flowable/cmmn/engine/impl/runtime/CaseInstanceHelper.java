@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.runtime;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.common.engine.impl.callback.CallbackData;
@@ -35,6 +36,9 @@ public interface CaseInstanceHelper {
      * @return the copied case instance entity added back to the runtime
      */
     CaseInstanceEntity copyHistoricCaseInstanceToRuntime(HistoricCaseInstance caseInstance);
+
+    CaseDefinition resolveCaseDefinition(String caseDefinitionKey, String tenantId,
+            boolean fallbackToDefaultTenant, String parentDeploymentId);
 
     void callCaseInstanceStateChangeCallbacks(CallbackData callbackData);
     
