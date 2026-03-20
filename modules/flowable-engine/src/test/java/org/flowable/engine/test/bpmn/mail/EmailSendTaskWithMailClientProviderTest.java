@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.drools.util.StringUtils;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.engine.test.Deployment;
@@ -39,12 +40,12 @@ public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
     @BeforeEach
     void saveProvider() {
         initialMailClientProvider = processEngineConfiguration.getMailClientProvider();
+        reinitilizeMailClients();
     }
 
     @AfterEach
     void restoreProvider() {
         processEngineConfiguration.setMailClientProvider(initialMailClientProvider);
-        reinitilizeMailClients();
     }
 
     @Test
@@ -101,10 +102,10 @@ public class EmailSendTaskWithMailClientProviderTest extends EmailTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailSendTaskTest.testSimpleTextMail.bpmn20.xml")
-    public void testProviderReturnsClientForNullTenantId() throws Exception {
+    public void testProviderReturnsClientForEmptyTenantId() throws Exception {
         FlowableMailClient defaultProviderClient = createMailClient("provider-default@flowable.org");
         processEngineConfiguration.setMailClientProvider(requestedTenantId -> {
-            if (requestedTenantId == null) {
+            if (StringUtils.isEmpty(requestedTenantId)) {
                 return defaultProviderClient;
             }
             return null;

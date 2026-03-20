@@ -40,6 +40,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
         initialForceTo = processEngineConfiguration.getMailServerForceTo();
         initialMailClientProvider = processEngineConfiguration.getMailClientProvider();
+        reinitilizeMailClients();
         Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
         initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
         boolean serverUpAndRunning = false;
@@ -66,13 +67,10 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
         processEngineConfiguration.setMailServers(initialMailServers);
-        reinitilizeMailClients();
         processEngineConfiguration.setMailClientProvider(initialMailClientProvider);
     }
 
     protected void reinitilizeMailClients() {
-        processEngineConfiguration.setDefaultMailClient(null);
-        processEngineConfiguration.getMailClients().clear();
         processEngineConfiguration.setMailClientProvider(null);
         processEngineConfiguration.initMailClients();
     }

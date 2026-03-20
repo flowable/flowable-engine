@@ -56,6 +56,7 @@ public abstract class CmmnEmailTestCase extends FlowableCmmnTestCase {
     public void setUp() {
         wiser.getMessages().clear();
         initialMailClientProvider = cmmnEngineConfiguration.getMailClientProvider();
+        reinitializeMailClients();
         Map<String, MailServerInfo> mailServers = cmmnEngineConfiguration.getMailServers();
         initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
     }
@@ -66,7 +67,6 @@ public abstract class CmmnEmailTestCase extends FlowableCmmnTestCase {
             cmmnEngineConfiguration.getMailServers().clear();
             cmmnEngineConfiguration.getMailServers().putAll(initialMailServers);
         }
-        reinitializeMailClients();
         cmmnEngineConfiguration.setMailClientProvider(initialMailClientProvider);
     }
 
@@ -76,8 +76,6 @@ public abstract class CmmnEmailTestCase extends FlowableCmmnTestCase {
     }
 
     protected void reinitializeMailClients() {
-        cmmnEngineConfiguration.setDefaultMailClient(null);
-        cmmnEngineConfiguration.getMailClients().clear();
         cmmnEngineConfiguration.setMailClientProvider(null);
         cmmnEngineConfiguration.initMailClients();
     }

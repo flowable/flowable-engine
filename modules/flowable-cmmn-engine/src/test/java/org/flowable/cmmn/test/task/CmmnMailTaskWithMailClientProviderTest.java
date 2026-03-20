@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
@@ -36,10 +37,10 @@ public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
 
     @Test
     @CmmnDeployment(resources = CMMN_RESOURCE)
-    public void testProviderReturnsClientForNullTenantId() {
+    public void testProviderReturnsClientForEmptyTenantId() {
         FlowableMailClient providerClient = createMailClient("provider-default@flowable.org");
         cmmnEngineConfiguration.setMailClientProvider(requestedTenantId -> {
-            if (requestedTenantId == null) {
+            if (StringUtils.isEmpty(requestedTenantId)) {
                 return providerClient;
             }
             return null;
