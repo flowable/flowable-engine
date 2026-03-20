@@ -101,29 +101,19 @@ public class CmmnMailTaskWithMailClientProviderTest extends CmmnEmailTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = CMMN_RESOURCE, tenantId = "staticTenant")
     public void testDefaultProviderResolvesTenantFromStaticConfig() {
-        String tenantId = "staticTenant";
-        addMailServer(tenantId, "static-tenant@flowable.org", null);
+        addMailServer("staticTenant", "static-tenant@flowable.org", null);
         reinitializeMailClients();
 
-        String deploymentId = cmmnRepositoryService.createDeployment()
-                .addClasspathResource(CMMN_RESOURCE)
-                .tenantId(tenantId)
-                .deploy()
-                .getId();
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testSimpleTextMail")
+                .tenantId("staticTenant")
+                .start();
 
-        try {
-            cmmnRuntimeService.createCaseInstanceBuilder()
-                    .caseDefinitionKey("testSimpleTextMail")
-                    .tenantId(tenantId)
-                    .start();
-
-            List<WiserMessage> messages = wiser.getMessages();
-            assertThat(messages).hasSize(1);
-            assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("static-tenant@flowable.org");
-        } finally {
-            cmmnRepositoryService.deleteDeployment(deploymentId, true);
-        }
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        assertThat(messages.get(0).getEnvelopeSender()).isEqualTo("static-tenant@flowable.org");
     }
 
     @Test
