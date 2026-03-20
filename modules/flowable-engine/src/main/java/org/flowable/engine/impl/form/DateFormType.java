@@ -13,11 +13,10 @@
 
 package org.flowable.engine.impl.form;
 
-import java.text.Format;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.FastDateFormat;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.form.AbstractFormType;
 
@@ -29,11 +28,9 @@ public class DateFormType extends AbstractFormType {
     private static final long serialVersionUID = 1L;
 
     protected String datePattern;
-    protected Format dateFormat;
 
     public DateFormType(String datePattern) {
         this.datePattern = datePattern;
-        this.dateFormat = FastDateFormat.getInstance(datePattern);
     }
 
     @Override
@@ -55,7 +52,9 @@ public class DateFormType extends AbstractFormType {
             return null;
         }
         try {
-            return dateFormat.parseObject(propertyValue);
+            SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
+            sdf.setLenient(false);
+            return sdf.parse(propertyValue);
         } catch (ParseException e) {
             throw new FlowableIllegalArgumentException("invalid date value " + propertyValue, e);
         }
@@ -66,6 +65,6 @@ public class DateFormType extends AbstractFormType {
         if (modelValue == null) {
             return null;
         }
-        return dateFormat.format(modelValue);
+        return new SimpleDateFormat(datePattern).format(modelValue);
     }
 }
