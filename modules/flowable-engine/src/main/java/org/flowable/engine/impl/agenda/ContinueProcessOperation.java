@@ -15,6 +15,7 @@ package org.flowable.engine.impl.agenda;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -360,11 +361,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
-                if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                        || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
-                    continue;
-                }
+            if (!isExecutableBoundaryEvent(boundaryEvent)) {
+                continue;
             }
 
             // A Child execution of the current execution is created to represent the boundary event being active
@@ -389,6 +387,7 @@ public class ContinueProcessOperation extends AbstractOperation {
 
     protected void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
         if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
+            boundaryEvents = boundaryEvents.stream().filter(this::isExecutableBoundaryEvent).collect(Collectors.toList());
             Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
             Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
@@ -400,5 +399,15 @@ public class ContinueProcessOperation extends AbstractOperation {
                 boundaryEventBehavior.execute(boundaryEventExecution);
             }
         }
+    }
+
+    private boolean isExecutableBoundaryEvent(BoundaryEvent boundaryEvent) {
+        if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
+            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                    || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

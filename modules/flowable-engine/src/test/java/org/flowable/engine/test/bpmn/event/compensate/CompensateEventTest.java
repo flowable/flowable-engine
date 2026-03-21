@@ -337,4 +337,11 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTimerEventBoundary.bpmn20.xml" })
+    public void testCompensationTimerEventBoundary() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationTimerEventBoundary");
+        assertThat(processInstance).isNotNull();
+    }
+
 }
