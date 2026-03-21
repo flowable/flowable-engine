@@ -1615,7 +1615,7 @@ public abstract class AbstractDynamicStateManager {
                         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(eventSubProcessExecution.getProcessDefinitionId());
                         Signal signal = bpmnModel.getSignal(signalEventDefinition.getSignalRef());
                         if (signal != null) {
-                            signalEventDefinition.setSignalRef(signal.getName());
+                            signalEventDefinition.setSignalRef(signal.getId());
                         }
 
                         ExecutionEntity signalExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(eventSubProcessExecution.getParent());
