@@ -33,15 +33,9 @@ import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
 import tools.jackson.databind.node.ArrayNode;
@@ -49,41 +43,7 @@ import tools.jackson.databind.node.ArrayNode;
 /**
  * @author Joram Barrez
  */
-@Tag("email")
-public class CmmnMailTaskTest extends FlowableCmmnTestCase {
-
-    protected static Wiser wiser;
-
-    @BeforeAll
-    public static void setupWiser() throws Exception {
-        wiser = Wiser.port(5025);
-
-        int counter = 0;
-        boolean serverUpAndRunning = false;
-        while (!serverUpAndRunning && counter++ < 11) {
-
-            wiser = Wiser.port(5025);
-
-            try {
-                wiser.start();
-                serverUpAndRunning = true;
-            } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
-                if (e.getMessage().toLowerCase().contains("bindexception")) {
-                    Thread.sleep(250L);
-                }
-            }
-        }
-    }
-
-    @BeforeEach
-    public void resetMessages() {
-        wiser.getMessages().clear();
-    }
-
-    @AfterAll
-    public static void stopWiser() {
-        wiser.stop();
-    }
+public class CmmnMailTaskTest extends CmmnEmailTestCase {
 
     @Test
     @CmmnDeployment

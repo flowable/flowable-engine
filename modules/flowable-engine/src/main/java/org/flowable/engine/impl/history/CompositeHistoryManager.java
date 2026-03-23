@@ -15,6 +15,8 @@ package org.flowable.engine.impl.history;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -35,7 +37,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CompositeHistoryManager implements HistoryManager {
 
-    protected final Collection<HistoryManager> historyManagers;
+    protected final List<HistoryManager> historyManagers;
 
     public CompositeHistoryManager(Collection<HistoryManager> historyManagers) {
         this.historyManagers = new ArrayList<>(historyManagers);
@@ -108,22 +110,34 @@ public class CompositeHistoryManager implements HistoryManager {
 
     @Override
     public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
         }
     }
 
     @Override
     public void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordDeleteHistoricProcessInstancesByProcessDefinitionId(processDefinitionId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordDeleteHistoricProcessInstancesByProcessDefinitionId(processDefinitionId);
         }
     }
 
     @Override
     public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordBulkDeleteProcessInstances(processInstanceIds);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordBulkDeleteProcessInstances(processInstanceIds);
         }
     }
 
@@ -183,8 +197,12 @@ public class CompositeHistoryManager implements HistoryManager {
 
     @Override
     public void recordHistoricTaskDeleted(HistoricTaskInstance task){
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricTaskDeleted(task);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricTaskDeleted(task);
         }
     }
 
