@@ -2692,6 +2692,60 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
     }
 
     @Test
+    public void testMigrateActivityToActivityWithTimerAndCompensationInNewDefinition() {
+        ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
+        ProcessDefinition procDefWithTimerAndCompensation = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/twoTasksProcessWithTimerAndCompensation.bpmn20.xml");
+
+        //Start the processInstance without timer or compensation
+        ProcessInstance processInstance = runtimeService.startProcessInstanceById(procDefOneTask.getId());
+
+        //Confirm the state to migrate
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().list();
+        assertThat(executions)
+                .extracting(Execution::getActivityId)
+                .containsExactly("userTask1Id");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("userTask1Id");
+
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNull();
+
+        changeStateEventListener.clear();
+
+        //Migrate to the processDefinition with timer and compensation boundary events
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(procDefWithTimerAndCompensation.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask1Id", "firstTask"));
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationResult = processInstanceMigrationBuilder.validateMigration(processInstance.getId());
+        assertThat(processInstanceMigrationResult.isMigrationValid()).isTrue();
+
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+
+        //Confirm - the timer boundary event should be properly set up (not mismatched with the compensation boundary event)
+        List<Execution> executionsAfterMigration = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions()
+                .list();
+        assertThat(executionsAfterMigration)
+                .extracting(Execution::getActivityId)
+                .containsExactlyInAnyOrder("firstTask", "boundaryTimerEvent");
+        assertThat(executionsAfterMigration)
+                .extracting("processDefinitionId")
+                .containsOnly(procDefWithTimerAndCompensation.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).extracting(Task::getTaskDefinitionKey).isEqualTo("firstTask");
+        timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+
+        //Complete the process
+        completeProcessInstanceTasks(processInstance.getId());
+
+        assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
     public void testMigrateActivityWithTimerToActivityWithoutTimerInNewDefinition() {
         ProcessDefinition procDefOWithTimer = deployProcessDefinition("my deploy", "org/flowable/engine/test/api/twoTasksProcessWithTimer.bpmn20.xml");
         ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
