@@ -173,7 +173,7 @@ public class EventSubscriptionManager {
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         SignalEventSubscriptionEntity subscriptionEntity = eventSubscriptionService.createSignalEventSubscription();
 
-        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, processDefinition);
         subscriptionEntity.setEventName(signalName);
 
         subscriptionEntity.setActivityId(startEvent.getId());
@@ -191,8 +191,9 @@ public class EventSubscriptionManager {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+
         // look for subscriptions for the same name in db:
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
                 .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 

@@ -56,6 +56,10 @@ public class MultiValuePart {
         return new MultiValuePart(name, value, null);
     }
 
+    public static MultiValuePart fromText(String name, String value, String mimeType) {
+        return new MultiValuePart(name, value, null, mimeType);
+    }
+
     public static MultiValuePart fromFile(String name, byte[] value, String filename) {
         return new MultiValuePart(name, value, filename);
     }

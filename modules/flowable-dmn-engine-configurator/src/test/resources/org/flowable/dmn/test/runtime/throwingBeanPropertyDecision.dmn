@@ -1,0 +1,21 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="throwingBeanPropertyDecision" name="Throwing Bean Property Decision"
+             namespace="http://flowable.org/dmn">
+    <decision id="DecisionTable" name="Throwing Bean Property Decision">
+        <decisionTable id="decisionTable" hitPolicy="FIRST">
+            <input>
+                <inputExpression id="inputExpression1" typeRef="number">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="output1" label="Output 1" name="output1" typeRef="string"/>
+            <rule>
+                <inputEntry id="inputEntry1">
+                    <text><![CDATA[>= 0]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry1">
+                    <text>${testBean.throwingValue}</text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+</definitions>

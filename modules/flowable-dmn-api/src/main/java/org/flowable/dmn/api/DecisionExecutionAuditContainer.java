@@ -25,6 +25,7 @@ import org.flowable.dmn.model.HitPolicy;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -50,6 +51,8 @@ public class DecisionExecutionAuditContainer {
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
+    @JsonIgnore
+    protected Throwable exception;
     protected String validationMessage;
     protected Boolean strictMode;
 
@@ -213,12 +216,26 @@ public class DecisionExecutionAuditContainer {
         this.failed = Boolean.TRUE;
     }
 
+    public void setFailedWithException(Throwable exception) {
+        this.failed = Boolean.TRUE;
+        this.exception = exception;
+        this.exceptionMessage = exception.getMessage();
+    }
+
     public String getExceptionMessage() {
         return exceptionMessage;
     }
 
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = exceptionMessage;
+    }
+
+    public Throwable getException() {
+        return exception;
+    }
+
+    public void setException(Throwable exception) {
+        this.exception = exception;
     }
 
     public String getValidationMessage() {

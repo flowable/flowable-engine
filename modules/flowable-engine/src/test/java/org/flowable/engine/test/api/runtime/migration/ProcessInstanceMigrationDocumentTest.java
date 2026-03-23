@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -27,6 +28,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMappingOptions.SingleToActivityOptions;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.Script;
 import org.junit.jupiter.api.Test;
@@ -43,11 +45,22 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
                 .withLocalVariable("varForNewActivity1", "varValue")
-                .withNewAssignee("kermit");
+                .withNewName("New name")
+                .withNewDueDate("2040-10-02")
+                .withNewPriority("50")
+                .withNewCategory("New category")
+                .withNewFormKey("NewFormKey")
+                .withNewAssignee("kermit")
+                .withNewOwner("fozzie")
+                .withNewCandidateUsers(Arrays.asList("kermit", "fozzie"))
+                .withNewCandidateGroups(Arrays.asList("users", "admins"));
 
         ActivityMigrationMapping manyToOneMapping = ActivityMigrationMapping
                 .createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
-                .withLocalVariable("varForNewActivity3", 9876);
+                .withLocalVariable("varForNewActivity3", 9876)
+                .withNewPriority("99")
+                .withNewFormKey("UpdatedFormKey")
+                .withNewCandidateGroups(Arrays.asList("test", "test2"));
 
         ActivityMigrationMapping oneToManyMapping = ActivityMigrationMapping
                 .createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
@@ -101,8 +114,9 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
-                .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
+        
+        assertActivityMappings(migrationDocument, Arrays.asList(oneToOneMapping, oneToManyMapping, manyToOneMapping));
+
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
         assertThat(migrationDocument.getPreUpgradeScript())
@@ -499,5 +513,30 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
+    }
+    
+    protected void assertActivityMappings(ProcessInstanceMigrationDocument migrationDocument, List<ActivityMigrationMapping> activityMigrationMappings) {
+        assertThat(migrationDocument.getActivityMigrationMappings()).hasSize(activityMigrationMappings.size());
+        for (int i = 0; i < migrationDocument.getActivityMigrationMappings().size(); i++) {
+            ActivityMigrationMapping documentMapping = migrationDocument.getActivityMigrationMappings().get(i);
+            ActivityMigrationMapping comparisonMapping = activityMigrationMappings.get(i);
+            
+            assertThat(documentMapping.getFromActivityIds()).isEqualTo(comparisonMapping.getFromActivityIds());
+            assertThat(documentMapping.getToActivityIds()).isEqualTo(comparisonMapping.getToActivityIds());
+            
+            if (documentMapping instanceof SingleToActivityOptions) {
+                SingleToActivityOptions<?> documentOptions = (SingleToActivityOptions<?>) documentMapping;
+                SingleToActivityOptions<?> comparisonOptions = (SingleToActivityOptions<?>) comparisonMapping;
+                assertThat(documentOptions.getWithNewName()).isEqualTo(comparisonOptions.getWithNewName());
+                assertThat(documentOptions.getWithNewDueDate()).isEqualTo(comparisonOptions.getWithNewDueDate());
+                assertThat(documentOptions.getWithNewPriority()).isEqualTo(comparisonOptions.getWithNewPriority());
+                assertThat(documentOptions.getWithNewCategory()).isEqualTo(comparisonOptions.getWithNewCategory());
+                assertThat(documentOptions.getWithNewFormKey()).isEqualTo(comparisonOptions.getWithNewFormKey());
+                assertThat(documentOptions.getWithNewAssignee()).isEqualTo(comparisonOptions.getWithNewAssignee());
+                assertThat(documentOptions.getWithNewOwner()).isEqualTo(comparisonOptions.getWithNewOwner());
+                assertThat(documentOptions.getWithNewCandidateUsers()).isEqualTo(comparisonOptions.getWithNewCandidateUsers());
+                assertThat(documentOptions.getWithNewCandidateGroups()).isEqualTo(comparisonOptions.getWithNewCandidateGroups());
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '7.2.0.2', 1);
+values ('common.schema.version', '8.0.0.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -957,10 +957,10 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.2.0.2', 1);
+values ('schema.version', '8.0.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.2.0.2)', 1);
+values ('schema.history', 'create(8.0.0.0)', 1);
 
 
 create table ACT_HI_PROCINST (
@@ -985,6 +985,8 @@ create table ACT_HI_PROCINST (
     REFERENCE_TYPE_ NVARCHAR2(255),
     PROPAGATED_STAGE_INST_ID_ NVARCHAR2(255),
     BUSINESS_STATUS_ NVARCHAR2(255),
+    END_USER_ID_ NVARCHAR2(255),
+    STATE_ NVARCHAR2(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -1096,7 +1098,7 @@ CREATE INDEX ACT_IDX_APP_DEF_DPLY ON ACT_APP_APPDEF(DEPLOYMENT_ID_);
 CREATE UNIQUE INDEX ACT_IDX_APP_DEF_UNIQ ON ACT_APP_APPDEF(KEY_, VERSION_, TENANT_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('app.schema.version', '7.2.0.2', 1);
+values ('app.schema.version', '8.0.0.0', 1);
 
 
 CREATE TABLE ACT_CMMN_DEPLOYMENT
@@ -1299,6 +1301,7 @@ CREATE TABLE ACT_CMMN_HI_CASE_INST
     LAST_REACTIVATION_USER_ID_ VARCHAR2(255),
     BUSINESS_STATUS_           VARCHAR2(255),
     TENANT_ID_                 VARCHAR2(255) DEFAULT '',
+    END_USER_ID_               VARCHAR2(255),
     CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_)
 );
 
@@ -1360,7 +1363,7 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST (CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '7.2.0.2', 1);
+values ('cmmn.schema.version', '8.0.0.0', 1);
 
 
 CREATE TABLE ACT_DMN_DEPLOYMENT (ID_ VARCHAR2(255) NOT NULL, NAME_ VARCHAR2(255), CATEGORY_ VARCHAR2(255), DEPLOY_TIME_ TIMESTAMP, TENANT_ID_ VARCHAR2(255), PARENT_DEPLOYMENT_ID_ VARCHAR2(255), CONSTRAINT PK_ACT_DMN_DEPLOYMENT PRIMARY KEY (ID_));
@@ -1381,7 +1384,7 @@ CREATE UNIQUE INDEX ACT_IDX_DMN_DEC_UNIQ ON ACT_DMN_DECISION(KEY_, VERSION_, TEN
 CREATE INDEX ACT_IDX_DMN_INSTANCE_ID ON ACT_DMN_HI_DECISION_EXECUTION(INSTANCE_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('dmn.schema.version', '7.2.0.2', 1);
+values ('dmn.schema.version', '8.0.0.0', 1);
 
 
 CREATE TABLE FLW_EVENT_DEPLOYMENT (ID_ VARCHAR2(255) NOT NULL, NAME_ VARCHAR2(255), CATEGORY_ VARCHAR2(255), DEPLOY_TIME_ TIMESTAMP(3), TENANT_ID_ VARCHAR2(255), PARENT_DEPLOYMENT_ID_ VARCHAR2(255), CONSTRAINT PK_FLW_EVENT_DEPLOYMENT PRIMARY KEY (ID_));
@@ -1402,7 +1405,7 @@ CREATE TABLE FLW_CHANNEL_DEFINITION (ID_ VARCHAR2(255) NOT NULL, NAME_ VARCHAR2(
 CREATE UNIQUE INDEX ACT_IDX_CHANNEL_DEF_UNIQ ON FLW_CHANNEL_DEFINITION(KEY_, VERSION_, TENANT_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('eventregistry.schema.version', '7.2.0.2', 1);
+values ('eventregistry.schema.version', '8.0.0.0', 1);
 
 
 create table ACT_ID_PROPERTY (
@@ -1413,7 +1416,7 @@ create table ACT_ID_PROPERTY (
 );
 
 insert into ACT_ID_PROPERTY
-values ('schema.version', '7.2.0.2', 1);
+values ('schema.version', '8.0.0.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ NVARCHAR2(64),

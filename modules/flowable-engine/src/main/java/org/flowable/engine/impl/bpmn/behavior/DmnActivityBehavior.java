@@ -110,7 +110,8 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + " in " + execution);
+            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed in " + execution,
+                    decisionExecutionAuditContainer.getException());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/

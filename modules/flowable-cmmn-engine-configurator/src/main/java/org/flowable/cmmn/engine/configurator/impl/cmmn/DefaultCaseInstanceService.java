@@ -68,8 +68,9 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         
         if (tenantId != null) {
             caseInstanceBuilder.tenantId(tenantId);
+            caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
         }
-        
+
         if (executionId != null) {
             caseInstanceBuilder.callbackId(executionId);
             caseInstanceBuilder.callbackType(CallbackTypes.EXECUTION_CHILD_CASE);

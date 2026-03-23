@@ -179,7 +179,18 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
         if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
-            delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
+            // This is not the regular termination through the agenda, but the historic plan item state still needs to be correct.
+            // The state needs to be set before deleting the process instance, because the process instance deletion triggers
+            // a ChildProcessInstanceStateChangeCallback which re-enters the CMMN engine to terminate the plan item.
+            // With the state already set to TERMINATED, this callback becomes a no-op and avoids re-triggering repetition rules.
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
+            if (!PlanItemInstanceState.TERMINATED.equals(planItemInstanceEntity.getState())) {
+                planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                planItemInstanceEntity.setEndedTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+                planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+            }
+
             deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
             throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS + " for " + delegatePlanItemInstance);

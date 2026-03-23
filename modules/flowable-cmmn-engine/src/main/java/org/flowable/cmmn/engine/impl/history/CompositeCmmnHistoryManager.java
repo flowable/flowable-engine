@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -32,7 +34,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
-    protected final Collection<CmmnHistoryManager> historyManagers;
+    protected final List<CmmnHistoryManager> historyManagers;
 
     public CompositeCmmnHistoryManager(Collection<CmmnHistoryManager> historyManagers) {
         this.historyManagers = new ArrayList<>(historyManagers);
@@ -90,15 +92,23 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
         }
     }
 
     @Override
     public void recordBulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
         }
     }
 
@@ -181,8 +191,12 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricTaskDeleted(task);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricTaskDeleted(task);
         }
     }
 

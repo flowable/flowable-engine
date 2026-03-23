@@ -73,18 +73,12 @@ public class TimerManager {
                     if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                         if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
+
                             TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                                    false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(), 
+                                    false, processDefinition, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                                             timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
-                            if (timerJob != null) {
-                                timerJob.setProcessDefinitionId(processDefinition.getId());
-
-                                if (processDefinition.getTenantId() != null) {
-                                    timerJob.setTenantId(processDefinition.getTenantId());
-                                }
-                                timers.add(timerJob);
-                            }
+                            timers.add(timerJob);
 
                         }
                     }

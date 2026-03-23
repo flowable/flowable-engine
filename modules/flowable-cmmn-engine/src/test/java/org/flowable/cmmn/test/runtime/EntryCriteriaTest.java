@@ -395,4 +395,48 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
 
     }
 
+    @Test
+    @CmmnDeployment
+    public void testMultipleEntryCriteriaWithAndWithoutIfPart() {
+
+        // A plan item (Stage C) has two entry criteria:
+        // - sentry1: two onParts (A complete + B complete), no ifPart
+        // - sentry2: one onPart (B complete) + ifPart (myVar == true), default trigger mode (event deferred)
+        //
+        // The ifPart of sentry2 is evaluated proactively and stored as a
+        // SentryPartInstanceEntity. When later evaluating sentry1 (which has no ifPart), the code iterates
+        // through all satisfied sentry part instances for the plan item and must not NPE on the ifPart
+        // instance from sentry2.
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("myVar", true)
+                .start();
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks)
+                .extracting(Task::getName)
+                .containsExactly("A", "B");
+
+        // Completing A triggers evaluation of sentry1 (no ifPart) while a satisfied ifPart instance
+        // from sentry2 exists. Before the fix, this caused a NullPointerException.
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        PlanItemInstance stageCInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemInstanceName("Stage C").singleResult();
+        assertThat(stageCInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        // Completing B satisfies both sentries, activating Stage C
+        Task taskB = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(taskB.getName()).isEqualTo("B");
+        cmmnTaskService.complete(taskB.getId());
+
+        stageCInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemInstanceName("Stage C").singleResult();
+        assertThat(stageCInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+
+        Task taskC = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(taskC.getName()).isEqualTo("C");
+    }
+
 }

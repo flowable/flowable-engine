@@ -10,7 +10,7 @@
 	<artifactId>flowable-root</artifactId>
 
 	<packaging>pom</packaging>
-	<version>8.0.0-SNAPSHOT</version>
+	<version>8.1.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<distributionManagementSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</distributionManagementSnapshotsUrl>
@@ -303,6 +303,7 @@
                             <!--<skipPublishing>true</skipPublishing>-->
                             <excludeArtifacts>
                                 <excludeArtifact>flowable-distribution</excludeArtifact>
+                                <excludeArtifact>flowable-build-tools</excludeArtifact>
                             </excludeArtifacts>
                         </configuration>
                     </plugin>

@@ -22,6 +22,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.migration.ActivityMigrationMappingOptions.SingleToActivityOptions;
 import org.flowable.engine.repository.ProcessDefinition;
 
 public class MoveExecutionEntityContainer {
@@ -40,8 +41,7 @@ public class MoveExecutionEntityContainer {
     protected BpmnModel processModel;
     protected ExecutionEntity superExecution;
     protected boolean isMultiInstanceExecutionWithChildExecutions;
-    protected String newAssigneeId;
-    protected String newOwnerId;
+    protected SingleToActivityOptions<?> activityOptions;
     protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
     protected Map<String, FlowElementMoveEntry> moveToFlowElementMap = new LinkedHashMap<>();
     protected Map<String, FlowElementMoveEntry> currentActivityToNewElementMap = new LinkedHashMap<>();
@@ -49,9 +49,10 @@ public class MoveExecutionEntityContainer {
     protected List<String> newExecutionIds = new ArrayList<>();
     protected Map<String, ExecutionEntity> createdEventSubProcesses = new HashMap<>();
 
-    public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
+    public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds, SingleToActivityOptions<?> activityOptions) {
         this.executions = executions;
         this.moveToActivityIds = moveToActivityIds;
+        this.activityOptions = activityOptions;
     }
 
     public List<ExecutionEntity> getExecutions() {
@@ -154,20 +155,12 @@ public class MoveExecutionEntityContainer {
         this.isMultiInstanceExecutionWithChildExecutions = isMultiInstanceExecutionWithChildExecutions;
     }
 
-    public void setNewAssigneeId(String newAssigneeId) {
-        this.newAssigneeId = newAssigneeId;
+    public SingleToActivityOptions<?> getActivityOptions() {
+        return activityOptions;
     }
 
-    public String getNewAssigneeId() {
-        return newAssigneeId;
-    }
-
-    public String getNewOwnerId() {
-        return newOwnerId;
-    }
-
-    public void setNewOwnerId(String newOwnerId) {
-        this.newOwnerId = newOwnerId;
+    public void setActivityOptions(SingleToActivityOptions<?> activityOptions) {
+        this.activityOptions = activityOptions;
     }
 
     public void setSuperExecution(ExecutionEntity superExecution) {

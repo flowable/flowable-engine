@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.mail;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.mail.BaseMailActivityDelegate;
 import org.flowable.content.api.ContentService;
@@ -36,17 +35,7 @@ public class BpmnMailActivityDelegate extends BaseMailActivityDelegate<DelegateE
     @Override
     protected FlowableMailClient getMailClient(DelegateExecution execution) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        String tenantId = execution.getTenantId();
-        FlowableMailClient mailClient = null;
-        if (StringUtils.isNotBlank(tenantId)) {
-            mailClient = processEngineConfiguration.getMailClient(tenantId);
-        }
-
-        if (mailClient == null) {
-            mailClient = processEngineConfiguration.getDefaultMailClient();
-        }
-
-        return mailClient;
+        return processEngineConfiguration.getMailClientProvider().getMailClient(execution.getTenantId());
     }
 
     @Override

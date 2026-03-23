@@ -83,6 +83,8 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventRegistryEventConsumer;
 import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.function.IsPlanItemCompletedExpressionFunction;
@@ -294,7 +296,9 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.mail.common.api.client.FlowableMailClient;
+import org.flowable.mail.common.api.client.MailClientProvider;
 import org.flowable.task.service.InternalTaskAssignmentManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskPostProcessor;
@@ -524,11 +528,10 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
     // Email
-    protected FlowableMailClient defaultMailClient;
+    protected MailClientProvider mailClientProvider = new DefaultMailClientProvider();
     protected MailServerInfo defaultMailServer;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
-    protected Map<String, FlowableMailClient> mailClients = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
 
     // Async executor
@@ -680,6 +683,8 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     protected boolean alwaysUseArraysForDmnMultiHitPolicies = true;
 
+    protected CmmnEventInstanceOutParameterHandler cmmnEventInstanceOutParameterHandler;
+
     // Localization support
     protected CaseDefinitionLocalizationManager caseDefinitionLocalizationManager;
     protected CaseLocalizationManager caseLocalizationManager;
@@ -809,6 +814,13 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         afterInitEventRegistryEventBusConsumer();
         
         initHistoryCleaningManager();
+        initEventInstanceOutParameterHandler();
+    }
+
+    public void initEventInstanceOutParameterHandler() {
+        if (cmmnEventInstanceOutParameterHandler == null) {
+            cmmnEventInstanceOutParameterHandler = new CmmnEventInstanceOutParameterHandlerImpl();
+        }
     }
 
     public void initCaseDiagramGenerator() {
@@ -918,17 +930,23 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     }
 
     public void initMailClients() {
-        if (defaultMailClient == null) {
+        if (mailClientProvider == null) {
+            mailClientProvider = new DefaultMailClientProvider();
+        }
+        if (!(mailClientProvider instanceof DefaultMailClientProvider defaultMailClientProvider)) {
+            return; // custom provider handles resolution at runtime
+        }
+        if (defaultMailClientProvider.getDefaultMailClient() == null) {
             String sessionJndi = getMailSessionJndi();
             if (sessionJndi != null) {
-                defaultMailClient = FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer());
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer()));
             } else {
                 MailServerInfo mailServer = getDefaultMailServer();
                 String host = mailServer.getMailServerHost();
                 if (host == null) {
                     throw new FlowableException("no SMTP host is configured for the default mail server");
                 }
-                defaultMailClient = FlowableMailClientCreator.createHostClient(host, mailServer);
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createHostClient(host, mailServer));
             }
         }
 
@@ -936,6 +954,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         tenantIds.addAll(mailServers.keySet());
 
         if (!tenantIds.isEmpty()) {
+            Map<String, FlowableMailClient> mailClients = defaultMailClientProvider.getMailClients();
             MailServerInfo defaultMailServer = getDefaultMailServer();
             for (String tenantId : tenantIds) {
                 if (mailClients.containsKey(tenantId)) {
@@ -4067,12 +4086,34 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         return this;
     }
 
-    public FlowableMailClient getDefaultMailClient() {
-        return defaultMailClient;
+    public MailClientProvider getMailClientProvider() {
+        return mailClientProvider;
     }
 
+    public CmmnEngineConfiguration setMailClientProvider(MailClientProvider mailClientProvider) {
+        this.mailClientProvider = mailClientProvider;
+        return this;
+    }
+
+    /**
+     * @deprecated use {@link #getMailClientProvider()} and {@link MailClientProvider#getMailClient(String)} with tenantId {@code null} instead
+     */
+    @Deprecated
+    public FlowableMailClient getDefaultMailClient() {
+        return mailClientProvider.getMailClient(null);
+    }
+
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setDefaultMailClient(FlowableMailClient defaultMailClient) {
-        this.defaultMailClient = defaultMailClient;
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.setDefaultMailClient(defaultMailClient);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
+        }
         return this;
     }
 
@@ -4208,17 +4249,37 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         return mailServers.get(tenantId);
     }
 
+    /**
+     * @deprecated use {@link #getMailClientProvider()} instead
+     */
+    @Deprecated
     public Map<String, FlowableMailClient> getMailClients() {
-        return mailClients;
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            return defaultProvider.getMailClients();
+        }
+        return Collections.emptyMap();
     }
 
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
     public CmmnEngineConfiguration setMailClients(Map<String, FlowableMailClient> mailClients) {
-        this.mailClients = mailClients;
+        if (this.mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.getMailClients().putAll(mailClients);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
+        }
         return this;
     }
 
+    /**
+     * @deprecated use {@link #getMailClientProvider().getMailClient(String)} instead
+     */
+    @Deprecated
     public FlowableMailClient getMailClient(String tenantId) {
-        return mailClients.get(tenantId);
+        return mailClientProvider.getMailClient(tenantId);
     }
 
     public Map<String, String> getMailSessionsJndi() {
@@ -4472,5 +4533,13 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     public CmmnEngineConfiguration setPlanItemLocalizationManager(PlanItemLocalizationManager planItemLocalizationManager) {
         this.planItemLocalizationManager = planItemLocalizationManager;
         return this;
+    }
+
+    public CmmnEventInstanceOutParameterHandler getCmmnEventInstanceOutParameterHandler() {
+        return cmmnEventInstanceOutParameterHandler;
+    }
+
+    public void setCmmnEventInstanceOutParameterHandler(CmmnEventInstanceOutParameterHandler cmmnEventInstanceOutParameterHandler) {
+        this.cmmnEventInstanceOutParameterHandler = cmmnEventInstanceOutParameterHandler;
     }
 }

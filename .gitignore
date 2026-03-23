@@ -20,3 +20,8 @@ requirements.lock
 docs/docusaurus/website/build/
 k8s/index.yaml
 /k8s/*.tgz
+
+.factorypath
+
+.claude/settings.local.json
+.claude/worktrees

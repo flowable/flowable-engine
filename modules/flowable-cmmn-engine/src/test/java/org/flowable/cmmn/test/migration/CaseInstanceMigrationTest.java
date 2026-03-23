@@ -18,6 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.flowable.cmmn.converter.CmmnXmlConstants.ELEMENT_STAGE;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +32,6 @@ import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
-import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
 import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
@@ -52,6 +54,9 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
@@ -881,7 +886,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         // Act
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
-                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2", "kermit", null))
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2").withNewAssignee("kermit"))
                 .addTerminatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("humanTask1"))
                 .migrate(caseInstance.getId());
 
@@ -929,6 +934,120 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
                 .singleResult();
             assertThat(historicTask.getTaskDefinitionKey()).isEqualTo("humanTask2");
             assertThat(historicTask.getAssignee()).isEqualTo("kermit");
+        }
+    }
+    
+    @Test
+    void withChangingTaskProperties() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                    .isNotEqualTo(destinationDefinition.getId());
+        }
+
+        // Act
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2")
+                        .withNewName("Updated name")
+                        .withNewDueDate("2040-03-02T15:43:25")
+                        .withNewPriority("87")
+                        .withNewCategory("Updated category")
+                        .withNewFormKey("UpdatedFormKey")
+                        .withNewCandidateGroups(java.util.Arrays.asList("group1", "group2")))
+                .addTerminatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("humanTask1"))
+                .migrate(caseInstance.getId());
+
+        // Assert
+        CaseInstance caseInstanceAfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(caseInstanceAfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .list();
+        assertThat(planItemInstances).hasSize(1);
+        PlanItemInstance task2PlanItemInstance = planItemInstances.get(0);
+        assertThat(task2PlanItemInstance).isNotNull();
+        assertThat(task2PlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
+        assertThat(task2PlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("humanTask2");
+        assertThat(task.getName()).isEqualTo("Updated name");
+        assertThat(task.getPriority()).isEqualTo(87);
+        assertThat(task.getCategory()).isEqualTo("Updated category");
+        assertThat(task.getFormKey()).isEqualTo("UpdatedFormKey");
+        assertThat(task.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+        
+        Calendar dueDateCal = new GregorianCalendar();
+        dueDateCal.setTime(task.getDueDate());
+        assertThat(dueDateCal.get(Calendar.YEAR)).isEqualTo(2040);
+        assertThat(dueDateCal.get(Calendar.MONTH)).isEqualTo(2);
+        assertThat(dueDateCal.get(Calendar.DAY_OF_MONTH)).isEqualTo(2);
+        assertThat(dueDateCal.get(Calendar.HOUR_OF_DAY)).isEqualTo(15);
+        
+        List<String> taskCandidateGroups = new ArrayList<>();
+        List<IdentityLink> identityLinks = cmmnTaskService.getIdentityLinksForTask(task.getId());
+        for (IdentityLink identityLink : identityLinks) {
+            if (IdentityLinkType.CANDIDATE.equals(identityLink.getType())) {
+                taskCandidateGroups.add(identityLink.getGroupId());
+            }
+        }
+        
+        assertThat(taskCandidateGroups).contains("group1", "group2");
+        
+        cmmnTaskService.complete(task.getId());
+    
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getCaseDefinitionId())
+                .isEqualTo(destinationDefinition.getId());
+
+            List<HistoricPlanItemInstance> historicPlanItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).list();
+            assertThat(historicPlanItemInstances).hasSize(2);
+            for (HistoricPlanItemInstance historicPlanItemInstance : historicPlanItemInstances) {
+                assertThat(historicPlanItemInstance.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            List<HistoricTaskInstance> historicTasks = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(historicTasks).hasSize(2);
+            for (HistoricTaskInstance historicTask : historicTasks) {
+                assertThat(historicTask.getScopeDefinitionId()).isEqualTo(destinationDefinition.getId());
+            }
+
+            HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId())
+                    .taskDefinitionKey("humanTask2")
+                    .singleResult();
+            assertThat(historicTask.getTaskDefinitionKey()).isEqualTo("humanTask2");
+            assertThat(historicTask.getName()).isEqualTo("Updated name");
+            assertThat(historicTask.getPriority()).isEqualTo(87);
+            assertThat(historicTask.getCategory()).isEqualTo("Updated category");
+            assertThat(historicTask.getFormKey()).isEqualTo("UpdatedFormKey");
+            
+            dueDateCal = new GregorianCalendar();
+            dueDateCal.setTime(historicTask.getDueDate());
+            assertThat(dueDateCal.get(Calendar.YEAR)).isEqualTo(2040);
+            assertThat(dueDateCal.get(Calendar.MONTH)).isEqualTo(2);
+            assertThat(dueDateCal.get(Calendar.DAY_OF_MONTH)).isEqualTo(2);
+            assertThat(dueDateCal.get(Calendar.HOUR_OF_DAY)).isEqualTo(15);
+            
+            taskCandidateGroups = new ArrayList<>();
+            List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForTask(task.getId());
+            for (HistoricIdentityLink historicIdentityLink : historicIdentityLinks) {
+                if (IdentityLinkType.CANDIDATE.equals(historicIdentityLink.getType())) {
+                    taskCandidateGroups.add(historicIdentityLink.getGroupId());
+                }
+            }
+            
+            assertThat(taskCandidateGroups).contains("group1", "group2");
         }
     }
     
@@ -5117,7 +5236,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
                 .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("extra-task"))
-                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("stage", null, localStageVarMap))
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("stage", localStageVarMap))
                 .migrateCaseInstances(caseInstance.getCaseDefinitionId());
 
         // Assert
@@ -5209,7 +5328,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         cmmnMigrationService.createCaseInstanceMigrationBuilder()
                 .migrateToCaseDefinition(destinationDefinition.getId())
                 .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("extra-task"))
-                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("repeating-stage", null, localStageVarMap))
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("repeating-stage", localStageVarMap))
                 .migrateCaseInstances(caseInstance.getCaseDefinitionId());
 
         // Assert
@@ -6357,7 +6476,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         localVariables.put("myInt", 2);
 
         ActivatePlanItemDefinitionMapping activatePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("activateId", "${activateCondition}");
-        activatePlanItemDefinitionMapping.setWithLocalVariables(localVariables);
+        activatePlanItemDefinitionMapping.withLocalVariables(localVariables);
 
         MoveToAvailablePlanItemDefinitionMapping moveToAvailablePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("availableId", "${availableCondition}");
         moveToAvailablePlanItemDefinitionMapping.setWithLocalVariables(localVariables);
@@ -6401,7 +6520,7 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         taskThreeLocalVariables.put("myInt", 3);
 
         ActivatePlanItemDefinitionMapping activatePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2");
-        activatePlanItemDefinitionMapping.setWithLocalVariables(taskTwoLocalVariables);
+        activatePlanItemDefinitionMapping.withLocalVariables(taskTwoLocalVariables);
 
         MoveToAvailablePlanItemDefinitionMapping moveToAvailablePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("humanTask3");
         moveToAvailablePlanItemDefinitionMapping.setWithLocalVariables(taskThreeLocalVariables);
