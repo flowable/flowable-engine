@@ -149,6 +149,15 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
+    public boolean isHistoryEnabledForCaseInstance(String caseInstanceId) {
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
+        if (caseInstance != null) {
+            return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabled(caseInstance.getCaseDefinitionId());
+        }
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabled();
+    }
+
+    @Override
     public void deleteCaseInstanceWithoutAgenda(String caseInstanceId) {
         cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);

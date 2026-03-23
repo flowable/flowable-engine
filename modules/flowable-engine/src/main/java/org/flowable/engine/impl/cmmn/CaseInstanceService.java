@@ -50,4 +50,9 @@ public interface CaseInstanceService {
      */
     boolean isHistoryEnabledForCaseDefinitionId(String caseDefinitionId);
 
+    /**
+     * Checks whether history is enabled for the given case instance id.
+     */
+    boolean isHistoryEnabledForCaseInstance(String caseInstanceId);
+
 }

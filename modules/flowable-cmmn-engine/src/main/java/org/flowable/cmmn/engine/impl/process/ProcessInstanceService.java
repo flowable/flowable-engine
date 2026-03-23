@@ -85,4 +85,9 @@ public interface ProcessInstanceService {
      */
     boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId);
 
+    /**
+     * Checks whether history is enabled for the given process instance id.
+     */
+    boolean isHistoryEnabledForProcessInstance(String processInstanceId);
+
 }

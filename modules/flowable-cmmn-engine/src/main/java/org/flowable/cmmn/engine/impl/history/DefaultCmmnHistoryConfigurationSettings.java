@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -246,20 +247,43 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
         // Check if history is enabled for the source scope
-        String caseDefinitionId = getCaseDefinitionId(entityLink);
-        if (!isHistoryEnabled(caseDefinitionId)) {
-            return false;
+        String scopeType = entityLink.getScopeType();
+
+        if (ScopeTypes.BPMN.equals(scopeType)) {
+            // Source scope is a BPMN process — delegate to the BPMN engine via ProcessInstanceService
+            ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+            if (processInstanceService != null && !processInstanceService.isHistoryEnabledForProcessInstance(entityLink.getScopeId())) {
+                return false;
+            }
+        } else {
+            String caseDefinitionId = getCaseDefinitionId(entityLink);
+            if (!isHistoryEnabled(caseDefinitionId)) {
+                return false;
+            }
         }
 
         // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
         String referenceScopeId = entityLink.getReferenceScopeId();
         String referenceScopeType = entityLink.getReferenceScopeType();
-        // Only for CMMN scope type because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
+
+        // No check for BPMN scope type because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
         if (referenceScopeId != null && ScopeTypes.CMMN.equals(referenceScopeType)) {
             CaseInstanceEntity referenceScopeInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(referenceScopeId);
             if (referenceScopeInstance != null) {
                 return isHistoryEnabled(referenceScopeInstance.getCaseDefinitionId());
             }
+            return false;
+        }
+
+        if (referenceScopeId != null && ScopeTypes.TASK.equals(referenceScopeType)) {
+            TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(referenceScopeId);
+            if (task != null && task.getScopeId() != null) {
+                CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(task.getScopeId());
+                if (caseInstance != null) {
+                    return isHistoryEnabled(caseInstance.getCaseDefinitionId());
+                }
+            }
+            return false;
         }
 
         return true;

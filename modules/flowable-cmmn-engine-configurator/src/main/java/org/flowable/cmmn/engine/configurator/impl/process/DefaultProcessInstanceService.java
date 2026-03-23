@@ -156,6 +156,15 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
+    public boolean isHistoryEnabledForProcessInstance(String processInstanceId) {
+        ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
+        if (execution != null) {
+            return processEngineConfiguration.getHistoryConfigurationSettings().isHistoryEnabled(execution.getProcessDefinitionId());
+        }
+        return processEngineConfiguration.getHistoryConfigurationSettings().isHistoryEnabled();
+    }
+
+    @Override
     public void deleteProcessInstance(String processInstanceId) {
         processEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             
