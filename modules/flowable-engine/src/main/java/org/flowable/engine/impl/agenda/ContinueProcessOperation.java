@@ -13,9 +13,7 @@
 package org.flowable.engine.impl.agenda;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -174,9 +172,9 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         if (activityBehavior != null) {
             executeActivityBehavior(activityBehavior, flowNode);
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
         } else {
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
             LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
@@ -230,7 +228,7 @@ public class ContinueProcessOperation extends AbstractOperation {
                     }
                 }
                 
-                executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+                executeBoundaryEvents(boundaryEventExecutions);
             }
             
         } else {
@@ -361,8 +359,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         // The parent execution becomes a scope, and a child execution is created for each of the boundary events
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
-            if (!isExecutableBoundaryEvent(boundaryEvent)) {
-                continue;
+            if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
+                if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
+                        || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
+                    continue;
+                }
             }
 
             // A Child execution of the current execution is created to represent the boundary event being active
@@ -385,29 +386,15 @@ public class ContinueProcessOperation extends AbstractOperation {
         return boundaryEventExecutions;
     }
 
-    protected void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
+    protected void executeBoundaryEvents(List<ExecutionEntity> boundaryEventExecutions) {
         if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
-            boundaryEvents = boundaryEvents.stream().filter(this::isExecutableBoundaryEvent).collect(Collectors.toList());
-            Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
-            Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
-            while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
-                BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
-                ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
+            for (ExecutionEntity boundaryEventExecution: boundaryEventExecutions) {
+                BoundaryEvent boundaryEvent = (BoundaryEvent) boundaryEventExecution.getCurrentFlowElement();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
                 boundaryEventBehavior.execute(boundaryEventExecution);
             }
         }
-    }
-
-    private boolean isExecutableBoundaryEvent(BoundaryEvent boundaryEvent) {
-        if (!(boundaryEvent.getBehavior() instanceof BoundaryEventRegistryEventActivityBehavior)) {
-            if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())
-                    || (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
-                return false;
-            }
-        }
-        return true;
     }
 }
