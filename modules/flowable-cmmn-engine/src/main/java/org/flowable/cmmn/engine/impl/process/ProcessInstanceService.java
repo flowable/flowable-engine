@@ -33,15 +33,15 @@ public interface ProcessInstanceService {
     /**
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
@@ -73,5 +73,21 @@ public interface ProcessInstanceService {
      * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.
      */
     List<IOParameter> getOutputParametersOfCaseTask(String executionId);
+
+    /**
+     * Resolves the process definition id from the given key and parameters.
+     */
+    String resolveProcessDefinitionId(String processDefinitionKey, String tenantId,
+            Boolean fallbackToDefaultTenant, String parentDeploymentId);
+
+    /**
+     * Checks whether history is enabled for the given process definition id.
+     */
+    boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId);
+
+    /**
+     * Checks whether history is enabled for the given process instance id.
+     */
+    boolean isHistoryEnabledForProcessInstance(String processInstanceId);
 
 }
