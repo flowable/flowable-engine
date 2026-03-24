@@ -169,6 +169,118 @@
             <if test="withoutScopeType">
                 and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
             </if>
+            <if test="orQueryObjects != null and orQueryObjects.size > 0">
+                <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+                    and
+                    <trim prefix="(" prefixOverrides="OR" suffix=")">
+                        <if test="orQueryObject.id != null">
+                            RES.ID_ = #{orQueryObject.id, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.jobIds != null and !orQueryObject.jobIds.empty">
+                            or RES.ID_ IN
+                            <foreach item="jobId" index="index" collection="orQueryObject.jobIds" open="(" separator="," close=")">
+                                #{jobId, jdbcType=NVARCHAR}
+                            </foreach>
+                        </if>
+                        <if test="orQueryObject.processInstanceId != null">
+                            or RES.PROCESS_INSTANCE_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.withoutProcessInstanceId">
+                            or RES.PROCESS_INSTANCE_ID_ IS NULL
+                        </if>
+                        <if test="orQueryObject.executionId != null">
+                            or RES.EXECUTION_ID_ = #{orQueryObject.executionId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.handlerType != null">
+                            or RES.HANDLER_TYPE_ = #{orQueryObject.handlerType, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.handlerTypes != null">
+                            or RES.HANDLER_TYPE_ in
+                            <foreach item="handlerType" index="index" collection="orQueryObject.handlerTypes" open="(" separator="," close=")">
+                                #{handlerType, jdbcType=NVARCHAR}
+                            </foreach>
+                        </if>
+                        <if test="orQueryObject.processDefinitionId != null">
+                            or RES.PROC_DEF_ID_ = #{orQueryObject.processDefinitionId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.processDefinitionKey != null">
+                            or RES.PROC_DEF_ID_ IN (select DEF.ID_ from ${prefix}ACT_RE_PROCDEF DEF where DEF.KEY_ = #{orQueryObject.processDefinitionKey, jdbcType=NVARCHAR})
+                        </if>
+                        <if test="orQueryObject.category != null">
+                            or RES.CATEGORY_ = #{orQueryObject.category, jdbcType=VARCHAR}
+                        </if>
+                        <if test="orQueryObject.categoryLike != null">
+                            or RES.CATEGORY_ like #{orQueryObject.categoryLike, jdbcType=VARCHAR}${wildcardEscapeClause}
+                        </if>
+                        <if test="orQueryObject.elementId != null">
+                            or RES.ELEMENT_ID_ = #{orQueryObject.elementId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.elementName != null">
+                            or RES.ELEMENT_NAME_ = #{orQueryObject.elementName, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.scopeId != null">
+                            or RES.SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.withoutScopeId">
+                            or RES.SCOPE_ID_ IS NULL
+                        </if>
+                        <if test="orQueryObject.subScopeId != null">
+                            or RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.scopeType != null">
+                            or RES.SCOPE_TYPE_ = #{orQueryObject.scopeType, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.scopeDefinitionId != null">
+                            or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.caseDefinitionKey != null">
+                            or RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{orQueryObject.caseDefinitionKey, jdbcType=NVARCHAR})
+                        </if>
+                        <if test="orQueryObject.correlationId != null">
+                            or RES.CORRELATION_ID_ = #{orQueryObject.correlationId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.executable">
+                            or RES.DUEDATE_ &lt;= #{orQueryObject.now, jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="orQueryObject.onlyTimers">
+                            or RES.TYPE_ = 'timer'
+                        </if>
+                        <if test="orQueryObject.onlyMessages">
+                            or RES.TYPE_ = 'message'
+                        </if>
+                        <if test="orQueryObject.duedateHigherThan != null">
+                            or RES.DUEDATE_ &gt; #{orQueryObject.duedateHigherThan, jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="orQueryObject.duedateLowerThan != null">
+                            or RES.DUEDATE_ &lt; #{orQueryObject.duedateLowerThan, jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="orQueryObject.duedateHigherThanOrEqual != null">
+                            or RES.DUEDATE_ &gt;= #{orQueryObject.duedateHigherThanOrEqual, jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="orQueryObject.duedateLowerThanOrEqual != null">
+                            or RES.DUEDATE_ &lt;= #{orQueryObject.duedateLowerThanOrEqual, jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="orQueryObject.withException">
+                            or (RES.EXCEPTION_MSG_ is not null or RES.EXCEPTION_STACK_ID_ is not null)
+                        </if>
+                        <if test="orQueryObject.exceptionMessage">
+                            or RES.EXCEPTION_MSG_ = #{orQueryObject.exceptionMessage, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.tenantId != null">
+                            or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}
+                        </if>
+                        <if test="orQueryObject.tenantIdLike != null">
+                            or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
+                        </if>
+                        <if test="orQueryObject.withoutTenantId">
+                            or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+                        </if>
+                        <if test="orQueryObject.withoutScopeType">
+                            or (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
+                        </if>
+                    </trim>
+                </foreach>
+            </if>
         </where>
     </sql>
 

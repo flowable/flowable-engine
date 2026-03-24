@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -208,6 +209,83 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
         assertThat(managementService.createTimerJobQuery().correlationId("invalid").singleResult()).isNull();
         assertThat(managementService.createTimerJobQuery().correlationId("invalid").list()).isEmpty();
         assertThat(managementService.createTimerJobQuery().correlationId("invalid").count()).isZero();
+    }
+
+    @Test
+    public void testOrQuery() {
+        // Get specific timer jobs by element id, scoped to this test's process instance
+        Job timerA = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerA").singleResult();
+        Job timerB = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerB").singleResult();
+        Job timerC = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerC").singleResult();
+        assertThat(timerA).isNotNull();
+        assertThat(timerB).isNotNull();
+        assertThat(timerC).isNotNull();
+
+        // OR query: match by jobId OR elementId
+        List<Job> jobs = managementService.createTimerJobQuery()
+                .or()
+                    .jobId(timerA.getId())
+                    .elementId("timerB")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(2);
+        assertThat(jobs).extracting(JobInfo::getId)
+                .containsExactlyInAnyOrder(timerA.getId(), timerB.getId());
+
+        // OR query: match by executionId OR elementId
+        jobs = managementService.createTimerJobQuery()
+                .or()
+                    .executionId(timerA.getExecutionId())
+                    .elementId("timerC")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(2);
+        assertThat(jobs).extracting(JobInfo::getId)
+                .containsExactlyInAnyOrder(timerA.getId(), timerC.getId());
+
+        // OR with no match
+        assertThat(managementService.createTimerJobQuery()
+                .or()
+                    .processInstanceId("nonexistent")
+                    .executionId("nonexistent")
+                .endOr()
+                .count()).isZero();
+    }
+
+    @Test
+    public void testOrWithAndQuery() {
+        Job timerA = managementService.createTimerJobQuery().elementId("timerA").singleResult();
+        Job timerB = managementService.createTimerJobQuery().elementId("timerB").singleResult();
+
+        // AND (processInstanceId) + OR (jobId or elementId)
+        List<Job> jobs = managementService.createTimerJobQuery()
+                .processInstanceId(processInstanceId)
+                .or()
+                    .jobId(timerA.getId())
+                    .elementId("timerB")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(2);
+
+        // AND (wrong processInstanceId) + OR should return nothing
+        assertThat(managementService.createTimerJobQuery()
+                .processInstanceId("nonexistent")
+                .or()
+                    .jobId(timerA.getId())
+                    .elementId("timerB")
+                .endOr()
+                .count()).isZero();
+    }
+
+    @Test
+    public void testOrQueryErrors() {
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().or().or())
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("the query is already in an or statement");
+
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().endOr())
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("endOr() can only be called after calling or()");
     }
 
     private void createTimerJobWithHandlerType(String handlerType) {
