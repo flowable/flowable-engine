@@ -98,11 +98,6 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
             }
         }
         
-        if (processEngineConfiguration.isEnableEntityLinks()) {
-            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(), caseServiceTask.getId(),
-                    caseInstanceId, ScopeTypes.CMMN);
-        }
-
         String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);
 
         String parentDeploymentId = null;
@@ -110,9 +105,19 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
             parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
         }
 
-        caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
-                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(),
-                parentDeploymentId, inParameters);
+        // Resolve the case definition first so we can check its history level for the entity links
+        String caseDefinitionId = caseInstanceService.resolveCaseDefinitionId(caseDefinitionKey,
+                execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), parentDeploymentId);
+
+        if (processEngineConfiguration.isEnableEntityLinks()) {
+            boolean createHistoricEntityLinks = caseInstanceService.isHistoryEnabledForCaseDefinitionId(caseDefinitionId);
+
+            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(), caseServiceTask.getId(),
+                    caseInstanceId, ScopeTypes.CMMN, createHistoricEntityLinks);
+        }
+
+        caseInstanceService.startCaseInstance(caseDefinitionId, caseInstanceId,
+                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), inParameters);
 
         // Bidirectional storing of reference to avoid queries later on
         executionEntity.setReferenceId(caseInstanceId);
