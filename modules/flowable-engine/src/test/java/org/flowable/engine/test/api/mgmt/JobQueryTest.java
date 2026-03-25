@@ -430,8 +430,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     public void testHistoryJobQueryByHandlerTypes() {
 
         List<String> testTypes = new ArrayList<>();
-        createHistoryobWithHandlerType("Type1");
-        createHistoryobWithHandlerType("Type2");
+        createHistoryJobWithHandlerType("Type1");
+        createHistoryJobWithHandlerType("Type2");
 
         assertThat(managementService.createHistoryJobQuery().handlerType("Type1").singleResult()).isNotNull();
         assertThat(managementService.createHistoryJobQuery().handlerType("Type2").singleResult()).isNotNull();
@@ -1258,8 +1258,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testHistoryJobOrQuery() {
-        createHistoryobWithHandlerType("histHandler1");
-        createHistoryobWithHandlerType("histHandler2");
+        createHistoryJobWithHandlerType("histHandler1");
+        createHistoryJobWithHandlerType("histHandler2");
         try {
             HistoryJob hj1 = managementService.createHistoryJobQuery().handlerType("histHandler1").singleResult();
             HistoryJob hj2 = managementService.createHistoryJobQuery().handlerType("histHandler2").singleResult();
@@ -1290,8 +1290,8 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
     @Test
     public void testHistoryJobOrWithAndQuery() {
-        createHistoryobWithHandlerType("histHandler1");
-        createHistoryobWithHandlerType("histHandler2");
+        createHistoryJobWithHandlerType("histHandler1");
+        createHistoryJobWithHandlerType("histHandler2");
         try {
             HistoryJob hj1 = managementService.createHistoryJobQuery().handlerType("histHandler1").singleResult();
 
@@ -1330,6 +1330,122 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> managementService.createHistoryJobQuery().endOr())
                 .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("endOr() can only be called after calling or()");
+    }
+
+    @Test
+    public void testJobQueryConsecutiveOrQuery() {
+        JobEntity jobA = createJobWithHandlerType("consOrA");
+        JobEntity jobB = createJobWithHandlerType("consOrB");
+        JobEntity jobC = createJobWithHandlerType("consOrC");
+        try {
+            // First OR group matches {A, B}, second matches {B, C} -> intersection = {B}
+            List<Job> jobs = managementService.createJobQuery()
+                    .or()
+                        .jobId(jobA.getId())
+                        .handlerType("consOrB")
+                    .endOr()
+                    .or()
+                        .jobId(jobB.getId())
+                        .handlerType("consOrC")
+                    .endOr()
+                    .list();
+            assertThat(jobs).hasSize(1);
+            assertThat(jobs.get(0).getId()).isEqualTo(jobB.getId());
+        } finally {
+            managementService.deleteJob(jobA.getId());
+            managementService.deleteJob(jobB.getId());
+            managementService.deleteJob(jobC.getId());
+        }
+    }
+
+    @Test
+    public void testDeadLetterJobConsecutiveOrQuery() {
+        createDeadLetterJobWithHandlerType("consOrDlA");
+        createDeadLetterJobWithHandlerType("consOrDlB");
+        createDeadLetterJobWithHandlerType("consOrDlC");
+        try {
+            Job dlA = managementService.createDeadLetterJobQuery().handlerType("consOrDlA").singleResult();
+            Job dlB = managementService.createDeadLetterJobQuery().handlerType("consOrDlB").singleResult();
+            Job dlC = managementService.createDeadLetterJobQuery().handlerType("consOrDlC").singleResult();
+
+            // First OR group matches {A, B}, second matches {B, C} -> intersection = {B}
+            List<Job> jobs = managementService.createDeadLetterJobQuery()
+                    .or()
+                        .jobId(dlA.getId())
+                        .handlerType("consOrDlB")
+                    .endOr()
+                    .or()
+                        .jobId(dlB.getId())
+                        .handlerType("consOrDlC")
+                    .endOr()
+                    .list();
+            assertThat(jobs).hasSize(1);
+            assertThat(jobs.get(0).getId()).isEqualTo(dlB.getId());
+        } finally {
+            managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().handlerType("consOrDlA").singleResult().getId());
+            managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().handlerType("consOrDlB").singleResult().getId());
+            managementService.deleteDeadLetterJob(managementService.createDeadLetterJobQuery().handlerType("consOrDlC").singleResult().getId());
+        }
+    }
+
+    @Test
+    public void testSuspendedJobConsecutiveOrQuery() {
+        createSuspendedJobWithHandlerType("consOrSusA");
+        createSuspendedJobWithHandlerType("consOrSusB");
+        createSuspendedJobWithHandlerType("consOrSusC");
+        try {
+            Job susA = managementService.createSuspendedJobQuery().handlerType("consOrSusA").singleResult();
+            Job susB = managementService.createSuspendedJobQuery().handlerType("consOrSusB").singleResult();
+            Job susC = managementService.createSuspendedJobQuery().handlerType("consOrSusC").singleResult();
+
+            // First OR group matches {A, B}, second matches {B, C} -> intersection = {B}
+            List<Job> jobs = managementService.createSuspendedJobQuery()
+                    .or()
+                        .jobId(susA.getId())
+                        .handlerType("consOrSusB")
+                    .endOr()
+                    .or()
+                        .jobId(susB.getId())
+                        .handlerType("consOrSusC")
+                    .endOr()
+                    .list();
+            assertThat(jobs).hasSize(1);
+            assertThat(jobs.get(0).getId()).isEqualTo(susB.getId());
+        } finally {
+            managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType("consOrSusA").singleResult().getId());
+            managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType("consOrSusB").singleResult().getId());
+            managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType("consOrSusC").singleResult().getId());
+        }
+    }
+
+    @Test
+    public void testHistoryJobConsecutiveOrQuery() {
+        createHistoryJobWithHandlerType("consOrHistA");
+        createHistoryJobWithHandlerType("consOrHistB");
+        createHistoryJobWithHandlerType("consOrHistC");
+        try {
+            HistoryJob hjA = managementService.createHistoryJobQuery().handlerType("consOrHistA").singleResult();
+            HistoryJob hjB = managementService.createHistoryJobQuery().handlerType("consOrHistB").singleResult();
+            HistoryJob hjC = managementService.createHistoryJobQuery().handlerType("consOrHistC").singleResult();
+
+            // First OR group matches {A, B}, second matches {B, C} -> intersection = {B}
+            List<HistoryJob> jobs = managementService.createHistoryJobQuery()
+                    .or()
+                        .jobId(hjA.getId())
+                        .handlerType("consOrHistB")
+                    .endOr()
+                    .or()
+                        .jobId(hjB.getId())
+                        .handlerType("consOrHistC")
+                    .endOr()
+                    .list();
+            assertThat(jobs).hasSize(1);
+            assertThat(jobs.get(0).getId()).isEqualTo(hjB.getId());
+        } finally {
+            managementService.deleteHistoryJob(managementService.createHistoryJobQuery().handlerType("consOrHistA").singleResult().getId());
+            managementService.deleteHistoryJob(managementService.createHistoryJobQuery().handlerType("consOrHistB").singleResult().getId());
+            managementService.deleteHistoryJob(managementService.createHistoryJobQuery().handlerType("consOrHistC").singleResult().getId());
+        }
     }
 
     // helper ////////////////////////////////////////////////////////////
@@ -1525,7 +1641,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
         });
     }
 
-    private void createHistoryobWithHandlerType(String handlerType) {
+    private void createHistoryJobWithHandlerType(String handlerType) {
         HistoryJobEntity historyJobEntity = managementService.executeCommand((Command<HistoryJobEntity>) commandContext -> {
             JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
             HistoryJobService historyJobService = jobServiceConfiguration.getHistoryJobService();

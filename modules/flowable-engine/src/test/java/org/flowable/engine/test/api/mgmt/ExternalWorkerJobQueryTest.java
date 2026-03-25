@@ -813,4 +813,51 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .hasMessageContaining("endOr() can only be called after calling or()");
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testConsecutiveOrQuery() {
+        ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        ExternalWorkerJob job1Order = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(pi1.getId()).elementId("externalOrder").singleResult();
+        ExternalWorkerJob job2Order = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(pi2.getId()).elementId("externalOrder").singleResult();
+
+        // First OR group matches {job1Order, all pi2 jobs}, second matches {all pi2 jobs, all pi3 jobs}
+        // Intersection = pi2's jobs (2 jobs)
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery()
+                .or()
+                    .jobId(job1Order.getId())
+                    .processInstanceId(pi2.getId())
+                .endOr()
+                .or()
+                    .processInstanceId(pi2.getId())
+                    .processInstanceId(pi3.getId())
+                .endOr()
+                .list();
+        // Second OR group: last setter wins -> processInstanceId=pi3. So second group matches pi3 only.
+        // Intersection of {job1Order, pi2 jobs} AND {pi3 jobs} = empty
+        assertThat(jobs).hasSize(0);
+
+        // Let's use different fields instead:
+        jobs = managementService.createExternalWorkerJobQuery()
+                .or()
+                    .jobId(job1Order.getId())
+                    .processInstanceId(pi2.getId())
+                .endOr()
+                .or()
+                    .jobId(job2Order.getId())
+                    .processInstanceId(pi1.getId())
+                .endOr()
+                .list();
+        // First group: {job1Order} union {pi2's 2 jobs} = {job1Order, job2Order, job2Customer}
+        // Second group: {job2Order} union {pi1's 2 jobs} = {job2Order, job1Order, job1Customer}
+        // Intersection: {job1Order, job2Order} - both appear in both groups
+        assertThat(jobs).hasSize(2);
+        assertThat(jobs).extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(job1Order.getId(), job2Order.getId());
+    }
+
 }

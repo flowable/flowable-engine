@@ -288,6 +288,30 @@ public class TimerJobQueryTest extends PluggableFlowableTestCase {
                 .hasMessageContaining("endOr() can only be called after calling or()");
     }
 
+    @Test
+    public void testConsecutiveOrQuery() {
+        Job timerA = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerA").singleResult();
+        Job timerB = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerB").singleResult();
+        Job timerC = managementService.createTimerJobQuery().processInstanceId(processInstanceId).elementId("timerC").singleResult();
+        assertThat(timerA).isNotNull();
+        assertThat(timerB).isNotNull();
+        assertThat(timerC).isNotNull();
+
+        // First OR group matches {A, B}, second matches {B, C} -> intersection = {B}
+        List<Job> jobs = managementService.createTimerJobQuery()
+                .or()
+                    .jobId(timerA.getId())
+                    .elementId("timerB")
+                .endOr()
+                .or()
+                    .jobId(timerB.getId())
+                    .elementId("timerC")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(1);
+        assertThat(jobs.get(0).getId()).isEqualTo(timerB.getId());
+    }
+
     private void createTimerJobWithHandlerType(String handlerType) {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
