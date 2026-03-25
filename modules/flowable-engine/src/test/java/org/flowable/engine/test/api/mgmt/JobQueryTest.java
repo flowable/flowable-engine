@@ -343,6 +343,35 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testSuspendedJobQueryByType() {
+        String handlerType = "testSuspendedJobType";
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).count()).isEqualTo(0);
+
+        createSuspendedJobWithType(Job.JOB_TYPE_MESSAGE, handlerType);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).messages().count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).timers().count()).isEqualTo(0);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).externalWorkers().count()).isEqualTo(0);
+
+        createSuspendedJobWithType(Job.JOB_TYPE_TIMER, handlerType);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).count()).isEqualTo(2);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).messages().count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).timers().count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).externalWorkers().count()).isEqualTo(0);
+
+        createSuspendedJobWithType(Job.JOB_TYPE_EXTERNAL_WORKER, handlerType);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).count()).isEqualTo(3);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).messages().count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).timers().count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).externalWorkers().count()).isEqualTo(1);
+
+        managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType(handlerType).messages().singleResult().getId());
+        managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType(handlerType).timers().singleResult().getId());
+        managementService.deleteSuspendedJob(managementService.createSuspendedJobQuery().handlerType(handlerType).externalWorkers().singleResult().getId());
+        assertThat(managementService.createSuspendedJobQuery().handlerType(handlerType).count()).isEqualTo(0);
+    }
+
+    @Test
     public void testSuspendedJobQueryByHandlerTypes() {
 
         List<String> testTypes = new ArrayList<>();
@@ -1128,6 +1157,18 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 jobService.moveJobToDeadLetterJob(createJobWithType(type));
                 return null;
             }
+        });
+    }
+
+    private void createSuspendedJobWithType(String type, String handlerType) {
+        managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(type);
+            job.setJobHandlerType(handlerType);
+            suspendedJobEntityManager.insert(job);
+            return null;
         });
     }
 
