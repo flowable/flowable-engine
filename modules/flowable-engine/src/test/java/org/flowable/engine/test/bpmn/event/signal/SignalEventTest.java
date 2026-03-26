@@ -544,9 +544,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
                 .addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
                 .deploy();
         repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
+
+        // An example of behavior when there is no subscription to the signal.
         runtimeService.signalEventReceived("nonExisting");
-        // Starting the process that fires the signal should start three process
-        // instances that are listening on that signal
+
+        // Starting the process that fires the signal should start 2 process
+        // instances that are listening on that signal. The suspended one is not included.
         runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
