@@ -538,6 +538,27 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testDuplicatedSuspendedSignalStartEventFromProcess() {
+        // Deploy test processes
+        repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
+                .deploy();
+        repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
+        runtimeService.signalEventReceived("nonExisting");
+        // Starting the process that fires the signal should start three process
+        // instances that are listening on that signal
+        runtimeService.startProcessInstanceByKey("processWithSignalThrow");
+
+        // Verify
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName)
+                .containsExactlyInAnyOrder("Task in process B", "Task in process C");
+
+        // Cleanup
+        cleanup();
+    }
+
+    @Test
     public void testSignalStartEventFromProcess() {
 
         // Deploy test processes
@@ -805,12 +826,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
 
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSignalThrow"))
-                .as("Suspended process definition should fail")
-                .isExactlyInstanceOf(FlowableException.class);
+        runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count())
+                .as("Signal throw event is swallowed for suspended process")
+                .isZero();
 
         repositoryService.activateProcessDefinitionByKey("processWithSignalStart1");
 

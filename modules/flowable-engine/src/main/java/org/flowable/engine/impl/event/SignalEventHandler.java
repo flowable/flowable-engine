@@ -24,12 +24,16 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel Meyer
  * @author Joram Barrez
  */
 public class SignalEventHandler extends AbstractEventHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SignalEventHandler.class);
 
     public static final String EVENT_HANDLER_TYPE = "signal";
 
@@ -52,7 +56,8 @@ public class SignalEventHandler extends AbstractEventHandler {
             ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
             if (processDefinition.isSuspended()) {
-                throw new FlowableException("Could not handle signal: process definition with id: " + processDefinitionId + " is suspended for " + eventSubscription);
+                LOG.info("Could not handle signal: process definition with id: {} is suspended for {}", processDefinitionId, eventSubscription);
+                return;
             }
 
             // Start process instance via the flow element linked to the event
