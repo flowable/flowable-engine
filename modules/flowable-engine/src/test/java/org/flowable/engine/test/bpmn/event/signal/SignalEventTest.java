@@ -829,9 +829,10 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
-        assertThat(runtimeService.createProcessInstanceQuery().count())
+        assertThat(runtimeService.createProcessInstanceQuery().list())
                 .as("Signal throw event is swallowed for suspended process")
-                .isZero();
+                .extracting(ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder("processWithSignalStart2","processWithSignalStart3");
 
         repositoryService.activateProcessDefinitionByKey("processWithSignalStart1");
 
@@ -840,8 +841,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(3);
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(5);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(5);
 
         // Cleanup
         cleanup();
