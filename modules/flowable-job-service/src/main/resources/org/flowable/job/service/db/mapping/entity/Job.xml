@@ -139,8 +139,8 @@
             </if>
             <if test="jobIds != null and !jobIds.empty">
                 AND RES.ID_ IN
-                <foreach item="jobId" index="index" collection="jobIds" open="(" separator="," close=")">
-                    #{jobId, jdbcType=NVARCHAR}
+                <foreach item="id" index="index" collection="jobIds" open="(" separator="," close=")">
+                    #{id, jdbcType=NVARCHAR}
                 </foreach>
             </if>
             <if test="processInstanceId != null">
@@ -254,8 +254,8 @@
                         </if>
                         <if test="orQueryObject.jobIds != null and !orQueryObject.jobIds.empty">
                             or RES.ID_ IN
-                            <foreach item="jobId" index="index" collection="orQueryObject.jobIds" open="(" separator="," close=")">
-                                #{jobId, jdbcType=NVARCHAR}
+                            <foreach item="id" index="index" collection="orQueryObject.jobIds" open="(" separator="," close=")">
+                                #{id, jdbcType=NVARCHAR}
                             </foreach>
                         </if>
                         <if test="orQueryObject.processInstanceId != null">

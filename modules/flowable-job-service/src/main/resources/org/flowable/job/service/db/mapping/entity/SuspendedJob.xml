@@ -377,8 +377,8 @@
                         </if>
                         <if test="orQueryObject.jobIds != null and !orQueryObject.jobIds.empty">
                             or RES.ID_ IN
-                            <foreach item="jobId" index="index" collection="orQueryObject.jobIds" open="(" separator="," close=")">
-                                #{jobId, jdbcType=NVARCHAR}
+                            <foreach item="id" index="index" collection="orQueryObject.jobIds" open="(" separator="," close=")">
+                                #{id, jdbcType=NVARCHAR}
                             </foreach>
                         </if>
                         <if test="orQueryObject.processInstanceId != null">
@@ -433,7 +433,7 @@
                             or RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId, jdbcType=NVARCHAR}
                         </if>
                         <if test="orQueryObject.caseDefinitionKey != null">
-                            or RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{orQueryObject.caseDefinitionKey, jdbcType=NVARCHAR})
+                            or RES.SCOPE_DEFINITION_ID_ IN (select DEF.ID_ from ${prefix}ACT_CMMN_CASEDEF DEF where DEF.KEY_ = #{orQueryObject.caseDefinitionKey, jdbcType=VARCHAR})
                         </if>
                         <if test="orQueryObject.correlationId != null">
                             or RES.CORRELATION_ID_ = #{orQueryObject.correlationId, jdbcType=NVARCHAR}
