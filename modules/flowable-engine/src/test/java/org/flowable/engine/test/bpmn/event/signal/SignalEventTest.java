@@ -538,11 +538,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources={"org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml"})
     public void testDuplicatedSuspendedSignalStartEventFromProcess() {
-        // Deploy test processes
-        repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml")
-                .deploy();
         repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
 
         // An example of behavior when there is no subscription to the signal.
@@ -557,8 +554,6 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         assertThat(taskService.createTaskQuery().list()).extracting(Task::getName)
                 .containsExactlyInAnyOrder("Task in process B", "Task in process C");
 
-        // Cleanup
-        cleanup();
     }
 
     @Test
@@ -766,8 +761,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("throwSignal");
 
-        assertThat(createEventSubscriptionQuery().count()).isZero();
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(createEventSubscriptionQuery().count())
+                .as("Process definition is suspended and subscription is kept untouched despite of received signal.")
+                .isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().count())
+                .as("Process definition is suspended and process instance is kept untouched despite of received signal.")
+                .isEqualTo(1);
     }
 
     @Test

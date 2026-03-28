@@ -32,9 +32,6 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class SignalEventHandler extends AbstractEventHandler {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SignalEventHandler.class);
-
     public static final String EVENT_HANDLER_TYPE = "signal";
 
     @Override
@@ -54,11 +51,6 @@ public class SignalEventHandler extends AbstractEventHandler {
             String processDefinitionId = eventSubscription.getProcessDefinitionId();
             org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
             ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
-
-            if (processDefinition.isSuspended()) {
-                LOG.info("Could not handle signal: process definition with id: {} is suspended for {}", processDefinitionId, eventSubscription);
-                return;
-            }
 
             // Start process instance via the flow element linked to the event
             FlowElement flowElement = process.getFlowElement(eventSubscription.getActivityId(), true);
