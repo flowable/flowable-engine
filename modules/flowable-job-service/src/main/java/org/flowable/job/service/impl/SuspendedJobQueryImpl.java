@@ -347,7 +347,7 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
         }
 
-        this.onlyTimers = true;
+        this.onlyExternalWorkers = true;
         return this;
     }
 

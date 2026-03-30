@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.agenda;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.flowable.bpmn.model.Activity;
@@ -173,9 +172,9 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         if (activityBehavior != null) {
             executeActivityBehavior(activityBehavior, flowNode);
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
         } else {
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
             LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
@@ -229,7 +228,7 @@ public class ContinueProcessOperation extends AbstractOperation {
                     }
                 }
                 
-                executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+                executeBoundaryEvents(boundaryEventExecutions);
             }
             
         } else {
@@ -387,14 +386,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         return boundaryEventExecutions;
     }
 
-    protected void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
+    protected void executeBoundaryEvents(List<ExecutionEntity> boundaryEventExecutions) {
         if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
-            Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
-            Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
-            while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
-                BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
-                ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
+            for (ExecutionEntity boundaryEventExecution: boundaryEventExecutions) {
+                BoundaryEvent boundaryEvent = (BoundaryEvent) boundaryEventExecution.getCurrentFlowElement();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
                 boundaryEventBehavior.execute(boundaryEventExecution);

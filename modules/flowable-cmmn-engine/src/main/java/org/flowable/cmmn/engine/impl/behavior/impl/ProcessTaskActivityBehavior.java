@@ -118,18 +118,25 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         String parentDeploymentId = getParentDeploymentIfSameDeployment(cmmnEngineConfiguration, planItemInstanceEntity);
 
+        // Resolve the process definition already so we can check its history level for entity links
+        String processDefinitionId = processInstanceService.resolveProcessDefinitionId(externalRef,
+                planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId);
+
         if (blocking) {
 
             if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
+                boolean createHistoricEntityLinks = processInstanceService.isHistoryEnabledForProcessDefinitionId(processDefinitionId);
+
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
-                        planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration);
+                        planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration, createHistoricEntityLinks);
             }
 
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
+                    planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+
         } else {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
+                    planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         if (!blocking) {
