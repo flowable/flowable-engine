@@ -1,6 +1,5 @@
 drop index ACT_IDX_EXEC_REF_ID_;
 drop index ACT_IDX_EXEC_ROOT;
-drop index ACT_IDX_BYTEAR_DEPL;
 drop index ACT_IDX_EXE_PROCINST;
 drop index ACT_IDX_EXE_PARENT;
 drop index ACT_IDX_EXE_SUPER;

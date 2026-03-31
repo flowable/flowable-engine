@@ -9,7 +9,6 @@ drop table if exists ACT_PROCDEF_INFO cascade;
 drop index if exists ACT_IDX_EXEC_REF_ID_;
 drop index if exists ACT_IDX_EXE_ROOT;
 drop index if exists ACT_IDX_EXEC_BUSKEY;
-drop index if exists ACT_IDX_BYTEAR_DEPL;
 drop index if exists ACT_IDX_VARIABLE_TASK_ID;
 drop index if exists ACT_IDX_ATHRZ_PROCEDEF;
 drop index if exists ACT_IDX_INFO_PROCDEF;

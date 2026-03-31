@@ -1,7 +1,6 @@
 drop index ACT_IDX_EXEC_REF_ID_;
 drop index ACT_IDC_EXEC_ROOT;
 drop index ACT_IDX_EXEC_BUSKEY;
-drop index ACT_IDX_BYTEAR_DEPL;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
 alter table ACT_GE_BYTEARRAY 

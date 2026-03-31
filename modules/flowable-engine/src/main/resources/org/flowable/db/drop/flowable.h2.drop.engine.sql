@@ -12,7 +12,6 @@ drop index if exists ACT_IDX_EXEC_BUSKEY;
 drop index if exists ACT_IDX_VARIABLE_TASK_ID;
 drop index if exists ACT_IDX_ATHRZ_PROCEDEF;
 drop index if exists ACT_IDX_INFO_PROCDEF;
-drop index if exists ACT_IDX_BYTEAR_DEPL;
 
 drop index if exists ACT_IDX_RU_ACTI_START;
 drop index if exists ACT_IDX_RU_ACTI_END;
