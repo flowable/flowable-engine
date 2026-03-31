@@ -18,9 +18,11 @@ import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import org.flowable.cmmn.api.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
@@ -44,16 +46,19 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        Object value = null;
-        Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
-        value = expressionObject.getValue(planItemInstanceEntity);
-        if (value instanceof CompletableFuture) {
-            CommandContextUtil.getAgenda(commandContext)
-                    .planFutureOperation((CompletableFuture<Object>) value, new FutureExpressionCompleteAction(planItemInstanceEntity));
-        } else {
-            complete(value, planItemInstanceEntity);
+        try {
+            Object value = null;
+            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+            value = expressionObject.getValue(planItemInstanceEntity);
+            if (value instanceof CompletableFuture) {
+                CommandContextUtil.getAgenda(commandContext)
+                        .planFutureOperation((CompletableFuture<Object>) value, new FutureExpressionCompleteAction(planItemInstanceEntity));
+            } else {
+                complete(value, planItemInstanceEntity);
+            }
+        } catch (CmmnFault fault) {
+            FaultPropagation.propagateFault(fault, commandContext, planItemInstanceEntity);
         }
-
     }
 
     protected void complete(Object value, PlanItemInstanceEntity planItemInstanceEntity) {
@@ -80,6 +85,8 @@ public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior
         public void accept(Object value, Throwable throwable) {
             if (throwable == null) {
                 complete(value, planItemInstanceEntity);
+            } else if (throwable instanceof CmmnFault cmmnFault) {
+                FaultPropagation.propagateFault(cmmnFault, CommandContextUtil.getCommandContext(), planItemInstanceEntity);
             } else {
                 sneakyThrow(throwable);
             }

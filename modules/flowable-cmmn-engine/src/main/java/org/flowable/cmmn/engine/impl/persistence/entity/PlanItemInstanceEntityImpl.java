@@ -69,6 +69,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected Date completedTime;
     protected Date occurredTime;
     protected Date terminatedTime;
+    protected Date failedTime;
     protected Date exitTime;
     protected Date endedTime;
     protected String startUserId;
@@ -162,6 +163,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("completedTime", completedTime);
         persistentState.put("occurredTime", occurredTime);
         persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("failedTime", failedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
@@ -371,6 +373,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setTerminatedTime(Date terminatedTime) {
         this.terminatedTime = terminatedTime;
+    }
+    @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+    @Override
+    public void setFailedTime(Date failedTime) {
+        this.failedTime = failedTime;
     }
     @Override
     public Date getExitTime() {

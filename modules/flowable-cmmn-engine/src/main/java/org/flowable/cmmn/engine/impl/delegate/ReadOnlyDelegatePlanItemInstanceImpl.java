@@ -48,6 +48,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     protected final Date completedTime;
     protected final Date occurredTime;
     protected final Date terminatedTime;
+    protected final Date failedTime;
     protected final Date exitTime;
     protected final Date endedTime;
     protected final String startUserId;
@@ -87,6 +88,7 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.completedTime = planItemInstance.getCompletedTime();
         this.occurredTime = planItemInstance.getOccurredTime();
         this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.failedTime = planItemInstance.getFailedTime();
         this.exitTime = planItemInstance.getExitTime();
         this.endedTime = planItemInstance.getEndedTime();
         this.startUserId = planItemInstance.getStartUserId();
@@ -208,6 +210,11 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public Date getTerminatedTime() {
         return terminatedTime;
+    }
+
+    @Override
+    public Date getFailedTime() {
+        return failedTime;
     }
 
     @Override

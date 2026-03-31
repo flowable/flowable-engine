@@ -12,12 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.api.delegate.CmmnFault;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 
@@ -40,13 +42,18 @@ public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavi
                     planItemJavaDelegate.getClass().getName(), planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
         
-        planItemJavaDelegate.execute(planItemInstanceEntity);
-        
+        try {
+            planItemJavaDelegate.execute(planItemInstanceEntity);
+        } catch (CmmnFault fault) {
+            FaultPropagation.propagateFault(fault, commandContext, planItemInstanceEntity);
+            return;
+        }
+
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
-            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, "Executed service task with java class " + 
+            CmmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_SERVICE_TASK_EXIT, "Executed service task with java class " +
                     planItemJavaDelegate.getClass().getName(), planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper());
         }
-        
+
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 

@@ -50,6 +50,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected Date completedTime;
     protected Date occurredTime;
     protected Date terminatedTime;
+    protected Date failedTime;
     protected Date exitTime;
     protected Date endedTime;
     protected Date lastUpdatedTime;
@@ -100,6 +101,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         this.completedTime = planItemInstance.getCompletedTime();
         this.occurredTime = planItemInstance.getOccurredTime();
         this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.failedTime = planItemInstance.getFailedTime();
         this.endedTime = planItemInstance.getEndedTime();
 
         if (planItemInstance.getTenantId() != null) {
@@ -128,6 +130,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("completedTime", completedTime);
         persistentState.put("occurredTime", occurredTime);
         persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("failedTime", failedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("lastUpdatedTime", lastUpdatedTime);
@@ -347,6 +350,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setTerminatedTime(Date terminatedTime) {
         this.terminatedTime = terminatedTime;
+    }
+
+    @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+
+    @Override
+    public void setFailedTime(Date failedTime) {
+        this.failedTime = failedTime;
     }
 
     @Override

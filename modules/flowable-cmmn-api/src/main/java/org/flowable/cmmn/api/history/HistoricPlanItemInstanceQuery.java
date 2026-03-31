@@ -73,6 +73,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery occurredAfter(Date occurredAfter);
     HistoricPlanItemInstanceQuery terminatedBefore(Date terminatedBefore);
     HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter);
+    HistoricPlanItemInstanceQuery failedBefore(Date failedBefore);
+    HistoricPlanItemInstanceQuery failedAfter(Date failedAfter);
     HistoricPlanItemInstanceQuery exitBefore(Date exitBefore);
     HistoricPlanItemInstanceQuery exitAfter(Date exitAfter);
     HistoricPlanItemInstanceQuery endedBefore(Date endedBefore);

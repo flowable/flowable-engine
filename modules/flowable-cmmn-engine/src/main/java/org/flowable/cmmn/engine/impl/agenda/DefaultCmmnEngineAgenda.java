@@ -34,6 +34,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateToActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateVariableEventListenersOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.FailPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
@@ -264,6 +265,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType));
+    }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
     
     @Override

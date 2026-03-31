@@ -67,6 +67,9 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
                     String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, exitType, exitEventType);
 
+                } else if (PlanItemTransition.FAULT.equals(transition)) {
+                    CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity);
+
                 } else {
                     throw new FlowableException("Programmatic error: unsupported transition " + transition + " for " + planItemInstanceEntity);
 

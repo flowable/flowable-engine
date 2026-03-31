@@ -17,12 +17,14 @@ import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
+import org.flowable.cmmn.api.delegate.CmmnFault;
 import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 
@@ -74,6 +76,8 @@ public class PlanItemFutureJavaDelegateActivityBehavior extends CoreCmmnActivity
                 }
 
                 CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstance);
+            } else if (throwable instanceof CmmnFault cmmnFault) {
+                FaultPropagation.propagateFault(cmmnFault, CommandContextUtil.getCommandContext(), planItemInstance);
             } else {
                 sneakyThrow(throwable);
             }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testScriptFault" name="Test Script Fault">
+        <casePlanModel id="casePlanModel" name="Case plan model" autoComplete="true">
+            <planItem id="planItemA" name="A" definitionRef="scriptTaskA" />
+            <planItem id="planItemB" name="B" definitionRef="humanTaskB">
+                <entryCriterion id="entryB" sentryRef="sentryOnAFault" />
+            </planItem>
+            <sentry id="sentryOnAFault">
+                <planItemOnPart id="onPartA" sourceRef="planItemA">
+                    <standardEvent>fault</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="scriptTaskA" name="A" flowable:type="script" flowable:scriptFormat="groovy">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string><![CDATA[throw new org.flowable.cmmn.api.delegate.CmmnFault("SCRIPT_ERROR", "Fault from script")]]></string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+            <humanTask id="humanTaskB" name="B" />
+        </casePlanModel>
+    </case>
+</definitions>

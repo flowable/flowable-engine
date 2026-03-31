@@ -16,8 +16,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.cmmn.api.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -77,7 +79,10 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
         } catch (FlowableException e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof FlowableException) {
+            if (rootCause instanceof CmmnFault cmmnFault) {
+                FaultPropagation.propagateFault(cmmnFault, commandContext, planItemInstanceEntity);
+                return;
+            } else if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             } else {
                 throw e;

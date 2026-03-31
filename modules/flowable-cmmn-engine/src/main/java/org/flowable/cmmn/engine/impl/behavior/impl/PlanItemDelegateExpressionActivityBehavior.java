@@ -50,16 +50,20 @@ public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnTriggera
         Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
         if (delegate instanceof PlanItemActivityBehavior) {
+            // Note: CmmnFault is not caught here. PlanItemActivityBehavior implementations that want to support
+            // fault transitions need to handle CmmnFault themselves, similar to how PlanItemJavaDelegateActivityBehavior does.
             ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
 
         } else if (delegate instanceof CmmnActivityBehavior) {
             ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
 
         } else if (delegate instanceof PlanItemJavaDelegate) {
+            // PlanItemJavaDelegateActivityBehavior already catches CmmnFault internally
             PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
             behavior.execute(planItemInstanceEntity);
 
         } else if (delegate instanceof PlanItemFutureJavaDelegate) {
+            // PlanItemFutureJavaDelegateActivityBehavior already catches CmmnFault internally
             PlanItemFutureJavaDelegateActivityBehavior behavior = new PlanItemFutureJavaDelegateActivityBehavior((PlanItemFutureJavaDelegate<?>) delegate);
             behavior.execute(planItemInstanceEntity);
         } else {

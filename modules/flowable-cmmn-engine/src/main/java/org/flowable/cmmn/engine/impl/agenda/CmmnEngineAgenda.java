@@ -78,6 +78,8 @@ public interface CmmnEngineAgenda extends Agenda {
     
     void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType);
 
+    void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity);
