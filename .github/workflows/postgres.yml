@@ -26,6 +26,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: flowable
           POSTGRES_USER: flowable
+          PGDATA: /var/lib/postgresql/data
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a health check
