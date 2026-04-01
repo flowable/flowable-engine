@@ -700,4 +700,164 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
         });
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testOrQuery() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        ExternalWorkerJob orderJob1 = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .elementId("externalOrder")
+                .singleResult();
+        ExternalWorkerJob customerJob1 = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .elementId("externalCustomer1")
+                .singleResult();
+        ExternalWorkerJob orderJob2 = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance2.getId())
+                .elementId("externalOrder")
+                .singleResult();
+        assertThat(orderJob1).isNotNull();
+        assertThat(customerJob1).isNotNull();
+        assertThat(orderJob2).isNotNull();
+
+        // OR query: match by jobId(orderJob1) OR processInstanceId(processInstance2)
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery()
+                .or()
+                    .jobId(orderJob1.getId())
+                    .processInstanceId(processInstance2.getId())
+                .endOr()
+                .list();
+        // orderJob1 + both jobs from processInstance2
+        assertThat(jobs).hasSize(3);
+        assertThat(jobs).extracting(ExternalWorkerJob::getId)
+                .contains(orderJob1.getId(), orderJob2.getId());
+
+        // OR query: match by specific job IDs using jobId OR elementId scoped to a process
+        jobs = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .or()
+                    .jobId(orderJob1.getId())
+                    .elementId("externalCustomer1")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(2);
+        assertThat(jobs).extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(orderJob1.getId(), customerJob1.getId());
+
+        // OR with no match
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .processInstanceId("nonexistent")
+                    .executionId("nonexistent")
+                .endOr()
+                .count()).isZero();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testOrWithAndQuery() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        // AND (processInstanceId) + OR (elementId OR elementId)
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .or()
+                    .elementId("externalOrder")
+                    .elementId("externalCustomer1")
+                .endOr()
+                .list();
+        // In OR the last setter wins, so only externalCustomer1 matches within OR scope
+        // Combined with AND processInstanceId, returns 1 job
+        assertThat(jobs).hasSize(1);
+        assertThat(jobs.get(0).getElementId()).isEqualTo("externalCustomer1");
+
+        // Test with different OR fields
+        ExternalWorkerJob orderJob1 = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .elementId("externalOrder")
+                .singleResult();
+
+        jobs = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(processInstance1.getId())
+                .or()
+                    .jobId(orderJob1.getId())
+                    .elementId("externalCustomer1")
+                .endOr()
+                .list();
+        assertThat(jobs).hasSize(2);
+
+        // AND with non-matching processInstanceId + OR should return empty
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .processInstanceId("nonexistent")
+                .or()
+                    .elementId("externalOrder")
+                    .elementId("externalCustomer1")
+                .endOr()
+                .count()).isZero();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testOrQueryErrors() {
+        runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobQuery().or().or())
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("the query is already in an or statement");
+
+        assertThatThrownBy(() -> managementService.createExternalWorkerJobQuery().endOr())
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("endOr() can only be called after calling or()");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testConsecutiveOrQuery() {
+        ProcessInstance pi1 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+        ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("externalWorkerJobQueryTest");
+
+        ExternalWorkerJob job1Order = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(pi1.getId()).elementId("externalOrder").singleResult();
+        ExternalWorkerJob job2Order = managementService.createExternalWorkerJobQuery()
+                .processInstanceId(pi2.getId()).elementId("externalOrder").singleResult();
+
+        // First OR group matches {job1Order, all pi2 jobs}, second matches {all pi2 jobs, all pi3 jobs}
+        // Intersection = pi2's jobs (2 jobs)
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery()
+                .or()
+                    .jobId(job1Order.getId())
+                    .processInstanceId(pi2.getId())
+                .endOr()
+                .or()
+                    .processInstanceId(pi2.getId())
+                    .processInstanceId(pi3.getId())
+                .endOr()
+                .list();
+        // Second OR group: last setter wins -> processInstanceId=pi3. So second group matches pi3 only.
+        // Intersection of {job1Order, pi2 jobs} AND {pi3 jobs} = empty
+        assertThat(jobs).hasSize(0);
+
+        // Let's use different fields instead:
+        jobs = managementService.createExternalWorkerJobQuery()
+                .or()
+                    .jobId(job1Order.getId())
+                    .processInstanceId(pi2.getId())
+                .endOr()
+                .or()
+                    .jobId(job2Order.getId())
+                    .processInstanceId(pi1.getId())
+                .endOr()
+                .list();
+        // First group: {job1Order} union {pi2's 2 jobs} = {job1Order, job2Order, job2Customer}
+        // Second group: {job2Order} union {pi1's 2 jobs} = {job2Order, job1Order, job1Customer}
+        // Intersection: {job1Order, job2Order} - both appear in both groups
+        assertThat(jobs).hasSize(2);
+        assertThat(jobs).extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(job1Order.getId(), job2Order.getId());
+    }
+
 }

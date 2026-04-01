@@ -14,10 +14,12 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
@@ -51,6 +53,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     protected boolean onlyUnlocked;
     protected boolean withoutScopeType;
 
+    protected List<HistoryJobQueryImpl> orQueryObjects = new ArrayList<>();
+    protected HistoryJobQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
+
     public HistoryJobQueryImpl() {
     }
 
@@ -69,7 +75,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("Provided job id is null");
         }
-        this.id = jobId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.id = jobId;
+        } else {
+            this.id = jobId;
+        }
         return this;
     }
 
@@ -78,7 +88,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
-        this.handlerType = handlerType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerType = handlerType;
+        } else {
+            this.handlerType = handlerType;
+        }
         return this;
     }
 
@@ -87,13 +101,21 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (handlerTypes == null) {
             throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
         }
-        this.handlerTypes = handlerTypes;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerTypes = handlerTypes;
+        } else {
+            this.handlerTypes = handlerTypes;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery withException() {
-        this.withException = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withException = true;
+        } else {
+            this.withException = true;
+        }
         return this;
     }
 
@@ -102,7 +124,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (exceptionMessage == null) {
             throw new FlowableIllegalArgumentException("Provided exception message is null");
         }
-        this.exceptionMessage = exceptionMessage;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exceptionMessage = exceptionMessage;
+        } else {
+            this.exceptionMessage = exceptionMessage;
+        }
         return this;
     }
 
@@ -111,7 +137,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (scopeType == null) {
             throw new FlowableIllegalArgumentException("Provided scope type is null");
         }
-        this.scopeType = scopeType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
         return this;
     }
 
@@ -120,7 +150,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
@@ -129,37 +163,86 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery jobWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery lockOwner(String lockOwner) {
-        this.lockOwner = lockOwner;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lockOwner = lockOwner;
+        } else {
+            this.lockOwner = lockOwner;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery locked() {
-        this.onlyLocked = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyLocked = true;
+        } else {
+            this.onlyLocked = true;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery unlocked() {
-        this.onlyUnlocked = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyUnlocked = true;
+        } else {
+            this.onlyUnlocked = true;
+        }
         return this;
     }
 
     @Override
     public HistoryJobQuery withoutScopeType() {
-        this.withoutScopeType = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeType = true;
+        } else {
+            this.withoutScopeType = true;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoryJobQuery or() {
+        if (inOrStatement) {
+            throw new FlowableException("the query is already in an or statement");
+        }
+        inOrStatement = true;
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoryJobQueryImpl(commandContext, jobServiceConfiguration);
+        } else {
+            currentOrQueryObject = new HistoryJobQueryImpl(commandExecutor, jobServiceConfiguration);
+        }
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public HistoryJobQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableException("endOr() can only be called after calling or()");
+        }
+        inOrStatement = false;
+        currentOrQueryObject = null;
         return this;
     }
 
@@ -252,6 +335,10 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public boolean isWithoutScopeType() {
         return withoutScopeType;
+    }
+
+    public List<HistoryJobQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
     }
 
 }
