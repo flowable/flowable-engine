@@ -18,7 +18,7 @@ import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
-import org.flowable.cmmn.api.delegate.CmmnFault;
+import org.flowable.cmmn.engine.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;

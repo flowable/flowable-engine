@@ -10,16 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.api.delegate;
+package org.flowable.cmmn.engine.delegate;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 
 /**
- * Special exception that can be used to throw a CMMN Fault from {@link PlanItemJavaDelegate}s, expressions, and scripts.
+ * Special exception that can be used to throw a CMMN Fault from {@link org.flowable.cmmn.api.delegate.PlanItemJavaDelegate}s, expressions, and scripts.
  *
  * This should only be used for business faults, which shall be handled by sentries with {@code standardEvent="fault"}.
  * Technical errors should be represented by other exception types.
@@ -34,7 +35,7 @@ public class CmmnFault extends FlowableException {
     private static final long serialVersionUID = 1L;
 
     private String faultCode;
-    private Map<String, Object> additionalData;
+    private VariableContainer additionalDataContainer;
 
     public CmmnFault(String faultCode) {
         super("");
@@ -60,18 +61,18 @@ public class CmmnFault extends FlowableException {
         return faultCode;
     }
 
-    public Map<String, Object> getAdditionalData() {
-        return additionalData;
+    public VariableContainer getAdditionalDataContainer() {
+        return additionalDataContainer;
     }
 
-    public void setAdditionalData(Map<String, Object> additionalData) {
-        this.additionalData = additionalData;
+    public void setAdditionalDataContainer(VariableContainer additionalDataContainer) {
+        this.additionalDataContainer = additionalDataContainer;
     }
 
     public void addAdditionalData(String name, Object value) {
-        if (this.additionalData == null) {
-            this.additionalData = new HashMap<>();
+        if (this.additionalDataContainer == null) {
+            this.additionalDataContainer = new VariableContainerWrapper(new HashMap<>());
         }
-        this.additionalData.put(name, value);
+        this.additionalDataContainer.setVariable(name, value);
     }
 }

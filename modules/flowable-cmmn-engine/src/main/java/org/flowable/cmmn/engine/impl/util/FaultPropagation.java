@@ -12,10 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
-import java.util.Map;
-
-import org.flowable.cmmn.api.delegate.CmmnFault;
+import org.flowable.cmmn.engine.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -38,10 +37,10 @@ public class FaultPropagation {
         }
 
         // If additional data was provided, store each entry as a transient variable
-        Map<String, Object> additionalData = fault.getAdditionalData();
-        if (additionalData != null) {
-            for (Map.Entry<String, Object> entry : additionalData.entrySet()) {
-                planItemInstanceEntity.setTransientVariable(entry.getKey(), entry.getValue());
+        VariableContainer additionalDataContainer = fault.getAdditionalDataContainer();
+        if (additionalDataContainer != null) {
+            for (String name : additionalDataContainer.getVariableNames()) {
+                planItemInstanceEntity.setTransientVariable(name, additionalDataContainer.getVariable(name));
             }
         }
 

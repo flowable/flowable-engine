@@ -16,7 +16,7 @@
             <task id="scriptTaskA" name="A" flowable:type="script" flowable:scriptFormat="groovy">
                 <extensionElements>
                     <flowable:field name="script">
-                        <string><![CDATA[throw new org.flowable.cmmn.api.delegate.CmmnFault("SCRIPT_ERROR", "Fault from script")]]></string>
+                        <string><![CDATA[throw new org.flowable.cmmn.engine.delegate.CmmnFault("SCRIPT_ERROR", "Fault from script")]]></string>
                     </flowable:field>
                 </extensionElements>
             </task>

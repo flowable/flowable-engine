@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.runtime;
 
-import org.flowable.cmmn.api.delegate.CmmnFault;
+import org.flowable.cmmn.engine.delegate.CmmnFault;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 
