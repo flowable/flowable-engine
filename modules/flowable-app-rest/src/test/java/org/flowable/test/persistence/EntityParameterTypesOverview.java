@@ -1108,6 +1108,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("FAILED_TIME_", "failedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LAST_UPDATED_TIME_", "lastUpdatedTime", PARAMETER_TYPE_TIMESTAMP);
@@ -1171,6 +1172,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1232,6 +1235,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("FAILED_TIME_", "failedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
@@ -1295,6 +1299,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);
