@@ -262,4 +262,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST (CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '8.0.0.0', 1);
+values ('cmmn.schema.version', '8.1.0.0', 1);
