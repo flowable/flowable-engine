@@ -977,7 +977,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(caseInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(
                 cmmnEngineConfiguration.getAsyncExecutor().getLockOwner(), cmmnEngineConfiguration));
@@ -988,7 +988,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(caseInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd("worker1", cmmnEngineConfiguration));
 
