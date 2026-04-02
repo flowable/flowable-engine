@@ -12,14 +12,19 @@
  */
 package org.flowable.validation;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
+import org.flowable.validation.validator.ValidatorSet;
 
 /**
  * @author Tijs Rademakers
  */
 public interface ProcessValidationContext {
+    
+    List<ValidationError> getEntries();
 
     default ValidationError addError(String problem, String description) {
         return addError(problem, null, null, null, description, false);
@@ -98,5 +103,7 @@ public interface ProcessValidationContext {
     }
 
     ValidationError addEntry(ValidationError entry);
+    
+    void setCurrentValidatorSet(ValidatorSet validatorSet);
 
 }

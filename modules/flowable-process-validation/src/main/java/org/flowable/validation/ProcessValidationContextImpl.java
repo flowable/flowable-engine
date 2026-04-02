@@ -22,7 +22,7 @@ import org.flowable.validation.validator.ValidatorSet;
  */
 public class ProcessValidationContextImpl implements ProcessValidationContext {
 
-    protected final ValidatorSet validatorSet;
+    protected ValidatorSet validatorSet;
     protected final List<ValidationError> entries = new ArrayList<>();
 
     public ProcessValidationContextImpl(ValidatorSet validatorSet) {
@@ -36,6 +36,12 @@ public class ProcessValidationContextImpl implements ProcessValidationContext {
         return entry;
     }
 
+    @Override
+    public void setCurrentValidatorSet(ValidatorSet validatorSet) {
+        this.validatorSet = validatorSet;
+    }
+
+    @Override
     public List<ValidationError> getEntries() {
         return entries;
     }

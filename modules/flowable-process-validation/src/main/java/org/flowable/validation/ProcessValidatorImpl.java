@@ -28,16 +28,27 @@ public class ProcessValidatorImpl implements ProcessValidator {
 
     @Override
     public List<ValidationError> validate(BpmnModel bpmnModel) {
+        return validate(bpmnModel, null);
+    }
+
+    @Override
+    public List<ValidationError> validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         List<ValidationError> allErrors = new ArrayList<>();
 
+        ProcessValidationContext currentValidationContext = validationContext;;
         for (ValidatorSet validatorSet : validatorSets) {
-            ProcessValidationContextImpl validationContext = new ProcessValidationContextImpl(validatorSet);
-
-            for (Validator validator : validatorSet.getValidators()) {
-                validator.validate(bpmnModel, validationContext);
+            if (currentValidationContext == null) {
+                currentValidationContext = new ProcessValidationContextImpl(validatorSet);
+                
+            } else {
+                currentValidationContext.setCurrentValidatorSet(validatorSet);
             }
 
-            allErrors.addAll(validationContext.getEntries());
+            for (Validator validator : validatorSet.getValidators()) {
+                validator.validate(bpmnModel, currentValidationContext);
+            }
+
+            allErrors.addAll(currentValidationContext.getEntries());
         }
 
         return allErrors;

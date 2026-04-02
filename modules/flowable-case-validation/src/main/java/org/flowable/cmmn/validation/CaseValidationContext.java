@@ -12,15 +12,20 @@
  */
 package org.flowable.cmmn.validation;
 
+import java.util.List;
+
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.validation.validator.ValidationEntry;
+import org.flowable.cmmn.validation.validator.ValidatorSet;
 
 /**
  * @author Filip Hrisafov
  */
 public interface CaseValidationContext {
+    
+    List<ValidationEntry> getEntries();
 
     default ValidationEntry addError(String problem, String description) {
         return addError(problem, null, null, null, description);
@@ -68,5 +73,7 @@ public interface CaseValidationContext {
     }
 
     ValidationEntry addEntry(ValidationEntry entry);
+    
+    void setCurrentValidatorSet(ValidatorSet validatorSet);
 
 }
