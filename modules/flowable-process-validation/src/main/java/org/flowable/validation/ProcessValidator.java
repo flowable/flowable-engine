@@ -28,6 +28,11 @@ public interface ProcessValidator {
      * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurrences found.
      */
     List<ValidationError> validate(BpmnModel bpmnModel);
+    
+    /**
+     * Validates the provided {@link BpmnModel} and returns a list of all {@link ValidationError} occurrences found.
+     */
+    List<ValidationError> validate(BpmnModel bpmnModel, ProcessValidationContext validationContext);
 
     /**
      * Returns the {@link ValidatorSet} instances for this process validator. Useful if some validation rules need to be disabled.
