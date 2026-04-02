@@ -84,6 +84,16 @@ public interface HistoryJobQuery extends Query<HistoryJobQuery, HistoryJob> {
      */
     HistoryJobQuery unlocked();
 
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    HistoryJobQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    HistoryJobQuery endOr();
+
     // sorting //////////////////////////////////////////
 
     /**

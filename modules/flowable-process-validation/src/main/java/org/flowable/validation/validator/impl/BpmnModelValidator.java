@@ -12,11 +12,9 @@
  */
 package org.flowable.validation.validator.impl;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Constraints;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
@@ -28,42 +26,42 @@ import org.flowable.validation.validator.ValidatorImpl;
 public class BpmnModelValidator extends ValidatorImpl {
 
     @Override
-    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+    public void validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
 
         // If all process definitions of this bpmnModel are not executable, raise an error
-        boolean isAtLeastOneExecutable = validateAtLeastOneExecutable(bpmnModel, errors);
+        boolean isAtLeastOneExecutable = validateAtLeastOneExecutable(bpmnModel, validationContext);
 
         // If at least one process definition is executable, show a warning for each of the none-executables
         if (isAtLeastOneExecutable) {
             for (Process process : bpmnModel.getProcesses()) {
                 if (!process.isExecutable()) {
-                    addWarning(errors, Problems.PROCESS_DEFINITION_NOT_EXECUTABLE, process, process,
+                    validationContext.addWarning(Problems.PROCESS_DEFINITION_NOT_EXECUTABLE, process, process,
                             "Process definition is not executable. Please verify that this is intentional.");
                 }
-                handleProcessConstraints(bpmnModel, process, errors);
+                handleProcessConstraints(bpmnModel, process, validationContext);
             }
         }
-        handleBPMNModelConstraints(bpmnModel, errors);
+        handleBPMNModelConstraints(bpmnModel, validationContext);
     }
 
-    protected void handleProcessConstraints(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void handleProcessConstraints(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         if (process.getId() != null && process.getId().length() > Constraints.PROCESS_DEFINITION_ID_MAX_LENGTH) {
-            addError(errors, Problems.PROCESS_DEFINITION_ID_TOO_LONG, process,
+            validationContext.addError(Problems.PROCESS_DEFINITION_ID_TOO_LONG, process,
                     "The id of the process definition must not contain more than " + Constraints.PROCESS_DEFINITION_ID_MAX_LENGTH + " characters");
         }
         if (process.getName() != null && process.getName().length() > Constraints.PROCESS_DEFINITION_NAME_MAX_LENGTH) {
-            addError(errors, Problems.PROCESS_DEFINITION_NAME_TOO_LONG, process,
+            validationContext.addError(Problems.PROCESS_DEFINITION_NAME_TOO_LONG, process,
                     "The name of the process definition must not contain more than " + Constraints.PROCESS_DEFINITION_NAME_MAX_LENGTH + " characters");
         }
         if (process.getDocumentation() != null && process.getDocumentation().length() > Constraints.PROCESS_DEFINITION_DOCUMENTATION_MAX_LENGTH) {
-            addError(errors, Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, process,
+            validationContext.addError(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, process,
                     "The documentation of the process definition must not contain more than " + Constraints.PROCESS_DEFINITION_DOCUMENTATION_MAX_LENGTH + " characters");
         }
     }
 
-    protected void handleBPMNModelConstraints(BpmnModel bpmnModel, List<ValidationError> errors) {
+    protected void handleBPMNModelConstraints(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         if (bpmnModel.getTargetNamespace() != null && bpmnModel.getTargetNamespace().length() > Constraints.BPMN_MODEL_TARGET_NAMESPACE_MAX_LENGTH) {
-            addError(errors, Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG,
+            validationContext.addError(Problems.BPMN_MODEL_TARGET_NAMESPACE_TOO_LONG,
                     "The targetNamespace of the bpmn model must not contain more than " + Constraints.BPMN_MODEL_TARGET_NAMESPACE_MAX_LENGTH + " characters");
         }
     }
@@ -71,7 +69,7 @@ public class BpmnModelValidator extends ValidatorImpl {
     /**
      * Returns 'true' if at least one process definition in the {@link BpmnModel} is executable.
      */
-    protected boolean validateAtLeastOneExecutable(BpmnModel bpmnModel, List<ValidationError> errors) {
+    protected boolean validateAtLeastOneExecutable(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         int nrOfExecutableDefinitions = 0;
         for (Process process : bpmnModel.getProcesses()) {
             if (process.isExecutable()) {
@@ -80,7 +78,7 @@ public class BpmnModelValidator extends ValidatorImpl {
         }
 
         if (nrOfExecutableDefinitions == 0) {
-            addError(errors, Problems.ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE,
+            validationContext.addError(Problems.ALL_PROCESS_DEFINITIONS_NOT_EXECUTABLE,
                     "All process definition are set to be non-executable (property 'isExecutable' on process). This is not allowed.");
         }
 

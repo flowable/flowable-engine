@@ -181,6 +181,16 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      */
     U jobWithoutTenantId();
 
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    U or();
+
+    /**
+     * End an OR statement.
+     */
+    U endOr();
+
     // sorting //////////////////////////////////////////
 
     /**

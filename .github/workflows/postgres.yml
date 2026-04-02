@@ -19,13 +19,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres: [14, 15, 16, 17]
+        postgres: [15, 16, 17, 18]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_PASSWORD: flowable
           POSTGRES_USER: flowable
+          PGDATA: /var/lib/postgresql/data
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a health check

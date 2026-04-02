@@ -14,10 +14,12 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -71,6 +73,10 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String tenantIdLike;
     protected boolean withoutTenantId;
 
+    protected List<TimerJobQueryImpl> orQueryObjects = new ArrayList<>();
+    protected TimerJobQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
+
     public TimerJobQueryImpl() {
     }
 
@@ -89,7 +95,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("Provided job id is null");
         }
-        this.id = jobId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.id = jobId;
+        } else {
+            this.id = jobId;
+        }
         return this;
     }
 
@@ -98,7 +108,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (jobIds == null) {
             throw new FlowableIllegalArgumentException("Provided job id list is null");
         }
-        this.jobIds = jobIds;
+        if (inOrStatement) {
+            this.currentOrQueryObject.jobIds = jobIds;
+        } else {
+            this.jobIds = jobIds;
+        }
         return this;
     }
 
@@ -107,13 +121,21 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
         }
-        this.processInstanceId = processInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processInstanceId = processInstanceId;
+        } else {
+            this.processInstanceId = processInstanceId;
+        }
         return this;
     }
     
     @Override
     public TimerJobQueryImpl withoutProcessInstanceId() {
-        this.withoutProcessInstanceId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutProcessInstanceId = true;
+        } else {
+            this.withoutProcessInstanceId = true;
+        }
         return this;
     }
 
@@ -122,7 +144,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
-        this.processDefinitionId = processDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionId = processDefinitionId;
+        } else {
+            this.processDefinitionId = processDefinitionId;
+        }
         return this;
     }
 
@@ -131,7 +157,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (processDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Provided process definition key is null");
         }
-        this.processDefinitionKey = processDefinitionKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKey = processDefinitionKey;
+        } else {
+            this.processDefinitionKey = processDefinitionKey;
+        }
         return this;
     }
 
@@ -140,7 +170,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (category == null) {
             throw new FlowableIllegalArgumentException("Provided category is null");
         }
-        this.category = category;
+        if (inOrStatement) {
+            this.currentOrQueryObject.category = category;
+        } else {
+            this.category = category;
+        }
         return this;
     }
 
@@ -149,7 +183,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("Provided categoryLike is null");
         }
-        this.categoryLike = categoryLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.categoryLike = categoryLike;
+        } else {
+            this.categoryLike = categoryLike;
+        }
         return this;
     }
 
@@ -158,7 +196,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (elementId == null) {
             throw new FlowableIllegalArgumentException("Provided element id is null");
         }
-        this.elementId = elementId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementId = elementId;
+        } else {
+            this.elementId = elementId;
+        }
         return this;
     }
 
@@ -167,7 +209,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (elementName == null) {
             throw new FlowableIllegalArgumentException("Provided element name is null");
         }
-        this.elementName = elementName;
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementName = elementName;
+        } else {
+            this.elementName = elementName;
+        }
         return this;
     }
 
@@ -176,13 +222,21 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (scopeId == null) {
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
-        this.scopeId = scopeId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeId = scopeId;
+        } else {
+            this.scopeId = scopeId;
+        }
         return this;
     }
     
     @Override
     public TimerJobQueryImpl withoutScopeId() {
-        this.withoutScopeId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeId = true;
+        } else {
+            this.withoutScopeId = true;
+        }
         return this;
     }
 
@@ -191,7 +245,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
-        this.subScopeId = subScopeId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.subScopeId = subScopeId;
+        } else {
+            this.subScopeId = subScopeId;
+        }
         return this;
     }
 
@@ -200,13 +258,21 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (scopeType == null) {
             throw new FlowableIllegalArgumentException("Provided scope type is null");
         }
-        this.scopeType = scopeType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
         return this;
     }
 
     @Override
     public TimerJobQueryImpl withoutScopeType() {
-        this.withoutScopeType = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeType = true;
+        } else {
+            this.withoutScopeType = true;
+        }
         return this;
     }
 
@@ -215,7 +281,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (scopeDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided scope definitionid is null");
         }
-        this.scopeDefinitionId = scopeDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
+        } else {
+            this.scopeDefinitionId = scopeDefinitionId;
+        }
         return this;
     }
 
@@ -244,7 +314,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (caseDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Provided case definition key is null");
         }
-        this.caseDefinitionKey = caseDefinitionKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKey = caseDefinitionKey;
+        } else {
+            this.caseDefinitionKey = caseDefinitionKey;
+        }
         return this;
     }
 
@@ -263,7 +337,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (correlationId == null) {
             throw new FlowableIllegalArgumentException("Provided correlationId is null");
         }
-        this.correlationId = correlationId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.correlationId = correlationId;
+        } else {
+            this.correlationId = correlationId;
+        }
         return this;
     }
 
@@ -272,7 +350,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
         }
-        this.executionId = executionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.executionId = executionId;
+        } else {
+            this.executionId = executionId;
+        }
         return this;
     }
 
@@ -281,7 +363,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
-        this.handlerType = handlerType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerType = handlerType;
+        } else {
+            this.handlerType = handlerType;
+        }
         return this;
     }
 
@@ -290,13 +376,21 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (handlerTypes == null) {
             throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
         }
-        this.handlerTypes = handlerTypes;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerTypes = handlerTypes;
+        } else {
+            this.handlerTypes = handlerTypes;
+        }
         return this;
     }
 
     @Override
     public TimerJobQueryImpl executable() {
-        executable = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.executable = true;
+        } else {
+            this.executable = true;
+        }
         return this;
     }
 
@@ -305,7 +399,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
-        this.onlyTimers = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyTimers = true;
+        } else {
+            this.onlyTimers = true;
+        }
         return this;
     }
 
@@ -314,7 +412,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (onlyTimers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
         }
-        this.onlyMessages = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyMessages = true;
+        } else {
+            this.onlyMessages = true;
+        }
         return this;
     }
 
@@ -323,7 +425,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
-        this.duedateHigherThan = date;
+        if (inOrStatement) {
+            this.currentOrQueryObject.duedateHigherThan = date;
+        } else {
+            this.duedateHigherThan = date;
+        }
         return this;
     }
 
@@ -332,13 +438,21 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
-        this.duedateLowerThan = date;
+        if (inOrStatement) {
+            this.currentOrQueryObject.duedateLowerThan = date;
+        } else {
+            this.duedateLowerThan = date;
+        }
         return this;
     }
 
     @Override
     public TimerJobQueryImpl withException() {
-        this.withException = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withException = true;
+        } else {
+            this.withException = true;
+        }
         return this;
     }
 
@@ -347,7 +461,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (exceptionMessage == null) {
             throw new FlowableIllegalArgumentException("Provided exception message is null");
         }
-        this.exceptionMessage = exceptionMessage;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exceptionMessage = exceptionMessage;
+        } else {
+            this.exceptionMessage = exceptionMessage;
+        }
         return this;
     }
 
@@ -356,7 +474,11 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
@@ -365,13 +487,46 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
 
     @Override
     public TimerJobQueryImpl jobWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
+        return this;
+    }
+
+    @Override
+    public TimerJobQuery or() {
+        if (inOrStatement) {
+            throw new FlowableException("the query is already in an or statement");
+        }
+        inOrStatement = true;
+        if (commandContext != null) {
+            currentOrQueryObject = new TimerJobQueryImpl(commandContext, jobServiceConfiguration);
+        } else {
+            currentOrQueryObject = new TimerJobQueryImpl(commandExecutor, jobServiceConfiguration);
+        }
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public TimerJobQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableException("endOr() can only be called after calling or()");
+        }
+        inOrStatement = false;
+        currentOrQueryObject = null;
         return this;
     }
 
@@ -560,5 +715,9 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public boolean isExecutable() {
         return executable;
+    }
+
+    public List<TimerJobQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
     }
 }

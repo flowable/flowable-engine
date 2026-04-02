@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,21 +28,18 @@ public class ProcessValidatorImpl implements ProcessValidator {
 
     @Override
     public List<ValidationError> validate(BpmnModel bpmnModel) {
-
         List<ValidationError> allErrors = new ArrayList<>();
 
         for (ValidatorSet validatorSet : validatorSets) {
+            ProcessValidationContextImpl validationContext = new ProcessValidationContextImpl(validatorSet);
+
             for (Validator validator : validatorSet.getValidators()) {
-                List<ValidationError> validatorErrors = new ArrayList<>();
-                validator.validate(bpmnModel, validatorErrors);
-                if (!validatorErrors.isEmpty()) {
-                    for (ValidationError error : validatorErrors) {
-                        error.setValidatorSetName(validatorSet.getName());
-                    }
-                    allErrors.addAll(validatorErrors);
-                }
+                validator.validate(bpmnModel, validationContext);
             }
+
+            allErrors.addAll(validationContext.getEntries());
         }
+
         return allErrors;
     }
 

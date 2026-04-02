@@ -12,10 +12,8 @@
  */
 package org.flowable.validation.validator.impl;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
 
@@ -25,12 +23,12 @@ import org.flowable.validation.validator.ValidatorImpl;
 public class ErrorValidator extends ValidatorImpl {
 
     @Override
-    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+    public void validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         if (bpmnModel.getErrors() != null) {
             for (String errorRef : bpmnModel.getErrors().keySet()) {
                 String errorCode = bpmnModel.getErrors().get(errorRef);
                 if ("".equals(errorCode)) {
-                    addError(errors, Problems.ERROR_MISSING_ERROR_CODE, null, errorRef, "Invalid error code: empty errorCode");
+                    validationContext.addError(Problems.ERROR_MISSING_ERROR_CODE, null, errorRef, "Invalid error code: empty errorCode");
                 }
             }
         }
