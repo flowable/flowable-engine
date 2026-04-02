@@ -13,14 +13,13 @@
 package org.flowable.validation.validator.impl;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
 
@@ -30,14 +29,14 @@ import org.flowable.validation.validator.ValidatorImpl;
 public class AssociationValidator extends ValidatorImpl {
 
     @Override
-    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+    public void validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
 
         // Global associations
         Collection<Artifact> artifacts = bpmnModel.getGlobalArtifacts();
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 if (artifact instanceof Association) {
-                    validate(null, (Association) artifact, errors);
+                    validate(null, (Association) artifact, validationContext);
                 }
             }
         }
@@ -47,19 +46,19 @@ public class AssociationValidator extends ValidatorImpl {
             artifacts = process.getArtifacts();
             for (Artifact artifact : artifacts) {
                 if (artifact instanceof Association) {
-                    validate(process, (Association) artifact, errors);
+                    validate(process, (Association) artifact, validationContext);
                 }
             }
         }
 
     }
 
-    protected void validate(Process process, Association association, List<ValidationError> errors) {
+    protected void validate(Process process, Association association, ProcessValidationContext validationContext) {
         if (StringUtils.isEmpty(association.getSourceRef())) {
-            addError(errors, Problems.ASSOCIATION_INVALID_SOURCE_REFERENCE, process, association, "association element missing attribute 'sourceRef'");
+            validationContext.addError(Problems.ASSOCIATION_INVALID_SOURCE_REFERENCE, process, association, "association element missing attribute 'sourceRef'");
         }
         if (StringUtils.isEmpty(association.getTargetRef())) {
-            addError(errors, Problems.ASSOCIATION_INVALID_TARGET_REFERENCE, process, association, "association element missing attribute 'targetRef'");
+            validationContext.addError(Problems.ASSOCIATION_INVALID_TARGET_REFERENCE, process, association, "association element missing attribute 'targetRef'");
         }
     }
 

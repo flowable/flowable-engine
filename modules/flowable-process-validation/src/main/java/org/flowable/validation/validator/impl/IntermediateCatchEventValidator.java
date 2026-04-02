@@ -25,7 +25,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -35,7 +35,7 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class IntermediateCatchEventValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<IntermediateCatchEvent> intermediateCatchEvents = process.findFlowElementsOfType(IntermediateCatchEvent.class);
         for (IntermediateCatchEvent intermediateCatchEvent : intermediateCatchEvents) {
             EventDefinition eventDefinition = null;
@@ -53,16 +53,16 @@ public class IntermediateCatchEventValidator extends ProcessLevelValidator {
                     }
                 }
 
-                addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_NO_EVENTDEFINITION, process, intermediateCatchEvent, "No event definition for intermediate catch event ");
-                
+                validationContext.addError(Problems.INTERMEDIATE_CATCH_EVENT_NO_EVENTDEFINITION, process, intermediateCatchEvent, "No event definition for intermediate catch event ");
+
             } else {
-                if (!(eventDefinition instanceof TimerEventDefinition) && 
-                        !(eventDefinition instanceof SignalEventDefinition) && 
-                        !(eventDefinition instanceof MessageEventDefinition) && 
-                        !(eventDefinition instanceof ConditionalEventDefinition) && 
+                if (!(eventDefinition instanceof TimerEventDefinition) &&
+                        !(eventDefinition instanceof SignalEventDefinition) &&
+                        !(eventDefinition instanceof MessageEventDefinition) &&
+                        !(eventDefinition instanceof ConditionalEventDefinition) &&
                         !(eventDefinition instanceof VariableListenerEventDefinition)) {
-                    
-                    addError(errors, Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, eventDefinition, "Unsupported intermediate catch event type");
+
+                    validationContext.addError(Problems.INTERMEDIATE_CATCH_EVENT_INVALID_EVENTDEFINITION, process, intermediateCatchEvent, eventDefinition, "Unsupported intermediate catch event type");
                 }
             }
         }

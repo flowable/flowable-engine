@@ -22,7 +22,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -32,21 +32,21 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class StartEventValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
-        validateEventDefinitionTypes(startEvents, process, errors);
-        validateMultipleStartEvents(startEvents, process, errors);
+        validateEventDefinitionTypes(startEvents, process, validationContext);
+        validateMultipleStartEvents(startEvents, process, validationContext);
     }
 
-    protected void validateEventDefinitionTypes(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
+    protected void validateEventDefinitionTypes(List<StartEvent> startEvents, Process process, ProcessValidationContext validationContext) {
         for (StartEvent startEvent : startEvents) {
             if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
                 EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
                 if (!(eventDefinition instanceof MessageEventDefinition) &&
                         !(eventDefinition instanceof TimerEventDefinition) &&
                         !(eventDefinition instanceof SignalEventDefinition)) {
-                    
-                    addError(errors, Problems.START_EVENT_INVALID_EVENT_DEFINITION,
+
+                    validationContext.addError(Problems.START_EVENT_INVALID_EVENT_DEFINITION,
                             process, startEvent,
                             eventDefinition,
                             "Unsupported event definition on start event");
@@ -56,7 +56,7 @@ public class StartEventValidator extends ProcessLevelValidator {
         }
     }
 
-    protected void validateMultipleStartEvents(List<StartEvent> startEvents, Process process, List<ValidationError> errors) {
+    protected void validateMultipleStartEvents(List<StartEvent> startEvents, Process process, ProcessValidationContext validationContext) {
 
         // Multiple none events are not supported
         List<StartEvent> noneStartEvents = new ArrayList<>();
@@ -70,8 +70,7 @@ public class StartEventValidator extends ProcessLevelValidator {
 
         if (noneStartEvents.size() > 1) {
             for (StartEvent startEvent : noneStartEvents) {
-                addError(
-                        errors,
+                validationContext.addError(
                         Problems.START_EVENT_MULTIPLE_FOUND,
                         process,
                         startEvent,

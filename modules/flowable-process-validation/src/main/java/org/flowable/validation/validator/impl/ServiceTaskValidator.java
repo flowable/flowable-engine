@@ -24,7 +24,7 @@ import org.flowable.bpmn.model.Operation;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 
 /**
@@ -33,81 +33,81 @@ import org.flowable.validation.validator.Problems;
 public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<ServiceTask> serviceTasks = process.findFlowElementsOfType(ServiceTask.class);
         for (ServiceTask serviceTask : serviceTasks) {
-            verifyImplementation(process, serviceTask, errors);
-            verifyType(process, serviceTask, errors);
-            verifyResultVariableName(process, serviceTask, errors);
-            verifyWebservice(bpmnModel, process, serviceTask, errors);
+            verifyImplementation(process, serviceTask, validationContext);
+            verifyType(process, serviceTask, validationContext);
+            verifyResultVariableName(process, serviceTask, validationContext);
+            verifyWebservice(bpmnModel, process, serviceTask, validationContext);
         }
     }
 
-    protected void verifyImplementation(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+    protected void verifyImplementation(Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
         if (!ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())
                 && !ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) 
                 && StringUtils.isEmpty(serviceTask.getType())) {
             
-            addError(errors, Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
+            validationContext.addError(Problems.SERVICE_TASK_MISSING_IMPLEMENTATION, process, serviceTask,
                     "One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask.");
         }
     }
 
-    protected void verifyType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+    protected void verifyType(Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
         if (StringUtils.isNotEmpty(serviceTask.getType())) {
 
             switch (serviceTask.getType()) {
                 case ServiceTask.MAIL_TASK:
-                    validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    validateFieldDeclarationsForEmail(process, serviceTask, serviceTask.getFieldExtensions(), validationContext);
                     return;
                 case ServiceTask.SHELL_TASK:
-                    validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    validateFieldDeclarationsForShell(process, serviceTask, serviceTask.getFieldExtensions(), validationContext);
                     return;
                 case ServiceTask.DMN_TASK:
-                    validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    validateFieldDeclarationsForDmn(process, serviceTask, serviceTask.getFieldExtensions(), validationContext);
                     return;
                 case ServiceTask.HTTP_TASK:
-                    validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), errors);
+                    validateFieldDeclarationsForHttp(process, serviceTask, serviceTask.getFieldExtensions(), validationContext);
                     return;
                 case ServiceTask.CASE_TASK:
-                    validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, errors);
+                    validateFieldDeclarationsForCase(process, (CaseServiceTask) serviceTask, validationContext);
                     return;
                 case ServiceTask.SEND_EVENT_TASK:
-                    validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, errors);
+                    validateFieldDeclarationsForSendEventTask(process, (SendEventServiceTask) serviceTask, validationContext);
                     return;
                 case ServiceTask.EXTERNAL_WORKER_TASK:
-                    validateExternalWorkerTask(process, (ExternalWorkerServiceTask) serviceTask, errors);
+                    validateExternalWorkerTask(process, (ExternalWorkerServiceTask) serviceTask, validationContext);
                     return;
                 case ServiceTask.CAMEL:
                     // Camel has no special validation
                     return;
                 default:
-                    validateUnknownServiceTaskType(process, serviceTask, errors);
+                    validateUnknownServiceTaskType(process, serviceTask, validationContext);
             }
 
         }
     }
 
-    protected void validateUnknownServiceTaskType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
-        addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
+    protected void validateUnknownServiceTaskType(Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
+        validationContext.addError(Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
     }
 
-    protected void verifyResultVariableName(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+    protected void verifyResultVariableName(Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
         if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())
                 && (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType()) || 
                                 ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType()))) {
             
-            addError(errors, Problems.SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE, process, serviceTask, "'resultVariableName' not supported for service tasks using 'class' or 'delegateExpression");
+            validationContext.addError(Problems.SERVICE_TASK_RESULT_VAR_NAME_WITH_DELEGATE, process, serviceTask, "'resultVariableName' not supported for service tasks using 'class' or 'delegateExpression");
         }
 
         if (serviceTask.isUseLocalScopeForResultVariable() && StringUtils.isEmpty(serviceTask.getResultVariableName())) {
-            addWarning(errors, Problems.SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME, process, serviceTask, "'useLocalScopeForResultVariable' is set, but no 'resultVariableName' is set. The property would not be used");
+            validationContext.addWarning(Problems.SERVICE_TASK_USE_LOCAL_SCOPE_FOR_RESULT_VAR_WITHOUT_RESULT_VARIABLE_NAME, process, serviceTask, "'useLocalScopeForResultVariable' is set, but no 'resultVariableName' is set. The property would not be used");
         }
     }
 
-    protected void verifyWebservice(BpmnModel bpmnModel, Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+    protected void verifyWebservice(BpmnModel bpmnModel, Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
         if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
 
             boolean operationFound = false;
@@ -125,7 +125,7 @@ public class ServiceTaskValidator extends ExternalInvocationTaskValidator {
             }
 
             if (!operationFound) {
-                addError(errors, Problems.SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF, process, serviceTask, "Invalid operation reference");
+                validationContext.addError(Problems.SERVICE_TASK_WEBSERVICE_INVALID_OPERATION_REF, process, serviceTask, "Invalid operation reference");
             }
 
         }

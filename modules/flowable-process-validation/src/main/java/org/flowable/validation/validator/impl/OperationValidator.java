@@ -12,12 +12,10 @@
  */
 package org.flowable.validation.validator.impl;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Interface;
 import org.flowable.bpmn.model.Operation;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
 
@@ -27,13 +25,13 @@ import org.flowable.validation.validator.ValidatorImpl;
 public class OperationValidator extends ValidatorImpl {
 
     @Override
-    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+    public void validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         if (bpmnModel.getInterfaces() != null) {
             for (Interface bpmnInterface : bpmnModel.getInterfaces()) {
                 if (bpmnInterface.getOperations() != null) {
                     for (Operation operation : bpmnInterface.getOperations()) {
                         if (bpmnModel.getMessage(operation.getInMessageRef()) == null) {
-                            addError(errors, Problems.OPERATION_INVALID_IN_MESSAGE_REFERENCE, operation, "Invalid inMessageRef for operation");
+                            validationContext.addError(Problems.OPERATION_INVALID_IN_MESSAGE_REFERENCE, operation, "Invalid inMessageRef for operation");
                         }
                     }
                 }

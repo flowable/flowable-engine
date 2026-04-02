@@ -18,7 +18,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -28,18 +28,18 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class FlowableEventListenerValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<EventListener> eventListeners = process.getEventListeners();
         if (eventListeners != null) {
             for (EventListener eventListener : eventListeners) {
 
                 if (eventListener.getImplementationType() != null && eventListener.getImplementationType().equals(ImplementationType.IMPLEMENTATION_TYPE_INVALID_THROW_EVENT)) {
 
-                    addError(errors, Problems.EVENT_LISTENER_INVALID_THROW_EVENT_TYPE, process, eventListener, "Invalid or unsupported throw event type on event listener");
+                    validationContext.addError(Problems.EVENT_LISTENER_INVALID_THROW_EVENT_TYPE, process, eventListener, "Invalid or unsupported throw event type on event listener");
 
                 } else if (eventListener.getImplementationType() == null || eventListener.getImplementationType().length() == 0) {
 
-                    addError(errors, Problems.EVENT_LISTENER_IMPLEMENTATION_MISSING, process, eventListener, "Element 'class', 'delegateExpression' or 'throwEvent' is mandatory on eventListener");
+                    validationContext.addError(Problems.EVENT_LISTENER_IMPLEMENTATION_MISSING, process, eventListener, "Element 'class', 'delegateExpression' or 'throwEvent' is mandatory on eventListener");
 
                 } else if (eventListener.getImplementationType() != null) {
 
@@ -49,7 +49,7 @@ public class FlowableEventListenerValidator extends ProcessLevelValidator {
                             && !ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT.equals(eventListener.getImplementationType())
                             && !ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT.equals(eventListener.getImplementationType())
                             && !ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT.equals(eventListener.getImplementationType())) {
-                        addError(errors, Problems.EVENT_LISTENER_INVALID_IMPLEMENTATION, process, eventListener, "Unsupported implementation type for event listener");
+                        validationContext.addError(Problems.EVENT_LISTENER_INVALID_IMPLEMENTATION, process, eventListener, "Unsupported implementation type for event listener");
                     }
 
                 }

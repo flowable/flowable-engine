@@ -12,8 +12,6 @@
  */
 package org.flowable.validation.validator.impl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
@@ -21,7 +19,7 @@ import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -36,34 +34,34 @@ public class FlowElementValidator extends ProcessLevelValidator {
     protected static final int ID_MAX_LENGTH = 255;
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         for (FlowElement flowElement : process.getFlowElements()) {
 
             if (flowElement instanceof Activity activity) {
-                handleConstraints(process, activity, errors);
-                handleMultiInstanceLoopCharacteristics(process, activity, errors);
-                handleDataAssociations(process, activity, errors);
+                handleConstraints(process, activity, validationContext);
+                handleMultiInstanceLoopCharacteristics(process, activity, validationContext);
+                handleDataAssociations(process, activity, validationContext);
             }
 
         }
 
     }
 
-    protected void handleConstraints(Process process, Activity activity, List<ValidationError> errors) {
+    protected void handleConstraints(Process process, Activity activity, ProcessValidationContext validationContext) {
         if (activity.getId() != null && activity.getId().length() > ID_MAX_LENGTH) {
-            addError(errors, Problems.FLOW_ELEMENT_ID_TOO_LONG, process, activity,
+            validationContext.addError(Problems.FLOW_ELEMENT_ID_TOO_LONG, process, activity,
                     "The id of a flow element must not contain more than " + ID_MAX_LENGTH + " characters");
         }
     }
 
-    protected void handleMultiInstanceLoopCharacteristics(Process process, Activity activity, List<ValidationError> errors) {
+    protected void handleMultiInstanceLoopCharacteristics(Process process, Activity activity, ProcessValidationContext validationContext) {
         MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = activity.getLoopCharacteristics();
         if (multiInstanceLoopCharacteristics != null) {
 
             if (StringUtils.isEmpty(multiInstanceLoopCharacteristics.getLoopCardinality())
                     && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getInputDataItem()) && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getCollectionString())) {
 
-                addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION, process, activity, multiInstanceLoopCharacteristics,
+                validationContext.addError(Problems.MULTI_INSTANCE_MISSING_COLLECTION, process, activity, multiInstanceLoopCharacteristics,
                         "Either loopCardinality or loopDataInputRef/flowable:collection must been set");
             }
             
@@ -71,7 +69,7 @@ public class FlowElementValidator extends ProcessLevelValidator {
 
             	if (multiInstanceLoopCharacteristics.getHandler() == null) {
             		// verify string parsing function attributes
-            		addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION_FUNCTION_PARAMETERS, process, activity,
+            		validationContext.addError(Problems.MULTI_INSTANCE_MISSING_COLLECTION_FUNCTION_PARAMETERS, process, activity,
             				"The flowable:collection element string value requires the function parameters flowable:delegateExpression or flowable:class.");
             	}
             }
@@ -79,11 +77,11 @@ public class FlowElementValidator extends ProcessLevelValidator {
         }
     }
 
-    protected void handleDataAssociations(Process process, Activity activity, List<ValidationError> errors) {
+    protected void handleDataAssociations(Process process, Activity activity, ProcessValidationContext validationContext) {
         if (activity.getDataInputAssociations() != null) {
             for (DataAssociation dataAssociation : activity.getDataInputAssociations()) {
                 if (StringUtils.isEmpty(dataAssociation.getTargetRef())) {
-                    addError(errors, Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity, dataAssociation,
+                    validationContext.addError(Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity, dataAssociation,
                             "Targetref is required on a data association");
                 }
             }
@@ -91,7 +89,7 @@ public class FlowElementValidator extends ProcessLevelValidator {
         if (activity.getDataOutputAssociations() != null) {
             for (DataAssociation dataAssociation : activity.getDataOutputAssociations()) {
                 if (StringUtils.isEmpty(dataAssociation.getTargetRef())) {
-                    addError(errors, Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity,
+                    validationContext.addError(Problems.DATA_ASSOCIATION_MISSING_TARGETREF, process, activity,
                             "Targetref is required on a data association");
                 }
             }
