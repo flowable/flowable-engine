@@ -39,12 +39,12 @@ public class CaseValidatorImpl implements CaseValidator {
     public List<ValidationEntry> validate(CmmnModel model, CaseValidationContext validationContext) {
         List<ValidationEntry> allEntries = new ArrayList<>();
 
-        CaseValidationContext currentValidationContext = validationContext;
         for (ValidatorSet validatorSet : validatorSets) {
-            if (currentValidationContext == null) {
+            CaseValidationContext currentValidationContext;
+            if (validationContext == null) {
                 currentValidationContext = new CaseValidationContextImpl(validatorSet);
-                
             } else {
+                currentValidationContext = validationContext;
                 currentValidationContext.setCurrentValidatorSet(validatorSet);
             }
 
@@ -52,7 +52,13 @@ public class CaseValidatorImpl implements CaseValidator {
                 validator.validate(model, currentValidationContext);
             }
 
-            allEntries.addAll(currentValidationContext.getEntries());
+            if (validationContext == null) {
+                allEntries.addAll(currentValidationContext.getEntries());
+            }
+        }
+
+        if (validationContext != null) {
+            allEntries.addAll(validationContext.getEntries());
         }
 
         return allEntries;

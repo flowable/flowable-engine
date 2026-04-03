@@ -35,12 +35,12 @@ public class ProcessValidatorImpl implements ProcessValidator {
     public List<ValidationError> validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         List<ValidationError> allErrors = new ArrayList<>();
 
-        ProcessValidationContext currentValidationContext = validationContext;;
         for (ValidatorSet validatorSet : validatorSets) {
-            if (currentValidationContext == null) {
+            ProcessValidationContext currentValidationContext;
+            if (validationContext == null) {
                 currentValidationContext = new ProcessValidationContextImpl(validatorSet);
-                
             } else {
+                currentValidationContext = validationContext;
                 currentValidationContext.setCurrentValidatorSet(validatorSet);
             }
 
@@ -48,7 +48,13 @@ public class ProcessValidatorImpl implements ProcessValidator {
                 validator.validate(bpmnModel, currentValidationContext);
             }
 
-            allErrors.addAll(currentValidationContext.getEntries());
+            if (validationContext == null) {
+                allErrors.addAll(currentValidationContext.getEntries());
+            }
+        }
+
+        if (validationContext != null) {
+            allErrors.addAll(validationContext.getEntries());
         }
 
         return allErrors;
