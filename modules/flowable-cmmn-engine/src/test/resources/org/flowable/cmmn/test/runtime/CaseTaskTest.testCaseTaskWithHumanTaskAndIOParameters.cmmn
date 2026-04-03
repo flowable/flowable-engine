@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+             xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             targetNamespace="http://flowable.org/cmmn">
+  <case id="parentCaseWithHumanTaskAndSubCase" name="Parent Case" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel1" name="Case plan model" flowable:includeInStageOverview="false">
+      <planItem id="planItem1" name="Parent Human Task" definitionRef="parentHumanTask"></planItem>
+      <planItem id="planItem2" name="Sub Case" definitionRef="subCaseTask"></planItem>
+      <humanTask id="parentHumanTask" name="Parent Human Task" flowable:assignee="${initiator}" />
+      <caseTask id="subCaseTask" name="Sub Case" flowable:fallbackToDefaultTenant="true">
+        <extensionElements>
+          <flowable:in source="parentVar1" target="childVar1"></flowable:in>
+          <flowable:in source="parentVar2" target="childVar2"></flowable:in>
+          <flowable:out source="childResult" target="parentResult"></flowable:out>
+        </extensionElements>
+        <caseRefExpression><![CDATA[oneHumanTaskCase]]></caseRefExpression>
+      </caseTask>
+    </casePlanModel>
+  </case>
+</definitions>

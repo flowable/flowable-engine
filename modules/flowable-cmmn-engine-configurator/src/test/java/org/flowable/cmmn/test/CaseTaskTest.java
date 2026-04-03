@@ -609,6 +609,77 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
     }
 
     @Test
+    @CmmnDeployment
+    public void testProcessWithUserTaskAndCaseTaskIOParameters() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/processWithUserTaskAndCaseTask.bpmn20.xml")
+                .deploy();
+
+        try {
+            String inVar1Content = "First input value";
+            String inVar2Content = "Second input value";
+            String outVarContent = "Result from sub case";
+
+            // Start the parent process with 2 input variables
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("parentVar1", inVar1Content);
+            variables.put("parentVar2", inVar2Content);
+            ProcessInstance parentProcessInstance = processEngineRuntimeService.startProcessInstanceByKey(
+                    "parentProcessWithUserTaskAndCaseTask", variables);
+
+            // Both the parent user task and the child case task should be active
+            Task parentTask = processEngineTaskService.createTaskQuery()
+                    .processInstanceId(parentProcessInstance.getId())
+                    .singleResult();
+            assertThat(parentTask).isNotNull();
+            assertThat(parentTask.getName()).isEqualTo("Parent User Task");
+
+            // Verify the child case was started
+            Execution caseTaskExecution = processEngineRuntimeService.createExecutionQuery()
+                    .onlyChildExecutions()
+                    .processInstanceId(parentProcessInstance.getId())
+                    .activityId("caseServiceTask")
+                    .singleResult();
+            assertThat(caseTaskExecution).isNotNull();
+
+            CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceCallbackId(caseTaskExecution.getId())
+                    .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+                    .singleResult();
+            assertThat(childCaseInstance).isNotNull();
+
+            // Verify the child case received both input variables
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "childVar1")).isEqualTo(inVar1Content);
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "childVar2")).isEqualTo(inVar2Content);
+
+            // Set a variable on the child case and complete the child human task
+            Task childTask = cmmnTaskService.createTaskQuery()
+                    .caseInstanceId(childCaseInstance.getId())
+                    .singleResult();
+            assertThat(childTask).isNotNull();
+            assertThat(childTask.getName()).isEqualTo("Child Task");
+            cmmnRuntimeService.setVariable(childCaseInstance.getId(), "childResult", outVarContent);
+            cmmnTaskService.complete(childTask.getId());
+
+            // Verify the child case has ended
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(childCaseInstance.getId()).singleResult()).isNull();
+
+            // Verify the out parameter variable is now available on the parent process
+            assertThat(processEngineRuntimeService.getVariable(parentProcessInstance.getId(), "parentResult")).isEqualTo(outVarContent);
+
+            // Complete the parent user task
+            processEngineTaskService.complete(parentTask.getId());
+
+            // Verify the parent process has ended
+            assertThat(processEngineRuntimeService.createProcessInstanceQuery()
+                    .processInstanceId(parentProcessInstance.getId()).count()).isZero();
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTaskWithParameters.cmmn")
     public void testCaseTaskWithCaseNameAndBusinessKey() {
         Deployment deployment = processEngineRepositoryService.createDeployment()
