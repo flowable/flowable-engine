@@ -173,18 +173,21 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
-        // Need to be set before planning the complete operation
-        handleOutParameters(commandContext, planItemInstance);
-
         // load the case instance referenced by this case task plan item to check its current state
         CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getReferenceId());
 
-        // Triggering the plan item from a regular case complete (e.g. the referenced case did complete and hence is triggering its plan item
-        // to complete as well) must not terminate the referenced case as it is already completed
-        if (caseInstance.getState().equals(CaseInstanceState.ACTIVE)) {
-            // Triggering the plan item (as opposed to a regular complete of the referenced case) manually terminates the case instance
-            CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        if (caseInstance != null) {
+            // Out parameters are handled here only when the case is still active (manual trigger scenario).
+            // When the child case completed normally, out parameters are already handled
+            // in ChildCaseInstanceStateChangeCallback before the child case gets deleted.
+            handleOutParameters(commandContext, planItemInstance);
+
+            if (caseInstance.getState().equals(CaseInstanceState.ACTIVE)) {
+                // Triggering the plan item (as opposed to a regular complete of the referenced case) manually terminates the case instance
+                CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+            }
         }
+
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
 

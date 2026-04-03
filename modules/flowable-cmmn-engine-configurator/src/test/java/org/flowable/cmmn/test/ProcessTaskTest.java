@@ -905,6 +905,66 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+    public void testProcessTaskWithHumanTaskAndIOParameters() {
+        String inVar1Content = "First input value";
+        String inVar2Content = "Second input value";
+        String outVarContent = "Result from sub process";
+
+        // Start the parent case with 2 input variables
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("parentCaseWithHumanTaskAndSubProcess")
+                .variable("parentVar1", inVar1Content)
+                .variable("parentVar2", inVar2Content)
+                .start();
+
+        // Verify parent case has both a human task and a process task active
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .orderByName().asc()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getPlanItemDefinitionType)
+                .containsExactly(
+                        tuple("Parent Human Task", PlanItemDefinitionType.HUMAN_TASK),
+                        tuple("Sub Process", PlanItemDefinitionType.PROCESS_TASK)
+                );
+
+        // Verify the child process was started and received both input variables
+        PlanItemInstance processTaskPlanItemInstance = planItemInstances.get(1);
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+        ProcessInstance childProcessInstance = processEngineRuntimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        assertThat(childProcessInstance).isNotNull();
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "childVar1")).isEqualTo(inVar1Content);
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "childVar2")).isEqualTo(inVar2Content);
+
+        // Set a variable in the child process and complete the child task
+        Task childTask = processEngineTaskService.createTaskQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        assertThat(childTask).isNotNull();
+        processEngineRuntimeService.setVariable(processInstanceId, "childResult", outVarContent);
+        processEngineTaskService.complete(childTask.getId());
+
+        // Verify the out parameter variable is now available on the parent case
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "parentResult")).isEqualTo(outVarContent);
+
+        // Complete the parent human task
+        Task parentTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(parentTask.getName()).isEqualTo("Parent Human Task");
+        cmmnTaskService.complete(parentTask.getId());
+
+        // Verify the parent case has ended
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    @Test
+    @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testIOParameterCombinations() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testProcessTaskParameterExpressions")

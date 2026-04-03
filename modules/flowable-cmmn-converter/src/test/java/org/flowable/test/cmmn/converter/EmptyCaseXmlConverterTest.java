@@ -21,18 +21,11 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInfo;
 
 /**
  * @author Filip Hrisafov
  */
 public class EmptyCaseXmlConverterTest {
-
-    @BeforeEach
-    void setUp(TestInfo testInfo) {
-        System.out.println("Before: " + testInfo);
-    }
 
     @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/empty-case.cmmn")
     public void emptyCase(CmmnModel cmmnModel) {

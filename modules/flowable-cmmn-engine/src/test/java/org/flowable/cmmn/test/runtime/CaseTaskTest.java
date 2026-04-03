@@ -1072,6 +1072,78 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testCaseTaskWithHumanTaskAndIOParameters() {
+        String innerCaseDeploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+                .deploy()
+                .getId();
+
+        String inVar1Content = "First input value";
+        String inVar2Content = "Second input value";
+        String outVarContent = "Result from sub case";
+
+        // Start the parent case with 2 input variables
+        CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("parentCaseWithHumanTaskAndSubCase")
+                .variable("parentVar1", inVar1Content)
+                .variable("parentVar2", inVar2Content)
+                .start();
+
+        // Verify parent has both a human task and a case task active
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(parentCaseInstance.getId())
+                .planItemInstanceStateActive()
+                .orderByName().asc()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getPlanItemDefinitionType)
+                .containsExactly(
+                        tuple("Parent Human Task", PlanItemDefinitionType.HUMAN_TASK),
+                        tuple("Sub Case", PlanItemDefinitionType.CASE_TASK)
+                );
+
+        // Verify the child case was started and received both input variables
+        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .caseInstanceParentId(parentCaseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(childCaseInstance).isNotNull();
+        assertThat(childCaseInstance.getCaseVariables())
+                .containsEntry("childVar1", inVar1Content)
+                .containsEntry("childVar2", inVar2Content);
+        
+        cmmnRuntimeService.setVariable(childCaseInstance.getId(), "childResult", outVarContent);
+
+        // Complete the child human task with a variable that maps to the out parameter
+        Task childTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(childCaseInstance.getId())
+                .singleResult();
+        assertThat(childTask).isNotNull();
+        cmmnTaskService.complete(childTask.getId());
+
+        // Verify the child case has ended
+        assertCaseInstanceEnded(childCaseInstance);
+
+        // Verify the out parameter variable is now available on the parent case
+        Object parentResultValue = cmmnRuntimeService.getVariable(parentCaseInstance.getId(), "parentResult");
+        assertThat(parentResultValue).isEqualTo(outVarContent);
+
+        // Complete the parent human task
+        Task parentTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(parentCaseInstance.getId())
+                .singleResult();
+        assertThat(parentTask.getName()).isEqualTo("Parent Human Task");
+        cmmnTaskService.complete(parentTask.getId());
+
+        // Verify the parent case has ended
+        assertCaseInstanceEnded(parentCaseInstance);
+
+        cmmnRepositoryService.deleteDeployment(innerCaseDeploymentId, true);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testWithSpecifiedBusinessKey() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
