@@ -538,6 +538,25 @@ public class SignalEventTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources={"org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalStartEvent.bpmn20.xml"})
+    public void testDuplicatedSuspendedSignalStartEventFromProcess() {
+        repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
+
+        // An example of behavior when there is no subscription to the signal.
+        runtimeService.signalEventReceived("nonExisting");
+
+        // Starting the process that fires the signal should start 2 process
+        // instances that are listening on that signal. The suspended one is not included.
+        runtimeService.startProcessInstanceByKey("processWithSignalThrow");
+
+        // Verify
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().list()).extracting(Task::getName)
+                .containsExactlyInAnyOrder("Task in process B", "Task in process C");
+
+    }
+
+    @Test
     public void testSignalStartEventFromProcess() {
 
         // Deploy test processes
@@ -742,8 +761,12 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("throwSignal");
 
-        assertThat(createEventSubscriptionQuery().count()).isZero();
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(createEventSubscriptionQuery().count())
+                .as("Process definition is suspended and subscription is kept untouched despite of received signal.")
+                .isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().count())
+                .as("Process definition is suspended and process instance is kept untouched despite of received signal.")
+                .isEqualTo(1);
     }
 
     @Test
@@ -805,12 +828,13 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         repositoryService.suspendProcessDefinitionByKey("processWithSignalStart1");
 
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("processWithSignalThrow"))
-                .as("Suspended process definition should fail")
-                .isExactlyInstanceOf(FlowableException.class);
+        runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().list())
+                .as("Signal throw event is swallowed for suspended process")
+                .extracting(ProcessInstance::getProcessDefinitionKey)
+                .containsExactlyInAnyOrder("processWithSignalStart2","processWithSignalStart3");
 
         repositoryService.activateProcessDefinitionByKey("processWithSignalStart1");
 
@@ -819,8 +843,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("processWithSignalThrow");
 
         // Verify
-        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(3);
-        assertThat(taskService.createTaskQuery().count()).isEqualTo(3);
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(5);
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(5);
 
         // Cleanup
         cleanup();
