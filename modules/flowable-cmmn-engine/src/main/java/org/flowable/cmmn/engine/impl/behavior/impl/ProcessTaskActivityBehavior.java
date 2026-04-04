@@ -30,8 +30,10 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -131,8 +133,19 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                         planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration, createHistoricEntityLinks);
             }
 
-            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            try {
+                processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
+                        planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            } catch (BusinessError businessError) {
+                // An uncaught BusinessError from the child BPMN process propagates as a fault on this plan item.
+                // Clean up the orphaned child process instance (consistent with BPMN ErrorPropagation.executeCatch
+                // which deletes child processes when an error crosses a call activity boundary).
+                planItemInstanceEntity.setReferenceId(null);
+                planItemInstanceEntity.setReferenceType(null);
+                processInstanceService.deleteProcessInstance(processInstanceId);
+                FaultPropagation.propagateFault(businessError, commandContext, planItemInstanceEntity);
+                return;
+            }
 
         } else {
             processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),

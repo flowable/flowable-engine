@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.engine.delegate.CmmnFault;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
@@ -44,7 +44,7 @@ public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavi
         
         try {
             planItemJavaDelegate.execute(planItemInstanceEntity);
-        } catch (CmmnFault fault) {
+        } catch (BusinessError fault) {
             FaultPropagation.propagateFault(fault, commandContext, planItemInstanceEntity);
             return;
         }

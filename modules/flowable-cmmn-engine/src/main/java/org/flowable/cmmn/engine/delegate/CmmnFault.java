@@ -14,8 +14,7 @@ package org.flowable.cmmn.engine.delegate;
 
 import java.util.HashMap;
 
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 
@@ -30,49 +29,30 @@ import org.flowable.common.engine.impl.el.VariableContainerWrapper;
  *
  * @author Joram Barrez
  */
-public class CmmnFault extends FlowableException {
+public class CmmnFault extends BusinessError {
 
     private static final long serialVersionUID = 1L;
 
-    private String faultCode;
-    private VariableContainer additionalDataContainer;
-
     public CmmnFault(String faultCode) {
-        super("");
-        setFaultCode(faultCode);
+        super(faultCode);
     }
 
     public CmmnFault(String faultCode, String message) {
-        super(message);
-        setFaultCode(faultCode);
+        super(faultCode, message);
     }
 
-    protected void setFaultCode(String faultCode) {
-        if (faultCode == null) {
-            throw new FlowableIllegalArgumentException("Fault code must not be null.");
-        }
-        if (faultCode.isEmpty()) {
-            throw new FlowableIllegalArgumentException("Fault code must not be empty.");
-        }
-        this.faultCode = faultCode;
-    }
-
+    /**
+     * Returns the fault code. This is an alias for {@link #getErrorCode()}.
+     */
     public String getFaultCode() {
-        return faultCode;
+        return getErrorCode();
     }
 
-    public VariableContainer getAdditionalDataContainer() {
-        return additionalDataContainer;
-    }
-
-    public void setAdditionalDataContainer(VariableContainer additionalDataContainer) {
-        this.additionalDataContainer = additionalDataContainer;
-    }
-
+    @Override
     public void addAdditionalData(String name, Object value) {
-        if (this.additionalDataContainer == null) {
-            this.additionalDataContainer = new VariableContainerWrapper(new HashMap<>());
+        if (this.getAdditionalDataContainer() == null) {
+            this.setAdditionalDataContainer(new VariableContainerWrapper(new HashMap<>()));
         }
-        this.additionalDataContainer.setVariable(name, value);
+        this.getAdditionalDataContainer().setVariable(name, value);
     }
 }

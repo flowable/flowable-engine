@@ -25,8 +25,10 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  * Operation that moves a plan item instance to the {@link PlanItemInstanceState#FAILED} state
  * via the {@link PlanItemTransition#FAULT} transition.
  *
- * Unlike terminate/exit, the fault transition does NOT propagate to children.
- * Children remain in whatever state they are in (non-propagating per CMMN 1.1 spec).
+ * For tasks: children are NOT affected (non-propagating per CMMN 1.1 spec).
+ * For stages (when the fault propagates to a stage with a catching sentry): children are
+ * terminated via exitChildPlanItemInstances, since the stage is ending as a scope —
+ * consistent with BPMN where a subprocess is cleaned up when a boundary error event catches an error.
  *
  * @author Joram Barrez
  */
@@ -63,6 +65,12 @@ public class FailPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
 
     @Override
     protected void internalExecute() {
+        // When a stage faults (because a fault propagated through it and was caught at the parent level),
+        // its children must be terminated — the scope is ending, consistent with BPMN subprocess cleanup.
+        if (isStage(planItemInstanceEntity)) {
+            exitChildPlanItemInstances(PlanItemTransition.FAULT, null, null);
+        }
+
         planItemInstanceEntity.setEndedTime(getCurrentTime(commandContext));
         planItemInstanceEntity.setFailedTime(planItemInstanceEntity.getEndedTime());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceFailed(planItemInstanceEntity);

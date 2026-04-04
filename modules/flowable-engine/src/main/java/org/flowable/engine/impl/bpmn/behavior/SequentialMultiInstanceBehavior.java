@@ -18,7 +18,7 @@ import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -123,7 +123,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
                 executeOriginalBehavior(execution, multiInstanceRootExecution, loopCounter);
             }
 
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             // re-throw business fault so that it can be caught by an Error
             // Intermediate Event or Error Event Sub-Process in the process
             throw error;

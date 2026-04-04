@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -90,27 +91,12 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testFaultWithoutSentry() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        // No fault sentry exists → BusinessError re-thrown (like BPMN when no boundary event catches)
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testFaultNoSentry")
                 .variable("faultCode", "SOME_ERROR")
-                .start();
-
-        // A should be FAILED
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.FAILED)
-                .includeEnded()
-                .list())
-                .extracting(PlanItemInstance::getName)
-                .containsExactly("A");
-
-        // B should still be active (human task, no dependency on A)
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("B");
-
-        // Complete B -> case completes (A is in terminal state FAILED)
-        cmmnTaskService.complete(tasks.get(0).getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+                .start())
+                .isInstanceOf(BusinessError.class);
     }
 
     @Test
@@ -124,31 +110,14 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment
-    public void testNonPropagationChildrenUnaffected() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/FaultTransitionTest.testNonPropagationChildrenUnaffected.cmmn")
+    public void testUncaughtFaultInStageRethrows() {
+        // Stage has no fault sentry, nothing catches at any level → BusinessError re-thrown
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testNonPropagation")
                 .variable("faultCode", "BUSINESS_ERROR")
-                .start();
-
-        // A should be FAILED
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.FAILED)
-                .includeEnded()
-                .list())
-                .extracting(PlanItemInstance::getName)
-                .containsExactly("A");
-
-        // B and C should still be ACTIVE (not terminated)
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C");
-
-        // Complete both -> stage should complete (A=FAILED is terminal, B=COMPLETED, C=COMPLETED)
-        for (Task task : tasks) {
-            cmmnTaskService.complete(task.getId());
-        }
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+                .start())
+                .isInstanceOf(BusinessError.class);
     }
 
     @Test
@@ -225,31 +194,15 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
-    // Required plan item faults -> stage should still be able to complete
+    // Required plan item faults with no fault sentry -> BusinessError re-thrown
     @Test
     @CmmnDeployment
     public void testRequiredPlanItemFaults() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testRequiredFault")
                 .variable("faultCode", "BUSINESS_ERROR")
-                .start();
-
-        // A (required) should be FAILED
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.FAILED)
-                .includeEnded()
-                .list())
-                .extracting(PlanItemInstance::getName)
-                .containsExactly("A");
-
-        // B should still be active
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
-        assertThat(tasks).extracting(Task::getName).containsExactly("B");
-
-        // Complete B -> stage should complete because A is in terminal state FAILED (even though required)
-        cmmnTaskService.complete(tasks.get(0).getId());
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+                .start())
+                .isInstanceOf(BusinessError.class);
     }
 
     @Test
@@ -260,6 +213,73 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
                 .start();
 
         // Script task A should be FAILED
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.FAILED)
+                .includeEnded()
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+
+        // B should be active (fault sentry fired)
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B");
+
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    // Fault sentry crosses stage boundaries — sentry at outer level references task inside a stage
+    @Test
+    @CmmnDeployment
+    public void testFaultCaughtAcrossStageBoundary() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testFaultAcrossStageBoundary")
+                .variable("faultCode", "BUSINESS_ERROR")
+                .start();
+
+        // A faults inside Stage S, C at the outer level has a fault sentry on A → C activates
+        // B inside the stage is unaffected (still active)
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C");
+
+        // Complete both → stage completes (A=FAILED + B=COMPLETED) → case completes
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    // Fault caught at task level inside a stage → stage stays ACTIVE, siblings unaffected
+    @Test
+    @CmmnDeployment
+    public void testFaultCaughtInsideStageDoesNotAffectStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testFaultCaughtInsideStage")
+                .variable("faultCode", "BUSINESS_ERROR")
+                .start();
+
+        // A faults, B catches it (fault sentry on A). C is unaffected sibling.
+        // Stage should stay ACTIVE — fault was caught locally.
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B", "C");
+
+        // Complete B and C → stage completes → case completes
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    // Non-CmmnFault BusinessError (e.g. BpmnError) thrown from CMMN service task → plan item should still fault
+    @Test
+    @CmmnDeployment
+    public void testNonCmmnFaultBusinessErrorTriggersFault() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testBusinessError")
+                .start();
+
+        // A threw a BusinessError subclass (not CmmnFault, e.g. BpmnError) → should still trigger the fault transition
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.FAILED)

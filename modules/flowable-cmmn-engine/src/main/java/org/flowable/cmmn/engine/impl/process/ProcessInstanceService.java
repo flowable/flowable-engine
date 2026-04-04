@@ -70,6 +70,12 @@ public interface ProcessInstanceService {
     void triggerCaseTask(String executionId, Map<String, Object> variables);
 
     /**
+     * Propagates an uncaught business error from a child case instance to the parent BPMN execution.
+     * This triggers BPMN error propagation (boundary error events) on the CaseTask.
+     */
+    void handleCaseTaskError(String executionId, String errorCode);
+
+    /**
      * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.
      */
     List<IOParameter> getOutputParametersOfCaseTask(String executionId);

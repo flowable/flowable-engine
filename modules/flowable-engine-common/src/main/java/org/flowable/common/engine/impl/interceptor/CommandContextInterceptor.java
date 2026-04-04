@@ -108,6 +108,14 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
             commandContext.exception(e);
 
+            // When the command context is reused (nested engine call), the result that was pushed
+            // for this command will never be consumed via getResult() since the normal flow is
+            // short-circuited by the exception. Pop it to keep the result stack balanced
+            // for the parent command.
+            if (contextReused) {
+                commandContext.getResult();
+            }
+
         } finally {
             try {
                 if (!contextReused) {

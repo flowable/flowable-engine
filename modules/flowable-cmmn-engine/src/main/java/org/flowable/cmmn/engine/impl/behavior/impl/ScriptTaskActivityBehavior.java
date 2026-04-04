@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.flowable.cmmn.engine.delegate.CmmnFault;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.FaultPropagation;
@@ -79,7 +79,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
         } catch (FlowableException e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof CmmnFault cmmnFault) {
+            if (rootCause instanceof BusinessError cmmnFault) {
                 FaultPropagation.propagateFault(cmmnFault, commandContext, planItemInstanceEntity);
                 return;
             } else if (rootCause instanceof FlowableException) {
