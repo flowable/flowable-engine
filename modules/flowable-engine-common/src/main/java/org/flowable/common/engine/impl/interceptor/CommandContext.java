@@ -414,6 +414,10 @@ public class CommandContext {
     public void setResult(Object result) {
         resultStack.add(result);
     }
+
+    public int getResultStackSize() {
+        return resultStack.size();
+    }
     
     public long getStartTime() {
         return startTime;
