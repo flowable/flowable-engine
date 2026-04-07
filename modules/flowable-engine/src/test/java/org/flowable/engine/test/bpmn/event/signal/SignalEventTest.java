@@ -761,12 +761,8 @@ public class SignalEventTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("throwSignal");
 
-        assertThat(createEventSubscriptionQuery().count())
-                .as("Process definition is suspended and subscription is kept untouched despite of received signal.")
-                .isEqualTo(1);
-        assertThat(runtimeService.createProcessInstanceQuery().count())
-                .as("Process definition is suspended and process instance is kept untouched despite of received signal.")
-                .isEqualTo(1);
+        assertThat(createEventSubscriptionQuery().count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();
     }
 
     @Test
