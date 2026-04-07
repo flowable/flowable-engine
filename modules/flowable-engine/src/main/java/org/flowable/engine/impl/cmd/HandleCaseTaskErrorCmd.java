@@ -27,6 +27,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 /**
  * Handles an uncaught {@link BusinessError} from a child CMMN case instance
  * by propagating it as a BPMN error on the parent CaseTask execution.
+ * The full BusinessError is passed through so that error data (code, message,
+ * additional data) is preserved for boundary error event variable mapping.
  *
  * @author Joram Barrez
  */
@@ -35,17 +37,17 @@ public class HandleCaseTaskErrorCmd implements Command<Void>, Serializable {
     private static final long serialVersionUID = 1L;
 
     protected String executionId;
-    protected String errorCode;
+    protected BusinessError error;
 
-    public HandleCaseTaskErrorCmd(String executionId, String errorCode) {
+    public HandleCaseTaskErrorCmd(String executionId, BusinessError error) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("executionId is null");
         }
-        if (errorCode == null) {
-            throw new FlowableIllegalArgumentException("errorCode is null");
+        if (error == null) {
+            throw new FlowableIllegalArgumentException("error is null");
         }
         this.executionId = executionId;
-        this.errorCode = errorCode;
+        this.error = error;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class HandleCaseTaskErrorCmd implements Command<Void>, Serializable {
             throw new FlowableException("No execution could be found for id " + executionId);
         }
 
-        ErrorPropagation.propagateError(errorCode, execution);
+        ErrorPropagation.propagateError(error, execution);
         return null;
     }
 }

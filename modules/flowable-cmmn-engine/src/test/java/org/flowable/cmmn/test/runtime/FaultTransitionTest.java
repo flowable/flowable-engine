@@ -271,6 +271,37 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
+    @Test
+    @CmmnDeployment
+    public void testTaskListenerThrowsFaultOnComplete() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testListenerFault")
+                .start();
+
+        // A should be active (human task)
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("A");
+
+        // Complete A → task listener throws CmmnFault → A goes to FAILED → B activates
+        cmmnTaskService.complete(tasks.get(0).getId());
+
+        // A should be FAILED
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.FAILED)
+                .includeEnded()
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+
+        // B should be active (fault sentry fired)
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B");
+
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
     // Non-CmmnFault BusinessError (e.g. BpmnError) thrown from CMMN service task → plan item should still fault
     @Test
     @CmmnDeployment

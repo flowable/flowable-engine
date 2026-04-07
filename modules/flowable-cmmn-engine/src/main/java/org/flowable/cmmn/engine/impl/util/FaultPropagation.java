@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.common.engine.api.delegate.BusinessError;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -47,26 +46,16 @@ import org.flowable.cmmn.model.SentryOnPart;
 public class FaultPropagation {
 
     public static void propagateFault(BusinessError fault, CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        // Store fault info as transient variables so they're available during sentry evaluation
-        planItemInstanceEntity.setTransientVariable("faultCode", fault.getErrorCode());
-        if (fault.getMessage() != null && !fault.getMessage().isEmpty()) {
-            planItemInstanceEntity.setTransientVariable("faultMessage", fault.getMessage());
-        }
-
-        // If additional data was provided, store each entry as a transient variable
-        VariableContainer additionalDataContainer = fault.getAdditionalDataContainer();
-        if (additionalDataContainer != null) {
-            for (String name : additionalDataContainer.getVariableNames()) {
-                planItemInstanceEntity.setTransientVariable(name, additionalDataContainer.getVariable(name));
-            }
-        }
+        // The BusinessError is carried on the PlanItemLifeCycleEvent and resolved via
+        // CmmnFaultVariableContainer during sentry if-part evaluation — similar to BPMN's BpmnErrorVariableContainer.
 
         // Check if any plan item in the case has a fault sentry on this plan item.
         // Uses the parser-built dependency graph (entryDependentPlanItems) to avoid
         // walking the entire plan item instance tree at runtime.
         if (isFaultCaught(planItemInstanceEntity)) {
-            // Fault is caught — fail the task and let the standard sentry evaluation fire
-            CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity);
+            // Fault is caught — fail the task (passing the BusinessError for sentry evaluation)
+            // and let the standard sentry evaluation fire
+            CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity, fault);
         } else {
             // No sentry catches this fault.
             // If the case has a parent engine (started via CaseTask/ProcessTask), propagate the error.
@@ -86,7 +75,7 @@ public class FaultPropagation {
                         callback.onError(callbackData, fault);
                     }
                     // Fail the plan item (the error was handled by the parent engine)
-                    CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity);
+                    CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity, fault);
                     return;
                 }
             }

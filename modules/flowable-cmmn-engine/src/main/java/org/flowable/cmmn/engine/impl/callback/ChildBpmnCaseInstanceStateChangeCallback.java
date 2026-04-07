@@ -96,7 +96,7 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
-        processInstanceService.handleCaseTaskError(callbackData.getCallbackId(), error.getErrorCode());
+        processInstanceService.handleCaseTaskError(callbackData.getCallbackId(), error);
     }
 
 }

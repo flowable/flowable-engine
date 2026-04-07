@@ -16,9 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
@@ -34,8 +36,24 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
  */
 public class FailPlanItemInstanceOperation extends AbstractMovePlanItemInstanceToTerminalStateOperation {
 
+    protected BusinessError businessError;
+
     public FailPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
+    }
+
+    public FailPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, BusinessError businessError) {
+        super(commandContext, planItemInstanceEntity);
+        this.businessError = businessError;
+    }
+
+    @Override
+    protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
+        PlanItemLifeCycleEvent event = super.createPlanItemLifeCycleEvent();
+        if (businessError != null) {
+            event.setBusinessError(businessError);
+        }
+        return event;
     }
 
     @Override

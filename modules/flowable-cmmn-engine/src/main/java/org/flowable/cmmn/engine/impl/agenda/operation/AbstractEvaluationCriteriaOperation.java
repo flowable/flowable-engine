@@ -39,6 +39,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnFaultVariableContainer;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
@@ -716,9 +717,18 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        try { 
+
+        // When the lifecycle event carries fault data, wrap the variable container with CmmnFaultVariableContainer
+        // so that fault-specific variables (faultCode, faultMessage, error) are available for if-part expression
+        // resolution without polluting the actual variable scope. This is analogous to BPMN's BpmnErrorVariableContainer.
+        VariableContainer resolveContainer = variableContainer;
+        if (planItemLifeCycleEvent != null && planItemLifeCycleEvent.getBusinessError() != null) {
+            resolveContainer = new CmmnFaultVariableContainer(planItemLifeCycleEvent.getBusinessError(), variableContainer);
+        }
+
+        try {
             Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
-            Object result = conditionExpression.getValue(variableContainer);
+            Object result = conditionExpression.getValue(resolveContainer);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
