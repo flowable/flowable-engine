@@ -94,6 +94,10 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         }
 
 
+        // Record the result stack depth before execution so we can detect if the nested command
+        // pushed a result that needs to be cleaned up on exception.
+        int resultStackDepthBeforeExecution = contextReused ? commandContext.getResultStackSize() : 0;
+
         try {
             // Push the current engine configuration key to a stack
             // shared between nested calls that reuse the command context
@@ -107,6 +111,15 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         } catch (Throwable e) {
 
             commandContext.exception(e);
+
+            // When the command context is reused (nested engine call) and the command pushed a result
+            // before throwing, that result will never be consumed via getResult() since the normal flow
+            // is short-circuited by the exception. Pop it to keep the result stack balanced for the
+            // parent command. Only pop if the stack actually grew (the command may have thrown before
+            // pushing a result).
+            if (contextReused && commandContext.getResultStackSize() > resultStackDepthBeforeExecution) {
+                commandContext.getResult();
+            }
 
         } finally {
             try {

@@ -46,7 +46,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
@@ -146,7 +146,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
             try {
                 nrOfInstances = createInstances(delegateExecution);
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             }
 
@@ -173,7 +173,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             rootExecution = getMultiInstanceRootExecution(execution);
             CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
                     .executeExecutionListeners(activity, rootExecution, ExecutionListener.EVENTNAME_END);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             ErrorPropagation.propagateError(error, rootExecution);
             return;
         }

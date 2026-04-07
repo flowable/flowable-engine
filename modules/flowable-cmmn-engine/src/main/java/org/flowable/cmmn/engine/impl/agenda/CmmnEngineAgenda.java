@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.impl.agenda.Agenda;
 
 /**
@@ -77,6 +78,10 @@ public interface CmmnEngineAgenda extends Agenda {
     void planSuspendPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType);
+
+    void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, BusinessError businessError);
 
     void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
     

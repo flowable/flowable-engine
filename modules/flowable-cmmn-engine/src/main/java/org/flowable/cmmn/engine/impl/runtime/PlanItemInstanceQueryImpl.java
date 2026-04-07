@@ -68,6 +68,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Date completedAfter;
     protected Date terminatedBefore;
     protected Date terminatedAfter;
+    protected Date failedBefore;
+    protected Date failedAfter;
     protected Date occurredBefore;
     protected Date occurredAfter;
     protected Date exitBefore;
@@ -583,6 +585,32 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             this.currentOrQueryObject.terminatedAfter = terminatedAfter;
         } else {
             this.terminatedAfter = terminatedAfter;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceFailedBefore(Date failedBefore) {
+        if (failedBefore == null) {
+            throw new FlowableIllegalArgumentException("failedBefore is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedBefore = failedBefore;
+        } else {
+            this.failedBefore = failedBefore;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceFailedAfter(Date failedAfter) {
+        if (failedAfter == null) {
+            throw new FlowableIllegalArgumentException("failedAfter is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedAfter = failedAfter;
+        } else {
+            this.failedAfter = failedAfter;
         }
         return this;
     }
@@ -1279,6 +1307,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public Date getTerminatedAfter() {
         return terminatedAfter;
+    }
+    public Date getFailedBefore() {
+        return failedBefore;
+    }
+    public Date getFailedAfter() {
+        return failedAfter;
     }
     public Date getOccurredBefore() {
         return occurredBefore;

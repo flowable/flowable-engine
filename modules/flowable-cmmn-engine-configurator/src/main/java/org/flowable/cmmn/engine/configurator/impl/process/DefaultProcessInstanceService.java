@@ -25,6 +25,8 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.common.engine.api.delegate.BusinessError;
+import org.flowable.engine.impl.cmd.HandleCaseTaskErrorCmd;
 import org.flowable.engine.impl.cmd.TriggerCaseTaskCmd;
 import org.flowable.engine.impl.persistence.entity.BpmnEngineEntityConstants;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -109,6 +111,11 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     @Override
     public void triggerCaseTask(String executionId, Map<String, Object> variables) {
         processEngineConfiguration.getCommandExecutor().execute(new TriggerCaseTaskCmd(executionId, variables));
+    }
+
+    @Override
+    public void handleCaseTaskError(String executionId, BusinessError error) {
+        processEngineConfiguration.getCommandExecutor().execute(new HandleCaseTaskErrorCmd(executionId, error));
     }
     
     @Override

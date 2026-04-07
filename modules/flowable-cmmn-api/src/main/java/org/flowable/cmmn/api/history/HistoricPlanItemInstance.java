@@ -63,6 +63,8 @@ public interface HistoricPlanItemInstance {
 
     Date getTerminatedTime();
 
+    Date getFailedTime();
+
     Date getExitTime();
 
     Date getEndedTime();

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.criteria;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.common.engine.api.delegate.BusinessError;
 
 /**
  * Internal class used during criteria evaluation.
@@ -24,7 +25,8 @@ public class PlanItemLifeCycleEvent {
 
     protected PlanItemInstanceEntity planItemInstanceEntity;
     protected String transition;
-    
+    protected BusinessError businessError;
+
     public PlanItemLifeCycleEvent(PlanItemInstanceEntity planItemInstanceEntity, String transition) {
         this.planItemInstanceEntity = planItemInstanceEntity;
         this.transition = transition;
@@ -40,6 +42,14 @@ public class PlanItemLifeCycleEvent {
 
     public String getTransition() {
         return transition;
+    }
+
+    public BusinessError getBusinessError() {
+        return businessError;
+    }
+
+    public void setBusinessError(BusinessError businessError) {
+        this.businessError = businessError;
     }
 
     @Override

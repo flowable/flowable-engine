@@ -25,10 +25,11 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
@@ -151,8 +152,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
         }
@@ -205,8 +206,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                return;
             }
         }
@@ -295,7 +296,7 @@ public class ContinueProcessOperation extends AbstractOperation {
             } else {
                 activityBehavior.execute(execution);
             }
-            
+
         } catch (RuntimeException e) {
             if (LogMDC.isMDCEnabled()) {
                 LogMDC.putMDCExecution(execution);
@@ -311,8 +312,8 @@ public class ContinueProcessOperation extends AbstractOperation {
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_START);
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_TAKE);
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_END);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
         }
