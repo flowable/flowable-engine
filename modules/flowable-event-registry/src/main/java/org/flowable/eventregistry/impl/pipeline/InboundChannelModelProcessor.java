@@ -240,6 +240,8 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
         if (channelEventTenantIdDetection != null) {
             if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getFixedValue())) {
                 eventTenantDetector = new InboundEventStaticTenantDetector<>(channelEventTenantIdDetection.getFixedValue());
+            } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getXmlXPathExpression())) {
+                eventTenantDetector = new XpathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getXmlXPathExpression());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getxPathExpression())) {
                 eventTenantDetector = new XpathBasedInboundEventTenantDetector(channelEventTenantIdDetection.getxPathExpression());
             } else if (StringUtils.isNotEmpty(channelEventTenantIdDetection.getDelegateExpression())) {
@@ -248,7 +250,7 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             } else {
                 throw new FlowableException(
                     "The channel xml tenant detection value was not found for the channel model with key " + channelModel.getKey()
-                        + ". One of fixedValue, xPathExpression, delegateExpression should be set.");
+                        + ". One of fixedValue, xmlPathExpression (or xPathExpression), delegateExpression should be set.");
             }
         }
 
