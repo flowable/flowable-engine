@@ -98,6 +98,12 @@ public class FailPlanItemInstanceOperation extends AbstractMovePlanItemInstanceT
     protected Map<String, String> getAsyncLeaveTransitionMetadata() {
         Map<String, String> metadata = new HashMap<>();
         metadata.put(OperationSerializationMetadata.FIELD_PLAN_ITEM_INSTANCE_ID, planItemInstanceEntity.getId());
+        if (businessError != null) {
+            metadata.put(OperationSerializationMetadata.FIELD_ERROR_CODE, businessError.getErrorCode());
+            if (businessError.getMessage() != null) {
+                metadata.put(OperationSerializationMetadata.FIELD_ERROR_MESSAGE, businessError.getMessage());
+            }
+        }
         return metadata;
     }
 

@@ -302,6 +302,44 @@ public class FaultTransitionTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
     }
 
+    // Async leave with fault: error data (faultCode) must be preserved through the async job
+    @Test
+    @CmmnDeployment
+    public void testAsyncLeaveFaultPreservesErrorData() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testAsyncLeaveFault")
+                .variable("faultCode", "ASYNC_ERROR")
+                .start();
+
+        // A should be in ASYNC_ACTIVE_LEAVE state (async leave configured)
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ASYNC_ACTIVE_LEAVE)
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+
+        // Execute the async job
+        waitForJobExecutorToProcessAllJobs();
+
+        // A should be FAILED (fault transition completed via async job)
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.FAILED)
+                .includeEnded()
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+
+        // B should be active — the sentry if-part ${faultCode == 'ASYNC_ERROR'} matched
+        // because the error data was preserved through the async job serialization
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(tasks).extracting(Task::getName).containsExactly("B");
+
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
     // Non-CmmnFault BusinessError (e.g. BpmnError) thrown from CMMN service task → plan item should still fault
     @Test
     @CmmnDeployment
