@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
@@ -87,6 +88,15 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
             
             processInstanceService.triggerCaseTask(callbackData.getCallbackId(), variables);
         }
+    }
+
+    @Override
+    public void onError(CallbackData callbackData, BusinessError error) {
+        // An uncaught BusinessError from a child CMMN case propagates as a BPMN error on the parent CaseTask.
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+        processInstanceService.handleCaseTaskError(callbackData.getCallbackId(), error);
     }
 
 }

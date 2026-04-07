@@ -394,6 +394,17 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceFailed(PlanItemInstanceEntity planItemInstanceEntity) {
+        Date failedTime = planItemInstanceEntity.getFailedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, failedTime,
+            h -> {
+                h.setEndedTime(failedTime);
+                h.setFailedTime(failedTime);
+                h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
+            });
+    }
+
+    @Override
     public void recordPlanItemInstanceOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
         Date occurredTime = planItemInstanceEntity.getOccurredTime();
         recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, occurredTime,

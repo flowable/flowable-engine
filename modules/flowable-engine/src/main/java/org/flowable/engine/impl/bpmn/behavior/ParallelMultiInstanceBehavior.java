@@ -26,7 +26,7 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
@@ -199,8 +199,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         try {
             callActivityEndListeners(execution);
-        } catch (BpmnError bpmnError) {
-            ErrorPropagation.propagateError(bpmnError, execution);
+        } catch (BusinessError businessError) {
+            ErrorPropagation.propagateError(businessError, execution);
             return;
         }
 

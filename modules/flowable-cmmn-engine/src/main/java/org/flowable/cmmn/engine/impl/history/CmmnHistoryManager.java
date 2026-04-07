@@ -97,6 +97,8 @@ public interface CmmnHistoryManager {
 
     void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void recordPlanItemInstanceFailed(PlanItemInstanceEntity planItemInstanceEntity);
+
     void recordPlanItemInstanceExit(PlanItemInstanceEntity planItemInstanceEntity);
     
     void updateCaseDefinitionIdInHistory(CaseDefinition caseDefinition, CaseInstanceEntity caseInstance);

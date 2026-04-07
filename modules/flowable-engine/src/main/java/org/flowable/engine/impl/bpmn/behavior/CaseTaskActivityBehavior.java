@@ -20,12 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
@@ -116,8 +118,16 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
                     caseInstanceId, ScopeTypes.CMMN, createHistoricEntityLinks);
         }
 
-        caseInstanceService.startCaseInstance(caseDefinitionId, caseInstanceId,
-                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), inParameters);
+        try {
+            caseInstanceService.startCaseInstance(caseDefinitionId, caseInstanceId,
+                    caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), inParameters);
+        } catch (BusinessError businessError) {
+            // An uncaught BusinessError from the child CMMN case propagates as a BPMN error.
+            // Clean up the orphaned child case instance, then propagate.
+            caseInstanceService.deleteCaseInstanceWithoutAgenda(caseInstanceId);
+            ErrorPropagation.propagateError(businessError, execution);
+            return;
+        }
 
         // Bidirectional storing of reference to avoid queries later on
         executionEntity.setReferenceId(caseInstanceId);

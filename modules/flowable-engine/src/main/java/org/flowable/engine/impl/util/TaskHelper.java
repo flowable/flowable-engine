@@ -34,7 +34,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -112,11 +112,11 @@ public class TaskHelper {
         boolean bpmnErrorPropagated = false;
         try {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
-        } catch (BpmnError bpmnError) {
+        } catch (BusinessError businessError) {
             if (taskEntity.getExecutionId() != null) {
                 ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId());
                 if (execution != null) {
-                    ErrorPropagation.propagateError(bpmnError, execution);
+                    ErrorPropagation.propagateError(businessError, execution);
                     bpmnErrorPropagated = true;
                 }
             }
@@ -443,10 +443,10 @@ public class TaskHelper {
                 try {
                     CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper()
                             .executeTaskListeners(task, TaskListener.EVENTNAME_DELETE);
-                } catch (BpmnError bpmnError) {
+                } catch (BusinessError businessError) {
                     ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager().findById(task.getExecutionId());
                     if (execution != null) {
-                        ErrorPropagation.propagateError(bpmnError, execution);
+                        ErrorPropagation.propagateError(businessError, execution);
                     }
                 }
             }
@@ -735,7 +735,7 @@ public class TaskHelper {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         try {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_ASSIGNMENT);
-        } catch (BpmnError e) {
+        } catch (BusinessError e) {
             ErrorPropagation.propagateError(e, CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getExecutionId()));
         }
 

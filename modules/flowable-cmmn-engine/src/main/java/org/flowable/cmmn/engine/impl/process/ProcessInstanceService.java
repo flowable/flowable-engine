@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.model.IOParameter;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.form.api.FormInfo;
 
 /**
@@ -68,6 +69,12 @@ public interface ProcessInstanceService {
      * Triggers a case instance that was started by a process instance.
      */
     void triggerCaseTask(String executionId, Map<String, Object> variables);
+
+    /**
+     * Propagates an uncaught business error from a child case instance to the parent BPMN execution.
+     * This triggers BPMN error propagation (boundary error events) on the CaseTask.
+     */
+    void handleCaseTaskError(String executionId, BusinessError error);
 
     /**
      * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.

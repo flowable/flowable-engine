@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '8.0.0.0', 1);
+values ('common.schema.version', '8.1.0.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -583,7 +583,7 @@ create table ACT_RU_EVENT_SUBSCR (
     EVENT_NAME_ nvarchar(255),
     EXECUTION_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
-    ACTIVITY_ID_ nvarchar(64),
+    ACTIVITY_ID_ nvarchar(255),
     CONFIGURATION_ nvarchar(255),
     CREATED_ datetime not null,
     PROC_DEF_ID_ nvarchar(64),

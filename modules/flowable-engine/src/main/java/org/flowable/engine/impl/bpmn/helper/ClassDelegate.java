@@ -25,7 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -195,7 +195,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         try {
             activityBehaviorInstance.execute(execution);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             ErrorPropagation.propagateError(error, execution);
         } catch (RuntimeException e) {
             if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
@@ -217,7 +217,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                 if (triggerable && context.shouldLeave()) {
                     leave(execution);
                 }
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             } catch (RuntimeException e) {
                 if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
@@ -230,7 +230,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                 if (triggerable) {
                     leave(execution);
                 }
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             } catch (RuntimeException e) {
                 if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {

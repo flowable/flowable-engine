@@ -33,7 +33,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
@@ -164,8 +164,8 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             if (shouldExecuteEndListeners(flowNode)) {
                 try {
                     executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
-                } catch (BpmnError bpmnError) {
-                    ErrorPropagation.propagateError(bpmnError, execution);
+                } catch (BusinessError businessError) {
+                    ErrorPropagation.propagateError(businessError, execution);
                     // We don't return here immediately, because the activity needs to be ended properly and the event dispatched
                     continueNormally = false;
                 }
