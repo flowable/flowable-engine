@@ -85,7 +85,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Content is not supported',"
-                        + "  exception: 'other test content not supported'"
+                        + "  exception: '${json-unit.regex}Content is not supported[.] Error ID: .+'"
                         + "}");
 
     }
@@ -122,7 +122,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Conflict',"
-                        + "  exception: 'task already exists'"
+                        + "  exception: '${json-unit.regex}Conflict[.] Error ID: .+'"
                         + "}");
 
     }
@@ -159,7 +159,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Not found',"
-                        + "  exception: 'task not found'"
+                        + "  exception: '${json-unit.regex}Not found[.] Error ID: .+'"
                         + "}");
 
     }
@@ -196,7 +196,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Forbidden',"
-                        + "  exception: 'no access to task'"
+                        + "  exception: '${json-unit.regex}Forbidden[.] Error ID: .+'"
                         + "}");
 
     }
@@ -233,7 +233,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Bad request',"
-                        + "  exception: 'task name is mandatory'"
+                        + "  exception: '${json-unit.regex}Illegal argument[.] Error ID: .+'"
                         + "}");
 
     }
@@ -270,7 +270,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Bad request',"
-                        + "  exception: 'task not active'"
+                        + "  exception: '${json-unit.regex}Illegal state[.] Error ID: .+'"
                         + "}");
 
     }
@@ -307,7 +307,7 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Task was already claimed',"
-                        + "  exception: \"Task 'task-2' is already claimed by someone else.\""
+                        + "  exception: '${json-unit.regex}Task was already claimed[.] Error ID: .+'"
                         + "}");
 
     }
@@ -344,10 +344,8 @@ class BaseExceptionHandlerAdviceTest {
         assertThatJson(body)
                 .isEqualTo("{"
                         + "  message: 'Internal server error',"
-                        + "  exception: '${json-unit.any-string}'"
+                        + "  exception: '${json-unit.regex}Error with ID: .+'"
                         + "}");
-        assertThatJson(body)
-                .inPath("exception").asString().startsWith("Error with ID: ");
     }
 
     @RestController
