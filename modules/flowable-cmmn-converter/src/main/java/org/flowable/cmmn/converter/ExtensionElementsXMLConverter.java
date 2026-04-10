@@ -327,8 +327,10 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
     protected IOParameter readIoParameter(XMLStreamReader xtr) {
         String source = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE);
         String sourceExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
+        String sourceType = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_SOURCE_TYPE);
         String target = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET);
         String targetExpression = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION);
+        String targetType = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TARGET_TYPE);
         String isTransient = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IOPARAMETER_TRANSIENT);
 
         IOParameter parameter = new IOParameter();
@@ -339,10 +341,18 @@ public class ExtensionElementsXMLConverter extends CaseElementXmlConverter {
             parameter.setSource(source);
         }
 
+        if (StringUtils.isNotEmpty(sourceType)) {
+            parameter.setSourceType(sourceType);
+        }
+
         if (StringUtils.isNotEmpty(targetExpression)) {
             parameter.setTargetExpression(targetExpression);
         } else {
             parameter.setTarget(target);
+        }
+
+        if (StringUtils.isNotEmpty(targetType)) {
+            parameter.setTargetType(targetType);
         }
 
         if (StringUtils.isNotEmpty(isTransient)) {

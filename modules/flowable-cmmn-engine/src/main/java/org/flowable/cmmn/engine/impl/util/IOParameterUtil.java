@@ -22,8 +22,11 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.JsonUtil;
+import org.flowable.common.engine.impl.util.VariableValueConversionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -62,7 +65,7 @@ public class IOParameterUtil {
             } else {
                 value = sourceContainer.getVariable(parameter.getSource());
             }
-            
+
             if (value != null) {
                 value = JsonUtil.deepCopyIfJson(value);
             }
@@ -82,6 +85,19 @@ public class IOParameterUtil {
             } else if (StringUtils.isNotEmpty(parameter.getTarget())) {
                 variableName = parameter.getTarget();
 
+            }
+
+            // Apply type conversion if a target type (for in parameters) or source type (for out parameters) is specified
+            String conversionType = null;
+            if (StringUtils.isNotEmpty(parameter.getTargetType())) {
+                conversionType = parameter.getTargetType();
+            } else if (StringUtils.isNotEmpty(parameter.getSourceType())) {
+                conversionType = parameter.getSourceType();
+            }
+
+            if (conversionType != null && value != null) {
+                ObjectMapper objectMapper = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper();
+                value = VariableValueConversionUtil.convertValue(value, conversionType, objectMapper);
             }
 
             if (parameter.isTransient()) {

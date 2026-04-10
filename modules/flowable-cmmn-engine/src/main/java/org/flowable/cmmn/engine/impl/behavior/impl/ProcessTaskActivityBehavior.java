@@ -38,6 +38,7 @@ import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.VariableValueConversionUtil;
 import org.flowable.form.api.FormInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,6 +251,19 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                 variableValue = processInstanceService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
 
             }
+
+            String conversionType = null;
+            if (StringUtils.isNotEmpty(outParameter.getTargetType())) {
+                conversionType = outParameter.getTargetType();
+            } else if (StringUtils.isNotEmpty(outParameter.getSourceType())) {
+                conversionType = outParameter.getSourceType();
+            }
+
+            if (conversionType != null && variableValue != null) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+                variableValue = VariableValueConversionUtil.convertValue(variableValue, conversionType, cmmnEngineConfiguration.getObjectMapper());
+            }
+
             planItemInstance.setVariable(variableName, variableValue);
         }
     }
