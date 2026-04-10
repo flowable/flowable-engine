@@ -16,7 +16,6 @@ package org.flowable.engine.delegate;
 import java.util.HashMap;
 
 import org.flowable.common.engine.api.delegate.BusinessError;
-import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.engine.impl.bpmn.parser.Error;
 

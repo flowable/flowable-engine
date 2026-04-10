@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="parentCaseTypeConversion">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="The Case" definitionRef="theCase" />
+            <planItem id="planItem2" name="After Task" definitionRef="afterTask">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="afterTask" name="After Task" isBlocking="true" />
+            <caseTask id="theCase" isBlocking="true">
+                <extensionElements>
+                    <flowable:in source="stringIntVar" target="stringToInt" targetType="integer" />
+                    <flowable:in source="intVar" target="intToString" targetType="string" />
+                    <flowable:in source="stringBooleanVar" target="stringToBoolean" targetType="boolean" />
+                    <flowable:in source="periodVar" target="periodToDate" targetType="date" />
+                    <flowable:in source="durationVar" target="durationToLocalDate" targetType="localdate" />
+                    <flowable:out source="childIntVar" target="outStringToInt" sourceType="integer" />
+                    <flowable:out source="childStringVar" target="outIntToString" sourceType="string" />
+                </extensionElements>
+                <caseRefExpression><![CDATA[oneHumanTaskCase]]></caseRefExpression>
+            </caseTask>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

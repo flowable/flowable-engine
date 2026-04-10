@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.common.engine.impl.util.VariableValueConversionUtil;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,9 +84,20 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
 
                 }
 
+                String conversionType = null;
+                if (StringUtils.isNotEmpty(outParameter.getTargetType())) {
+                    conversionType = outParameter.getTargetType();
+                } else if (StringUtils.isNotEmpty(outParameter.getSourceType())) {
+                    conversionType = outParameter.getSourceType();
+                }
+
+                if (conversionType != null && value != null) {
+                    value = VariableValueConversionUtil.convertValue(value, conversionType, cmmnEngineConfiguration.getObjectMapper());
+                }
+
                 variables.put(variableName, value);
             }
-            
+
             processInstanceService.triggerCaseTask(callbackData.getCallbackId(), variables);
         }
     }

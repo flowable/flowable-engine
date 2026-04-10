@@ -19,8 +19,10 @@ public class IOParameter extends BaseElement {
 
     protected String source;
     protected String sourceExpression;
+    protected String sourceType;
     protected String target;
     protected String targetExpression;
+    protected String targetType;
     protected boolean isTransient;
 
     public String getSource() {
@@ -47,12 +49,28 @@ public class IOParameter extends BaseElement {
         this.sourceExpression = sourceExpression;
     }
 
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
     public String getTargetExpression() {
         return targetExpression;
     }
 
     public void setTargetExpression(String targetExpression) {
         this.targetExpression = targetExpression;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
     }
 
     public boolean isTransient() {
@@ -74,8 +92,10 @@ public class IOParameter extends BaseElement {
         super.setValues(otherElement);
         setSource(otherElement.getSource());
         setSourceExpression(otherElement.getSourceExpression());
+        setSourceType(otherElement.getSourceType());
         setTarget(otherElement.getTarget());
         setTargetExpression(otherElement.getTargetExpression());
+        setTargetType(otherElement.getTargetType());
         setTransient(otherElement.isTransient());
     }
 }

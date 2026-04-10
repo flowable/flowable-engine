@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://flowable.org/test">
+
+    <process id="childProcess" name="Child Process" isExecutable="true">
+        <startEvent id="childStart" />
+        <sequenceFlow id="childFlow1" sourceRef="childStart" targetRef="childTask" />
+        <userTask id="childTask" name="Child task" />
+        <sequenceFlow id="childFlow2" sourceRef="childTask" targetRef="childEnd" />
+        <endEvent id="childEnd" />
+    </process>
+
+</definitions>

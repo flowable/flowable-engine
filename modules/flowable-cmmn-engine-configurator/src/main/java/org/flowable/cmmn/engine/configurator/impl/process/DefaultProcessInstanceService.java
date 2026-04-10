@@ -139,8 +139,10 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
             IOParameter parameter = new IOParameter();
             parameter.setSource(ioParameter.getSource());
             parameter.setSourceExpression(ioParameter.getSourceExpression());
+            parameter.setSourceType(ioParameter.getSourceType());
             parameter.setTarget(ioParameter.getTarget());
             parameter.setTargetExpression(ioParameter.getTargetExpression());
+            parameter.setTargetType(ioParameter.getTargetType());
             cmmnParameters.add(parameter);
         }
         

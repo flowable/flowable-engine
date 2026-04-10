@@ -6,9 +6,9 @@
   <process id="process" name="process1" isExecutable="true">
     <callActivity id="callactivity" name="Call activity" calledElement="processId" flowable:fallbackToDefaultTenant="true">
       <extensionElements>
-        <flowable:in source="test" target="test"></flowable:in>
+        <flowable:in source="test" target="test" targetType="string"></flowable:in>
         <flowable:in sourceExpression="${test}" target="test"></flowable:in>
-        <flowable:out source="test" target="test"></flowable:out>
+        <flowable:out source="test" target="test" sourceType="integer"></flowable:out>
         <flowable:mapException errorCode="myErrorCode" rootCause="org.flowable.Exception">org.flowable.Something</flowable:mapException>
       </extensionElements>
     </callActivity>

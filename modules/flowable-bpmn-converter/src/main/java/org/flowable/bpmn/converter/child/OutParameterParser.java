@@ -30,9 +30,11 @@ public class OutParameterParser extends BaseChildElementParser {
 
     public static final List<ExtensionAttribute> defaultOutParameterAttributes = Arrays.asList(
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT),
-            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET)
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE)
     );
 
     @Override
@@ -55,6 +57,11 @@ public class OutParameterParser extends BaseChildElementParser {
             }
 
             parameter.setTarget(target);
+
+            String sourceType = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE);
+            if (StringUtils.isNotEmpty(sourceType)) {
+                parameter.setSourceType(sourceType);
+            }
 
             String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
             if ("true".equalsIgnoreCase(transientValue)) {
