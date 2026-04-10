@@ -24,7 +24,6 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.JsonUtil;
-import org.flowable.common.engine.impl.util.VariableValueConversionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +110,9 @@ public class IOParameterUtil {
             }
 
             if (conversionType != null && value != null) {
-                value = VariableValueConversionUtil.convertValue(value, conversionType,
-                        CommandContextUtil.getProcessEngineConfiguration().getObjectMapper());
+                var processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+                value = processEngineConfiguration.getVariableValueConversionHandler()
+                        .convertValue(value, conversionType, processEngineConfiguration.getVariableJsonMapper());
             }
 
             if (parameter.isTransient()) {

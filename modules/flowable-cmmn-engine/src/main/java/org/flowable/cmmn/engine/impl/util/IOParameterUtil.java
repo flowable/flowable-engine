@@ -22,11 +22,8 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.JsonUtil;
-import org.flowable.common.engine.impl.util.VariableValueConversionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -96,8 +93,9 @@ public class IOParameterUtil {
             }
 
             if (conversionType != null && value != null) {
-                ObjectMapper objectMapper = CommandContextUtil.getCmmnEngineConfiguration().getObjectMapper();
-                value = VariableValueConversionUtil.convertValue(value, conversionType, objectMapper);
+                var cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+                value = cmmnEngineConfiguration.getVariableValueConversionHandler()
+                        .convertValue(value, conversionType, cmmnEngineConfiguration.getVariableJsonMapper());
             }
 
             if (parameter.isTransient()) {

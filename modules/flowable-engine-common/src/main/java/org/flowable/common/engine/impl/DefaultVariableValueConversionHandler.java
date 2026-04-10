@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.common.engine.impl.util;
+package org.flowable.common.engine.impl;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,29 +22,20 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableException;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.ObjectNode;
+import org.flowable.common.engine.impl.json.FlowableJsonNode;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.util.DateUtil;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 /**
- * Utility class for converting variable values between types.
- * Used by IO parameter processing in both the BPMN and CMMN engines.
+ * Default implementation of {@link VariableValueConversionHandler}.
  *
  * @author Tijs Rademakers
  */
-public class VariableValueConversionUtil {
+public class DefaultVariableValueConversionHandler implements VariableValueConversionHandler {
 
-    /**
-     * Convert a value to the specified type.
-     *
-     * @param value the value to convert (must not be null)
-     * @param type the target type name (e.g. "string", "integer", "date", "json")
-     * @param objectMapper the ObjectMapper to use for JSON/array conversions (may be null if not converting to json/array)
-     * @return the converted value
-     */
-    public static Object convertValue(Object value, String type, ObjectMapper objectMapper) {
+    @Override
+    public Object convertValue(Object value, String type, VariableJsonMapper variableJsonMapper) {
         return switch (type.toLowerCase()) {
             case "string" -> convertToString(value);
             case "integer", "int" -> convertToInteger(value);
@@ -53,17 +44,18 @@ public class VariableValueConversionUtil {
             case "boolean" -> convertToBoolean(value);
             case "date" -> convertToDate(value);
             case "localdate" -> convertToLocalDate(value);
-            case "json" -> convertToJson(value, objectMapper);
-            case "array" -> convertToArray(value, objectMapper);
+            case "json" -> convertToJson(value, variableJsonMapper);
+            case "array" -> convertToArray(value, variableJsonMapper);
             default -> throw new FlowableException("Unsupported IO parameter type '" + type + "'");
         };
     }
 
-    public static String convertToString(Object value) {
+    protected String convertToString(Object value) {
         if (value instanceof String stringValue) {
             return stringValue;
         }
-        if (value instanceof JsonNode jsonNode) {
+        if (value != null && JsonUtil.isJsonNode(value)) {
+            FlowableJsonNode jsonNode = JsonUtil.asFlowableJsonNode(value);
             if (jsonNode.isString()) {
                 return jsonNode.asString();
             }
@@ -72,7 +64,7 @@ public class VariableValueConversionUtil {
         return value.toString();
     }
 
-    public static Integer convertToInteger(Object value) {
+    protected Integer convertToInteger(Object value) {
         if (value instanceof Integer intValue) {
             return intValue;
         }
@@ -85,7 +77,7 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to Integer");
     }
 
-    public static Long convertToLong(Object value) {
+    protected Long convertToLong(Object value) {
         if (value instanceof Long longValue) {
             return longValue;
         }
@@ -98,7 +90,7 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to Long");
     }
 
-    public static Double convertToDouble(Object value) {
+    protected Double convertToDouble(Object value) {
         if (value instanceof Double doubleValue) {
             return doubleValue;
         }
@@ -111,7 +103,7 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to Double");
     }
 
-    public static Boolean convertToBoolean(Object value) {
+    protected Boolean convertToBoolean(Object value) {
         if (value instanceof Boolean booleanValue) {
             return booleanValue;
         }
@@ -121,7 +113,7 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to Boolean");
     }
 
-    public static Date convertToDate(Object value) {
+    protected Date convertToDate(Object value) {
         if (value instanceof Date dateValue) {
             return dateValue;
         }
@@ -147,7 +139,7 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to Date");
     }
 
-    public static LocalDate convertToLocalDate(Object value) {
+    protected LocalDate convertToLocalDate(Object value) {
         if (value instanceof LocalDate localDate) {
             return localDate;
         }
@@ -173,25 +165,39 @@ public class VariableValueConversionUtil {
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to LocalDate");
     }
 
-    public static ObjectNode convertToJson(Object value, ObjectMapper objectMapper) {
-        if (value instanceof ObjectNode objectNode) {
-            return objectNode;
+    protected Object convertToJson(Object value, VariableJsonMapper variableJsonMapper) {
+        if (value != null && JsonUtil.isObjectNode(value)) {
+            return value;
         }
         if (value instanceof String stringValue) {
-            JsonNode jsonNode = objectMapper.readTree(stringValue);
-            if (jsonNode instanceof ObjectNode objectNode) {
-                return objectNode;
+            Object jsonNode = variableJsonMapper.readTree(stringValue);
+            if (JsonUtil.isObjectNode(jsonNode)) {
+                return jsonNode;
             }
             throw new FlowableException("JSON string does not represent an object: " + stringValue);
         }
         throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to JSON object");
     }
 
+    protected Object convertToArray(Object value, VariableJsonMapper variableJsonMapper) {
+        if (value != null && JsonUtil.isArrayNode(value)) {
+            return value;
+        }
+        if (value instanceof String stringValue) {
+            Object jsonNode = variableJsonMapper.readTree(stringValue);
+            if (JsonUtil.isArrayNode(jsonNode)) {
+                return jsonNode;
+            }
+            throw new FlowableException("JSON string does not represent an array: " + stringValue);
+        }
+        throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to JSON array");
+    }
+
     /**
      * Parses an ISO 8601 duration/period string (e.g. "P10D", "PT10H", "P1Y2M3DT4H") and adds it to the current time.
      * Uses the same parsing logic as {@link org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar}.
      */
-    protected static ZonedDateTime addDurationToNow(String durationString) {
+    protected ZonedDateTime addDurationToNow(String durationString) {
         ZonedDateTime now = ZonedDateTime.now();
         Period period;
         Duration duration;
@@ -209,20 +215,6 @@ public class VariableValueConversionUtil {
             }
         }
         return now.plus(period).plus(duration);
-    }
-
-    public static ArrayNode convertToArray(Object value, ObjectMapper objectMapper) {
-        if (value instanceof ArrayNode arrayNode) {
-            return arrayNode;
-        }
-        if (value instanceof String stringValue) {
-            JsonNode jsonNode = objectMapper.readTree(stringValue);
-            if (jsonNode instanceof ArrayNode arrayNode) {
-                return arrayNode;
-            }
-            throw new FlowableException("JSON string does not represent an array: " + stringValue);
-        }
-        throw new FlowableException("Cannot convert value of type " + value.getClass().getName() + " to JSON array");
     }
 
 }

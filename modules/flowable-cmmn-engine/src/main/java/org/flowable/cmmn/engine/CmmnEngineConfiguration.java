@@ -790,6 +790,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
         initDynamicStateManager();
         initCaseInstanceMigrationManager();
         initCaseInstanceCallbacks();
+        initVariableValueConversionHandler();
         initFormFieldHandler();
         initCaseValidator();
         initIdentityLinkInterceptor();
