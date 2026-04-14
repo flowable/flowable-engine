@@ -203,7 +203,6 @@ public class EngineMappingsValidationTest {
         assertThat(mappedResources).isNotEmpty();
 
         for (String mappedResource : mappedResources.keySet()) {
-            System.out.println("Checking mapping " + mappedResource);
             String xmlContent = mappedResources.get(mappedResource);
 
             int lineCounter = 0;

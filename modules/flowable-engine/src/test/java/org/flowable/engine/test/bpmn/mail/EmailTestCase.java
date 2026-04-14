@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.mail.common.api.client.MailClientProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -31,12 +32,15 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
     private String initialForceTo;
+    private MailClientProvider initialMailClientProvider;
     private Map<String, MailServerInfo> initialMailServers;
 
     @BeforeEach
     protected void setUp() throws Exception {
 
         initialForceTo = processEngineConfiguration.getMailServerForceTo();
+        initialMailClientProvider = processEngineConfiguration.getMailClientProvider();
+        reinitilizeMailClients();
         Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
         initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
         boolean serverUpAndRunning = false;
@@ -63,12 +67,11 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
         processEngineConfiguration.setMailServers(initialMailServers);
-        reinitilizeMailClients();
+        processEngineConfiguration.setMailClientProvider(initialMailClientProvider);
     }
 
     protected void reinitilizeMailClients() {
-        processEngineConfiguration.setDefaultMailClient(null);
-        processEngineConfiguration.getMailClients().clear();
+        processEngineConfiguration.setMailClientProvider(null);
         processEngineConfiguration.initMailClients();
     }
 

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.model.IOParameter;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.form.api.FormInfo;
 
 /**
@@ -33,15 +34,15 @@ public interface ProcessInstanceService {
     /**
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
-    String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
@@ -70,8 +71,30 @@ public interface ProcessInstanceService {
     void triggerCaseTask(String executionId, Map<String, Object> variables);
 
     /**
+     * Propagates an uncaught business error from a child case instance to the parent BPMN execution.
+     * This triggers BPMN error propagation (boundary error events) on the CaseTask.
+     */
+    void handleCaseTaskError(String executionId, BusinessError error);
+
+    /**
      * Retrieves the {@link IOParameter} out parameters of a case task currently being execution by the given execution.
      */
     List<IOParameter> getOutputParametersOfCaseTask(String executionId);
+
+    /**
+     * Resolves the process definition id from the given key and parameters.
+     */
+    String resolveProcessDefinitionId(String processDefinitionKey, String tenantId,
+            Boolean fallbackToDefaultTenant, String parentDeploymentId);
+
+    /**
+     * Checks whether history is enabled for the given process definition id.
+     */
+    boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId);
+
+    /**
+     * Checks whether history is enabled for the given process instance id.
+     */
+    boolean isHistoryEnabledForProcessInstance(String processInstanceId);
 
 }

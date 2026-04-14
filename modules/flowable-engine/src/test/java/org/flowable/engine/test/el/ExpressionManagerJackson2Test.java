@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.json.jackson2.Jackson2VariableJsonMapper;
-import org.flowable.common.engine.impl.tenant.CurrentTenant;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;

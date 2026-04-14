@@ -24,7 +24,7 @@ import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -211,8 +211,8 @@ public class ServiceTaskFutureJavaDelegateActivityBehavior extends TaskActivityB
                     "Service task with java class " + futureJavaDelegate.getClass().getName() + " threw exception " + throwable.getMessage(), throwable, execution);
         }
 
-        if (throwable instanceof BpmnError) {
-            ErrorPropagation.propagateError((BpmnError) throwable, execution);
+        if (throwable instanceof BusinessError) {
+            ErrorPropagation.propagateError((BusinessError) throwable, execution);
         } else if (throwable instanceof Exception) {
             if (!ErrorPropagation.mapException((Exception) throwable, (ExecutionEntity) execution, mapExceptions)) {
                 sneakyThrow(throwable);

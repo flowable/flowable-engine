@@ -34,6 +34,8 @@ import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateToActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateVariableEventListenersOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.FailPlanItemInstanceOperation;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
@@ -41,7 +43,9 @@ import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanModelInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ResumePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.SuspendPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
@@ -253,15 +257,35 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
         addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType));
     }
+    
+    @Override
+    public void planSuspendPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new SuspendPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
 
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType));
     }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, BusinessError businessError) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity, businessError));
+    }
     
     @Override
     public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planResumePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ResumePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override

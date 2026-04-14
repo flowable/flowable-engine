@@ -25,10 +25,13 @@ import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.common.engine.api.delegate.BusinessError;
+import org.flowable.engine.impl.cmd.HandleCaseTaskErrorCmd;
 import org.flowable.engine.impl.cmd.TriggerCaseTaskCmd;
 import org.flowable.engine.impl.persistence.entity.BpmnEngineEntityConstants;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.form.api.FormInfo;
@@ -56,30 +59,27 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
-        
-        return startProcessInstanceByKey(processDefinitionKey, predefinedProcessInstanceId, null, stageInstanceId, tenantId, fallbackToDefaultTenant,
-                parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+
+        return startProcessInstance(processDefinitionId, predefinedProcessInstanceId, null, stageInstanceId, tenantId,
+                inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
     }
 
     @Override
-    public String startProcessInstanceByKey(String processDefinitionKey, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap, String businessKey,
+    public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
+            String tenantId, Map<String, Object> inParametersMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
-        
+
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
-        processInstanceBuilder.processDefinitionKey(processDefinitionKey);
+        processInstanceBuilder.processDefinitionId(processDefinitionId);
+
         if (tenantId != null) {
             processInstanceBuilder.tenantId(tenantId);
             processInstanceBuilder.overrideProcessDefinitionTenantId(tenantId);
         }
 
-        if (parentDeploymentId != null) {
-            processInstanceBuilder.processDefinitionParentDeploymentId(parentDeploymentId);
-        }
-        
         processInstanceBuilder.predefineProcessInstanceId(predefinedProcessInstanceId);
 
         if (planItemInstanceId != null) {
@@ -89,10 +89,6 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
         for (String target : inParametersMap.keySet()) {
             processInstanceBuilder.variable(target, inParametersMap.get(target));
-        }
-
-        if (fallbackToDefaultTenant != null && fallbackToDefaultTenant) {
-            processInstanceBuilder.fallbackToDefaultTenant();
         }
 
         if (businessKey != null) {
@@ -116,6 +112,11 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     public void triggerCaseTask(String executionId, Map<String, Object> variables) {
         processEngineConfiguration.getCommandExecutor().execute(new TriggerCaseTaskCmd(executionId, variables));
     }
+
+    @Override
+    public void handleCaseTaskError(String executionId, BusinessError error) {
+        processEngineConfiguration.getCommandExecutor().execute(new HandleCaseTaskErrorCmd(executionId, error));
+    }
     
     @Override
     public List<IOParameter> getOutputParametersOfCaseTask(String executionId) {
@@ -138,12 +139,38 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
             IOParameter parameter = new IOParameter();
             parameter.setSource(ioParameter.getSource());
             parameter.setSourceExpression(ioParameter.getSourceExpression());
+            parameter.setSourceType(ioParameter.getSourceType());
             parameter.setTarget(ioParameter.getTarget());
             parameter.setTargetExpression(ioParameter.getTargetExpression());
+            parameter.setTargetType(ioParameter.getTargetType());
             cmmnParameters.add(parameter);
         }
         
         return cmmnParameters;
+    }
+
+    @Override
+    public String resolveProcessDefinitionId(String processDefinitionKey, String tenantId,
+            Boolean fallbackToDefaultTenant, String parentDeploymentId) {
+        ProcessDefinition processDefinition = processEngineConfiguration.getProcessInstanceHelper()
+                .resolveProcessDefinition(processDefinitionKey, tenantId,
+                        Boolean.TRUE.equals(fallbackToDefaultTenant) || processEngineConfiguration.isFallbackToDefaultTenant(),
+                        parentDeploymentId, processEngineConfiguration);
+        return processDefinition.getId();
+    }
+
+    @Override
+    public boolean isHistoryEnabledForProcessDefinitionId(String processDefinitionId) {
+        return processEngineConfiguration.getHistoryConfigurationSettings().isHistoryEnabled(processDefinitionId);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForProcessInstance(String processInstanceId) {
+        ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(processInstanceId);
+        if (execution != null) {
+            return processEngineConfiguration.getHistoryConfigurationSettings().isHistoryEnabled(execution.getProcessDefinitionId());
+        }
+        return processEngineConfiguration.getHistoryConfigurationSettings().isHistoryEnabled();
     }
 
     @Override

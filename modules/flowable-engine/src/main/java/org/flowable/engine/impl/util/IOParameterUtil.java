@@ -34,19 +34,22 @@ public class IOParameterUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IOParameterUtil.class);
 
-    public static void processInParameters(List<IOParameter> inParameters, VariableContainer sourceContainer, VariableContainer targetContainer,
-            ExpressionManager expressionManager) {
+    public static void processInParameters(List<IOParameter> inParameters, VariableContainer sourceContainer, 
+            VariableContainer targetContainer, ExpressionManager expressionManager) {
+        
         processInParameters(inParameters, sourceContainer, targetContainer::setVariable, targetContainer::setTransientVariable, expressionManager);
     }
 
     public static void processInParameters(List<IOParameter> inParameters, VariableContainer sourceContainer, BiConsumer<String, Object> targetVariableConsumer,
             BiConsumer<String, Object> targetTransientVariableConsumer, ExpressionManager expressionManager) {
-        processParameters(inParameters, sourceContainer, targetVariableConsumer, targetTransientVariableConsumer, expressionManager, "In");
+        
+        processParameters(inParameters, sourceContainer, targetVariableConsumer, targetTransientVariableConsumer, expressionManager, true);
     }
 
     public static void processOutParameters(List<IOParameter> outParameters, VariableContainer sourceContainer, BiConsumer<String, Object> targetVariableConsumer,
             BiConsumer<String, Object> targetTransientVariableConsumer, ExpressionManager expressionManager) {
-        processParameters(outParameters, sourceContainer, targetVariableConsumer, targetTransientVariableConsumer, expressionManager, "Out");
+        
+        processParameters(outParameters, sourceContainer, targetVariableConsumer, targetTransientVariableConsumer, expressionManager, false);
     }
 
     public static Map<String, Object> extractOutVariables(List<IOParameter> outParameters, VariableContainer sourceContainer, ExpressionManager expressionManager) {
@@ -55,13 +58,14 @@ public class IOParameterUtil {
         }
 
         Map<String, Object> payload = new HashMap<>();
-        processParameters(outParameters, sourceContainer, payload::put, payload::put, expressionManager, "Out");
+        processParameters(outParameters, sourceContainer, payload::put, payload::put, expressionManager, false);
 
         return payload;
     }
 
     protected static void processParameters(List<IOParameter> parameters, VariableContainer sourceContainer, BiConsumer<String, Object> targetVariableConsumer,
-            BiConsumer<String, Object> targetTransientVariableConsumer, ExpressionManager expressionManager, String parameterType) {
+            BiConsumer<String, Object> targetTransientVariableConsumer, ExpressionManager expressionManager, boolean isInParameters) {
+        
         if (parameters == null || parameters.isEmpty()) {
             return;
         }
@@ -75,7 +79,7 @@ public class IOParameterUtil {
             } else {
                 value = sourceContainer.getVariable(parameter.getSource());
             }
-            
+
             if (value != null) {
                 value = JsonUtil.deepCopyIfJson(value);
             }
@@ -89,7 +93,7 @@ public class IOParameterUtil {
                     variableName = variableNameValue.toString();
                 } else {
                     LOGGER.warn("{} parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                            parameterType, parameter.getTargetExpression());
+                            isInParameters ? "In" : "Out", parameter.getTargetExpression());
                 }
 
             } else if (StringUtils.isNotEmpty(parameter.getTarget())){
@@ -97,8 +101,23 @@ public class IOParameterUtil {
 
             }
 
+            // Apply type conversion if a target type (for in parameters) or source type (for out parameters) is specified
+            String conversionType = null;
+            if (isInParameters && StringUtils.isNotEmpty(parameter.getTargetType())) {
+                conversionType = parameter.getTargetType();
+            } else if (!isInParameters && StringUtils.isNotEmpty(parameter.getSourceType())) {
+                conversionType = parameter.getSourceType();
+            }
+
+            if (conversionType != null && value != null) {
+                var processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+                value = processEngineConfiguration.getVariableValueConversionHandler()
+                        .convertValue(value, conversionType, processEngineConfiguration.getVariableJsonMapper());
+            }
+
             if (parameter.isTransient()) {
                 targetTransientVariableConsumer.accept(variableName, value);
+                
             } else {
                 targetVariableConsumer.accept(variableName, value);
             }

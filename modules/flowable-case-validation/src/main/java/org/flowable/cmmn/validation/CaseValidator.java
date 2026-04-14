@@ -26,6 +26,8 @@ import org.flowable.cmmn.validation.validator.ValidatorSet;
 public interface CaseValidator {
     
     List<ValidationEntry> validate(CmmnModel model);
+    
+    List<ValidationEntry> validate(CmmnModel model, CaseValidationContext validationContext);
 
     List<ValidatorSet> getValidatorSets();
 }

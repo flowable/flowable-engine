@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.job;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.agenda.operation.OperationSerializationMetadata;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -66,6 +67,16 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
                     String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).stringValue(null);
                     String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, exitType, exitEventType);
+
+                } else if (PlanItemTransition.FAULT.equals(transition)) {
+                    String errorCode = jsonConfiguration.path(OperationSerializationMetadata.FIELD_ERROR_CODE).stringValue(null);
+                    if (errorCode != null) {
+                        String errorMessage = jsonConfiguration.path(OperationSerializationMetadata.FIELD_ERROR_MESSAGE).stringValue(null);
+                        CmmnFault reconstructedError = errorMessage != null ? new CmmnFault(errorCode, errorMessage) : new CmmnFault(errorCode);
+                        CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity, reconstructedError);
+                    } else {
+                        CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity);
+                    }
 
                 } else {
                     throw new FlowableException("Programmatic error: unsupported transition " + transition + " for " + planItemInstanceEntity);

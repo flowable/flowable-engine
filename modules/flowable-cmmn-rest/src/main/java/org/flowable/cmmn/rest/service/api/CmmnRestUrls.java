@@ -292,10 +292,9 @@ public final class CmmnRestUrls {
     public static final String[] URL_CASE_INSTANCE_IDENTITYLINKS_COLLECTION = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS };
 
     /**
-     * URL template for an identitylink on a case instance: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/identitylinks/users/{1: identityId}/{2:type}</i>
+     * URL template for an identitylink on a case instance: <i>cmmn-runtime/case-instances/{0:caseInstanceId}/identitylinks/{1: family}/{2: identityId}/{3:type}</i>
      */
-    public static final String[] URL_CASE_INSTANCE_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, 
-                    SEGMENT_IDENTITYLINKS_FAMILY_USERS, "{1}", "{2}" };
+    public static final String[] URL_CASE_INSTANCE_IDENTITYLINK = { SEGMENT_RUNTIME_RESOURCES, SEGMENT_CASE_INSTANCE_RESOURCE, "{0}", SEGMENT_IDENTITYLINKS, "{1}", "{2}", "{3}" };
     
     /**
      * URL template for plan item instance collection: <i>cmmn-runtime/plan-item-instances</i>

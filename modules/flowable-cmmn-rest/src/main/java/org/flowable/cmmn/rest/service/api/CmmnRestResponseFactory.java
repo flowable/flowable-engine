@@ -443,7 +443,7 @@ public class CmmnRestResponseFactory {
         }
 
         if (caseInstanceId != null) {
-            result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstanceId, (userId != null ? userId : groupId), type));
+            result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE_IDENTITYLINK, caseInstanceId, family, (userId != null ? userId : groupId), type));
         } else if (taskId != null) {
             result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_TASK_IDENTITYLINK, taskId, family, (userId != null ? userId : groupId), type));
         } else if (caseDefinitionId != null) {

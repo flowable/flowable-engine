@@ -241,6 +241,8 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
@@ -387,6 +389,8 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
+import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -850,6 +854,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
 
+    protected BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler;
+
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
     protected boolean flowable5CompatibilityEnabled; // Default flowable 5 backwards compatibility is disabled!
@@ -966,6 +972,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
+        initVariableValueConversionHandler();
         initProcessValidator();
         initFormFieldHandler();
         initDatabaseEventLogging();
@@ -987,6 +994,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         initHistoryCleaningManager();
         initLocalizationManagers();
+        initEventInstanceOutParameterHandler();
+    }
+
+    public void initEventInstanceOutParameterHandler() {
+        if (bpmnEventInstanceOutParameterHandler == null) {
+            bpmnEventInstanceOutParameterHandler = new BpmnEventInstanceOutParameterHandlerImpl();
+        }
     }
 
     // failedJobCommandFactory
@@ -2341,17 +2355,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initMailClients() {
-        if (defaultMailClient == null) {
+        if (mailClientProvider == null) {
+            mailClientProvider = new DefaultMailClientProvider();
+        }
+        if (!(mailClientProvider instanceof DefaultMailClientProvider defaultMailClientProvider)) {
+            return; // custom provider handles resolution at runtime
+        }
+        if (defaultMailClientProvider.getDefaultMailClient() == null) {
             String sessionJndi = getMailSessionJndi();
             if (sessionJndi != null) {
-                defaultMailClient = FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer());
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer()));
             } else {
                 MailServerInfo mailServer = getDefaultMailServer();
                 String host = mailServer.getMailServerHost();
                 if (host == null) {
                     throw new FlowableException("no SMTP host is configured for the default mail server");
                 }
-                defaultMailClient = FlowableMailClientCreator.createHostClient(host, mailServer);
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createHostClient(host, mailServer));
             }
         }
 
@@ -2359,6 +2379,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         tenantIds.addAll(mailServers.keySet());
 
         if (!tenantIds.isEmpty()) {
+            Map<String, FlowableMailClient> mailClients = defaultMailClientProvider.getMailClients();
             MailServerInfo defaultMailServer = getDefaultMailServer();
             for (String tenantId : tenantIds) {
                 if (mailClients.containsKey(tenantId)) {
@@ -5474,4 +5495,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.batchStatusTimeCycleConfig = batchStatusTimeCycleConfig;
     }
 
+    public BpmnEventInstanceOutParameterHandler getBpmnEventInstanceOutParameterHandler() {
+        return bpmnEventInstanceOutParameterHandler;
+    }
+
+    public void setBpmnEventInstanceOutParameterHandler(BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler) {
+        this.bpmnEventInstanceOutParameterHandler = bpmnEventInstanceOutParameterHandler;
+    }
 }

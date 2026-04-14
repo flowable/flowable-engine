@@ -55,6 +55,8 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -324,7 +326,7 @@ public abstract class AbstractDynamicStateManager {
             .collect(Collectors.toList());
 
         if (executions.isEmpty()) {
-            throw new FlowableException("Active execution could not be found with activity id " + activityId);
+            throw new FlowableIllegalArgumentException("Active execution could not be found with activity id " + activityId);
         }
 
         return executions;
@@ -446,7 +448,7 @@ public abstract class AbstractDynamicStateManager {
     protected FlowElement resolveFlowElementFromBpmnModel(BpmnModel bpmnModel, String activityId) {
         FlowElement flowElement = bpmnModel.getFlowElement(activityId);
         if (flowElement == null) {
-            throw new FlowableException("Cannot find activity '" + activityId + "' in process definition with id '" + bpmnModel.getMainProcess().getId() + "'");
+            throw new FlowableIllegalArgumentException("Cannot find activity '" + activityId + "' in process definition with id '" + bpmnModel.getMainProcess().getId() + "'");
         }
         return flowElement;
     }
@@ -1287,7 +1289,7 @@ public abstract class AbstractDynamicStateManager {
         
         if (finalBoundaryEvents != null && !finalBoundaryEvents.isEmpty()) {
             List<ExecutionEntity> boundaryEventsExecutions = createBoundaryEvents(finalBoundaryEvents, childExecution, commandContext);
-            executeBoundaryEvents(finalBoundaryEvents, boundaryEventsExecutions);
+            executeBoundaryEvents(boundaryEventsExecutions);
         }
 
         if (LOGGER.isDebugEnabled()) {
@@ -1441,14 +1443,11 @@ public abstract class AbstractDynamicStateManager {
         return boundaryEventExecutions;
     }
 
-    protected void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
+    protected void executeBoundaryEvents(List<ExecutionEntity> boundaryEventExecutions) {
         if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
-            Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
-            Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
-            while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
-                BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
-                ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
+            for (ExecutionEntity boundaryEventExecution : boundaryEventExecutions) {
+                BoundaryEvent boundaryEvent = (BoundaryEvent) boundaryEventExecution.getCurrentFlowElement();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
                 boundaryEventBehavior.execute(boundaryEventExecution);
@@ -1585,7 +1584,10 @@ public abstract class AbstractDynamicStateManager {
                         messageExecution.setEventScope(true);
                         messageExecution.setActive(false);
 
-                        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+                        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(messageExecution.getProcessDefinitionId(),
+                                messageExecution.getProcessDefinitionKey(), eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, messageExecution.getTenantId());
+
+                        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, definitionVariableContainer);
                         EventSubscriptionEntity messageSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
                                         .eventName(messageName)
@@ -1618,7 +1620,9 @@ public abstract class AbstractDynamicStateManager {
                         signalExecution.setEventScope(true);
                         signalExecution.setActive(false);
 
-                        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+                        DefinitionVariableContainer signalDefinitionVariableContainer = new DefinitionVariableContainer(signalExecution.getProcessDefinitionId(),
+                                signalExecution.getProcessDefinitionKey(), eventSubProcessExecution.getDeploymentId(), ScopeTypes.BPMN, signalExecution.getTenantId());
+                        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, signalDefinitionVariableContainer);
 
                         EventSubscriptionEntity signalSubscription = (EventSubscriptionEntity) eventSubscriptionService.createEventSubscriptionBuilder()
                                         .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)

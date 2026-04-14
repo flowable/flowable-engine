@@ -345,11 +345,17 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression());
             }
+            if (StringUtils.isNotEmpty(ioParameter.getSourceType())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getSourceType());
+            }
             if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
             }
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetType())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getTargetType());
             }
 
             xtw.writeEndElement();

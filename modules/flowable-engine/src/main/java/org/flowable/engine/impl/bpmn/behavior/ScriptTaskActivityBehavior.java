@@ -26,7 +26,7 @@ import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -106,8 +106,8 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
             noErrors = false;
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof BpmnError) {
-                ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+            if (rootCause instanceof BusinessError) {
+                ErrorPropagation.propagateError((BusinessError) rootCause, execution);
             } else if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             } else {

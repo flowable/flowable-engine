@@ -28,6 +28,7 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
 import org.flowable.job.service.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobByCorrelationIdMatcher;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.SuspendedJobsByExecutionIdMatcher;
+import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.SuspendedJobsBySubScopeIdMatcher;
 
 /**
  * @author Tijs Rademakers
@@ -35,6 +36,7 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.S
 public class MybatisSuspendedJobDataManager extends AbstractDataManager<SuspendedJobEntity> implements SuspendedJobDataManager {
 
     protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsByExecutionIdMatcher = new SuspendedJobsByExecutionIdMatcher();
+    protected CachedEntityMatcher<SuspendedJobEntity> suspendedJobsBySubScopeIdMatcher = new SuspendedJobsBySubScopeIdMatcher();
     protected SingleCachedEntityMatcher<SuspendedJobEntity> suspendedJobByCorrelationIdMatcher = new JobByCorrelationIdMatcher<>();
 
     protected JobServiceConfiguration jobServiceConfiguration;
@@ -86,6 +88,12 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
     @SuppressWarnings("unchecked")
     public List<SuspendedJobEntity> findJobsByProcessInstanceId(final String processInstanceId) {
         return getDbSqlSession().selectList("selectSuspendedJobsByProcessInstanceId", processInstanceId);
+    }
+    
+    @Override
+    public List<SuspendedJobEntity> findJobsBySubScopeId(String subScopeId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        return getList(dbSqlSession, "selectSuspendedJobsBySubScopeId", subScopeId, suspendedJobsBySubScopeIdMatcher, true);
     }
 
     @Override

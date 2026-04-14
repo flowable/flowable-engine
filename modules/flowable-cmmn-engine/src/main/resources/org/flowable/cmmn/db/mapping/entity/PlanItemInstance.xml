@@ -7,7 +7,7 @@
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
               NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-              LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
+              LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_,
               START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, EXTRA_VALUE_, IS_COUNT_ENABLED_,
               VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
@@ -32,6 +32,7 @@
             #{completedTime, jdbcType=TIMESTAMP},
             #{occurredTime, jdbcType=TIMESTAMP},
             #{terminatedTime, jdbcType=TIMESTAMP},
+            #{failedTime, jdbcType=TIMESTAMP},
             #{exitTime, jdbcType=TIMESTAMP},
             #{endedTime, jdbcType=TIMESTAMP},
             #{startUserId, jdbcType=VARCHAR},
@@ -53,7 +54,7 @@
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                      NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-                                                     LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_,
+                                                     LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_,
                                                      ENDED_TIME_, START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                      EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
     values
@@ -80,6 +81,7 @@
             #{planItemInstance.completedTime, jdbcType=TIMESTAMP},
             #{planItemInstance.occurredTime, jdbcType=TIMESTAMP},
             #{planItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+            #{planItemInstance.failedTime, jdbcType=TIMESTAMP},
             #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
             #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
             #{planItemInstance.startUserId, jdbcType=VARCHAR},
@@ -104,7 +106,7 @@
         <foreach collection="list" item="planItemInstance" index="index">
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_,
                                                       NAME_, STATE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_,
+                                                      LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_,
                                                       START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_,
                                                       EXTRA_VALUE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
@@ -129,6 +131,7 @@
                 #{planItemInstance.completedTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.occurredTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+                #{planItemInstance.failedTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.exitTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.endedTime, jdbcType=TIMESTAMP},
                 #{planItemInstance.startUserId, jdbcType=VARCHAR},
@@ -212,6 +215,9 @@
         </if>
         <if test="originalPersistentState.terminatedTime != terminatedTime">
             TERMINATED_TIME_ = #{terminatedTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.failedTime != failedTime">
+            FAILED_TIME_ = #{failedTime, jdbcType=TIMESTAMP},
         </if>
         <if test="originalPersistentState.exitTime != exitTime">
             EXIT_TIME_ = #{exitTime, jdbcType=TIMESTAMP},
@@ -304,6 +310,7 @@
     <result property="completedTime" column="COMPLETED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="occurredTime" column="OCCURRED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="terminatedTime" column="TERMINATED_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="failedTime" column="FAILED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="exitTime" column="EXIT_TIME_" jdbcType="TIMESTAMP"/>
     <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
@@ -358,11 +365,16 @@
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
       where CASE_INST_ID_ = #{parameter.caseInstanceId, jdbcType=VARCHAR} and ELEMENT_ID_ = #{parameter.planItemId, jdbcType=VARCHAR}
   </select>
+  
+  <select id="selectPlanItemInstancesByReferenceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+      select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+      where REFERENCE_ID_ = #{parameter, jdbcType=VARCHAR}
+  </select>
 
-    <select id="selectPlanItemInstancesByStageInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
-        select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
-        where STAGE_INST_ID_ = #{parameter.stageInstanceId, jdbcType=VARCHAR} and ELEMENT_ID_ = #{parameter.planItemId, jdbcType=VARCHAR}
-    </select>
+  <select id="selectPlanItemInstancesByStageInstanceIdAndPlanItemId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
+      select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
+      where STAGE_INST_ID_ = #{parameter.stageInstanceId, jdbcType=VARCHAR} and ELEMENT_ID_ = #{parameter.planItemId, jdbcType=VARCHAR}
+  </select>
 
   <select id="selectPlanItemInstancesByStagePlanItemInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST RES
@@ -529,6 +541,12 @@
         </if>
         <if test="terminatedAfter != null">
             and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter, jdbcType=TIMESTAMP}
+        </if>
+        <if test="failedBefore != null">
+            and RES.FAILED_TIME_ &lt;= #{failedBefore, jdbcType=TIMESTAMP}
+        </if>
+        <if test="failedAfter != null">
+            and RES.FAILED_TIME_ &gt;= #{failedAfter, jdbcType=TIMESTAMP}
         </if>
         <if test="exitBefore != null">
             and RES.EXIT_TIME_ &lt;= #{exitBefore, jdbcType=TIMESTAMP}
@@ -830,6 +848,12 @@
                 </if>
                 <if test="orQueryObject.terminatedAfter != null">
                     or RES.TERMINATED_TIME_ &gt;= #{orQueryObject.terminatedAfter, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.failedBefore != null">
+                    or RES.FAILED_TIME_ &lt;= #{orQueryObject.failedBefore, jdbcType=TIMESTAMP}
+                </if>
+                <if test="orQueryObject.failedAfter != null">
+                    or RES.FAILED_TIME_ &gt;= #{orQueryObject.failedAfter, jdbcType=TIMESTAMP}
                 </if>
                 <if test="orQueryObject.exitBefore != null">
                     or RES.EXIT_TIME_ &lt;= #{orQueryObject.exitBefore, jdbcType=TIMESTAMP}

@@ -408,6 +408,8 @@ public abstract class AbstractEngineConfiguration {
      */
     protected VariableLengthVerifier variableLengthVerifier = NoopVariableLengthVerifier.INSTANCE;
 
+    protected VariableValueConversionHandler variableValueConversionHandler;
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -638,6 +640,12 @@ public abstract class AbstractEngineConfiguration {
     public void initIdGenerator() {
         if (idGenerator == null) {
             idGenerator = new StrongUuidGenerator();
+        }
+    }
+
+    public void initVariableValueConversionHandler() {
+        if (variableValueConversionHandler == null) {
+            variableValueConversionHandler = new DefaultVariableValueConversionHandler();
         }
     }
 
@@ -1948,6 +1956,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setVariableLengthVerifier(VariableLengthVerifier variableLengthVerifier) {
         this.variableLengthVerifier = variableLengthVerifier;
+        return this;
+    }
+
+    public VariableValueConversionHandler getVariableValueConversionHandler() {
+        return variableValueConversionHandler;
+    }
+
+    public AbstractEngineConfiguration setVariableValueConversionHandler(VariableValueConversionHandler variableValueConversionHandler) {
+        this.variableValueConversionHandler = variableValueConversionHandler;
         return this;
     }
 

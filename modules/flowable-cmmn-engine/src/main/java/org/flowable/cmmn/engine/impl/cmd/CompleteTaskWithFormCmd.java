@@ -22,6 +22,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.model.HasValidateFormFields;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -214,7 +216,14 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleCompleteTask(task);
         }
         
-        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_COMPLETE);
+        try {
+            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_COMPLETE);
+        } catch (BusinessError businessError) {
+            // Delete the task entity — it won't be cleaned up by the normal completion flow
+            cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().deleteTask(task, false);
+            FaultPropagation.propagateFault(businessError, commandContext, planItemInstanceEntity);
+            return;
+        }
 
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
     }

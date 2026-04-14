@@ -47,6 +47,8 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId);
     
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
+    
+    List<PlanItemInstanceEntity> findByReferenceId(String referenceId);
 
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
 

@@ -12,12 +12,10 @@
  */
 package org.flowable.validation.validator.impl;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Message;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
 
@@ -27,14 +25,14 @@ import org.flowable.validation.validator.ValidatorImpl;
 public class MessageValidator extends ValidatorImpl {
 
     @Override
-    public void validate(BpmnModel bpmnModel, List<ValidationError> errors) {
+    public void validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         if (bpmnModel.getMessages() != null && !bpmnModel.getMessages().isEmpty()) {
             for (Message message : bpmnModel.getMessages()) {
 
                 // Item ref
                 if (StringUtils.isNotEmpty(message.getItemRef())) {
                     if (!bpmnModel.getItemDefinitions().containsKey(message.getItemRef())) {
-                        addError(errors, Problems.MESSAGE_INVALID_ITEM_REF, message, "Item reference is invalid: not found");
+                        validationContext.addError(Problems.MESSAGE_INVALID_ITEM_REF, message, "Item reference is invalid: not found");
                     }
                 }
 

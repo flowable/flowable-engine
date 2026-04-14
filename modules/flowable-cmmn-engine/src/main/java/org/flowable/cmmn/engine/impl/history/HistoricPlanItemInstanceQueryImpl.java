@@ -67,6 +67,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date completedAfter;
     protected Date terminatedBefore;
     protected Date terminatedAfter;
+    protected Date failedBefore;
+    protected Date failedAfter;
     protected Date occurredBefore;
     protected Date occurredAfter;
     protected Date exitBefore;
@@ -422,6 +424,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery failedBefore(Date failedBefore) {
+        this.failedBefore = failedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery failedAfter(Date failedAfter) {
+        this.failedAfter = failedAfter;
+        return this;
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery exitBefore(Date exitBefore) {
         this.exitBefore = exitBefore;
         return this;
@@ -654,6 +668,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public Date getTerminatedAfter() {
         return terminatedAfter;
+    }
+    public Date getFailedBefore() {
+        return failedBefore;
+    }
+    public Date getFailedAfter() {
+        return failedAfter;
     }
     public Date getOccurredBefore() {
         return occurredBefore;

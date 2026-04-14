@@ -48,6 +48,7 @@ public interface PlanItemInstance {
     Date getCompletedTime();
     Date getOccurredTime();
     Date getTerminatedTime();
+    Date getFailedTime();
     Date getExitTime();
     Date getEndedTime();
     String getStartUserId();

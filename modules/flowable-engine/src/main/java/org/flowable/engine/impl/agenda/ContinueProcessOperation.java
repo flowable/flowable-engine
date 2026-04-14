@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.agenda;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.flowable.bpmn.model.Activity;
@@ -24,12 +23,12 @@ import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventRegistryEventActivityBehavior;
@@ -152,8 +151,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
         }
@@ -173,9 +172,9 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         if (activityBehavior != null) {
             executeActivityBehavior(activityBehavior, flowNode);
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
         } else {
-            executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+            executeBoundaryEvents(boundaryEventExecutions);
             LOGGER.debug("No activityBehavior on activity '{}' with execution {}", flowNode.getId(), execution.getId());
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(execution, true);
         }
@@ -206,8 +205,8 @@ public class ContinueProcessOperation extends AbstractOperation {
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                return;
             }
         }
@@ -229,7 +228,7 @@ public class ContinueProcessOperation extends AbstractOperation {
                     }
                 }
                 
-                executeBoundaryEvents(boundaryEvents, boundaryEventExecutions);
+                executeBoundaryEvents(boundaryEventExecutions);
             }
             
         } else {
@@ -296,7 +295,7 @@ public class ContinueProcessOperation extends AbstractOperation {
             } else {
                 activityBehavior.execute(execution);
             }
-            
+
         } catch (RuntimeException e) {
             if (LogMDC.isMDCEnabled()) {
                 LogMDC.putMDCExecution(execution);
@@ -312,8 +311,8 @@ public class ContinueProcessOperation extends AbstractOperation {
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_START);
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_TAKE);
                 executeExecutionListeners(sequenceFlow, ExecutionListener.EVENTNAME_END);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
         }
@@ -387,14 +386,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         return boundaryEventExecutions;
     }
 
-    protected void executeBoundaryEvents(List<BoundaryEvent> boundaryEvents, List<ExecutionEntity> boundaryEventExecutions) {
+    protected void executeBoundaryEvents(List<ExecutionEntity> boundaryEventExecutions) {
         if (!CollectionUtil.isEmpty(boundaryEventExecutions)) {
-            Iterator<BoundaryEvent> boundaryEventsIterator = boundaryEvents.iterator();
-            Iterator<ExecutionEntity> boundaryEventExecutionsIterator = boundaryEventExecutions.iterator();
 
-            while (boundaryEventsIterator.hasNext() && boundaryEventExecutionsIterator.hasNext()) {
-                BoundaryEvent boundaryEvent = boundaryEventsIterator.next();
-                ExecutionEntity boundaryEventExecution = boundaryEventExecutionsIterator.next();
+            for (ExecutionEntity boundaryEventExecution: boundaryEventExecutions) {
+                BoundaryEvent boundaryEvent = (BoundaryEvent) boundaryEventExecution.getCurrentFlowElement();
                 ActivityBehavior boundaryEventBehavior = ((ActivityBehavior) boundaryEvent.getBehavior());
                 LOGGER.debug("Executing boundary event activityBehavior {} with execution {}", boundaryEventBehavior.getClass(), boundaryEventExecution.getId());
                 boundaryEventBehavior.execute(boundaryEventExecution);

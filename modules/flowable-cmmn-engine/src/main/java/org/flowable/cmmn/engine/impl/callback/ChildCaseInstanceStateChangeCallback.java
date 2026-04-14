@@ -12,9 +12,17 @@
  */
 package org.flowable.cmmn.engine.impl.callback;
 
+import java.util.List;
+
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.IOParameter;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -44,6 +52,12 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
 
             if (planItemInstanceEntity != null) {
                 if (CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
+
+                    // Handle out parameters here, before the child case instance gets deleted.
+                    // The TriggerPlanItemInstanceOperation is only executed after the CompleteCaseInstanceOperation
+                    // finishes, at which point the child case instance (and its variables) will already be deleted.
+                    handleOutParameters(commandContext, planItemInstanceEntity, callbackData);
+
                     CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
 
                 } else if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())) {
@@ -71,6 +85,22 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
 
         }
 
+    }
+
+    protected void handleOutParameters(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, CallbackData callbackData) {
+        PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+        if (planItemDefinition instanceof CaseTask caseTask) {
+            List<IOParameter> outParameters = caseTask.getOutParameters();
+            if (outParameters != null && !outParameters.isEmpty()) {
+                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+                CaseInstanceEntity childCaseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
+                        .findById(callbackData.getInstanceId());
+                if (childCaseInstance != null) {
+                    IOParameterUtil.processOutParameters(outParameters, childCaseInstance, planItemInstanceEntity,
+                            cmmnEngineConfiguration.getExpressionManager());
+                }
+            }
+        }
     }
 
 }

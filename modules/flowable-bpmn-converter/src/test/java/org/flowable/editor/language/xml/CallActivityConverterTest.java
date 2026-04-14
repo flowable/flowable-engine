@@ -40,17 +40,17 @@ class CallActivityConverterTest {
 
         List<IOParameter> parameters = callActivity.getInParameters();
         assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression)
+                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceExpression, IOParameter::getTargetType)
                 .containsExactly(
-                        tuple("test", "test", null),
-                        tuple(null, "test", "${test}")
+                        tuple("test", "test", null, "string"),
+                        tuple(null, "test", "${test}", null)
                 );
 
         parameters = callActivity.getOutParameters();
         assertThat(parameters)
-                .extracting(IOParameter::getSource, IOParameter::getTarget)
+                .extracting(IOParameter::getSource, IOParameter::getTarget, IOParameter::getSourceType)
                 .containsExactly(
-                        tuple("test", "test")
+                        tuple("test", "test", "integer")
                 );
         
         List<MapExceptionEntry> mapExceptions = callActivity.getMapExceptions();

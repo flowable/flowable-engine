@@ -30,10 +30,13 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.flowable.engine.test.util.TestProcessUtil;
+import org.flowable.validation.ProcessValidationContextImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.validation.ProcessValidatorImpl;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
+import org.flowable.validation.validator.ValidatorSet;
 import org.flowable.validation.validator.ValidatorSetNames;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -485,6 +488,44 @@ public class DefaultProcessValidatorTest {
             }
         }
         return results;
+    }
+
+    @Test
+    public void testValidateWithSharedContextDoesNotDuplicateErrors() {
+        ProcessValidatorImpl validator = new ProcessValidatorImpl();
+
+        ValidatorSet set1 = new ValidatorSet("set1");
+        set1.addValidator((bpmnModel, validationContext) -> validationContext.addError("PROBLEM_A", "Error from set 1"));
+
+        ValidatorSet set2 = new ValidatorSet("set2");
+        set2.addValidator((bpmnModel, validationContext) -> validationContext.addError("PROBLEM_B", "Error from set 2"));
+
+        validator.addValidatorSet(set1);
+        validator.addValidatorSet(set2);
+
+        BpmnModel bpmnModel = new BpmnModel();
+
+        // Validate with a shared external context
+        ProcessValidationContextImpl sharedContext = new ProcessValidationContextImpl(set1);
+        List<ValidationError> errors = validator.validate(bpmnModel, sharedContext);
+
+        // Must be exactly 2 errors (1 per set), not 3 which would happen
+        // if the cumulative getEntries() list was re-added each iteration
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getValidatorSetName)
+                .containsExactly(
+                        tuple("PROBLEM_A", "set1"),
+                        tuple("PROBLEM_B", "set2")
+                );
+
+        // Verify no-context path produces the same result count
+        List<ValidationError> errorsWithoutContext = validator.validate(bpmnModel, null);
+        assertThat(errorsWithoutContext)
+                .extracting(ValidationError::getProblem, ValidationError::getValidatorSetName)
+                .containsExactly(
+                        tuple("PROBLEM_A", "set1"),
+                        tuple("PROBLEM_B", "set2")
+                );
     }
 
     protected BpmnModel readBpmnModelFromXml(String resource) {

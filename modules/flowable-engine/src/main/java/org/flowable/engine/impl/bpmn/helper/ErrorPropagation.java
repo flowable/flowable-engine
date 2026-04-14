@@ -43,12 +43,16 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.common.engine.impl.callback.CallbackData;
+import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -67,7 +71,7 @@ public class ErrorPropagation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorPropagation.class);
 
-    public static void propagateError(BpmnError error, DelegateExecution execution) {
+    public static void propagateError(BusinessError error, DelegateExecution execution) {
         propagateError(new BpmnErrorVariableContainer(error, execution.getTenantId()), execution);
     }
 
@@ -107,6 +111,34 @@ public class ErrorPropagation {
         }
 
         if (eventMap.size() == 0) {
+            // No BPMN handler found. Check if the process instance has a callback to a parent engine
+            // (e.g., a CMMN case that started this process via a ProcessTask).
+            // If so, propagate the error via the callback instead of re-throwing.
+            ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager().findById(execution.getProcessInstanceId());
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            if (processInstance != null && processInstance.getCallbackId() != null && processInstance.getCallbackType() != null
+                    && commandContext != null && !commandContext.isReused()) {
+                ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+                Map<String, List<RuntimeInstanceStateChangeCallback>> callbacks = processEngineConfiguration.getProcessInstanceStateChangedCallbacks();
+                if (callbacks != null && callbacks.containsKey(processInstance.getCallbackType())) {
+                    BpmnError bpmnError = new BpmnError(errorCode,
+                            "No catching boundary event found for error with errorCode '" + errorCode + "' in process, propagating to parent engine");
+                    bpmnError.setAdditionalDataContainer(errorVariableContainer);
+                    CallbackData callbackData = new CallbackData(processInstance.getCallbackId(),
+                            processInstance.getCallbackType(), processInstance.getId(), null, null);
+                    for (RuntimeInstanceStateChangeCallback callback : callbacks.get(processInstance.getCallbackType())) {
+                        callback.onError(callbackData, bpmnError);
+                    }
+
+                    // Clean up the orphaned child process instance — the error was handled by the parent engine.
+                    // Clear the callback reference to prevent the delete from re-triggering stateChanged.
+                    processInstance.setCallbackId(null);
+                    CommandContextUtil.getExecutionEntityManager().deleteProcessInstanceExecutionEntity(
+                            processInstance.getId(), null, "businessError-propagated-to-parent", true, false, false);
+                    return;
+                }
+            }
+
             BpmnError bpmnError = new BpmnError(errorCode,
                     "No catching boundary event found for error with errorCode '" + errorCode + "', neither in same process nor in parent process");
             bpmnError.setAdditionalDataContainer(errorVariableContainer);
@@ -487,10 +519,10 @@ public class ErrorPropagation {
 
     public static <E extends Throwable> void handleException(Throwable exc, ExecutionEntity execution, List<MapExceptionEntry> exceptionMap) throws E {
         Throwable cause = exc;
-        BpmnError error = null;
+        BusinessError error = null;
         while (cause != null) {
-            if (cause instanceof BpmnError) {
-                error = (BpmnError) cause;
+            if (cause instanceof BusinessError) {
+                error = (BusinessError) cause;
                 break;
             } else if (cause instanceof Exception) {
                 if (ErrorPropagation.mapException((Exception) cause, (ExecutionEntity) execution, exceptionMap)) {
@@ -557,7 +589,7 @@ public class ErrorPropagation {
             this.tenantId = tenantId;
         }
 
-        protected BpmnErrorVariableContainer(BpmnError error, String tenantId) {
+        protected BpmnErrorVariableContainer(BusinessError error, String tenantId) {
             this.error = error;
             this.additionalDataContainer = error.getAdditionalDataContainer();
             this.errorCode = error.getErrorCode();
@@ -566,8 +598,8 @@ public class ErrorPropagation {
 
         protected BpmnErrorVariableContainer(String errorCode, Throwable error, String tenantId) {
             this.error = error;
-            if (error instanceof BpmnError) {
-                this.additionalDataContainer = ((BpmnError) error).getAdditionalDataContainer();
+            if (error instanceof BusinessError) {
+                this.additionalDataContainer = ((BusinessError) error).getAdditionalDataContainer();
             }
             this.errorCode = errorCode;
             this.tenantId = tenantId;

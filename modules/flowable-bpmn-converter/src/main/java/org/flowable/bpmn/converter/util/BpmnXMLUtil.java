@@ -251,10 +251,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_TARGET_TYPE.equals(attributeName)) {
+                    parameter.setTargetType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -267,10 +272,10 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 parameter.addAttribute(extensionAttribute);
             }
         }
-        
+
         return parameter;
     }
-    
+
     public static IOParameter parseOutIOParameter(XMLStreamReader xtr) {
         IOParameter parameter = null;
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
@@ -297,10 +302,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_SOURCE_TYPE.equals(attributeName)) {
+                    parameter.setSourceType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -456,8 +466,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getSourceType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getSourceType(), xtw);
             }
             
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
@@ -467,8 +477,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getTargetType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getTargetType(), xtw);
             }
             
             if (ioParameter.isTransient()) {

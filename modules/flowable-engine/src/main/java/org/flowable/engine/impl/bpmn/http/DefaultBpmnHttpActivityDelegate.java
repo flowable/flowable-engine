@@ -34,7 +34,7 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.cfg.HttpClientConfig;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -140,8 +140,8 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
             // Save response fields in the execution
             saveResponseFields(execution, request, response, processEngineConfiguration.getObjectMapper());
-        } catch (BpmnError e) {
-            // Rethrow BPMN error so it can be propagated
+        } catch (BusinessError e) {
+            // Rethrow business error so it can be propagated
             throw e;
         } catch (Exception ex) {
             if (request.isIgnoreErrors()) {

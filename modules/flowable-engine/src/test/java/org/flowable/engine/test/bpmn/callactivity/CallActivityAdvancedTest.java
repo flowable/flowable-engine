@@ -847,6 +847,64 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = {
+            "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallActivityWithUserTaskAndIOParameters.bpmn20.xml",
+            "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
+    })
+    public void testCallActivityWithUserTaskAndIOParameters() {
+        String inVar1Content = "First input value";
+        String inVar2Content = "Second input value";
+        String outVarContent = "Result from sub process";
+
+        // Start the parent process with 2 input variables
+        ProcessInstance parentProcessInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("parentProcessWithUserTaskAndCallActivity")
+                .variable("parentVar1", inVar1Content)
+                .variable("parentVar2", inVar2Content)
+                .start();
+
+        // Both the parent user task and the child subprocess task should be active
+        List<Task> allTasks = taskService.createTaskQuery()
+                .processInstanceIdWithChildren(parentProcessInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        assertThat(allTasks).extracting(Task::getName)
+                .containsExactly("Parent User Task", "Task in subprocess");
+
+        // Verify the child process was started and received both input variables
+        ProcessInstance childProcessInstance = runtimeService.createProcessInstanceQuery()
+                .superProcessInstanceId(parentProcessInstance.getId())
+                .singleResult();
+        assertThat(childProcessInstance).isNotNull();
+        assertThat(runtimeService.getVariable(childProcessInstance.getId(), "childVar1")).isEqualTo(inVar1Content);
+        assertThat(runtimeService.getVariable(childProcessInstance.getId(), "childVar2")).isEqualTo(inVar2Content);
+
+        // Set the result variable and complete the child task
+        Task childTask = taskService.createTaskQuery()
+                .processInstanceId(childProcessInstance.getId())
+                .singleResult();
+        assertThat(childTask.getName()).isEqualTo("Task in subprocess");
+        runtimeService.setVariable(childProcessInstance.getId(), "childResult", outVarContent);
+        taskService.complete(childTask.getId());
+
+        // Verify the child process has ended
+        assertProcessEnded(childProcessInstance.getId());
+
+        // Verify the out parameter variable is now available on the parent process
+        assertThat(runtimeService.getVariable(parentProcessInstance.getId(), "parentResult")).isEqualTo(outVarContent);
+
+        // Complete the parent user task
+        Task parentTask = taskService.createTaskQuery()
+                .processInstanceId(parentProcessInstance.getId())
+                .singleResult();
+        assertThat(parentTask.getName()).isEqualTo("Parent User Task");
+        taskService.complete(parentTask.getId());
+
+        // Verify the parent process has ended
+        assertProcessEnded(parentProcessInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = {
             "org/flowable/engine/test/bpmn/callactivity/CallActivity.testMultiInstanceSequentialSubProcessDataInputOutput.bpmn20.xml",
             "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
     })

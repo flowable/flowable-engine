@@ -40,6 +40,16 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
 
     @Test
     @CmmnDeployment
+    public void testGenericEventListenerNoCorrelationWithLongId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);
+
+        inboundEventChannelAdapter.triggerTestEvent("test");
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(2);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testGenericEventListenerNoCorrelation() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);

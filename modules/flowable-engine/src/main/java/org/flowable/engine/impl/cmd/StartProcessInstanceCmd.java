@@ -32,7 +32,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -264,64 +263,25 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     }
 
     protected ProcessDefinition getProcessDefinition(ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
-        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
-        ProcessDefinitionEntityManager processDefinitionEntityManager = processEngineConfiguration.getProcessDefinitionEntityManager();
-
         // Find the process definition
         ProcessDefinition processDefinition = null;
         if (processDefinitionId != null) {
+            DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
             processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
             if (processDefinition == null) {
                 throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
             }
 
-        } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
+        } else if (processDefinitionKey != null) {
+            processDefinition = processEngineConfiguration.getProcessInstanceHelper()
+                    .resolveProcessDefinition(processDefinitionKey, tenantId,
+                            fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant(),
+                            processDefinitionParentDeploymentId, processEngineConfiguration);
 
-            if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
-            }
-
-            if (processDefinition == null) {
-                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
-            }
-
-            if (processDefinition == null) {
-                throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
-            }
-
-        } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-
-            if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
-            }
-
-            if (processDefinition == null) {
-                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-            }
-
-            if (processDefinition == null) {
-                if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
-                    String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
-                    if (StringUtils.isNotEmpty(defaultTenant)) {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
-                        if (processDefinition != null) {
-                            overrideDefinitionTenantId = tenantId;
-                        }
-                        
-                    } else {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
-                    }
-                    
-                    if (processDefinition == null) {
-                        throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey +
-                            "'. Fallback to default tenant was also applied.", ProcessDefinition.class);
-                    }
-                } else {
-                    throw new FlowableObjectNotFoundException("Process definition with key '" + processDefinitionKey +
-                        "' and tenantId '"+ tenantId +"' was not found", ProcessDefinition.class);
-                }
+            if (tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)
+                    && !tenantId.equals(processDefinition.getTenantId())) {
+                // Process definition comes from the fallback to the default tenant
+                overrideDefinitionTenantId = tenantId;
             }
 
         } else {

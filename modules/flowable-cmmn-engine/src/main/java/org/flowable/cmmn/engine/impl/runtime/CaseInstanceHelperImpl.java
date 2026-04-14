@@ -28,6 +28,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.job.AsyncInitializePlanModelJobHandler;
 import org.flowable.cmmn.engine.impl.listener.CaseInstanceLifeCycleListenerUtil;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
@@ -41,7 +42,6 @@ import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
-import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.engine.impl.util.IdentityLinkUtil;
 import org.flowable.cmmn.engine.impl.util.JobUtil;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceAfterContext;
@@ -112,6 +112,52 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         return caseInstanceEntity;
     }
 
+    @Override
+    public CaseDefinition resolveCaseDefinition(String caseDefinitionKey, String tenantId,
+            boolean fallbackToDefaultTenant, String parentDeploymentId) {
+        CaseDefinitionEntityManager caseDefinitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
+        CaseDefinition caseDefinition = null;
+
+        if (tenantId != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (parentDeploymentId != null) {
+                caseDefinition = caseDefinitionEntityManager
+                        .findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+            }
+            if (caseDefinition == null) {
+                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
+            }
+            if (caseDefinition == null && fallbackToDefaultTenant) {
+                String defaultTenant = cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.CMMN, caseDefinitionKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, defaultTenant);
+                } else {
+                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+                }
+            }
+        } else {
+            if (parentDeploymentId != null) {
+                caseDefinition = caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+            }
+            if (caseDefinition == null) {
+                caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
+            }
+        }
+
+        if (caseDefinition == null) {
+            if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+            } else if (fallbackToDefaultTenant) {
+                throw new FlowableObjectNotFoundException(
+                        "Case definition was not found by key '" + caseDefinitionKey + "'. Fallback to default tenant was also used.");
+            } else {
+                throw new FlowableObjectNotFoundException(
+                        "Case definition was not found by key '" + caseDefinitionKey + "' and tenant '" + tenantId + "'");
+            }
+        }
+
+        return caseDefinition;
+    }
+
     protected CaseDefinition getCaseDefinition(CaseInstanceBuilder caseInstanceBuilder, CommandContext commandContext) {
         CaseDefinition caseDefinition = null;
         if (caseInstanceBuilder.getCaseDefinitionId() != null) {
@@ -121,53 +167,17 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         } else if (caseInstanceBuilder.getCaseDefinitionKey() != null) {
             String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
-            CaseDefinitionEntityManager caseDefinitionEntityManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
             String tenantId = caseInstanceBuilder.getTenantId();
             String parentDeploymentId = caseInstanceBuilder.getCaseDefinitionParentDeploymentId();
-            if (tenantId == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
 
-                if (parentDeploymentId != null) {
-                    caseDefinition = caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
-                }
+            caseDefinition = resolveCaseDefinition(caseDefinitionKey, tenantId,
+                    caseInstanceBuilder.isFallbackToDefaultTenant() || cmmnEngineConfiguration.isFallbackToDefaultTenant(),
+                    parentDeploymentId);
 
-                if (caseDefinition == null) {
-                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
-                }
-
-                if (caseDefinition == null) {
-                    throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
-                }
-                
-            } else if (!CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                if (parentDeploymentId != null) {
-                    caseDefinition = caseDefinitionEntityManager
-                            .findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
-                }
-
-                if (caseDefinition == null) {
-                    caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
-                }
-
-                if (caseDefinition == null) {
-                    if (caseInstanceBuilder.isFallbackToDefaultTenant() || cmmnEngineConfiguration.isFallbackToDefaultTenant()) {
-                        String defaultTenant = cmmnEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.CMMN, caseDefinitionKey);
-                        if (StringUtils.isNotEmpty(defaultTenant)) {
-                            caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, defaultTenant);
-                            caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
-                            
-                        } else {
-                            caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
-                        }
-                        
-                        if (caseDefinition == null) {
-                            throw new FlowableObjectNotFoundException(
-                                "Case definition was not found by key '" + caseDefinitionKey + "'. Fallback to default tenant was also used.");
-                        }
-                    } else {
-                        throw new FlowableObjectNotFoundException(
-                            "Case definition was not found by key '" + caseDefinitionKey + "' and tenant '" + tenantId + "'");
-                    }
-                }
+            if (caseDefinition != null && tenantId != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)
+                    && !tenantId.equals(caseDefinition.getTenantId())) {
+                // Case definition comes from the fallback to the default tenant
+                caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
             }
         } else {
             throw new FlowableIllegalArgumentException("caseDefinitionKey and caseDefinitionId are null");
@@ -368,7 +378,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
             Object eventInstance = caseInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
-                EventInstanceCmmnUtil.handleEventInstanceOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
+                CmmnEventInstanceOutParameterHandler outParameterHandler = cmmnEngineConfiguration.getCmmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(caseInstanceEntity, caseModel, (EventInstance) eventInstance);
             }
         }
 

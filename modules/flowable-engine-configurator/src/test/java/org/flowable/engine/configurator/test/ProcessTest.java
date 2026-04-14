@@ -46,7 +46,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
@@ -387,11 +386,6 @@ public class ProcessTest {
             assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
             
             runtimeService.setVariable(processInstance.getId(), "var1", "test");
-            
-            List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-            for (Execution execution : executions) {
-                System.out.println("execution " + execution.getId() + " " + execution.getActivityId());
-            }
             
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 

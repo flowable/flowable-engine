@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
@@ -27,11 +28,13 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -512,12 +515,28 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertThat(task.getSuspendedTime()).isNotNull();
         assertThat(task.getSuspendedBy()).isEqualTo("gonzo");
         
+        PlanItemInstance taskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask").singleResult();
+        assertThat(taskPlanItemInstance).isNotNull();
+        assertThat(taskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+        assertThat(taskPlanItemInstance.getLastSuspendedTime()).isNotNull();
+        
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
             assertThat(historicTaskInstance.getState()).isEqualTo(Task.SUSPENDED);
             assertThat(historicTaskInstance.getSuspendedTime()).isNotNull();
             assertThat(historicTaskInstance.getSuspendedBy()).isEqualTo("gonzo");
+            
+            HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceReferenceId(task.getId()).singleResult();
+            assertThat(historicPlanItemInstance).isNotNull();
+            assertThat(historicPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+            assertThat(historicPlanItemInstance.getLastSuspendedTime()).isNotNull();
         }
+        
+        final String taskId = task.getId();
+        assertThatThrownBy(() -> {
+            cmmnTaskService.complete(taskId, "kermit");
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("Can only trigger a plan item that is in the ACTIVE state");
         
         cmmnTaskService.activateTask(task.getId(), "kermit");
         task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();

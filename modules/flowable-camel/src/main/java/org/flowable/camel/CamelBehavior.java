@@ -27,6 +27,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
@@ -171,13 +172,13 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         Exception camelException = exchange.getException();
         boolean notHandledByCamel = exchange.isFailed() && camelException != null;
         if (notHandledByCamel) {
-            if (camelException instanceof BpmnError) {
+            if (camelException instanceof BusinessError) {
                 if (isV5Execution) {
                     Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
                     compatibilityHandler.propagateError((BpmnError) camelException, execution);
                     return true;
                 }
-                ErrorPropagation.propagateError((BpmnError) camelException, execution);
+                ErrorPropagation.propagateError((BusinessError) camelException, execution);
                 return true;
             } else {
                 if (isV5Execution) {

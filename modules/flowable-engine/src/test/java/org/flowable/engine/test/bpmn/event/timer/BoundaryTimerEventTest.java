@@ -78,6 +78,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         // After process start, there should be 3 timers created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleTimersOnUserTask");
@@ -174,6 +175,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public void testExpressionOnTimer() {
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", "PT1H");
@@ -208,6 +210,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public void testExpressionWithJavaDurationOnTimer() {
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", Duration.ofHours(1));

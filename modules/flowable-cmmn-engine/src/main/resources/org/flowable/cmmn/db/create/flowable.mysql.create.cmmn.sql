@@ -112,6 +112,7 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     COMPLETED_TIME_         datetime(3)             NULL,
     OCCURRED_TIME_          datetime(3)             NULL,
     TERMINATED_TIME_        datetime(3)             NULL,
+    FAILED_TIME_            datetime(3)             NULL,
     EXIT_TIME_              datetime(3)             NULL,
     ENDED_TIME_             datetime(3)             NULL,
     ENTRY_CRITERION_ID_     VARCHAR(255)            NULL,
@@ -239,6 +240,7 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
     COMPLETED_TIME_        datetime(3)             NULL,
     OCCURRED_TIME_         datetime(3)             NULL,
     TERMINATED_TIME_       datetime(3)             NULL,
+    FAILED_TIME_           datetime(3)             NULL,
     EXIT_TIME_             datetime(3)             NULL,
     ENDED_TIME_            datetime(3)             NULL,
     LAST_UPDATED_TIME_     datetime(3)             NULL,
@@ -260,4 +262,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST (CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '8.0.0.0', 1);
+values ('cmmn.schema.version', '8.1.0.0', 1);

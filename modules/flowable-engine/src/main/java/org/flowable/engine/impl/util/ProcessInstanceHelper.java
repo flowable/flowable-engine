@@ -36,22 +36,27 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.interceptor.StartProcessInstanceAfterContext;
 import org.flowable.engine.interceptor.StartProcessInstanceBeforeContext;
@@ -156,8 +161,7 @@ public class ProcessInstanceHelper {
             if (flowElement instanceof StartEvent startEvent) {
                 if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions()
                         .get(0) instanceof MessageEventDefinition messageEventDefinition) {
-
-                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+                    String actualMessageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
                     if (Objects.equals(actualMessageName, messageName)) {
                         initialFlowElement = flowElement;
                         break;
@@ -258,8 +262,8 @@ public class ProcessInstanceHelper {
             
             Object eventInstance = startInstanceBeforeContext.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
             if (eventInstance instanceof EventInstance) {
-                EventInstanceBpmnUtil.handleEventInstanceOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), 
-                                (EventInstance) eventInstance);
+                BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(processInstance, startInstanceBeforeContext.getInitialFlowElement(), (EventInstance) eventInstance);
             }
             
             for (String varName : startInstanceBeforeContext.getTransientVariables().keySet()) {
@@ -461,7 +465,9 @@ public class ProcessInstanceHelper {
         signalExecution.setEventScope(true);
         signalExecution.setActive(false);
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(parentExecution.getProcessDefinitionId(),
+                parentExecution.getProcessDefinitionKey(), parentExecution.getDeploymentId(), ScopeTypes.BPMN, parentExecution.getTenantId());
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, definitionVariableContainer);
 
         EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
                 .getEventSubscriptionService().createEventSubscriptionBuilder()
@@ -545,6 +551,59 @@ public class ProcessInstanceHelper {
         return variablesMap;
     }
     
+    public ProcessDefinition resolveProcessDefinition(String processDefinitionKey, String tenantId,
+            boolean fallbackToDefaultTenant, String parentDeploymentId,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+        ProcessDefinitionEntityManager processDefinitionEntityManager = processEngineConfiguration.getProcessDefinitionEntityManager();
+        ProcessDefinition processDefinition = null;
+
+        if (tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+            if (parentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, processDefinitionKey, tenantId);
+            }
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager
+                        .findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
+            }
+            if (processDefinition == null && fallbackToDefaultTenant) {
+                String defaultTenant = processEngineConfiguration.getDefaultTenantProvider()
+                        .getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    processDefinition = processDefinitionEntityManager
+                            .findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
+                } else {
+                    processDefinition = processDefinitionEntityManager
+                            .findLatestProcessDefinitionByKey(processDefinitionKey);
+                }
+            }
+        } else {
+            if (parentDeploymentId != null) {
+                processDefinition = processDefinitionEntityManager
+                        .findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey);
+            }
+            if (processDefinition == null) {
+                processDefinition = processDefinitionEntityManager
+                        .findLatestProcessDefinitionByKey(processDefinitionKey);
+            }
+        }
+
+        if (processDefinition == null) {
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                throw new FlowableObjectNotFoundException(
+                        "No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
+            } else if (fallbackToDefaultTenant) {
+                throw new FlowableObjectNotFoundException(
+                        "No process definition found for key '" + processDefinitionKey + "'. Fallback to default tenant was also applied.", ProcessDefinition.class);
+            } else {
+                throw new FlowableObjectNotFoundException(
+                        "Process definition with key '" + processDefinitionKey + "' and tenantId '" + tenantId + "' was not found", ProcessDefinition.class);
+            }
+        }
+
+        return processDefinition;
+    }
+
     public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, ProcessInstance processInstance, String oldState, String newState) {
         if (processInstance.getCallbackId() != null && processInstance.getCallbackType() != null) {
             Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil

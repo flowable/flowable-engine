@@ -62,7 +62,7 @@ public class IOParameterUtil {
             } else {
                 value = sourceContainer.getVariable(parameter.getSource());
             }
-            
+
             if (value != null) {
                 value = JsonUtil.deepCopyIfJson(value);
             }
@@ -82,6 +82,20 @@ public class IOParameterUtil {
             } else if (StringUtils.isNotEmpty(parameter.getTarget())) {
                 variableName = parameter.getTarget();
 
+            }
+
+            // Apply type conversion if a target type (for in parameters) or source type (for out parameters) is specified
+            String conversionType = null;
+            if (StringUtils.isNotEmpty(parameter.getTargetType())) {
+                conversionType = parameter.getTargetType();
+            } else if (StringUtils.isNotEmpty(parameter.getSourceType())) {
+                conversionType = parameter.getSourceType();
+            }
+
+            if (conversionType != null && value != null) {
+                var cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+                value = cmmnEngineConfiguration.getVariableValueConversionHandler()
+                        .convertValue(value, conversionType, cmmnEngineConfiguration.getVariableJsonMapper());
             }
 
             if (parameter.isTransient()) {

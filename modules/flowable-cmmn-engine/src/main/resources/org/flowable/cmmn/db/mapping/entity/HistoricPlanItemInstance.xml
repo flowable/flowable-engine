@@ -7,7 +7,7 @@
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
             START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values (
             #{id, jdbcType=VARCHAR},
@@ -31,6 +31,7 @@
             #{completedTime, jdbcType=TIMESTAMP},
             #{occurredTime, jdbcType=TIMESTAMP},
             #{terminatedTime, jdbcType=TIMESTAMP},
+            #{failedTime, jdbcType=TIMESTAMP},
             #{exitTime, jdbcType=TIMESTAMP},
             #{endedTime, jdbcType=TIMESTAMP},
             #{lastUpdatedTime, jdbcType=TIMESTAMP},
@@ -50,7 +51,7 @@
     <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
         ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
         START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
@@ -76,6 +77,7 @@
             #{historicPlanItemInstance.completedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.occurredTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.failedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.exitTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
@@ -98,7 +100,7 @@
         <foreach collection="list" item="historicPlanItemInstance" index="index">
             into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
             START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id, jdbcType=VARCHAR},
@@ -122,6 +124,7 @@
                 #{historicPlanItemInstance.completedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.occurredTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.failedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.exitTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
@@ -204,6 +207,9 @@
             </if>
             <if test="originalPersistentState.terminatedTime != terminatedTime">
                 TERMINATED_TIME_ = #{terminatedTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.failedTime != failedTime">
+                FAILED_TIME_ = #{failedTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.exitTime != exitTime">
                 EXIT_TIME_ = #{exitTime, jdbcType=TIMESTAMP},
@@ -308,6 +314,7 @@
         <result property="completedTime" column="COMPLETED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="occurredTime" column="OCCURRED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="terminatedTime" column="TERMINATED_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="failedTime" column="FAILED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="exitTime" column="EXIT_TIME_" jdbcType="TIMESTAMP"/>
         <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastUpdatedTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP"/>
@@ -496,6 +503,12 @@
             </if>
             <if test="terminatedAfter != null">
                 and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter, jdbcType=TIMESTAMP}
+            </if>
+            <if test="failedBefore != null">
+                and RES.FAILED_TIME_ &lt;= #{failedBefore, jdbcType=TIMESTAMP}
+            </if>
+            <if test="failedAfter != null">
+                and RES.FAILED_TIME_ &gt;= #{failedAfter, jdbcType=TIMESTAMP}
             </if>
             <if test="exitBefore != null">
                 and RES.EXIT_TIME_ &lt;= #{exitBefore, jdbcType=TIMESTAMP}

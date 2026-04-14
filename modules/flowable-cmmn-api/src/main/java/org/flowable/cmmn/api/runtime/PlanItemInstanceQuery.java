@@ -76,6 +76,8 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceOccurredAfter(Date occurredAfter);
     PlanItemInstanceQuery planItemInstanceTerminatedBefore(Date terminatedBefore);
     PlanItemInstanceQuery planItemInstanceTerminatedAfter(Date terminatedAfter);
+    PlanItemInstanceQuery planItemInstanceFailedBefore(Date failedBefore);
+    PlanItemInstanceQuery planItemInstanceFailedAfter(Date failedAfter);
     PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore);
     PlanItemInstanceQuery planItemInstanceExitAfter(Date exitAfter);
     PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore);

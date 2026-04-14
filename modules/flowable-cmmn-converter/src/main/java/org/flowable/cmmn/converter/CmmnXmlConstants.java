@@ -158,8 +158,10 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
+    String ATTRIBUTE_IOPARAMETER_SOURCE_TYPE = "sourceType";
     String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    String ATTRIBUTE_IOPARAMETER_TARGET_TYPE = "targetType";
     String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";

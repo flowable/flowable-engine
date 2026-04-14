@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef" exporter="Flowable Open Source Modeler">
+  <process id="compensationTimerEventBoundary" name="compensationTimerEventBoundary" isExecutable="true">
+    <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+    <sequenceFlow sourceRef="startEvent1" targetRef="waitTask"></sequenceFlow>
+
+    <userTask id="waitTask" name="wait task"/>
+
+    <boundaryEvent id="firstCompensateEvent" attachedToRef="waitTask" cancelActivity="false">
+      <compensateEventDefinition/>
+    </boundaryEvent>
+
+    <scriptTask id="compensateServiceTask" name="compensate service task" scriptFormat="groovy" isForCompensation="true">
+      <script><![CDATA[System.out.println('compensate service task');]]></script>
+    </scriptTask>
+
+    <boundaryEvent id="firstTimerEvent" attachedToRef="waitTask" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT5M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="timerTask" name="timer task"/>
+
+    <endEvent id="end"/>
+    <sequenceFlow sourceRef="waitTask" targetRef="end"></sequenceFlow>
+    <sequenceFlow sourceRef="firstTimerEvent" targetRef="timerTask"></sequenceFlow>
+    <association sourceRef="firstCompensateEvent" targetRef="compensateServiceTask" associationDirection="None"></association>
+  </process>
+</definitions>

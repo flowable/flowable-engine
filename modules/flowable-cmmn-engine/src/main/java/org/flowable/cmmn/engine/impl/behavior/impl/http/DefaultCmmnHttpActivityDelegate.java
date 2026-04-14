@@ -19,6 +19,7 @@ import static org.flowable.common.engine.impl.util.ExceptionUtil.sneakyThrow;
 import java.util.concurrent.CompletableFuture;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.HttpClientConfig;
@@ -129,6 +130,9 @@ public class DefaultCmmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
             // Save response fields in the planItemInstance
             saveResponseFields(planItemInstance, request, response, cmmnEngineConfiguration.getObjectMapper());
+        } catch (BusinessError e) {
+            // Rethrow business error so it can be propagated via FaultPropagation
+            throw e;
         } catch (Exception ex) {
             if (request.isIgnoreErrors()) {
                 LOGGER.info("Error ignored while processing http task in planItemInstance {}", planItemInstance.getId(), ex);

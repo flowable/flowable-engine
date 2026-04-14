@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="Examples">
+
+  <process id="twoTasksProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="firstTask" />
+    <userTask id="firstTask" name="First task" />
+    <boundaryEvent id="boundaryCompensateEvent" attachedToRef="firstTask" cancelActivity="false">
+      <compensateEventDefinition/>
+    </boundaryEvent>
+    <scriptTask id="compensateTask" name="compensate task" scriptFormat="groovy" isForCompensation="true">
+      <script><![CDATA[System.out.println('compensate task');]]></script>
+    </scriptTask>
+    <boundaryEvent id="boundaryTimerEvent" attachedToRef="firstTask">
+      <timerEventDefinition>
+        <timeDuration>PT1H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow2" sourceRef="boundaryTimerEvent" targetRef="theEnd" />
+    <sequenceFlow id="flow3" sourceRef="firstTask" targetRef="secondTask" />
+    <userTask id="secondTask" name="Second task" />
+    <sequenceFlow id="flow4" sourceRef="secondTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    <association sourceRef="boundaryCompensateEvent" targetRef="compensateTask" associationDirection="None"/>
+
+  </process>
+
+</definitions>

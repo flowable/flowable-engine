@@ -37,7 +37,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
@@ -179,8 +179,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
             try {
                 processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
 

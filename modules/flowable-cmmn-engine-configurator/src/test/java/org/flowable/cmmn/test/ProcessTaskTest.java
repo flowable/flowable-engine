@@ -905,6 +905,66 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+    public void testProcessTaskWithHumanTaskAndIOParameters() {
+        String inVar1Content = "First input value";
+        String inVar2Content = "Second input value";
+        String outVarContent = "Result from sub process";
+
+        // Start the parent case with 2 input variables
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("parentCaseWithHumanTaskAndSubProcess")
+                .variable("parentVar1", inVar1Content)
+                .variable("parentVar2", inVar2Content)
+                .start();
+
+        // Verify parent case has both a human task and a process task active
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .orderByName().asc()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getPlanItemDefinitionType)
+                .containsExactly(
+                        tuple("Parent Human Task", PlanItemDefinitionType.HUMAN_TASK),
+                        tuple("Sub Process", PlanItemDefinitionType.PROCESS_TASK)
+                );
+
+        // Verify the child process was started and received both input variables
+        PlanItemInstance processTaskPlanItemInstance = planItemInstances.get(1);
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+        ProcessInstance childProcessInstance = processEngineRuntimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        assertThat(childProcessInstance).isNotNull();
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "childVar1")).isEqualTo(inVar1Content);
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "childVar2")).isEqualTo(inVar2Content);
+
+        // Set a variable in the child process and complete the child task
+        Task childTask = processEngineTaskService.createTaskQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        assertThat(childTask).isNotNull();
+        processEngineRuntimeService.setVariable(processInstanceId, "childResult", outVarContent);
+        processEngineTaskService.complete(childTask.getId());
+
+        // Verify the out parameter variable is now available on the parent case
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "parentResult")).isEqualTo(outVarContent);
+
+        // Complete the parent human task
+        Task parentTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertThat(parentTask.getName()).isEqualTo("Parent Human Task");
+        cmmnTaskService.complete(parentTask.getId());
+
+        // Verify the parent case has ended
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    @Test
+    @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
     public void testIOParameterCombinations() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testProcessTaskParameterExpressions")
@@ -2285,6 +2345,58 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
             }
         } finally {
             processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+    public void testTerminateCaseInstanceWithBlockingProcessTaskHistoricPlanItemState() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        // Complete the human task so the process task becomes active
+        Task caseTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseTask).isNotNull();
+        assertThat(caseTask.getName()).isEqualTo("Task A");
+        cmmnTaskService.complete(caseTask.getId());
+
+        // Process task should now be active with a child process instance
+        PlanItemInstance processTaskPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        assertThat(processTaskPlanItem).isNotNull();
+
+        // The child process instance should have a user task
+        Task processTask = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertThat(processTask).isNotNull();
+        assertThat(processTask.getName()).isEqualTo("my task");
+
+        // Terminate the case instance
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        // Verify runtime data is cleaned up
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+        assertThat(processEngine.getTaskService().createTaskQuery().count()).isZero();
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isZero();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            // The historic case instance should be terminated
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getState()).isEqualTo(CaseInstanceState.TERMINATED);
+
+            // The historic plan item for the process task should be terminated, not active
+            HistoricPlanItemInstance historicProcessTaskPlanItem = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceId(processTaskPlanItem.getId())
+                    .singleResult();
+            assertThat(historicProcessTaskPlanItem).isNotNull();
+            assertThat(historicProcessTaskPlanItem.getState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+            assertThat(historicProcessTaskPlanItem.getEndedTime()).isNotNull();
+            assertThat(historicProcessTaskPlanItem.getTerminatedTime()).isNotNull();
         }
     }
 

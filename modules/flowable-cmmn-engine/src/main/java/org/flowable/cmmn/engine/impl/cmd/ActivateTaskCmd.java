@@ -13,8 +13,11 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Date;
+import java.util.List;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -71,6 +74,14 @@ public class ActivateTaskCmd implements Command<Void> {
             task.setState(Task.CREATED);
         }
         task.setSuspensionState(SuspensionState.ACTIVE.getStateCode());
+        
+        List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByReferenceId(task.getId());
+        
+        if (planItemInstances != null && !planItemInstances.isEmpty()) {
+            planItemInstances.get(0).setState(PlanItemInstanceState.ACTIVE);
+            
+            cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceUpdated(planItemInstances.get(0));
+        }
         
         HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
         historicTaskService.recordTaskInfoChange(task, updateTime, cmmnEngineConfiguration);

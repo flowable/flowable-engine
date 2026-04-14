@@ -30,9 +30,17 @@
 
 <h3>Release Notes - Flowable - 8.0.0</h3>
 
+<h4>Breaking Changes</h4>
+<ul>
+    <li>Upgrade to Spring Framework 7 and Spring Boot 4. There is no support for Spring Boot 3 anymore.</li>
+    <li>Upgrade to Jackson 3 (see details below). Jackson 2 is still supported via a compatibility layer</li>
+    <li>Remove JUnit 3 and JUnit 4 testing support (deprecated in 7.2.0). Use JUnit 5 (Jupiter) exclusively</li>
+</ul>
+
+<h4>New Features</h4>
 <ul>
     <li>
-        The method `stream()` can be used to obtain a <code>java.util.stream.Stream</code> from a collection.
+        The method <code>stream()</code> can be used to obtain a <code>java.util.stream.Stream</code> from a collection.
     </li>
     <li>
         Lambda expressions can be used in expressions. e.g. if you have a transient list of customers you can do something like:
@@ -51,6 +59,48 @@
         Date properties e.g., Process Instance start time will be returned as an ISO 8601 in the UTC timezone.
         E.g., if the start time was returned as <code>2025-09-24T09:58:12.609+02:00</code> now it is returned as <code>2025-09-24T07:58:12.609Z</code>.
     </li>
+    <li>Expressions can now access some of the definition information in expressions resolved during deployment. e.g. in Start Timer expression <code>${variableContainer.definitionKey}</code> to access the definition key</li>
+    <li>Support Java Records in Expressions</li>
+    <li>Support for updating more task properties when doing case and process instance migration</li>
+    <li>Case and process instance migration validation is now available in the REST API</li>
+    <li>Option to automatically create plan item instances for new plan items during case instance migration</li>
+    <li>Added <code>endUserId</code> for historic process/case instances and <code>state</code> for historic process instances</li>
+    <li>Added case and process end interceptor support</li>
+    <li>Dispatch events when updating the business status of a case or process</li>
+    <li>Added hookpoints to event registry for event payload types</li>
+    <li>Added option to disable history persistence when executing DMN decisions</li>
+</ul>
+
+<h4>Performance Improvements</h4>
+<ul>
+    <li>Improve Expression coercion performance</li>
+    <li>Long String variables now store a cached value, avoiding repeated deserialization</li>
+    <li>Reduce unnecessary <code>ObjectMapper</code> instance creation - reuse the one from engine configuration</li>
+</ul>
+
+<h4>Bug Fixes</h4>
+<ul>
+    <li>Fix issue with multiple case reactivations with a parent case instance</li>
+    <li>Fix NPE when having two sentries, and one doesn't have an <code>ifPart</code></li>
+    <li>Fix case / process instance ended invoked twice when undeploying deeply nested app</li>
+    <li>Fix issue with moving parallel multi-instance activities to a single activity</li>
+    <li>Ensure that multiple character events for the same element are handled correctly in XML parsing</li>
+    <li>Make sure that <code>BeanELResolver</code> and DMN Expression resolution propagates the exception cause</li>
+    <li>Avoid 'Invalid reference in diagram interchange definition' warning message in logs when plan items are part of a plan fragment</li>
+    <li>Unlock exclusive jobs when unacquiring all jobs of a worker</li>
+    <li>Unacquiring external worker job should unlock the exclusive scope if the external worker job is exclusive</li>
+    <li>Address security concerns raised via GitHub issue</li>
+</ul>
+
+<h4>Jackson 3</h4>
+<p>
+    <strong>Important:</strong> If you have scripts or expressions that call methods on a <code>JsonNode</code>, you need to carefully check if these work with Jackson 3,
+    as many method signatures have changed (see details below). If you are unsure, we recommend starting with Jackson 2 configured first
+    (<code>flowable.variable-json-mapper=jackson2</code>), and then testing for an upgrade to Jackson 3 over time.
+    We do recommend looking into upgrading to Jackson 3, since Jackson 2 will eventually stop receiving updates.
+    See <a href="https://github.com/FasterXML/jackson/wiki/Jackson-Releases">Jackson Releases</a> for the latest support information.
+</p>
+<ul>
     <li>
         Jackson 3 is used for Flowable internal json manipulation.
         There is still support for Jackson 2 variables.
@@ -96,8 +146,14 @@
             <li>When using <code>stringValue</code> on a non <code>StringNode</code> or <code>NullNode</code> it would fail, in Jackson 2 it would return <code>null</code>.</li>
             <li>When using <code>asString</code> on a <code>ObjectNode</code> or <code>ArrayNode</code> it would fail, in Jackson 2 it would return an empty string.</li>
         </ul>
-
     </li>
+</ul>
+
+<h4>Dependency Upgrades</h4>
+<ul>
+    <li>Upgrade to Spring Framework 7 / Spring Boot 4</li>
+    <li>Upgrade to Jackson 3 (with Jackson 2 compatibility)</li>
+    <li>Various other dependency updates</li>
 </ul>
 <h3>Release Notes - Flowable - 7.2.0</h3>
 
