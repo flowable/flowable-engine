@@ -26,7 +26,7 @@
             #{businessStatus, jdbcType=NVARCHAR},
             #{dueDate, jdbcType=TIMESTAMP},
             #{claimTime, jdbcType=TIMESTAMP},
-            #{claimedBy, jdbcType=VARCHAR},
+            #{claimedBy, jdbcType=NVARCHAR},
             #{endUserId, jdbcType=VARCHAR}
         )
     </insert>
@@ -55,7 +55,7 @@
                 #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
                 #{historicCaseInstance.dueDate, jdbcType=TIMESTAMP},
                 #{historicCaseInstance.claimTime, jdbcType=TIMESTAMP},
-                #{historicCaseInstance.claimedBy, jdbcType=VARCHAR},
+                #{historicCaseInstance.claimedBy, jdbcType=NVARCHAR},
                 #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
@@ -85,7 +85,7 @@
                 #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
                 #{historicCaseInstance.dueDate, jdbcType=TIMESTAMP},
                 #{historicCaseInstance.claimTime, jdbcType=TIMESTAMP},
-                #{historicCaseInstance.claimedBy, jdbcType=VARCHAR},
+                #{historicCaseInstance.claimedBy, jdbcType=NVARCHAR},
                 #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
@@ -151,7 +151,7 @@
                 CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
             </if>
             <if test="originalPersistentState.claimedBy != claimedBy">
-                CLAIMED_BY_ = #{claimedBy, jdbcType=VARCHAR},
+                CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.endUserId != endUserId">
                 END_USER_ID_ = #{endUserId, jdbcType=VARCHAR},
@@ -201,7 +201,7 @@
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
         <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
-        <result property="claimedBy" column="CLAIMED_BY_" jdbcType="VARCHAR" />
+        <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="endUserId" column="END_USER_ID_" jdbcType="VARCHAR" />
 
