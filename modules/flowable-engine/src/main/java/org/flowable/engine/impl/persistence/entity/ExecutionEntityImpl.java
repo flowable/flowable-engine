@@ -100,6 +100,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String localizedName;
     protected String localizedDescription;
 
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
+
     protected Date lockTime;
     protected String lockOwner;
 
@@ -280,6 +284,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("isEventScope", this.isEventScope);
         persistentState.put("parentId", parentId);
         persistentState.put("name", name);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         persistentState.put("lockTime", lockTime);
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("superExecution", this.superExecutionId);
@@ -1235,6 +1242,36 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 
     @Override

@@ -91,6 +91,10 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     
     String updateProcessInstanceBusinessStatus(ExecutionEntity executionEntity, String businessStatus);
 
+    void updateProcessInstanceDueDate(ExecutionEntity executionEntity, Date dueDate);
+
+    void updateProcessInstanceClaimTime(ExecutionEntity executionEntity, Date claimTime, String claimedBy);
+
     void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
     
     void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade);

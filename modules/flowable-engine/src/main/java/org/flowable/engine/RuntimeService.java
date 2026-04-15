@@ -13,6 +13,7 @@
 package org.flowable.engine;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
@@ -63,6 +65,14 @@ public interface RuntimeService {
      * Create a {@link ProcessInstanceBuilder}, that allows to set various options for starting a process instance, as an alternative to the various startProcessInstanceByXX methods.
      */
     ProcessInstanceBuilder createProcessInstanceBuilder();
+
+    /**
+     * Create a {@link ProcessInstanceUpdateBuilder}, that allows to update various properties of a process instance.
+     *
+     * @param processInstanceId
+     *     id of the process instance to update, cannot be null
+     */
+    ProcessInstanceUpdateBuilder createProcessInstanceUpdateBuilder(String processInstanceId);
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
@@ -448,6 +458,35 @@ public interface RuntimeService {
      *     new business status value
      */
     void updateBusinessStatus(String processInstanceId, String businessStatus);
+
+    /**
+     * Sets the due date for the provided process instance.
+     *
+     * @param processInstanceId
+     *     id of the process instance to set the due date, cannot be null
+     * @param dueDate
+     *     new due date value
+     */
+    void setProcessInstanceDueDate(String processInstanceId, Date dueDate);
+
+    /**
+     * Claims the process instance by setting the given user as the assignee.
+     * When the process instance is already claimed by another user, an exception is thrown.
+     *
+     * @param processInstanceId
+     *     id of the process instance to claim, cannot be null
+     * @param userId
+     *     user id of the user to claim the process instance
+     */
+    void claimProcessInstance(String processInstanceId, String userId);
+
+    /**
+     * Unclaims the process instance by removing the assignee.
+     *
+     * @param processInstanceId
+     *     id of the process instance to unclaim, cannot be null
+     */
+    void unclaimProcessInstance(String processInstanceId);
 
     // Identity Links
     // ///////////////////////////////////////////////////////////////

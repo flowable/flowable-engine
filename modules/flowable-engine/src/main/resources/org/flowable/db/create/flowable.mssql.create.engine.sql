@@ -69,6 +69,9 @@ create table ACT_RU_EXECUTION (
     REFERENCE_TYPE_ nvarchar(255),
     PROPAGATED_STAGE_INST_ID_ nvarchar(255),
     BUSINESS_STATUS_ nvarchar(255),
+    DUE_DATE_ datetime,
+    CLAIM_TIME_ datetime,
+    CLAIMED_BY_ nvarchar(255),
     primary key (ID_)
 );
 
@@ -340,7 +343,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '8.1.0.0', 1);
+values ('schema.version', '8.1.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(8.1.0.0)', 1);
+values ('schema.history', 'create(8.1.0.1)', 1);

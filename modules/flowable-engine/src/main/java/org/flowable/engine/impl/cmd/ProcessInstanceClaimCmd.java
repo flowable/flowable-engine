@@ -75,18 +75,18 @@ public class ProcessInstanceClaimCmd implements Command<Void>, Serializable {
 
             executionManager.updateProcessInstanceClaimTime(processInstance,
                     processEngineConfiguration.getClock().getCurrentTime(), userId);
-            
-            if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
-                processEngineConfiguration.getStartProcessInstanceInterceptor().handleClaim(processInstance, userId);
+
+            if (processEngineConfiguration.getProcessInstanceStateInterceptor() != null) {
+                processEngineConfiguration.getProcessInstanceStateInterceptor().handleClaim(processInstance, userId);
             }
-            
+
         } else {
             IdentityLinkUtil.deleteProcessInstanceIdentityLinks(processInstance, null, null, IdentityLinkType.ASSIGNEE);
 
             executionManager.updateProcessInstanceClaimTime(processInstance, null, null);
-            
-            if (processEngineConfiguration.getStartProcessInstanceInterceptor() != null) {
-                processEngineConfiguration.getStartProcessInstanceInterceptor().handleUnclaim(processInstance, userId);
+
+            if (processEngineConfiguration.getProcessInstanceStateInterceptor() != null) {
+                processEngineConfiguration.getProcessInstanceStateInterceptor().handleUnclaim(processInstance, userId);
             }
         }
 

@@ -469,6 +469,9 @@ public class CmmnRestResponseFactory {
         CaseInstanceResponse result = new CaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setBusinessStatus(caseInstance.getBusinessStatus());
+        result.setDueDate(caseInstance.getDueDate());
+        result.setClaimTime(caseInstance.getClaimTime());
+        result.setClaimedBy(caseInstance.getClaimedBy());
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
         result.setStartTime(caseInstance.getStartTime());
@@ -496,6 +499,9 @@ public class CmmnRestResponseFactory {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         CaseInstanceResponse result = new CaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
+        result.setDueDate(caseInstance.getDueDate());
+        result.setClaimTime(caseInstance.getClaimTime());
+        result.setClaimedBy(caseInstance.getClaimedBy());
         result.setId(caseInstance.getId());
         result.setName(caseInstance.getName());
         result.setStartTime(caseInstance.getStartTime());
@@ -693,6 +699,9 @@ public class CmmnRestResponseFactory {
         HistoricCaseInstanceResponse result = new HistoricCaseInstanceResponse();
         result.setBusinessKey(caseInstance.getBusinessKey());
         result.setBusinessStatus(caseInstance.getBusinessStatus());
+        result.setDueDate(caseInstance.getDueDate());
+        result.setClaimTime(caseInstance.getClaimTime());
+        result.setClaimedBy(caseInstance.getClaimedBy());
         result.setName(caseInstance.getName());
         result.setEndTime(caseInstance.getEndTime());
         result.setId(caseInstance.getId());

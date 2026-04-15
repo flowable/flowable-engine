@@ -268,6 +268,19 @@ public class CaseInstanceEntityManagerImpl
         }
     }
 
+    @Override
+    public void updateCaseInstanceDueDate(CaseInstanceEntity caseInstanceEntity, Date dueDate) {
+        caseInstanceEntity.setDueDate(dueDate);
+        engineConfiguration.getCmmnHistoryManager().recordUpdateDueDate(caseInstanceEntity, dueDate);
+    }
+
+    @Override
+    public void updateCaseInstanceClaimTime(CaseInstanceEntity caseInstanceEntity, Date claimTime, String claimedBy) {
+        caseInstanceEntity.setClaimTime(claimTime);
+        caseInstanceEntity.setClaimedBy(claimedBy);
+        engineConfiguration.getCmmnHistoryManager().recordUpdateClaimTime(caseInstanceEntity, claimTime, claimedBy);
+    }
+
     protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
         return engineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager();
     }

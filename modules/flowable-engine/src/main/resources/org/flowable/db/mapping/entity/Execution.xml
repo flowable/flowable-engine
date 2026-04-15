@@ -11,7 +11,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_)
     values (
       #{id, jdbcType=NVARCHAR},
       1, #{processInstanceId, jdbcType=NVARCHAR},
@@ -47,7 +47,10 @@
       #{referenceId, jdbcType=NVARCHAR},
       #{referenceType, jdbcType=NVARCHAR},
       #{propagatedStageInstanceId, jdbcType=NVARCHAR},
-      #{businessStatus, jdbcType=NVARCHAR}
+      #{businessStatus, jdbcType=NVARCHAR},
+      #{dueDate, jdbcType=TIMESTAMP},
+      #{claimTime, jdbcType=TIMESTAMP},
+      #{claimedBy, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -56,7 +59,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id, jdbcType=NVARCHAR},
@@ -93,7 +96,10 @@
          #{execution.referenceId, jdbcType=NVARCHAR},
          #{execution.referenceType, jdbcType=NVARCHAR},
          #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
-         #{execution.businessStatus, jdbcType=NVARCHAR}
+         #{execution.businessStatus, jdbcType=NVARCHAR},
+         #{execution.dueDate, jdbcType=TIMESTAMP},
+         #{execution.claimTime, jdbcType=TIMESTAMP},
+         #{execution.claimedBy, jdbcType=NVARCHAR}
         )
       </foreach>
   </insert>
@@ -105,7 +111,7 @@
                                         IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                         TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                         TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                        CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_) VALUES
+                                        CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_) VALUES
             (
              #{execution.id, jdbcType=NVARCHAR},
              1, #{execution.processInstanceId, jdbcType=NVARCHAR},
@@ -240,6 +246,15 @@
             <if test="originalPersistentState.businessStatus != businessStatus">
                 BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
+            <if test="originalPersistentState.dueDate != dueDate">
+                DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimTime != claimTime">
+                CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimedBy != claimedBy">
+                CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
+            </if>
         </set>
     where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -360,6 +375,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="processInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -409,6 +427,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -448,6 +469,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
@@ -509,6 +533,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR" />
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />

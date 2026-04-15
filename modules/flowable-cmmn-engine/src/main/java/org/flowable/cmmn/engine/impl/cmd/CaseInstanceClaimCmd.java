@@ -67,10 +67,19 @@ public class CaseInstanceClaimCmd implements Command<Void>, Serializable {
             IdentityLinkUtil.createCaseInstanceIdentityLink(caseInstanceEntity, userId, null, IdentityLinkType.ASSIGNEE, cmmnEngineConfiguration);
 
             caseInstanceEntityManager.updateCaseInstanceClaimTime(caseInstanceEntity, cmmnEngineConfiguration.getClock().getCurrentTime(), userId);
+
+            if (cmmnEngineConfiguration.getCaseInstanceStateInterceptor() != null) {
+                cmmnEngineConfiguration.getCaseInstanceStateInterceptor().handleClaim(caseInstanceEntity, userId);
+            }
+
         } else {
             IdentityLinkUtil.deleteCaseInstanceIdentityLinks(caseInstanceEntity, null, null, IdentityLinkType.ASSIGNEE, cmmnEngineConfiguration);
 
             caseInstanceEntityManager.updateCaseInstanceClaimTime(caseInstanceEntity, null, null);
+
+            if (cmmnEngineConfiguration.getCaseInstanceStateInterceptor() != null) {
+                cmmnEngineConfiguration.getCaseInstanceStateInterceptor().handleUnclaim(caseInstanceEntity, userId);
+            }
         }
 
         return null;

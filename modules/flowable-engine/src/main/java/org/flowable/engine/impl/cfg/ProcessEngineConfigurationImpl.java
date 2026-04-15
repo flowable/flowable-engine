@@ -357,6 +357,7 @@ import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
+import org.flowable.engine.interceptor.ProcessInstanceStateInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
 import org.flowable.engine.interceptor.UserTaskStateInterceptor;
 import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
@@ -762,6 +763,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected ProcessInstanceStateInterceptor processInstanceStateInterceptor;
     protected EndProcessInstanceInterceptor endProcessInstanceInterceptor;
 
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
@@ -3398,6 +3400,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setStartProcessInstanceInterceptor(StartProcessInstanceInterceptor startProcessInstanceInterceptor) {
         this.startProcessInstanceInterceptor = startProcessInstanceInterceptor;
+        return this;
+    }
+
+    public ProcessInstanceStateInterceptor getProcessInstanceStateInterceptor() {
+        return processInstanceStateInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceStateInterceptor(ProcessInstanceStateInterceptor processInstanceStateInterceptor) {
+        this.processInstanceStateInterceptor = processInstanceStateInterceptor;
         return this;
     }
 

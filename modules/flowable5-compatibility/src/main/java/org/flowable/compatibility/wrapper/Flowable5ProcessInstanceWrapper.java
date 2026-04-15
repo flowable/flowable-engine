@@ -156,6 +156,21 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
     }
     
     @Override
+    public Date getDueDate() {
+        return null;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return null;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return null;
+    }
+
+    @Override
     public String getCallbackId() {
         return null;
     }

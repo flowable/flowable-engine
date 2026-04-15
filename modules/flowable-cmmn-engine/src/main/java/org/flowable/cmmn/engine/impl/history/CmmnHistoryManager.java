@@ -43,6 +43,10 @@ public interface CmmnHistoryManager {
     
     void recordUpdateBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus);
 
+    void recordUpdateDueDate(CaseInstanceEntity caseInstanceEntity, Date dueDate);
+
+    void recordUpdateClaimTime(CaseInstanceEntity caseInstanceEntity, Date claimTime, String claimedBy);
+
     void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity);
 
     void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId);
