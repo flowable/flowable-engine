@@ -346,4 +346,41 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
 
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("original");
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testClaimProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"claim\", \"assignee\": \"kermit\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("claimedBy").asText()).isEqualTo("kermit");
+        assertThat(responseNode.get("claimTime").asText()).isNotEmpty();
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isEqualTo("kermit");
+        assertThat(updatedInstance.getClaimTime()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUnclaimProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        runtimeService.claimProcessInstance(processInstance.getId(), "kermit");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"unclaim\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isNull();
+        assertThat(updatedInstance.getClaimTime()).isNull();
+    }
 }

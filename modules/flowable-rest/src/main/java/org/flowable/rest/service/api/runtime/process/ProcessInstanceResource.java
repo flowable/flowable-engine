@@ -127,8 +127,20 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
             } else if (ProcessInstanceUpdateRequest.ACTION_SUSPEND.equals(updateRequest.getAction())) {
                 return suspendProcessInstance(processInstance);
+
+            } else if (ProcessInstanceUpdateRequest.ACTION_CLAIM.equals(updateRequest.getAction())) {
+                runtimeService.claimProcessInstance(processInstanceId, updateRequest.getAssignee());
+                processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+                return restResponseFactory.createProcessInstanceResponse(processInstance);
+
+            } else if (ProcessInstanceUpdateRequest.ACTION_UNCLAIM.equals(updateRequest.getAction())) {
+                runtimeService.unclaimProcessInstance(processInstanceId);
+                processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+                return restResponseFactory.createProcessInstanceResponse(processInstance);
+
+            } else {
+                throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
             }
-            throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
 
         } else { // update
 

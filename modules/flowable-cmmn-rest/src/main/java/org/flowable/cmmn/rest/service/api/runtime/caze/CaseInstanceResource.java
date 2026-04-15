@@ -101,6 +101,12 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             if (RestActionRequest.EVALUATE_CRITERIA.equals(updateRequest.getAction())) {
                 runtimeService.evaluateCriteria(caseInstance.getId());
 
+            } else if (CaseInstanceUpdateRequest.ACTION_CLAIM.equals(updateRequest.getAction())) {
+                runtimeService.claimCaseInstance(caseInstanceId, updateRequest.getAssignee());
+
+            } else if (CaseInstanceUpdateRequest.ACTION_UNCLAIM.equals(updateRequest.getAction())) {
+                runtimeService.unclaimCaseInstance(caseInstanceId);
+
             } else {
                 throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
             }

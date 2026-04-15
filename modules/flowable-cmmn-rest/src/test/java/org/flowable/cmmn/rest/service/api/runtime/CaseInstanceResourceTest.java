@@ -499,6 +499,49 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testClaimCaseInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"claim\", \"assignee\": \"kermit\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("claimedBy").asText()).isEqualTo("kermit");
+        assertThat(responseNode.get("claimTime").asText()).isNotEmpty();
+
+        CaseInstance updatedInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isEqualTo("kermit");
+        assertThat(updatedInstance.getClaimTime()).isNotNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testUnclaimCaseInstance() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        runtimeService.claimCaseInstance(caseInstance.getId(), "kermit");
+
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"unclaim\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        CaseInstance updatedInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isNull();
+        assertThat(updatedInstance.getClaimTime()).isNull();
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/changeStateCase.cmmn" })
     public void testChangeStateCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()

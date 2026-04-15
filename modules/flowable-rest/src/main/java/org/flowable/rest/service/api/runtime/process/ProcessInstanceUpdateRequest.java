@@ -28,11 +28,14 @@ public class ProcessInstanceUpdateRequest extends RestActionRequest {
 
     public static final String ACTION_SUSPEND = "suspend";
     public static final String ACTION_ACTIVATE = "activate";
+    public static final String ACTION_CLAIM = "claim";
+    public static final String ACTION_UNCLAIM = "unclaim";
 
     protected String name;
     protected String businessKey;
     protected String businessStatus;
     protected Date dueDate;
+    protected String assignee;
 
     @Override
     @ApiModelProperty(value = "Action to perform: Either activate or suspend", example = "activate", required = true)
@@ -63,5 +66,11 @@ public class ProcessInstanceUpdateRequest extends RestActionRequest {
     }
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
 }
