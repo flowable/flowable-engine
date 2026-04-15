@@ -276,6 +276,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("START_ACT_ID_", "startActivityId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("IS_COUNT_ENABLED_", "isCountEnabled", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("EVT_SUBSCR_COUNT_", "eventSubscriptionCount", PARAMETER_TYPE_INTEGER);
         info.addColumn("TASK_COUNT_", "taskCount", PARAMETER_TYPE_INTEGER);
@@ -466,6 +469,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("START_USER_ID_", "startUserId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_ACT_ID_", "startActivityId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("END_ACT_ID_", "endActivityId",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("SUPER_PROCESS_INSTANCE_ID_", "superProcessInstanceId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("DELETE_REASON_", "deleteReason",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TENANT_ID_", "tenantId",  PARAMETER_TYPE_NVARCHAR);
@@ -899,6 +905,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("IS_COMPLETEABLE_", "completeable", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_TIME_", "lockTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
@@ -1009,6 +1018,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("END_USER_ID_", "endUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionName", "caseDefinitionName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CaseDefinitionVersion", "caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
