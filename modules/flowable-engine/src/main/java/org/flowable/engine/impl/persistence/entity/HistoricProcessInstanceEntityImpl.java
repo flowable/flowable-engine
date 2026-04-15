@@ -14,6 +14,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,9 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String referenceId;
     protected String referenceType;
     protected String propagatedStageInstanceId;
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -117,6 +121,9 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
         persistentState.put("state", state);
         persistentState.put("endUserId", endUserId);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         return persistentState;
     }
 
@@ -356,6 +363,36 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
         this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 
     @Override

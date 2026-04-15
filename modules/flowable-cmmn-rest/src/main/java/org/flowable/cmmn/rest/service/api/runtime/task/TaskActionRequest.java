@@ -30,6 +30,7 @@ public class TaskActionRequest extends RestActionRequest {
 
     public static final String ACTION_COMPLETE = "complete";
     public static final String ACTION_CLAIM = "claim";
+    public static final String ACTION_UNCLAIM = "unclaim";
     public static final String ACTION_DELEGATE = "delegate";
     public static final String ACTION_RESOLVE = "resolve";
 

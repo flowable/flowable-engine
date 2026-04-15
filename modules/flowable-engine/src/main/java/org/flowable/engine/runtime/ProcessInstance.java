@@ -117,6 +117,21 @@ public interface ProcessInstance extends Execution {
     String getStartUserId();
     
     /**
+     * Returns the due date of this process instance.
+     */
+    Date getDueDate();
+
+    /**
+     * Returns the claim time of this process instance.
+     */
+    Date getClaimTime();
+
+    /**
+     * Returns the user id of the user that claimed this process instance.
+     */
+    String getClaimedBy();
+
+    /**
      * Returns the callback id of this process instance.
      */
     String getCallbackId();

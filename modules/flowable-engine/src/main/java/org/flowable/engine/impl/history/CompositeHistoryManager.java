@@ -347,6 +347,20 @@ public class CompositeHistoryManager implements HistoryManager {
             historyManager.updateProcessBusinessStatusInHistory(processInstance);
         }
     }
+    
+    @Override
+    public void updateProcessDueDateInHistory(ExecutionEntity processInstance) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.updateProcessDueDateInHistory(processInstance);
+        }
+    }
+
+    @Override
+    public void updateProcessClaimTimeInHistory(ExecutionEntity processInstance) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.updateProcessClaimTimeInHistory(processInstance);
+        }
+    }
 
     @Override
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {

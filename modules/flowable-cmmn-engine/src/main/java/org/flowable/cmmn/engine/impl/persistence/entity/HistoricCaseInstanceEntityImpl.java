@@ -44,6 +44,9 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     protected String callbackType;
     protected String referenceId;
     protected String referenceType;
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected List<HistoricVariableInstanceEntity> queryVariables;
     protected String endUserId;
@@ -100,6 +103,9 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
         persistentState.put("callbackType", callbackType);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         persistentState.put("tenantId", tenantId);
         persistentState.put("endUserId", endUserId);
         return persistentState;
@@ -235,6 +241,30 @@ public class HistoricCaseInstanceEntityImpl extends AbstractCmmnEngineEntity imp
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
     @Override
     public String getEndUserId() {

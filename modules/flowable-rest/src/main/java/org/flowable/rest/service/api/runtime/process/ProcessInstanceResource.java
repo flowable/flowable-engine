@@ -26,6 +26,7 @@ import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -126,16 +127,45 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
             } else if (ProcessInstanceUpdateRequest.ACTION_SUSPEND.equals(updateRequest.getAction())) {
                 return suspendProcessInstance(processInstance);
+
+            } else if (ProcessInstanceUpdateRequest.ACTION_CLAIM.equals(updateRequest.getAction())) {
+                runtimeService.claimProcessInstance(processInstanceId, updateRequest.getAssignee());
+                processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+                return restResponseFactory.createProcessInstanceResponse(processInstance);
+
+            } else if (ProcessInstanceUpdateRequest.ACTION_UNCLAIM.equals(updateRequest.getAction())) {
+                runtimeService.unclaimProcessInstance(processInstanceId);
+                processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+                return restResponseFactory.createProcessInstanceResponse(processInstance);
+
+            } else {
+                throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
             }
-            throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
 
         } else { // update
 
-            if (StringUtils.isNotEmpty(updateRequest.getName())) {
-                runtimeService.setProcessInstanceName(processInstanceId, updateRequest.getName());
+            boolean hasUpdates = false;
+            ProcessInstanceUpdateBuilder updateBuilder = runtimeService.createProcessInstanceUpdateBuilder(processInstanceId);
+
+            if (updateRequest.getName() != null) {
+                updateBuilder.name(updateRequest.getName());
+                hasUpdates = true;
             }
-            if (StringUtils.isNotEmpty(updateRequest.getBusinessKey())) {
-                runtimeService.updateBusinessKey(processInstanceId, updateRequest.getBusinessKey());
+            if (updateRequest.getBusinessKey() != null) {
+                updateBuilder.businessKey(updateRequest.getBusinessKey());
+                hasUpdates = true;
+            }
+            if (updateRequest.getBusinessStatus() != null) {
+                updateBuilder.businessStatus(updateRequest.getBusinessStatus());
+                hasUpdates = true;
+            }
+            if (updateRequest.getDueDate() != null) {
+                updateBuilder.dueDate(updateRequest.getDueDate());
+                hasUpdates = true;
+            }
+
+            if (hasUpdates) {
+                updateBuilder.update();
             }
 
             processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();

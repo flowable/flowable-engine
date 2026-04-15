@@ -228,6 +228,10 @@ public interface HistoryManager {
      */
     void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance);
 
+    void updateProcessDueDateInHistory(ExecutionEntity processInstance);
+
+    void updateProcessClaimTimeInHistory(ExecutionEntity processInstance);
+
     /**
      * Record the update of a process definition for historic process instance, task, and activity instance, if history is enabled.
      */

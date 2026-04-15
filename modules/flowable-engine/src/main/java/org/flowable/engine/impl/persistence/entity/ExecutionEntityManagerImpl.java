@@ -1127,6 +1127,19 @@ public class ExecutionEntityManagerImpl
         return null;
     }
 
+    @Override
+    public void updateProcessInstanceDueDate(ExecutionEntity executionEntity, Date dueDate) {
+        executionEntity.setDueDate(dueDate);
+        getHistoryManager().updateProcessDueDateInHistory(executionEntity);
+    }
+
+    @Override
+    public void updateProcessInstanceClaimTime(ExecutionEntity executionEntity, Date claimTime, String claimedBy) {
+        executionEntity.setClaimTime(claimTime);
+        executionEntity.setClaimedBy(claimedBy);
+        getHistoryManager().updateProcessClaimTimeInHistory(executionEntity);
+    }
+
     protected HistoryManager getHistoryManager() {
         return engineConfiguration.getHistoryManager();
     }

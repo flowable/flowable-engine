@@ -475,6 +475,33 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
     
     @Override
+    public void updateProcessDueDateInHistory(ExecutionEntity processInstance) {
+        if (processInstance != null) {
+            if (isHistoryEnabled(processInstance.getProcessDefinitionId())) {
+                HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
+                if (historicProcessInstance != null) {
+                    historicProcessInstance.setDueDate(processInstance.getDueDate());
+                    getHistoricProcessInstanceEntityManager().update(historicProcessInstance, false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void updateProcessClaimTimeInHistory(ExecutionEntity processInstance) {
+        if (processInstance != null) {
+            if (isHistoryEnabled(processInstance.getProcessDefinitionId())) {
+                HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
+                if (historicProcessInstance != null) {
+                    historicProcessInstance.setClaimTime(processInstance.getClaimTime());
+                    historicProcessInstance.setClaimedBy(processInstance.getClaimedBy());
+                    getHistoricProcessInstanceEntityManager().update(historicProcessInstance, false);
+                }
+            }
+        }
+    }
+
+    @Override
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
         if (isHistoryEnabled(processDefinitionEntity.getId())) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());

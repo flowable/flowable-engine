@@ -706,6 +706,43 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    public void testUnclaimTask() throws Exception {
+        try {
+            Task task = taskService.newTask();
+            taskService.saveTask(task);
+            String taskId = task.getId();
+
+            // Claim the task first
+            taskService.claim(taskId, "kermit");
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task.getAssignee()).isEqualTo("kermit");
+
+            // Unclaim the task
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            requestNode.put("action", "unclaim");
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getAssignee()).isNull();
+
+        } finally {
+            List<Task> tasks = taskService.createTaskQuery().list();
+            for (Task task : tasks) {
+                taskService.deleteTask(task.getId(), true);
+            }
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
+            for (HistoricTaskInstance task : historicTasks) {
+                historyService.deleteHistoricTaskInstance(task.getId());
+            }
+        }
+    }
+
+    @Test
     @Deployment
     public void testReclaimTask() throws Exception {
 

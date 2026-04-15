@@ -628,6 +628,9 @@ public class RestResponseFactory {
         result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setBusinessStatus(processInstance.getBusinessStatus());
+        result.setDueDate(processInstance.getDueDate());
+        result.setClaimTime(processInstance.getClaimTime());
+        result.setClaimedBy(processInstance.getClaimedBy());
         result.setId(processInstance.getId());
         result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
@@ -827,6 +830,9 @@ public class RestResponseFactory {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setBusinessStatus(processInstance.getBusinessStatus());
+        result.setDueDate(processInstance.getDueDate());
+        result.setClaimTime(processInstance.getClaimTime());
+        result.setClaimedBy(processInstance.getClaimedBy());
         result.setDeleteReason(processInstance.getDeleteReason());
         result.setDurationInMillis(processInstance.getDurationInMillis());
         result.setEndActivityId(processInstance.getEndActivityId());

@@ -151,6 +151,12 @@ public interface HistoricProcessInstance {
      */
     String getPropagatedStageInstanceId();
 
+    Date getDueDate();
+
+    Date getClaimTime();
+
+    String getClaimedBy();
+
     /** Returns the process variables if requested in the process instance query */
     Map<String, Object> getProcessVariables();
 }

@@ -70,6 +70,9 @@ CREATE TABLE ACT_CMMN_RU_CASE_INST
     LAST_REACTIVATION_TIME_    datetime,
     LAST_REACTIVATION_USER_ID_ varchar(255),
     BUSINESS_STATUS_           nvarchar(255),
+    DUE_DATE_                  datetime,
+    CLAIM_TIME_                datetime,
+    CLAIMED_BY_                nvarchar(255),
     TENANT_ID_                 varchar(255) CONSTRAINT DF_ACT_CMMN_RU_CASE_INST_TENANT_ID_ DEFAULT '',
     CONSTRAINT PK_ACT_CMMN_RU_CASE_INST PRIMARY KEY (ID_)
 );
@@ -198,6 +201,9 @@ CREATE TABLE ACT_CMMN_HI_CASE_INST
     LAST_REACTIVATION_TIME_    datetime,
     LAST_REACTIVATION_USER_ID_ varchar(255),
     BUSINESS_STATUS_           nvarchar(255),
+    DUE_DATE_                  datetime,
+    CLAIM_TIME_                datetime,
+    CLAIMED_BY_                nvarchar(255),
     TENANT_ID_                 varchar(255) CONSTRAINT DF_ACT_CMMN_HI_CASE_INST_TENANT_ID_ DEFAULT '',
     END_USER_ID_               varchar(255),
     CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_)
@@ -262,4 +268,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE NONCLUSTERED INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST(CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '8.1.0.0', 1);
+values ('cmmn.schema.version', '8.1.0.1', 1);

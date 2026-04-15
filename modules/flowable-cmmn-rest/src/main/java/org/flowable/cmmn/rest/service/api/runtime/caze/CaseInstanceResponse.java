@@ -37,6 +37,11 @@ public class CaseInstanceResponse {
     protected String businessKey;
     protected String businessStatus;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date dueDate;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date claimTime;
+    protected String claimedBy;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date startTime;
     protected String startUserId;
     protected String state;
@@ -242,5 +247,29 @@ public class CaseInstanceResponse {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 }

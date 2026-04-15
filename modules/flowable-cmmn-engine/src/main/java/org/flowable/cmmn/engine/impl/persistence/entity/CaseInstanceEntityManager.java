@@ -45,6 +45,10 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     
     void updateCaseInstanceBusinessStatus(CaseInstanceEntity caseInstanceEntity, String businessStatus);
 
+    void updateCaseInstanceDueDate(CaseInstanceEntity caseInstanceEntity, Date dueDate);
+
+    void updateCaseInstanceClaimTime(CaseInstanceEntity caseInstanceEntity, Date claimTime, String claimedBy);
+
     void updateLockTime(String caseInstanceId, String lockOwner, Date lockTime);
 
     void clearLockTime(String caseInstanceId);

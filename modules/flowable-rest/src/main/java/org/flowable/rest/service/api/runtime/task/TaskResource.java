@@ -124,6 +124,9 @@ public class TaskResource extends TaskBaseResource {
         } else if (TaskActionRequest.ACTION_CLAIM.equals(actionRequest.getAction())) {
             claimTask(task, actionRequest);
 
+        } else if (TaskActionRequest.ACTION_UNCLAIM.equals(actionRequest.getAction())) {
+            unclaimTask(task);
+
         } else if (TaskActionRequest.ACTION_DELEGATE.equals(actionRequest.getAction())) {
             delegateTask(task, actionRequest);
 
@@ -250,5 +253,9 @@ public class TaskResource extends TaskBaseResource {
         // FlowableTaskAlreadyClaimedException is thrown and converted to
         // a CONFLICT response by the ExceptionHandlerAdvice
         taskService.claim(task.getId(), actionRequest.getAssignee());
+    }
+
+    protected void unclaimTask(Task task) {
+        taskService.unclaim(task.getId());
     }
 }

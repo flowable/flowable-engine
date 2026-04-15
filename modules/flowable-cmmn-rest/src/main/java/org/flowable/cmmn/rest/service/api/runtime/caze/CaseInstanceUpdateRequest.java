@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Date;
+
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 
 /*
@@ -20,8 +22,14 @@ import org.flowable.cmmn.rest.service.api.RestActionRequest;
  */
 public class CaseInstanceUpdateRequest extends RestActionRequest {
 
+    public static final String ACTION_CLAIM = "claim";
+    public static final String ACTION_UNCLAIM = "unclaim";
+
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
+    protected Date dueDate;
+    protected String assignee;
 
     public String getName() {
         return name;
@@ -34,5 +42,23 @@ public class CaseInstanceUpdateRequest extends RestActionRequest {
     }
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
+    }
+    public Date getDueDate() {
+        return dueDate;
+    }
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
 }
