@@ -44,7 +44,10 @@
         PROPAGATED_STAGE_INST_ID_,
         BUSINESS_STATUS_,
         STATE_,
-        END_USER_ID_
+        END_USER_ID_,
+        DUE_DATE_,
+        CLAIM_TIME_,
+        CLAIMED_BY_
       ) values (
         #{id, jdbcType=NVARCHAR},
         1, #{processInstanceId, jdbcType=NVARCHAR},
@@ -67,7 +70,10 @@
         #{propagatedStageInstanceId, jdbcType=NVARCHAR},
         #{businessStatus, jdbcType=NVARCHAR},
         #{state, jdbcType=NVARCHAR},
-        #{endUserId, jdbcType=NVARCHAR}
+        #{endUserId, jdbcType=NVARCHAR},
+        #{dueDate, jdbcType=TIMESTAMP},
+        #{claimTime, jdbcType=TIMESTAMP},
+        #{claimedBy, jdbcType=NVARCHAR}
       )
   </insert>
   
@@ -95,7 +101,10 @@
         PROPAGATED_STAGE_INST_ID_,
         BUSINESS_STATUS_,
         STATE_,
-        END_USER_ID_
+        END_USER_ID_,
+        DUE_DATE_,
+        CLAIM_TIME_,
+        CLAIMED_BY_
       ) values
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
           (
@@ -120,7 +129,10 @@
            #{historicProcessInstance.propagatedStageInstanceId, jdbcType=NVARCHAR},
            #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR},
            #{historicProcessInstance.state, jdbcType=NVARCHAR},
-           #{historicProcessInstance.endUserId, jdbcType=NVARCHAR}
+           #{historicProcessInstance.endUserId, jdbcType=NVARCHAR},
+           #{historicProcessInstance.dueDate, jdbcType=TIMESTAMP},
+           #{historicProcessInstance.claimTime, jdbcType=TIMESTAMP},
+           #{historicProcessInstance.claimedBy, jdbcType=NVARCHAR}
           )
          </foreach>
   </insert>
@@ -151,7 +163,10 @@
             PROPAGATED_STAGE_INST_ID_,
             BUSINESS_STATUS_,
             STATE_,
-            END_USER_ID_
+            END_USER_ID_,
+            DUE_DATE_,
+            CLAIM_TIME_,
+            CLAIMED_BY_
           ) VALUES
               (
                #{historicProcessInstance.id, jdbcType=NVARCHAR},
@@ -175,7 +190,10 @@
                #{historicProcessInstance.propagatedStageInstanceId, jdbcType=NVARCHAR},
                #{historicProcessInstance.businessStatus, jdbcType=NVARCHAR},
                #{historicProcessInstance.state, jdbcType=NVARCHAR},
-               #{historicProcessInstance.endUserId, jdbcType=NVARCHAR}
+               #{historicProcessInstance.endUserId, jdbcType=NVARCHAR},
+               #{historicProcessInstance.dueDate, jdbcType=TIMESTAMP},
+               #{historicProcessInstance.claimTime, jdbcType=TIMESTAMP},
+               #{historicProcessInstance.claimedBy, jdbcType=NVARCHAR}
               )
        </foreach>
     SELECT * FROM dual
@@ -234,6 +252,15 @@
         </if>
         <if test="originalPersistentState.endUserId != endUserId">
           END_USER_ID_ = #{endUserId, jdbcType=NVARCHAR},
+        </if>
+        <if test="originalPersistentState.dueDate != dueDate">
+          DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.claimTime != claimTime">
+          CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+        </if>
+        <if test="originalPersistentState.claimedBy != claimedBy">
+          CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
         </if>
       </set>
     where ID_ = #{id, jdbcType=NVARCHAR}
@@ -297,6 +324,9 @@
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
     <result property="state" column="STATE_" jdbcType="NVARCHAR" />
     <result property="endUserId" column="END_USER_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceIdResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">

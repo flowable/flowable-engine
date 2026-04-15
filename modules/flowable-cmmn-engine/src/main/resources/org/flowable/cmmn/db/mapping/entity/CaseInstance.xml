@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
 
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_) values (
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_) values (
             #{id, jdbcType=VARCHAR},
             1, #{parentId, jdbcType=VARCHAR},
             #{caseDefinitionId, jdbcType=VARCHAR},
@@ -22,12 +22,15 @@
             #{referenceType, jdbcType=VARCHAR},
             #{completeable, jdbcType=BOOLEAN},
             #{tenantId, jdbcType=VARCHAR},
-            #{businessStatus, jdbcType=NVARCHAR}
+            #{businessStatus, jdbcType=NVARCHAR},
+            #{dueDate, jdbcType=TIMESTAMP},
+            #{claimTime, jdbcType=TIMESTAMP},
+            #{claimedBy, jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_)
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_)
         values
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
@@ -47,7 +50,10 @@
                 #{caseInstance.referenceType, jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId, jdbcType=VARCHAR},
-                #{caseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{caseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{caseInstance.dueDate, jdbcType=TIMESTAMP},
+                #{caseInstance.claimTime, jdbcType=TIMESTAMP},
+                #{caseInstance.claimedBy, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -55,7 +61,7 @@
     <insert id="bulkInsertCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="caseInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_) VALUES
+            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_) VALUES
             (
                 #{caseInstance.id, jdbcType=VARCHAR},
                 1, #{caseInstance.parentId, jdbcType=VARCHAR},
@@ -73,7 +79,10 @@
                 #{caseInstance.referenceType, jdbcType=VARCHAR},
                 #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId, jdbcType=VARCHAR},
-                #{caseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{caseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{caseInstance.dueDate, jdbcType=TIMESTAMP},
+                #{caseInstance.claimTime, jdbcType=TIMESTAMP},
+                #{caseInstance.claimedBy, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -131,6 +140,15 @@
             <if test="originalPersistentState.businessStatus != businessStatus">
                 BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
+            <if test="originalPersistentState.dueDate != dueDate">
+                DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimTime != claimTime">
+                CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimedBy != claimedBy">
+                CLAIMED_BY_ = #{claimedBy, jdbcType=VARCHAR},
+            </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </update>
@@ -182,6 +200,9 @@
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
         <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+        <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+        <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+        <result property="claimedBy" column="CLAIMED_BY_" jdbcType="VARCHAR" />
         <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP" />
         <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />

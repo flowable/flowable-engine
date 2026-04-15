@@ -202,6 +202,7 @@ import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobIntercept
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.EndCaseInstanceInterceptor;
 import org.flowable.cmmn.engine.interceptor.HumanTaskStateInterceptor;
+import org.flowable.cmmn.engine.interceptor.CaseInstanceStateInterceptor;
 import org.flowable.cmmn.engine.interceptor.StartCaseInstanceInterceptor;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
@@ -395,6 +396,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     protected List<CaseInstanceLifecycleListener> caseInstanceLifecycleListeners;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
+    protected CaseInstanceStateInterceptor caseInstanceStateInterceptor;
     protected EndCaseInstanceInterceptor endCaseInstanceInterceptor;
 
     protected CreateHumanTaskInterceptor createHumanTaskInterceptor;
@@ -2552,6 +2554,15 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setCreateHumanTaskInterceptor(CreateHumanTaskInterceptor createHumanTaskInterceptor) {
         this.createHumanTaskInterceptor = createHumanTaskInterceptor;
+        return this;
+    }
+
+    public CaseInstanceStateInterceptor getCaseInstanceStateInterceptor() {
+        return caseInstanceStateInterceptor;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceStateInterceptor(CaseInstanceStateInterceptor caseInstanceStateInterceptor) {
+        this.caseInstanceStateInterceptor = caseInstanceStateInterceptor;
         return this;
     }
 

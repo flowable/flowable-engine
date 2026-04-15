@@ -34,6 +34,11 @@ public class HistoricProcessInstanceResponse {
     protected String name;
     protected String businessKey;
     protected String businessStatus;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date dueDate;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date claimTime;
+    protected String claimedBy;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
     protected String processDefinitionName;
@@ -293,5 +298,29 @@ public class HistoricProcessInstanceResponse {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 }

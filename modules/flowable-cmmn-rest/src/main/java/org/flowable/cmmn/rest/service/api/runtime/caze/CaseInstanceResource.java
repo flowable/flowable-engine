@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
@@ -100,6 +101,12 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             if (RestActionRequest.EVALUATE_CRITERIA.equals(updateRequest.getAction())) {
                 runtimeService.evaluateCriteria(caseInstance.getId());
 
+            } else if (CaseInstanceUpdateRequest.ACTION_CLAIM.equals(updateRequest.getAction())) {
+                runtimeService.claimCaseInstance(caseInstanceId, updateRequest.getAssignee());
+
+            } else if (CaseInstanceUpdateRequest.ACTION_UNCLAIM.equals(updateRequest.getAction())) {
+                runtimeService.unclaimCaseInstance(caseInstanceId);
+
             } else {
                 throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
             }
@@ -110,11 +117,28 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
                 restApiInterceptor.updateCaseInstance(caseInstance, updateRequest);
             }
 
-            if (StringUtils.isNotEmpty(updateRequest.getName())) {
-                runtimeService.setCaseInstanceName(caseInstanceId, updateRequest.getName());
+            boolean hasUpdates = false;
+            CaseInstanceUpdateBuilder updateBuilder = runtimeService.createCaseInstanceUpdateBuilder(caseInstanceId);
+
+            if (updateRequest.getName() != null) {
+                updateBuilder.name(updateRequest.getName());
+                hasUpdates = true;
             }
-            if (StringUtils.isNotEmpty(updateRequest.getBusinessKey())) {
-                runtimeService.updateBusinessKey(caseInstanceId, updateRequest.getBusinessKey());
+            if (updateRequest.getBusinessKey() != null) {
+                updateBuilder.businessKey(updateRequest.getBusinessKey());
+                hasUpdates = true;
+            }
+            if (updateRequest.getBusinessStatus() != null) {
+                updateBuilder.businessStatus(updateRequest.getBusinessStatus());
+                hasUpdates = true;
+            }
+            if (updateRequest.getDueDate() != null) {
+                updateBuilder.dueDate(updateRequest.getDueDate());
+                hasUpdates = true;
+            }
+
+            if (hasUpdates) {
+                updateBuilder.update();
             }
 
         }
