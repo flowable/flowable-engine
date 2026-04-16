@@ -45,6 +45,11 @@ public abstract class BusinessError extends FlowableException {
         setErrorCode(errorCode);
     }
 
+    protected BusinessError(String errorCode, String message, Throwable cause) {
+        super(message, cause);
+        setErrorCode(errorCode);
+    }
+
     protected void setErrorCode(String errorCode) {
         if (errorCode == null) {
             throw new FlowableIllegalArgumentException("Error code must not be null.");

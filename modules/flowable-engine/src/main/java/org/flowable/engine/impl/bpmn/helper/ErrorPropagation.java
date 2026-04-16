@@ -122,7 +122,8 @@ public class ErrorPropagation {
                 Map<String, List<RuntimeInstanceStateChangeCallback>> callbacks = processEngineConfiguration.getProcessInstanceStateChangedCallbacks();
                 if (callbacks != null && callbacks.containsKey(processInstance.getCallbackType())) {
                     BpmnError bpmnError = new BpmnError(errorCode,
-                            "No catching boundary event found for error with errorCode '" + errorCode + "' in process, propagating to parent engine");
+                            "No catching boundary event found for error with errorCode '" + errorCode + "' in process, propagating to parent engine",
+                            errorVariableContainer.error);
                     bpmnError.setAdditionalDataContainer(errorVariableContainer);
                     CallbackData callbackData = new CallbackData(processInstance.getCallbackId(),
                             processInstance.getCallbackType(), processInstance.getId(), null, null);
@@ -140,7 +141,8 @@ public class ErrorPropagation {
             }
 
             BpmnError bpmnError = new BpmnError(errorCode,
-                    "No catching boundary event found for error with errorCode '" + errorCode + "', neither in same process nor in parent process");
+                    "No catching boundary event found for error with errorCode '" + errorCode + "', neither in same process nor in parent process",
+                    errorVariableContainer.error);
             bpmnError.setAdditionalDataContainer(errorVariableContainer);
             throw bpmnError;
         }
