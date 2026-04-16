@@ -15,6 +15,8 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class CaseInstanceDueDateAndClaimTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         cmmnRuntimeService.setCaseInstanceDueDate(caseInstance.getId(), dueDate);
 
         CaseInstance updatedInstance = cmmnRuntimeService.createCaseInstanceQuery()
@@ -61,7 +63,7 @@ public class CaseInstanceDueDateAndClaimTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        cmmnRuntimeService.setCaseInstanceDueDate(caseInstance.getId(), new Date());
+        cmmnRuntimeService.setCaseInstanceDueDate(caseInstance.getId(), Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)));
 
         CaseInstance updatedInstance = cmmnRuntimeService.createCaseInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).singleResult();

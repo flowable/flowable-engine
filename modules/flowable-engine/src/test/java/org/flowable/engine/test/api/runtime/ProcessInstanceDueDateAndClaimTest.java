@@ -15,6 +15,8 @@ package org.flowable.engine.test.api.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class ProcessInstanceDueDateAndClaimTest extends PluggableFlowableTestCas
     public void testSetProcessInstanceDueDate() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         runtimeService.setProcessInstanceDueDate(processInstance.getId(), dueDate);
 
         ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery()
@@ -57,7 +59,7 @@ public class ProcessInstanceDueDateAndClaimTest extends PluggableFlowableTestCas
     public void testSetProcessInstanceDueDateToNull() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        runtimeService.setProcessInstanceDueDate(processInstance.getId(), new Date());
+        runtimeService.setProcessInstanceDueDate(processInstance.getId(), Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)));
 
         ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(processInstance.getId()).singleResult();

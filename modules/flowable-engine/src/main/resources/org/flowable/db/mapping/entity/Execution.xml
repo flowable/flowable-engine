@@ -147,7 +147,10 @@
              #{execution.referenceId, jdbcType=NVARCHAR},
              #{execution.referenceType, jdbcType=NVARCHAR},
              #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
-             #{execution.businessStatus, jdbcType=NVARCHAR}
+             #{execution.businessStatus, jdbcType=NVARCHAR},
+             #{execution.dueDate, jdbcType=TIMESTAMP},
+             #{execution.claimTime, jdbcType=TIMESTAMP},
+             #{execution.claimedBy, jdbcType=NVARCHAR}
             )
       </foreach>
     SELECT * FROM dual

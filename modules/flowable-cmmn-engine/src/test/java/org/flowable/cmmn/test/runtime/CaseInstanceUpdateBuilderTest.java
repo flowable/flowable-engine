@@ -15,6 +15,8 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
@@ -98,7 +100,7 @@ public class CaseInstanceUpdateBuilderTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
                 .dueDate(dueDate)
                 .update();
@@ -122,7 +124,7 @@ public class CaseInstanceUpdateBuilderTest extends FlowableCmmnTestCase {
                 .start();
 
         cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
-                .dueDate(new Date())
+                .dueDate(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)))
                 .update();
 
         CaseInstance updatedInstance = cmmnRuntimeService.createCaseInstanceQuery()
@@ -145,7 +147,7 @@ public class CaseInstanceUpdateBuilderTest extends FlowableCmmnTestCase {
                 .caseDefinitionKey("oneTaskCase")
                 .start();
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
                 .businessKey("myKey")
                 .businessStatus("myStatus")
@@ -180,7 +182,7 @@ public class CaseInstanceUpdateBuilderTest extends FlowableCmmnTestCase {
                 .name("Original name")
                 .start();
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
                 .dueDate(dueDate)
                 .update();
