@@ -15,6 +15,8 @@ package org.flowable.engine.test.api.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -89,7 +91,7 @@ public class ProcessInstanceUpdateBuilderTest extends PluggableFlowableTestCase 
     public void testUpdateDueDate() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
                 .dueDate(dueDate)
                 .update();
@@ -111,7 +113,7 @@ public class ProcessInstanceUpdateBuilderTest extends PluggableFlowableTestCase 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
-                .dueDate(new Date())
+                .dueDate(Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)))
                 .update();
 
         ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery()
@@ -132,7 +134,7 @@ public class ProcessInstanceUpdateBuilderTest extends PluggableFlowableTestCase 
     public void testUpdateMultipleProperties() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
                 .businessKey("myKey")
                 .businessStatus("myStatus")
@@ -167,7 +169,7 @@ public class ProcessInstanceUpdateBuilderTest extends PluggableFlowableTestCase 
                 .name("Original name")
                 .start();
 
-        Date dueDate = new Date();
+        Date dueDate = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
                 .dueDate(dueDate)
                 .update();
