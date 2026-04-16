@@ -41,6 +41,10 @@ public class BpmnError extends BusinessError {
         super(errorCode, message);
     }
 
+    public BpmnError(String errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
+    }
+
     @Override
     public void addAdditionalData(String name, Object value) {
         if (this.getAdditionalDataContainer() == null) {
