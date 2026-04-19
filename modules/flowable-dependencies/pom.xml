@@ -71,7 +71,7 @@
         <postgresql.version>42.7.8</postgresql.version>
 
         <!-- Test dependencies -->
-        <assertj.version>3.27.6</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <awaitility.version>4.3.0</awaitility.version>
         <hibernate.version>7.1.8.Final</hibernate.version>
         <json-unit.version>5.1.0</json-unit.version>
