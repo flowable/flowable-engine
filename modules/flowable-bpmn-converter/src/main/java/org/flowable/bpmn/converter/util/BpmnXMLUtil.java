@@ -200,12 +200,11 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         while (!readyWithExtensionElement && xtr.hasNext()) {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
-                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                if (StringUtils.isNotBlank(xtr.getText())) {
                     if (extensionElement.getElementText() != null) {
-                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
-                        
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText());
                     } else {
-                        extensionElement.setElementText(xtr.getText().trim());
+                        extensionElement.setElementText(xtr.getText().stripLeading());
                     }
                 }
             } else if (xtr.isStartElement()) {
@@ -213,6 +212,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 extensionElement.addChildElement(childExtensionElement);
                 
             } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
+                if (extensionElement.getElementText() != null) {
+                    extensionElement.setElementText(extensionElement.getElementText().stripTrailing());
+                }
                 readyWithExtensionElement = true;
             }
         }
