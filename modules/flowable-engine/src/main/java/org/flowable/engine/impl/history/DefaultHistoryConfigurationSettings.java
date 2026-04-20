@@ -292,7 +292,7 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLink) {
         String processDefinitionId = getProcessDefinitionId(identityLink);
         if (identityLink.getTaskId() != null) {
-            return isHistoryLevelAtLeast(HistoryLevel.TASK, processDefinitionId);
+            return isHistoryEnabledForUserTask(processDefinitionId);
         }
         return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processDefinitionId);
     }

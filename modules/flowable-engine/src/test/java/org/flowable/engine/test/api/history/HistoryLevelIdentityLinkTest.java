@@ -23,9 +23,9 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 public class HistoryLevelIdentityLinkTest extends PluggableFlowableTestCase {
@@ -129,6 +129,9 @@ public class HistoryLevelIdentityLinkTest extends PluggableFlowableTestCase {
         // Process instance links: starter + participant + participant from candidate user interceptor
         List<HistoricIdentityLink> processIdentityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
         assertThat(processIdentityLinks).hasSize(3);
+        
+        HistoricTaskInstance historyTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+        assertThat(historyTaskInstance).isNull();
 
         // Task identity links: candidate user + candidate group
         // At activity level, historic tasks are not stored, so we query via the service directly
@@ -137,22 +140,11 @@ public class HistoryLevelIdentityLinkTest extends PluggableFlowableTestCase {
                     .getHistoricIdentityLinkService()
                     .findHistoricIdentityLinksByTaskId(task.getId());
         });
-        assertThat(taskLinks).hasSize(2);
+        assertThat(taskLinks).hasSize(0);
 
         taskService.complete(task.getId());
 
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 7000, 200);
-
-        // Clean up task identity links that are not associated with a process instance
-        // (at activity level, no historic task exists so these are not cascade-deleted)
-        managementService.executeCommand(commandContext -> {
-            HistoricIdentityLinkService historicIdentityLinkService = processEngineConfiguration.getIdentityLinkServiceConfiguration()
-                    .getHistoricIdentityLinkService();
-            for (HistoricIdentityLinkEntity link : taskLinks) {
-                historicIdentityLinkService.deleteHistoricIdentityLink(link.getId());
-            }
-            return null;
-        });
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelNoneProcess.bpmn20.xml" })
