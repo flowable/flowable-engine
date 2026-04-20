@@ -222,7 +222,10 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     @Override
     public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLinkEntity) {
         String caseDefinitionId = getCaseDefinitionId(identityLinkEntity);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+        if (identityLinkEntity.getTaskId() != null) {
+            return isHistoryLevelAtLeast(HistoryLevel.TASK, caseDefinitionId);
+        }
+        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseDefinitionId);
     }
 
     protected String getCaseDefinitionId(IdentityLinkEntity identityLink) {
