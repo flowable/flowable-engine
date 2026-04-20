@@ -23,9 +23,9 @@ import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -143,6 +143,9 @@ public class HistoryLevelIdentityLinkTest extends FlowableCmmnTestCase {
         // Case instance links: starter + participant + participant from candidate user interceptor
         List<HistoricIdentityLink> caseIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstance.getId());
         assertThat(caseIdentityLinks).hasSize(3);
+        
+        HistoricTaskInstance historyTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+        assertThat(historyTaskInstance).isNull();
 
         // Task identity links: candidate user + candidate group
         // At activity level, historic tasks are not stored, so we query via the service directly
@@ -151,22 +154,11 @@ public class HistoryLevelIdentityLinkTest extends FlowableCmmnTestCase {
                     .getHistoricIdentityLinkService()
                     .findHistoricIdentityLinksByTaskId(task.getId());
         });
-        assertThat(taskLinks).hasSize(2);
+        assertThat(taskLinks).hasSize(0);
 
         cmmnTaskService.complete(task.getId());
 
         CmmnHistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(cmmnEngineConfiguration, cmmnManagementService, 7000, 200);
-
-        // Clean up task identity links that are not associated with a case instance
-        // (at activity level, no historic task exists so these are not cascade-deleted)
-        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
-            HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration()
-                    .getHistoricIdentityLinkService();
-            for (HistoricIdentityLinkEntity link : taskLinks) {
-                historicIdentityLinkService.deleteHistoricIdentityLink(link.getId());
-            }
-            return null;
-        });
     }
 
     @Test

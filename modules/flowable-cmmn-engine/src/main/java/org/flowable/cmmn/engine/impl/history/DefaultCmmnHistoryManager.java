@@ -259,14 +259,14 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordTaskCreated(TaskEntity task) {
-        if (getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+        if (getHistoryConfigurationSettings().isHistoryEnabledForHumanTask(task)) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskCreated(task);
         }
     }
 
     @Override
     public void recordTaskEnd(TaskEntity task, String userId, String deleteReason, Date endTime) {
-        if (getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+        if (getHistoryConfigurationSettings().isHistoryEnabledForHumanTask(task)) {
             HistoricTaskInstanceEntity historicTaskInstance = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskEnd(task, deleteReason, endTime);
             if (historicTaskInstance != null) {
                 historicTaskInstance.setState(Task.COMPLETED);
@@ -278,14 +278,14 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordTaskInfoChange(TaskEntity task, Date changeTime) {
-        if (getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+        if (getHistoryConfigurationSettings().isHistoryEnabledForHumanTask(task)) {
             cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().recordTaskInfoChange(task, changeTime, cmmnEngineConfiguration);
         }
     }
 
     @Override
     public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
-        if (task != null && getHistoryConfigurationSettings().isHistoryEnabledForUserTask(task)) {
+        if (task != null && getHistoryConfigurationSettings().isHistoryEnabledForHumanTask(task)) {
             TaskHelper.deleteHistoricTask(task.getId(), cmmnEngineConfiguration);
         }
     }
