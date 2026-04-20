@@ -60,9 +60,14 @@ public interface CmmnHistoryConfigurationSettings {
     boolean isHistoryEnabledForPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
     /**
-     * Returns whether history is enabled for the provided user task.
+     * Returns whether history is enabled for the provided human task.
      */
-    boolean isHistoryEnabledForUserTask(TaskInfo taskInfo);
+    boolean isHistoryEnabledForHumanTask(TaskInfo taskInfo);
+    
+    /**
+     * Returns whether task history is enabled for the provided case definition id.
+     */
+    boolean isHistoryEnabledForHumanTask(String caseDefinitionId);
 
     /**
      * Returns whether history is enabled for the provided variable instance.

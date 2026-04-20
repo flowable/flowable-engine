@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.impl.history;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
@@ -170,11 +170,16 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(TaskInfo taskInfo) {
+    public boolean isHistoryEnabledForHumanTask(TaskInfo taskInfo) {
         String scopeDefinitionId = taskInfo.getScopeDefinitionId();
+        return isHistoryEnabledForHumanTask(scopeDefinitionId);
+    }
+    
+    @Override
+    public boolean isHistoryEnabledForHumanTask(String caseDefinitionId) {
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
-        if (isEnableCaseDefinitionHistoryLevel() && scopeDefinitionId != null) {
-            HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(scopeDefinitionId);
+        if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
+            HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);
             if (caseDefinitionLevel != null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Current history level: {}, level required: {}", caseDefinitionLevel, HistoryLevel.TASK);
@@ -222,7 +227,10 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     @Override
     public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLinkEntity) {
         String caseDefinitionId = getCaseDefinitionId(identityLinkEntity);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+        if (identityLinkEntity.getTaskId() != null) {
+            return isHistoryEnabledForHumanTask(caseDefinitionId);
+        }
+        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseDefinitionId);
     }
 
     protected String getCaseDefinitionId(IdentityLinkEntity identityLink) {
